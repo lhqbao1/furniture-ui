@@ -12,16 +12,16 @@ const IconList = () => {
             if (!text) return
 
             // set initial state
-            gsap.set(text, { display: 'none', x: -100, opacity: 0 })
+            gsap.set(text, { display: 'none', x: -30, opacity: 0 })
 
             container.addEventListener('mouseenter', () => {
-                gsap.to(text, { display: 'block', x: 0, opacity: 1, duration: 0.7, ease: 'power2.out' })
+                gsap.to(text, { display: 'block', x: 0, opacity: 1, duration: 0.4, ease: '' })
                 // gsap.to(container, { width: 'auto', duration: 0.5, ease: 'power2.out' })
 
             })
 
             container.addEventListener('mouseleave', () => {
-                gsap.to(text, { x: -100, opacity: 0, duration: 0.3, ease: 'power2.in', onComplete: () => { gsap.set(text, { display: 'none' }); } })
+                gsap.to(text, { display: 'none', x: -30, opacity: 0, duration: 0.4, ease: '', onComplete: () => { gsap.set(text, { display: 'none' }); } })
                 // gsap.to(container, { width: '30px', duration: 0.5, ease: 'power2.out' })
             })
         })
