@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Comfortaa } from "next/font/google";
 import "./globals.css";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/layout/app-sidebar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const comfortaa = Comfortaa({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-comfortaa",
 });
 
 export const metadata: Metadata = {
@@ -24,10 +21,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${comfortaa.variable} font-sans antialiased`}>
+        <SidebarProvider>
+          <div className="flex h-screen w-screen overflow-hidden">
+            <AppSidebar />
+            <main className="flex-1 overflow-y-auto">{children}</main>
+          </div>
+        </SidebarProvider>
       </body>
     </html>
   );
