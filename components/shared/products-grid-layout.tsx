@@ -17,10 +17,10 @@ const ProductsGridLayout = () => {
             gsap.set(btn, { display: 'none', opacity: 0 })
 
             card.addEventListener('mouseenter', () => {
-                gsap.fromTo(btn, { x: 20 }, { display: 'block', opacity: 1, duration: 0.5, x: 0 })
+                gsap.fromTo(btn, { x: 20 }, { display: 'block', opacity: 1, duration: 0.3, x: 0 })
             })
             card.addEventListener('mouseleave', () => {
-                gsap.fromTo(btn, { x: 0 }, { x: 20, opacity: 0, duration: 0.5, onComplete: () => { gsap.set(btn, { display: 'none' }); } })
+                gsap.fromTo(btn, { x: 0 }, { x: 0, opacity: 0, duration: 0.3, onComplete: () => { gsap.set(btn, { display: 'none' }); } })
             })
         })
     }, [])

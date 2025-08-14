@@ -3,6 +3,7 @@ import { Comfortaa } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import Footer from "@/components/shared/footer";
 
 const comfortaa = Comfortaa({
   subsets: ["latin"],
@@ -25,7 +26,10 @@ export default function RootLayout({
         <SidebarProvider>
           <div className="flex h-screen w-screen overflow-hidden">
             <AppSidebar />
-            <main className="flex-1 overflow-y-auto">{children}</main>
+            <main className="flex-1 overflow-y-auto">
+              {children}
+              <Footer />
+            </main>
           </div>
         </SidebarProvider>
       </body>

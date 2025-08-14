@@ -88,8 +88,8 @@ const CountDownGridLayout = () => {
 
                             <div className='relative w-full'>
 
-                                <div className='absolute -top-9' style={{ left: `${100 - barWidth - 26}px` }}>
-                                    <div className="relative w-fit bg-primary text-white p-1 rounded min-w-[60px]">
+                                <div className='absolute -top-9' style={{ left: `${100 - barWidth - 15}px` }}>
+                                    <div className="relative w-fit bg-primary text-white p-1 rounded min-w-[70px]">
                                         <p className="text-center text-sm font-bold">
                                             {(product.salePrice + (100 - barWidth) / 100 * (product.price - product.salePrice)).toFixed(2)}$
                                         </p>
