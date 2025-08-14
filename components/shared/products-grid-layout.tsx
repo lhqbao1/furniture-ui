@@ -27,10 +27,6 @@ const ProductsGridLayout = () => {
     return (
         <div className='grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 sm:mt-6 mt-4'>
             {trendingProducts.map((product, idx) => {
-                const fullStars = Math.floor(product.rating);
-                const partial = product.rating % 1;
-                const emptyStars = 5 - fullStars - (partial > 0 ? 1 : 0);
-
                 return (
                     <div
                         key={product.id}
@@ -50,34 +46,14 @@ const ProductsGridLayout = () => {
                         </div>
 
                         <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>
-                            <div className="flex items-center gap-1">
-                                {/* Full stars */}
-                                {[...Array(fullStars)].map((_, i) => (
-                                    <Star key={`full-${i}`} className="text-yellow-400" fill="currentColor" size={16} />
-                                ))}
-
-                                {/* Partial star */}
-                                {partial > 0 && (
-                                    <Star
-                                        className="text-gray-300 relative"
-                                        fill="currentColor"
-                                        size={16}
-                                    />
-                                )}
-
-                                {/* Empty stars */}
-                                {[...Array(emptyStars)].map((_, i) => (
-                                    <Star key={`empty-${i}`} className="text-gray-300" fill="currentColor" size={16} />
-                                ))}
-                            </div>
-                            <h3 className='text-base text-gray-600 font-semibold sm:mt-2'>{product.name}</h3>
+                            <h3 className='text-xl text-gray-600 font-black sm:mt-2'>{product.name}</h3>
                             {product.salePrice ?
                                 <div className='flex flex-row gap-2 items-end'>
-                                    <p className=' text-base font-bold mb-1 relative line-through text-gray-400'>${product.price}</p>
-                                    <p className=' text-xl font-bold mb-1 relative'>${product.salePrice}</p>
+                                    <p className=' text-base font-bold mb-1 relative line-through text-gray-400'>€{product.price}</p>
+                                    <p className=' text-xl font-bold mb-1 relative text-gray-600'>€{product.salePrice}</p>
                                 </div>
                                 :
-                                <p className=' text-xl font-bold mb-1'>${product.price}</p>
+                                <p className=' text-xl font-bold mb-1'>€{product.price}</p>
 
                             }
                         </div>

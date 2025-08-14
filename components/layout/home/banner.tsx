@@ -11,18 +11,17 @@ import {
 
 const Banner = () => {
     return (
-        <div className='home-banner bg-[url("/home-banner.webp")] h-[600px] bg-no-repeat bg-center bg-cover'>
+        <div className='home-banner bg-[url("/banner.jpg")] h-[500px] bg-no-repeat bg-center bg-cover'>
             <SidebarTrigger className='absolute' />
             <div className='home-banner__content h-full flex flex-col'>
                 <div className='home-banner-top__content flex items-center justify-end gap-4 pt-4 pr-4'>
                     <Select>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Theme" />
+                        <SelectTrigger className="w-[150px] text-white">
+                            <SelectValue placeholder="German" className='text-white' />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="light" className='font-semibold '>Light</SelectItem>
-                            <SelectItem value="dark" className='font-semibold '>Dark</SelectItem>
-                            <SelectItem value="system" className='font-semibold '>System</SelectItem>
+                            <SelectItem value="German" className='font-semibold '>German</SelectItem>
+                            <SelectItem value="English" className='font-semibold '>English</SelectItem>
                         </SelectContent>
                     </Select>
                     <div className='flex flex-row relative'>
@@ -47,7 +46,7 @@ const Banner = () => {
                     <span className='text-white text-base font-medium'>THE PLACE YOU CAN FIND UNIQUE AND TRENDY PRODUCTS</span>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 w-full bg-amber-50/90">
+                {/* <div className="grid grid-cols-2 md:grid-cols-4 w-full bg-amber-50/90">
                     <div className="flex items-center justify-center gap-2 p-4">
                         <Headset className="w-6 h-6 text-primary" />
                         <span className="text-sm font-medium text-gray-800">24/7 Support Always Be There For You</span>
@@ -64,7 +63,7 @@ const Banner = () => {
                         <ShieldCheck className="w-6 h-6 text-primary" />
                         <span className="text-sm font-medium text-gray-800">Best Quality Furniture</span>
                     </div>
-                </div>
+                </div> */}
             </div>
 
 

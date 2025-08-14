@@ -70,7 +70,7 @@ export function AppSidebar() {
     ]
 
     return (
-        <Sidebar>
+        <Sidebar className="app-sidebar custom-scroll">
             <SidebarContent>
                 <SidebarGroup>
                     <div className="side-bar__logo px-5 py-6">

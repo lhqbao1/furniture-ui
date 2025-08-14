@@ -1,4 +1,5 @@
 'use client'
+import { Button } from "@/components/ui/button";
 import { homeBannerItems } from "@/data/data";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
@@ -58,8 +59,8 @@ const AnimatedCarousel = () => {
 
     return (
         <div className="flex flex-col container-padding">
-            <h2 className="text-primary text-4xl font-bold text-center uppercase">Categories</h2>
-            <div className="relative w-full h-[650px] min-h-[650px] [perspective:2000px] [transform-style:preserve-3d] ">
+            <h2 className="text-secondary text-4xl font-bold text-center uppercase">Categories</h2>
+            <div className="relative w-full h-[700px] min-h-[650px] [perspective:2000px] [transform-style:preserve-3d] ">
                 {homeBannerItems.map((item, index) => {
                     const angle = index * angleStep + rotation;
 
@@ -86,16 +87,20 @@ const AnimatedCarousel = () => {
                         >
                             <div className="flex flex-col items-center">
                                 <Image src={item.image} alt={item.name} width={295} height={340} />
-                                <div className="min-h-16">
-                                    {isCenter && (
+
+                            </div>
+                            <div className="mt-4">
+                                {isCenter && (
+                                    <div className="flex flex-col gap-6">
                                         <span
                                             ref={titleRef}
-                                            className="carousel-item__title mt-2 text-center text-black font-bold min-h-24"
+                                            className="carousel-item__title text-4xl mt-2 text-primary text-center text-black-600 font-light"
                                         >
                                             {item.name}
                                         </span>
-                                    )}
-                                </div>
+                                        <Button>Explore now</Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     );

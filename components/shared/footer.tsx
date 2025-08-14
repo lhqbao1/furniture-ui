@@ -11,30 +11,33 @@ const Footer = () => {
                     <Image src="/logo.svg" alt="P Furniture Logo" width={40} height={40} />
                     <span className="text-xl font-bold">P Furniture</span>
                 </div>
-                <p className="text-sm text-gray-400">
-                    Mang đến cho bạn những sản phẩm nội thất chất lượng và tinh tế.
-                </p>
+                <div className="space-y-2">
+                    <p className="text-sm text-black-700">
+                        Prestige Home GmbH,
+                    </p>
+                    <p className="text-sm text-black-700">Greifswalder Straße 226, 10405 Berlin.</p>
+                    <p className="text-sm text-black-700">Tax code: DE454714336</p>
+                </div>
             </div>
 
             {/* Cột 2: Các trang */}
             <div>
-                <h3 className="font-semibold mb-3">Trang</h3>
+                <h3 className="font-semibold mb-3">Pages</h3>
                 <ul className="space-y-2 text-gray-400 text-sm">
-                    <li><Link href="/#" className="hover:text-white">Trang chủ</Link></li>
-                    <li><Link href="/about" className="hover:text-white">Giới thiệu</Link></li>
-                    <li><Link href="/products" className="hover:text-white">Sản phẩm</Link></li>
-                    <li><Link href="/contact" className="hover:text-white">Liên hệ</Link></li>
+                    <li><Link href="/#" className="">Become a seller</Link></li>
+                    <li><Link href="/about" className="">About us</Link></li>
+                    <li><Link href="/products" className="">Career</Link></li>
+                    <li><Link href="/contact" className="">FAQ</Link></li>
                 </ul>
             </div>
 
             {/* Cột 3: Danh mục sản phẩm */}
             <div>
-                <h3 className="font-semibold mb-3">Danh mục</h3>
+                <h3 className="font-semibold mb-3">Terms & Policy</h3>
                 <ul className="space-y-2 text-gray-400 text-sm">
-                    <li><Link href="/category/sofa" className="hover:text-white">Sofa</Link></li>
-                    <li><Link href="/category/ban-an" className="hover:text-white">Bàn ăn</Link></li>
-                    <li><Link href="/category/giuong" className="hover:text-white">Giường ngủ</Link></li>
-                    <li><Link href="/category/tu-quan-ao" className="hover:text-white">Tủ quần áo</Link></li>
+                    <li><Link href="/category/sofa" className="">Term & Condition</Link></li>
+                    <li><Link href="/category/ban-an" className="">Disclaimer</Link></li>
+                    <li><Link href="/category/giuong" className="">Privacy Policy</Link></li>
                 </ul>
             </div>
 
@@ -42,13 +45,14 @@ const Footer = () => {
             <div>
                 <h3 className="font-semibold mb-3">Địa chỉ</h3>
                 <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.5023358887835!2d106.70042387585859!3d10.773374089378272!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f482e5fef8d%3A0x3a99376a5e0e02d1!2zMjIzIE5ndXnhu4VuIFRy4buNdSwgUGjGsOG7nW5nIDUsIFF14bqtbiAxLCBUaMOgbmggcGjhu5EgSG8gQ2jDrSBNaW5oLCBWaWV0bmFt!5e0!3m2!1svi!2s!4v1692000000000!5m2!1svi!2s"
-                    width="100%"
-                    height="120"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4474729196345!2d106.69272717573601!3d10.776999459181726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f385570472f%3A0x1787491df0ed8d6a!2zRGluaCDEkOG7mWMgTOG6rXA!5e0!3m2!1svi!2s!4v1755185910394!5m2!1svi!2s"
+                    width={400}
+                    height={250}
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
-                ></iframe>
+                    referrerPolicy="no-referrer-when-downgrade"
+                />
                 <div className="flex gap-3 mt-3">
                     <Image
                         src={'/fb.png'}

@@ -38,17 +38,17 @@ export const Categories: Category[] = [
 ]
 
 export const homeBannerItems: HomeBannerItems[] = [
-    { id: 1, image: "/home-banner-image1.png", name: "Sofa" },
-    { id: 2, image: "/home-banner-image1.png", name: "Bed" },
-    { id: 3, image: "/home-banner-image1.png", name: "Dining Table" },
-    { id: 4, image: "/home-banner-image1.png", name: "Wardrobe" },
-    { id: 5, image: "/home-banner-image1.png", name: "Bookshelf" },
-    { id: 6, image: "/home-banner-image1.png", name: "Coffee Table" },
-    { id: 7, image: "/home-banner-image1.png", name: "TV Stand" },
-    { id: 8, image: "/home-banner-image1.png", name: "Office Chair" },
-    { id: 9, image: "/home-banner-image1.png", name: "Desk" },
-    { id: 10, image: "/home-banner-image1.png", name: "Nightstand" },
-    { id: 11, image: "/home-banner-image1.png", name: "Outdoor Furniture" },
+    { id: 1, image: "/1.png", name: "Sofa" },
+    { id: 2, image: "/2.png", name: "Bed" },
+    { id: 3, image: "/3.png", name: "Dining Table" },
+    { id: 4, image: "/13.png", name: "Wardrobe" },
+    { id: 5, image: "/5.png", name: "Bookshelf" },
+    { id: 6, image: "/6.png", name: "Coffee Table" },
+    { id: 7, image: "/7.png", name: "TV Stand" },
+    { id: 8, image: "/8.png", name: "Office Chair" },
+    // { id: 9, image: "/home-banner-image1.png", name: "Desk" },
+    // { id: 10, image: "/home-banner-image1.png", name: "Nightstand" },
+    // { id: 11, image: "/home-banner-image1.png", name: "Outdoor Furniture" },
 ];
 
 export const preOrderItems: PreOrderProduct[] = [
@@ -56,7 +56,7 @@ export const preOrderItems: PreOrderProduct[] = [
         id: 1,
         name: "Premium Chair 1",
         award: "Best Seller",
-        image: "/chair.jpg",
+        image: "/1.png",
         price: 120,
         category: "Furniture",
         color: ["#FF0000", "#000000"],
@@ -66,7 +66,7 @@ export const preOrderItems: PreOrderProduct[] = [
         id: 2,
         name: "Premium Chair 2",
         award: "Top Rated",
-        image: "/chair.jpg",
+        image: "/2.png",
         price: 140,
         category: "Furniture",
         color: ["#00FF00", "#FFFFFF"],
@@ -75,7 +75,7 @@ export const preOrderItems: PreOrderProduct[] = [
     {
         id: 3,
         name: "Premium Chair 3",
-        image: "/chair.jpg",
+        image: "/3.png",
         price: 150,
         category: "Furniture",
         color: ["#0000FF", "#CCCCCC"],
@@ -85,7 +85,7 @@ export const preOrderItems: PreOrderProduct[] = [
         id: 4,
         name: "Premium Chair 4",
         award: "New Arrival",
-        image: "/chair.jpg",
+        image: "/4.png",
         price: 160,
         category: "Furniture",
         color: ["#FFFF00", "#333333"],
@@ -94,7 +94,7 @@ export const preOrderItems: PreOrderProduct[] = [
     {
         id: 5,
         name: "Premium Chair 5",
-        image: "/chair.jpg",
+        image: "/5.png",
         price: 170,
         category: "Furniture",
         color: ["#FF00FF", "#666666"],
@@ -103,14 +103,14 @@ export const preOrderItems: PreOrderProduct[] = [
 ];
 
 export const trendingProducts: Product[] = [
-    { id: 1, name: "Classic Bed", image: "/bed.webp", price: 1200, salePrice: 900, category: "Bedroom", rating: 3.5 },
-    { id: 2, name: "Modern Bed", image: "/bed.webp", price: 1500, salePrice: 1200, category: "Bedroom", rating: 4.7 },
-    { id: 3, name: "Queen Bed", image: "/bed.webp", price: 1800, salePrice: 1500, category: "Bedroom", rating: 4.6 },
-    { id: 4, name: "King Bed", image: "/bed.webp", price: 2200, salePrice: 1900, category: "Bedroom", rating: 3.8 },
-    { id: 5, name: "Single Bed", image: "/bed.webp", price: 800, salePrice: 500, category: "Bedroom", rating: 4.2 },
-    { id: 6, name: "Double Bed", image: "/bed.webp", price: 1400, salePrice: 1100, category: "Bedroom", rating: 4.4 },
-    { id: 7, name: "Futon Bed", image: "/bed.webp", price: 1000, salePrice: 700, category: "Bedroom", rating: 2.3 },
-    { id: 8, name: "Storage Bed", image: "/bed.webp", price: 2000, salePrice: 1700, category: "Bedroom", rating: 4.7 },
+    { id: 1, name: "Classic Bed", image: "/1.png", price: 1200, salePrice: 900, category: "Bedroom", rating: 3.5 },
+    { id: 2, name: "Modern Bed", image: "/4.png", price: 1500, salePrice: 1200, category: "Bedroom", rating: 4.7 },
+    { id: 3, name: "Queen Bed", image: "/6.png", price: 1800, salePrice: 1500, category: "Bedroom", rating: 4.6 },
+    { id: 4, name: "King Bed", image: "/8.png", price: 2200, salePrice: 1900, category: "Bedroom", rating: 3.8 },
+    { id: 5, name: "Single Bed", image: "/10.png", price: 800, salePrice: 500, category: "Bedroom", rating: 4.2 },
+    { id: 6, name: "Double Bed", image: "/13.png", price: 1400, salePrice: 1100, category: "Bedroom", rating: 4.4 },
+    { id: 7, name: "Futon Bed", image: "/14.png", price: 1000, salePrice: 700, category: "Bedroom", rating: 2.3 },
+    { id: 8, name: "Storage Bed", image: "/3.png", price: 2000, salePrice: 1700, category: "Bedroom", rating: 4.7 },
 ];
 
 

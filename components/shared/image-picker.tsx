@@ -137,7 +137,7 @@ export default function ImagePickerForm() {
                             name="custom_amount"
                             render={({ field }) => (
                                 <FormItem className="flex flex-row gap-3 items-center">
-                                    <FormLabel>Quantity</FormLabel>
+                                    <FormLabel className='text-base'>Quantity</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="number"
@@ -147,17 +147,17 @@ export default function ImagePickerForm() {
                                             placeholder="10"
                                         />
                                     </FormControl>
-                                    <p>pcs</p>
+                                    <p className='text-base'>pcs</p>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        <div className="flex flex-row gap-2">
-                            <Button type="button" variant="outline">
+                        <div className="flex flex-row gap-4">
+                            <Button type="button" variant="outline" className='text-xl px-4 py-6'>
                                 Cancel
                             </Button>
-                            <Button type="submit">Check out</Button>
+                            <Button type="submit" className='text-xl px-4 py-6'>Check out</Button>
                         </div>
                     </div>
                 </div>
@@ -175,7 +175,7 @@ function UploadIcon(props: React.SVGProps<SVGSVGElement>) {
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="currentColor"
+            stroke="#f15a24"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"

@@ -8,24 +8,32 @@ const IconList = () => {
 
     useEffect(() => {
         containersRef.current.forEach(container => {
-            const text = container.querySelector<HTMLParagraphElement>('p')
-            if (!text) return
+            if (!container) return
 
-            // set initial state
-            gsap.set(text, { display: 'none', x: -30, opacity: 0 })
+            // 1. Read original width BEFORE setting it with GSAP
+            const originalWidth = container.offsetWidth
+            console.log('Original container width:', originalWidth)
 
-            container.addEventListener('mouseenter', () => {
-                gsap.to(text, { display: 'block', x: 0, opacity: 1, duration: 0.3, ease: '' })
-                // gsap.to(container, { width: 'auto', duration: 0.5, ease: 'power2.out' })
+            // 2. Set initial width with GSAP
+            gsap.set(container, { width: 40 })
 
-            })
+            // 3. Set icon/text positions
+            const icon = container.querySelector<SVGSVGElement>('.button-icon')
+            const textElements = container.querySelectorAll<HTMLElement>('.button-name')
+            if (!icon || textElements.length === 0) return
 
-            container.addEventListener('mouseleave', () => {
-                gsap.to(text, { display: 'none', x: -30, opacity: 0, duration: 0.3, ease: '', onComplete: () => { gsap.set(text, { display: 'none' }); } })
-            })
+            gsap.set(icon, { position: 'absolute', right: '10px' })
+            textElements.forEach(t => gsap.set(t, { position: 'absolute', right: '55px' }))
+
+            // 4. Create timeline to expand to original width
+            const tl = gsap.timeline({ paused: true })
+            tl.to(container, { width: 140, duration: 0.6, paddingRight: 20, ease: 'power2.out' })
+                .fromTo(textElements, { x: 100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power2.out' }, '<')
+
+            container.addEventListener('mouseenter', () => tl.play())
+            container.addEventListener('mouseleave', () => tl.reverse())
         })
     }, [])
-
     const items = [
         { label: 'Wish List', Icon: Heart },
         { label: 'Review', Icon: Expand },
@@ -38,13 +46,14 @@ const IconList = () => {
                 <div
                     key={idx}
                     ref={el => { if (el) containersRef.current[idx] = el }}
-                    className="icon-container flex flex-row gap-2 items-center cursor-pointer bg-orange-400/85 px-4 py-2 rounded-tl-full rounded-bl-full"
+                    className="relative icon-container box-border flex flex-row gap-2 items-center justify-end cursor-pointer bg-primary px-6 py-4 rounded-tl-full rounded-bl-full overflow-hidden"
                 >
-                    <p className="text-white text-xs font-medium">{item.label}</p>
-                    <item.Icon className="text-white" size={16} />
+                    <p className="text-white text-xs font-medium whitespace-nowrap button-name">{item.label}</p>
+                    <item.Icon className="text-white button-icon" size={18} />
                 </div>
             ))}
         </div>
+
     )
 }
 

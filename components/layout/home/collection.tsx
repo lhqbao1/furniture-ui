@@ -18,6 +18,7 @@ const Collection = () => {
                 { col: 6, row: 1, color: '#ffb535' },
             ]
             return { ...item, ...layout[idx] }
+
         })
         setListCollection(updated)
     }, [])
@@ -97,29 +98,36 @@ const Collection = () => {
             </p>
 
             <div className='grid grid-cols-12 grid-rows-2 gap-8 xl:h-[600px] mt-5 ml:mt-8'>
-                {listCollection.map((item, idx) => (
-                    <div
-                        key={item.id}
-                        ref={(el) => {
-                            if (el) containerRefs.current[idx] = el
-                        }}
-                        className={`col-span-${item.col} row-span-${item.row} bg-gray-200 h-full relative rounded-2xl`}
-                    >
-                        <Image
-                            src={item.image}
-                            height={600}
-                            width={400}
-                            alt={item.name}
-                            className='object-cover absolute w-full h-full top-0 z-0 rounded-2xl'
-                        />
-                        <div className='collection-details z-10 p-6'>
-                            <h3 className='text-white uppercase text-4xl font-bold absolute top-7 left-7 z-10'>
-                                {item.name}
-                            </h3>
-                            <span className={`absolute w-12 h-14 top-4 left-5 z-0`} style={{ backgroundColor: item.color }}></span>
+                {listCollection.map((item, idx) => {
+                    return (
+                        <div
+                            key={item.id}
+                            ref={(el) => {
+                                if (el) containerRefs.current[idx] = el
+                            }}
+                            className={` bg-gray-200 h-full relative rounded-2xl`}
+                            style={{
+                                gridColumnEnd: `span ${item.col}`,
+                                gridRowEnd: `span ${item.row}`,
+                            }}
+                        >
+                            <Image
+                                src={item.image}
+                                height={600}
+                                width={400}
+                                alt={item.name}
+                                className='object-cover absolute w-full h-full top-0 z-0 rounded-2xl'
+                            />
+                            <div className='collection-details z-10 p-6'>
+                                <h3 className='text-white uppercase text-4xl font-bold absolute top-7 left-7 z-10'>
+                                    {item.name}
+                                </h3>
+                                <span className={`absolute w-12 h-14 top-4 left-5 z-0 opacity-70`} style={{ backgroundColor: item.color }}></span>
+                            </div>
                         </div>
-                    </div>
-                ))}
+
+                    )
+                })}
             </div>
         </div>
     )
