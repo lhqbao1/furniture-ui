@@ -123,7 +123,7 @@ export default function ImagePickerForm() {
                         render={({ field }) => (
                             <FormItem className="flex-1">
                                 <FormControl>
-                                    <Textarea {...field} placeholder="Enter your description..." className="h-full" />
+                                    <Textarea {...field} placeholder="Enter your description..." className="xl:h-52 h-full" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

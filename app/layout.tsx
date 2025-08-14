@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Comfortaa } from "next/font/google";
+import { Quicksand } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";
 
-const comfortaa = Comfortaa({
+const quicksand = Quicksand({
   subsets: ["latin"],
-  variable: "--font-comfortaa",
+  variable: "--font-quicksand",
 });
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${comfortaa.variable} font-sans antialiased`}>
+      <body className={`${quicksand.variable} font-sans antialiased`}>
         <SidebarProvider>
           <div className="flex h-screen w-screen overflow-hidden">
             <AppSidebar />

@@ -86,8 +86,8 @@ const AnimatedCarousel = () => {
                             }}
                         >
                             <div className="flex flex-col items-center">
-                                <Image src={item.image} alt={item.name} width={295} height={340} />
-
+                                <Image src={item.image} alt={item.name} width={295} height={340} style={{ width: "100%", height: "auto" }} // keeps aspect ratio
+                                />
                             </div>
                             <div className="mt-4">
                                 {isCenter && (

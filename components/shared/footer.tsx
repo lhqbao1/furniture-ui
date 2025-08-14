@@ -8,8 +8,7 @@ const Footer = () => {
             {/* Cột 1: Logo */}
             <div>
                 <div className="flex items-center gap-3 mb-4">
-                    <Image src="/logo.svg" alt="P Furniture Logo" width={40} height={40} />
-                    <span className="text-xl font-bold">P Furniture</span>
+                    <span className="text-3xl font-bold text-primary">P Furniture</span>
                 </div>
                 <div className="space-y-2">
                     <p className="text-sm text-black-700">

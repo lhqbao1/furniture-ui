@@ -103,14 +103,14 @@ export const preOrderItems: PreOrderProduct[] = [
 ];
 
 export const trendingProducts: Product[] = [
-    { id: 1, name: "Classic Bed", image: "/1.png", price: 1200, salePrice: 900, category: "Bedroom", rating: 3.5 },
-    { id: 2, name: "Modern Bed", image: "/4.png", price: 1500, salePrice: 1200, category: "Bedroom", rating: 4.7 },
-    { id: 3, name: "Queen Bed", image: "/6.png", price: 1800, salePrice: 1500, category: "Bedroom", rating: 4.6 },
-    { id: 4, name: "King Bed", image: "/8.png", price: 2200, salePrice: 1900, category: "Bedroom", rating: 3.8 },
-    { id: 5, name: "Single Bed", image: "/10.png", price: 800, salePrice: 500, category: "Bedroom", rating: 4.2 },
-    { id: 6, name: "Double Bed", image: "/13.png", price: 1400, salePrice: 1100, category: "Bedroom", rating: 4.4 },
-    { id: 7, name: "Futon Bed", image: "/14.png", price: 1000, salePrice: 700, category: "Bedroom", rating: 2.3 },
-    { id: 8, name: "Storage Bed", image: "/3.png", price: 2000, salePrice: 1700, category: "Bedroom", rating: 4.7 },
+    { id: 1, name: "Classic Bed", image: "/1.png", price: 120, salePrice: 90, category: "Bedroom", rating: 3.5 },
+    { id: 2, name: "Modern Bed", image: "/4.png", price: 150, salePrice: 120, category: "Bedroom", rating: 4.7 },
+    { id: 3, name: "Queen Bed", image: "/6.png", price: 180, salePrice: 150, category: "Bedroom", rating: 4.6 },
+    { id: 4, name: "King Bed", image: "/8.png", price: 220, salePrice: 190, category: "Bedroom", rating: 3.8 },
+    { id: 5, name: "Single Bed", image: "/10.png", price: 80, salePrice: 50, category: "Bedroom", rating: 4.2 },
+    { id: 6, name: "Double Bed", image: "/13.png", price: 140, salePrice: 110, category: "Bedroom", rating: 4.4 },
+    { id: 7, name: "Futon Bed", image: "/14.png", price: 100, salePrice: 70, category: "Bedroom", rating: 2.3 },
+    { id: 8, name: "Storage Bed", image: "/3.png", price: 200, salePrice: 170, category: "Bedroom", rating: 4.7 },
 ];
 
 

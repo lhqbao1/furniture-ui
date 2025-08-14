@@ -138,19 +138,46 @@ const PreOrder = () => {
                     </div> */}
                     <div className='grid grid-cols-2 gap-4'>
                         <div className='flex flex-row gap-3 items-center mb-4'>
-                            <Upload size={40} stroke='#f15a24' />
+                            <Image
+                                src={'/1.svg'}
+                                width={36}
+                                height={36}
+                                alt='1'
+                                style={{ width: 60 }}
+                            />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>
                         <div className='flex flex-row gap-3 items-center mb-4'>
-                            <Upload size={40} stroke='#f15a24' />
+                            <Image
+                                src={'/2.svg'}
+                                width={36}
+                                height={36}
+                                alt='1'
+                                style={{ width: 60 }}
+
+                            />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>
                         <div className='flex flex-row gap-3 items-center mb-4'>
-                            <Upload size={40} stroke='#f15a24' />
+                            <Image
+                                src={'/3.svg'}
+                                width={36}
+                                // sizes={16}
+                                height={36}
+                                alt='1'
+                                style={{ width: 60 }}
+                            />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>
                         <div className='flex flex-row gap-3 items-center mb-4'>
-                            <Upload size={40} stroke='#f15a24' />
+                            <Image
+                                src={'/4.svg'}
+                                width={36}
+                                height={36}
+                                alt='1'
+                                style={{ width: 60 }}
+
+                            />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>
                     </div>

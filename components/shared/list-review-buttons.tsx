@@ -12,7 +12,6 @@ const IconList = () => {
 
             // 1. Read original width BEFORE setting it with GSAP
             const originalWidth = container.offsetWidth
-            console.log('Original container width:', originalWidth)
 
             // 2. Set initial width with GSAP
             gsap.set(container, { width: 40 })

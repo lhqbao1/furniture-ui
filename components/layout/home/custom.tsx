@@ -7,7 +7,7 @@ const Custom = () => {
             < h2 className='text-secondary text-4xl font-bold text-center uppercase' >
                 CUSTOM REQUEST
             </h2 >
-            <p className='text-primary text-lg text-center font-semibold'>
+            <p className='text-primary text-2xl text-center font-semibold'>
                 Get a free 3D mock-up in 24hours
             </p>
 
