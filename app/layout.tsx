@@ -4,6 +4,7 @@ import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";
+import StickyIcon from "@/components/shared/sticky-icon";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
           <div className="flex h-screen w-screen overflow-hidden">
             <AppSidebar />
             <main className="flex-1 overflow-y-auto">
+              <StickyIcon />
               {children}
               <Footer />
             </main>

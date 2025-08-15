@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { homeBannerItems } from "@/data/data";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 
 const TAU = Math.PI * 2;
 
@@ -17,9 +18,20 @@ const AnimatedCarousel = () => {
     const rotationRef = useRef(rotation);
     const titleRef = useRef<HTMLSpanElement | null>(null);
 
-    const radius = 600;
-    const verticalRadius = 220;
-    const zOffset = -700;
+    // Responsive breakpoints
+    const isMobile = useMediaQuery({ maxWidth: 430 }); // iPhone 12 Pro và nhỏ hơn
+    const isTablet = useMediaQuery({ minWidth: 431, maxWidth: 768 });
+
+    // Các thông số carousel thay đổi theo kích thước màn hình
+    const radius = isMobile ? 350 : isTablet ? 500 : 600;
+    const verticalRadius = isMobile ? 130 : isTablet ? 180 : 220;
+    const zOffset = isMobile ? -500 : isTablet ? -600 : -700;
+    const cardSize = isMobile
+        ? { w: 220, h: 300 }
+        : isTablet
+            ? { w: 260, h: 340 }
+            : { w: 295, h: 380 };
+
     const angleStep = TAU / homeBannerItems.length;
 
     useEffect(() => {
@@ -59,8 +71,10 @@ const AnimatedCarousel = () => {
 
     return (
         <div className="flex flex-col container-padding">
-            <h2 className="text-secondary text-4xl font-bold text-center uppercase">Categories</h2>
-            <div className="relative w-full h-[700px] min-h-[650px] [perspective:2000px] [transform-style:preserve-3d] ">
+            <h2 className="text-secondary text-2xl md:text-4xl font-bold text-center uppercase mb-6">
+                Categories
+            </h2>
+            <div className="relative w-full h-[600px] md:h-[700px] min-h-[500px] [perspective:2000px] [transform-style:preserve-3d]">
                 {homeBannerItems.map((item, index) => {
                     const angle = index * angleStep + rotation;
 
@@ -78,27 +92,40 @@ const AnimatedCarousel = () => {
                         <div
                             key={item.id}
                             onClick={() => handleClick(index)}
-                            className="absolute left-1/2 top-20 -translate-x-1/2 w-[295px] h-[380px] cursor-pointer [transform-style:preserve-3d]"
+                            className="absolute left-1/2 top-10 md:top-20 -translate-x-1/2 cursor-pointer [transform-style:preserve-3d]"
                             style={{
+                                width: `${cardSize.w}px`,
+                                height: `${cardSize.h}px`,
                                 transform: `translate3d(${x}px, ${y}px, ${z + zOffset}px) scale3d(${scale},${scale},1)`,
                                 opacity,
                                 zIndex,
                             }}
                         >
                             <div className="flex flex-col items-center">
-                                <Image src={item.image} alt={item.name} width={295} height={340} style={{ width: "100%", height: "auto" }} // keeps aspect ratio
+                                <Image
+                                    src={item.image}
+                                    alt={item.name}
+                                    width={cardSize.w}
+                                    height={cardSize.h - 40}
+                                    style={{ width: "100%", height: "auto" }}
                                 />
                             </div>
                             <div className="mt-4">
                                 {isCenter && (
-                                    <div className="flex flex-col gap-6">
+                                    <div className="flex flex-col items-center gap-4 md:gap-6">
                                         <span
                                             ref={titleRef}
-                                            className="carousel-item__title text-4xl mt-2 text-primary text-center text-black-600 font-light"
+                                            className="carousel-item__title text-xl md:text-4xl mt-2 text-primary text-center font-light"
                                         >
                                             {item.name}
                                         </span>
-                                        <Button>Explore now</Button>
+                                        <Button
+                                            variant="default"
+                                            className="cursor-pointer opacity-100 w-fit text-sm md:text-lg"
+                                            hasEffect
+                                        >
+                                            Explore now
+                                        </Button>
                                     </div>
                                 )}
                             </div>
@@ -107,7 +134,6 @@ const AnimatedCarousel = () => {
                 })}
             </div>
         </div>
-
     );
 };
 

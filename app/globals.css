@@ -150,4 +150,53 @@
 }
 
 
+@keyframes collapsible-down {
+  from {
+    height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.data-\[state\=open\]\:animate-collapsible-down[data-state="open"]  {
+  animation: collapsible-down 0.4s ease-out;
+}
+
+.data-\[state\=closed\]\:animate-collapsible-up[data-state="closed"] {
+  animation: collapsible-up 0.3s ease-out;
+}
+
+@keyframes button-wave {
+  from {
+    width: 0%;
+    opacity: 0.4;
+  }
+  to {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-button-wave {
+  animation: button-wave 0.5s ease-out forwards;
+}
+
 

@@ -45,7 +45,7 @@ const ProductsGridLayout = () => {
                             className="w-full h-48 object-contain mb-2 rounded"
                         />
 
-                        <div className="absolute top-4 right-0 list-review-btn">
+                        <div className="absolute bottom-18 right-0 list-review-btn">
                             <ListReviewButton />
                         </div>
 

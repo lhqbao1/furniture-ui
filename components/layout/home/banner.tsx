@@ -1,5 +1,6 @@
+'use client'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { CircleDollarSign, Headset, Mic, Search, ShieldCheck, ShoppingCart, Truck, User, Voicemail } from 'lucide-react'
+import { Mic, Search, ShoppingCart, User } from 'lucide-react'
 import React from 'react'
 import {
     Select,

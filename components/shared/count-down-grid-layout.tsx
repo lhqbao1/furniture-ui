@@ -108,11 +108,11 @@ const CountDownGridLayout = () => {
                             className='w-full h-48 object-contain mb-2 rounded'
                         />
 
-                        <div className='absolute top-4 right-0 list-review-btn'>
+                        <div className='absolute bottom-18 right-0 list-review-btn'>
                             <ListReviewButton />
                         </div>
 
-                        <div className='flex flex-col items-end gap-4 2xl:mt-20 '>
+                        <div className='flex flex-col items-end gap-2 2xl:mt-20 '>
                             <div className="relative w-full"> {/* container relative */}
                                 {/* Thanh progress */}
                                 <div className="h-2.5 w-full bg-gray-300 relative overflow-hidden rounded-full">
@@ -124,11 +124,11 @@ const CountDownGridLayout = () => {
 
                                 {/* Tooltip */}
                                 <div
-                                    className="absolute -top-14 z-10 transform -translate-x-1/2"
+                                    className="absolute -top-13 z-10 transform -translate-x-1/2"
                                     style={{ left: `${100 - barWidth}%` }}
                                 >
-                                    <div className="relative bg-primary text-white p-1 rounded min-w-[120px]">
-                                        <p className="text-center text-2xl font-bold">
+                                    <div className="relative bg-primary text-white p-1 rounded min-w-[100px]">
+                                        <p className="text-center text-xl font-bold">
                                             €{(product.salePrice + (100 - barWidth) / 100 * (product.price - product.salePrice)).toFixed(2)}
                                         </p>
                                         <div

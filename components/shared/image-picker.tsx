@@ -157,7 +157,7 @@ export default function ImagePickerForm() {
                             <Button type="button" variant="outline" className='text-xl px-4 py-6'>
                                 Cancel
                             </Button>
-                            <Button type="submit" className='text-xl px-4 py-6'>Check out</Button>
+                            <Button type="submit" className='text-xl px-4 py-6' hasEffect>Check out</Button>
                         </div>
                     </div>
                 </div>

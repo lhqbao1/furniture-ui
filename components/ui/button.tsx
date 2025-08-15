@@ -40,20 +40,49 @@ function Button({
   variant,
   size,
   asChild = false,
+  hasEffect = false,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    hasEffect?: boolean
   }) {
   const Comp = asChild ? Slot : "button"
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (hasEffect) {
+      const button = e.currentTarget
+      const effect = document.createElement("span")
+
+      effect.className = `
+        absolute top-0 left-1/2 h-full bg-white/20 pointer-events-none
+        animate-button-wave
+      `
+      effect.style.borderRadius = "inherit"
+      effect.style.transform = "translateX(-50%)"
+      button.appendChild(effect)
+
+      setTimeout(() => {
+        effect.remove()
+      }, 500)
+    }
+
+    if (props.onClick) props.onClick(e)
+  }
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      onClick={handleClick}
+      className={cn(
+        hasEffect && "relative overflow-hidden", // chỉ thêm khi cần effect
+        buttonVariants({ variant, size, className })
+      )}
       {...props}
     />
   )
 }
+
+
 
 export { Button, buttonVariants }

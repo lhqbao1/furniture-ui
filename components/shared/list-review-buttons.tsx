@@ -11,7 +11,7 @@ const IconList = () => {
             if (!container) return
 
             // 1. Read original width BEFORE setting it with GSAP
-            const originalWidth = container.offsetWidth
+            const originalWidth = container.scrollWidth
 
             // 2. Set initial width with GSAP
             gsap.set(container, { width: 40 })
@@ -45,7 +45,7 @@ const IconList = () => {
                 <div
                     key={idx}
                     ref={el => { if (el) containersRef.current[idx] = el }}
-                    className="relative icon-container box-border flex flex-row gap-2 items-center justify-end cursor-pointer bg-primary px-6 py-4 rounded-tl-full rounded-bl-full overflow-hidden"
+                    className="relative icon-container box-border flex flex-row gap-2 items-center justify-end cursor-pointer bg-primary/80 px-6 py-4 rounded-tl-full rounded-bl-full overflow-hidden"
                 >
                     <p className="text-white text-xs font-medium whitespace-nowrap button-name">{item.label}</p>
                     <item.Icon className="text-white button-icon" size={18} />
