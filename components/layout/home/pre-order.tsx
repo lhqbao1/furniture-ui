@@ -182,7 +182,7 @@ const PreOrder = () => {
                         </div>
                     </div>
                     <div className='flex flex-row xl:gap-6 gap-3 justify-start items-center'>
-                        <Button className='w-fit px-6 py-7 text-2xl uppercase rounded-2xl'>
+                        <Button className='w-fit px-6 py-7 text-2xl uppercase rounded-2xl' hasEffect>
                             Pre-order
                         </Button>
                         <div className='text-gray-500'>
