@@ -5,7 +5,13 @@ export interface Product {
     price: number;
     category: string;
     rating: number;
-    salePrice: number
+    salePrice: number;
+    tag: Tag
+}
+
+export interface Tag {
+    name: string;
+    color: string
 }
 
 export interface PreOrderProduct {

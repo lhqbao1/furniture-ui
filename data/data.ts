@@ -103,15 +103,129 @@ export const preOrderItems: PreOrderProduct[] = [
 ];
 
 export const trendingProducts: Product[] = [
-    { id: 1, name: "Classic Bed", image: "/1.png", price: 120, salePrice: 90, category: "Bedroom", rating: 3.5 },
-    { id: 2, name: "Modern Bed", image: "/4.png", price: 150, salePrice: 120, category: "Bedroom", rating: 4.7 },
-    { id: 3, name: "Queen Bed", image: "/6.png", price: 180, salePrice: 150, category: "Bedroom", rating: 4.6 },
-    { id: 4, name: "King Bed", image: "/8.png", price: 220, salePrice: 190, category: "Bedroom", rating: 3.8 },
-    { id: 5, name: "Single Bed", image: "/10.png", price: 80, salePrice: 50, category: "Bedroom", rating: 4.2 },
-    { id: 6, name: "Double Bed", image: "/13.png", price: 140, salePrice: 110, category: "Bedroom", rating: 4.4 },
-    { id: 7, name: "Futon Bed", image: "/14.png", price: 100, salePrice: 70, category: "Bedroom", rating: 2.3 },
-    { id: 8, name: "Storage Bed", image: "/3.png", price: 200, salePrice: 170, category: "Bedroom", rating: 4.7 },
+    { id: 1, name: "Classic Bed", image: "/1.png", price: 120, salePrice: 90, category: "Bedroom", rating: 3.5, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 2, name: "Modern Bed", image: "/4.png", price: 150, salePrice: 120, category: "Bedroom", rating: 4.7, tag: {
+        name: 'Featured',
+        color: '#8cc63f'
+    }},
+    { id: 3, name: "Queen Bed", image: "/6.png", price: 180, salePrice: 150, category: "Bedroom", rating: 4.6, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 4, name: "King Bed", image: "/8.png", price: 220, salePrice: 190, category: "Bedroom", rating: 3.8, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    }},
+    { id: 5, name: "Single Bed", image: "/10.png", price: 80, salePrice: 50, category: "Bedroom", rating: 4.2, tag: {
+        name: 'New',
+        color: '#2dc4b6',
+    }},
+    { id: 6, name: "Double Bed", image: "/13.png", price: 140, salePrice: 110, category: "Bedroom", rating: 4.4, tag: {
+        name: 'Trending',
+        color: '#af01ff'
+    } },
+    { id: 7, name: "Futon Bed", image: "/14.png", price: 100, salePrice: 70, category: "Bedroom", rating: 2.3, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    } },
+    { id: 8, name: "Storage Bed", image: "/3.png", price: 200, salePrice: 170, category: "Bedroom", rating: 4.7, tag: {name: 'Top Rated', color: '#fba707'} },
 ];
+
+export const allProducts: Product[] = [
+    { id: 1, name: "Classic Bed", image: "/1.png", price: 120, salePrice: 90, category: "Bedroom", rating: 3.5, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 2, name: "Modern Bed", image: "/4.png", price: 150, salePrice: 120, category: "Bedroom", rating: 4.7, tag: {
+        name: 'Featured',
+        color: '#8cc63f'
+    }},
+    { id: 3, name: "Queen Bed", image: "/6.png", price: 180, salePrice: 150, category: "Bedroom", rating: 4.6, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 4, name: "King Bed", image: "/8.png", price: 220, salePrice: 190, category: "Bedroom", rating: 3.8, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    }},
+    { id: 5, name: "Single Bed", image: "/10.png", price: 80, salePrice: 50, category: "Bedroom", rating: 4.2, tag: {
+        name: 'New',
+        color: '#2dc4b6',
+    }},
+    { id: 6, name: "Double Bed", image: "/13.png", price: 140, salePrice: 110, category: "Bedroom", rating: 4.4, tag: {
+        name: 'Trending',
+        color: '#af01ff'
+    } },
+    { id: 7, name: "Futon Bed", image: "/14.png", price: 100, salePrice: 70, category: "Bedroom", rating: 2.3, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    } },
+    { id: 8, name: "Storage Bed", image: "/3.png", price: 200, salePrice: 170, category: "Bedroom", rating: 4.7, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 9, name: "Classic Bed", image: "/1.png", price: 120, salePrice: 90, category: "Bedroom", rating: 3.5, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 10, name: "Modern Bed", image: "/4.png", price: 150, salePrice: 120, category: "Bedroom", rating: 4.7, tag: {
+        name: 'Featured',
+        color: '#8cc63f'
+    }},
+    { id: 11, name: "Queen Bed", image: "/6.png", price: 180, salePrice: 150, category: "Bedroom", rating: 4.6, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 12, name: "King Bed", image: "/8.png", price: 220, salePrice: 190, category: "Bedroom", rating: 3.8, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    }},
+    { id: 13, name: "Single Bed", image: "/10.png", price: 80, salePrice: 50, category: "Bedroom", rating: 4.2, tag: {
+        name: 'New',
+        color: '#2dc4b6',
+    }},
+    { id: 14, name: "Double Bed", image: "/13.png", price: 140, salePrice: 110, category: "Bedroom", rating: 4.4, tag: {
+        name: 'Trending',
+        color: '#af01ff'
+    } },
+    { id: 15, name: "Futon Bed", image: "/14.png", price: 100, salePrice: 70, category: "Bedroom", rating: 2.3, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    } },
+    { id: 16, name: "Storage Bed", image: "/3.png", price: 200, salePrice: 170, category: "Bedroom", rating: 4.7, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 17, name: "Classic Bed", image: "/1.png", price: 120, salePrice: 90, category: "Bedroom", rating: 3.5, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 18, name: "Modern Bed", image: "/4.png", price: 150, salePrice: 120, category: "Bedroom", rating: 4.7, tag: {
+        name: 'Featured',
+        color: '#8cc63f'
+    }},
+    { id: 19, name: "Queen Bed", image: "/6.png", price: 180, salePrice: 150, category: "Bedroom", rating: 4.6, tag: {name: 'Top Rated', color: '#fba707'} },
+    { id: 20, name: "King Bed", image: "/8.png", price: 220, salePrice: 190, category: "Bedroom", rating: 3.8, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    }},
+    { id: 21, name: "Single Bed", image: "/10.png", price: 80, salePrice: 50, category: "Bedroom", rating: 4.2, tag: {
+        name: 'New',
+        color: '#2dc4b6',
+    }},
+    { id: 22, name: "Double Bed", image: "/13.png", price: 140, salePrice: 110, category: "Bedroom", rating: 4.4, tag: {
+        name: 'Trending',
+        color: '#af01ff'
+    } },
+    { id: 23, name: "Futon Bed", image: "/14.png", price: 100, salePrice: 70, category: "Bedroom", rating: 2.3, tag: {
+        name: 'Sale',
+        color: '#f15454',
+    } },
+    { id: 24, name: "Storage Bed", image: "/3.png", price: 200, salePrice: 170, category: "Bedroom", rating: 4.7, tag: {name: 'Top Rated', color: '#fba707'} },
+];
+
+export const tags = [
+    {
+        name: 'Top Rated',
+        color: '#fba707'
+    },
+    {
+        name: 'Featured',
+        color: '#8cc63f'
+    },
+    {
+        name: 'Sale',
+        color: '#f15454',
+    },
+    {
+        name: 'Trending',
+        color: '#af01ff'
+    },
+    {
+        name: 'New',
+        color: '#2dc4b6',
+    },
+    {
+        name: 'Best Seller',
+        color: '#01bfff'
+    }
+]
 
 
 export const collectionList: Collection[] = [
@@ -120,5 +234,21 @@ export const collectionList: Collection[] = [
     { id: 3, name: 'Chair', image: '/collection-3.jpg' },
     { id: 4, name: 'Sofa', image: '/collection-4.jpg' },
     { id: 5, name: 'Furniture', image: '/collection-5.jpg' },
+]
 
+export const materials = ['Asset1.png', 'Asset2.png', 'Asset3.png', 'Asset4.png']
+export const colors = ['#28abe2', '#009244', '#c1282d', '#93278f']
+export const dimension = [
+    {
+        name: '120x50',
+        available: true
+    },
+    {
+        name: '150x60',
+        available: true
+    },
+    {
+        name: '180x80',
+        available: false
+    }
 ]

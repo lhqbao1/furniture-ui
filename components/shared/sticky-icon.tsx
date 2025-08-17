@@ -54,14 +54,14 @@ export default function StickyIcon() {
     return (
         <div
             ref={wrapperRef}
-            className="fixed right-0 top-[150px] z-50 w-48 h-48"
+            className="fixed right-0 top-[150px] z-50 w-24 h-24"
         >
             <Image
                 src="/cart-icon.svg"
                 alt="icon"
                 width={64}
                 height={64}
-                className="w-48 h-48 select-none pointer-events-auto"
+                className="w-24 h-24 select-none pointer-events-auto"
             />
         </div>
     )

@@ -11,40 +11,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { colors, materials, tags, trendingProducts } from '@/data/data'
 import { SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import React, { useState } from 'react'
 
-const colors = ['#28abe2', '#009244', '#c1282d', '#93278f']
-const materials = ['Asset1.png', 'Asset2.png', 'Asset3.png', 'Asset4.png']
 const brands = ['Asset11.png', 'Asset12.png', 'Asset13.png']
-const tags = [
-    {
-        name: 'Top Rated',
-        color: '#fba707'
-    },
-    {
-        name: 'Featured',
-        color: '#8cc63f'
-    },
-    {
-        name: 'Sale',
-        color: '#f15454',
-    },
-    {
-        name: 'Trending',
-        color: '#af01ff'
-    },
-    {
-        name: 'New',
-        color: '#2dc4b6',
-    },
-    {
-        name: 'Best Seller',
-        color: '#01bfff'
-    }
-]
+
 
 const specialFeatures = ['waterproof', 'reclining', 'dustproof', 'natural fragrance', 'anti-moth', 'antifading']
 const spaceFilter = ['Living room', 'Dining room', 'Outdoor', 'Office']
@@ -318,7 +292,7 @@ const ProductCategory = () => {
 
                     {/*Products section */}
                     <div className='pt-10 pb-12'>
-                        <ProductsGridLayout hasBadge />
+                        <ProductsGridLayout hasBadge data={trendingProducts} />
                     </div>
 
                 </div>
