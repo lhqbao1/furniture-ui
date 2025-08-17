@@ -54,7 +54,7 @@ export default function StickyIcon() {
     return (
         <div
             ref={wrapperRef}
-            className="fixed right-8 top-[150px] z-50 w-48 h-48 will-change-transform"
+            className="fixed right-0 top-[150px] z-50 w-48 h-48"
         >
             <Image
                 src="/cart-icon.svg"

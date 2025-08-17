@@ -11,11 +11,11 @@ const ColorPickerButton: React.FC<ColorPickerButtonProps> = ({ color, active, on
     return (
         <button
             onClick={onClick}
-            className="w-5 h-5 rounded-full border border-gray-300"
+            className="w-6 h-6 rounded-full border border-gray-300"
             style={{
                 backgroundColor: color,
                 outline: active ? `2px solid ${color}` : "none",
-                outlineOffset: "1px", // cách nút 1px nhưng outline thường tính theo px, nên 2px sẽ đẹp hơn
+                outlineOffset: "3px", // cách nút 1px nhưng outline thường tính theo px, nên 2px sẽ đẹp hơn
             }}
         />
     );

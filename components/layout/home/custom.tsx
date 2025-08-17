@@ -3,7 +3,7 @@ import React from 'react'
 
 const Custom = () => {
     return (
-        <div className='container-padding'>
+        <div className='section-padding'>
             < h2 className='text-secondary text-4xl font-bold text-center uppercase' >
                 CUSTOM REQUEST
             </h2 >

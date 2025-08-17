@@ -3,7 +3,7 @@ import React from 'react'
 
 const TrendingProducts = () => {
     return (
-        <div className='container-padding'>
+        <div className='section-padding'>
             <h2 className='text-secondary text-4xl font-bold text-center uppercase'>Trending</h2>
             <p className='text-primary text-lg text-center'>most wanted on social media</p>
             <ProductsGridLayout />

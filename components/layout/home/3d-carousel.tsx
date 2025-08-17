@@ -70,7 +70,7 @@ const AnimatedCarousel = () => {
     }, [targetRotation]);
 
     return (
-        <div className="flex flex-col container-padding">
+        <div className="flex flex-col section-padding">
             <h2 className="text-secondary text-2xl md:text-4xl font-bold text-center uppercase mb-6">
                 Categories
             </h2>

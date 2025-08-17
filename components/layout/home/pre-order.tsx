@@ -1,21 +1,16 @@
 'use client'
-import ColorPickerButton from '@/components/shared/color-picker-button'
 import { Button } from '@/components/ui/button'
 import { preOrderItems } from '@/data/data'
 import { PreOrderProduct } from '@/types/products'
-import { Upload } from 'lucide-react'
 import Image from 'next/image'
 import React, { useState } from 'react'
 
 const PreOrder = () => {
     const [activeIndex, setActiveIndex] = useState(0) // thẻ đang ở giữa
     const [currentItem, setCurrentItem] = useState<PreOrderProduct | undefined>(preOrderItems[0])
-    const [choosedColor, setChoosedColor] = useState<string>('')
-    const chooseColor = (color: string) => {
-        setChoosedColor(color)
-    }
+
     return (
-        <div className='container-padding'>
+        <div className='section-padding'>
             <h2 className='text-secondary text-4xl font-bold text-center uppercase'>PRE-ORDER</h2>
             <p className='text-primary text-lg text-center font-semibold'>
                 start delivery from Sep 10 to Sep 15
@@ -129,13 +124,7 @@ const PreOrder = () => {
                     <p className='text-primary text-4xl font-bold'>€{currentItem?.price}</p>
                     <p className=''>{currentItem?.desc}</p>
                     <p className=''>{currentItem?.desc}</p>
-                    {/* <div className='item-color flex flex-row gap-2'>
-                        {currentItem?.color.map((item, index) => {
-                            return (
-                                <ColorPickerButton color={item} key={index} onClick={() => chooseColor(item)} active={choosedColor === item} />
-                            )
-                        })}
-                    </div> */}
+
                     <div className='grid grid-cols-2 gap-4'>
                         <div className='flex flex-row gap-3 items-center mb-4'>
                             <Image

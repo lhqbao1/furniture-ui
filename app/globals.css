@@ -124,8 +124,12 @@
 
 @layer components {
   .container-padding {
-    @apply px-4 py-6 xl:px-12 xl:py-12 ;
+    @apply px-4 py-0 xl:px-12 xl:py-0 ;
   }
+
+  .section-padding {
+      @apply px-0 py-6 xl:px-0 xl:py-12;
+    }
 }
 
 @keyframes stripes {

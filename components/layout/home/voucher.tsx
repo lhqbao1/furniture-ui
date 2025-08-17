@@ -4,7 +4,7 @@ import React from 'react'
 
 const Voucher = () => {
     return (
-        <div className='container-padding mt-12 grid xl:grid-cols-2 grid-cols-1 xl:gap-4 gap-2 w-full'>
+        <div className='mt-12 grid xl:grid-cols-2 grid-cols-1 xl:gap-4 gap-2 w-full section-padding'>
             <div className='h-[300px] relative rounded-2xl'>
                 <Image
                     src={'/voucher-banner-1.jpg'}

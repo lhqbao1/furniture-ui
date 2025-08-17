@@ -11,7 +11,6 @@ import Voucher from "@/components/layout/home/voucher";
 export default function Home() {
   return (
     <div id="home" className="w-full">
-      <Banner />
       <TrendingProducts />
       <AnimatedCarousel />
       <Voucher />

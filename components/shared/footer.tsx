@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Footer = () => {
     return (
-        <footer className="bg-white shadow-2xl text-black w-full grid grid-cols-4 gap-6 p-8 rounded-tl-2xl rounded-tr-2xl">
+        <footer className="bg-white shadow-2xl text-black w-full grid xl:grid-cols-4 grid-cols-2 xl:gap-6 gap-4 p-8 rounded-tl-2xl rounded-tr-2xl">
             {/* Cột 1: Logo */}
             <div>
                 <div className="space-y-2">
@@ -39,7 +39,7 @@ const Footer = () => {
 
             {/* Cột 4: Bản đồ + Social */}
             <div>
-                <h3 className="font-semibold mb-3">Address</h3>
+                <h3 className="font-semibold mb-3">Contact</h3>
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4474729196345!2d106.69272717573601!3d10.776999459181726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f385570472f%3A0x1787491df0ed8d6a!2zRGluaCDEkOG7mWMgTOG6rXA!5e0!3m2!1svi!2s!4v1755185910394!5m2!1svi!2s"
                     width={350}
@@ -48,6 +48,7 @@ const Footer = () => {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
+                    className="w-full"
                 />
                 <div className="flex gap-3 mt-3">
                     <Image

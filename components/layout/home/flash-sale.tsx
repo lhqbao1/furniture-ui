@@ -3,7 +3,7 @@ import React from 'react'
 
 const FlashSale = () => {
     return (
-        <div className='container-padding'>
+        <div className='section-padding'>
             <h2 className='text-secondary text-4xl font-bold text-center uppercase'>Flash Sale</h2>
             <p className='text-primary text-lg text-center uppercase'>up to 50%</p>
             <CountDownGridLayout />

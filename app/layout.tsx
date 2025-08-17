@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";
 import StickyIcon from "@/components/shared/sticky-icon";
+import Banner from "@/components/layout/home/banner";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -25,13 +26,18 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${quicksand.variable} font-sans antialiased`}>
         <SidebarProvider>
-          <div className="flex h-screen w-screen overflow-hidden">
+          <div className="flex h-screen w-screen overflow-hidden min-h-screen">
             <AppSidebar />
-            <main className="flex-1 overflow-y-auto">
-              <StickyIcon />
-              {children}
-              <Footer />
-            </main>
+            <div className="flex flex-col">
+              <main className="flex-1 overflow-x-hidden overflow-y-auto relative">
+                <StickyIcon />
+                <Banner />
+                <div className="container-padding">
+                  {children}
+                </div>
+                <Footer />
+              </main>
+            </div>
           </div>
         </SidebarProvider>
       </body>
