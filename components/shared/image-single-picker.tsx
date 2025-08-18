@@ -27,7 +27,7 @@ const ImageSinglePicker: React.FC<ImageSinglePickerProps> = ({ item, active, onC
             className={`${sizeMap[size]} rounded-xs`}
             style={{
                 // backgroundColor: color,
-                outline: active ? `2px solid red` : "none",
+                outline: active ? `2px solid #f15a24` : "none",
                 outlineOffset: "3px", // cách nút 1px nhưng outline thường tính theo px, nên 2px sẽ đẹp hơn
             }}
         >

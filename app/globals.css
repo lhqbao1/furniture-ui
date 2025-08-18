@@ -200,7 +200,10 @@
 }
 
 .animate-button-wave {
-  animation: button-wave 0.5s ease-out forwards;
+  animation: button-wave 1s ease-out forwards;
 }
 
-
+/* .video-iframe-container .ytp-large-play-button {
+  width: 30px !important;
+  height: 30px !important;
+} */

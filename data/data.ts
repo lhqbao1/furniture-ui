@@ -1,6 +1,8 @@
 import { Category, HomeBannerItems } from "@/types/categories";
 import { Collection } from "@/types/collection";
+import { Comment } from "@/types/comment";
 import { PreOrderProduct, Product } from "@/types/products";
+import { Voucher } from "@/types/voucher";
 import { Bed, Sofa, Table } from "lucide-react";
 
 export const Categories: Category[] = [
@@ -251,4 +253,88 @@ export const dimension = [
         name: '180x80',
         available: false
     }
+]
+
+export const listComments: Comment[] = [
+    {
+        id: 1,
+        name: 'Olivia Grace',
+        status: 'purchased',
+        date: 'March 20,2025',
+        company: 'ebay.png',
+        comment: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequat',
+        rating: 4,
+        listImages: ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png']
+    },
+    {
+        id: 2,
+        name: 'Harry Poster',
+        status: 'purchased',
+        date: 'March 20,2025',
+        company: 'amazon.png',
+        comment: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequatLorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequatLorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequat',
+        rating: 5,
+        listImages: ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png']
+    },
+    {
+        id: 3,
+        name: 'Justin Beiber',
+        status: 'purchased',
+        date: 'March 20,2025',
+        company: 'amazon.png',
+        comment: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequatLorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequatLorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequat',
+        rating: 5
+    },
+    {
+        id: 4,
+        name: 'Javis Scott',
+        status: 'purchased',
+        date: 'March 20,2025',
+        company: 'amazon.png',
+        comment: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequatLorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequatLorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequat',
+        rating: 5
+    },
+    {
+        id: 5,
+        name: 'Kitty',
+        status: 'purchased',
+        date: 'March 20,2025',
+        comment: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequat',
+        rating: 1,
+        reply: {
+            name: 'Thao',
+            role: 'Customer Service',
+            comment: 'Sorry for your experience. we would like to give you a Free voucher for the next transaction.'
+        }
+    }
+]
+
+export const specialFeatures = ['waterproof', 'reclining', 'dustproof', 'natural fragrance', 'anti-moth', 'antifading']
+export const originFilter = ['China (10-15 days)', 'Vietnam (7-10 days)', 'Thailand (12-17 days)', 'Malaysia (30-35 days)']
+export const spaceFilter = ['Living room', 'Dining room', 'Outdoor', 'Office']
+export const brands = ['Asset11.png', 'Asset12.png', 'Asset13.png']
+
+export const vouchers: Voucher[] = [
+    {
+        id: 1,
+        title: 'For all order from 200$',
+        type: 'Discount',
+        discountAmount: 10,
+        code: 'MO200200'
+    },
+    {
+        id: 2,
+        title: 'For all order from 300$',
+        type: 'Discount',
+        discountAmount: 15,
+        code: 'MO300300'
+    },
+    {
+        id: 3,
+        title: 'For all order from 500$',
+        type: 'Discount',
+        discountAmount: 20,
+        code: 'MO500500'
+    }
+
 ]

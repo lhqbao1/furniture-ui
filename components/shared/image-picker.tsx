@@ -17,6 +17,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
+import { cn } from '@/lib/utils'
 
 // ---------------- ZOD SCHEMA ----------------
 const formSchema = z.object({
@@ -29,7 +30,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export default function ImagePickerForm() {
+interface ImagePickerFormProps {
+    type?: 'full' | 'simple'
+}
+
+export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps) {
     const [images, setImages] = useState<string[]>([])
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -67,10 +72,16 @@ export default function ImagePickerForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-12 gap-6 p-8 md:p-12">
+            <form onSubmit={form.handleSubmit(onSubmit)} className={cn(
+                type === 'simple' ? 'p-0 md:p-0' : 'p-8 md:p-12',
+                'grid grid-cols-12 gap-6'
+            )}>
 
                 {/* LEFT SIDE */}
-                <div className="col-span-4 flex flex-col gap-4">
+                <div className={cn(
+                    type === "simple" ? "col-span-12" : "col-span-4",
+                    "flex flex-col gap-4"
+                )}>
                     {/* Dropzone */}
                     <div
                         {...getRootProps()}
@@ -113,56 +124,57 @@ export default function ImagePickerForm() {
                         )}
                     />
                 </div>
-
                 {/* RIGHT SIDE */}
-                <div className="col-span-8 flex flex-col gap-6">
-                    {/* Description */}
-                    <FormField
-                        control={form.control}
-                        name="custom_desc"
-                        render={({ field }) => (
-                            <FormItem className="flex-1">
-                                <FormControl>
-                                    <Textarea {...field} placeholder="Enter your description..." className="xl:h-52 h-full" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Quantity + Buttons */}
-                    <div className="flex flex-row justify-between">
+                {type === 'full' ?
+                    <div className="col-span-8 flex flex-col gap-6">
+                        {/* Description */}
                         <FormField
                             control={form.control}
-                            name="custom_amount"
+                            name="custom_desc"
                             render={({ field }) => (
-                                <FormItem className="flex flex-row gap-3 items-center">
-                                    <FormLabel className='text-base'>Quantity</FormLabel>
+                                <FormItem className="flex-1">
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            className="w-24"
-                                            value={field.value}
-                                            onChange={(e) => field.onChange(Number(e.target.value))}
-                                            placeholder="10"
-                                        />
+                                        <Textarea {...field} placeholder="Enter your description..." className="xl:h-52 h-full" />
                                     </FormControl>
-                                    <p className='text-base'>pcs</p>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        <div className="flex flex-row gap-4">
-                            <Button type="button" variant="outline" className='text-xl px-4 py-6'>
-                                Cancel
-                            </Button>
-                            <Button type="submit" className='text-xl px-4 py-6' hasEffect>Check out</Button>
+                        {/* Quantity + Buttons */}
+                        <div className="flex flex-row justify-between">
+                            <FormField
+                                control={form.control}
+                                name="custom_amount"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row gap-3 items-center">
+                                        <FormLabel className='text-base'>Quantity</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                className="w-24"
+                                                value={field.value}
+                                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                                placeholder="10"
+                                            />
+                                        </FormControl>
+                                        <p className='text-base'>pcs</p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <div className="flex flex-row gap-4">
+                                <Button type="button" variant="outline" className='text-xl px-4 py-6'>
+                                    Cancel
+                                </Button>
+                                <Button type="submit" className='text-xl px-4 py-6' hasEffect>Check out</Button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    : ''}
             </form>
-        </Form>
+        </Form >
     )
 }
 

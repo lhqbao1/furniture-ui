@@ -26,10 +26,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${quicksand.variable} font-sans antialiased`}>
         <SidebarProvider>
-          <div className="flex h-screen w-screen overflow-hidden min-h-screen">
-            <AppSidebar />
-            <div className="flex flex-col">
-              <main className="flex-1 overflow-x-hidden overflow-y-auto relative">
+          <div className="grid grid-cols-12 h-screen w-screen overflow-hidden min-h-screen">
+            <div className="xl:col-span-2 col-span-0">
+              <AppSidebar />
+            </div>
+            <div className="flex flex-col w-full xl:col-span-10 col-span-12 overflow-x-hidden  overflow-y-auto">
+              <main className="flex-1 relative">
                 <StickyIcon />
                 <Banner />
                 <div className="container-padding">

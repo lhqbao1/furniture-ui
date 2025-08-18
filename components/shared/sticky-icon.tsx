@@ -19,7 +19,7 @@ export default function StickyIcon() {
                 const el = wrapperRef.current
                 if (!el) return
 
-                gsap.set(el, { transformOrigin: "50% 50%", rotation: 0 })
+                gsap.set(el, { transformOrigin: "50% 0%", rotation: 0 })
 
                 const wiggle = () => {
                     gsap
@@ -32,7 +32,7 @@ export default function StickyIcon() {
                 }
 
 
-                ScrollTrigger.addEventListener("scrollEnd", wiggle)
+                ScrollTrigger.addEventListener("scrollStart", wiggle)
 
                 const st = ScrollTrigger.create({
                     trigger: document.documentElement,
@@ -56,13 +56,16 @@ export default function StickyIcon() {
             ref={wrapperRef}
             className="fixed right-0 top-[150px] z-50 w-24 h-24"
         >
-            <Image
-                src="/cart-icon.svg"
-                alt="icon"
-                width={64}
-                height={64}
-                className="w-24 h-24 select-none pointer-events-auto"
-            />
+            <div className="relative">
+                <Image
+                    src="/carticon.svg"
+                    alt="icon"
+                    width={64}
+                    height={64}
+                    className="w-24 h-24 select-none pointer-events-auto"
+                />
+                <p className="absolute bottom-4 text-lg text-white font-bold left-7.5 text-center flex flex-col leading-3">3 <br /> <span className="text-sm font-semibold">items</span></p>
+            </div>
         </div>
     )
 }

@@ -7,9 +7,8 @@ import ProductVoucher from '@/components/shared/product-voucher'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { allProducts, colors, dimension, materials } from '@/data/data'
+import { allProducts, colors, dimension, materials, vouchers } from '@/data/data'
 import { cn } from '@/lib/utils'
 import { Product } from '@/types/products'
 import { Equal, Facebook, Heart, Instagram, Plus, Star, Twitter, Youtube } from 'lucide-react'
@@ -100,10 +99,10 @@ const ProductDetails = () => {
                             </div>
 
                             {/*Product details voucher */}
-                            <div className='flex flex-row justify-between gap-2 mt-6'>
-                                {[1, 2, 3].map((item, index) => {
+                            <div className='flex flex-row justify-center gap-2 mt-6'>
+                                {vouchers.map((item, index) => {
                                     return (
-                                        <ProductVoucher key={index} isSelected={selectedVoucher === item} onSelect={() => handleSelectVoucher(item)} />
+                                        <ProductVoucher item={item} key={index} isSelected={selectedVoucher === item.id} onSelect={() => handleSelectVoucher(item.id)} />
                                     )
                                 })}
                             </div>
@@ -112,6 +111,10 @@ const ProductDetails = () => {
                         {/*Product details */}
                         <div className='xl:col-span-5 col-span-12 flex flex-col gap-6'>
                             <h2 className='text-3xl font-semibold text-secondary'>{productDetails.name}</h2>
+                            <div className='flex gap-2'>
+                                <p className='text-primary text-3xl font-semibold'>€{productDetails.salePrice}</p>
+                                <p className='text-gray-300 line-through text-3xl font-semibold'>€{productDetails.price}</p>
+                            </div>
                             <div className='flex flex-row justify-start gap-4 items-center'>
                                 <div
                                     className='rounded-xl text-xs py-1 uppercase px-2 text-white'
@@ -160,9 +163,9 @@ const ProductDetails = () => {
                                         return (
                                             <div
                                                 key={index}
-                                                onClick={() => !item.available && chooseDimension(item.name)}
+                                                onClick={() => item.available && chooseDimension(item.name)}
                                                 className={cn(
-                                                    "text-sm px-2 py-1 border cursor-pointer rounded-sm font-bold ",
+                                                    "text-base px-2 py-1 border cursor-pointer rounded-sm ",
                                                     item.name === choosedDimension
                                                         ? "border-primary text-primary"
                                                         : "border-gray-400 text-gray-600",
@@ -193,7 +196,7 @@ const ProductDetails = () => {
                                         width={36}
                                         height={36}
                                         alt='1'
-                                        style={{ width: 30 }}
+                                        style={{ width: 40 }}
                                     />
                                     <p className='text-base'>Lorem ipsum</p>
                                 </div>
@@ -203,7 +206,7 @@ const ProductDetails = () => {
                                         width={36}
                                         height={36}
                                         alt='1'
-                                        style={{ width: 30 }}
+                                        style={{ width: 40 }}
 
                                     />
                                     <p className='text-base'>Lorem ipsum</p>
@@ -215,7 +218,7 @@ const ProductDetails = () => {
                                         // sizes={16}
                                         height={36}
                                         alt='1'
-                                        style={{ width: 30 }}
+                                        style={{ width: 40 }}
                                     />
                                     <p className='text-base'>Lorem ipsum</p>
                                 </div>
@@ -225,7 +228,7 @@ const ProductDetails = () => {
                                         width={36}
                                         height={36}
                                         alt='1'
-                                        style={{ width: 30 }}
+                                        style={{ width: 40 }}
 
                                     />
                                     <p className='text-base'>Lorem ipsum</p>
@@ -243,7 +246,7 @@ const ProductDetails = () => {
                                 </Button>
                             </div>
 
-                            <p className='text-gray-500 font-bold italic'>20 people are viewing this product.</p>
+                            <p className='text-gray-500 font-bold italic'><span className='text-primary'>20</span> people are viewing this product</p>
 
                             <div className='relative pt-2'>
                                 <div className="h-2.5 w-full rounded-full overflow-hidden relative 
@@ -272,13 +275,13 @@ const ProductDetails = () => {
                                 <p>Tags: Chair, Airm chair</p>
                             </div>
 
-                            <div className='flex flex-row items-center text-sm'>
+                            <div className='flex flex-row items-center'>
                                 <p className=''>Shared:</p>
                                 <div className='flex flex-row gap-2 items-center'>
-                                    <Facebook size={16} />
-                                    <Twitter size={16} />
-                                    <Youtube size={16} />
-                                    <Instagram size={16} />
+                                    <Facebook size={20} />
+                                    <Twitter size={20} />
+                                    <Youtube size={20} />
+                                    <Instagram size={20} />
                                 </div>
                             </div>
 
@@ -289,7 +292,7 @@ const ProductDetails = () => {
                     {/*Product bought together */}
                     <div>
                         <h3 className='text-2xl text-secondary font-semibold'>Frequenly bought togheter</h3>
-                        <div className='flex flex-row items-center gap-0'>
+                        <div className='flex flex-row items-center justify-start gap-0'>
                             <div className='flex flex-col items-center gap-4'>
                                 <Image
                                     src={productDetails.image}
@@ -366,15 +369,15 @@ const ProductDetails = () => {
                             </div>
                             <Equal size={100} fill='gray' className='text-gray-400' />
 
-                            <div className='flex flex-col gap-4 ml-2'>
+                            <div className='flex flex-col gap-4 ml-2 flex-1'>
                                 <div className='flex gap-2'>
-                                    <p className='text-primary text-3xl font-semibold'>310€</p>
-                                    <p className='text-gray-300 line-through text-3xl font-semibold'>370€</p>
+                                    <p className='text-primary text-3xl font-semibold'>€310</p>
+                                    <p className='text-gray-300 line-through text-3xl font-semibold'>€370</p>
                                 </div>
                                 <div className='text-gray-500 text-xl font-semibold'>
-                                    <p>Item save 130€</p>
-                                    <p>Combo save 50€</p>
-                                    <p>Total save 180€</p>
+                                    <p>Item saved €130</p>
+                                    <p>Combo saved €50</p>
+                                    <p>Total saved €180</p>
                                 </div>
                                 <Button className='rounded-full px-10 font-bold text-lg basis-2/5 relative'>
                                     Order

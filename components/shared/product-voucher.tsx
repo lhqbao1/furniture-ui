@@ -1,11 +1,13 @@
+import { Voucher } from '@/types/voucher'
 import React from 'react'
 
 interface ProductVoucherProps {
     isSelected: boolean
     onSelect: () => void
+    item: Voucher
 }
 
-const ProductVoucher = ({ isSelected, onSelect }: ProductVoucherProps) => {
+const ProductVoucher = ({ isSelected, onSelect, item }: ProductVoucherProps) => {
     return (
         <div
             onClick={onSelect}
@@ -30,11 +32,11 @@ const ProductVoucher = ({ isSelected, onSelect }: ProductVoucherProps) => {
 
             {/* content */}
             <div className="grid grid-cols-2 gap-4 items-center mb-8">
-                <div className="text-center text-xs">
-                    For all orders <br /> from 200$
+                <div className="text-center text-xs text-wrap">
+                    {item.title}
                 </div>
                 <div className="text-center text-xs">
-                    Discount <br /> <span className="font-bold">OFF 10%</span>
+                    {item.type} <br /> <span className="font-bold">OFF {item.discountAmount}%</span>
                 </div>
             </div>
 
@@ -43,7 +45,7 @@ const ProductVoucher = ({ isSelected, onSelect }: ProductVoucherProps) => {
                 <button className="bg-black text-white text-xs px-3 py-1 rounded-full">
                     Apply Code
                 </button>
-                <span className="font-bold text-xs">MO234231</span>
+                <span className="font-bold text-xs">{item.code}</span>
             </div>
         </div>
     )
