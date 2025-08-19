@@ -17,10 +17,7 @@ import { useParams } from 'next/navigation'
 import React, { useState } from 'react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import FilterSection from '@/components/layout/single-product/filter-section'
-
-
-
-
+import { CustomPagination } from '@/components/shared/custom-pagination'
 
 const ProductCategory = () => {
     const params = useParams()
@@ -28,7 +25,7 @@ const ProductCategory = () => {
     const category = paramValues[paramValues.length - 1]
 
     return (
-        <div className='py-3'>
+        <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb />
             <div className=''>
                 <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{category}</h2>
@@ -36,9 +33,11 @@ const ProductCategory = () => {
                     <Collapsible>
                         {/* Trigger */}
                         <CollapsibleTrigger asChild>
-                            <div className='flex flex-row justify-end items-center gap-1 cursor-pointer mb-2'>
-                                <SlidersHorizontal className='text-primary' />
-                                <p className='text-lg'>Filter</p>
+                            <div className='flex justify-end cursor-pointer mb-2'>
+                                <div className='rounded-full border-primary border w-fit flex gap-1 items-center px-2 py-1'>
+                                    <SlidersHorizontal className='text-primary' />
+                                    <p className='text-lg'>Filter</p>
+                                </div>
                             </div>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
@@ -56,6 +55,7 @@ const ProductCategory = () => {
 
                 </div>
             </div>
+            <CustomPagination />
         </div >
     )
 }

@@ -18,6 +18,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import ProductReviewTab from "./tabs/review"
+import QASection from "./tabs/q&a"
 
 export function ProductDetailsTab() {
   return (
@@ -79,6 +80,9 @@ export function ProductDetailsTab() {
         </TabsContent>
         <TabsContent value="review">
           <ProductReviewTab />
+        </TabsContent>
+        <TabsContent value="q&a">
+          <QASection />
         </TabsContent>
       </Tabs>
     </div>

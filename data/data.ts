@@ -1,6 +1,7 @@
 import { Category, HomeBannerItems } from "@/types/categories";
 import { Collection } from "@/types/collection";
 import { Comment } from "@/types/comment";
+import { Faqs } from "@/types/faqs";
 import { PreOrderProduct, Product } from "@/types/products";
 import { Voucher } from "@/types/voucher";
 import { Bed, Sofa, Table } from "lucide-react";
@@ -338,3 +339,55 @@ export const vouchers: Voucher[] = [
     }
 
 ]
+
+export const faqs: Faqs[] = [
+    {
+      question: "Product Information",
+      answer: [
+        "Our flagship product combines cutting-edge technology with sleek design. Built with premium materials, it offers unparalleled performance and reliability.",
+        "Key features include advanced processing capabilities, and an intuitive user interface designed for both beginners and experts."
+      ]
+    },
+    {
+      question: "Warranty & Support",
+      answer: [
+        "All of our products come with a 2-year international warranty.",
+        "You can also contact our 24/7 customer support team for assistance."
+      ]
+    },
+    {
+      question: "Shipping & Delivery",
+      answer: [
+        "We offer free worldwide shipping for orders over $100.",
+        "Delivery time usually takes 5–7 business days depending on your location."
+      ]
+    },
+    {
+      question: "Return Policy",
+      answer: [
+        "You can return your product within 30 days of purchase for a full refund.",
+        "The product must be in its original packaging and unused condition."
+      ]
+    },
+    {
+      question: "Payment Methods",
+      answer: [
+        "We accept Visa, MasterCard, PayPal, and major online wallets.",
+        "All transactions are securely encrypted for your safety."
+      ]
+    },
+    {
+      question: "Technical Specifications",
+      answer: [
+        "The product is powered by a quad-core processor with 16GB RAM.",
+        "Battery life lasts up to 12 hours with normal usage."
+      ]
+    },
+    {
+      question: "Installation Guide",
+      answer: [
+        "You will receive a step-by-step installation manual inside the package.",
+        "Video tutorials are also available on our official website."
+      ]
+    },
+  ]

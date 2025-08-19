@@ -19,6 +19,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import ImagePickerForm from "@/components/shared/image-picker";
+import ImagePickerInput from "./image-picker-input";
 
 const Schema = z.object({
     message: z
@@ -26,9 +27,10 @@ const Schema = z.object({
         .trim()
         .min(10, "Nội dung tối thiểu 10 ký tự")
         .max(1000, "Nội dung tối đa 1000 ký tự"),
+    image: z.array(z.string()).optional()
 });
 
-type FormValues = z.infer<typeof Schema>;
+export type FormValues = z.infer<typeof Schema>;
 
 export default function CommentForm() {
     const form = useForm<FormValues>({
@@ -36,6 +38,7 @@ export default function CommentForm() {
         mode: "onChange",
         defaultValues: {
             message: "",
+            image: []
         },
     });
 
@@ -79,8 +82,7 @@ export default function CommentForm() {
                     )}
                 />
 
-                {/* <ImagePickerForm type="simple" /> */}
-
+                <ImagePickerInput form={form} />
                 {/* Buttons nằm cạnh nhau, phải */}
                 <div className="flex items-center justify-center gap-2">
                     <Button
@@ -88,11 +90,11 @@ export default function CommentForm() {
                         variant="outline"
                         onClick={onCancel}
                         disabled={isSubmitting}
-                        className="flex-1"
+                        className="flex-1 text-lg font-semibold"
                     >
-                        Cancel
+                        Clear
                     </Button>
-                    <Button type="submit" disabled={isSubmitting || !isValid} className="flex-1" hasEffect>
+                    <Button type="submit" disabled={isSubmitting || !isValid} className="flex-1 text-lg font-bold" variant={'default'} hasEffect>
                         {isSubmitting ? "Submitting..." : "Submit"}
                     </Button>
                 </div>

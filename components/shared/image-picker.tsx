@@ -115,6 +115,8 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                             ))}
                         </div>
                     )}
+
+
                     {/* Field hidden cho images */}
                     <FormField
                         control={form.control}

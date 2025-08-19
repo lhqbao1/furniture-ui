@@ -15,14 +15,9 @@ import { Equal, Facebook, Heart, Instagram, Plus, Star, Twitter, Youtube } from 
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { ProductDetailsTab } from '@/components/layout/single-product/product-tab'
+import ListStars from '@/components/shared/list-stars'
+import BoughtTogetherSection from '@/components/layout/single-product/bought-together'
 
 const ProductDetails = () => {
     const params = useParams()
@@ -32,7 +27,15 @@ const ProductDetails = () => {
     const [choosedMaterial, setChoosedMaterial] = useState<string>('')
     const [choosedColor, setChoosedColor] = useState<string>('')
     const [choosedDimension, setChoosedDimension] = useState<string>('')
+    const [position, setPosition] = useState({ x: 0, y: 0 })
+    const [isHover, setIsHover] = useState(false)
 
+    const handleZoomImage = (e: React.MouseEvent<HTMLDivElement>) => {
+        const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
+        const x = ((e.pageX - left) / width) * 100
+        const y = ((e.pageY - top) / height) * 100
+        setPosition({ x, y })
+    }
 
     const chooseMaterial = (material: string) => {
         setChoosedMaterial(material)
@@ -48,7 +51,6 @@ const ProductDetails = () => {
     useEffect(() => {
         const found = allProducts.find((product) => product.id.toString() === slug)
         setProductDetails(found || null)
-        console.log(found)
     }, [slug])
 
     const handleSelectVoucher = (item: number) => {
@@ -66,13 +68,22 @@ const ProductDetails = () => {
                         {/*Product details images */}
                         <div className='xl:col-span-7 col-span-12 flex flex-col gap-6'>
                             {/*Product details main image */}
-                            <div className='2xl:px-24 xl:px-20 md:px-6 xl:pt-8'>
+                            <div
+                                className='2xl:p-24 xl:p-20 md:p-6 overflow-hidden main-image'
+                                onMouseMove={handleZoomImage}
+                                onMouseEnter={() => setIsHover(true)}
+                                onMouseLeave={() => setIsHover(false)}
+                            >
                                 <Image
                                     src={`${productDetails.image}`}
                                     width={600}
                                     height={400}
                                     alt={`${productDetails.name}`}
-                                    className=''
+                                    className='transition-transform duration-300'
+                                    style={{
+                                        transformOrigin: `${position.x}% ${position.y}%`,
+                                        transform: isHover ? "scale(1.5)" : "scale(1)",
+                                    }}
                                 />
                             </div>
                             {/*Product details sub images */}
@@ -124,13 +135,7 @@ const ProductDetails = () => {
                                 </div>
                                 <div className='flex gap-1 items-center'>
                                     <p className='text-xl text-gray-500 font-bold'>{productDetails.rating}</p>
-                                    <div className='flex'>
-                                        <Star fill='#feed22' stroke='#f8931c' />
-                                        <Star fill='#feed22' stroke='#f8931c' />
-                                        <Star fill='#feed22' stroke='#f8931c' />
-                                        <Star fill='#feed22' stroke='#f8931c' />
-                                        <Star fill='#feed22' stroke='#f8931c' />
-                                    </div>
+                                    <ListStars rating={productDetails.rating} />
                                 </div>
                             </div>
 
@@ -290,103 +295,7 @@ const ProductDetails = () => {
                     </div>
 
                     {/*Product bought together */}
-                    <div>
-                        <h3 className='text-2xl text-secondary font-semibold'>Frequenly bought togheter</h3>
-                        <div className='flex flex-row items-center justify-start gap-0'>
-                            <div className='flex flex-col items-center gap-4'>
-                                <Image
-                                    src={productDetails.image}
-                                    alt=''
-                                    width={300}
-                                    height={200}
-                                    className=''
-                                />
-                                <div className='flex flex-col items-center'>
-                                    <p>{productDetails.name}</p>
-                                    <div className="flex items-center gap-2">
-                                        <Checkbox id="terms" defaultChecked />
-                                        <div className="flex items-center gap-2">
-                                            <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.salePrice}€</Label>
-                                            <p className='text-xl text-gray-300 line-through font-semibold'>{productDetails.price}€</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <Plus size={100} fill='gray' className='text-gray-400' />
-
-                            <div className='flex flex-col items-center gap-4'>
-                                <Image
-                                    src={productDetails.image}
-                                    alt=''
-                                    width={300}
-                                    height={200}
-                                    className=''
-                                />
-                                <div className='flex flex-col items-center relative w-full'>
-                                    <p>{productDetails.name}</p>
-                                    <div className="flex items-center gap-2">
-                                        <Checkbox id="terms" defaultChecked />
-                                        <div className="flex items-center gap-2">
-                                            <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.salePrice}€</Label>
-                                            <p className='text-xl text-gray-300 line-through font-semibold'>{productDetails.price}€</p>
-                                        </div>
-                                    </div>
-                                    <div className='absolute -bottom-2 translate-y-full w-fit'>
-                                        <Select>
-                                            <SelectTrigger className="w-full text-gray-600 border border-gray-400 data-[placeholder]:text-gray-600" iconColor='#4a5565'>
-                                                <SelectValue placeholder="Round" className='text-gray-600' />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="light">Round</SelectItem>
-                                                <SelectItem value="dark">Dark</SelectItem>
-                                                <SelectItem value="system">System</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <Plus size={100} fill='gray' className='text-gray-400' />
-
-                            <div className='flex flex-col items-center gap-4'>
-                                <Image
-                                    src={productDetails.image}
-                                    alt=''
-                                    width={300}
-                                    height={200}
-                                    className=''
-                                />
-                                <div className='flex flex-col items-center'>
-                                    <p>{productDetails.name}</p>
-                                    <div className="flex items-center gap-2">
-                                        <Checkbox id="terms" defaultChecked />
-                                        <div className="flex items-center gap-2">
-                                            <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.salePrice}€</Label>
-                                            <p className='text-xl text-gray-300 line-through font-semibold'>{productDetails.price}€</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <Equal size={100} fill='gray' className='text-gray-400' />
-
-                            <div className='flex flex-col gap-4 ml-2 flex-1'>
-                                <div className='flex gap-2'>
-                                    <p className='text-primary text-3xl font-semibold'>€310</p>
-                                    <p className='text-gray-300 line-through text-3xl font-semibold'>€370</p>
-                                </div>
-                                <div className='text-gray-500 text-xl font-semibold'>
-                                    <p>Item saved €130</p>
-                                    <p>Combo saved €50</p>
-                                    <p>Total saved €180</p>
-                                </div>
-                                <Button className='rounded-full px-10 font-bold text-lg basis-2/5 relative'>
-                                    Order
-                                    <div className='absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0'><Heart /></div>
-                                    <div className='absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0'><Plus /></div>
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
+                    <BoughtTogetherSection productDetails={productDetails} />
 
                     {/*Product tabs */}
                     <div className='xl:mt-12 mt-8'>

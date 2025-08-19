@@ -7,10 +7,16 @@ interface RangePickerProps {
     minValue: number;
     maxValue: number;
     step: number;
+    onChange: (value: number[]) => void // <-- sửa lại type
 }
 
-export default function RangePicker({ minValue, maxValue, step }: RangePickerProps) {
+export default function RangePicker({ minValue, maxValue, step, onChange }: RangePickerProps) {
     const [range, setRange] = React.useState([minValue, maxValue])
+
+    const handleChange = (val: number[]) => {
+        setRange(val as [number, number])
+        onChange(val) // <-- gọi onChange để FormField nhận giá trị
+    }
 
     return (
         <div className="w-full flex flex-col gap-3 relative">
@@ -20,7 +26,7 @@ export default function RangePicker({ minValue, maxValue, step }: RangePickerPro
             </div>
             <Slider
                 value={range}
-                onValueChange={setRange}
+                onValueChange={handleChange}
                 min={minValue}
                 max={maxValue}
                 step={step}
