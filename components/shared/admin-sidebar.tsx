@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Home, Inbox, Search, Settings, ChevronDown } from "lucide-react"
+import { ChevronDown, ChevronRight, CornerDownRight } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -12,29 +12,56 @@ import {
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
-import { Categories } from "@/data/data"
 import { usePathname } from "next/navigation"
 
-export function AppSidebar() {
+export function AdminSideBar() {
     const pathname = usePathname()
 
     const items = [
-        { title: "Home", url: "/", icon: Home },
-        { title: "Best Seller", url: "/best-seller", icon: Inbox },
-        { title: "Flash Sale", url: "/flash-sale", icon: Calendar },
         {
-            title: "Categories",
-            url: "#",
-            icon: Search,
-            children: Categories.map((category) => ({
-                title: category.name,
-                url: `/${category.name.toLowerCase()}`,
-                icon: category.icon
-            })),
+            title: "Products",
+            url: "/admin/products",
+            icon: ChevronRight,
+            children: [
+                { title: "Add Product", url: "/admin/products/add", icon: CornerDownRight },
+                { title: "Product List", url: "/admin/products/list", icon: CornerDownRight },
+                { title: "Category List", url: "/admin/products/categories", icon: CornerDownRight },
+            ],
         },
-        { title: "Viewed", url: "/viewed", icon: Settings },
-        { title: "Contact", url: "/contact", icon: Settings },
-    ]
+        {
+            title: "Orders",
+            url: "/admin/orders",
+            icon: ChevronRight,
+            children: [
+                { title: "Order List", url: "/admin/orders/list", icon: CornerDownRight },
+                { title: "Order Details", url: "/admin/orders/details", icon: CornerDownRight },
+            ],
+        },
+        {
+            title: "CRM",
+            url: "/admin/crm",
+            icon: ChevronRight,
+            children: [
+                { title: "Customer List", url: "/admin/crm/customers", icon: CornerDownRight },
+            ],
+        },
+        {
+            title: "Invoice",
+            url: "/admin/invoices",
+            icon: ChevronRight,
+            children: [
+                { title: "Invoice List", url: "/admin/invoices/list", icon: CornerDownRight },
+                { title: "Create Invoice", url: "/admin/invoices/create", icon: CornerDownRight },
+            ],
+        },
+        {
+            title: "Setting",
+            url: "/admin/setting",
+            icon: ChevronRight,
+        },
+    ];
+
+
 
     return (
         <Sidebar className="app-sidebar custom-scroll">
@@ -66,15 +93,15 @@ export function AppSidebar() {
                                                 <CollapsibleTrigger asChild>
                                                     <SidebarMenuButton asChild>
                                                         <button
-                                                            className={`flex w-full flex-row items-center justify-between gap-4 !rounded-full px-4 py-6 transition-colors ${isActive ? "bg-orange-500 text-white" : "hover:bg-orange-100"
+                                                            className={`flex w-full flex-row items-center justify-between gap-4 !rounded-full px-4 py-6 transition-colors hover:[&_svg]:stroke-white  ${isActive ? "bg-primary text-white" : "hover:bg-orange-100"
                                                                 }`}
                                                         >
                                                             <div className="flex items-center gap-4">
                                                                 <item.icon
                                                                     size={24}
-                                                                    stroke={isActive ? "#fff" : "#0028a0"}
+                                                                    stroke={isActive ? "#fff" : "#FAA61A"}
                                                                 />
-                                                                <span className="text-xl">{item.title}</span>
+                                                                <span className="text-lg">{item.title}</span>
                                                             </div>
                                                             <ChevronDown className="size-4 opacity-70" />
                                                         </button>
@@ -91,9 +118,9 @@ export function AppSidebar() {
                                                             <a
                                                                 key={child.title}
                                                                 href={child.url}
-                                                                className={`flex flex-row gap-3 rounded-md px-2 py-1 text-base transition-colors ${isChildActive
-                                                                    ? "bg-orange-500 text-white"
-                                                                    : "text-muted-foreground hover:bg-orange-100 hover:text-foreground"
+                                                                className={`flex flex-row gap-3 rounded-full px-3 py-2 text-base transition-colors ${isChildActive
+                                                                    ? "bg-primary/70 text-white"
+                                                                    : "text-muted-foreground hover:bg-primary/90 hover:text-white"
                                                                     }`}
                                                             >
                                                                 <child.icon />
@@ -108,7 +135,6 @@ export function AppSidebar() {
                                     )
                                 }
 
-                                // Nếu không có children → render bình thường
                                 return (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton asChild>
@@ -118,11 +144,11 @@ export function AppSidebar() {
                                                     }`}
                                             >
                                                 <item.icon
-                                                    size={24}
-                                                    className="!size-5"
-                                                    stroke={isActive ? "#fff" : "#0028a0"}
+                                                    size={48}
+                                                    className="!size-6"
+                                                    stroke={isActive ? "#fff" : "#FAA61A"}
                                                 />
-                                                <span className="text-xl">{item.title}</span>
+                                                <span className="text-lg">{item.title}</span>
                                             </a>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>

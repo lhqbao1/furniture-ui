@@ -441,3 +441,33 @@ export const faqs: Faqs[] = [
     },
   ]
   
+export const listDE = [
+    {
+        id:1,
+        icon: '/new-logo.png',
+        text: 'Default DE'
+    },
+    {
+        id:2,
+        icon: '/new-logo.png',
+        text: 'English'
+    },
+    {
+        id:3,
+        icon: '/amazon.png',
+        text: 'EN'
+    },
+    {
+        id:4,
+        icon: '/amazon.png',
+        text: 'DE'
+    },
+    {
+        id:5,
+        icon: '/ebay.png',
+    },
+    {
+        id:6,
+        icon: '/kau.png',
+    },
+]

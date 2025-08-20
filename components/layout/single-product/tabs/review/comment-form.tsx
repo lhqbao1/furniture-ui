@@ -82,7 +82,7 @@ export default function CommentForm() {
                     )}
                 />
 
-                <ImagePickerInput form={form} />
+                <ImagePickerInput form={form} fieldName="image" />
                 {/* Buttons nằm cạnh nhau, phải */}
                 <div className="flex items-center justify-center gap-2">
                     <Button

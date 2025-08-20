@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Quicksand } from "next/font/google";
+import { Figtree, Libre_Caslon_Display, Quicksand } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import Footer from "@/components/shared/footer";
-import StickyIcon from "@/components/shared/sticky-icon";
-import Banner from "@/components/layout/home/banner";
 
-const quicksand = Quicksand({
+const figtree = Figtree({
     subsets: ["latin"],
-    variable: "--font-quicksand",
+    variable: "--font-figtree",
+});
+
+const libre = Libre_Caslon_Display({
+    subsets: ["latin"],
+    weight: '400',
+    variable: "--font-libre",
 });
 
 export const metadata: Metadata = {
@@ -24,24 +25,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${quicksand.variable} font-sans antialiased`}>
-                <SidebarProvider>
-                    <div className="grid grid-cols-12 h-screen w-screen overflow-hidden min-h-screen">
-                        <div className="xl:col-span-2 col-span-0">
-                            <AppSidebar />
-                        </div>
-                        <div className="flex flex-col w-full xl:col-span-10 col-span-12 overflow-x-hidden  overflow-y-auto">
-                            <main className="flex-1 relative">
-                                <StickyIcon />
-                                {/* <Banner /> */}
-                                <div className="">
-                                    {children}
-                                </div>
-                                <Footer />
-                            </main>
-                        </div>
-                    </div>
-                </SidebarProvider>
+            <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
+                {children}
             </body>
         </html>
     );

@@ -11,10 +11,20 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CartItem, getColumns } from "./column"
 import { ArrowLeft, Trash } from "lucide-react"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 
 type Props = { data: CartItem[] }
 
 export function CartTable({ data: initial }: Props) {
+    const [voucher, setVoucher] = React.useState("")
+
     const [data, setData] = React.useState<CartItem[]>(initial)
 
     const onQtyChange = (id: string, nextQty: number) => {
@@ -95,10 +105,15 @@ export function CartTable({ data: initial }: Props) {
                             Remove out of stock products
                         </div>
 
-                        <select className="text-black rounded px-3 py-1 bg-white h-8">
-                            <option>Select Voucher</option>
-                            <option>SALE10</option>
-                        </select>
+                        <Select value={voucher} onValueChange={setVoucher}>
+                            <SelectTrigger className="xl:h-8 h-6 text-black bg-white rounded px-3 py-1 w-full" placeholderColor="black">
+                                <SelectValue placeholder="Select Voucher" className="text-black" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="SALE10">SALE10</SelectItem>
+                                <SelectItem value="SALE20">SALE20</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="flex flex-col gap-3">
@@ -106,9 +121,10 @@ export function CartTable({ data: initial }: Props) {
                             <ArrowLeft size={20} />
                             <span className="text-sm">Continue Shopping</span>
                         </div>
-                        <input
+                        <Input
+                            type="text"
                             placeholder="< apply code >"
-                            className="text-black rounded px-3 py-1 bg-white h-8"
+                            className="text-black rounded px-3 py-1 bg-white h-9"
                         />
                     </div>
                 </div>

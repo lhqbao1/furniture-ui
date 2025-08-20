@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Quicksand } from "next/font/google";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";
@@ -18,11 +17,22 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="">
-      <Banner />
-      <div className="container-padding">
-        {children}
+    <SidebarProvider>
+      <div className="grid grid-cols-12 h-screen w-screen overflow-hidden min-h-screen">
+        <div className="xl:col-span-2 col-span-0">
+          <AppSidebar />
+        </div>
+        <div className="flex flex-col w-full xl:col-span-10 col-span-12 overflow-x-hidden  overflow-y-auto">
+          <main className="flex-1 relative">
+            <StickyIcon />
+            <Banner />
+            <div className="container-padding">
+              {children}
+            </div>
+            <Footer />
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
