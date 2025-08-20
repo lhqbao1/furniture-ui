@@ -1,3 +1,4 @@
+import { CartItem } from "@/components/layout/wishlist/column";
 import { Category, HomeBannerItems } from "@/types/categories";
 import { Collection } from "@/types/collection";
 import { Comment } from "@/types/comment";
@@ -391,3 +392,52 @@ export const faqs: Faqs[] = [
       ]
     },
   ]
+
+
+  export const cartData: CartItem[] = [
+    {
+      id: "1",
+      name: "Elegant Wooden Chair",
+      material: "Oak Wood",
+      sku: "CH-001",
+      unitPrice: 100,
+      oldUnitPrice: 120,
+      qty: 2,
+      stock: 10,
+      image: "/chair.jpg",
+    },
+    {
+      id: "2",
+      name: "Modern Office Desk",
+      material: "MDF + Metal",
+      sku: "DS-234",
+      unitPrice: 300,
+      oldUnitPrice: 420,
+      qty: 1,
+      stock: 3,
+      image: "/desk.jpg",
+    },
+    {
+      id: "3",
+      name: "Comfy Sofa 3-Seater",
+      material: "Fabric + Wood",
+      sku: "SF-789",
+      unitPrice: 650,
+      oldUnitPrice: 750,
+      qty: 1,
+      stock: 5,
+      image: "/sofa.jpg",
+    },
+    {
+      id: "4",
+      name: "Minimalist Bed Frame",
+      material: "Pine Wood",
+      sku: "BD-542",
+      unitPrice: 400,
+      oldUnitPrice: 500,
+      qty: 1,
+      stock: 0,
+      image: "/bed.jpg",
+    },
+  ]
+  

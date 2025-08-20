@@ -1,5 +1,4 @@
 "use client"
-
 import {
     Breadcrumb,
     BreadcrumbList,
@@ -12,18 +11,27 @@ import { Home } from "lucide-react"
 import { useParams } from "next/navigation"
 import React from "react"
 
-export default function CustomBreadCrumb() {
+interface CustomBreadCrumbProps {
+    currentPage?: string
+}
+
+export default function CustomBreadCrumb({ currentPage }: CustomBreadCrumbProps) {
     const params = useParams()
     const values = Object.values(params)
+
     return (
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/"><Home /></BreadcrumbLink>
                 </BreadcrumbItem>
+                <BreadcrumbSeparator className="text-primary" />
+                <BreadcrumbItem>
+                    <BreadcrumbPage className="capitalize text-gray-500 font-bold text-lg">{currentPage}</BreadcrumbPage>
+                </BreadcrumbItem>
 
-                {values.map((item, idx) => {
-                    const href = "/product/" + values.slice(0, idx + 1).join("/")
+                {values && values.length > 0 && values.map((item, idx) => {
+                    const href = `/${currentPage}` + values.slice(0, idx + 1).join("/")
                     const isLast = idx === values.length - 1
 
                     return (
