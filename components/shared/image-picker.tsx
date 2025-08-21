@@ -79,7 +79,7 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
 
                 {/* LEFT SIDE */}
                 <div className={cn(
-                    type === "simple" ? "col-span-12" : "col-span-4",
+                    type === "simple" ? "col-span-12" : "lg:col-span-4 col-span-12",
                     "flex flex-col gap-4"
                 )}>
                     {/* Dropzone */}
@@ -128,7 +128,7 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                 </div>
                 {/* RIGHT SIDE */}
                 {type === 'full' ?
-                    <div className="col-span-8 flex flex-col gap-6">
+                    <div className="lg:col-span-8 col-span-12 flex flex-col gap-6">
                         {/* Description */}
                         <FormField
                             control={form.control}
@@ -144,12 +144,12 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                         />
 
                         {/* Quantity + Buttons */}
-                        <div className="flex flex-row justify-between">
+                        <div className="flex lg:flex-row flex-col gap-4 lg:gap-0 justify-between">
                             <FormField
                                 control={form.control}
                                 name="custom_amount"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row gap-3 items-center">
+                                    <FormItem className="flex flex-row gap-3 items-center lg:justify-start justify-center">
                                         <FormLabel className='text-base'>Quantity</FormLabel>
                                         <FormControl>
                                             <Input
@@ -166,7 +166,7 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                                 )}
                             />
 
-                            <div className="flex flex-row gap-4">
+                            <div className="flex flex-row justify-center lg:justify-start gap-4">
                                 <Button type="button" variant="outline" className='text-xl px-4 py-6'>
                                     Cancel
                                 </Button>

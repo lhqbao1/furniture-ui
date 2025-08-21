@@ -11,9 +11,10 @@ import { UseFormReturn, FieldValues, Path, PathValue } from "react-hook-form"
 interface ImagePickerInputProps<T extends FieldValues> {
     form: UseFormReturn<T>
     fieldName: Path<T & { image: string[] }>
+    description?: string
 }
 
-function ImagePickerInput<T extends FieldValues>({ form, fieldName }: ImagePickerInputProps<T>) {
+function ImagePickerInput<T extends FieldValues>({ form, fieldName, description }: ImagePickerInputProps<T>) {
     const images = form.watch(fieldName as Path<T>) || []
 
     const onDrop = useCallback(
@@ -56,6 +57,9 @@ function ImagePickerInput<T extends FieldValues>({ form, fieldName }: ImagePicke
                 <p className="text-gray-500 dark:text-gray-400">
                     {isDragActive ? "Drop your images here" : "Drag and drop your images here"}
                 </p>
+                {description ?
+                    <p className="text-gray-500 text-sm">{description}</p>
+                    : ''}
                 <Button variant="outline" type="button">
                     Browse Files
                 </Button>

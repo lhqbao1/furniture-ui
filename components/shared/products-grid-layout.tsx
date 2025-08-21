@@ -8,6 +8,7 @@ import { CustomPagination } from './custom-pagination'
 import { Product } from '@/types/products'
 import Link from 'next/link'
 import TagBadge from './tab-badge'
+import { useMediaQuery } from 'react-responsive'
 
 
 interface ProductsGridLayoutProps {
@@ -19,6 +20,7 @@ interface ProductsGridLayoutProps {
 
 const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsGridLayoutProps) => {
     const cardRefs = useRef<HTMLDivElement[]>([])
+    const isMobile = useMediaQuery({ maxWidth: 430 }); // ví dụ mobile breakpoint
 
     useEffect(() => {
         cardRefs.current.forEach((card) => {
@@ -45,9 +47,18 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                             <div
                                 className="bg-white p-0 relative overflow-hidden group py-4 cursor-pointer"
                                 style={{
-                                    borderTop: idx < 4 ? '' : '1px solid #e0e0e0',
-                                    borderRight: idx === 3 || idx === 7 ? '' : '1px solid #e0e0e0'
+                                    borderTop: isMobile
+                                        ? undefined
+                                        : idx < 4
+                                            ? ""
+                                            : "1px solid #e0e0e0",
+                                    borderRight: isMobile
+                                        ? undefined
+                                        : idx === 3 || idx === 7
+                                            ? ""
+                                            : "1px solid #e0e0e0",
                                 }}
+
                                 ref={el => { if (el) cardRefs.current[idx] = el }}
                             >
                                 <Image

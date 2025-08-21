@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ListReviewButton from './list-review-buttons'
 import gsap from 'gsap'
 import { Item } from '@radix-ui/react-select'
+import { useMediaQuery } from 'react-responsive'
 
 interface ProductTime {
     id: number
@@ -14,6 +15,7 @@ interface ProductTime {
 
 const CountDownGridLayout = () => {
     const cardRefs = useRef<HTMLDivElement[]>([])
+    const isMobile = useMediaQuery({ maxWidth: 430 }); // ví dụ mobile breakpoint
 
     // Khởi tạo productTimes với barWidth ngẫu nhiên 30–70%
     const [productTimes, setProductTimes] = useState<ProductTime[]>(
@@ -94,12 +96,20 @@ const CountDownGridLayout = () => {
                         key={product.id}
                         className='bg-white p-4 relative group'
                         style={{
-                            borderTop: idx < 4 ? '' : '1px solid #e0e0e0',
-                            borderRight: idx === 3 || idx === 7 ? '' : '1px solid #e0e0e0'
+                            borderTop: isMobile
+                                ? undefined
+                                : idx < 4
+                                    ? ""
+                                    : "1px solid #e0e0e0",
+                            borderRight: isMobile
+                                ? undefined
+                                : idx === 3 || idx === 7
+                                    ? ""
+                                    : "1px solid #e0e0e0",
                         }}
                         ref={el => { if (el) cardRefs.current[idx] = el }}
                     >
-                        <div className='text-gray-600 font-semibold text-2xl mb-14'>{product.name}</div>
+                        <div className='text-gray-600 font-semibold text-2xl xl:mb-14 mb-0'>{product.name}</div>
                         <Image
                             width={200}
                             height={200}
@@ -141,7 +151,7 @@ const CountDownGridLayout = () => {
 
 
 
-                            <div className='flex flex-row justify-between w-full'>
+                            <div className='flex xl:flex-row flex-col xl:justify-between items-end xl:items-center w-full'>
                                 <div className='flex flex-row gap-1 text-base text-gray-500'>
                                     <p>ends in:</p>
                                     <div>{formatTime(timeLeft)}</div>

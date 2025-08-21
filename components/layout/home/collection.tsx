@@ -3,10 +3,12 @@ import { collectionList } from '@/data/data'
 import gsap from 'gsap'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
+import { useMediaQuery } from 'react-responsive'
 
 const Collection = () => {
     const [listCollection, setListCollection] = useState(collectionList)
     const containerRefs = useRef<HTMLDivElement[]>([])
+    const isMobile = useMediaQuery({ maxWidth: 430 }); // iPhone 12 Pro và nhỏ hơn
 
     useEffect(() => {
         const updated = collectionList.map((item, idx) => {
@@ -17,8 +19,12 @@ const Collection = () => {
                 { col: 3, row: 1, color: '#ffb535' },
                 { col: 6, row: 1, color: '#ffb535' },
             ]
-            return { ...item, ...layout[idx] }
 
+            if (isMobile) {
+                return { ...item, col: 12, row: 1, color: layout[idx].color }
+            }
+
+            return { ...item, ...layout[idx] }
         })
         setListCollection(updated)
     }, [])
@@ -97,7 +103,14 @@ const Collection = () => {
                 Award winning design 2026
             </p>
 
-            <div className='grid grid-cols-12 grid-rows-2 gap-8 xl:h-[600px] mt-5 ml:mt-8'>
+            <div className="
+                            grid 
+                            grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 
+                            auto-rows-[150px] sm:auto-rows-[200px] xl:grid-rows-2
+                            gap-4 sm:gap-6 xl:gap-8
+                            xl:h-[600px] mt-5 sm:mt-6 xl:mt-8
+                        "
+            >
                 {listCollection.map((item, idx) => {
                     return (
                         <div

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, VariantProps } from "class-variance-authority"
-import { PanelLeftIcon, ToggleLeft, ToggleRight } from "lucide-react"
+import { AlignJustify, PanelLeftIcon, ToggleLeft, ToggleRight } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -253,9 +253,14 @@ function Sidebar({
   )
 }
 
+type SidebarTriggerProps = React.ComponentProps<typeof Button> & {
+  isMobile?: boolean
+}
+
 function SidebarTrigger({
   className,
   onClick,
+  isMobile, // thêm props ở đây
   ...props
 }: React.ComponentProps<typeof Button>) {
   const [isOpen, setIsOpen] = React.useState(true)
@@ -275,11 +280,16 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      {isOpen ? (
-        <ToggleRight size={24} className="size-8" stroke="black" /> // icon when open
-      ) : (
-        <ToggleLeft size={24} className="size-8" stroke="black" /> // icon when closed
-      )}
+      {isMobile ?
+        <AlignJustify size={24} className="size-6" stroke="black" /> // icon when open
+        :
+        isOpen ? (
+          <ToggleRight size={24} className="size-8" stroke="black" /> // icon when open
+        ) : (
+          <ToggleLeft size={24} className="size-8" stroke="black" /> // icon when closed
+        )
+      }
+
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

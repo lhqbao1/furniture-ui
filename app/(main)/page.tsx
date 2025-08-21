@@ -1,5 +1,5 @@
 import AnimatedCarousel from "@/components/layout/home/3d-carousel";
-import Banner from "@/components/layout/home/banner";
+import Banner from "@/components/shared/banner";
 import Collection from "@/components/layout/home/collection";
 import Custom from "@/components/layout/home/custom";
 import FlashSale from "@/components/layout/home/flash-sale";

@@ -1,6 +1,6 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,14 @@ import { Input } from "@/components/ui/input"
 import "react-quill-new/dist/quill.snow.css"
 import RichTextEditor from '@/components/shared/editor'
 import ImagePickerInput from '@/components/layout/single-product/tabs/review/image-picker-input'
+import ImageSinglePicker, { SizeType } from '@/components/shared/image-single-picker'
+import { colors, dimension, materials, types } from '@/data/data'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { MySwitch } from '@/components/shared/my-swtich'
+import ColorPickerButton from '@/components/shared/color-picker-button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "Product name is required" }),
@@ -49,6 +57,11 @@ const formSchema = z.object({
 })
 
 const AddProductForm = () => {
+    const [showMaterial, setShowMaterial] = useState<boolean>(true)
+    const [showColor, setShowColor] = useState<boolean>(true)
+    const [showSize, setShowSize] = useState<boolean>(true)
+    const [showType, setShowType] = useState<boolean>(true)
+
     const defaultValues = {
         name: "",
         price: 0,
@@ -220,7 +233,7 @@ const AddProductForm = () => {
                             name="description"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Description</FormLabel>
+                                    <FormLabel className='text-[#666666] text-sm'>Description</FormLabel>
                                     <FormControl>
                                         <RichTextEditor
                                             value={field.value || ""}
@@ -232,8 +245,149 @@ const AddProductForm = () => {
                             )}
                         />
 
-                        <ImagePickerInput form={form} fieldName="image"
-                        />
+                        {/*Product Images */}
+                        <div className='flex flex-col gap-2'>
+                            <p className='text-[#666666] text-sm'>Image</p>
+                            <ImagePickerInput form={form} fieldName="image" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
+                        </div>
+
+                        {/*Product Variants */}
+                        <div className='border-t border-gray-400 pt-2'>
+                            <p>Product Variants</p>
+                            <div className='pt-5 space-y-6'>
+                                {/*Product Materials */}
+                                <div className='grid grid-cols-12 gap-16 items-center'>
+                                    <div className='col-span-3 flex gap-2 items-center'>
+                                        <p className='text-[#666666] text-sm'>Materials</p>
+                                        <MySwitch checked={showMaterial} onCheckedChange={() => setShowMaterial(!showMaterial)} />
+                                    </div>
+                                    {showMaterial ?
+                                        <div className='item-color flex flex-row gap-4 col-span-9'>
+                                            {materials.map((item, index) => {
+                                                return (
+                                                    <ImageSinglePicker key={index} size={SizeType.Icon} item={item} name='materials' isFormInput />
+                                                )
+                                            })}
+                                        </div>
+                                        : ''
+                                    }
+                                </div>
+
+                                {/*Product Colors */}
+                                <div className='grid grid-cols-12 gap-16 items-center'>
+                                    <div className='flex gap-2 items-center col-span-3'>
+                                        <p className='text-[#666666] text-sm'>Color</p>
+                                        <MySwitch checked={showColor} onCheckedChange={() => setShowColor(!showColor)} />
+                                    </div>
+
+                                    {showColor ?
+                                        <div className='item-color flex flex-row gap-4 col-span-9'>
+                                            {colors.map((item, index) => {
+                                                return (
+                                                    <ColorPickerButton key={index} color={item} name='color' isFormInput />
+                                                )
+                                            })}
+                                        </div>
+                                        : ''
+                                    }
+                                </div>
+
+                                {/*Product Size */}
+                                <div className='grid grid-cols-12 gap-16 items-center'>
+                                    <div className='flex gap-2 items-center col-span-3'>
+                                        <p className='text-[#666666] text-sm'>Size</p>
+                                        <MySwitch checked={showSize} onCheckedChange={() => setShowSize(!showSize)} />
+                                    </div>
+
+                                    {showSize ?
+                                        <div className="grid grid-cols-3 gap-4 col-span-9">
+                                            {/* Length */}
+                                            <FormField
+                                                control={form.control}
+                                                name="size.sizeLength"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Length</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" placeholder="Length" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            {/* Width */}
+                                            <FormField
+                                                control={form.control}
+                                                name="size.sizeWidth"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Width</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" placeholder="Width" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            {/* Height */}
+                                            <FormField
+                                                control={form.control}
+                                                name="size.sizeHeight"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Height</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" placeholder="Height" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+
+                                        : ''
+                                    }
+                                </div>
+
+                                {/*Product Type */}
+                                <div className='grid grid-cols-12 gap-16 items-center'>
+                                    <div className='flex gap-2 items-center col-span-3'>
+                                        <p className='text-[#666666] text-sm'>Type</p>
+                                        <MySwitch checked={showType} onCheckedChange={() => setShowType(!showType)} />
+                                    </div>
+
+                                    {showType && (
+                                        <FormField
+                                            control={form.control}
+                                            name="type"
+                                            render={({ field }) => (
+                                                <FormItem className="col-span-9">
+                                                    <FormControl>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <SelectTrigger className='border text-black' placeholderColor='#666666'>
+                                                                <SelectValue placeholder="Select type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {types.map((item, index) => (
+                                                                    <SelectItem key={item.id} value={item.name}>
+                                                                        {item.name}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <div className='col-span-4'>
                         as

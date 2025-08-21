@@ -4,11 +4,13 @@ import { preOrderItems } from '@/data/data'
 import { PreOrderProduct } from '@/types/products'
 import Image from 'next/image'
 import React, { useState } from 'react'
+import { useMediaQuery } from 'react-responsive'
 
 const PreOrder = () => {
     const [activeIndex, setActiveIndex] = useState(0) // thẻ đang ở giữa
     const [currentItem, setCurrentItem] = useState<PreOrderProduct | undefined>(preOrderItems[0])
 
+    const isPhone = useMediaQuery({ maxWidth: 430 })
     return (
         <div className='section-padding'>
             <h2 className='text-secondary text-4xl font-bold text-center uppercase'>PRE-ORDER</h2>
@@ -16,9 +18,9 @@ const PreOrder = () => {
                 start delivery from Sep 10 to Sep 15
             </p>
 
-            <div className='grid grid-cols-12 xl:min-h-[700px] min-h-0'>
-                <div className='col-span-5 flex justify-center items-center'>
-                    <div className="relative w-[380px] h-[420px]" style={{ perspective: '700px' }}>
+            <div className='grid grid-cols-12 xl:min-h-[700px] min-h-0 translate-y-1/7 xl:translate-y-0'>
+                <div className='xl:col-span-5 col-span-12 flex justify-center items-center h-fit '>
+                    <div className="relative xl:w-[380px] xl:h-[420px] w-[180px] h-[220px]" style={{ perspective: '700px' }}>
                         <div
                             className="absolute inset-0"
                             style={{ transformStyle: 'preserve-3d', transform: 'rotateY(0deg)', isolation: 'isolate' }}
@@ -32,8 +34,8 @@ const PreOrder = () => {
                                 const rad = (angle * Math.PI) / 180
                                 let opacity = 1
 
-                                const radiusY = 170
-                                const radiusZ = 230
+                                const radiusY = isPhone ? 100 : 170
+                                const radiusZ = isPhone ? 130 : 230
                                 let ty = Math.sin(rad) * radiusY
                                 let tz = Math.cos(rad) * radiusZ
 
@@ -42,7 +44,7 @@ const PreOrder = () => {
 
                                 if (isBack) {
                                     opacity = 0.4
-                                    tx = -150
+                                    tx = isPhone ? -130 : -150
                                 }
 
                                 const norm = (tz + radiusZ) / (2 * radiusZ)
@@ -77,13 +79,13 @@ const PreOrder = () => {
                                 const zIndex = isFront ? 999 : Math.round(tz)
 
                                 return (
-                                    <div key={item.id} className="absolute top-1/2 left-1/2">
+                                    <div key={item.id} className="absolute top-1/2 left-2/3 lg:left-1/2">
                                         <div
                                             onClick={() => {
                                                 setActiveIndex(index);
                                                 setCurrentItem(item)
                                             }}
-                                            className="w-[220px] h-[160px] rounded-2xl border-2 overflow-hidden  bg-white cursor-pointer transition-transform duration-500 absolute"
+                                            className="xl:w-[220px] w-[160px] h-[100px] xl:h-[160px] rounded-2xl border-2 overflow-hidden  bg-white cursor-pointer transition-transform duration-500 absolute"
                                             style={{
                                                 transform: `
                                                     translate(-50%, -50%)
@@ -116,7 +118,7 @@ const PreOrder = () => {
                     </div>
                 </div>
 
-                <div className='col-span-5 h-full flex flex-col justify-center xl:gap-6'>
+                <div className='xl:col-span-5 col-span-12 h-full flex flex-col justify-center xl:gap-6 gap-4 mt-20 lg:mt-0'>
                     <div className='item-title'>
                         <h3 className='text-3xl font-bold text-gray-600 capitalize'>{currentItem?.name}</h3>
                         <p className='font-bold text-gray-400 text-2xl'>{currentItem?.award ? currentItem?.award : 'description'}</p>
@@ -170,11 +172,11 @@ const PreOrder = () => {
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>
                     </div>
-                    <div className='flex flex-row xl:gap-6 gap-3 justify-start items-center'>
+                    <div className='flex xl:flex-row flex-col xl:gap-6 gap-3 justify-start items-center'>
                         <Button className='w-fit px-6 py-7 text-2xl uppercase rounded-2xl' hasEffect>
                             Pre-order
                         </Button>
-                        <div className='text-gray-500'>
+                        <div className='text-gray-500 text-center lg:text-start'>
                             <p>340 Customers have placed orders</p>
                             <p>Pre-order before Aug 31</p>
                         </div>

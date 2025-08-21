@@ -3,7 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";
 import StickyIcon from "@/components/shared/sticky-icon";
-import Banner from "@/components/layout/home/banner";
+import Banner from "@/components/shared/banner";
 import "../globals.css"
 
 export const metadata: Metadata = {
@@ -18,11 +18,11 @@ export default function MainLayout({
 }>) {
   return (
     <SidebarProvider>
-      <div className="grid grid-cols-12 h-screen w-screen overflow-hidden min-h-screen">
-        <div className="xl:col-span-2 col-span-0">
+      <div className="h-screen w-screen flex overflow-hidden min-h-screen">
+        <div className="">
           <AppSidebar />
         </div>
-        <div className="flex flex-col w-full xl:col-span-10 col-span-12 overflow-x-hidden  overflow-y-auto">
+        <div className="flex flex-col w-full col-span-5 overflow-x-hidden overflow-y-auto">
           <main className="flex-1 relative">
             <StickyIcon />
             <Banner />

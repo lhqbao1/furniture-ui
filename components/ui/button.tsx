@@ -41,11 +41,13 @@ function Button({
   size,
   asChild = false,
   hasEffect = false,
+  isMobile = false,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
     hasEffect?: boolean
+    isMobile?: boolean
   }) {
   const Comp = asChild ? Slot : "button"
 

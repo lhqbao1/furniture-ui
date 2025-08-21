@@ -25,9 +25,9 @@ const AnimatedCarousel = () => {
     // Các thông số carousel thay đổi theo kích thước màn hình
     const radius = isMobile ? 350 : isTablet ? 500 : 600;
     const verticalRadius = isMobile ? 130 : isTablet ? 180 : 220;
-    const zOffset = isMobile ? -500 : isTablet ? -600 : -700;
+    const zOffset = isMobile ? -1500 : isTablet ? -600 : -700;
     const cardSize = isMobile
-        ? { w: 220, h: 300 }
+        ? { w: 180, h: 200 }
         : isTablet
             ? { w: 260, h: 340 }
             : { w: 295, h: 380 };
@@ -74,7 +74,7 @@ const AnimatedCarousel = () => {
             <h2 className="text-secondary text-2xl md:text-4xl font-bold text-center uppercase mb-6">
                 Categories
             </h2>
-            <div className="relative w-full h-[600px] md:h-[700px] min-h-[500px] [perspective:2000px] [transform-style:preserve-3d]">
+            <div className="relative w-full xl:h-[600px] h-[300px] xl:min-h-[500px] [perspective:2000px] [transform-style:preserve-3d]">
                 {homeBannerItems.map((item, index) => {
                     const angle = index * angleStep + rotation;
 
@@ -115,13 +115,13 @@ const AnimatedCarousel = () => {
                                     <div className="flex flex-col items-center gap-4 md:gap-6">
                                         <span
                                             ref={titleRef}
-                                            className="carousel-item__title text-xl md:text-4xl mt-2 text-primary text-center font-light"
+                                            className="carousel-item__title text-3xl md:text-4xl mt-2 text-primary text-center xl:font-light font-semibold"
                                         >
                                             {item.name}
                                         </span>
                                         <Button
                                             variant="default"
-                                            className="cursor-pointer opacity-100 w-fit text-sm md:text-lg"
+                                            className="cursor-pointer opacity-100 w-fit text-lg"
                                             hasEffect
                                         >
                                             Explore now

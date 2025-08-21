@@ -471,3 +471,18 @@ export const listDE = [
         icon: '/kau.png',
     },
 ]
+
+export const types = [
+    {
+        id: 1,
+        name: 'Type 1'
+    },
+    {
+        id: 2,
+        name: 'Type 2'
+    },
+    {
+        id: 3,
+        name: 'Type 3'
+    },
+]
