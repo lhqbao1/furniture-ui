@@ -1,7 +1,7 @@
 'use client'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Mic, Search, ShoppingCart, User } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -15,6 +15,14 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useMediaQuery } from 'react-responsive'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface BannerProps {
     height?: number
@@ -24,6 +32,7 @@ interface BannerProps {
 
 const Banner = ({ height }: BannerProps) => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
+    const [user, setUser] = useState<{ username: string } | null>(null)
 
     return (
         <div
@@ -58,7 +67,32 @@ const Banner = ({ height }: BannerProps) => {
                                 2
                             </div>
                         </Link>
-                        <User stroke='white' />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <User className="cursor-pointer" stroke='white' />
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end" className="w-48">
+                                {!user ? (
+                                    <Link href={'/login'} className='cursor-pointer'>
+                                        <DropdownMenuItem className='cursor-pointer'>
+                                            Đăng nhập
+                                        </DropdownMenuItem>
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <DropdownMenuLabel>Xin chào, {user.username}</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={() => alert("Đi tới thông tin tài khoản")}>
+                                            Thông tin tài khoản
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setUser(null)}>
+                                            Đăng xuất
+                                        </DropdownMenuItem>
+                                    </>
+                                )}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 

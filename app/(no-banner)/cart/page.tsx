@@ -58,6 +58,9 @@ const sampleData: CartItem[] = [
 ]
 const CartPage = () => {
     const [cart, setCart] = useState<CartItem[]>(sampleData)
+    const shipping = 50
+    const discount = 30.50
+    const tax = 28.78
 
     const increaseQty = (id: number) => {
         setCart((prev) =>
@@ -79,11 +82,18 @@ const CartPage = () => {
         setCart(cart.filter(item => item.id !== id))
     }
 
-    const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    const subTotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    const total = subTotal + shipping - discount + tax
 
     return (
         <div>
-            <div className='text-center xl:text-5xl text-3xl bg-gray-100 xl:py-10 py-4'>
+            <div className='text-center flex flex-col items-center gap-1 xl:text-5xl text-3xl bg-gray-100 xl:py-10 py-4'>
+                <Image
+                    src={'/new-logo.png'}
+                    height={50}
+                    width={50}
+                    alt=''
+                />
                 <Link href={'/'} className='cursor-pointer space-x-2'>
                     <span className='text-primary font-libre font-bold'>Prestige</span>
                     <span className='text-secondary font-libre font-bold'>Home</span>
@@ -141,51 +151,62 @@ const CartPage = () => {
                         </div>
 
                         {/* Right: Summary */}
-                        <Card className="p-4 col-span-12 md:col-span-4 h-fit px-0 border-0 shadow-none bg-zinc-100/55 rounded-xl">
-                            <CardHeader className="pb-0 [.border-b]:pb-0 border-b">
-                                <CardTitle className="text-xl font-bold text-center">Order Summary</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {/* Apply Coupon */}
-                                <div className="flex items-center gap-2">
-                                    <BadgePercent className="w-5 h-5 text-muted-foreground" />
-                                    <Input placeholder="Apply Coupons" className="flex-1" />
-                                    <Button className='bg-secondary'>Apply</Button>
-                                </div>
-
-                                {/* Product Details */}
-                                <div className="space-y-2">
-                                    <p className="font-semibold">Product Details:</p>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Sub Total</span>
-                                        <span className="font-medium">$792.99</span>
+                        <div className='col-span-12 md:col-span-4'>
+                            <Card className="p-4  px-0 border-0 shadow-none bg-zinc-100/55 rounded-xl sticky top-20">
+                                <CardHeader className="pb-0 [.border-b]:pb-0 border-b">
+                                    <CardTitle className="text-xl font-bold text-center">Order Summary</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Apply Coupon */}
+                                    <div className="flex items-center gap-2">
+                                        <BadgePercent className="w-5 h-5 text-muted-foreground" />
+                                        <Input placeholder="Apply Coupons" className="flex-1" />
+                                        <Button className='bg-secondary/85 hover:bg-secondary cursor-pointer' hasEffect>Apply</Button>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Shipping</span>
-                                        <span className="font-medium">$08.00</span>
+
+                                    {/* Product Details */}
+                                    <div className="space-y-2">
+                                        <p className="font-semibold">Product Details:</p>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">Sub Total</span>
+                                            <span className="font-medium">€{subTotal.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">Shipping</span>
+                                            <span className="font-medium">€{shipping.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">Discount</span>
+                                            <span className="font-medium">€{discount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">Tax</span>
+                                            <span className="font-medium">€{tax.toFixed(2)}</span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* Grand Total */}
-                                <div className="xl:py-7 py-3 border-t border-b space-y-4">
-                                    <div className="flex justify-between text-base font-semibold">
-                                        <span>Grand Total</span>
-                                        <span className="text-red-500">$800.99</span>
+                                    {/* Grand Total */}
+                                    <div className="xl:py-7 py-3 border-t border-b space-y-4">
+                                        <div className="flex justify-between text-base font-semibold items-center">
+                                            <span>Total</span>
+                                            <span className="text-primary text-xl font-bold">€{total.toFixed(2)}</span>
+                                        </div>
+                                        {/* Checkout Button */}
+                                        <Button className="w-full bg-primary py-5 cursor-pointer" hasEffect>
+                                            PROCEED TO CHECKOUT
+                                        </Button>
                                     </div>
-                                    {/* Checkout Button */}
-                                    <Button className="w-full bg-primary py-5">
-                                        PROCEED TO CHECKOUT
-                                    </Button>
-                                </div>
 
 
-                                {/* Info */}
-                                <p className="text-xs text-muted-foreground flex items-center gap-2">
-                                    <span>🔒</span> Safe and Secure Payments, Easy Returns. <br />
-                                    100% Authentic Products
-                                </p>
-                            </CardContent>
-                        </Card>
+                                    {/* Info */}
+                                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                                        <span>🔒</span> Safe and Secure Payments, Easy Returns. <br />
+                                        100% Authentic Products
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+
                     </div>
                 </div>
             </div>

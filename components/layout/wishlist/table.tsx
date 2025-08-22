@@ -59,7 +59,7 @@ export function CartTable({ data: initial }: Props) {
     const totalItems = rows.reduce((s, r) => s + r.qty, 0)
 
     return (
-        <div className="w-full">
+        <div className="w-full container">
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((hg) => (
@@ -86,60 +86,63 @@ export function CartTable({ data: initial }: Props) {
             </Table>
 
             {/* Footer action bar */}
-            <div className="grid grid-cols-12 flex-wrap gap-4 justify-between items-center bg-secondary text-white p-4 mt-4 rounded-lg">
-                <div className="xl:col-span-7 col-span-12 flex justify-between">
-                    <div className="flex items-center gap-2">
-                        <Checkbox
-                            checked={table.getIsAllPageRowsSelected()}
-                            onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-                        />
-                        <span className="text-sm">Select all</span>
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <div
-                            onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
-                            className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
-                        >
-                            <Trash size={20} />
-                            Remove out of stock products
+            <div className="sticky  bottom-0 lg:mt-12 bg-secondary w-[1104px] text-white p-4 rounded-lg">
+                <div className="grid grid-cols-12 gap-4 bg-secondary text-white rounded-lg">
+                    <div className="xl:col-span-7 col-span-12 flex justify-between">
+                        <div className="flex items-center gap-2">
+                            <Checkbox
+                                checked={table.getIsAllPageRowsSelected()}
+                                onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+                            />
+                            <span className="text-sm">Select all</span>
                         </div>
 
-                        <Select value={voucher} onValueChange={setVoucher}>
-                            <SelectTrigger className="xl:h-8 h-6 text-black bg-white rounded px-3 py-1 w-full" placeholderColor="black">
-                                <SelectValue placeholder="Select Voucher" className="text-black" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="SALE10">SALE10</SelectItem>
-                                <SelectItem value="SALE20">SALE20</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className="flex flex-col gap-3">
+                            <div
+                                onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
+                                className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
+                            >
+                                <Trash size={20} />
+                                Remove out of stock products
+                            </div>
+
+                            <Select value={voucher} onValueChange={setVoucher}>
+                                <SelectTrigger className="xl:h-8 h-6 text-black bg-white rounded px-3 py-1 w-full" placeholderColor="black">
+                                    <SelectValue placeholder="Select Voucher" className="text-black" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="SALE10">SALE10</SelectItem>
+                                    <SelectItem value="SALE20">SALE20</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <div className="flex gap-2 items-center">
+                                <ArrowLeft size={20} />
+                                <span className="text-sm">Continue Shopping</span>
+                            </div>
+                            <Input
+                                type="text"
+                                placeholder="< apply code >"
+                                className="text-black rounded px-3 py-1 bg-white h-9"
+                            />
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                        <div className="flex gap-2 items-center">
-                            <ArrowLeft size={20} />
-                            <span className="text-sm">Continue Shopping</span>
+                    <div className="xl:col-span-5 col-span-12 flex gap-6 xl:justify-end justify-center">
+                        <div className="text-right">
+                            <p>Total saved <span className="font-bold">€{saved}</span></p>
+                            <p className="font-semibold text-lg">
+                                Total ({totalItems} items) <span className="font-bold">€{totalNew}</span>
+                            </p>
                         </div>
-                        <Input
-                            type="text"
-                            placeholder="< apply code >"
-                            className="text-black rounded px-3 py-1 bg-white h-9"
-                        />
+                        <Button className="bg-orange-400 hover:bg-orange-500 text-white rounded-full px-6 py-2">
+                            CHECK OUT
+                        </Button>
                     </div>
                 </div>
 
-                <div className="xl:col-span-5 col-span-12 flex gap-6 xl:justify-end justify-center">
-                    <div className="text-right">
-                        <p>Total saved <span className="font-bold">€{saved}</span></p>
-                        <p className="font-semibold text-lg">
-                            Total ({totalItems} items) <span className="font-bold">€{totalNew}</span>
-                        </p>
-                    </div>
-                    <Button className="bg-orange-400 hover:bg-orange-500 text-white rounded-full px-6 py-2">
-                        CHECK OUT
-                    </Button>
-                </div>
             </div>
         </div>
     )
