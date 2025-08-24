@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";
-import StickyIcon from "@/components/shared/sticky-icon";
-import Banner from "@/components/shared/banner";
 import "../globals.css"
 
 export const metadata: Metadata = {

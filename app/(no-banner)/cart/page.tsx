@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { BadgePercent, Minus, Plus, Trash, X } from "lucide-react"
+import { BadgePercent, Trash } from "lucide-react"
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 

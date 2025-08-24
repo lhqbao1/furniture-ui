@@ -9,7 +9,6 @@ const AddProduct = () => {
                 <ListDE />
                 <AddProductForm />
             </div>
-
         </div>
     )
 }

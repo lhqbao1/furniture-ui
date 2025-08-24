@@ -13,9 +13,9 @@ export default function RichTextEditor({ value, onChange }: { value: string, onC
                 height: 400,
                 menubar: true,
                 plugins: [
-                    "advlist autolink lists link image charmap preview anchor",
-                    "searchreplace visualblocks code fullscreen",
-                    "insertdatetime media table code help wordcount"
+                    "advlist", "anchor", "autolink", "charmap", "code", "fullscreen",
+                    "help", "image", "insertdatetime", "link", "lists", "media",
+                    "preview", "searchreplace", "table", "visualblocks",
                 ],
                 toolbar:
                     "undo redo | formatselect | bold italic underline forecolor backcolor | " +

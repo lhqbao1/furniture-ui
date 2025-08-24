@@ -1,0 +1,2 @@
+export type User = { id: string; email: string; first_name?: string, last_name?: string, phone_number: string }
+export type LoginResponse = {id: string, access_token: string, token_type: string, email: string}

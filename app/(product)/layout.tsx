@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Quicksand } from "next/font/google";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";

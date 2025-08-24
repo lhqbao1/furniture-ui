@@ -3,8 +3,9 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 import Image from "next/image"
+import { Input } from "@/components/ui/input"
 
 export type CartItem = {
     id: string
@@ -67,13 +68,53 @@ export const getColumns = (actions: Actions): ColumnDef<CartItem>[] => [
         header: "Quantity",
         cell: ({ row }) => {
             const it = row.original
-            const dec = () => actions.onQtyChange(it.id, Math.max(1, it.qty - 1))
-            const inc = () => actions.onQtyChange(it.id, Math.min(it.stock, it.qty + 1))
+            const dec = () =>
+                actions.onQtyChange(it.id, Math.max(1, it.qty - 1))
+            const inc = () =>
+                actions.onQtyChange(it.id, Math.min(it.stock, it.qty + 1))
+            const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                const val = parseInt(e.target.value, 10)
+                if (!isNaN(val)) {
+                    actions.onQtyChange(it.id, val)
+                }
+            }
+
             return (
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={dec} disabled={it.qty <= 1}>-</Button>
-                    <span className="w-8 text-center">{it.qty}</span>
-                    <Button variant="outline" size="icon" onClick={inc} disabled={it.qty >= it.stock}>+</Button>
+                <div className="flex items-center gap-0">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={dec}
+                        disabled={it.qty <= 1}
+                    >
+                        -
+                    </Button>
+
+                    <Input
+                        type="number"
+                        value={it.qty}
+                        onChange={onChange}
+                        onBlur={() => {
+                            if (!it.qty || it.qty < 1) actions.onQtyChange(it.id, 1)
+                            if (it.qty > it.stock) actions.onQtyChange(it.id, it.stock)
+                        }}
+                        className="w-16 text-center 
+             [&::-webkit-inner-spin-button]:appearance-none 
+             [&::-webkit-outer-spin-button]:appearance-none 
+             [appearance:textfield]"
+                        min={0}
+                        max={it.stock}
+                    />
+
+
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={inc}
+                        disabled={it.qty >= it.stock}
+                    >
+                        +
+                    </Button>
                 </div>
             )
         },
@@ -89,7 +130,7 @@ export const getColumns = (actions: Actions): ColumnDef<CartItem>[] => [
                     {oldUnitPrice ? (
                         <>
                             <span className="line-through text-gray-400 mr-1">{oldUnitPrice}€</span>
-                            <span className="text-red-500 font-semibold">{unitPrice}€</span>
+                            <span className="text-primary font-semibold">{unitPrice}€</span>
                         </>
                     ) : (
                         <span className="font-semibold">{unitPrice}€</span>
@@ -108,14 +149,14 @@ export const getColumns = (actions: Actions): ColumnDef<CartItem>[] => [
             return (
                 <div>
                     {oldUnitPrice && <span className="line-through text-gray-400 mr-1">{oldTotal}€</span>}
-                    <span className="text-red-500 font-semibold">{newTotal}€</span>
+                    <span className="text-primary font-semibold">{newTotal}€</span>
                 </div>
             )
         },
     },
     {
         accessorKey: "stock",
-        header: "In stocks",
+        header: "Stock status",
         cell: ({ row }) => <span>{row.original.stock} left</span>,
     },
     {
@@ -138,10 +179,14 @@ export const getColumns = (actions: Actions): ColumnDef<CartItem>[] => [
         header: "BUY",
         cell: ({ row }) => (
             <Button
-                className="bg-orange-400 hover:bg-orange-500 text-white rounded-full px-4"
+                className="bg-primary/85 hover:bg-primary text-white rounded-full relative w-full"
                 onClick={() => actions.onBuy?.(row.original.id)}
+                hasEffect
             >
-                + BUY
+                <div className="absolute left-0 p-2 bg-white rounded-full">
+                    <Plus stroke="black" />
+                </div>
+                <span className="text-center font-bold text-base pl-3">BUY</span>
             </Button>
         ),
         size: 120,

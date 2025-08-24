@@ -23,6 +23,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAtom } from 'jotai'
+import { userIdAtom } from '@/store/auth'
+import { useCurrentUser } from '@/features/users/hook'
 
 interface BannerProps {
     height?: number
@@ -32,7 +35,10 @@ interface BannerProps {
 
 const Banner = ({ height }: BannerProps) => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
-    const [user, setUser] = useState<{ username: string } | null>(null)
+    const { data: user, isLoading } = useCurrentUser()
+
+    if (isLoading) return <div>Loading...</div>
+    if (!user) return <div>Not logged in</div>
 
     return (
         <div
@@ -74,19 +80,26 @@ const Banner = ({ height }: BannerProps) => {
 
                             <DropdownMenuContent align="end" className="w-48">
                                 {!user ? (
-                                    <Link href={'/login'} className='cursor-pointer'>
-                                        <DropdownMenuItem className='cursor-pointer'>
-                                            Đăng nhập
-                                        </DropdownMenuItem>
-                                    </Link>
+                                    <div>
+                                        <Link href={'/login'} className='cursor-pointer'>
+                                            <DropdownMenuItem className='cursor-pointer'>
+                                                Đăng nhập
+                                            </DropdownMenuItem>
+                                        </Link>
+                                        <Link href={'/sign-up'} className='cursor-pointer'>
+                                            <DropdownMenuItem className='cursor-pointer'>
+                                                Đăng ký
+                                            </DropdownMenuItem>
+                                        </Link>
+                                    </div>
                                 ) : (
                                     <>
-                                        <DropdownMenuLabel>Xin chào, {user.username}</DropdownMenuLabel>
+                                        <DropdownMenuLabel>Xin chào, {user.first_name}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={() => alert("Đi tới thông tin tài khoản")}>
                                             Thông tin tài khoản
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setUser(null)}>
+                                        <DropdownMenuItem onClick={() => console.log('hehe')}>
                                             Đăng xuất
                                         </DropdownMenuItem>
                                     </>

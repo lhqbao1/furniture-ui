@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree, Libre_Caslon_Display, Quicksand } from "next/font/google";
 import "./globals.css";
+import Providers from "./provider";
 
 const figtree = Figtree({
     subsets: ["latin"],
@@ -26,7 +27,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
-                {children}
+                <Providers>{children}</Providers>
             </body>
         </html>
     );

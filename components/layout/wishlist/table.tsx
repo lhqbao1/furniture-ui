@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CartItem, getColumns } from "./column"
-import { ArrowLeft, Trash } from "lucide-react"
+import { ArrowLeft, Plus, Trash } from "lucide-react"
 import {
     Select,
     SelectContent,
@@ -24,6 +24,23 @@ type Props = { data: CartItem[] }
 
 export function CartTable({ data: initial }: Props) {
     const [voucher, setVoucher] = React.useState("")
+    const containerRef = React.useRef<HTMLDivElement>(null)
+    const [barStyle, setBarStyle] = React.useState<React.CSSProperties>({})
+
+    React.useEffect(() => {
+        function updateWidth() {
+            if (!containerRef.current) return
+            const rect = containerRef.current.getBoundingClientRect()
+            setBarStyle({
+                width: `${rect.width}px`,
+                left: `${rect.left}px`,
+            })
+        }
+
+        updateWidth()
+        window.addEventListener("resize", updateWidth)
+        return () => window.removeEventListener("resize", updateWidth)
+    }, [])
 
     const [data, setData] = React.useState<CartItem[]>(initial)
 
@@ -59,24 +76,27 @@ export function CartTable({ data: initial }: Props) {
     const totalItems = rows.reduce((s, r) => s + r.qty, 0)
 
     return (
-        <div className="w-full container">
+        <div className="w-full container" ref={containerRef}>
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((hg) => (
                         <TableRow key={hg.id}>
-                            {hg.headers.map((header) => (
-                                <TableHead key={header.id} style={{ width: header.getSize() }}>
-                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                </TableHead>
-                            ))}
+                            {hg.headers.map((header) => {
+                                console.log(header)
+                                return (
+                                    <TableHead key={header.id} style={{ width: header.getSize(), textAlign: header.id === "qty" ? 'center' : 'start' }}>
+                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
+                                )
+                            })}
                         </TableRow>
                     ))}
                 </TableHeader>
                 <TableBody>
                     {table.getRowModel().rows.map((row) => (
-                        <TableRow key={row.id}>
+                        <TableRow key={row.id} >
                             {row.getVisibleCells().map((cell) => (
-                                <TableCell key={cell.id}>
+                                <TableCell key={cell.id} className="py-6">
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}
@@ -86,26 +106,24 @@ export function CartTable({ data: initial }: Props) {
             </Table>
 
             {/* Footer action bar */}
-            <div className="sticky  bottom-0 lg:mt-12 bg-secondary w-[1104px] text-white p-4 rounded-lg">
+            <div className="sticky bottom-0 lg:mt-12 bg-secondary text-white p-4 rounded-lg" style={barStyle}>
                 <div className="grid grid-cols-12 gap-4 bg-secondary text-white rounded-lg">
                     <div className="xl:col-span-7 col-span-12 flex justify-between">
-                        <div className="flex items-center gap-2">
-                            <Checkbox
-                                checked={table.getIsAllPageRowsSelected()}
-                                onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-                            />
-                            <span className="text-sm">Select all</span>
+                        <div className="flex flex-col gap-3 justify-between">
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    checked={table.getIsAllPageRowsSelected()}
+                                    onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+                                />
+                                <span className="text-sm">Select all</span>
+                            </div>
+                            <div className="flex gap-2 items-center">
+                                <ArrowLeft size={20} />
+                                <span className="text-sm">Continue Shopping</span>
+                            </div>
                         </div>
 
-                        <div className="flex flex-col gap-3">
-                            <div
-                                onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
-                                className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
-                            >
-                                <Trash size={20} />
-                                Remove out of stock products
-                            </div>
-
+                        <div className="flex flex-col gap-3 justify-between">
                             <Select value={voucher} onValueChange={setVoucher}>
                                 <SelectTrigger className="xl:h-8 h-6 text-black bg-white rounded px-3 py-1 w-full" placeholderColor="black">
                                     <SelectValue placeholder="Select Voucher" className="text-black" />
@@ -115,13 +133,17 @@ export function CartTable({ data: initial }: Props) {
                                     <SelectItem value="SALE20">SALE20</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <div
+                                onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
+                                className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
+                            >
+                                <Trash size={20} />
+                                Remove out of stock products
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <div className="flex gap-2 items-center">
-                                <ArrowLeft size={20} />
-                                <span className="text-sm">Continue Shopping</span>
-                            </div>
+
                             <Input
                                 type="text"
                                 placeholder="< apply code >"
@@ -131,14 +153,15 @@ export function CartTable({ data: initial }: Props) {
                     </div>
 
                     <div className="xl:col-span-5 col-span-12 flex gap-6 xl:justify-end justify-center">
-                        <div className="text-right">
+                        <div className="text-right text-xl">
                             <p>Total saved <span className="font-bold">€{saved}</span></p>
-                            <p className="font-semibold text-lg">
+                            <p className="font-semibold">
                                 Total ({totalItems} items) <span className="font-bold">€{totalNew}</span>
                             </p>
                         </div>
-                        <Button className="bg-orange-400 hover:bg-orange-500 text-white rounded-full px-6 py-2">
-                            CHECK OUT
+                        <Button className="bg-primary/90 hover:bg-primary cursor-pointer text-white rounded-full px-10 py-2 relative">
+                            <div className="px-2.5 h-full flex items-center left-0 bg-white rounded-full absolute"><Plus stroke="black" /></div>
+                            <span className="pl-2">CHECK OUT</span>
                         </Button>
                     </div>
                 </div>

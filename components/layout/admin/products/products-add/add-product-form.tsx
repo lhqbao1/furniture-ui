@@ -1,7 +1,7 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import z from 'zod'
 import { Button } from "@/components/ui/button"
 import {
@@ -16,51 +16,27 @@ import { Input } from "@/components/ui/input"
 import "react-quill-new/dist/quill.snow.css"
 import RichTextEditor from '@/components/shared/editor'
 import ImagePickerInput from '@/components/layout/single-product/tabs/review/image-picker-input'
-import ImageSinglePicker, { SizeType } from '@/components/shared/image-single-picker'
-import { colors, dimension, materials, types } from '@/data/data'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
+import { Categories, collectionList, colors, dimension, materials, tags, types } from '@/data/data'
 import { Switch } from '@/components/ui/switch'
 import { MySwitch } from '@/components/shared/my-swtich'
-import ColorPickerButton from '@/components/shared/color-picker-button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
-const formSchema = z.object({
-    name: z.string().min(2, { message: "Product name is required" }),
-    price: z.number().min(0),
-    discountPercent: z.number().min(0).max(100).optional(),
-    discountAmount: z.number().optional(),
-    finalPrice: z.number().optional(),
-    description: z.string().optional(),
-    image: z.array(z.string()),
-    materials: z.string(),
-    color: z.string(),
-    size: z.object({
-        sizeLength: z.string().optional(),
-        sizeWidth: z.string().optional(),
-        sizeHeight: z.string().optional(),
-    }),
-    type: z.string(),
-    category: z.string().optional(),
-    collection: z.string().optional(),
-    stock: z.boolean(),
-    quantity: z.number().min(0),
-    sku: z.string().optional(),
-    barcode: z.string().optional(),
-    packaging: z.object({
-        packageLength: z.string().optional(),
-        packageWidth: z.string().optional(),
-        packageHeight: z.string().optional(),
-    }),
-    weight: z.number().optional(),
-    tag: z.string()
-})
+import VariantDrawer from './add-variant-form'
+import {
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import { Variant } from '@/lib/schema/variant'
+import Image from 'next/image'
+import { addProductSchema, Products } from '@/lib/schema/product'
+import { useMutation } from '@tanstack/react-query'
+import { api } from '@/lib/api'
 
 const AddProductForm = () => {
     const [showMaterial, setShowMaterial] = useState<boolean>(true)
-    const [showColor, setShowColor] = useState<boolean>(true)
-    const [showSize, setShowSize] = useState<boolean>(true)
-    const [showType, setShowType] = useState<boolean>(true)
+    const [variants, setVariants] = useState<Variant[]>([])
 
     const defaultValues = {
         name: "",
@@ -85,6 +61,7 @@ const AddProductForm = () => {
         collection: "",
 
         stock: false,
+        active: false,
         quantity: 0,
         sku: "",
         barcode: "",
@@ -97,21 +74,45 @@ const AddProductForm = () => {
 
         weight: 0,
         tag: "",
+        variants: []
     }
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof addProductSchema>>({
+        resolver: zodResolver(addProductSchema),
         defaultValues: defaultValues,
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "variants",
+    })
+
+    const [openVariant, setOpenVariant] = useState(false)
+
+    const addProductMutation = useMutation({
+        mutationFn: async (data: Products) => {
+            const res = await api.post("/products", data)
+            console.log(res)
+            return res.data
+        },
+        onSuccess: () => {
+            console.log("✅ Product created")
+        },
+        onError: (error) => {
+            console.error("❌ Failed to create product:", error)
+        },
+    })
+
+    function onSubmit(values: z.infer<typeof addProductSchema>) {
+        addProductMutation.mutate(values)
     }
 
     const price = form.watch("price")
     const discountPercent = form.watch("discountPercent")
+    const stock = useWatch({
+        control: form.control,
+        name: "stock",
+    })
 
     const discountAmount = price && discountPercent
         ? (price * discountPercent) / 100
@@ -119,284 +120,476 @@ const AddProductForm = () => {
 
     const finalPrice = price - discountAmount
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                <div className='grid-cols-12 grid gap-5 w-full'>
-                    <div className='col-span-8 flex flex-col gap-4'>
-                        <h3 className='text-xl text-[#666666]'>Add New Product</h3>
-                        {/*Product Name */}
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className='text-[#666666] text-sm'>Product Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Ghế sofa" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+        <div className='pb-20'>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                    <div className='grid-cols-12 grid gap-5 w-full'>
+                        <div className='col-span-8 flex flex-col gap-4'>
+                            <h3 className='text-xl text-[#666666]'>Add New Product</h3>
+                            {/*Product Name */}
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className='text-[#666666] text-sm'>Product Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Ghế sofa" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        {/*Product Price and Discount */}
-                        <div className='grid grid-cols-12 gap-6'>
-                            <div className='col-span-3'>
+                            {/*Product Price and Discount */}
+                            <div className='grid grid-cols-12 gap-6'>
+                                <div className='col-span-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="price"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className='text-[#666666] text-sm'>Price</FormLabel>
+                                                <FormControl>
+                                                    <div className='relative flex items-center'>
+                                                        <Input placeholder="" {...field} type='number' min={0} className='pl-7' />
+                                                        <span className='absolute left-3 text-gray-500'>€</span>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className='col-span-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="discountPercent"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className='text-[#666666] text-sm'>Discount</FormLabel>
+                                                <FormControl>
+                                                    <div className='relative flex items-center'>
+                                                        <Input placeholder="" {...field} type='number' min={0} className='pl-7' />
+                                                        <span className='absolute left-3 text-gray-500'>%</span>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className='col-span-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="discountAmount"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className='text-[#666666] text-sm'>Discount Amount</FormLabel>
+                                                <FormControl>
+                                                    <div className='relative flex items-center'>
+                                                        <Input
+                                                            value={discountAmount}
+                                                            readOnly
+                                                            min={0}
+                                                            type='number'
+                                                            className='pl-7 bg-gray-100 cursor-not-allowed'
+                                                        />
+                                                        <span className='absolute left-3 text-gray-500'>€</span>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className='col-span-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="finalPrice"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className='text-[#666666] text-sm'>Final Price</FormLabel>
+                                                <FormControl>
+                                                    <div className='relative flex items-center'>
+                                                        <Input
+                                                            value={finalPrice}
+                                                            readOnly
+                                                            type='number'
+                                                            min={0}
+                                                            className='pl-7 bg-gray-100 cursor-not-allowed'
+                                                        />
+                                                        <span className='absolute left-3 text-gray-500'>€</span>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
+
+                            {/*Product Description */}
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className='text-[#666666] text-sm'>Description</FormLabel>
+                                        <FormControl>
+                                            <RichTextEditor
+                                                value={field.value || ""}
+                                                onChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/*Product Images */}
+                            <div className='flex flex-col gap-2'>
+                                <p className='text-[#666666] text-sm'>Image</p>
+                                <ImagePickerInput form={form} fieldName="image" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
+                            </div>
+
+                            {/*Product Variants */}
+                            <div className='border-t border-gray-400 pt-2'>
+                                <p>Product Variants</p>
+                                <div className='flex flex-col gap-3 mt-3'>
+                                    {variants && variants.length > 0 ?
+                                        variants.map((item, index) => {
+                                            return (
+                                                <div className='grid grid-cols-12 gap-4 items-center' key={index}>
+                                                    <div className='col-span-3 flex gap-2 items-center justify-start'>
+                                                        <p className='text-[#666666] text-sm'>{item.name}</p>
+                                                        <MySwitch checked={showMaterial} onCheckedChange={() => setShowMaterial(!showMaterial)} />
+                                                    </div>
+                                                    {showMaterial ?
+                                                        <div className='item-color flex flex-row gap-4 col-span-9'>
+                                                            {item.options.map((options, index) => {
+                                                                if (options.image_url) {
+                                                                    console.log(options)
+                                                                    return (
+                                                                        <div key={options.id}>
+                                                                            <Image
+                                                                                src={`/1.png`}
+                                                                                width={50}
+                                                                                height={50}
+                                                                                alt=''
+                                                                                className='shadow-sm bg-white rounded-sm'
+                                                                            />
+                                                                        </div>
+                                                                        // <ImageSinglePicker key={index} size={SizeType.Icon} item={options} name='materials' isFormInput />
+                                                                    )
+                                                                } else {
+                                                                    console.log(options)
+                                                                    return (
+
+                                                                        <div key={options.id} className='px-2 py-1 rounded-md'>{options.label}</div>
+                                                                    )
+                                                                }
+                                                            })}
+                                                        </div>
+                                                        : ''
+                                                    }
+                                                </div>
+                                            )
+                                        })
+
+                                        : ''}
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div className='col-span-4 flex flex-col items-end gap-4'>
+                            {/*Form Button */}
+                            <div className='flex gap-2 justify-end'>
+                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white' type="button" hasEffect>Discard</Button>
+                                <Button className='cursor-pointer bg-primary/95 hover:bg-primary text-lg' type="submit" hasEffect>Submit</Button>
+                            </div>
+
+                            {/*Product Active */}
+                            <FormField
+                                control={form.control}
+                                name="active"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormLabel className="!mt-0 text-[#666666]">Active</FormLabel>
+                                        <FormControl>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                className='data-[state=unchecked]:bg-gray-400'
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/*Product ID */}
+                            <span className='text-[#666666]'>ID 1136574654</span>
+
+                            {/*Product Category */}
+                            <FormField
+                                control={form.control}
+                                name="category"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row gap-3">
+                                        <FormLabel className="!mt-0 text-[#666666]">Category</FormLabel>
+                                        <FormControl>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <SelectTrigger className='border text-black' placeholderColor='black'>
+                                                    <SelectValue placeholder="Select category" className='text-black' />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {Categories.map((item, index) => (
+                                                        <SelectItem key={index} value={item.name}>
+                                                            {item.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/*Product Collection */}
+                            <FormField
+                                control={form.control}
+                                name="collection"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row gap-3">
+                                        <FormLabel className="!mt-0 text-[#666666]">Collection</FormLabel>
+                                        <FormControl>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <SelectTrigger className='border text-black' placeholderColor='black'>
+                                                    <SelectValue placeholder="Select category" className='text-black' />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {collectionList.map((item, index) => (
+                                                        <SelectItem key={index} value={item.name}>
+                                                            {item.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <div className="flex items-center gap-4">
+                                {/* Stock toggle */}
                                 <FormField
                                     control={form.control}
-                                    name="price"
+                                    name="stock"
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-[#666666] text-sm'>Price</FormLabel>
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormLabel className="!mt-0 text-[#666666]">Stock</FormLabel>
                                             <FormControl>
-                                                <div className='relative flex items-center'>
-                                                    <Input placeholder="" {...field} type='number' min={0} className='pl-7' />
-                                                    <span className='absolute left-3 text-gray-500'>€</span>
-                                                </div>
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                    className="data-[state=unchecked]:bg-gray-400"
+                                                />
                                             </FormControl>
-                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Quantity input */}
+                                <FormField
+                                    control={form.control}
+                                    name="quantity"
+                                    render={({ field }) => (
+                                        <FormItem className="">
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="quantity"
+                                                    min={0}
+                                                    disabled={!stock} // <-- disable khi stock = false
+                                                    {...field}
+                                                />
+                                            </FormControl>
                                         </FormItem>
                                     )}
                                 />
                             </div>
-                            <div className='col-span-3'>
-                                <FormField
-                                    control={form.control}
-                                    name="discountPercent"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-[#666666] text-sm'>Discount</FormLabel>
-                                            <FormControl>
-                                                <div className='relative flex items-center'>
-                                                    <Input placeholder="" {...field} type='number' min={0} className='pl-7' />
-                                                    <span className='absolute left-3 text-gray-500'>%</span>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className='col-span-3'>
-                                <FormField
-                                    control={form.control}
-                                    name="discountAmount"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-[#666666] text-sm'>Discount Amount</FormLabel>
-                                            <FormControl>
-                                                <div className='relative flex items-center'>
+
+                            {/* SKU input */}
+                            <FormField
+                                control={form.control}
+                                name='sku'
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-3">
+                                        <FormLabel className='text-[#666666]'>SKU</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                placeholder="SKU"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Barcode input */}
+                            <FormField
+                                control={form.control}
+                                name='barcode'
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-3">
+                                        <FormLabel className='text-[#666666]'>Barcode</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                placeholder="Barcode"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Weight input */}
+                            <FormField
+                                control={form.control}
+                                name='weight'
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center gap-3">
+                                        <FormLabel className='text-[#666666] flex-1'>Weight (kg)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                placeholder="Weight"
+                                                min={0}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Packaging input */}
+                            <div className='flex gap-3 items-center'>
+                                <span>Packaging (cm)</span>
+                                <div className='flex flex-row gap-1'>
+                                    <FormField
+                                        control={form.control}
+                                        name='packaging.packageLength'
+                                        render={({ field }) => (
+                                            <FormItem className='flex flex-col items-center'>
+                                                <FormControl>
                                                     <Input
-                                                        value={discountAmount}
-                                                        readOnly
+                                                        type="number"
+                                                        placeholder=""
                                                         min={0}
-                                                        type='number'
-                                                        className='pl-7 bg-gray-100 cursor-not-allowed'
+                                                        className="w-14"
+                                                        {...field}
                                                     />
-                                                    <span className='absolute left-3 text-gray-500'>€</span>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className='col-span-3'>
-                                <FormField
-                                    control={form.control}
-                                    name="finalPrice"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className='text-[#666666] text-sm'>Final Price</FormLabel>
-                                            <FormControl>
-                                                <div className='relative flex items-center'>
+                                                </FormControl>
+                                                <FormLabel className='text-gray-500'>Length</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name='packaging.packageHeight'
+                                        render={({ field }) => (
+                                            <FormItem className='flex flex-col items-center'>
+                                                <FormControl>
                                                     <Input
-                                                        value={finalPrice}
-                                                        readOnly
-                                                        type='number'
+                                                        type="number"
+                                                        placeholder=""
                                                         min={0}
-                                                        className='pl-7 bg-gray-100 cursor-not-allowed'
+                                                        className="w-14"
+                                                        {...field}
                                                     />
-                                                    <span className='absolute left-3 text-gray-500'>€</span>
+                                                </FormControl>
+                                                <FormLabel className='text-gray-500'>Height</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name='packaging.packageWidth'
+                                        render={({ field }) => (
+                                            <FormItem className='flex flex-col items-center'>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder=""
+                                                        min={0}
+                                                        className="w-14"
+
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className='text-gray-500'>Width</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
+
+                            {/*Tag choose */}
+                            <FormField
+                                control={form.control}
+                                name="tag"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="font-bold text-base">Tag</FormLabel>
+                                        <div className="flex flex-row gap-2 flex-wrap">
+                                            {tags.map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    style={{ background: item.color }}
+                                                    onClick={() => field.onChange(item.name)}
+                                                    className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${field.value === item.name ? "ring ring-primary ring-offset-2" : ""
+                                                        }`}
+                                                >
+                                                    {item.name}
                                                 </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                        </div>
-
-                        {/*Product Description */}
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className='text-[#666666] text-sm'>Description</FormLabel>
-                                    <FormControl>
-                                        <RichTextEditor
-                                            value={field.value || ""}
-                                            onChange={field.onChange}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/*Product Images */}
-                        <div className='flex flex-col gap-2'>
-                            <p className='text-[#666666] text-sm'>Image</p>
-                            <ImagePickerInput form={form} fieldName="image" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
-                        </div>
-
-                        {/*Product Variants */}
-                        <div className='border-t border-gray-400 pt-2'>
-                            <p>Product Variants</p>
-                            <div className='pt-5 space-y-6'>
-                                {/*Product Materials */}
-                                <div className='grid grid-cols-12 gap-16 items-center'>
-                                    <div className='col-span-3 flex gap-2 items-center'>
-                                        <p className='text-[#666666] text-sm'>Materials</p>
-                                        <MySwitch checked={showMaterial} onCheckedChange={() => setShowMaterial(!showMaterial)} />
-                                    </div>
-                                    {showMaterial ?
-                                        <div className='item-color flex flex-row gap-4 col-span-9'>
-                                            {materials.map((item, index) => {
-                                                return (
-                                                    <ImageSinglePicker key={index} size={SizeType.Icon} item={item} name='materials' isFormInput />
-                                                )
-                                            })}
+                                            ))}
                                         </div>
-                                        : ''
-                                    }
-                                </div>
-
-                                {/*Product Colors */}
-                                <div className='grid grid-cols-12 gap-16 items-center'>
-                                    <div className='flex gap-2 items-center col-span-3'>
-                                        <p className='text-[#666666] text-sm'>Color</p>
-                                        <MySwitch checked={showColor} onCheckedChange={() => setShowColor(!showColor)} />
-                                    </div>
-
-                                    {showColor ?
-                                        <div className='item-color flex flex-row gap-4 col-span-9'>
-                                            {colors.map((item, index) => {
-                                                return (
-                                                    <ColorPickerButton key={index} color={item} name='color' isFormInput />
-                                                )
-                                            })}
-                                        </div>
-                                        : ''
-                                    }
-                                </div>
-
-                                {/*Product Size */}
-                                <div className='grid grid-cols-12 gap-16 items-center'>
-                                    <div className='flex gap-2 items-center col-span-3'>
-                                        <p className='text-[#666666] text-sm'>Size</p>
-                                        <MySwitch checked={showSize} onCheckedChange={() => setShowSize(!showSize)} />
-                                    </div>
-
-                                    {showSize ?
-                                        <div className="grid grid-cols-3 gap-4 col-span-9">
-                                            {/* Length */}
-                                            <FormField
-                                                control={form.control}
-                                                name="size.sizeLength"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Length</FormLabel>
-                                                        <FormControl>
-                                                            <Input type="number" placeholder="Length" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            {/* Width */}
-                                            <FormField
-                                                control={form.control}
-                                                name="size.sizeWidth"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Width</FormLabel>
-                                                        <FormControl>
-                                                            <Input type="number" placeholder="Width" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            {/* Height */}
-                                            <FormField
-                                                control={form.control}
-                                                name="size.sizeHeight"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Height</FormLabel>
-                                                        <FormControl>
-                                                            <Input type="number" placeholder="Height" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        : ''
-                                    }
-                                </div>
-
-                                {/*Product Type */}
-                                <div className='grid grid-cols-12 gap-16 items-center'>
-                                    <div className='flex gap-2 items-center col-span-3'>
-                                        <p className='text-[#666666] text-sm'>Type</p>
-                                        <MySwitch checked={showType} onCheckedChange={() => setShowType(!showType)} />
-                                    </div>
-
-                                    {showType && (
-                                        <FormField
-                                            control={form.control}
-                                            name="type"
-                                            render={({ field }) => (
-                                                <FormItem className="col-span-9">
-                                                    <FormControl>
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                            <SelectTrigger className='border text-black' placeholderColor='#666666'>
-                                                                <SelectValue placeholder="Select type" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {types.map((item, index) => (
-                                                                    <SelectItem key={item.id} value={item.name}>
-                                                                        {item.name}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    )}
-
-                                </div>
-                            </div>
+                                    </FormItem>
+                                )}
+                            />
                         </div>
-
                     </div>
-                    <div className='col-span-4'>
-                        as
-                    </div>
-                </div>
+                </form>
+            </Form>
+            {/* Nút mở Drawer */}
+            <Drawer open={openVariant} onOpenChange={setOpenVariant} direction='right' disablePreventScroll>
+                <DrawerTrigger asChild>
+                    <Button type="button">Add Variant</Button>
+                </DrawerTrigger>
+                <DrawerContent className="p-4 !max-w-[1000px] !w-[1000px] overflow-y-auto">
+                    <DrawerHeader>
+                        <DrawerTitle>Add New Variant</DrawerTitle>
+                    </DrawerHeader>
+                    <VariantDrawer
+                        onAdd={(variant) => {
+                            append(variant)
+                            setOpenVariant(false) // đóng drawer
+                        }}
+                        setVariant={setVariants}
+                    />
+                </DrawerContent>
+            </Drawer>
+        </div>
 
-                <Button type="submit">Submit</Button>
-            </form>
-        </Form>
     )
 }
 

@@ -8,9 +8,13 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Chrome, Facebook, Mail, Key } from "lucide-react"
 import Link from "next/link"
+import { useLogin, useLogout } from "@/features/auth/hook"
+import { useAtom } from "jotai"
+import { accessTokenAtom, userIdAtom } from "@/store/auth"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
-    email: z
+    username: z
         .string()
         .min(1, "Email is required")
         .email("Invalid email address"),
@@ -29,18 +33,40 @@ const formSchema = z.object({
 })
 
 export default function LoginForm() {
+    const [userId, setUserId] = useAtom(userIdAtom)
+    const [accessToken, setAccessToken] = useAtom(accessTokenAtom)
+
+    const router = useRouter()
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            email: "",
+            username: "",
             password: "",
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log("Login:", values)
-        // TODO: gọi API login hoặc next-auth
+    const loginMutation = useLogin()
+    const logoutMutation = useLogout()
+
+    const onSubmit = (values: z.infer<typeof formSchema>) => {
+        loginMutation.mutate(values, {
+            onSuccess: (data) => {
+                console.log(data)
+                // setUserId(data.id)
+                // setAccessToken(data.access_token)
+                router.push('/')
+            },
+            onError(error, variables, context) {
+                console.log(error)
+            },
+        })
     }
+
+    const onLogOut = () => {
+        logoutMutation.mutate()
+    }
+
 
     return (
         <div className="p-6 bg-white rounded-2xl lg:w-3/4 w-full">
@@ -50,7 +76,7 @@ export default function LoginForm() {
                     {/* Email */}
                     <FormField
                         control={form.control}
-                        name="email"
+                        name="username"
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
@@ -122,7 +148,7 @@ export default function LoginForm() {
             {/* Sign up link */}
             <p className="text-sm text-center mt-6">
                 Don’t have an account?{" "}
-                <Link href="/signup" className="text-secondary font-medium hover:underline">
+                <Link href="/sign-up" className="text-secondary font-medium hover:underline">
                     Sign Up
                 </Link>
             </p>
