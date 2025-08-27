@@ -107,7 +107,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
             </div>
             {hasPagination &&
                 <div className='pt-8'>
-                    <CustomPagination />
+                    {/* <CustomPagination /> */}
                 </div>
             }
         </div>

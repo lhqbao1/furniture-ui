@@ -55,7 +55,7 @@ const ProductCategory = () => {
 
                 </div>
             </div>
-            <CustomPagination />
+            {/* <CustomPagination /> */}
         </div >
     )
 }

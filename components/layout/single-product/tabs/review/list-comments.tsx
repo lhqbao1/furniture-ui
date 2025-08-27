@@ -101,7 +101,7 @@ const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps
                         <div className='py-6 text-center'>
                             <Button hasEffect className='rounded-full font-bold'>Load More</Button>
                         </div>
-                        <CustomPagination />
+                        {/* <CustomPagination /> */}
                     </div>
                 </CollapsibleContent>
             </Collapsible>
