@@ -101,18 +101,21 @@ import axios, { AxiosError } from "axios"
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true, // tuỳ: nếu bạn dùng cookie HttpOnly cho session
+  withCredentials: true,
 })
 
 // attach access token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token")
   if (token) {
-    config.headers = config.headers ?? {}
-    config.headers.Authorization = `Bearer ${token}`
+    // đảm bảo headers tồn tại
+    config.headers = config.headers || {}
+    // gán trực tiếp field Authorization
+    config.headers.set("Authorization", `Bearer ${token}`)
   }
   return config
 })
+
 
 // handle 401
 api.interceptors.response.use(

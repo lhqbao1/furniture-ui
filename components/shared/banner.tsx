@@ -37,8 +37,8 @@ const Banner = ({ height }: BannerProps) => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
     const { data: user, isLoading } = useCurrentUser()
 
-    if (isLoading) return <div>Loading...</div>
-    if (!user) return <div>Not logged in</div>
+    // if (isLoading) return <div>Loading...</div>
+    // if (!user) return <div>Not logged in</div>
 
     return (
         <div

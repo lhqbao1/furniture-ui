@@ -11,7 +11,9 @@ export const OptionSchema = z.object({
 export const VariantSchema = z.object({
   name: z.string().min(1, 'Must provide variant name'),
   is_active: z.boolean(),
-  type: z.string().min(1, 'Must provide variant type'),
+  type: z.enum(["global", "local"]).refine((val) => !!val, {
+    message: "Must provide variant type",
+  }),
   id: z.string().optional(),
   options: z.array(OptionSchema).min(1, { message: "You must add at least one option" }),
   optionType: z.string().min(1, "Must provide variant option's type")

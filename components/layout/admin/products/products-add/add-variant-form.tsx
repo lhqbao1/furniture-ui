@@ -9,7 +9,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { X } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Variant, VariantSchema } from "@/lib/schema/variant"
-import { useState } from "react"
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input"
 
 type VariantDrawerProps = {
@@ -23,7 +22,7 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
         defaultValues: {
             name: "",
             is_active: true,
-            type: "",
+            type: "local",
             options: [],
             optionType: ''
         },
@@ -130,11 +129,11 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
 
                 {/* Options */}
                 {optionType === "image" ? (
-                    <div className="space-y-3">
+                    <div className="space-y-5">
                         <Label>Options</Label>
                         {fields.map((field, index) => (
                             <Card key={field.id} className="p-3">
-                                <CardContent className="grid grid-cols-12 gap-3">
+                                <CardContent className="grid grid-cols-12 gap-5">
                                     <div className="col-span-6">
                                         <ImagePickerInput
                                             form={form}
@@ -145,7 +144,7 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                                             className="flex-row"
                                         />
                                     </div>
-                                    <div className="col-span-6 space-y-3">
+                                    <div className="col-span-12 space-y-3">
                                         <Label>Extra price</Label>
                                         <Controller
                                             control={form.control}

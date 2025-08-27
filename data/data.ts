@@ -10,7 +10,7 @@ import { Bed, Sofa, Table } from "lucide-react";
 export const Categories: Category[] = [
     {
         id: 1,
-        name: "Sofa",
+        name: "Indoor",
         icon: Sofa
     },
     {

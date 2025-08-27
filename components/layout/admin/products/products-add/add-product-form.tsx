@@ -30,95 +30,66 @@ import {
 } from "@/components/ui/drawer"
 import { Variant } from '@/lib/schema/variant'
 import Image from 'next/image'
-import { addProductSchema, Products } from '@/lib/schema/product'
-import { useMutation } from '@tanstack/react-query'
-import { api } from '@/lib/api'
+import { addProductSchema, defaultValues, Products } from '@/lib/schema/product'
+import { useAddProduct } from '@/features/products/hook'
+import { toast } from 'sonner'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
 
 const AddProductForm = () => {
     const [showMaterial, setShowMaterial] = useState<boolean>(true)
     const [variants, setVariants] = useState<Variant[]>([])
-
-    const defaultValues = {
-        name: "",
-        price: 0,
-        discountPercent: 0,
-        discountAmount: 0,
-        finalPrice: 0,
-        description: "",
-        image: [],
-
-        materials: "",
-        color: "",
-
-        size: {
-            sizeLength: "",
-            sizeWidth: "",
-            sizeHeight: "",
-        },
-
-        type: "",
-        category: "",
-        collection: "",
-
-        stock: false,
-        active: false,
-        quantity: 0,
-        sku: "",
-        barcode: "",
-
-        packaging: {
-            packageLength: "",
-            packageWidth: "",
-            packageHeight: "",
-        },
-
-        weight: 0,
-        tag: "",
-        variants: []
-    }
+    const createProduct = useAddProduct()
+    const [openVariant, setOpenVariant] = useState(false)
 
     const form = useForm<z.infer<typeof addProductSchema>>({
         resolver: zodResolver(addProductSchema),
         defaultValues: defaultValues,
     })
 
+    const { control, setValue } = form
+
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: "variants",
     })
 
-    const [openVariant, setOpenVariant] = useState(false)
-
-    const addProductMutation = useMutation({
-        mutationFn: async (data: Products) => {
-            const res = await api.post("/products", data)
-            console.log(res)
-            return res.data
-        },
-        onSuccess: () => {
-            console.log("✅ Product created")
-        },
-        onError: (error) => {
-            console.error("❌ Failed to create product:", error)
-        },
-    })
 
     function onSubmit(values: z.infer<typeof addProductSchema>) {
-        addProductMutation.mutate(values)
+        createProduct.mutate(values, {
+            onSuccess: (data) => {
+                toast.success("Product is created")
+                form.reset()
+                setVariants([])
+                console.log("Created product:", data)
+            },
+            onError: (error) => {
+                toast.error(error.message)
+            }
+        })
     }
 
-    const price = form.watch("price")
-    const discountPercent = form.watch("discountPercent")
+    // Watch price + discountPercent
+    const price = useWatch({ control, name: "price" })
+    const discountPercent = useWatch({ control, name: "discount_percent" })
+
     const stock = useWatch({
         control: form.control,
         name: "stock",
     })
 
-    const discountAmount = price && discountPercent
-        ? (price * discountPercent) / 100
-        : 0
+    React.useEffect(() => {
+        if (price && discountPercent) {
+            const discountAmount = (price * discountPercent) / 100
+            const finalPrice = price - discountAmount
 
-    const finalPrice = price - discountAmount
+            setValue("discount_amount", discountAmount)
+            setValue("final_price", finalPrice)
+        } else {
+            setValue("discount_amount", 0)
+            setValue("final_price", price || 0)
+        }
+    }, [price, discountPercent, setValue])
     return (
         <div className='pb-20'>
             <Form {...form}>
@@ -152,7 +123,14 @@ const AddProductForm = () => {
                                                 <FormLabel className='text-[#666666] text-sm'>Price</FormLabel>
                                                 <FormControl>
                                                     <div className='relative flex items-center'>
-                                                        <Input placeholder="" {...field} type='number' min={0} className='pl-7' />
+                                                        <Input
+                                                            placeholder=""
+                                                            {...field}
+                                                            type='number'
+                                                            min={0}
+                                                            className='pl-7'
+                                                            onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                                        />
                                                         <span className='absolute left-3 text-gray-500'>€</span>
                                                     </div>
                                                 </FormControl>
@@ -164,13 +142,14 @@ const AddProductForm = () => {
                                 <div className='col-span-3'>
                                     <FormField
                                         control={form.control}
-                                        name="discountPercent"
+                                        name="discount_percent"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className='text-[#666666] text-sm'>Discount</FormLabel>
                                                 <FormControl>
                                                     <div className='relative flex items-center'>
-                                                        <Input placeholder="" {...field} type='number' min={0} className='pl-7' />
+                                                        <Input placeholder="" {...field} type='number' min={0} className='pl-7' onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                                        />
                                                         <span className='absolute left-3 text-gray-500'>%</span>
                                                     </div>
                                                 </FormControl>
@@ -182,14 +161,15 @@ const AddProductForm = () => {
                                 <div className='col-span-3'>
                                     <FormField
                                         control={form.control}
-                                        name="discountAmount"
+                                        name="discount_amount"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className='text-[#666666] text-sm'>Discount Amount</FormLabel>
                                                 <FormControl>
                                                     <div className='relative flex items-center'>
                                                         <Input
-                                                            value={discountAmount}
+                                                            {...field}
+                                                            // value={discountAmount}
                                                             readOnly
                                                             min={0}
                                                             type='number'
@@ -206,14 +186,14 @@ const AddProductForm = () => {
                                 <div className='col-span-3'>
                                     <FormField
                                         control={form.control}
-                                        name="finalPrice"
+                                        name="final_price"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className='text-[#666666] text-sm'>Final Price</FormLabel>
                                                 <FormControl>
                                                     <div className='relative flex items-center'>
                                                         <Input
-                                                            value={finalPrice}
+                                                            {...field}
                                                             readOnly
                                                             type='number'
                                                             min={0}
@@ -228,6 +208,36 @@ const AddProductForm = () => {
                                     />
                                 </div>
                             </div>
+
+                            <FormField
+                                control={form.control}
+                                name='tax'
+                                render={({ field }) => (
+                                    <div className='flex gap-4'>
+                                        <FormLabel className='text-[#666666] text-sm'>Tax</FormLabel>
+                                        <RadioGroup
+                                            value={field.value}
+                                            onValueChange={field.onChange}
+                                            className="flex gap-6"
+                                            defaultValue='19%'
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <RadioGroupItem value="19%" id="19%" />
+                                                <Label htmlFor="19%">19%</Label>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <RadioGroupItem value="7%" id="7%" />
+                                                <Label htmlFor="7%">7%</Label>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <RadioGroupItem value="0%" id="0%" />
+                                                <Label htmlFor="0%">0%</Label>
+                                            </div>
+                                        </RadioGroup>
+                                    </div>
+                                )}
+                            />
+
 
                             {/*Product Description */}
                             <FormField
@@ -250,7 +260,7 @@ const AddProductForm = () => {
                             {/*Product Images */}
                             <div className='flex flex-col gap-2'>
                                 <p className='text-[#666666] text-sm'>Image</p>
-                                <ImagePickerInput form={form} fieldName="image" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
+                                <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
                             </div>
 
                             {/*Product Variants */}
@@ -260,7 +270,7 @@ const AddProductForm = () => {
                                     {variants && variants.length > 0 ?
                                         variants.map((item, index) => {
                                             return (
-                                                <div className='grid grid-cols-12 gap-4 items-center' key={index}>
+                                                <div className='grid grid-cols-12 gap-4 items-center' key={item.id}>
                                                     <div className='col-span-3 flex gap-2 items-center justify-start'>
                                                         <p className='text-[#666666] text-sm'>{item.name}</p>
                                                         <MySwitch checked={showMaterial} onCheckedChange={() => setShowMaterial(!showMaterial)} />
@@ -269,11 +279,10 @@ const AddProductForm = () => {
                                                         <div className='item-color flex flex-row gap-4 col-span-9'>
                                                             {item.options.map((options, index) => {
                                                                 if (options.image_url) {
-                                                                    console.log(options)
                                                                     return (
                                                                         <div key={options.id}>
                                                                             <Image
-                                                                                src={`/1.png`}
+                                                                                src={options.image_url}
                                                                                 width={50}
                                                                                 height={50}
                                                                                 alt=''
@@ -283,9 +292,7 @@ const AddProductForm = () => {
                                                                         // <ImageSinglePicker key={index} size={SizeType.Icon} item={options} name='materials' isFormInput />
                                                                     )
                                                                 } else {
-                                                                    console.log(options)
                                                                     return (
-
                                                                         <div key={options.id} className='px-2 py-1 rounded-md'>{options.label}</div>
                                                                     )
                                                                 }
@@ -313,7 +320,7 @@ const AddProductForm = () => {
                             {/*Product Active */}
                             <FormField
                                 control={form.control}
-                                name="active"
+                                name="is_active"
                                 render={({ field }) => (
                                     <FormItem className="flex items-center space-x-2">
                                         <FormLabel className="!mt-0 text-[#666666]">Active</FormLabel>
@@ -360,7 +367,7 @@ const AddProductForm = () => {
                             />
 
                             {/*Product Collection */}
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="collection"
                                 render={({ field }) => (
@@ -385,7 +392,7 @@ const AddProductForm = () => {
                                         </FormControl>
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
                             <div className="flex items-center gap-4">
                                 {/* Stock toggle */}
@@ -419,6 +426,7 @@ const AddProductForm = () => {
                                                     min={0}
                                                     disabled={!stock} // <-- disable khi stock = false
                                                     {...field}
+                                                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                                 />
                                             </FormControl>
                                         </FormItem>
@@ -475,6 +483,7 @@ const AddProductForm = () => {
                                                 placeholder="Weight"
                                                 min={0}
                                                 {...field}
+                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                             />
                                         </FormControl>
                                     </FormItem>
@@ -575,7 +584,7 @@ const AddProductForm = () => {
                 <DrawerTrigger asChild>
                     <Button type="button">Add Variant</Button>
                 </DrawerTrigger>
-                <DrawerContent className="p-4 !max-w-[1000px] !w-[1000px] overflow-y-auto">
+                <DrawerContent className="p-4 !max-w-[500px] !w-[500px] overflow-y-auto">
                     <DrawerHeader>
                         <DrawerTitle>Add New Variant</DrawerTitle>
                     </DrawerHeader>

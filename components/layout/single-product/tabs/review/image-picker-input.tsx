@@ -2,13 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { FormField, FormMessage } from "@/components/ui/form"
+import { useUploadStaticFile } from "@/features/file/hook"
 import { cn } from "@/lib/utils"
-import { UploadIcon } from "lucide-react"
+import { Loader2, UploadIcon } from "lucide-react"
 import Image from "next/image"
 import React, { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import { UseFormReturn, FieldValues, Path, PathValue } from "react-hook-form"
 
+type ImageItem = {
+    url: string
+}
 interface ImagePickerInputProps<T extends FieldValues> {
     form: UseFormReturn<T>
     fieldName: Path<T>
@@ -26,42 +30,61 @@ function ImagePickerInput<T extends FieldValues>({
     className,
     isSimple
 }: ImagePickerInputProps<T>) {
+    const uploadImage = useUploadStaticFile()
     const value = form.watch(fieldName as Path<T>)
-    const images = isSingle
-        ? (value ? [value] : []) // string -> array 1 phần tử
-        : (value || [])          // array
+    const images: ImageItem[] = isSingle
+        ? value
+            ? [{ url: value as string }]
+            : []
+        : (value as ImageItem[]) || []
 
 
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
-            const newImages = acceptedFiles.map((file) => URL.createObjectURL(file))
+            const file = acceptedFiles[0]
+            if (!file) return
 
-            if (isSingle) {
-                // chỉ giữ 1 ảnh
-                form.setValue(
-                    fieldName,
-                    newImages[0] as PathValue<T, Path<T>>,
-                    { shouldValidate: true }
-                )
-            } else {
-                const currentImages = (form.getValues(fieldName) as string[]) || []
-                form.setValue(
-                    fieldName,
-                    [...currentImages, ...newImages] as PathValue<T, Path<T>>,
-                    { shouldValidate: true }
-                )
-            }
+            // tạo FormData
+            const formData = new FormData()
+            formData.append("file", file)
+
+            // gọi API upload
+            uploadImage.mutate(formData, {
+                onSuccess(data) {
+                    console.log("Upload success:", data)
+                    const uploadedUrl = data.url
+
+                    if (isSingle) {
+                        form.setValue(
+                            fieldName,
+                            uploadedUrl as PathValue<T, Path<T>>, // string luôn
+                            { shouldValidate: true }
+                        )
+                    } else {
+                        const currentImages = (form.getValues(fieldName) as ImageItem[]) || []
+                        form.setValue(
+                            fieldName,
+                            [...currentImages, { url: uploadedUrl }] as PathValue<T, Path<T>>,
+                            { shouldValidate: true }
+                        )
+                    }
+                },
+                onError(error) {
+                    console.error("Upload failed:", error)
+                },
+            })
         },
-        [form, fieldName, isSingle]
+        [form, fieldName, isSingle, uploadImage]
     )
 
-    const removeImage = (index: number) => {
+
+    const removeImage = (index?: number) => {
         if (isSingle) {
             form.setValue(fieldName, "" as PathValue<T, Path<T>>, {
                 shouldValidate: true,
             })
         } else {
-            const updated = (images as string[]).filter((_, idx) => idx !== index)
+            const updated = (images as ImageItem[]).filter((_, idx) => idx !== index)
             form.setValue(fieldName, updated as PathValue<T, Path<T>>, {
                 shouldValidate: true,
             })
@@ -82,8 +105,12 @@ function ImagePickerInput<T extends FieldValues>({
                 className={`h-full w-full border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center space-y-4 transition-colors cursor-pointer
           ${isDragActive ? "border-primary bg-primary/5" : "border-gray-300 dark:border-gray-700"}`}
             >
-                <UploadIcon className={cn("w-12 h-12 text-gray-400", isSimple && 'w-6 h-6')} />
-                {!isSimple && <>
+                {/* nếu đang upload thì hiện spinner */}
+                {uploadImage.isPending ? (
+                    <Loader2 className={cn("w-12 h-12 text-gray-400 animate-spin", isSimple && 'w-6 h-6')} />
+                ) : (
+                    <UploadIcon className={cn("w-12 h-12 text-gray-400", isSimple && 'w-6 h-6')} />
+                )}                {!isSimple && <>
                     <p className="text-gray-500 dark:text-gray-400 text-center">
                         {isDragActive ? "Drop your images here" : "Drag and drop your images here"}
                     </p>
@@ -97,11 +124,24 @@ function ImagePickerInput<T extends FieldValues>({
             </div>
 
             {/* Preview */}
-            {images.length > 0 && (
-                <div className={cn('grid gap-4 w-full max-h-[144px]', isSingle ? 'grid-cols-1' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4')}>
-                    {images.map((src: string, idx: number) => (
+            {isSingle ? (
+                value ? (
+                    <div className="col-span-6 relative h-[100px] w-[100px] aspect-square rounded-lg group">
+                        <Image src={value as string} alt="Uploaded" fill className="object-cover" />
+                        <button
+                            type="button"
+                            onClick={() => removeImage()}
+                            className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                ) : null
+            ) : images.length > 0 ? (
+                <div className="grid gap-4 w-full max-h-[144px] grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+                    {images.map((src: ImageItem, idx: number) => (
                         <div key={idx} className="relative h-full aspect-square rounded-lg overflow-hidden group">
-                            <Image src={src} alt={`Uploaded ${idx}`} fill className="object-cover" />
+                            <Image src={src.url} alt={`Uploaded ${idx}`} fill className="object-cover" />
                             <button
                                 type="button"
                                 onClick={() => removeImage(idx)}
@@ -112,7 +152,8 @@ function ImagePickerInput<T extends FieldValues>({
                         </div>
                     ))}
                 </div>
-            )}
+            ) : null}
+
 
             {/* Hidden field for errors */}
             <FormField

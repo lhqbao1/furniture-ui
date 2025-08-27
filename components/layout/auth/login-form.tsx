@@ -12,6 +12,7 @@ import { useLogin, useLogout } from "@/features/auth/hook"
 import { useAtom } from "jotai"
 import { accessTokenAtom, userIdAtom } from "@/store/auth"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 const formSchema = z.object({
     username: z
@@ -52,13 +53,12 @@ export default function LoginForm() {
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         loginMutation.mutate(values, {
             onSuccess: (data) => {
-                console.log(data)
-                // setUserId(data.id)
-                // setAccessToken(data.access_token)
-                router.push('/')
+                setUserId(data.id)
+                // // setAccessToken(data.access_token)
+                router.push('/admin')
             },
             onError(error, variables, context) {
-                console.log(error)
+                toast(error.message)
             },
         })
     }

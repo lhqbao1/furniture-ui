@@ -1,18 +1,19 @@
 // components/auth/Protected.tsx
 "use client"
 import { useMe } from "@/features/auth/hook"
+import { useCurrentUser } from "@/features/users/hook"
 import { ReactNode, useEffect } from "react"
 
 export default function Protected({ children }: { children: ReactNode }) {
-    const { data, isLoading, isError } = useMe()
-
+    const { data: user, isLoading } = useCurrentUser()
+    console.log(user)
     useEffect(() => {
-        if (!isLoading && (isError || !data?.user)) {
-            window.location.href = "/login"
+        if (!user) {
+            // window.location.href = "/login"
         }
-    }, [isLoading, isError, data])
+    }, [isLoading, user])
 
     if (isLoading) return <div className="p-6">Loading...</div>
-    if (!data?.user) return null
+    if (!user) return null
     return <>{children}</>
 }
