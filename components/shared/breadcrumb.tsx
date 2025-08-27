@@ -20,7 +20,7 @@ export default function CustomBreadCrumb({ currentPage }: CustomBreadCrumbProps)
     const values = Object.values(params)
 
     return (
-        <Breadcrumb>
+        <Breadcrumb className="pt-2">
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/"><Home /></BreadcrumbLink>

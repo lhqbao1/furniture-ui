@@ -486,3 +486,72 @@ export const types = [
         name: 'Type 3'
     },
 ]
+
+export const addresses = [
+    {
+      id: "home",
+      label: "Home (default)",
+      street: "Mauerweg 15A",
+      city: "10117 Berlin",
+      country: "Germany",
+      recipient: "Jane (Mom)",
+      phone: "+49 321316546",
+    },
+    {
+      id: "office",
+      label: "Office",
+      street: "Schillerstraße 28",
+      city: "80336 München",
+      country: "Germany",
+      recipient: "Marry (Secretary)",
+      phone: "+49 32106546",
+    },
+    {
+      id: "invoice",
+      label: "Invoice address",
+      street: "Mauerweg 15A",
+      city: "10117 Berlin",
+      country: "Germany",
+      recipient: null,
+      phone: null,
+    },
+  ]
+  
+
+export const paymentOptions = [
+    { id: "klarna", label: "Klarna", logo: "/klarna.svg" },
+    { id: "paypal", label: "PayPal", logo: "/paypal.svg" },
+    { id: "apple", label: "Apple Pay", logo: "/apple.svg" },
+    { id: "google", label: "Google Pay", logo: "/google.svg" },
+  ]
+  
+  export const cartItems = [
+    {
+      id: 1,
+      name: "Dining Table",
+      color: "White",
+      size: "L",
+      unitPrice: 48.0,
+      quantity: 2,
+      imageUrl: "/1.png",
+    },
+    {
+      id: 2,
+      name: "Modern Sofa",
+      color: "Brown",
+      size: "S",
+      unitPrice: 67.0,
+      quantity: 6,
+      imageUrl: "/2.png",
+    },
+    {
+      id: 3,
+      name: "Versatile Storage",
+      color: "Red",
+      size: "M",
+      unitPrice: 42.0,
+      quantity: 4,
+      imageUrl: "/3.png",
+    },
+  ]
+  

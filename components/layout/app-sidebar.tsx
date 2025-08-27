@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Home, Inbox, Search, Settings, ChevronDown } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, ChevronDown, User } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -34,6 +34,8 @@ export function AppSidebar() {
         },
         { title: "Viewed", url: "/viewed", icon: Settings },
         { title: "Contact", url: "/contact", icon: Settings },
+        { title: "Account", url: "/account", icon: User },
+
     ]
 
     return (
@@ -66,7 +68,7 @@ export function AppSidebar() {
                                                 <CollapsibleTrigger asChild>
                                                     <SidebarMenuButton asChild>
                                                         <button
-                                                            className={`flex w-full flex-row items-center justify-between gap-4 !rounded-full px-4 py-6 transition-colors ${isActive ? "bg-orange-500 text-white" : "hover:bg-orange-100"
+                                                            className={`flex w-full flex-row items-center justify-between gap-4 !rounded-full px-4 py-6 transition-colors ${isActive ? "bg-primary text-white" : "hover:bg-orange-100"
                                                                 }`}
                                                         >
                                                             <div className="flex items-center gap-4">
@@ -92,7 +94,7 @@ export function AppSidebar() {
                                                                 key={child.title}
                                                                 href={child.url}
                                                                 className={`flex flex-row gap-3 rounded-md px-2 py-1 text-base transition-colors ${isChildActive
-                                                                    ? "bg-orange-500 text-white"
+                                                                    ? "bg-primary text-white"
                                                                     : "text-muted-foreground hover:bg-orange-100 hover:text-foreground"
                                                                     }`}
                                                             >
@@ -114,7 +116,7 @@ export function AppSidebar() {
                                         <SidebarMenuButton asChild>
                                             <a
                                                 href={item.url}
-                                                className={`flex flex-row items-center gap-4 !rounded-full px-4 py-6 transition-colors ${isActive ? "bg-orange-500 text-white" : "hover:bg-orange-100"
+                                                className={`flex flex-row items-center gap-4 !rounded-full px-4 py-6 transition-colors ${isActive ? "bg-primary text-white" : "hover:bg-orange-100"
                                                     }`}
                                             >
                                                 <item.icon
