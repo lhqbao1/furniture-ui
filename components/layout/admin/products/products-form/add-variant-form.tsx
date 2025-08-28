@@ -8,26 +8,41 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { X } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Variant, VariantSchema } from "@/lib/schema/variant"
+import { VariantSchema } from "@/lib/schema/variant"
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input"
+import { Variant } from "@/types/products"
+import { useEffect } from "react"
 
 type VariantDrawerProps = {
     onAdd: (v: Variant) => void
     setVariant: React.Dispatch<React.SetStateAction<Variant[]>>
+    editingVariant?: Variant | null
 }
 
-export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps) {
+export default function VariantDrawer({
+    onAdd,
+    setVariant,
+    editingVariant,
+}: VariantDrawerProps) {
     const form = useForm<Variant>({
         resolver: zodResolver(VariantSchema),
-        defaultValues: {
+        defaultValues: editingVariant ?? {
             name: "",
             is_active: true,
-            type: "local",
+            is_global: false,
             options: [],
-            optionType: ''
+            optionType: "",
         },
-        mode: "onChange", // validate khi thay đổi
+        mode: "onChange",
     })
+
+    // reset khi editingVariant thay đổi
+    useEffect(() => {
+        console.log("editingVariant changed:", editingVariant)
+        if (editingVariant) {
+            form.reset(editingVariant)
+        }
+    }, [editingVariant, form])
 
     const optionType = form.watch("optionType")
 
@@ -37,10 +52,9 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
     })
 
     const onSubmit = (data: Variant) => {
-        onAdd(data)
-        setVariant((prev) => [...prev, data])
-        console.log("✅ form data", data)
-    }
+        onAdd(data);
+        form.reset();
+    };
 
     return (
         <FormProvider {...form}>
@@ -49,34 +63,29 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                 className="space-y-6"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Type (Global / Local) */}
+                {/* Variant Type */}
                 <div className="space-y-4">
                     <Label>Variant Type</Label>
                     <Controller
                         control={form.control}
-                        name="type"
+                        name="is_global"
                         render={({ field }) => (
                             <RadioGroup
-                                value={field.value}
-                                onValueChange={field.onChange}
+                                value={field.value ? "true" : "false"}
+                                onValueChange={(val) => field.onChange(val === "true")}
                                 className="flex gap-6"
                             >
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="global" id="global" />
+                                    <RadioGroupItem value="true" id="global" />
                                     <Label htmlFor="global">Global Variant</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="local" id="local" />
+                                    <RadioGroupItem value="false" id="local" />
                                     <Label htmlFor="local">Local Variant</Label>
                                 </div>
                             </RadioGroup>
                         )}
                     />
-                    {form.formState.errors.type && (
-                        <p className="text-sm text-red-500">
-                            {form.formState.errors.type.message as string}
-                        </p>
-                    )}
                 </div>
 
                 {/* Variant Name */}
@@ -126,7 +135,6 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                     )}
                 </div>
 
-
                 {/* Options */}
                 {optionType === "image" ? (
                     <div className="space-y-5">
@@ -144,7 +152,7 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                                             className="flex-row"
                                         />
                                     </div>
-                                    <div className="col-span-12 space-y-3">
+                                    <div className="col-span-6 space-y-3">
                                         <Label>Extra price</Label>
                                         <Controller
                                             control={form.control}
@@ -153,6 +161,23 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                                                 <Input
                                                     type="number"
                                                     placeholder="Extra price"
+                                                    {...field}
+                                                    onChange={(e) =>
+                                                        field.onChange(e.target.valueAsNumber)
+                                                    }
+                                                />
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="col-span-6 space-y-3">
+                                        <Label>Stock</Label>
+                                        <Controller
+                                            control={form.control}
+                                            name={`options.${index}.stock`}
+                                            render={({ field }) => (
+                                                <Input
+                                                    type="number"
+                                                    placeholder="Stock"
                                                     {...field}
                                                     onChange={(e) =>
                                                         field.onChange(e.target.valueAsNumber)
@@ -178,7 +203,7 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                             type="button"
                             variant="secondary"
                             onClick={() =>
-                                append({ label: "", extra_price: 0, image_url: "" })
+                                append({ label: "", extra_price: 0, image_url: "", stock: 0 })
                             }
                         >
                             + Add Option
@@ -190,7 +215,7 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                         {fields.map((field, index) => (
                             <Card key={field.id} className="p-3">
                                 <CardContent className="grid grid-cols-12 gap-3">
-                                    <div className="col-span-3 space-y-3">
+                                    <div className="col-span-6 space-y-3">
                                         <Label>Name</Label>
                                         <Controller
                                             control={form.control}
@@ -200,14 +225,12 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                                                     type="text"
                                                     placeholder="Option Label"
                                                     {...field}
-                                                    onChange={(e) =>
-                                                        field.onChange(e.target.value)
-                                                    }
+                                                    onChange={(e) => field.onChange(e.target.value)}
                                                 />
                                             )}
                                         />
                                     </div>
-                                    <div className="col-span-3 space-y-3">
+                                    <div className="col-span-6 space-y-3">
                                         <Label>Extra price</Label>
                                         <Controller
                                             control={form.control}
@@ -224,15 +247,34 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                                             )}
                                         />
                                     </div>
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => remove(index)}
-                                        className="w-fit"
-                                    >
-                                        <X className="w-4 h-4 mr-1" /> Remove
-                                    </Button>
+                                    <div className="col-span-6 space-y-3">
+                                        <Label>Stock</Label>
+                                        <Controller
+                                            control={form.control}
+                                            name={`options.${index}.stock`}
+                                            render={({ field }) => (
+                                                <Input
+                                                    type="number"
+                                                    placeholder="Stock"
+                                                    {...field}
+                                                    onChange={(e) =>
+                                                        field.onChange(e.target.valueAsNumber)
+                                                    }
+                                                />
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="col-span-12">
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => remove(index)}
+                                            className="w-fit"
+                                        >
+                                            <X className="w-4 h-4 mr-1" /> Remove
+                                        </Button>
+                                    </div>
                                 </CardContent>
                             </Card>
                         ))}
@@ -241,7 +283,7 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                             type="button"
                             variant="secondary"
                             onClick={() =>
-                                append({ label: "", extra_price: 0, image_url: "" })
+                                append({ label: "", extra_price: 0, image_url: "", stock: 0 })
                             }
                         >
                             + Add Option
@@ -249,8 +291,9 @@ export default function VariantDrawer({ onAdd, setVariant }: VariantDrawerProps)
                     </div>
                 )}
 
-                <Button type="submit" className="w-full">
-                    Add Variant
+                {/* Submit */}
+                <Button type="button" className="w-full" onClick={form.handleSubmit(onSubmit)}>
+                    {editingVariant ? "Update Variant" : "Add Variant"}
                 </Button>
             </form>
         </FormProvider>

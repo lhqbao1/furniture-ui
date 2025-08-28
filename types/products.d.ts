@@ -1,3 +1,5 @@
+import { Pagination } from "./pagination";
+
 export interface Product {
     id: number;
     name: string;
@@ -24,3 +26,64 @@ export interface PreOrderProduct {
     color: string[];
     desc: string;
 }
+
+export type StaticFile = {
+    file_type?: "image" | string
+    url: string
+    id?: string
+    created_at?: string
+    updated_at?: string
+  }
+  
+  export type VariantOption = {
+    label: string
+    image_url?: string
+    extra_price: number
+    stock: number
+    id?: string
+    created_at?: string
+    updated_at?: string
+  }
+  
+  export type Variant = {
+    name: string
+    is_active: boolean
+    is_global: boolean
+    id?: string
+    created_at?: string
+    updated_at?: string
+    optionType?: string
+    options: VariantOption[]
+  }
+
+  export type ProductItem = {
+    name: string
+    description: string
+    price: number
+    discount_percent?: number
+    discount_amount?: number
+    tax: string
+    category?: string
+    collection?: string | null
+    stock: number
+    sku: string
+    barcode: string
+    weight: number
+    length: number
+    width: number
+    height: number
+    is_active: boolean
+    tag?: string
+    id?: string
+    final_price: number
+    created_at?: string
+    updated_at?: string
+    static_files: StaticFile[]
+    variants: Variant[]
+  }
+  
+  export type ProductResponse = {
+    pagination: Pagination
+    items: ProductItem[] | ProductItem
+  }
+  

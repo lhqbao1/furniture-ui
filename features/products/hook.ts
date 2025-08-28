@@ -1,6 +1,7 @@
 import { Products } from "@/lib/schema/product"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CreateProduct, getAllProducts } from "./api"
+import { CreateProduct, deleteProduct, editProduct, getAllProducts, getProductById } from "./api"
+import { ProductItem } from "@/types/products"
 
 export function useGetAllProducts(){
     return useQuery({
@@ -8,6 +9,15 @@ export function useGetAllProducts(){
        queryFn: getAllProducts,
        retry: false,
      })
+}
+
+export function useGetProductById(id: string) {
+  return useQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProductById(id),
+    enabled: !!id,
+    retry: false,
+  })
 }
 
 export function useAddProduct() {
@@ -20,4 +30,23 @@ export function useAddProduct() {
     })
 }
 
+export function useEditProduct() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: ProductItem }) => editProduct(input, id),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["products"] })
+    },
+  })
+}
+
   
+export function useDeleteProduct(){
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteProduct(id),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["products"] })
+    },
+  })
+}

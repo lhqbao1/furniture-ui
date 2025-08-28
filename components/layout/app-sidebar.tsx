@@ -44,11 +44,12 @@ export function AppSidebar() {
                 <SidebarGroup>
                     <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3">
                         <Image
-                            className="h-[100px] w-fit"
                             src="/new-logo.png"
-                            alt="Next.js logo"
+                            alt="Prestige Home logo"
                             width={180}
-                            height={38}
+                            height={100}   // match h-[100px]
+                            priority
+                            className="w-auto h-[100px]"
                         />
                         <div className="font-libre text-2xl flex gap-1">
                             <span className="text-secondary">Prestige</span>

@@ -8,14 +8,14 @@ import React, { Suspense } from 'react'
 
 const ProductList = () => {
     const { data, isLoading, isError } = useGetAllProducts()
-    if (isError) return <div>Error</div>
+    if (isError) return <div>No data</div>
     if (isLoading) return <div>Loading</div>
 
     return (
         <div className='space-y-12'>
             <ProductStatistic />
             <Suspense fallback={<Loader2 className="animate-spin" />} >
-                <ProductTable data={data ? data.items : []} columns={productColumns} pagination={data.pagination} />
+                <ProductTable data={data ? data.items : []} columns={productColumns} />
             </Suspense>
         </div>
     )

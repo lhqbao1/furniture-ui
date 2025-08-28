@@ -4,11 +4,14 @@ import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { Pencil, Trash2 } from "lucide-react"
-import { Products } from "@/lib/schema/product"
+import { Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
+import DeleteDialog from "./delete-dialog"
+import { ProductItem } from "@/types/products"
+import Link from "next/link"
 
-export const productColumns: ColumnDef<Products>[] = [
+
+export const productColumns: ColumnDef<ProductItem>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -39,7 +42,8 @@ export const productColumns: ColumnDef<Products>[] = [
             return (
                 <div className="w-12 h-12 relative">
                     {image ? (
-                        <Image src={image} alt="icon" fill className="object-cover rounded-md" />
+                        <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px"
+                        />
                     ) : (
                         <div className="w-12 h-12 bg-gray-200 rounded-md" />
                     )}
@@ -94,12 +98,12 @@ export const productColumns: ColumnDef<Products>[] = [
     },
     {
         id: "amazon",
-        header: () => <Image src="/amazon.png" alt="amazon" width={24} height={24} />,
+        header: () => <Image src="/amazon.png" alt="amazon" width={24} height={24} className="w-auto h-auto" />,
         cell: () => <Switch />,
     },
     {
         id: "ebay",
-        header: () => <Image src="/ebay.png" alt="ebay" width={24} height={24} />,
+        header: () => <Image src="/ebay.png" alt="ebay" width={24} height={24} className="w-auto h-auto" />,
         cell: () => <Switch />,
     },
     {
@@ -115,15 +119,19 @@ export const productColumns: ColumnDef<Products>[] = [
     {
         id: "actions",
         header: "ACTION",
-        cell: () => (
-            <div className="flex gap-2">
-                <Button variant="ghost" size="icon">
-                    <Pencil className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
-            </div>
-        ),
+        cell: ({ row }) => {
+            return (
+
+                <div className="flex gap-2">
+                    <Link href={`/admin/products/${row.original.id}/edit`}>
+                        <Button variant="ghost" size="icon">
+                            <Pencil className="w-4 h-4" />
+                        </Button>
+                    </Link>
+                    <DeleteDialog product={row.original} />
+                </div>
+
+            )
+        }
     },
 ]

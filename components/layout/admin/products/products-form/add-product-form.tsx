@@ -1,7 +1,7 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useState } from 'react'
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import React, { useEffect, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import z from 'zod'
 import { Button } from "@/components/ui/button"
 import {
@@ -16,87 +16,92 @@ import { Input } from "@/components/ui/input"
 import "react-quill-new/dist/quill.snow.css"
 import RichTextEditor from '@/components/shared/editor'
 import ImagePickerInput from '@/components/layout/single-product/tabs/review/image-picker-input'
-import { Categories, collectionList, colors, dimension, materials, tags, types } from '@/data/data'
+import { Categories, tags } from '@/data/data'
 import { Switch } from '@/components/ui/switch'
-import { MySwitch } from '@/components/shared/my-swtich'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import VariantDrawer from './add-variant-form'
-import {
-    Drawer,
-    DrawerContent,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from "@/components/ui/drawer"
-import { Variant } from '@/lib/schema/variant'
-import Image from 'next/image'
-import { addProductSchema, defaultValues, Products } from '@/lib/schema/product'
-import { useAddProduct } from '@/features/products/hook'
-import { toast } from 'sonner'
+import { addProductSchema, defaultValues } from '@/lib/schema/product'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
+import { Loader2 } from 'lucide-react'
+import { ProductItem, Variant } from '@/types/products'
+import { toast } from 'sonner'
+import ProductTypeSelector from './product-type'
+import { ProductPricingFields } from './pricing-field'
+import ProductVariants from './variant-list'
 
-const AddProductForm = () => {
+interface AddProductFormProps {
+    productValues?: Partial<ProductItem>
+    onSubmit: (values: ProductItem) => Promise<void> | void
+    isPending?: boolean
+}
+
+const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps) => {
     const [showMaterial, setShowMaterial] = useState<boolean>(true)
     const [variants, setVariants] = useState<Variant[]>([])
-    const createProduct = useAddProduct()
     const [openVariant, setOpenVariant] = useState(false)
+    const [description, setDescription] = useState("")
+    const [isSimple, setIsSimple] = useState(true)
 
     const form = useForm<z.infer<typeof addProductSchema>>({
         resolver: zodResolver(addProductSchema),
-        defaultValues: defaultValues,
+        defaultValues: productValues || defaultValues,
+        mode: "onBlur",
     })
 
-    const { control, setValue } = form
+    useEffect(() => {
+        if (productValues) {
+            form.reset(productValues)
+        }
+    }, [productValues, form])
 
-    const { fields, append, remove } = useFieldArray({
+
+    //Khai báo useFieldArray cho variants form
+    const { fields, append, remove, replace } = useFieldArray({
         control: form.control,
         name: "variants",
     })
 
+    // Khi fields thay đổi (tức là variant/option thay đổi)
+    useEffect(() => {
+        if (!fields || fields.length === 0) return
 
-    function onSubmit(values: z.infer<typeof addProductSchema>) {
-        createProduct.mutate(values, {
-            onSuccess: (data) => {
-                toast.success("Product is created")
-                form.reset()
-                setVariants([])
-                console.log("Created product:", data)
-            },
-            onError: (error) => {
-                toast.error(error.message)
+        // tính tổng stock từ tất cả option trong tất cả variant
+        let totalStock = 0
+        fields.forEach((variant) => {
+            if (variant.options && Array.isArray(variant.options)) {
+                variant.options.forEach((opt) => {
+                    if (opt.stock) {
+                        totalStock += Number(opt.stock) || 0
+                    }
+                })
             }
         })
+
+        form.setValue("stock", totalStock) // gán về stock của sản phẩm
+    }, [fields, form])
+
+    const handleSubmit = async (values: ProductItem) => {
+        // await onSubmit(values)
+        // form.reset()
     }
 
-    // Watch price + discountPercent
-    const price = useWatch({ control, name: "price" })
-    const discountPercent = useWatch({ control, name: "discount_percent" })
-
-    const stock = useWatch({
-        control: form.control,
-        name: "stock",
-    })
-
-    React.useEffect(() => {
-        if (price && discountPercent) {
-            const discountAmount = (price * discountPercent) / 100
-            const finalPrice = price - discountAmount
-
-            setValue("discount_amount", discountAmount)
-            setValue("final_price", finalPrice)
-        } else {
-            setValue("discount_amount", 0)
-            setValue("final_price", price || 0)
-        }
-    }, [price, discountPercent, setValue])
     return (
         <div className='pb-20'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                <form onSubmit={form.handleSubmit(
+                    (values) => {
+                        console.log("✅ Valid submit", values)
+                        handleSubmit(values)
+                    },
+                    (errors) => {
+                        toast.error("Please check the form for errors")
+                    }
+                )}>
                     <div className='grid-cols-12 grid gap-5 w-full'>
                         <div className='col-span-8 flex flex-col gap-4'>
                             <h3 className='text-xl text-[#666666]'>Add New Product</h3>
+                            <ProductTypeSelector isSimple={isSimple} setIsSimple={setIsSimple} />
+
                             {/*Product Name */}
                             <FormField
                                 control={form.control}
@@ -113,7 +118,7 @@ const AddProductForm = () => {
                             />
 
                             {/*Product Price and Discount */}
-                            <div className='grid grid-cols-12 gap-6'>
+                            {/* <div className='grid grid-cols-12 gap-6'>
                                 <div className='col-span-3'>
                                     <FormField
                                         control={form.control}
@@ -207,7 +212,8 @@ const AddProductForm = () => {
                                         )}
                                     />
                                 </div>
-                            </div>
+                            </div> */}
+                            <ProductPricingFields form={form} />
 
                             <FormField
                                 control={form.control}
@@ -250,6 +256,8 @@ const AddProductForm = () => {
                                             <RichTextEditor
                                                 value={field.value || ""}
                                                 onChange={field.onChange}
+                                                content={description}
+                                                setContent={setDescription}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -263,58 +271,26 @@ const AddProductForm = () => {
                                 <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
                             </div>
 
-                            {/*Product Variants */}
-                            <div className='border-t border-gray-400 pt-2'>
-                                <p>Product Variants</p>
-                                <div className='flex flex-col gap-3 mt-3'>
-                                    {variants && variants.length > 0 ?
-                                        variants.map((item, index) => {
-                                            return (
-                                                <div className='grid grid-cols-12 gap-4 items-center' key={item.id}>
-                                                    <div className='col-span-3 flex gap-2 items-center justify-start'>
-                                                        <p className='text-[#666666] text-sm'>{item.name}</p>
-                                                        <MySwitch checked={showMaterial} onCheckedChange={() => setShowMaterial(!showMaterial)} />
-                                                    </div>
-                                                    {showMaterial ?
-                                                        <div className='item-color flex flex-row gap-4 col-span-9'>
-                                                            {item.options.map((options, index) => {
-                                                                if (options.image_url) {
-                                                                    return (
-                                                                        <div key={options.id}>
-                                                                            <Image
-                                                                                src={options.image_url}
-                                                                                width={50}
-                                                                                height={50}
-                                                                                alt=''
-                                                                                className='shadow-sm bg-white rounded-sm'
-                                                                            />
-                                                                        </div>
-                                                                        // <ImageSinglePicker key={index} size={SizeType.Icon} item={options} name='materials' isFormInput />
-                                                                    )
-                                                                } else {
-                                                                    return (
-                                                                        <div key={options.id} className='px-2 py-1 rounded-md'>{options.label}</div>
-                                                                    )
-                                                                }
-                                                            })}
-                                                        </div>
-                                                        : ''
-                                                    }
-                                                </div>
-                                            )
-                                        })
-
-                                        : ''}
-                                </div>
-
-                            </div>
+                            <ProductVariants
+                                openVariant={openVariant}
+                                setOpenVariant={setOpenVariant}
+                                append={append}
+                                setVariants={setVariants}
+                                isSimple={isSimple}
+                                variants={fields}
+                                showMaterial={showMaterial}
+                                setShowMaterial={setShowMaterial}
+                                replace={replace}
+                            />
 
                         </div>
                         <div className='col-span-4 flex flex-col items-end gap-4'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end'>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white' type="button" hasEffect>Discard</Button>
-                                <Button className='cursor-pointer bg-primary/95 hover:bg-primary text-lg' type="submit" hasEffect>Submit</Button>
+                                <Button className='cursor-pointer bg-primary/95 hover:bg-primary text-lg' type="submit" hasEffect>
+                                    {isPending ? <Loader2 /> : 'Submit'}
+                                </Button>
                             </div>
 
                             {/*Product Active */}
@@ -348,10 +324,10 @@ const AddProductForm = () => {
                                         <FormControl>
                                             <Select
                                                 onValueChange={field.onChange}
-                                                value={field.value}
+                                                value={field.value || ""}   // chỉ cần value
                                             >
-                                                <SelectTrigger className='border text-black' placeholderColor='black'>
-                                                    <SelectValue placeholder="Select category" className='text-black' />
+                                                <SelectTrigger className="border text-black">
+                                                    <SelectValue placeholder="Select category" className="text-black" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {Categories.map((item, index) => (
@@ -366,34 +342,6 @@ const AddProductForm = () => {
                                 )}
                             />
 
-                            {/*Product Collection */}
-                            {/* <FormField
-                                control={form.control}
-                                name="collection"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row gap-3">
-                                        <FormLabel className="!mt-0 text-[#666666]">Collection</FormLabel>
-                                        <FormControl>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                value={field.value}
-                                            >
-                                                <SelectTrigger className='border text-black' placeholderColor='black'>
-                                                    <SelectValue placeholder="Select category" className='text-black' />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {collectionList.map((item, index) => (
-                                                        <SelectItem key={index} value={item.name}>
-                                                            {item.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            /> */}
-
                             <div className="flex items-center gap-4">
                                 {/* Stock toggle */}
                                 <FormField
@@ -403,30 +351,14 @@ const AddProductForm = () => {
                                         <FormItem className="flex items-center space-x-2">
                                             <FormLabel className="!mt-0 text-[#666666]">Stock</FormLabel>
                                             <FormControl>
-                                                <Switch
-                                                    checked={field.value}
-                                                    onCheckedChange={field.onChange}
-                                                    className="data-[state=unchecked]:bg-gray-400"
-                                                />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {/* Quantity input */}
-                                <FormField
-                                    control={form.control}
-                                    name="quantity"
-                                    render={({ field }) => (
-                                        <FormItem className="">
-                                            <FormControl>
                                                 <Input
+                                                    readOnly={isSimple ? false : true}
                                                     type="number"
                                                     placeholder="quantity"
                                                     min={0}
-                                                    disabled={!stock} // <-- disable khi stock = false
                                                     {...field}
                                                     onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                                    className={`${isSimple ? '' : 'bg-gray-100 cursor-not-allowed'}`}
                                                 />
                                             </FormControl>
                                         </FormItem>
@@ -496,7 +428,7 @@ const AddProductForm = () => {
                                 <div className='flex flex-row gap-1'>
                                     <FormField
                                         control={form.control}
-                                        name='packaging.packageLength'
+                                        name='length'
                                         render={({ field }) => (
                                             <FormItem className='flex flex-col items-center'>
                                                 <FormControl>
@@ -514,7 +446,7 @@ const AddProductForm = () => {
                                     />
                                     <FormField
                                         control={form.control}
-                                        name='packaging.packageHeight'
+                                        name='height'
                                         render={({ field }) => (
                                             <FormItem className='flex flex-col items-center'>
                                                 <FormControl>
@@ -532,7 +464,7 @@ const AddProductForm = () => {
                                     />
                                     <FormField
                                         control={form.control}
-                                        name='packaging.packageWidth'
+                                        name='width'
                                         render={({ field }) => (
                                             <FormItem className='flex flex-col items-center'>
                                                 <FormControl>
@@ -579,27 +511,9 @@ const AddProductForm = () => {
                     </div>
                 </form>
             </Form>
-            {/* Nút mở Drawer */}
-            <Drawer open={openVariant} onOpenChange={setOpenVariant} direction='right' disablePreventScroll>
-                <DrawerTrigger asChild>
-                    <Button type="button">Add Variant</Button>
-                </DrawerTrigger>
-                <DrawerContent className="p-4 !max-w-[500px] !w-[500px] overflow-y-auto">
-                    <DrawerHeader>
-                        <DrawerTitle>Add New Variant</DrawerTitle>
-                    </DrawerHeader>
-                    <VariantDrawer
-                        onAdd={(variant) => {
-                            append(variant)
-                            setOpenVariant(false) // đóng drawer
-                        }}
-                        setVariant={setVariants}
-                    />
-                </DrawerContent>
-            </Drawer>
         </div>
 
     )
 }
 
-export default AddProductForm
+export default ProductForm

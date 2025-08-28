@@ -1,43 +1,51 @@
 import z from "zod";
-import { VariantSchema } from "./variant";
+import {  VariantSchema } from "./variant";
+import { fa } from "zod/v4/locales";
+import { StaticFile, Variant } from "@/types/products";
 
-const ImageItemSchema = z.object({
-    url: z.string().url() // có thể thêm validate url
-  })
+// schema cho StaticFile
+const StaticFileSchema = z.object({
+  url: z.string(),
+  file_type: z.string().optional(),
+  id: z.string().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+})
 
 export const addProductSchema = z.object({
-    name: z.string().min(2, { message: "Product name is required" }),
-    price: z.number().min(0),
-    discount_percent: z.number().min(0).max(100).optional(),
-    discount_amount: z.number().optional(),
-    final_price: z.number().optional(),
-    description: z.string().optional(),
-    static_files: z.array(ImageItemSchema),
-    materials: z.string(),
-    color: z.string(),
-    tax: z.string(),
-    size: z.object({
-        sizeLength: z.string().optional(),
-        sizeWidth: z.string().optional(),
-        sizeHeight: z.string().optional(),
-    }),
-    type: z.string(),
-    category: z.string().optional(),
-    // collection: z.string().optional(),
-    stock: z.boolean(),
-    quantity: z.number().min(0),
-    sku: z.string().optional(),
-    barcode: z.string().optional(),
-    packaging: z.object({
-        packageLength: z.string().optional(),
-        packageWidth: z.string().optional(),
-        packageHeight: z.string().optional(),
-    }),
-    weight: z.number().optional(),
-    tag: z.string(),
-    is_active: z.boolean(),
-    variants: z.array(VariantSchema),
+  name: z.string().min(2, { message: "Product name is required" }),
+  description: z.string().min(1, { message: "Description is required" }),
+  price: z.number().min(0),
+  discount_percent: z.number().min(0).max(100).optional(),
+  discount_amount: z.number().optional(),
+  final_price: z.number(),
+  tax: z.string().min(1, { message: "Tax is required" }),
+  category: z.string().optional(),
+  collection: z.string().optional().nullable(),
+  stock: z.number().min(0),
+  sku: z.string(),
+  barcode: z.string(),
+  weight: z.number(),
+  length: z.number(),
+  width: z.number(),
+  height: z.number(),
+  is_active: z.boolean(),
+  tag: z.string().optional(),
+  static_files: z.array(StaticFileSchema),
+  variants: z.array(VariantSchema),
+
+  // giữ lại các field phụ nhưng optional (không có trong ProductItem)
+  materials: z.string().optional(),
+  color: z.string().optional(),
+  size: z
+    .object({
+      sizeLength: z.string().optional(),
+      sizeWidth: z.string().optional(),
+      sizeHeight: z.string().optional(),
+    })
+    .optional(),
 })
+
 
 export type Products = z.infer<typeof addProductSchema>
 
@@ -48,34 +56,32 @@ export const defaultValues = {
     discount_percent: 0,
     discount_amount: 0,
     final_price: 0,
-    static_files: [],
-    tax: '19%',
-    materials: "",
-    color: "",
-
-    size: {
-        sizeLength: "",
-        sizeWidth: "",
-        sizeHeight: "",
-    },
-
-    type: "",
+    tax: "19%",
     category: "",
-    // collection: "",
-
-    stock: false,
-    is_active: false,
-    quantity: 0,
+    collection: "None",
+  
+    stock: 0,
     sku: "",
     barcode: "",
-
-    packaging: {
-        packageLength: "",
-        packageWidth: "",
-        packageHeight: "",
-    },
-
     weight: 0,
+    length: 0,
+    width: 0,
+    height: 0,
+  
+    is_active: false,
     tag: "",
-    variants: []
-}
+  
+    static_files: [] as StaticFile[],
+  
+    variants: [] as Variant[],
+  
+    // những field phụ UI, optional
+    materials: "",
+    color: "",
+    size: {
+      sizeLength: "",
+      sizeWidth: "",
+      sizeHeight: "",
+    },
+  }
+  

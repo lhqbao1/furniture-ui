@@ -13,23 +13,14 @@ import React, { useState } from "react"
 import TableToolbar from "./toolbar"
 import { Button } from "@/components/ui/button"
 
-interface PaginationInfo {
-    page: number
-    page_size: number
-    total_pages: number
-    total_items: number
-}
-
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
-    pagination: PaginationInfo
 }
 
 export function ProductTable<TData, TValue>({
     columns,
     data,
-    pagination,
 }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = React.useState({})
     const [page, setPage] = useState(1)

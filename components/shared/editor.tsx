@@ -1,11 +1,8 @@
 "use client"
 
 import { Editor } from "@tinymce/tinymce-react"
-import { useState } from "react"
 
-export default function RichTextEditor({ value, onChange }: { value: string, onChange: (val: string) => void }) {
-    const [content, setContent] = useState(value)
-
+export default function RichTextEditor({ value, onChange, content, setContent }: { value: string, onChange: (val: string) => void, content: string, setContent: (val: string) => void }) {
     return (
         <Editor
             apiKey={process.env.NEXT_PUBLIC_TINY_API_KEY}
@@ -28,6 +25,7 @@ export default function RichTextEditor({ value, onChange }: { value: string, onC
                 setContent(newValue)
                 onChange(newValue)
             }}
+            value={value}
         />
 
     )

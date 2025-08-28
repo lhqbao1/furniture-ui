@@ -32,7 +32,7 @@ const checkOutBreadcrumb = [
     { label: 'Tracking', icon: 'tracking.svg' },
 ]
 
-export const cartItemSchema = z.object({
+const cartItemSchema = z.object({
     id: z.number(),
     name: z.string(),
     color: z.string(),

@@ -106,22 +106,33 @@ const api = axios.create({
 
 // attach access token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token")
-  if (token) {
-    // đảm bảo headers tồn tại
-    config.headers = config.headers || {}
-    // gán trực tiếp field Authorization
-    config.headers.set("Authorization", `Bearer ${token}`)
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("access_token")
+    if (token) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${token}`
+    }
   }
   return config
 })
+
+// api.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("access_token")
+//   if (token) {
+//     // đảm bảo headers tồn tại
+//     config.headers = config.headers || {}
+//     // gán trực tiếp field Authorization
+//     config.headers.set("Authorization", `Bearer ${token}`)
+//   }
+//   return config
+// })
 
 
 // handle 401
 api.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && typeof window !== "undefined") {
       // Xoá token cũ
       localStorage.removeItem("access_token")      
     }
