@@ -18,9 +18,9 @@ export default function AdminLayout({
         <SidebarProvider>
             <AdminSideBar />
             <div className="container-padding pt-8 w-full overflow-x-scroll">
-                {/* <Protected> */}
-                {children}
-                {/* </Protected> */}
+                <Protected>
+                    {children}
+                </Protected>
             </div>
         </SidebarProvider>
     );

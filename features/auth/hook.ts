@@ -1,7 +1,7 @@
 // features/auth/hooks.ts
 "use client"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getMe, login, logout, LoginInput } from "./api"
+import { getMe, login, logout, LoginInput, signUp, SignUpInput, forgotPassword, resetPassword } from "./api"
 import { tokenStore } from "@/lib/token"
 
 export function useMe() {
@@ -17,7 +17,6 @@ export function useLogin() {
   return useMutation({
     mutationFn: (input: LoginInput) => login(input),
     onSuccess: (res) => {
-      tokenStore.set(res.access_token)
       qc.invalidateQueries({ queryKey: ["me"] })
     },
   })
@@ -31,5 +30,23 @@ export function useLogout() {
       tokenStore.set(null)
       qc.invalidateQueries({ queryKey: ["me"] })
     },
+  })
+}
+
+export function useSignUp() {
+  return useMutation({
+    mutationFn: (input: SignUpInput) => signUp(input),
+  })
+}
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: (email: string) => forgotPassword(email),
+  })
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: ({email,code,new_password}: {email: string, code: string, new_password: string}) => resetPassword(email, code, new_password),
   })
 }

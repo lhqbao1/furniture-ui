@@ -122,7 +122,7 @@ const CountDownGridLayout = () => {
                             <ListReviewButton />
                         </div>
 
-                        <div className='flex flex-col items-end gap-2 2xl:mt-20 '>
+                        <div className='flex flex-col items-end gap-2 xl:mt-20 mt-10 '>
                             <div className="relative w-full"> {/* container relative */}
                                 {/* Thanh progress */}
                                 <div className="h-2.5 w-full bg-gray-300 relative overflow-hidden rounded-full">

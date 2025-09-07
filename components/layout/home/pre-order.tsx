@@ -13,7 +13,7 @@ const PreOrder = () => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
     return (
         <div className='section-padding'>
-            <h2 className='text-secondary text-4xl font-bold text-center uppercase'>PRE-ORDER</h2>
+            <h2 className='section-header'>Pre-Order</h2>
             <p className='text-primary text-lg text-center font-semibold'>
                 start delivery from Sep 10 to Sep 15
             </p>
@@ -167,7 +167,6 @@ const PreOrder = () => {
                                 height={36}
                                 alt='1'
                                 style={{ width: 60 }}
-
                             />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>

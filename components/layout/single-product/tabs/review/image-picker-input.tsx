@@ -51,7 +51,6 @@ function ImagePickerInput<T extends FieldValues>({
             // gọi API upload
             uploadImage.mutate(formData, {
                 onSuccess(data) {
-                    console.log("Upload success:", data)
                     const uploadedUrl = data.url
 
                     if (isSingle) {

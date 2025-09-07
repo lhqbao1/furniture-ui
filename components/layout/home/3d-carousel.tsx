@@ -71,7 +71,7 @@ const AnimatedCarousel = () => {
 
     return (
         <div className="flex flex-col section-padding">
-            <h2 className="text-secondary text-2xl md:text-4xl font-bold text-center uppercase mb-6">
+            <h2 className="section-header mb-6">
                 Categories
             </h2>
             <div className="relative w-full xl:h-[600px] h-[300px] xl:min-h-[500px] [perspective:2000px] [transform-style:preserve-3d]">

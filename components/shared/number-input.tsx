@@ -3,6 +3,7 @@ import { forwardRef, useEffect, useState } from "react"
 import { NumericFormat, NumericFormatProps } from "react-number-format"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
+import { useFormContext } from "react-hook-form"
 
 
 export interface NumberInputProps
@@ -98,6 +99,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                         variant="outline"
                         onClick={handleIncrement}
                         disabled={value === max}
+                        type="button"
                     >
                         <ChevronUp size={15} />
                     </Button>
@@ -107,6 +109,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                         variant="outline"
                         onClick={handleDecrement}
                         disabled={value === min}
+                        type="button"
                     >
                         <ChevronDown size={15} />
                     </Button>

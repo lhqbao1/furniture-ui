@@ -18,5 +18,4 @@ export const VariantSchema = z.object({
   optionType: z.string().optional()
 })
 
-// ✅ Lấy TypeScript type
 export type Option = z.infer<typeof OptionSchema>

@@ -40,7 +40,7 @@ function Button({
   variant,
   size,
   asChild = false,
-  hasEffect = false,
+  hasEffect = true,
   isMobile = false,
   ...props
 }: React.ComponentProps<"button"> &

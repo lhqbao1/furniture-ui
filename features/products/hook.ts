@@ -1,13 +1,15 @@
 import { Products } from "@/lib/schema/product"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { CreateProduct, deleteProduct, editProduct, getAllProducts, getProductById } from "./api"
-import { ProductItem } from "@/types/products"
+import { ProductItem, ProductResponse } from "@/types/products"
 
 export function useGetAllProducts(){
     return useQuery({
        queryKey: ["products"],
-       queryFn: getAllProducts,
+       queryFn: () => getAllProducts(),
        retry: false,
+      //  initialData
+      //  staleTime: 60_000
      })
 }
 

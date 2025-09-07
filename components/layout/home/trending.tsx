@@ -1,13 +1,24 @@
+'use client'
+import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
 import ProductsGridLayout from '@/components/shared/products-grid-layout'
-import { trendingProducts } from '@/data/data'
+import { useGetAllProducts } from '@/features/products/hook'
 import React from 'react'
 
 const TrendingProducts = () => {
+    const { data: products, isLoading, isError } = useGetAllProducts()
+
     return (
         <div className='section-padding'>
-            <h2 className='text-secondary text-4xl font-bold text-center uppercase'>Trending</h2>
+            <h2 className='section-header'>
+                Trending
+            </h2>
             <p className='text-primary text-lg text-center'>most wanted on social media</p>
-            <ProductsGridLayout data={trendingProducts} />
+
+            {isLoading || isError || !products ? (
+                <ProductGridSkeleton />
+            ) : (
+                <ProductsGridLayout data={products} />
+            )}
         </div>
     )
 }

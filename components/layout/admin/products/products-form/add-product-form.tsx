@@ -81,8 +81,10 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     }, [fields, form])
 
     const handleSubmit = async (values: ProductItem) => {
-        // await onSubmit(values)
-        // form.reset()
+        await onSubmit(values)
+        // if (!productValues) {
+        //     form.reset()
+        // }
     }
 
     return (
@@ -117,102 +119,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 )}
                             />
 
-                            {/*Product Price and Discount */}
-                            {/* <div className='grid grid-cols-12 gap-6'>
-                                <div className='col-span-3'>
-                                    <FormField
-                                        control={form.control}
-                                        name="price"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className='text-[#666666] text-sm'>Price</FormLabel>
-                                                <FormControl>
-                                                    <div className='relative flex items-center'>
-                                                        <Input
-                                                            placeholder=""
-                                                            {...field}
-                                                            type='number'
-                                                            min={0}
-                                                            className='pl-7'
-                                                            onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                                        />
-                                                        <span className='absolute left-3 text-gray-500'>€</span>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                                <div className='col-span-3'>
-                                    <FormField
-                                        control={form.control}
-                                        name="discount_percent"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className='text-[#666666] text-sm'>Discount</FormLabel>
-                                                <FormControl>
-                                                    <div className='relative flex items-center'>
-                                                        <Input placeholder="" {...field} type='number' min={0} className='pl-7' onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                                        />
-                                                        <span className='absolute left-3 text-gray-500'>%</span>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                                <div className='col-span-3'>
-                                    <FormField
-                                        control={form.control}
-                                        name="discount_amount"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className='text-[#666666] text-sm'>Discount Amount</FormLabel>
-                                                <FormControl>
-                                                    <div className='relative flex items-center'>
-                                                        <Input
-                                                            {...field}
-                                                            // value={discountAmount}
-                                                            readOnly
-                                                            min={0}
-                                                            type='number'
-                                                            className='pl-7 bg-gray-100 cursor-not-allowed'
-                                                        />
-                                                        <span className='absolute left-3 text-gray-500'>€</span>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                                <div className='col-span-3'>
-                                    <FormField
-                                        control={form.control}
-                                        name="final_price"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className='text-[#666666] text-sm'>Final Price</FormLabel>
-                                                <FormControl>
-                                                    <div className='relative flex items-center'>
-                                                        <Input
-                                                            {...field}
-                                                            readOnly
-                                                            type='number'
-                                                            min={0}
-                                                            className='pl-7 bg-gray-100 cursor-not-allowed'
-                                                        />
-                                                        <span className='absolute left-3 text-gray-500'>€</span>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                            </div> */}
                             <ProductPricingFields form={form} />
 
                             <FormField
@@ -438,6 +344,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         min={0}
                                                         className="w-14"
                                                         {...field}
+                                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                                     />
                                                 </FormControl>
                                                 <FormLabel className='text-gray-500'>Length</FormLabel>
@@ -456,6 +363,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         min={0}
                                                         className="w-14"
                                                         {...field}
+                                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                                     />
                                                 </FormControl>
                                                 <FormLabel className='text-gray-500'>Height</FormLabel>
@@ -473,8 +381,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         placeholder=""
                                                         min={0}
                                                         className="w-14"
-
                                                         {...field}
+                                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                                     />
                                                 </FormControl>
                                                 <FormLabel className='text-gray-500'>Width</FormLabel>
@@ -485,28 +393,30 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             </div>
 
                             {/*Tag choose */}
-                            <FormField
-                                control={form.control}
-                                name="tag"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="font-bold text-base">Tag</FormLabel>
-                                        <div className="flex flex-row gap-2 flex-wrap">
-                                            {tags.map((item, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    style={{ background: item.color }}
-                                                    onClick={() => field.onChange(item.name)}
-                                                    className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${field.value === item.name ? "ring ring-primary ring-offset-2" : ""
-                                                        }`}
-                                                >
-                                                    {item.name}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
+                            <div className='w-1/2'>
+                                <FormField
+                                    control={form.control}
+                                    name="tag"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="font-bold text-base">Tag</FormLabel>
+                                            <div className="flex flex-row gap-2 flex-wrap">
+                                                {tags.map((item, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        style={{ background: item.color }}
+                                                        onClick={() => field.onChange(item.name)}
+                                                        className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${field.value === item.name ? "ring ring-primary ring-offset-2" : ""
+                                                            }`}
+                                                    >
+                                                        {item.name}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
                     </div>
                 </form>

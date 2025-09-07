@@ -29,7 +29,14 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
                 <Providers>{children}</Providers>
-                <Toaster richColors position="top-right" closeButton />
+                <Toaster
+                    richColors
+                    position="top-right"
+                    closeButton
+                    toastOptions={{
+                        className: "bg-[rgba(81,190,140,0.2)] text-white z-100",
+                    }}
+                />
             </body>
         </html>
     );

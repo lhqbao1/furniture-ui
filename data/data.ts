@@ -555,3 +555,26 @@ export const paymentOptions = [
     },
   ]
   
+  // data/invoice.ts
+export const invoiceData = {
+    id: "56467987",
+    date: "2025-08-31",
+    customerId: "54987931",
+    customer: {
+      name: "Mia Rose",
+      address: "Musterweg 7, 20095 Hamburg, Germany",
+    },
+    items: [
+      { pos: 1, name: "Airm Chair", desc: "Color: Blue", id: "#567100", price: 100, qty: 2, vat: 7 },
+      { pos: 2, name: "Table Nan", desc: "Material: Oak wood", id: "#524550", price: 50, qty: 1, vat: 19 },
+      { pos: 3, name: "Coupon", desc: "", id: "#SALE10", price: -35, qty: 1, vat: 0 },
+      { pos: 4, name: "Voucher", desc: "", id: "#FREESHIP", price: -15, qty: 1, vat: 0 },
+    ],
+    totals: {
+      net: 176.5,
+      vat: 23.5,
+      shipping: 30,
+      amount: 230,
+    },
+  };
+  

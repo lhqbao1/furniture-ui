@@ -219,3 +219,17 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* globals.css */
+.clip-triangle-top-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.clip-triangle-bottom-right {
+  clip-path: polygon(100% 100%, 0 100%, 100% 0);
+}
+
+/* custom class */
+.section-header {
+  @apply text-secondary text-5xl font-bold text-center capitalize font-libre;
+}

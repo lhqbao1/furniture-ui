@@ -176,17 +176,17 @@ export const getColumns = (actions: Actions): ColumnDef<CartItem>[] => [
     },
     {
         id: "buy",
-        header: "BUY",
+        header: "Action",
         cell: ({ row }) => (
             <Button
                 className="bg-primary/85 hover:bg-primary text-white rounded-full relative w-full"
                 onClick={() => actions.onBuy?.(row.original.id)}
                 hasEffect
             >
-                <div className="absolute left-0 p-2 bg-white rounded-full">
+                {/* <div className="absolute left-0 p-2 bg-white rounded-full">
                     <Plus stroke="black" />
-                </div>
-                <span className="text-center font-bold text-base pl-3">BUY</span>
+                </div> */}
+                <span className="text-center font-light text-base">Add to cart</span>
             </Button>
         ),
         size: 120,

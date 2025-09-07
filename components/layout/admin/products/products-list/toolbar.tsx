@@ -46,7 +46,7 @@ export default function TableToolbar({ pageSize, setPageSize }: TableToolbarProp
             {/* Search */}
             <div className="flex items-center w-[300px] relative">
                 <Input placeholder="Search" className="pr-20" />
-                <Button className="absolute right-0 rounded-l-none bg-orange-400 hover:bg-orange-500 text-white">
+                <Button className="absolute right-0 rounded-l-none  text-white">
                     <Mic className="h-4 w-4 mr-1" /> Search
                 </Button>
             </div>
@@ -63,6 +63,8 @@ export default function TableToolbar({ pageSize, setPageSize }: TableToolbarProp
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="1">1 rows</SelectItem>
+                        <SelectItem value="5">5 rows</SelectItem>
+                        <SelectItem value="10">10 rows</SelectItem>
                         <SelectItem value="20">20 rows</SelectItem>
                         <SelectItem value="50">50 rows</SelectItem>
                     </SelectContent>
@@ -106,6 +108,10 @@ export default function TableToolbar({ pageSize, setPageSize }: TableToolbarProp
                         <DropdownMenuItem>Price</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                <div className="flex flex-1 w-full justify-end">
+                    <Button className="bg-primary hover:bg-primary font-semibold">Add Product</Button>
+                </div>
             </div>
         </div>
     )

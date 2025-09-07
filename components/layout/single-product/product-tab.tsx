@@ -19,8 +19,13 @@ import {
 } from "@/components/ui/tabs"
 import ProductReviewTab from "./tabs/review"
 import QASection from "./tabs/q&a"
+import { Product, ProductItem } from "@/types/products"
 
-export function ProductDetailsTab() {
+interface ProductDetailsTabProps {
+  product?: ProductItem
+}
+
+export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
   return (
     <div className="">
       <Tabs defaultValue="account">
@@ -40,14 +45,12 @@ export function ProductDetailsTab() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-name">Name</Label>
-                <Input id="tabs-demo-name" defaultValue="Pedro Duarte" />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-username">Username</Label>
-                <Input id="tabs-demo-username" defaultValue="@peduarte" />
-              </div>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: product?.description ?? "",
+                }}
+                className="w-20 h-20"
+              ></div>
             </CardContent>
             <CardFooter>
               <Button>Save changes</Button>

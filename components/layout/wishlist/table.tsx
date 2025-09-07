@@ -125,7 +125,7 @@ export function CartTable({ data: initial }: Props) {
 
                         <div className="flex flex-col gap-3 justify-between">
                             <Select value={voucher} onValueChange={setVoucher}>
-                                <SelectTrigger className="xl:h-8 h-6 text-black bg-white rounded px-3 py-1 w-full" placeholderColor="black">
+                                <SelectTrigger className="xl:h-8 h-6 text-black bg-white rounded px-3 py-1 w-full" placeholderColor>
                                     <SelectValue placeholder="Select Voucher" className="text-black" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -160,8 +160,8 @@ export function CartTable({ data: initial }: Props) {
                             </p>
                         </div>
                         <Button className="bg-primary/90 hover:bg-primary cursor-pointer text-white rounded-full px-10 py-2 relative">
-                            <div className="px-2.5 h-full flex items-center left-0 bg-white rounded-full absolute"><Plus stroke="black" /></div>
-                            <span className="pl-2">CHECK OUT</span>
+                            {/* <div className="px-2.5 h-full flex items-center left-0 bg-white rounded-full absolute"><Plus stroke="black" /></div> */}
+                            <span className="font-bold">Add to cart</span>
                         </Button>
                     </div>
                 </div>

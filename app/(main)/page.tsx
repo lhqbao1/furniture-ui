@@ -6,18 +6,48 @@ import PreOrder from "@/components/layout/home/pre-order";
 import RecentViewed from "@/components/layout/home/recent-viewed";
 import TrendingProducts from "@/components/layout/home/trending";
 import Voucher from "@/components/layout/home/voucher";
+import { getMe } from "@/features/auth/api";
+import { getCartItems } from "@/features/cart/api";
+import { getAllProducts } from "@/features/products/api";
+import { serverGetAllProducts } from "@/features/products/server";
+import getQueryClient from "@/lib/get-query-client";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-export default function Home() {
+export default async function Home() {
+  // const products = await serverGetAllProducts()
+
+  const queryClient = getQueryClient()
+
+  // Prefetch trending products
+  await queryClient.prefetchQuery({
+    queryKey: ["products"],
+    queryFn: () => getAllProducts(),
+  })
+
+  // Prefetch trending products
+  await queryClient.prefetchQuery({
+    queryKey: ["cart-items"],
+    queryFn: () => getCartItems(),
+  })
+
+  // Prefetch trending products
+  await queryClient.prefetchQuery({
+    queryKey: ["me"],
+    queryFn: () => getMe(),
+  })
+
   return (
-    <div id="home" className="w-full">
-      <TrendingProducts />
-      <AnimatedCarousel />
-      <Voucher />
-      <FlashSale />
-      <PreOrder />
-      <RecentViewed />
-      <Collection />
-      <Custom />
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div id="home" className="w-full">
+        <TrendingProducts />
+        <AnimatedCarousel />
+        <Voucher />
+        <FlashSale />
+        <PreOrder />
+        <RecentViewed />
+        <Collection />
+        <Custom />
+      </div>
+    </HydrationBoundary>
   );
 }

@@ -1,0 +1,160 @@
+import { formatDateTime } from '@/lib/date-formated'
+import { User } from '@/types/user'
+import React from 'react'
+
+interface OrderInformationProps {
+    payment_method?: string
+    language: string
+    external_id?: string
+    warehouse?: string
+    referrer?: string
+    owner?: User
+    order_type?: string
+    shipping_profile?: string
+    package_number?: string
+    entry_date?: Date
+    client?: string
+    sub_total?: number
+    shipping_amount?: number
+    discount_amount?: number
+    tax?: number
+    total_amount?: number
+}
+
+const OrderInformation = ({
+    payment_method,
+    language,
+    external_id,
+    warehouse,
+    referrer,
+    owner,
+    order_type,
+    shipping_profile,
+    package_number,
+    entry_date,
+    client,
+    sub_total,
+    shipping_amount,
+    discount_amount,
+    tax,
+    total_amount
+}: OrderInformationProps) => {
+    return (
+        <div className="grid grid-cols-3 gap-10">
+            <div className="space-y-3 col-span-1">
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Payment Method:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {payment_method ?? 'eBay Payment'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Language:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {language ?? 'None'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">External order ID:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {external_id ?? '21-13452-00796'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Warehouse:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {warehouse ?? 'Norma NF / DE'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Order referrer:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {referrer ?? '2.08 | eBay Germany'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Owner:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {owner?.first_name ?? 'Unknown selection ID 339'}
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-3 col-span-1">
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Order type:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {order_type ?? 'Sales order'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Shipping profile:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {shipping_profile ?? 'Standard DPD'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Package numbers:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {package_number ?? '21-13452-00796'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Entry date:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {entry_date
+                            ? formatDateTime(entry_date)
+                            : '18.08.2025 22:56:24'}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-10 items-center gap-2">
+                    <div className="text-right col-span-4">Client:</div>
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                        {client ?? '43350 | NORMAShopware'}
+                    </div>
+                </div>
+            </div>
+
+            <div className='space-y-3 col-span-1'>
+                <div className='grid grid-cols-2'>
+                    <div className='text-end col-span-1'>Sub total</div>
+                    <div className='text-end'>
+                        €{sub_total}
+                    </div>
+                </div>
+                <div className='grid grid-cols-2'>
+                    <div className='text-end'>Shipping</div>
+                    <div className='text-end'>
+                        €{shipping_amount}
+                    </div>
+                </div>
+                <div className='grid grid-cols-2'>
+                    <div className='text-end'>Discount</div>
+                    <div className='text-end'>
+                        €{discount_amount}
+                    </div>
+                </div>
+                <div className='grid grid-cols-2'>
+                    <div className='text-end'>VAT Tax</div>
+                    <div className='text-end'>
+                        €{tax}
+                    </div>
+                </div>
+                <div className='text-end'>
+                    <div className=''>Total €{total_amount}</div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default OrderInformation

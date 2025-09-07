@@ -12,10 +12,16 @@ import {
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { Button } from "../ui/button"
+import Link from "next/link"
+import { useState } from "react"
 
 export function AdminSideBar() {
+    const router = useRouter()
     const pathname = usePathname()
+    const [open, setOpen] = useState(false)
+    const [openItem, setOpenItem] = useState<string | null>(null)
 
     const items = [
         {
@@ -25,6 +31,7 @@ export function AdminSideBar() {
             children: [
                 { title: "Add Product", url: "/admin/products/add", icon: CornerDownRight },
                 { title: "Product List", url: "/admin/products/list", icon: CornerDownRight },
+                { title: "Product Group", url: "/admin/products/group", icon: CornerDownRight },
                 { title: "Category List", url: "/admin/products/categories", icon: CornerDownRight },
             ],
         },
@@ -67,89 +74,128 @@ export function AdminSideBar() {
         <Sidebar className="app-sidebar custom-scroll">
             <SidebarContent>
                 <SidebarGroup>
-                    <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3">
-                        <Image
-                            className="h-[100px] w-fit"
-                            src="/new-logo.png"
-                            alt="Next.js logo"
-                            width={180}
-                            height={38}
-                        />
-                        <div className="font-libre text-2xl flex gap-1">
-                            <span className="text-secondary">Prestige</span>
-                            <span className="text-primary">Home</span>
+                    <Link href={'/'}>
+                        <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
+                            <Image
+                                src="/new-logo.png"
+                                alt="Prestige Home logo"
+                                width={100}
+                                height={100}
+                                priority
+                                className="w-auto h-[80px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
+                            />
+                            <div className="font-libre text-[29px] flex gap-1">
+                                <span className="text-secondary font-semibold">Prestige</span>
+                                <span className="text-primary font-semibold">Home</span>
+                            </div>
                         </div>
-                    </div>
-                    <SidebarGroupContent className="px-2">
+                    </Link>
+                    <SidebarGroupContent>
                         <SidebarMenu className="gap-3">
                             {items.map((item) => {
                                 const isActive = pathname === item.url
+                                const isOpen = openItem === item.title
 
                                 // Nếu có children → dùng Collapsible
                                 if (item.children) {
                                     return (
-                                        <SidebarMenuItem key={item.title}>
-                                            <Collapsible>
+                                        <SidebarMenuItem key={item.title} className="flex justify-start">
+                                            <Collapsible
+                                                className="w-full"
+                                                open={isOpen}
+                                                onOpenChange={(open) => setOpenItem(open ? item.title : null)}
+                                            >
                                                 <CollapsibleTrigger asChild>
                                                     <SidebarMenuButton asChild>
-                                                        <button
-                                                            className={`flex w-full flex-row items-center justify-between gap-4 !rounded-full px-4 py-6 transition-colors hover:[&_svg]:stroke-white  ${isActive ? "bg-primary text-white" : "hover:bg-orange-100"
+                                                        <Button
+                                                            className={`flex w-full flex-row items-center justify-start gap-4 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black ${isActive
+                                                                ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
+                                                                : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 }`}
+                                                            variant={"ghost"}
                                                         >
-                                                            <div className="flex items-center gap-4">
+                                                            <div className="w-8">
                                                                 <item.icon
-                                                                    size={24}
-                                                                    stroke={isActive ? "#fff" : "#FAA61A"}
+                                                                    // src={item.icon}
+                                                                    height={40}
+                                                                    width={40}
+                                                                // alt=""
                                                                 />
-                                                                <span className="text-lg">{item.title}</span>
                                                             </div>
-                                                            <ChevronDown className="size-4 opacity-70" />
-                                                        </button>
+                                                            <span className="text-xl">{item.title}</span>
+                                                            <ChevronDown
+                                                                className={`size-4 opacity-70 transition-transform ${open ? "rotate-180" : ""
+                                                                    }`}
+                                                            />
+                                                        </Button>
                                                     </SidebarMenuButton>
                                                 </CollapsibleTrigger>
 
                                                 <CollapsibleContent
-                                                    style={{ transition: "none" }} // tắt inline transition Radix
-                                                    className="ml-6 flex flex-col gap-3 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                                    style={{ transition: "none" }}
+                                                    className="flex flex-col gap-3 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
                                                 >
                                                     {item.children.map((child) => {
                                                         const isChildActive = pathname === child.url
                                                         return (
-                                                            <a
+                                                            <Button
                                                                 key={child.title}
-                                                                href={child.url}
-                                                                className={`flex flex-row gap-3 rounded-full px-3 py-2 text-base transition-colors ${isChildActive
-                                                                    ? "bg-primary/70 text-white"
-                                                                    : "text-muted-foreground hover:bg-primary/90 hover:text-white"
+                                                                onClick={() => {
+                                                                    router.push(child.url)
+                                                                }}
+                                                                variant={"ghost"}
+                                                                className={`relative flex flex-row items-center justify-start pl-12 gap-3 rounded-md py-1 text-base transition-colors ${isChildActive
+                                                                    ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
+                                                                    : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
                                                                     }`}
                                                             >
-                                                                <child.icon />
+                                                                <child.icon
+                                                                    size={24}
+                                                                    className="!size-5"
+                                                                    stroke="#51BE8C"
+                                                                />
                                                                 <span>{child.title}</span>
-                                                            </a>
+
+                                                                {/* chỉ render indicator nếu Collapsible mở */}
+                                                                {open && isChildActive && (
+                                                                    <span className="absolute w-1 h-full bg-secondary right-0"></span>
+                                                                )}
+                                                            </Button>
                                                         )
                                                     })}
                                                 </CollapsibleContent>
-
                                             </Collapsible>
                                         </SidebarMenuItem>
                                     )
                                 }
 
+                                // Nếu không có children → render bình thường
                                 return (
-                                    <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuItem key={item.title} className="flex justify-center">
                                         <SidebarMenuButton asChild>
-                                            <a
-                                                href={item.url}
-                                                className={`flex flex-row items-center gap-4 !rounded-full px-4 py-6 transition-colors ${isActive ? "bg-orange-500 text-white" : "hover:bg-orange-100"
+                                            <Button
+                                                onClick={() => {
+                                                    router.push(item.url)
+                                                }}
+                                                className={`relative flex flex-row items-center justify-start rounded-none gap-3 px-4 py-6 transition-colors ${isActive
+                                                    ? "bg-secondary/20 text-[#4D4D4D] hover:text-black hover:bg-secondary/20"
+                                                    : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                     }`}
+                                                variant={"ghost"}
                                             >
-                                                <item.icon
-                                                    size={48}
-                                                    className="!size-6"
-                                                    stroke={isActive ? "#fff" : "#FAA61A"}
-                                                />
-                                                <span className="text-lg">{item.title}</span>
-                                            </a>
+                                                <div className="w-8">
+                                                    <item.icon
+                                                        // src={item.icon}
+                                                        height={40}
+                                                        width={40}
+                                                    // alt=""
+                                                    />
+                                                </div>
+                                                <span className="text-xl">{item.title}</span>
+                                                {isActive && !open && (
+                                                    <span className="absolute w-1 h-full bg-secondary right-0"></span>
+                                                )}
+                                            </Button>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )

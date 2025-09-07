@@ -1,6 +1,6 @@
 import api from "@/lib/axios"
 import { Products } from "@/lib/schema/product"
-import { ProductItem } from "@/types/products"
+import { NewProductItem, Product, ProductItem, ProductResponse } from "@/types/products"
 
 export async function CreateProduct(input: Products) {
   const { data } = await api.post(
@@ -22,14 +22,14 @@ export async function CreateProduct(input: Products) {
     const {data} = await api.get(
         '/products/',
     )
-    return data
+    return data as NewProductItem[]
 }
 
 export async function getProductById(id: string) {
   const {data} = await api.get(
       `/products/${id}`,
   )
-  return data
+  return data as ProductItem 
 }
 
 export async function deleteProduct(id: string){

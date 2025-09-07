@@ -2,6 +2,7 @@
 import ListDE from '@/components/layout/admin/products/products-form/list-de'
 import React from 'react'
 import ProductAddClient from './product-add-client'
+import { Button } from '@/components/ui/button'
 
 const AddProduct = () => {
     return (

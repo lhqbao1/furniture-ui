@@ -1,0 +1,215 @@
+"use client"
+
+import { ColumnDef } from "@tanstack/react-table"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { CheckOut } from "@/types/checkout"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Eye, File } from "lucide-react"
+import Link from "next/link"
+
+
+export const orderColumns: ColumnDef<CheckOut>[] = [
+    {
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "id",
+        header: "ORDER ID",
+        cell: ({ row }) => {
+            return (
+                <div>#{row.original.id.slice(0, 7)}</div>
+            )
+        }
+    },
+    {
+        accessorKey: "external_id",
+        header: "EXTERNAL ID",
+        cell: ({ row }) => {
+            return (
+                <div>21-13452-00796</div>
+            )
+        }
+    },
+    {
+        accessorKey: "channel",
+        header: () => (
+            <div className="text-center w-full">CHANNEL</div>
+        ),
+        cell: ({ row }) => {
+            return (
+                <div className="h-12 relative">
+                    {/* {image ? (
+                        <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px"
+                        />
+                    ) : (
+                        <div className="w-12 h-12 bg-gray-200 rounded-md" />
+                    )} */}
+                    <Image src={'/amazon.png'} alt="icon" fill className="object-contain px-4" />
+                </div>
+            )
+        },
+    },
+    {
+        accessorKey: "created_at",
+        header: () => (
+            <div className="text-center w-full">DATE</div>
+        ),
+        cell: ({ row }) => {
+            const isoString = row.original.created_at
+            const date = new Date(isoString)
+
+            const time = date.toLocaleString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false, // bỏ AM/PM nếu muốn
+            })
+
+            const day = date.toLocaleString("en-US", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            })
+
+            return (
+                <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
+                    <span>{time}</span>
+                    <span>{day}</span>
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: "customer",
+        header: () => (
+            <div className="text-center w-full">CUSTOMER</div>
+        ),
+        cell: ({ row }) => {
+            const user = row.original.user
+            const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
+            return (
+                <div className="flex gap-2 items-center justify-center">
+                    <Avatar>
+                        <AvatarImage src={`${user.avatar_url}`} alt={user.first_name} />
+                        <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                        <div className="text-[#4D4D4D] font-semibold">{user.first_name} {user.last_name}</div>
+                        <div className="text-xs text-[#4D4D4D]">{user.phone_number}</div>
+                    </div>
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: "payment",
+        header: () => (
+            <div className="text-center w-full">PAYMENT</div>
+        ),
+        cell: ({ row }) => (
+            <div className="h-12 relative">
+                <Image src={'/paypal.svg'} alt="icon" fill className="object-contain p-2" />
+            </div>
+        ),
+    },
+    {
+        accessorKey: "status",
+        header: () => (
+            <div className="text-center w-full">STATUS</div>
+        ),
+        cell: ({ row }) => <div className="text-center">{row.original.status}</div>,
+    },
+    {
+        accessorKey: "shipping",
+        header: () => (
+            <div className="text-center w-full">CARRIER</div>
+        ),
+        cell: ({ row }) => {
+            return (
+                <div className="h-12 relative">
+                    <Image src={'/dhl.png'} alt="icon" fill className="object-contain px-2" />
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: "value",
+        header: () => (
+            <div className="text-center w-full">INVOICE</div>
+        ),
+        cell: ({ row }) => {
+            return (
+                <div className="flex gap-1 items-center justify-end">
+                    <div className={`${row.original.total_amount < 0 ? 'text-red-500' : 'text-[#4D4D4D]'}`}>€{row.original.total_amount}</div>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="ghost" className="p-0">
+                                <File />
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="">
+                            <DialogHeader>
+                                <DialogTitle>Share link</DialogTitle>
+                                <DialogDescription>
+                                    Anyone who has this link will be able to view this.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex items-center gap-2">
+                                <div className="grid flex-1 gap-2">
+                                    <Label htmlFor="link" className="sr-only">
+                                        Link
+                                    </Label>
+                                </div>
+                            </div>
+                            <DialogFooter className="sm:justify-start">
+                                <DialogClose asChild>
+                                    <Button type="button" variant="secondary">
+                                        Close
+                                    </Button>
+                                </DialogClose>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            )
+        }
+    },
+    {
+        id: "actions",
+        header: "ACTION",
+        cell: ({ row }) => {
+            return (
+                <div className="flex justify-center">
+                    <Link href={`/admin/orders/${row.original.id}`}>
+                        <Button variant="ghost" size="icon">
+                            <Eye className="w-4 h-4" stroke="#FAA61A" />
+                        </Button>
+                    </Link>
+                </div>
+
+            )
+        }
+    },
+]

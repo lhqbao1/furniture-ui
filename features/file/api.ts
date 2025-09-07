@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-export type StaticFileResponse = { status: string; url: string }
+import { StaticFile } from "@/types/products";
 
 
 export async function uploadStaticFile(file: FormData){
@@ -8,5 +8,5 @@ export async function uploadStaticFile(file: FormData){
             "Content-Type": "multipart/form-data",
         }
     })
-    return data as StaticFileResponse
+    return data as StaticFile
 }

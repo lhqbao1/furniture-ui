@@ -1,4 +1,5 @@
 import { Pagination } from "./pagination";
+import { VariantOptionResponse } from "./variant";
 
 export interface Product {
     id: number;
@@ -81,9 +82,35 @@ export type StaticFile = {
     static_files: StaticFile[]
     variants: Variant[]
   }
+
+    export type NewProductItem = {
+    name: string
+    description: string
+    price: number
+    discount_percent?: number
+    discount_amount?: number
+    tax: string
+    category?: string
+    collection?: string | null
+    stock: number
+    sku: string
+    barcode: string
+    weight: number
+    length: number
+    width: number
+    height: number
+    is_active: boolean
+    tag?: string
+    id?: string
+    final_price: number
+    created_at?: string
+    updated_at?: string
+    static_files: StaticFile[]
+    options: VariantOptionResponse[]
+  }
   
   export type ProductResponse = {
     pagination: Pagination
-    items: ProductItem[] | ProductItem
+    items: ProductItem[]
   }
   

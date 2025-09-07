@@ -2,9 +2,30 @@
 import { useEffect, useRef } from 'react'
 import { Heart, Expand, ShoppingCart } from 'lucide-react'
 import gsap from 'gsap'
+import { useAddToCart } from '@/features/cart/hook'
+import { NewProductItem } from '@/types/products'
+import { toast } from 'sonner'
 
-const IconList = () => {
+interface IconListProps {
+    currentProduct?: NewProductItem
+}
+
+const IconList = ({ currentProduct }: IconListProps) => {
     const containersRef = useRef<HTMLDivElement[]>([])
+    const addToCartMutation = useAddToCart()
+
+    const handleAddToCart = () => {
+        if (!currentProduct) return
+        console.log(currentProduct)
+        addToCartMutation.mutate({ productId: currentProduct.id ?? '', quantity: 1, option_id: null }, {
+            onSuccess(data, variables, context) {
+                toast.success("Added to cart")
+            },
+            onError(error, variables, context) {
+                toast.error("Failed to add to cart")
+            },
+        })
+    }
 
     useEffect(() => {
         containersRef.current.forEach(container => {
@@ -36,13 +57,18 @@ const IconList = () => {
     const items = [
         { label: 'Wish List', Icon: Heart },
         { label: 'Review', Icon: Expand },
-        { label: 'Add to cart', Icon: ShoppingCart },
+        {
+            label: 'Add to cart',
+            Icon: ShoppingCart,
+            action: handleAddToCart
+        },
     ]
 
     return (
         <div className='flex flex-col gap-2 items-end'>
             {items.map((item, idx) => (
                 <div
+                    onClick={item.action}
                     key={idx}
                     ref={el => { if (el) containersRef.current[idx] = el }}
                     className="relative icon-container box-border flex flex-row gap-2 items-center justify-end cursor-pointer bg-primary/80 px-6 py-4 rounded-tl-full rounded-bl-full overflow-hidden"

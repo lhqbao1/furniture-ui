@@ -7,7 +7,7 @@ import Image from "next/image"
 import { paymentOptions } from "@/data/data"
 
 type PaymentMethodSelectorProps = {
-    field: {
+    field?: {
         value: string
         onChange: (value: string) => void
     }
@@ -16,7 +16,10 @@ type PaymentMethodSelectorProps = {
 export default function PaymentMethodSelector({ field }: PaymentMethodSelectorProps) {
     return (
         <div className="space-y-2">
-            <RadioGroup value={field.value} onValueChange={field.onChange} className="flex gap-4">
+            <RadioGroup
+                // value={field.value}
+                // onValueChange={field.onChange}
+                className="flex gap-4">
                 {paymentOptions.map((option) => (
                     <div key={option.id} className="flex gap-2 items-center">
                         <RadioGroupItem value={option.id} id={option.id} />

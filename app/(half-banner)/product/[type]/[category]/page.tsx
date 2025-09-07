@@ -1,28 +1,24 @@
 'use client'
 import CustomBreadCrumb from '@/components/shared/breadcrumb'
-import ColorPickerButton from '@/components/shared/color-picker-button'
-import ImageSinglePicker, { SizeType } from '@/components/shared/image-single-picker'
-import MaterialPicker from '@/components/shared/image-single-picker'
 import ProductsGridLayout from '@/components/shared/products-grid-layout'
-import RangePicker from '@/components/shared/range-picker'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { colors, materials, tags, trendingProducts } from '@/data/data'
+import { trendingProducts } from '@/data/data'
 import { SlidersHorizontal } from 'lucide-react'
-import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import React, { useState } from 'react'
+import React from 'react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import FilterSection from '@/components/layout/single-product/filter-section'
-import { CustomPagination } from '@/components/shared/custom-pagination'
+import { useGetAllProducts } from '@/features/products/hook'
 
 const ProductCategory = () => {
     const params = useParams()
     const paramValues = Object.values(params)
     const category = paramValues[paramValues.length - 1]
+
+    const { data: products, isLoading, isError } = useGetAllProducts()
+    if (isLoading) return <div>Loading...</div>
+    if (isError) return <div className="text-red-500">❌ Failed to load products.</div>
+    if (!products) return <div className="text-red-500">No products found.</div>
+
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
@@ -50,7 +46,7 @@ const ProductCategory = () => {
 
                     {/*Products section */}
                     <div className='pt-10 pb-12'>
-                        <ProductsGridLayout hasBadge data={trendingProducts} />
+                        <ProductsGridLayout hasBadge data={products} />
                     </div>
 
                 </div>

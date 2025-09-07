@@ -3,16 +3,17 @@
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Chrome, Facebook, Mail, Key } from "lucide-react"
+import { Chrome, Facebook, Mail, Key, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { useLogin, useLogout } from "@/features/auth/hook"
+import { useLogin } from "@/features/auth/hook"
 import { useAtom } from "jotai"
-import { accessTokenAtom, userIdAtom } from "@/store/auth"
+import { userIdAtom } from "@/store/auth"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import Image from "next/image"
 
 const formSchema = z.object({
     username: z
@@ -33,9 +34,12 @@ const formSchema = z.object({
         }),
 })
 
-export default function LoginForm() {
-    const [userId, setUserId] = useAtom(userIdAtom)
-    const [accessToken, setAccessToken] = useAtom(accessTokenAtom)
+interface LoginFormProps {
+    isAdmin?: boolean
+}
+
+export default function LoginForm({ isAdmin = false }: LoginFormProps) {
+    // const [userId, setUserId] = useAtom(userIdAtom)
 
     const router = useRouter()
 
@@ -48,31 +52,53 @@ export default function LoginForm() {
     })
 
     const loginMutation = useLogin()
-    const logoutMutation = useLogout()
 
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         loginMutation.mutate(values, {
             onSuccess: (data) => {
-                setUserId(data.id)
-                // // setAccessToken(data.access_token)
-                router.push('/admin')
+                // Giả sử backend trả về token
+                const token = data.access_token
+
+                if (isAdmin) {
+                    localStorage.setItem("admin_access_token", token)
+                    router.push("/admin")
+                } else {
+                    localStorage.setItem("access_token", token)
+                    router.push("/")
+                }
+
+                localStorage.setItem("userId", data.id)
+
+                // Có thể lưu userId nếu cần
+                // setUserId(data.id)
+                toast.success("Logged in successfully")
+
             },
             onError(error, variables, context) {
-                toast(error.message)
+                toast.error(error.message)
             },
         })
     }
 
-    const onLogOut = () => {
-        logoutMutation.mutate()
-    }
-
-
     return (
         <div className="p-6 bg-white rounded-2xl lg:w-3/4 w-full">
-            <h2 className="text-2xl font-bold mb-6 lg:text-start text-center">Log In</h2>
+            <div className="flex flex-col items-center mb-12 gap-3">
+                {/* Logo giả */}
+                <Image
+                    src={'/new-logo.png'}
+                    width={100}
+                    height={100}
+                    alt=""
+                />
+                <h1 className="text-3xl font-semibold text-secondary text-center font-libre flex gap-2">
+                    <span>Welcome to</span>
+                    <span className="text-primary">Prestige Home</span>
+                </h1>
+            </div>
+
+            {/* <h2 className="text-2xl font-bold mb-6 lg:text-start text-center">Log In</h2> */}
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     {/* Email */}
                     <FormField
                         control={form.control}
@@ -107,8 +133,16 @@ export default function LoginForm() {
                         )}
                     />
 
-                    <Button type="submit" className="w-full bg-secondary/95 hover:bg-secondary" hasEffect>
-                        Log In
+                    <Button
+                        type="submit"
+                        className="w-full bg-secondary/95 hover:bg-secondary"
+                        hasEffect
+                        disabled={loginMutation.isPending}
+                    >
+                        {loginMutation.isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : 'Log In'}
+
                     </Button>
                 </form>
             </Form>

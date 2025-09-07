@@ -18,7 +18,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import ImagePickerForm from "@/components/shared/image-picker";
 import ImagePickerInput from "./image-picker-input";
 
 const Schema = z.object({

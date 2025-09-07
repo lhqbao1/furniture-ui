@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css"
+import Protected from "@/components/layout/auth/protected";
 
 export const metadata: Metadata = {
     title: "Create Next App",

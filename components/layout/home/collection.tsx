@@ -96,8 +96,8 @@ const Collection = () => {
 
     return (
         <div className='section-padding'>
-            <h2 className='text-secondary text-4xl font-bold text-center uppercase'>
-                NEW COLLECTIONS
+            <h2 className='section-header mb-2'>
+                New Collections
             </h2>
             <p className='text-primary text-lg text-center font-semibold'>
                 Award winning design 2026

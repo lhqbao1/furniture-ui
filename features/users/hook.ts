@@ -1,16 +1,22 @@
-// features/users/hooks.ts
-import { useAtomValue } from "jotai"
-import { useQuery } from "@tanstack/react-query"
-import { getUserById } from "./api"
-import { userIdAtom } from "@/store/auth"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { User } from "@/types/user"
+import { getUserById, updateUser } from "./api"
 
-export function useCurrentUser() {
-  const userId = useAtomValue(userIdAtom)
-
+export function useGetUserById(userId: string) {
   return useQuery<User>({
     queryKey: ["user", userId],
-    queryFn: () => getUserById(userId!),
-    enabled: !!userId, // chỉ gọi khi có userId
+    queryFn: () => getUserById(userId),
+    enabled: !!userId,
   })
+}
+
+
+export function useUpdateUser() {
+  const qc = useQueryClient()
+    return useMutation({
+      mutationFn: ({id, user}: {id: string, user: Partial<User>}) => updateUser(id, user),
+      onSuccess: (data, variables) => {
+        qc.refetchQueries({ queryKey: ["user", variables.id] })
+      },
+    })
 }

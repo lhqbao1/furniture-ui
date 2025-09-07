@@ -40,7 +40,7 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
     }
 
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 w-full justify-center">
             <Pagination>
                 <PaginationContent>
                     {/* First */}
@@ -115,7 +115,7 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
 
             {/* Go to page */}
             <div className="flex items-center gap-2">
-                <span className="text-sm">Go to</span>
+                <div className="text-sm">Go to</div>
                 <Input
                     type="number"
                     min={1}

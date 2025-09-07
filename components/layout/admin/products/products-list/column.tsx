@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import DeleteDialog from "./delete-dialog"
-import { ProductItem } from "@/types/products"
+import { NewProductItem, ProductItem } from "@/types/products"
 import Link from "next/link"
 
 
-export const productColumns: ColumnDef<ProductItem>[] = [
+export const productColumns: ColumnDef<NewProductItem>[] = [
     {
         id: "select",
         header: ({ table }) => (

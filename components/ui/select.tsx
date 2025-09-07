@@ -34,7 +34,7 @@ function SelectTrigger({
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default",
   iconColor?: string
-  placeholderColor?: string
+  placeholderColor?: boolean
 }) {
   return (
     <SelectPrimitive.Trigger

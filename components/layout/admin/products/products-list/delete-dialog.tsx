@@ -11,14 +11,13 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button'
-import { Products } from '@/lib/schema/product'
 import { Loader2, Trash2 } from 'lucide-react'
 import { useDeleteProduct } from '@/features/products/hook'
-import { ProductItem } from '@/types/products'
+import { NewProductItem } from '@/types/products'
 import { toast } from 'sonner'
 
 interface DeleteDialogProps {
-    product: ProductItem
+    product: NewProductItem
 }
 
 const DeleteDialog = ({ product }: DeleteDialogProps) => {
@@ -61,7 +60,7 @@ const DeleteDialog = ({ product }: DeleteDialogProps) => {
                             Close
                         </Button>
                     </DialogClose>
-                    <Button type="button" onClick={handleDelete} variant="secondary">
+                    <Button type="button" onClick={handleDelete} hasEffect variant="secondary" disabled={deleteProduct.isPending}>
                         {deleteProduct.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (

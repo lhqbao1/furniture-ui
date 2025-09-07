@@ -1,19 +1,28 @@
-// components/auth/Protected.tsx
 "use client"
-import { useMe } from "@/features/auth/hook"
-import { useCurrentUser } from "@/features/users/hook"
-import { ReactNode, useEffect } from "react"
+import { ReactNode, useEffect, useState } from "react"
 
-export default function Protected({ children }: { children: ReactNode }) {
-    const { data: user, isLoading } = useCurrentUser()
-    console.log(user)
+interface ProtectedProps {
+    children: ReactNode
+}
+
+export default function Protected({ children }: ProtectedProps) {
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+
     useEffect(() => {
-        if (!user) {
-            // window.location.href = "/login"
+        // check admin token trong localStorage
+        const adminToken = localStorage.getItem("admin_access_token")
+        if (!adminToken) {
+            // không có token → redirect login
+            window.location.href = "/login"
+        } else {
+            setIsAdmin(true)
         }
-    }, [isLoading, user])
+    }, [])
 
-    if (isLoading) return <div className="p-6">Loading...</div>
-    if (!user) return null
+    if (isAdmin === null) {
+        // chưa kiểm tra xong
+        return <div className="p-6">Loading...</div>
+    }
+
     return <>{children}</>
 }

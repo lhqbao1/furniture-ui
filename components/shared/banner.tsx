@@ -23,22 +23,39 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAtom } from 'jotai'
-import { userIdAtom } from '@/store/auth'
-import { useCurrentUser } from '@/features/users/hook'
+import { toast } from 'sonner'
+import { useMe } from '@/features/auth/hook'
+import { useQueryClient } from '@tanstack/react-query'
+import { useGetCartItems } from '@/features/cart/hook'
+import { useRouter } from 'next/navigation'
 
 interface BannerProps {
     height?: number
 }
 
-// home-banner bg-[url("/banner.jpg")] bg-no-repeat xl:bg-center bg-top xl:bg-cover bg-contain
-
 const Banner = ({ height }: BannerProps) => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
-    const { data: user, isLoading } = useCurrentUser()
+    const queryClient = useQueryClient();
+    const router = useRouter()
 
-    // if (isLoading) return <div>Loading...</div>
-    // if (!user) return <div>Not logged in</div>
+    const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useMe()
+    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartItems()
+
+    // if (isLoadingUser) return <div>Loading...</div>
+    // if (isErrorUser) return <div className="text-red-500">❌ Failed to load user.</div>
+    // if (isLoadingCart) return <div>Loading...</div>
+    // if (isErrorCart) return <div className="text-red-500">❌ Failed to load cart.</div>
+    // if (!cart) return <div className="text-red-500">No cart found.</div>
+
+    const onLogout = () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("id");
+        toast.success("Logged out successfully")
+        // Reset react-query cache
+        queryClient.invalidateQueries({ queryKey: ["me"] }); // xóa dữ liệu user cũ
+        queryClient.setQueryData(["me"], null)
+        queryClient.clear(); // tùy chọn xóa tất cả cache
+    }
 
     return (
         <div
@@ -48,7 +65,7 @@ const Banner = ({ height }: BannerProps) => {
             style={{ height: height ? height : 500 }}
         >
             <Image
-                src='/banner.jpg'
+                src='/banner.jpeg'
                 fill
                 alt=''
                 className='absolute top-0 z-0'
@@ -67,15 +84,9 @@ const Banner = ({ height }: BannerProps) => {
                                 <SelectItem value="English" className='font-semibold '>English</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Link href={'/cart'} className='flex flex-row relative cursor-pointer'>
-                            <ShoppingCart stroke='white' className='hover:scale-110 transition-all duration-300' />
-                            <div className="absolute bg-primary w-6 h-6 flex items-center justify-center rounded-full text-white text-sm -top-3 -right-3">
-                                2
-                            </div>
-                        </Link>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <User className="cursor-pointer" stroke='white' />
+                                <User className="cursor-pointer hover:scale-110 transition-all duration-300 text-primary" stroke='#FAA61A' />
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="w-48">
@@ -83,24 +94,24 @@ const Banner = ({ height }: BannerProps) => {
                                     <div>
                                         <Link href={'/login'} className='cursor-pointer'>
                                             <DropdownMenuItem className='cursor-pointer'>
-                                                Đăng nhập
+                                                Login
                                             </DropdownMenuItem>
                                         </Link>
                                         <Link href={'/sign-up'} className='cursor-pointer'>
                                             <DropdownMenuItem className='cursor-pointer'>
-                                                Đăng ký
+                                                Create an account
                                             </DropdownMenuItem>
                                         </Link>
                                     </div>
                                 ) : (
                                     <>
-                                        <DropdownMenuLabel>Xin chào, {user.first_name}</DropdownMenuLabel>
+                                        <DropdownMenuLabel>Hello, {user.last_name}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={() => alert("Đi tới thông tin tài khoản")}>
-                                            Thông tin tài khoản
+                                        <DropdownMenuItem onClick={() => router.push('/account')}>
+                                            Account information
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => console.log('hehe')}>
-                                            Đăng xuất
+                                        <DropdownMenuItem onClick={onLogout}>
+                                            Log out
                                         </DropdownMenuItem>
                                     </>
                                 )}
@@ -126,10 +137,10 @@ const Banner = ({ height }: BannerProps) => {
                 {height ? '' :
                     <div className="flex-1 flex flex-col justify-center items-center gap-6 xl:mt-12 mt-0 xl:px-0 px-4">
                         <h1 className="home-banner__title font-bold leading-tight flex xl:flex-row flex-col justify-center items-center xl:gap-4 gap-1">
-                            <span className="text-secondary text-4xl lg:text-6xl">
+                            <span className="text-secondary text-4xl lg:text-6xl font-libre font-semibold">
                                 WELCOME TO
                             </span>
-                            <span className="text-primary text-4xl lg:text-6xl">
+                            <span className="text-primary text-4xl lg:text-6xl font-libre font-semibold">
                                 PRESTIGE HOME
                             </span>
                         </h1>

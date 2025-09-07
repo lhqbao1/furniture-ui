@@ -2,13 +2,13 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Product } from '@/types/products'
+import { NewProductItem, Product, ProductItem } from '@/types/products'
 import { Equal, Heart, Plus } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 
 interface BoughtTogetherSectionProps {
-    productDetails: Product
+    productDetails: NewProductItem
 }
 
 const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) => {
@@ -18,7 +18,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
             <div className='flex flex-row items-center justify-start gap-0'>
                 <div className='flex flex-col items-center gap-4'>
                     <Image
-                        src={productDetails.image}
+                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/1.png'}
                         alt=''
                         width={300}
                         height={200}
@@ -29,7 +29,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
                         <div className="flex items-center gap-2">
                             <Checkbox id="terms" defaultChecked />
                             <div className="flex items-center gap-2">
-                                <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.salePrice}€</Label>
+                                <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.final_price}€</Label>
                                 <p className='text-xl text-gray-300 line-through font-semibold'>{productDetails.price}€</p>
                             </div>
                         </div>
@@ -39,7 +39,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
 
                 <div className='flex flex-col items-center gap-4'>
                     <Image
-                        src={productDetails.image}
+                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/1.png'}
                         alt=''
                         width={300}
                         height={200}
@@ -50,7 +50,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
                         <div className="flex items-center gap-2">
                             <Checkbox id="terms" defaultChecked />
                             <div className="flex items-center gap-2">
-                                <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.salePrice}€</Label>
+                                <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.final_price}€</Label>
                                 <p className='text-xl text-gray-300 line-through font-semibold'>{productDetails.price}€</p>
                             </div>
                         </div>
@@ -73,7 +73,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
 
                 <div className='flex flex-col items-center gap-4'>
                     <Image
-                        src={productDetails.image}
+                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/1.png'}
                         alt=''
                         width={300}
                         height={200}
@@ -84,7 +84,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
                         <div className="flex items-center gap-2">
                             <Checkbox id="terms" defaultChecked />
                             <div className="flex items-center gap-2">
-                                <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.salePrice}€</Label>
+                                <Label htmlFor="terms" className='text-primary text-xl font-semibold'>{productDetails.final_price}€</Label>
                                 <p className='text-xl text-gray-300 line-through font-semibold'>{productDetails.price}€</p>
                             </div>
                         </div>

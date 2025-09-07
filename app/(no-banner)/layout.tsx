@@ -14,10 +14,9 @@ export default function MainLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <SidebarProvider>
+        <SidebarProvider >
             <div className="h-screen w-screen overflow-hidden overflow-y-scroll min-h-screen">
                 <main className="flex-1 relative">
-                    {/* <StickyIcon /> */}
                     <div className="">
                         {children}
                     </div>

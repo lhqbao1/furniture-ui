@@ -1,10 +1,14 @@
 "use client"
 
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
+import { useGetCartItems } from "@/features/cart/hook"
+import { useRouter } from "next/navigation"
 
 export default function StickyIcon() {
     const wrapperRef = useRef<HTMLDivElement | null>(null)
+    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartItems()
+    const router = useRouter()
 
     useEffect(() => {
         let cleanup: (() => void) | undefined
@@ -51,20 +55,24 @@ export default function StickyIcon() {
         }
     }, [])
 
+
     return (
         <div
             ref={wrapperRef}
-            className="fixed right-0 top-[150px] z-50 w-24 h-24"
+            className="fixed right-0 top-[150px] z-50 w-24 h-24 cursor-pointer"
+            onClick={() => {
+                router.push('/cart')
+            }}
         >
             <div className="relative">
                 <Image
-                    src="/carticon.svg"
+                    src="/cart-logo.svg"
                     alt="icon"
                     width={64}
                     height={64}
-                    className="w-24 h-24 select-none pointer-events-auto"
+                    className="w-24 h-24 select-none pointer-events-auto "
                 />
-                <p className="absolute bottom-4 text-lg text-white font-bold left-7.5 text-center flex flex-col leading-3">3 <br /> <span className="text-sm font-semibold">items</span></p>
+                <p className="absolute bottom-4 text-lg text-white font-bold left-7.5 text-center flex flex-col leading-3">{isLoadingCart || isErrorCart ? 0 : cart?.items.length} <br /> <span className="text-sm font-semibold">items</span></p>
             </div>
         </div>
     )

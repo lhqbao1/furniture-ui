@@ -1,4 +1,5 @@
 'use client'
+import ProductFormSkeleton from "@/components/layout/admin/products/products-form/product-form-skeleton"
 import { EditProductFormClient } from "./product-edit-client"
 import { useGetProductById } from "@/features/products/hook"
 import React from "react"
@@ -8,7 +9,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const { data, isLoading, isError } = useGetProductById(id)
     if (isError) return <div>No data</div>
-    if (isLoading) return <div>Loading</div>
+    if (isLoading || !data) return <ProductFormSkeleton />
 
     return (
         <div className="p-6">
