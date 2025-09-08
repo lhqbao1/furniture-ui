@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CategoryInput, CategoryResponse } from "@/types/categories";
-import { createCategory, deleteCategory, editCategory, getCategories, getCategoryById } from "./api";
+import { AddOrRemoveProductToCategoryInput, CategoryInput, CategoryResponse } from "@/types/categories";
+import { addProductToCategory, createCategory, deleteCategory, editCategory, getCategories, getCategoryById, removeProductFromCategory } from "./api";
 
 
 // --- GET ALL CATEGORIES ---
@@ -53,6 +53,33 @@ export function useDeleteCategory() {
     mutationFn: (id: string) => deleteCategory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ["categories"]});
+    },
+  });
+}
+
+
+// --- ADD PRODUCT TO CATEGORY ---
+export function useAddProductToCategory() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({input, categoryId}: {input: AddOrRemoveProductToCategoryInput, categoryId: string}) =>
+      addProductToCategory(input, categoryId),
+    onSuccess: (data, variables) => {
+      qc.invalidateQueries({ queryKey: ["category", variables.categoryId] });
+    },
+  });
+}
+
+// --- REMOVE PRODUCT FROM CATEGORY ---
+export function useRemoveProductFromCategory() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({input, categoryId}: {input: AddOrRemoveProductToCategoryInput, categoryId: string}) =>
+      removeProductFromCategory(input, categoryId),
+    onSuccess: (data, variables) => {
+      qc.invalidateQueries({ queryKey: ["category", variables.categoryId] });
     },
   });
 }

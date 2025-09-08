@@ -1,3 +1,4 @@
+import { CategoryResponse } from "./categories";
 import { Pagination } from "./pagination";
 import { VariantOptionResponse } from "./variant";
 
@@ -26,6 +27,17 @@ export interface PreOrderProduct {
     category: string;
     color: string[];
     desc: string;
+}
+
+export type StaticFileResponse = {
+  status: string
+  results: StaticFileItem[]
+}
+
+export type StaticFileItem = {
+  filename: string
+  url: string
+  status: string
 }
 
 export type StaticFile = {
@@ -87,14 +99,15 @@ export type StaticFile = {
     name: string
     description: string
     price: number
+    id_provider: string
+    cost: number
     discount_percent?: number
     discount_amount?: number
     tax: string
-    category?: string
     collection?: string | null
     stock: number
     sku: string
-    barcode: string
+    ean: string
     weight: number
     length: number
     width: number
@@ -103,14 +116,17 @@ export type StaticFile = {
     tag?: string
     id?: string
     final_price: number
+    price_whithout_tax?: number
     created_at?: string
     updated_at?: string
+    parent_id?: string
     static_files: StaticFile[]
     options: VariantOptionResponse[]
+    categories: CategoryResponse[]
   }
   
   export type ProductResponse = {
     pagination: Pagination
-    items: ProductItem[]
+    items: NewProductItem[]
   }
   

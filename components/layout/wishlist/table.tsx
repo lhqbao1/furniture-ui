@@ -1,108 +1,172 @@
 "use client"
 
-import * as React from "react"
-import {
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
+import React, { useState, useCallback } from "react"
+import { debounce } from "lodash"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { toast } from "sonner"
+import { ColumnDef, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, flexRender } from "@tanstack/react-table"
+import { getWishlistColumns } from "./column"
+import CartTableSkeleton from "../cart/table-skeleton"
+import { WishListItem, WishListResponse } from "@/types/wishlist"
+import { useAddWishlistItemToCart, useAddWishlistToCart, useRemoveWishlistItem, useUpdateWishlistItemQuantity, useUpdateWishlistItemStatus } from "@/features/wishlist/hook"
+import { ArrowLeft, Trash } from "lucide-react"
+import { Checkbox } from "@radix-ui/react-checkbox"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { CartItem, getColumns } from "./column"
-import { ArrowLeft, Plus, Trash } from "lucide-react"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
+import { useRouter } from "next/navigation"
 
-type Props = { data: CartItem[] }
+interface WishlistTableProps {
+    wishlist?: WishListResponse
+    isLoadingWishlist?: boolean
+    isCheckout?: boolean
+    localQuantities: Record<string, number>
+    setLocalQuantities: React.Dispatch<React.SetStateAction<Record<string, number>>>
+}
 
-export function CartTable({ data: initial }: Props) {
-    const [voucher, setVoucher] = React.useState("")
-    const containerRef = React.useRef<HTMLDivElement>(null)
+const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQuantities, setLocalQuantities }: WishlistTableProps) => {
+    const [localStatuses, setLocalStatuses] = useState<Record<string, boolean>>({})
     const [barStyle, setBarStyle] = React.useState<React.CSSProperties>({})
 
-    React.useEffect(() => {
-        function updateWidth() {
-            if (!containerRef.current) return
-            const rect = containerRef.current.getBoundingClientRect()
-            setBarStyle({
-                width: `${rect.width}px`,
-                left: `${rect.left}px`,
-            })
-        }
+    const router = useRouter()
+    const updateWishlistItemQuantityMutation = useUpdateWishlistItemQuantity()
+    const deleteWishlistItemMutation = useRemoveWishlistItem()
+    const updateWishlistItemStatusMutation = useUpdateWishlistItemStatus()
+    const addItemToWishlistMutation = useAddWishlistItemToCart()
+    const addWishlistToCartMutation = useAddWishlistToCart()
 
-        updateWidth()
-        window.addEventListener("resize", updateWidth)
-        return () => window.removeEventListener("resize", updateWidth)
-    }, [])
+    // const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
+    const [rowSelection, setRowSelection] = useState({})
 
-    const [data, setData] = React.useState<CartItem[]>(initial)
+    // ✅ debounce API update
+    const debouncedUpdate = useCallback(
+        debounce((itemId: string, quantity: number) => {
+            updateWishlistItemQuantityMutation.mutate(
+                { itemId, quantity },
+            )
+        }, 400),
+        []
+    )
 
-    const onQtyChange = (id: string, nextQty: number) => {
-        setData((prev) =>
-            prev.map((it) => (it.id === id ? { ...it, qty: Math.max(1, Math.min(it.stock, nextQty)) } : it))
+    const handleToggleSelect = (item: WishListItem, is_active: boolean) => {
+        // update local state
+        setLocalStatuses((prev) => ({
+            ...prev,
+            [item.id]: is_active,
+        }))
+
+        // call api update cart item status for checkout
+        updateWishlistItemStatusMutation.mutate(
+            { itemId: item.id, is_active },
         )
     }
-    const onRemove = (id: string) => setData((prev) => prev.filter((it) => it.id !== id))
-    const onBuy = (id: string) => {
-        // TODO: add to order flow
-        console.log("BUY", id)
+
+    const handleUpdateWishlistItemQuantity = (item: WishListItem, newQuantity: number) => {
+        if (newQuantity <= 0) {
+            deleteWishlistItemMutation.mutate({ itemId: item.id })
+            return
+        }
+
+        if (newQuantity > item.products.stock) {
+            toast.error("Product's stock is not enough")
+            return
+        }
+
+        setLocalQuantities((prev) => ({ ...prev, [item.id]: newQuantity }))
+        debouncedUpdate(item.id, newQuantity)
     }
 
-    const columns = React.useMemo(() => getColumns({ onQtyChange, onRemove, onBuy }), [])
+    const handleDeleteItem = (item: WishListItem) => {
+        deleteWishlistItemMutation.mutate({ itemId: item.id }, {
+            onSuccess: () => toast.success("Remove item successful"),
+            onError: () => toast.error("Remove item fail"),
+        })
+    }
 
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
+    const handleAddToCart = (item: WishListItem) => {
+        addItemToWishlistMutation.mutate({ itemId: item.id }, {
+            onSuccess: () => toast.success("Add item to cart successful"),
+            onError: () => toast.error("Add item to cart fail"),
+        })
+    }
+
+    const handleAddWishlistToCart = (wishlistId: string) => {
+        addWishlistToCartMutation.mutate({ wishlistId: wishlistId }, {
+            onSuccess: () => {
+                toast.success("Add item to cart successful")
+                router.push('/cart')
+            },
+            onError: () => toast.error("Add item to cart fail"),
+        })
+    }
+
+    const columns = getWishlistColumns({
+        localQuantities,
+        onUpdateQuantity: handleUpdateWishlistItemQuantity,
+        onAddToCart: handleAddToCart,
+        onDeleteItem: handleDeleteItem,
+        onToggleSelect: handleToggleSelect,
+        isCheckout: isCheckout,
+        localStatuses,
     })
 
-    // Tính tổng theo các row được chọn; nếu chưa chọn gì, tính tất cả
-    const selected = table.getSelectedRowModel().rows.map((r) => r.original)
-    const rows = selected.length ? selected : data
-
-    const totalOld = rows.reduce(
-        (s, r) => s + (r.oldUnitPrice ?? r.unitPrice) * r.qty,
-        0
-    )
-    const totalNew = rows.reduce((s, r) => s + r.unitPrice * r.qty, 0)
-    const saved = totalOld - totalNew
-    const totalItems = rows.reduce((s, r) => s + r.qty, 0)
+    const table = useReactTable({
+        data: wishlist?.items ?? [],
+        columns,
+        state: { rowSelection },
+        onRowSelectionChange: setRowSelection,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        initialState: {
+            sorting: [{ id: "is_active", desc: true }],
+        },
+    })
 
     return (
-        <div className="w-full container" ref={containerRef}>
+        <div className="col-span-12 md:col-span-8 flex-1">
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold mb-6">Shopping Cart</h2>
+                <p className="text-xl font-bold mb-6">({wishlist?.items.length} items)</p>
+            </div>
+
             <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((hg) => (
-                        <TableRow key={hg.id}>
-                            {hg.headers.map((header) => {
-                                console.log(header)
-                                return (
-                                    <TableHead key={header.id} style={{ width: header.getSize(), textAlign: header.id === "qty" ? 'center' : 'start' }}>
-                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {table.getRowModel().rows.map((row) => (
-                        <TableRow key={row.id} >
-                            {row.getVisibleCells().map((cell) => (
-                                <TableCell key={cell.id} className="py-6">
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </TableCell>
+                <TableHeader className="border-t">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => (
+                                <TableHead key={header.id}>
+                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                </TableHead>
                             ))}
                         </TableRow>
                     ))}
-                </TableBody>
+                </TableHeader>
+
+                {isLoadingWishlist ? (
+                    <TableBody>
+                        <CartTableSkeleton />
+                    </TableBody>
+                ) : (
+                    <TableBody>
+                        {table.getRowModel().rows.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    No items
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                )}
             </Table>
 
             {/* Footer action bar */}
@@ -124,43 +188,23 @@ export function CartTable({ data: initial }: Props) {
                         </div>
 
                         <div className="flex flex-col gap-3 justify-between">
-                            <Select value={voucher} onValueChange={setVoucher}>
-                                <SelectTrigger className="xl:h-8 h-6 text-black bg-white rounded px-3 py-1 w-full" placeholderColor>
-                                    <SelectValue placeholder="Select Voucher" className="text-black" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="SALE10">SALE10</SelectItem>
-                                    <SelectItem value="SALE20">SALE20</SelectItem>
-                                </SelectContent>
-                            </Select>
                             <div
-                                onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
+                                // onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
                                 className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
                             >
                                 <Trash size={20} />
                                 Remove out of stock products
                             </div>
                         </div>
-
-                        <div className="flex flex-col gap-3">
-
-                            <Input
-                                type="text"
-                                placeholder="< apply code >"
-                                className="text-black rounded px-3 py-1 bg-white h-9"
-                            />
-                        </div>
                     </div>
 
                     <div className="xl:col-span-5 col-span-12 flex gap-6 xl:justify-end justify-center">
                         <div className="text-right text-xl">
-                            <p>Total saved <span className="font-bold">€{saved}</span></p>
                             <p className="font-semibold">
-                                Total ({totalItems} items) <span className="font-bold">€{totalNew}</span>
+                                Total ({10} items) <span className="font-bold">€1200</span>
                             </p>
                         </div>
-                        <Button className="bg-primary/90 hover:bg-primary cursor-pointer text-white rounded-full px-10 py-2 relative">
-                            {/* <div className="px-2.5 h-full flex items-center left-0 bg-white rounded-full absolute"><Plus stroke="black" /></div> */}
+                        <Button className="bg-primary/90 hover:bg-primary cursor-pointer text-white rounded-full px-10 py-2 relative" onClick={() => handleAddWishlistToCart(wishlist?.id ?? '')}>
                             <span className="font-bold">Add to cart</span>
                         </Button>
                     </div>
@@ -170,3 +214,5 @@ export function CartTable({ data: initial }: Props) {
         </div>
     )
 }
+
+export default WishlistTable

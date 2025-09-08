@@ -9,28 +9,39 @@ export const revalidate = 3600
 export default async function FAQ() {
     const queryClient = new QueryClient()
 
-    // gọi API server-side
+    // Gọi API server-side
     const topic = await getFAQTopic()
-    const firstTopic = topic[topic.length - 1].id
 
-    // prefetch để cache cho React Query
+    // Kiểm tra topic có tồn tại hay không
+    const firstTopic = topic.length > 0 ? topic[0].id : null
+
+    // Prefetch topic list
     await queryClient.prefetchQuery({
         queryKey: ['faq-topic'],
         queryFn: () => getFAQTopic(),
     })
 
-    await queryClient.prefetchQuery({
-        queryKey: ['faq-item', firstTopic],
-        queryFn: () => getFAQItem(firstTopic),
-    })
+    // Prefetch FAQ items nếu có topic
+    if (firstTopic) {
+        await queryClient.prefetchQuery({
+            queryKey: ['faq-item', firstTopic],
+            queryFn: () => getFAQItem(firstTopic),
+        })
+    }
 
-    // convert cache sang dehydrated state
+    // Convert cache sang dehydrated state
     const dehydratedState = dehydrate(queryClient)
 
     return (
         <HydrationBoundary state={dehydratedState}>
             <div className="w-full min-h-screen overflow-scroll">
-                <ListFAQ topic_id={firstTopic} />
+                {firstTopic ? (
+                    <ListFAQ topic_id={firstTopic} />
+                ) : (
+                    <div className="text-center py-20 text-gray-500">
+                        No FAQ topics available
+                    </div>
+                )}
             </div>
         </HydrationBoundary>
     )

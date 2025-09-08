@@ -23,10 +23,10 @@ export default function MainLayout({
                     <AppSidebar />
                 </div>
                 <div className="flex flex-col w-full col-span-5 overflow-x-hidden overflow-y-auto">
-                    <main className="flex-1 relative">
+                    <main className="flex-1 relative h-full flex flex-col">
                         <StickyIcon />
                         <Banner height={200} />
-                        <div className="container-padding">
+                        <div className="container-padding flex-1">
                             {children}
                         </div>
                         <Footer />

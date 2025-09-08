@@ -38,9 +38,7 @@ const GiveCommentSection = () => {
                     <p className='text-sm text-gray-600 font-semibold'>Your rating</p>
                 </div>
             </div>
-
-
-            <CommentForm />
+            {/* <CommentForm /> */}
         </div>
     )
 }

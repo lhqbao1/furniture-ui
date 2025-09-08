@@ -1,21 +1,17 @@
 import z from "zod";
-import {  VariantSchema } from "./variant";
-import { fa } from "zod/v4/locales";
-import { StaticFile, Variant } from "@/types/products";
+import { StaticFile } from "@/types/products";
 
 // schema cho StaticFile
 const StaticFileSchema = z.object({
   url: z.string(),
-  file_type: z.string().optional(),
-  id: z.string().optional(),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
 })
 
 export const addProductSchema = z.object({
   name: z.string().min(2, { message: "Product name is required" }),
   description: z.string().min(1, { message: "Description is required" }),
-  price: z.number().min(0),
+  price: z.number().min(1, "You must provide a price"),
+  id_provider: z.string().min(1, 'You must provide an ID for product'),
+  cost: z.number().min(1, "You must provide a cost price"),
   discount_percent: z.number().min(0).max(100).optional(),
   discount_amount: z.number().optional(),
   final_price: z.number(),
@@ -24,7 +20,7 @@ export const addProductSchema = z.object({
   collection: z.string().optional().nullable(),
   stock: z.number().min(0),
   sku: z.string(),
-  barcode: z.string(),
+  ean: z.string(),
   weight: z.number(),
   length: z.number(),
   width: z.number(),
@@ -32,56 +28,34 @@ export const addProductSchema = z.object({
   is_active: z.boolean(),
   tag: z.string().optional(),
   static_files: z.array(StaticFileSchema),
-  variants: z.array(VariantSchema),
-
-  // giữ lại các field phụ nhưng optional (không có trong ProductItem)
-  materials: z.string().optional(),
-  color: z.string().optional(),
-  size: z
-    .object({
-      sizeLength: z.string().optional(),
-      sizeWidth: z.string().optional(),
-      sizeHeight: z.string().optional(),
-    })
-    .optional(),
+  category_ids: z.array(z.string().min(1))
 })
 
 
-export type Products = z.infer<typeof addProductSchema>
+export type ProductInput = z.infer<typeof addProductSchema>
 
 export const defaultValues = {
-    name: "",
-    description: "",
-    price: 0,
-    discount_percent: 0,
-    discount_amount: 0,
-    final_price: 0,
-    tax: "19%",
-    category: "",
-    collection: "None",
-  
-    stock: 0,
-    sku: "",
-    barcode: "",
-    weight: 0,
-    length: 0,
-    width: 0,
-    height: 0,
-  
-    is_active: false,
-    tag: "",
-  
-    static_files: [] as StaticFile[],
-  
-    variants: [] as Variant[],
-  
-    // những field phụ UI, optional
-    materials: "",
-    color: "",
-    size: {
-      sizeLength: "",
-      sizeWidth: "",
-      sizeHeight: "",
-    },
-  }
+  name: "",
+  description: "",
+  price: 0,
+  cost: 0,
+  id_provider: '',
+  discount_percent: 0,
+  discount_amount: 0,
+  final_price: 0,
+  tax: "19%",
+  category: "",
+  collection: null as string | null,
+  stock: 0,
+  sku: "",
+  ean: "",
+  weight: 0,
+  length: 0,
+  width: 0,
+  height: 0,
+  is_active: false,
+  tag: "",
+  static_files: [] as StaticFile[],
+  category_ids: [] as string[],
+}
   

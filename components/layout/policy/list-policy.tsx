@@ -15,10 +15,9 @@ import { PolicyResponse } from '@/types/policy'
 
 interface ListPolicyProps {
     versionId: string
-    initialData: PolicyResponse
 }
 
-const ListPolicy = ({ versionId, initialData }: ListPolicyProps) => {
+const ListPolicy = ({ versionId }: ListPolicyProps) => {
     const [currentPolicy, setCurrentPolicy] = useState(0)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
 
@@ -26,7 +25,6 @@ const ListPolicy = ({ versionId, initialData }: ListPolicyProps) => {
         queryKey: ["policy-items", versionId],
         queryFn: () => getPolicyItemsByVersion(versionId),
         enabled: !!versionId,
-        initialData
     })
 
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>

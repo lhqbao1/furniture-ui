@@ -1,8 +1,8 @@
 import { NewProductItem } from "./products"
 
-export type CartItem = {
+export type WishListItem = {
   id: string
-  cart_id: string
+  wishlist_id: string
   is_active: boolean
   products: NewProductItem
   image_url: string
@@ -13,19 +13,17 @@ export type CartItem = {
   created_at: string
   updated_at: string
 }
-  
-  export type CartResponse = {
+
+export interface WishListResponse {
     user_id: string
     id: string
-    items: CartItem[]
+    items: WishListItem[]
     created_at: string
     updated_at: string
-  }
-  
-  export type CartFormValue = {
+}
+
+export interface WishListInput {
     product_id: string
-    option_id: string
     quantity: number
     is_active: boolean
-  }
-  
+}

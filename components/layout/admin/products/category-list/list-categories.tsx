@@ -70,11 +70,11 @@ const ListCategories = () => {
         <div className='space-y-4'>
             <AddCategoryDrawer />
             {isLoading && <Loader2 className='animate-spin' />}
-            {isError && <Loader2 className='animate-spin' />}
-            {categories &&
+            {categories ?
                 categories.map((item) => (
                     <CategoryItem key={item.id} category={item} />
                 ))
+                : <div>No category found</div>
             }
         </div>
     )

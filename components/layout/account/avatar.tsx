@@ -32,8 +32,7 @@ const AccountAvatar = ({ user }: AvatarProps) => {
         formData.append("file", file)
         uploadStaticFileMutation.mutate(formData, {
             onSuccess(data, variables, context) {
-                console.log(data)
-                setValue("avatar_url", data.url, { shouldValidate: true })
+                setValue("avatar_url", data.results[0].url, { shouldValidate: true })
                 qc.invalidateQueries({ queryKey: ['user'] })
             },
         })

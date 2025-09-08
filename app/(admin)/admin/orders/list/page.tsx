@@ -2,18 +2,18 @@
 import { orderColumns } from '@/components/layout/admin/orders/order-list/column'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import ProductStatistic from '@/components/layout/admin/products/products-list/statistic'
+import ProductStatisticSkeleton from '@/components/shared/statistic-skeleton'
+import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetCheckOut, useGetCheckOutStatistic } from '@/features/checkout/hook'
 import { Loader2 } from 'lucide-react'
-import React, { Suspense } from 'react'
+import React, { Suspense, useState } from 'react'
 
 const OrderList = () => {
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
     const { data, isLoading, isError } = useGetCheckOut()
     const { data: statistic, isLoading: isLoadingStatistic, isError: isErrorStatistic } = useGetCheckOutStatistic()
 
-    console.log(statistic)
-
-    if (isError || isErrorStatistic) return <div>No data</div>
-    if (isLoading || isLoadingStatistic) return <div>Loading</div>
     // map statistic từ API vào demo
     const mergedStatistic = [
         {
@@ -40,10 +40,19 @@ const OrderList = () => {
 
     return (
         <div className='space-y-12 pb-30'>
-            <ProductStatistic statistic={mergedStatistic} />
-            <Suspense fallback={<Loader2 className="animate-spin" />} >
-                <ProductTable data={data ? data : []} columns={orderColumns} />
-            </Suspense>
+            {isLoadingStatistic || !statistic ? <ProductStatisticSkeleton /> : <ProductStatistic statistic={mergedStatistic} />}
+            {isLoading ? <ProductTableSkeleton columnsCount={6} rowsCount={6} /> :
+                <ProductTable
+                    data={data ? data : []}
+                    columns={orderColumns}
+                    page={page}
+                    setPage={setPage}
+                    pageSize={pageSize}
+                    setPageSize={setPageSize}
+                    totalItems={data?.length ?? 0}
+                    totalPages={Math.ceil((data?.length ?? 0) / pageSize)}
+                />
+            }
         </div>
     )
 }

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import DeleteDialog from "./delete-dialog"
-import { NewProductItem, ProductItem } from "@/types/products"
+import { NewProductItem } from "@/types/products"
 import Link from "next/link"
 
 
@@ -58,6 +58,19 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     {
         accessorKey: "category",
         header: "CATEGORY",
+        cell: ({ row }) => {
+            return (
+                <div className="flex flex-col gap-1 items-center">
+                    {row.original.categories.map((item, indx) => {
+                        return (
+                            <div key={item.id}>
+                                {item.name}
+                            </div>
+                        )
+                    })}
+                </div>
+            )
+        }
     },
     {
         accessorKey: "stock",
@@ -77,9 +90,9 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
         ),
     },
     {
-        accessorKey: "price",
+        accessorKey: "cost",
         header: "COST",
-        cell: ({ row }) => <>€{(row.original.price).toFixed(2)}</>,
+        cell: ({ row }) => <>€{(row.original.cost ?? 0).toFixed(2)}</>,
     },
     {
         accessorKey: "discount_amount",
@@ -94,7 +107,7 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     {
         id: "revenue",
         header: "REVENUE",
-        cell: () => <>€184.000</>, // fake since not in API
+        cell: ({ row }) => <div>€{(row.original.final_price - (row.original.cost ?? 0)).toFixed(2)}</div>, // fake since not in API
     },
     {
         id: "amazon",

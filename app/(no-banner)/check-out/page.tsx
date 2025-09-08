@@ -23,8 +23,10 @@ import { useAtom } from 'jotai'
 import { checkOutIdAtom, paymentIdAtom } from '@/store/payment'
 import { useRouter } from 'next/navigation'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import { Label } from "@/components/ui/label"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import AddressSkeleton from '@/components/layout/checkout/address-skeleton'
 
 export interface CartItem {
     id: number
@@ -75,13 +77,18 @@ export default function CheckOutPage() {
         defaultValues: {
             shipping_address_id: "",
             invoice_address_id: "",
+            payment_method: "paypal",
             cart_id: '',
             note: '',
             coupon_amount: 0,
             voucher_amount: 0,
-            total_shipping: 0
+            total_shipping: 0,
+            terms: false
         },
     })
+
+    const couponAmount = form.watch('coupon_amount')
+    const voucherAmount = form.watch('voucher_amount')
 
     //Assign cart_id into form values
     useEffect(() => {
@@ -145,7 +152,36 @@ export default function CheckOutPage() {
                 {/* Shipping Address */}
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:px-24 md:px-14 px-4'>
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <AddressSelector addresses={addresses ? addresses : []} name="shipping_address_id" />
+                        <div className='space-y-4'>
+                            <div className='text-base font-semibold'>Shipping Address</div>
+                            <AddressSelector addresses={addresses ? addresses : []} name="shipping_address_id" />
+                        </div>
+                        <div className='space-y-4'>
+                            <div className='text-base font-semibold'>Invoice Address</div>
+                            {!invoiceAddress ? <AddressSkeleton /> :
+                                <Card
+                                    className={`cursor-pointer transition border-secondary border-2`}
+                                >
+                                    <CardHeader className="flex items-center gap-2">
+                                        <Label
+                                            className="text-lg font-semibold cursor-pointer"
+                                        >
+                                            {invoiceAddress.name_address}
+                                        </Label>
+                                    </CardHeader>
+                                    <CardContent className="text-sm text-muted-foreground space-y-1 pl-7">
+                                        <p>{invoiceAddress.address_line}</p>
+                                        <p>{invoiceAddress.city}</p>
+                                        <p>{invoiceAddress.country}</p>
+                                        {invoiceAddress.recipient_name && (
+                                            <p>Recipient: {invoiceAddress.recipient_name}</p>
+                                        )}
+                                        {invoiceAddress.phone_number && <p>{invoiceAddress.phone_number}</p>}
+                                    </CardContent>
+                                </Card>
+                            }
+                        </div>
+
                         <PaymentMethodSelector />
                     </div>
 
@@ -196,40 +232,55 @@ export default function CheckOutPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <div className='flex flex-row gap-2 mt-4 items-center'>
-                                    <Checkbox>
-                                    </Checkbox>
-                                    <Label className='text-sm flex flex-row'>By placing this order, you accept our<span><Link href={'/'} className='text-secondary underline'>Terms  & Conditions</Link></span></Label>
-                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name="terms" // chỉ dùng cho validation, không map vào schema gửi lên backend
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <div className="flex flex-row gap-2 mt-4 items-center">
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={(checked) => field.onChange(checked)}
+                                                />
+                                                <FormLabel className="text-sm flex flex-row">
+                                                    By placing this order, you accept our
+                                                    <span>
+                                                        <Link href="/" className="text-secondary underline">
+                                                            Terms & Conditions
+                                                        </Link>
+                                                    </span>
+                                                </FormLabel>
+                                            </div>
+                                            <FormMessage /> {/* hiển thị lỗi nếu chưa tick */}
+                                        </FormItem>
+                                    )}
+                                />
 
                             </div>
                             <div className='text-sm space-y-2'>
                                 <div className='flex gap-6 justify-end'>
-                                    <span>Sub total</span>
+                                    <span>Sub total (include VAT)</span>
                                     <span>
                                         €{cartItems?.items
-                                            .reduce((total, item) => total + item.price_whithout_tax, 0)
+                                            .reduce((total, item) => total + item.final_price, 0)
                                             .toFixed(2)}
                                     </span>
                                 </div>
                                 <div className='flex gap-6 justify-end'>
                                     <span>Shipping</span>
-                                    <span>20</span>
+                                    <span>€5.95</span>
                                 </div>
                                 <div className='flex gap-6 justify-end'>
                                     <span>Discount</span>
-                                    <span>30</span>
-                                </div>
-                                <div className='flex gap-6 justify-end'>
-                                    <span>VAT Tax (19%)</span>
-                                    <span>30</span>
+                                    <span>€0</span>
                                 </div>
                                 <div className='flex gap-6 justify-end text-xl text-primary font-bold'>
                                     <span>Total</span>
                                     <span>
-                                        €{cartItems?.items
-                                            .reduce((total, item) => total + item.final_price, 0)
-                                            .toFixed(2)}
+                                        €{(
+                                            (cartItems?.items.reduce((total, item) => total + item.final_price, 0) ?? 0) + 5.95 - (couponAmount ?? 0) - (voucherAmount ?? 0)
+                                        )}
+
                                     </span>
                                 </div>
                             </div>

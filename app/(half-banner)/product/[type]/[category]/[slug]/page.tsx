@@ -9,76 +9,121 @@ import { vouchers } from '@/data/data'
 import { Facebook, Heart, Instagram, Plus, Twitter, Youtube } from 'lucide-react'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ProductDetailsTab } from '@/components/layout/single-product/product-tab'
 import ListStars from '@/components/shared/list-stars'
-import { useGetProductById } from '@/features/products/hook'
 import ProductDetailsSkeleton from '@/components/layout/single-product/product-detail-skeleton'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FormProvider, useForm } from "react-hook-form"
+import { FormProvider, useForm, useWatch } from "react-hook-form"
 import { cartFormSchema } from '@/lib/schema/cart'
 import z from 'zod'
 import {
-    Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { toast } from 'sonner'
 import ListVariant from '@/components/layout/single-product/list-variant'
 import { FormNumberInput } from '@/components/layout/single-product/form-number.input'
 import { useAddToCart } from '@/features/cart/hook'
+import { useQuery } from '@tanstack/react-query'
+import { getProductGroupDetail } from '@/features/product-group/api'
+import { getProductById } from '@/features/products/api'
+import { VariantOptionResponse } from '@/types/variant'
+import { NewProductItem } from '@/types/products'
 
 const ProductDetails = () => {
     const params = useParams()
     const router = useRouter()
-    const { type, category, slug } = params
-    const { data: productDetails, isLoading: isLoadingProduct, isError: isErrorProduct } = useGetProductById(slug as string)
-    const [selectedVoucher, setSelectedVoucher] = useState<number>()
+    const { slug } = params
 
-    const [position, setPosition] = useState({ x: 0, y: 0 })
-    const [isHover, setIsHover] = useState(false)
-
-    const createCartMutation = useAddToCart()
-
-    // 1. Define your form.
+    // Form init
     const form = useForm<z.infer<typeof cartFormSchema>>({
         resolver: zodResolver(cartFormSchema),
         defaultValues: {
             productId: "",
-            option_id: null,
+            option_id: [],
             quantity: 1,
             is_active: false
         },
     })
 
+    // Watch option_id để biết user chọn options nào
+    const optionIds = useWatch({
+        control: form.control,
+        name: "option_id",
+    })
+
+    // Query product theo slug ban đầu
+    const { data: initialProduct } = useQuery({
+        queryKey: ["product-initial", slug],
+        queryFn: () => getProductById(slug as string),
+        enabled: !!slug,
+        retry: false,
+    })
+
+    // Query parent group
+    const { data: parentProduct } = useQuery({
+        queryKey: ["product-group-detail", initialProduct?.parent_id],
+        queryFn: () => getProductGroupDetail(initialProduct!.parent_id ?? ''),
+        enabled: !!initialProduct?.parent_id,
+        retry: false,
+    })
+
+    // Tìm product match dựa vào option_id user chọn
+    const matchedProductId = useMemo(() => {
+        if (!parentProduct?.products || !optionIds || optionIds.length === 0) return null
+
+        return (
+            parentProduct.products.find((p: NewProductItem) => {
+                const productOptionIds = p.options.map((o: VariantOptionResponse) => o.id)
+                return (
+                    optionIds.length === productOptionIds.length &&
+                    optionIds.every((id: string) => productOptionIds.includes(id))
+                )
+            })?.id ?? null
+        )
+    }, [parentProduct?.products, optionIds])
+
+    // Query product details (dùng matchedProductId nếu có, fallback slug ban đầu)
+    const { data: productDetails, isLoading: isLoadingProduct, isError: isErrorProduct } = useQuery({
+        queryKey: ["product", matchedProductId || slug],
+        queryFn: () => getProductById(matchedProductId || (slug as string)),
+        enabled: !!(matchedProductId || slug),
+        retry: false,
+    })
+
+    // Khi có productDetails mới → sync form
     useEffect(() => {
         if (productDetails?.id) {
-            form.setValue("productId", productDetails.id);
+            form.setValue("productId", productDetails.id)
+            form.setValue(
+                "option_id",
+                productDetails.options.map((o: VariantOptionResponse) => o.id) // auto select option mặc định
+            )
         }
-    }, [productDetails?.id, form]);
+    }, [productDetails, form])
 
-    // 2. Define a submit handler.
-    function handleSubmit(values: z.infer<typeof cartFormSchema>) {
-        // if (!values.option_id || values.option_id.length === 0)
+    // Add to cart mutation
+    const createCartMutation = useAddToCart()
 
-
-        // console.log(values)
+    const handleSubmit = (values: z.infer<typeof cartFormSchema>) => {
         createCartMutation.mutate(values, {
-            onSuccess(data, variables, context) {
+            onSuccess: () => {
                 router.push('/cart')
                 toast.success('Product is added to cart')
             },
-            onError(error, variables, context) {
-                toast.error('Product is added to cart fail')
+            onError: () => {
+                toast.error('Add to cart failed')
             },
         })
     }
 
+    // Image zoom
+    const [position, setPosition] = useState({ x: 0, y: 0 })
+    const [isHover, setIsHover] = useState(false)
     const handleZoomImage = (e: React.MouseEvent<HTMLDivElement>) => {
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
         const x = ((e.pageX - left) / width) * 100
@@ -86,10 +131,8 @@ const ProductDetails = () => {
         setPosition({ x, y })
     }
 
-    const handleSelectVoucher = (item: number) => {
-        setSelectedVoucher(item)
-    }
-
+    const [selectedVoucher, setSelectedVoucher] = useState<number>()
+    const handleSelectVoucher = (item: number) => setSelectedVoucher(item)
 
     return (
         <div className='py-3'>
@@ -98,32 +141,28 @@ const ProductDetails = () => {
                 <FormProvider {...form}>
                     <form
                         onSubmit={form.handleSubmit(
-                            (values) => {
-                                console.log("✅ Valid submit", values)
-                                handleSubmit(values)
-                            },
-                            (errors) => {
-                                console.log(errors)
-                                toast.error("Please check the form for errors")
-                            }
+                            (values) => handleSubmit(values),
+                            () => toast.error("Please check the form for errors")
                         )}
                         className='space-y-8'
-                    >                        <div className='flex flex-col gap-8'>
+                    >
+                        <div className='flex flex-col gap-8'>
+
                             {/*Product details */}
-                            <div className='grid grid-cols-12 xl:gap-16 gap-8'>
+                            <div className='grid grid-cols-12 xl:gap-16 gap-8 auto-rows-fr'>
                                 {/*Product details images */}
-                                <div className='xl:col-span-7 col-span-12 flex flex-col gap-6'>
-                                    {/*Product details main image */}
+                                <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
+                                    {/* Main image */}
                                     <div
-                                        className='2xl:p-24 xl:p-20 md:p-6 overflow-hidden main-image'
+                                        className='2xl:p-30 xl:p-26 md:p-6 overflow-hidden main-image'
                                         onMouseMove={handleZoomImage}
                                         onMouseEnter={() => setIsHover(true)}
                                         onMouseLeave={() => setIsHover(false)}
                                     >
                                         <Image
-                                            src={`${productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/1.png'}`}
+                                            src={`${productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/2.png'}`}
                                             width={600}
-                                            height={400}
+                                            height={300}
                                             alt={`${productDetails.name}`}
                                             className='transition-transform duration-300'
                                             style={{
@@ -132,19 +171,19 @@ const ProductDetails = () => {
                                             }}
                                         />
                                     </div>
-                                    {/*Product details sub images */}
-                                    <div className='flex flex-row px-12'>
+                                    {/* Sub images */}
+                                    <div className='flex flex-row px-12 w-full'>
                                         <Carousel opts={{ loop: true }}>
-                                            <CarouselContent>
-                                                {productDetails.static_files.slice(0, 1).map((item, index) => {
+                                            <CarouselContent className='w-full'>
+                                                {productDetails.static_files.map((item, index) => {
+                                                    console.log(productDetails.static_files.length)
                                                     return (
-                                                        <CarouselItem key={index} className='md:basis-1/2 lg:basis-1/3 flex justify-center'>
+                                                        <CarouselItem key={index} className={`flex justify-center basis-1/4`}>
                                                             <Image
                                                                 src={item.url}
                                                                 width={100}
                                                                 height={100}
                                                                 alt=''
-
                                                             />
                                                         </CarouselItem>
                                                     )
@@ -154,29 +193,28 @@ const ProductDetails = () => {
                                             <CarouselNext className='text-primary border-primary' />
                                         </Carousel>
                                     </div>
-
-                                    {/*Product details voucher */}
+                                    {/* Voucher */}
                                     <div className='flex flex-row justify-center gap-2 mt-6'>
-                                        {vouchers.map((item, index) => {
-                                            return (
-                                                <ProductVoucher item={item} key={index} isSelected={selectedVoucher === item.id} onSelect={() => handleSelectVoucher(item.id)} />
-                                            )
-                                        })}
+                                        {vouchers.map((item, index) => (
+                                            <ProductVoucher
+                                                item={item}
+                                                key={index}
+                                                isSelected={selectedVoucher === item.id}
+                                                onSelect={() => handleSelectVoucher(item.id)}
+                                            />
+                                        ))}
                                     </div>
                                 </div>
 
                                 {/*Product details */}
-                                <div className='xl:col-span-5 col-span-12 flex flex-col gap-6'>
+                                <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
                                     <h2 className='text-3xl font-semibold text-secondary'>{productDetails.name}</h2>
                                     <div className='flex gap-2'>
                                         <p className='text-primary text-3xl font-semibold'>€{productDetails.final_price}</p>
                                         <p className='text-gray-300 line-through text-3xl font-semibold'>€{productDetails.price}</p>
                                     </div>
                                     <div className='flex flex-row justify-start gap-4 items-center'>
-                                        <div
-                                            className='rounded-xl text-xs py-1 uppercase px-2 text-white'
-                                            style={{ backgroundColor: `red` }}
-                                        >
+                                        <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>
                                             {productDetails.tag}
                                         </div>
                                         <div className='flex gap-1 items-center'>
@@ -184,10 +222,13 @@ const ProductDetails = () => {
                                             <ListStars rating={5} />
                                         </div>
                                     </div>
-                                    {productDetails.variants && productDetails.variants.length > 0 ?
-                                        <ListVariant variant={productDetails.variants} />
-                                        : ''}
-
+                                    {parentProduct && parentProduct?.variants?.length > 0 &&
+                                        <ListVariant
+                                            variant={parentProduct.variants}
+                                            currentProduct={productDetails}
+                                            parentProduct={parentProduct}
+                                        />
+                                    }
 
                                     <div className="flex items-center gap-3">
                                         <Checkbox id="terms" defaultChecked />
@@ -251,12 +292,7 @@ const ProductDetails = () => {
                                                     <FormItem>
                                                         <FormLabel>Quantity</FormLabel>
                                                         <FormControl>
-                                                            <FormNumberInput
-                                                                {...field}
-                                                                min={1}
-                                                                stepper={1}
-                                                                placeholder="1"
-                                                            />
+                                                            <FormNumberInput {...field} min={1} stepper={1} placeholder="1" />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -269,67 +305,16 @@ const ProductDetails = () => {
                                             <div className='absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0'><Plus /></div>
                                         </Button>
                                     </div>
-
-                                    <p className='text-gray-500 font-bold italic'><span className='text-primary'>20</span> people are viewing this product</p>
-
-                                    <div className='relative pt-2'>
-                                        <div className="h-2.5 w-full rounded-full overflow-hidden relative 
-                                            bg-[radial-gradient(circle,_#d1d5db_2px,_transparent_2px)] 
-                                            [background-size:10px_10px]">
-                                            <div
-                                                style={{ width: `60%` }}
-                                                className="absolute top-0 right-0 h-full bg-primary animate-stripes rounded-full"
-                                            ></div>
-                                        </div>
-                                        <div className='absolute left-2/5 -translate-y-2/3 -translate-x-[20px]'>
-                                            <Image
-                                                src={'/game.png'}
-                                                height={32}
-                                                width={32}
-                                                alt=''
-                                                className=''
-                                            />
-                                        </div>
-                                        <div className='text-end font-semibold text-gray-500 mt-1'><span className='text-primary'>Hurry up,</span> only <span className='text-primary'>7</span> items left</div>
-                                    </div>
-
-                                    <div className='flex flex-col gap-2'>
-                                        <p>SKU: BE45VGRT</p>
-                                        <p>Category: Indoor</p>
-                                        <p>Tags: Chair, Airm chair</p>
-                                    </div>
-
-                                    <div className='flex flex-row items-center'>
-                                        <p className=''>Shared:</p>
-                                        <div className='flex flex-row gap-2 items-center'>
-                                            <Facebook size={20} />
-                                            <Twitter size={20} />
-                                            <Youtube size={20} />
-                                            <Instagram size={20} />
-                                        </div>
-                                    </div>
-
-
                                 </div>
                             </div>
-
-                            {/*Product bought together */}
-                            {/* <BoughtTogetherSection productDetails={productDetails} /> */}
 
                             {/*Product tabs */}
                             <div className='xl:mt-12 mt-8'>
                                 <ProductDetailsTab product={productDetails} />
                             </div>
-
-                            {/*Product related */}
-                            <div></div>
-
-                            {/*Product voucher */}
-                            <div></div>
                         </div>
                     </form>
                 </FormProvider>
-
                 : <ProductDetailsSkeleton />}
         </div>
     )

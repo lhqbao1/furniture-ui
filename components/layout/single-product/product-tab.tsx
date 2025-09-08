@@ -1,5 +1,3 @@
-import { AppWindowIcon, CodeIcon } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -19,16 +17,16 @@ import {
 } from "@/components/ui/tabs"
 import ProductReviewTab from "./tabs/review"
 import QASection from "./tabs/q&a"
-import { Product, ProductItem } from "@/types/products"
+import { NewProductItem } from "@/types/products"
 
 interface ProductDetailsTabProps {
-  product?: ProductItem
+  product?: NewProductItem
 }
 
 export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
   return (
     <div className="">
-      <Tabs defaultValue="account">
+      <Tabs defaultValue="review">
         <TabsList className="flex flex-row gap-12">
           <TabsTrigger value="description" className="text-xl text-gray-600 font-bold w-fit">Description</TabsTrigger>
           <TabsTrigger value="shipping" className="text-xl text-gray-600 font-bold">Shipping</TabsTrigger>

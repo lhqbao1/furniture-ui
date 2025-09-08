@@ -73,3 +73,8 @@ export interface CategoryByIdResponse {
     in_category: ProductItem[]
     not_in_category: ProductItem[]
 }
+
+
+export type AddOrRemoveProductToCategoryInput = {
+  products: string[]
+}

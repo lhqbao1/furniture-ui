@@ -4,8 +4,8 @@ import { BannerInput } from '@/components/shared/banner-input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { Mic, Search } from 'lucide-react'
-import React from 'react'
+import { Loader2, Mic, Search } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { productsColumn } from './all-product-columns'
 import {
     Table,
@@ -20,11 +20,19 @@ import { useAtom } from 'jotai'
 import { useQuery } from '@tanstack/react-query'
 import { getCategoryById } from '@/features/category/api'
 import SkeletonTable from './table-skeleton'
+import { useAddProductToCategory, useRemoveProductFromCategory } from '@/features/category/hook'
+import { AddOrRemoveProductToCategoryInput } from '@/types/categories'
+import { toast } from 'sonner'
 
 const CategoryAdd = () => {
     const [selectedCategory] = useAtom(selectedCategoryAtom)
+    const [productsSelection, setProductsSelection] = useState({});
+    const [categorySelection, setCategorySelection] = useState({});
 
-    // Lấy dữ liệu category
+    const addProductToCategoryMutation = useAddProductToCategory()
+    const removeProductToCategoryMutation = useRemoveProductFromCategory()
+
+
     const { data: categoryProducts, isLoading: categoryProductsLoading } = useQuery({
         queryKey: ["category", selectedCategory],
         queryFn: () => getCategoryById(selectedCategory),
@@ -37,32 +45,82 @@ const CategoryAdd = () => {
     const categoryData = React.useMemo(() => categoryProducts?.in_category ?? [], [categoryProducts])
     const columns = React.useMemo(() => productsColumn, [])
 
-    // Table instance
+
     const productsTable = useReactTable({
         data: productsData,
         columns,
+        state: {
+            rowSelection: productsSelection,
+        },
+        onRowSelectionChange: setProductsSelection,
         getCoreRowModel: getCoreRowModel(),
         enableRowSelection: true,
-    })
+    });
 
     const categoryProductsTable = useReactTable({
         data: categoryData,
         columns,
+        state: {
+            rowSelection: categorySelection,
+        },
+        onRowSelectionChange: setCategorySelection,
         getCoreRowModel: getCoreRowModel(),
         enableRowSelection: true,
-    })
+    });
 
-    // Xử lý Add / Remove
+    // reset selection khi data thay đổi
+    useEffect(() => {
+        setProductsSelection({});
+    }, [productsData]);
+
+    useEffect(() => {
+        setCategorySelection({});
+    }, [categoryData]);
+
+    // xử lý Add
     const handleAdd = () => {
-        const selectedRows = productsTable.getSelectedRowModel().rows.map(r => r.original)
-        console.log("Add products:", selectedRows)
-        // TODO: gọi API thêm sản phẩm vào category
-    }
+        const selectedRows = productsTable.getSelectedRowModel().rows.map(r => r.original);
+
+        // Lấy ra mảng id
+        const data: AddOrRemoveProductToCategoryInput = {
+            products: selectedRows.map(product => product.id),
+        };
+
+        if (data.products.length <= 0) {
+            toast.error("You need to choose at least one product")
+        } else {
+            addProductToCategoryMutation.mutate({ input: data, categoryId: selectedCategory }, {
+                onSuccess(data, variables, context) {
+                    toast.success("Add products to category successful")
+                },
+                onError(error, variables, context) {
+                    toast.success("Add products to category fail")
+                },
+            })
+        }
+    };
 
     const handleRemove = () => {
         const selectedRows = categoryProductsTable.getSelectedRowModel().rows.map(r => r.original)
-        console.log("Remove products:", selectedRows)
-        // TODO: gọi API xóa sản phẩm khỏi category
+
+        // Lấy ra mảng id
+        const data: AddOrRemoveProductToCategoryInput = {
+            products: selectedRows.map(product => product.id),
+        };
+
+        if (data.products.length <= 0) {
+            toast.error("You need to choose at least one product")
+        } else {
+            removeProductToCategoryMutation.mutate({ input: data, categoryId: selectedCategory }, {
+                onSuccess(data, variables, context) {
+                    toast.success("Remove products from category successful")
+                },
+                onError(error, variables, context) {
+                    toast.success("Remove products from category fail")
+                },
+            })
+        }
+
     }
 
     return (
@@ -123,8 +181,16 @@ const CategoryAdd = () => {
 
                 {/* Add / Remove Buttons */}
                 <div className='flex flex-col gap-8 justify-center'>
-                    <Button onClick={handleAdd}>Add →</Button>
-                    <Button onClick={handleRemove}>← Remove</Button>
+                    <Button onClick={handleAdd}>
+                        {addProductToCategoryMutation.isPending ?
+                            <Loader2 className='animate-spin' />
+                            : 'Add →'}
+                    </Button>
+                    <Button onClick={handleRemove}>
+                        {removeProductToCategoryMutation.isPending ?
+                            <Loader2 className='animate-spin' />
+                            : '← Remove'}
+                    </Button>
                 </div>
 
                 {/* In category */}

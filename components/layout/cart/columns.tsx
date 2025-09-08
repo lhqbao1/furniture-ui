@@ -24,33 +24,45 @@ export const getCartColumns = ({
     isCheckout,
     localStatuses
 }: GetCartColumnsProps): ColumnDef<CartItem>[] => [
-        // Nếu KHÔNG checkout thì thêm cột select
         ...(!isCheckout
             ? [
                 {
                     id: "select",
-                    header: ({ table }) => (
-                        <Checkbox
-                            checked={table.getIsAllPageRowsSelected()}
-                            onCheckedChange={(value) =>
-                                table.toggleAllPageRowsSelected(!!value)
-                            }
-                            aria-label="Select all"
-                        />
-                    ),
+                    header: ({ table }) => {
+                        // Check xem tất cả rows có đang được chọn theo localStatuses không
+                        const allSelected = table.getRowModel().rows.every(
+                            (row) => localStatuses[row.original.id] ?? row.original.is_active
+                        );
+
+                        const someSelected = table.getRowModel().rows.some(
+                            (row) => localStatuses[row.original.id] ?? row.original.is_active
+                        );
+
+                        return (
+                            <Checkbox
+                                checked={allSelected}
+                                onCheckedChange={(value) => {
+                                    table.getRowModel().rows.forEach((row) => {
+                                        onToggleSelect(row.original, value === true);
+                                    });
+                                }}
+                                aria-label="Select all"
+                            />
+                        );
+                    },
                     cell: ({ row }) => {
-                        const item = row.original as CartItem
                         return (
                             <Checkbox
                                 checked={Boolean(localStatuses[row.original.id] ?? row.original.is_active)}
                                 onCheckedChange={(value) => onToggleSelect(row.original, value === true)}
                                 aria-label="Select row"
                             />
-                        )
+                        );
                     },
                     enableSorting: false,
                     enableHiding: false,
-                } as ColumnDef<CartItem>,
+                } as ColumnDef<CartItem>
+
             ]
             : []),
         {
@@ -58,18 +70,17 @@ export const getCartColumns = ({
             header: "Product",
             cell: ({ row }) => {
                 const item = row.original
-                console.log(row.original)
                 return (
                     <div className="flex items-center gap-3">
                         <Image
                             src={item.image_url || "/1.png"}
-                            alt={item.product_name}
+                            alt={item.products.name}
                             width={60}
                             height={60}
                             className="rounded"
                         />
                         <div>
-                            <p className="font-semibold">{item.product_name}</p>
+                            <p className="font-semibold">{item.products.name}</p>
                         </div>
                     </div>
                 )
@@ -100,7 +111,7 @@ export const getCartColumns = ({
                             variant="outline"
                             size="sm"
                             onClick={() => onUpdateQuantity(item, quantity + 1)}
-                            disabled={quantity >= item.product_stock}
+                            disabled={quantity >= item.products.stock}
                         >
                             +
                         </Button>

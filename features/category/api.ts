@@ -1,5 +1,5 @@
 import api from "@/lib/axios"
-import { CategoryByIdResponse, CategoryInput, CategoryResponse } from "@/types/categories"
+import { AddOrRemoveProductToCategoryInput, CategoryByIdResponse, CategoryInput, CategoryResponse } from "@/types/categories"
 
 export async function getCategories(){
     const {data} = await api.get(
@@ -44,6 +44,36 @@ export async function createCategory(input: CategoryInput) {
     }
   )
   return data as CategoryResponse
+  }
+
+  export async function addProductToCategory(input: AddOrRemoveProductToCategoryInput, category_id: string) {
+  const { data } = await api.post(
+    `/categories/add-product/${category_id}`,
+    input,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    }
+  )
+  return data
+  }
+
+    export async function removeProductFromCategory(input: AddOrRemoveProductToCategoryInput, category_id: string) {
+  const { data } = await api.post(
+    `/categories/remove-product/${category_id}`,
+    input,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    }
+  )
+  return data
   }
 
   export async function editCategory(input: CategoryInput, id: string) {

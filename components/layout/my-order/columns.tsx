@@ -7,7 +7,7 @@ export const myOrderTableColumns: ColumnDef<CartItem>[] = [
         accessorKey: 'product_name',
         cell: ({ row }) => {
             return (
-                <div>{row.original.product_name}</div>
+                <div>{row.original.products.name}</div>
             )
         }
     },

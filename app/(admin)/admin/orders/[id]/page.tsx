@@ -9,14 +9,14 @@ import { ProductTable } from '@/components/layout/admin/products/products-list/p
 import { useGetCheckOutByCheckOutId } from '@/features/checkout/hook'
 import { formatDateTime } from '@/lib/date-formated'
 import { useParams } from 'next/navigation'
-import React from 'react'
+import React, { useState } from 'react'
 
 const OrderDetails = () => {
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
     const params = useParams<{ id: string }>()  // type-safe
     const checkoutId = params?.id
     const { data: order, isLoading, isError } = useGetCheckOutByCheckOutId(checkoutId)
-
-    console.log("params:", order)
 
     if (isLoading) return <div>Loading...</div>
     if (isError) return <div>Error loading order</div>
@@ -33,7 +33,17 @@ const OrderDetails = () => {
                 />
                 <OrderDetailUser user={order.user} shippingAddress={order.shipping_address} invoiceAddress={order.invoice_address} />
             </div>
-            <ProductTable data={order.cart.items} columns={orderDetailColumn} hasBackground />
+            <ProductTable
+                data={order.cart.items}
+                columns={orderDetailColumn}
+                hasBackground
+                page={page}
+                setPage={setPage}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                totalItems={order.cart.items.length}
+                totalPages={Math.ceil(order.cart.items.length / pageSize)}
+            />
             <OrderInformation language={order.user.language ?? ''} sub_total={order.total_amount_item} shipping_amount={order.total_shipping} discount_amount={order.voucher_amount + order.coupon_amount} tax={order.total_vat} total_amount={order.total_amount} />
             <div className='flex gap-12'>
                 <DocumentTable />

@@ -10,6 +10,8 @@ interface InvoiceResponse {
     total_shipping: number
     total_amount: number
     id: string
+    invoice_code: string
+    user_code: string
     cart: CartResponse
     shipping_address: Address
     invoice_address: Address

@@ -19,26 +19,23 @@ import ImagePickerInput from '@/components/layout/single-product/tabs/review/ima
 import { Categories, tags } from '@/data/data'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { addProductSchema, defaultValues } from '@/lib/schema/product'
+import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/product'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import { ProductItem, Variant } from '@/types/products'
+import { NewProductItem, ProductItem, Variant } from '@/types/products'
 import { toast } from 'sonner'
 import ProductTypeSelector from './product-type'
 import { ProductPricingFields } from './pricing-field'
-import ProductVariants from './variant-list'
+import { MultiSelectField } from './category-select'
 
 interface AddProductFormProps {
-    productValues?: Partial<ProductItem>
-    onSubmit: (values: ProductItem) => Promise<void> | void
+    productValues?: Partial<NewProductItem>
+    onSubmit: (values: ProductInput) => Promise<void> | void
     isPending?: boolean
 }
 
 const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps) => {
-    const [showMaterial, setShowMaterial] = useState<boolean>(true)
-    const [variants, setVariants] = useState<Variant[]>([])
-    const [openVariant, setOpenVariant] = useState(false)
     const [description, setDescription] = useState("")
     const [isSimple, setIsSimple] = useState(true)
 
@@ -54,37 +51,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
         }
     }, [productValues, form])
 
-
-    //Khai báo useFieldArray cho variants form
-    const { fields, append, remove, replace } = useFieldArray({
-        control: form.control,
-        name: "variants",
-    })
-
-    // Khi fields thay đổi (tức là variant/option thay đổi)
-    useEffect(() => {
-        if (!fields || fields.length === 0) return
-
-        // tính tổng stock từ tất cả option trong tất cả variant
-        let totalStock = 0
-        fields.forEach((variant) => {
-            if (variant.options && Array.isArray(variant.options)) {
-                variant.options.forEach((opt) => {
-                    if (opt.stock) {
-                        totalStock += Number(opt.stock) || 0
-                    }
-                })
-            }
-        })
-
-        form.setValue("stock", totalStock) // gán về stock của sản phẩm
-    }, [fields, form])
-
-    const handleSubmit = async (values: ProductItem) => {
+    const handleSubmit = async (values: ProductInput) => {
         await onSubmit(values)
-        // if (!productValues) {
-        //     form.reset()
-        // }
+        form.reset(defaultValues)
     }
 
     return (
@@ -102,7 +71,53 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                     <div className='grid-cols-12 grid gap-5 w-full'>
                         <div className='col-span-8 flex flex-col gap-4'>
                             <h3 className='text-xl text-[#666666]'>Add New Product</h3>
-                            <ProductTypeSelector isSimple={isSimple} setIsSimple={setIsSimple} />
+
+                            <div className='flex gap-4 w-full'>
+                                {/*Product ID */}
+                                <div className='w-full'>
+                                    <FormField
+                                        control={form.control}
+                                        name="id_provider"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className='text-[#666666] text-sm'>Product ID</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="" {...field} className='' />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                {/*Product Cost */}
+                                <div className='w-full'>
+                                    <FormField
+                                        control={form.control}
+                                        name="cost"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[#666666] text-sm">Cost Price</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative flex items-center">
+                                                        <Input
+                                                            {...field}
+                                                            type="number"
+                                                            min={0}
+                                                            className="pl-7 w-1/2"
+                                                            onChange={(e) => {
+                                                                field.onChange(e.target.valueAsNumber)
+                                                            }}
+                                                        />
+                                                        <span className="absolute left-3 text-gray-500">€</span>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
 
                             {/*Product Name */}
                             <FormField
@@ -176,26 +191,13 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 <p className='text-[#666666] text-sm'>Image</p>
                                 <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
                             </div>
-
-                            <ProductVariants
-                                openVariant={openVariant}
-                                setOpenVariant={setOpenVariant}
-                                append={append}
-                                setVariants={setVariants}
-                                isSimple={isSimple}
-                                variants={fields}
-                                showMaterial={showMaterial}
-                                setShowMaterial={setShowMaterial}
-                                replace={replace}
-                            />
-
                         </div>
                         <div className='col-span-4 flex flex-col items-end gap-4'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end'>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white' type="button" hasEffect>Discard</Button>
                                 <Button className='cursor-pointer bg-primary/95 hover:bg-primary text-lg' type="submit" hasEffect>
-                                    {isPending ? <Loader2 /> : 'Submit'}
+                                    {isPending ? <Loader2 className='animate-spin' /> : 'Submit'}
                                 </Button>
                             </div>
 
@@ -217,35 +219,10 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 )}
                             />
 
-                            {/*Product ID */}
-                            <span className='text-[#666666]'>ID 1136574654</span>
-
                             {/*Product Category */}
-                            <FormField
-                                control={form.control}
-                                name="category"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row gap-3">
-                                        <FormLabel className="!mt-0 text-[#666666]">Category</FormLabel>
-                                        <FormControl>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                value={field.value || ""}   // chỉ cần value
-                                            >
-                                                <SelectTrigger className="border text-black">
-                                                    <SelectValue placeholder="Select category" className="text-black" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {Categories.map((item, index) => (
-                                                        <SelectItem key={index} value={item.name}>
-                                                            {item.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                    </FormItem>
-                                )}
+                            <MultiSelectField
+                                fieldName="category_ids"
+                                label="Categories"
                             />
 
                             <div className="flex items-center gap-4">
@@ -293,10 +270,10 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             {/* Barcode input */}
                             <FormField
                                 control={form.control}
-                                name='barcode'
+                                name='ean'
                                 render={({ field }) => (
                                     <FormItem className="flex items-center gap-3">
-                                        <FormLabel className='text-[#666666]'>Barcode</FormLabel>
+                                        <FormLabel className='text-[#666666]'>EAN</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="text"

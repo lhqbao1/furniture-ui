@@ -7,7 +7,7 @@ export interface VariantResponse {
 }
 
 type VariantOptionResponse = {
-  id?: string
+  id: string
   image_url?: string | null
   label: string
   created_at?: string

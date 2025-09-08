@@ -43,7 +43,7 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
         uploadStaticFile.mutate(formData, {
             onSuccess(data) {
                 toast.success("Image uploaded successfully")
-                setCurrentImage(data.url)
+                setCurrentImage(data.results[0].url)
                 console.log("Response:", data)
             },
             onError(error) {

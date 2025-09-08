@@ -20,23 +20,20 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-center">#{row.original.id.slice(0, 7)}</div>
+                <div className="text-center">#{row.original.products.id_provider}</div>
             )
         }
     },
     {
         accessorKey: "product_name",
         header: "Name",
-    },
-    {
-        accessorKey: "variant_name",
-        header: "Variant name",
         cell: ({ row }) => {
             return (
-                <div>{row.original.variant_name ? row.original.variant_name : 'None'}</div>
+                <div>{row.original.products.name}</div>
             )
         }
     },
+
     {
         accessorKey: "net_price",
         header: () => (
@@ -62,16 +59,14 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     },
     {
         accessorKey: "discount",
-        header: () => (
-            <div className="text-center w-full">Discount</div>
-        ),
+        header: () => <div className="text-center w-full">Discount</div>,
         cell: ({ row }) => {
-            return (
-                <div className="text-center">
-                    {row.original.discount_percent}%
-                </div>
-            )
-        }
+            const { final_price, cost, discount_percent } = row.original.products;
+            const discount = final_price
+                ? ((final_price - cost) / final_price) * 100
+                : 0;
+            return <div className="text-center">{discount_percent?.toFixed(2)}%</div>;
+        },
     },
     {
         accessorKey: "surcharge_total",

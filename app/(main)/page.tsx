@@ -8,15 +8,18 @@ import TrendingProducts from "@/components/layout/home/trending";
 import Voucher from "@/components/layout/home/voucher";
 import { getMe } from "@/features/auth/api";
 import { getCartItems } from "@/features/cart/api";
-import { getAllProducts } from "@/features/products/api";
-import { serverGetAllProducts } from "@/features/products/server";
+import { getAllProducts, getProductByTag } from "@/features/products/api";
 import getQueryClient from "@/lib/get-query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 export default async function Home() {
-  // const products = await serverGetAllProducts()
-
   const queryClient = getQueryClient()
+
+  // Prefetch trending (tag: trending)
+  await queryClient.prefetchQuery({
+    queryKey: ["product-by-tag"],
+    queryFn: () => getProductByTag('Trending'),
+  });
 
   // Prefetch trending products
   await queryClient.prefetchQuery({

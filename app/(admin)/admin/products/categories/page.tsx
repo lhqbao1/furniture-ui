@@ -1,7 +1,5 @@
 import CategoryAdd from '@/components/layout/admin/products/category-list/category-add'
 import ListCategories from '@/components/layout/admin/products/category-list/list-categories'
-import { getAllProductsSelect } from '@/features/product-group/api'
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
 import React from 'react'
 
 const CategoryPage = async () => {

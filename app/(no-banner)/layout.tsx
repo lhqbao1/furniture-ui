@@ -16,8 +16,8 @@ export default function MainLayout({
     return (
         <SidebarProvider >
             <div className="h-screen w-screen overflow-hidden overflow-y-scroll min-h-screen">
-                <main className="flex-1 relative">
-                    <div className="">
+                <main className="flex-1 relative flex flex-col h-full">
+                    <div className="flex-1">
                         {children}
                     </div>
                     <Footer />

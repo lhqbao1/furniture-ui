@@ -41,29 +41,31 @@ function ImagePickerInput<T extends FieldValues>({
 
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
-            const file = acceptedFiles[0]
-            if (!file) return
+            if (!acceptedFiles || acceptedFiles.length === 0) return
 
-            // tạo FormData
             const formData = new FormData()
-            formData.append("file", file)
+            acceptedFiles.forEach((file) => {
+                formData.append("files", file) // 👈 đổi "file" thành "files" nếu backend nhận mảng
+            })
 
-            // gọi API upload
             uploadImage.mutate(formData, {
                 onSuccess(data) {
-                    const uploadedUrl = data.url
+                    // data: StaticFileResponse
+                    const uploadedUrls = data.results.map((item) => item.url)
 
                     if (isSingle) {
+                        // chỉ lấy ảnh đầu tiên
                         form.setValue(
                             fieldName,
-                            uploadedUrl as PathValue<T, Path<T>>, // string luôn
+                            uploadedUrls[0] as PathValue<T, Path<T>>,
                             { shouldValidate: true }
                         )
                     } else {
                         const currentImages = (form.getValues(fieldName) as ImageItem[]) || []
+                        const newImages = uploadedUrls.map((url) => ({ url }))
                         form.setValue(
                             fieldName,
-                            [...currentImages, { url: uploadedUrl }] as PathValue<T, Path<T>>,
+                            [...currentImages, ...newImages] as PathValue<T, Path<T>>,
                             { shouldValidate: true }
                         )
                     }
@@ -72,9 +74,11 @@ function ImagePickerInput<T extends FieldValues>({
                     console.error("Upload failed:", error)
                 },
             })
+
         },
         [form, fieldName, isSingle, uploadImage]
     )
+
 
 
     const removeImage = (index?: number) => {
@@ -119,7 +123,7 @@ function ImagePickerInput<T extends FieldValues>({
                 <Button variant="outline" type="button">
                     Browse Files
                 </Button>
-                <input {...getInputProps()} className="hidden" />
+                <input {...getInputProps()} className="hidden" multiple />
             </div>
 
             {/* Preview */}
@@ -138,18 +142,20 @@ function ImagePickerInput<T extends FieldValues>({
                 ) : null
             ) : images.length > 0 ? (
                 <div className="grid gap-4 w-full max-h-[144px] grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
-                    {images.map((src: ImageItem, idx: number) => (
-                        <div key={idx} className="relative h-full aspect-square rounded-lg overflow-hidden group">
-                            <Image src={src.url} alt={`Uploaded ${idx}`} fill className="object-cover" />
-                            <button
-                                type="button"
-                                onClick={() => removeImage(idx)}
-                                className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-                            >
-                                ✕
-                            </button>
-                        </div>
-                    ))}
+                    {uploadImage.isPending ? <Loader2 className="animate-spin" /> :
+                        images.map((src: ImageItem, idx: number) => (
+                            <div key={idx} className="relative h-full aspect-square rounded-lg overflow-hidden group">
+                                <Image src={src.url} alt={`Uploaded ${idx}`} fill className="object-cover" />
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage(idx)}
+                                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))
+                    }
                 </div>
             ) : null}
 

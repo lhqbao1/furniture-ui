@@ -5,6 +5,7 @@ import gsap from 'gsap'
 import { useAddToCart } from '@/features/cart/hook'
 import { NewProductItem } from '@/types/products'
 import { toast } from 'sonner'
+import { useAddToWishList, useAddWishlistItemToCart } from '@/features/wishlist/hook'
 
 interface IconListProps {
     currentProduct?: NewProductItem
@@ -13,16 +14,28 @@ interface IconListProps {
 const IconList = ({ currentProduct }: IconListProps) => {
     const containersRef = useRef<HTMLDivElement[]>([])
     const addToCartMutation = useAddToCart()
+    const addToWishlistMutation = useAddToWishList()
 
     const handleAddToCart = () => {
         if (!currentProduct) return
-        console.log(currentProduct)
-        addToCartMutation.mutate({ productId: currentProduct.id ?? '', quantity: 1, option_id: null }, {
+        addToCartMutation.mutate({ productId: currentProduct.id ?? '', quantity: 1 }, {
             onSuccess(data, variables, context) {
                 toast.success("Added to cart")
             },
             onError(error, variables, context) {
                 toast.error("Failed to add to cart")
+            },
+        })
+    }
+
+    const handleAddToWishlist = () => {
+        if (!currentProduct) return
+        addToWishlistMutation.mutate({ productId: currentProduct.id ?? '', quantity: 1 }, {
+            onSuccess(data, variables, context) {
+                toast.success("Added to wishlist")
+            },
+            onError(error, variables, context) {
+                toast.error("Failed to add to wishlist")
             },
         })
     }
@@ -55,7 +68,7 @@ const IconList = ({ currentProduct }: IconListProps) => {
         })
     }, [])
     const items = [
-        { label: 'Wish List', Icon: Heart },
+        { label: 'Wish List', Icon: Heart, action: handleAddToWishlist },
         { label: 'Review', Icon: Expand },
         {
             label: 'Add to cart',

@@ -13,17 +13,14 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
     header: "Item(s)",
     cell: ({ row }) => (
       <div>
-        <div>{row.original.product_name}</div>
-        {row.original.variant_name && (
-          <div className="text-xs text-muted-foreground">{row.original.variant_name}</div>
-        )}
+        <div>{row.original.products.name}</div>
       </div>
     ),
   },
   {
     accessorKey: "id",
     header: "Item ID",
-    cell: ({ row }) => `#${row.original.id.slice(0, 7)}`
+    cell: ({ row }) => `#${row.original.products.id_provider}`
   },
   {
     accessorKey: "price",

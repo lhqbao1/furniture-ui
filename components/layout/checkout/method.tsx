@@ -2,40 +2,44 @@
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Card, CardHeader } from "@/components/ui/card"
+import { useFormContext, Controller } from "react-hook-form"
 import Image from "next/image"
 import { paymentOptions } from "@/data/data"
+import { FormField, FormItem, FormMessage } from "@/components/ui/form"
 
-type PaymentMethodSelectorProps = {
-    field?: {
-        value: string
-        onChange: (value: string) => void
-    }
-}
+export default function PaymentMethodSelector() {
+    const { control } = useFormContext()
 
-export default function PaymentMethodSelector({ field }: PaymentMethodSelectorProps) {
     return (
-        <div className="space-y-2">
-            <RadioGroup
-                // value={field.value}
-                // onValueChange={field.onChange}
-                className="flex gap-4">
-                {paymentOptions.map((option) => (
-                    <div key={option.id} className="flex gap-2 items-center">
-                        <RadioGroupItem value={option.id} id={option.id} />
-                        <Label htmlFor={option.id} className="text-base font-medium">
-                            <Image
-                                src={option.logo}
-                                width={30}
-                                height={30}
-                                alt=""
-                                className="size-6"
-                            />
-                            <div>{option.label}</div>
-                        </Label>
-                    </div>
-                ))}
-            </RadioGroup>
-        </div>
+        <FormField
+            control={control}
+            name="payment_method"
+            render={({ field }) => (
+                <FormItem>
+                    <RadioGroup
+                        className="flex gap-4"
+                        value={field.value}
+                        onValueChange={field.onChange}
+                    >
+                        {paymentOptions.map((option) => (
+                            <div key={option.id} className="flex gap-2 items-center">
+                                <RadioGroupItem value={option.id} id={option.id} />
+                                <Label htmlFor={option.id} className="text-base font-medium flex items-center gap-2">
+                                    <Image
+                                        src={option.logo}
+                                        width={30}
+                                        height={30}
+                                        alt=""
+                                        className="size-6"
+                                    />
+                                    <span>{option.label}</span>
+                                </Label>
+                            </div>
+                        ))}
+                    </RadioGroup>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
     )
 }

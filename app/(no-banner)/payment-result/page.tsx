@@ -5,43 +5,58 @@ import { useUploadStaticFile } from '@/features/file/hook'
 import { useSendMail } from '@/features/mail/hook'
 import { useGetUserById } from '@/features/users/hook'
 import { useAtom } from 'jotai'
-import { checkOutIdAtom } from '@/store/payment'
+import { checkOutIdAtom, paymentIdAtom } from '@/store/payment'
 import { getCheckOutByCheckOutId } from '@/features/checkout/api'
 import { getInvoiceByCheckOut } from '@/features/invoice/api'
 import { useQuery } from '@tanstack/react-query'
 import { InvoicePDF } from '@/components/layout/pdf/file'
 import { pdf } from '@react-pdf/renderer'
 import Image from 'next/image'
+import { useCapturePayment } from '@/features/payment/hook'
 
 const OrderPlaced = () => {
     const router = useRouter()
     const [counter, setCounter] = useState(5)
     const [userId, setUserId] = useState<string | null>(null)
     const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom)
+    const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
+
+    const capturePaymentMutation = useCapturePayment()
+    const uploadStaticFileMutation = useUploadStaticFile()
+    const sendMailMutation = useSendMail()
+
     // Lấy userId từ localStorage
     useEffect(() => {
         const id = localStorage.getItem('userId')
         if (id) setUserId(id)
     }, [])
 
-    const { data: checkout } = useQuery({
+    console.log(paymentId)
+
+    const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
         queryKey: ["checkout-id", checkoutId],
-        queryFn: () => getCheckOutByCheckOutId(checkoutId as string),
-        enabled: !!checkoutId,
-    })
+        queryFn: async () => {
+            if (!checkoutId || !paymentId) return null;
+
+            // 1. Capture payment trước
+            await capturePaymentMutation.mutateAsync(paymentId);
+
+            // 2. Sau đó fetch checkout
+            return getCheckOutByCheckOutId(checkoutId);
+        },
+        enabled: !!checkoutId && !!paymentId, // chỉ chạy khi có checkoutId và paymentId
+    });
 
     const { data: invoice } = useQuery({
         queryKey: ["invoice-checkout", checkoutId],
         queryFn: () => getInvoiceByCheckOut(checkoutId as string),
-        enabled: !!checkoutId,
-    })
-
+        enabled: !!checkout, // chỉ fetch khi checkout đã có dữ liệu
+    });
 
     // Gọi hook trực tiếp
     const { data: user } = useGetUserById(userId || '')
 
-    const uploadStaticFileMutation = useUploadStaticFile()
-    const sendMailMutation = useSendMail()
+
 
     // Luồng xử lý khi có user
     useEffect(() => {
@@ -56,19 +71,16 @@ const OrderPlaced = () => {
                 // 2. upload file
                 const file = new File([blob], 'invoice.pdf', { type: 'application/pdf' })
                 const formData = new FormData()
-                formData.append('file', file)
+                formData.append('files', file)
                 const uploadRes = await uploadStaticFileMutation.mutateAsync(formData)
 
-                // 3. gửi mail
+                // 3. Send mail
                 await sendMailMutation.mutateAsync({
                     to_email: user.email,
-                    attachment_url: uploadRes.url,
+                    attachment_url: uploadRes.results[0].url,
                     checkout_id: checkout.id,
                     first_name: user.first_name ?? ''
                 })
-
-                // Reset checkoutId
-                // setCheckOutId(null)
             } catch (err) {
                 console.error(err)
             }

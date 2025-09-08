@@ -67,7 +67,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
 
 
                                     <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>
-                                        <h3 className='text-2xl text-gray-600 font-semibold sm:mt-2 text-center'>
+                                        <h3 className='text-2xl text-gray-600 font-semibold sm:mt-2 text-center lg:min-h-[64px]'>
                                             {product.name}
                                         </h3>
 

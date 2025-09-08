@@ -46,7 +46,7 @@ const ProductCategory = () => {
 
                     {/*Products section */}
                     <div className='pt-10 pb-12'>
-                        <ProductsGridLayout hasBadge data={products} />
+                        <ProductsGridLayout hasBadge data={products.items} />
                     </div>
 
                 </div>

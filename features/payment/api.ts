@@ -15,6 +15,20 @@ export async function createPayment(paymentInput: PaymentFormValues) {
     return data
   }
 
+  export async function capturePayment(paymentId: string) {
+    const {data} = await api.post(
+        `/payments/${paymentId}/capture`,
+        {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+            withCredentials: true,
+        }
+    )
+    return data
+  }
+
   export async function getPaymentStatus(payment_id: string) {
     const {data} = await api.get(
         `/payments/${payment_id}/capture`,

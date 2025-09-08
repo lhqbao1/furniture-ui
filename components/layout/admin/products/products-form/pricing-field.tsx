@@ -5,9 +5,10 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input"
 import { ProductItem } from "@/types/products"
 import { useEffect, useState } from "react"
+import { ProductInput } from "@/lib/schema/product"
 
 interface ProductPricingFieldsProps {
-    form: UseFormReturn<ProductItem>
+    form: UseFormReturn<ProductInput>
 }
 
 export function ProductPricingFields({ form }: ProductPricingFieldsProps) {

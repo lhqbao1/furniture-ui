@@ -3,18 +3,23 @@ import { addToCart, deleteCartItem, getCartById, getCartItems, quickAddToCart, u
 import { CartFormValue } from "@/types/cart";
 
 
-export function useGetCartItems(){
-    return useQuery({
-        queryKey: ["cart-items"],
-        queryFn: () => getCartItems(),
-        retry: false,
-     })
+export function useGetCartItems() {
+  return useQuery({
+    queryKey: ["cart-items"],
+    queryFn: async () => {
+      const data = await getCartItems()
+      // Sort theo created_at giảm dần (mới nhất lên trước)
+      data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      return data
+    },
+    retry: false,
+  })
 }
 
 export function useAddToCart(){
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({productId, quantity, option_id}: {productId: string, quantity: number, option_id?: string | null}) => addToCart(productId, quantity, option_id),
+        mutationFn: ({productId, quantity}: {productId: string, quantity: number}) => addToCart(productId, quantity),
         onSuccess: () => {
             qc.refetchQueries({ queryKey: ["cart-items"] })
         },

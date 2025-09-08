@@ -12,7 +12,6 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel"
-import CommentForm from './review/comment-form'
 import { allProducts, listComments } from '@/data/data'
 import ListComments from './review/list-comments'
 import {
@@ -34,8 +33,6 @@ const reviewCount = [
     { title: 2, percent: 0 },
     { title: 1, percent: 2 }
 ]
-
-
 
 const ProductReviewTab = () => {
     const [selectedRate, setSelectedRate] = useState<number>()

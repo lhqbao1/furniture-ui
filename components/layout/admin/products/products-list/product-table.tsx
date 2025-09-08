@@ -1,77 +1,71 @@
-"use client"
+'use client'
 
 import {
     ColumnDef,
     flexRender,
     getCoreRowModel,
-    getPaginationRowModel,
     useReactTable,
 } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CustomPagination } from "@/components/shared/custom-pagination"
-import React, { useState } from "react"
+import React from "react"
 import TableToolbar from "./toolbar"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    page: number
+    pageSize: number
+    setPage: (page: number) => void
+    setPageSize: React.Dispatch<React.SetStateAction<number>>
+    totalItems: number
     hasBackground?: boolean
+    totalPages: number
 }
 
 export function ProductTable<TData, TValue>({
     columns,
     data,
-    hasBackground
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+    totalItems,
+    hasBackground,
+    totalPages
 }: DataTableProps<TData, TValue>) {
-    const [rowSelection, setRowSelection] = React.useState({})
-    const [page, setPage] = useState(1)
-    const [pageSize, setPageSize] = useState(10)
 
     const table = useReactTable({
         data,
         columns,
+        pageCount: Math.ceil(totalItems / pageSize),
         state: {
-            pagination: {
-                pageIndex: page - 1, // react-table dùng index bắt đầu từ 0
-                pageSize: pageSize,
-            },
-            rowSelection,
+            pagination: { pageIndex: page - 1, pageSize },
         },
-        onPaginationChange: (updater) => {
-            const next = typeof updater === "function" ? updater({ pageIndex: page - 1, pageSize }) : updater
-            setPage(next.pageIndex + 1)
-            setPageSize(next.pageSize)
-        },
-        enableRowSelection: true,
+        manualPagination: true, // phân trang server-side
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(), // hoặc getPaginationRowModel nếu bạn dùng phân trang thực sự
     })
-
 
     return (
         <div className="flex flex-col items-center gap-4">
             <TableToolbar
                 pageSize={pageSize}
-                setPageSize={setPageSize}
+                setPageSize={setPageSize} // đảm bảo type đúng
             />
             <div className="rounded-md border w-full overflow-x-scroll">
                 <Table>
                     <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => {
-                            return (
-                                <TableRow key={headerGroup.id} className="">
-                                    {headerGroup.headers.map((header) => {
-                                        return (
-                                            <TableHead key={header.id}>
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(header.column.columnDef.header, header.getContext())}
-                                            </TableHead>
-                                        )
-                                    })}
-                                </TableRow>
-                            )
-                        })}
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows.map((row, index) => (
@@ -87,14 +81,13 @@ export function ProductTable<TData, TValue>({
                             </TableRow>
                         ))}
                     </TableBody>
-
-
                 </Table>
             </div>
+
             <CustomPagination
-                page={table.getState().pagination.pageIndex + 1}
-                totalPages={Math.ceil(data.length / table.getState().pagination.pageSize)}
-                onPageChange={(newPage) => table.setPageIndex(newPage - 1)}
+                page={page}
+                totalPages={totalPages}
+                onPageChange={(newPage) => setPage(newPage)}
             />
         </div>
     )
