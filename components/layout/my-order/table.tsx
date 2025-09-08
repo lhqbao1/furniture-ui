@@ -54,18 +54,30 @@ export function MyOrderDataTable<TData, TValue>({
 
                 <TableBody>
                     {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && "selected"}
-                            >
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
+                        <>
+                            {table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+
+                            {/* Hàng custom hiển thị total */}
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="border-t pt-2 text-right font-semibold"
+                                >
+                                    Total: {orderData.total_amount}
+                                </TableCell>
                             </TableRow>
-                        ))
+                        </>
                     ) : (
                         <TableRow>
                             <TableCell colSpan={columns.length} className="h-24 text-center">
@@ -74,6 +86,7 @@ export function MyOrderDataTable<TData, TValue>({
                         </TableRow>
                     )}
                 </TableBody>
+
             </Table>
         </div>
     )

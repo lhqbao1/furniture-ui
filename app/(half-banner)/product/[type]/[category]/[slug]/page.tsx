@@ -142,7 +142,7 @@ const ProductDetails = () => {
                     <form
                         onSubmit={form.handleSubmit(
                             (values) => handleSubmit(values),
-                            () => toast.error("Please check the form for errors")
+                            (e) => console.error("Please check the form for errors", e)
                         )}
                         className='space-y-8'
                     >
