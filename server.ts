@@ -3,7 +3,7 @@ import { parse } from "url";
 import next from "next";
 import fs from "fs";
 
-const port = 3001;
+const port = 3000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();

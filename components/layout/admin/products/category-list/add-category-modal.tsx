@@ -77,8 +77,6 @@ export default function AddCategoryDrawer() {
     };
 
 
-    // const imgUrl = form.watch("img_url"); // theo dõi giá trị img_url
-
 
     return (
         <Drawer open={open} onOpenChange={setOpen} direction="right">
@@ -108,36 +106,39 @@ export default function AddCategoryDrawer() {
 
                         <ImagePickerInput fieldName="img_url" form={form} isSingle />
 
-                        <FormField
-                            control={form.control}
-                            name="parent_id"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Parent category</FormLabel>
-                                    <FormControl>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value || ""} // nếu chưa chọn thì là empty
-                                            disabled={isLoading || isError}
-                                        >
-                                            <SelectTrigger placeholderColor className="border">
-                                                <SelectValue placeholder="Select parent category" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {isLoading && <SelectItem value="">Loading...</SelectItem>}
-                                                {isError && <SelectItem value="">Error loading</SelectItem>}
-                                                {categories?.map((cat) => (
-                                                    <SelectItem key={cat.id} value={cat.id.toString()}>
-                                                        {cat.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+
+                        {!categories || isError ? '' :
+                            <FormField
+                                control={form.control}
+                                name="parent_id"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Parent category</FormLabel>
+                                        <FormControl>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value || ""} // nếu chưa chọn thì là empty
+                                                disabled={isLoading || isError}
+                                            >
+                                                <SelectTrigger placeholderColor className="border">
+                                                    <SelectValue placeholder="Select parent category" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {isLoading && <SelectItem value="">Loading...</SelectItem>}
+                                                    {isError && <SelectItem value="">Error loading</SelectItem>}
+                                                    {categories?.map((cat) => (
+                                                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                                                            {cat.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        }
 
 
                         <FormField
