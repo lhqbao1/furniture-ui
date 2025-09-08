@@ -170,12 +170,20 @@ const ListVariantOption = () => {
                                     variantOption?.map((option, index) => (
                                         <DropdownMenuCheckboxItem
                                             key={option.label + index}
-                                            checked={true}
+                                            checked={false}
                                             onCheckedChange={() => {
                                                 handleAddVariantOption(variant.variant.id, option)
                                             }}
                                         >
-                                            {option.label}
+                                            {option.image_url ?
+                                                <Image
+                                                    src={option.image_url}
+                                                    width={40}
+                                                    height={40}
+                                                    alt=""
+                                                />
+                                                : <div>{option.label}</div>
+                                            }
                                         </DropdownMenuCheckboxItem>
                                     ))}
                             </DropdownMenuContent>

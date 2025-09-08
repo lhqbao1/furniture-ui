@@ -18,14 +18,12 @@ import RichTextEditor from '@/components/shared/editor'
 import ImagePickerInput from '@/components/layout/single-product/tabs/review/image-picker-input'
 import { Categories, tags } from '@/data/data'
 import { Switch } from '@/components/ui/switch'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/product'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
 import { NewProductItem, ProductItem, Variant } from '@/types/products'
 import { toast } from 'sonner'
-import ProductTypeSelector from './product-type'
 import { ProductPricingFields } from './pricing-field'
 import { MultiSelectField } from './category-select'
 
@@ -53,7 +51,20 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
 
     const handleSubmit = async (values: ProductInput) => {
         await onSubmit(values)
-        form.reset(defaultValues)
+        form.reset({
+            name: "",
+            description: "",
+            id_provider: '',
+            tax: "19%",
+            category: "",
+            collection: null as string | null,
+            sku: "",
+            ean: "",
+            is_active: false,
+            tag: "",
+            static_files: [] as StaticFile[],
+            category_ids: [] as string[],
+        })
     }
 
     return (
@@ -127,7 +138,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                     <FormItem>
                                         <FormLabel className='text-[#666666] text-sm'>Product Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Ghế sofa" {...field} />
+                                            <Input placeholder="" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
