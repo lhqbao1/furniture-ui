@@ -13,7 +13,7 @@ export function useGetAddressByUserId(userId: string){
 
 export function useGetInvoiceAddressByUserId(userId: string){
     return useQuery({
-        queryKey: ["invoice-address-by-user"],
+        queryKey: ["invoice-address-by-user", userId],
         queryFn: () => getInvoiceAddressByUserId(userId),
         retry: false,
         enabled: !!userId,
@@ -44,7 +44,7 @@ export function useCreateInvoiceAddress(){
     return useMutation({
         mutationFn: (address: AddressFormValues) => createInvoiceAddress(address),
         onSuccess: () => {
-            qc.refetchQueries({ queryKey: ["invoice-address"] })
+            qc.refetchQueries({queryKey: ["invoice-address-by-user"]})
         },
     })
 }

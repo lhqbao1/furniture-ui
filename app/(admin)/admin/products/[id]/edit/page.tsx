@@ -11,6 +11,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     if (isError) return <div>No data</div>
     if (isLoading || !data) return <ProductFormSkeleton />
 
+
     return (
         <div className="p-6">
             <h1 className="text-xl font-bold mb-4">Edit Product</h1>

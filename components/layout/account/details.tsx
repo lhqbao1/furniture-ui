@@ -93,7 +93,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
                                 <DialogContent className='lg:w-[800px]'>
                                     <DialogHeader>
                                         <DialogTitle>Add Invoice Address</DialogTitle>
-                                        <AddressForm setOpen={setOpenAddressDialog} open={openAddressDialog} userId={user.id} isInvoice />
+                                        <AddressForm setOpen={setOpenAddressDialog} open={openAddressDialog} userId={user.id} isInvoice={true} />
                                     </DialogHeader>
                                 </DialogContent>
                             </Dialog>

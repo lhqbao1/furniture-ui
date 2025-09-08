@@ -28,7 +28,7 @@ interface AddressFormProps {
     isInvoice?: boolean
 }
 
-export default function AddressForm({ setOpen, open, userId, currentAddress, isInvoice = false }: AddressFormProps) {
+export default function AddressForm({ setOpen, open, userId, currentAddress, isInvoice }: AddressFormProps) {
     const createAddressMutation = useCreateAddress()
     const updateAddressMutation = useUpdateAddress()
     const createInvoiceAddressMutation = useCreateInvoiceAddress()
@@ -49,7 +49,8 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
         if (userId) {
             data.user_id = userId
         }
-        if (currentAddress && isInvoice) {
+
+        if (currentAddress && isInvoice === true) {
             // update invoice address
             updateInvoiceAddressMutation.mutate(
                 { addressId: currentAddress.id, address: data },
@@ -104,8 +105,6 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                 },
             })
         }
-
-
     }
 
     return (

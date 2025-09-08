@@ -53,6 +53,7 @@ const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
                                     open={openEdit}
                                     setOpen={setOpenEdit}
                                     currentAddress={address}
+                                    isInvoice
                                 />
                             </DialogHeader>
                         </DialogContent>

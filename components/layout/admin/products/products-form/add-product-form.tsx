@@ -22,10 +22,11 @@ import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/prod
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import { NewProductItem, ProductItem, Variant } from '@/types/products'
+import { NewProductItem, ProductItem, StaticFile, Variant } from '@/types/products'
 import { toast } from 'sonner'
 import { ProductPricingFields } from './pricing-field'
 import { MultiSelectField } from './category-select'
+import { CategoryResponse } from '@/types/categories'
 
 interface AddProductFormProps {
     productValues?: Partial<NewProductItem>
@@ -37,9 +38,23 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     const [description, setDescription] = useState("")
     const [isSimple, setIsSimple] = useState(true)
 
+    const normalizeProductValues = (productValues?: Partial<NewProductItem>) => {
+        if (!productValues) return defaultValues
+
+        return {
+            ...defaultValues,
+            ...productValues,
+            category_ids:
+                productValues.categories?.map((c: CategoryResponse | number) =>
+                    typeof c === "object" ? String(c.id) : String(c)
+                ) || [],
+        }
+    }
+    console.log(productValues)
+
     const form = useForm<z.infer<typeof addProductSchema>>({
         resolver: zodResolver(addProductSchema),
-        defaultValues: productValues || defaultValues,
+        defaultValues: normalizeProductValues(productValues) || defaultValues,
         mode: "onBlur",
     })
 
@@ -64,6 +79,10 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             tag: "",
             static_files: [] as StaticFile[],
             category_ids: [] as string[],
+            price: 0,
+            cost: 0,
+            discount_amount: 0,
+            discount_percent: 0
         })
     }
 
