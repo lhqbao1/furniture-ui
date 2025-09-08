@@ -92,7 +92,7 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     {
         accessorKey: "cost",
         header: "COST",
-        cell: ({ row }) => <>€{(row.original.cost ?? 0).toFixed(2)}</>,
+        cell: ({ row }) => <>€{(row.original.cost).toFixed(2)}</>,
     },
     {
         accessorKey: "discount_amount",
