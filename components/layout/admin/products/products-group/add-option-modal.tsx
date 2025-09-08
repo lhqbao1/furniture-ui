@@ -38,7 +38,7 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
         setPreview(URL.createObjectURL(selectedFile))
 
         const formData = new FormData()
-        formData.append("file", selectedFile)
+        formData.append("files", selectedFile)
 
         uploadStaticFile.mutate(formData, {
             onSuccess(data) {
