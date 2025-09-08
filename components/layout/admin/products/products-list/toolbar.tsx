@@ -17,10 +17,8 @@ interface TableToolbarProps {
 }
 
 export default function TableToolbar({ pageSize, setPageSize }: TableToolbarProps) {
-    // Ví dụ: xóa tất cả lựa chọn
-
     return (
-        <div className="flex items-center justify-between gap-4 p-2">
+        <div className="flex items-center justify-between gap-4 p-2 w-full">
             {/* Left group */}
             <div className="flex items-center gap-4">
                 {/* Group Action */}
@@ -44,7 +42,7 @@ export default function TableToolbar({ pageSize, setPageSize }: TableToolbarProp
             </div>
 
             {/* Search */}
-            <div className="flex items-center w-[300px] relative">
+            <div className="flex items-center w-full flex-1 relative">
                 <Input placeholder="Search" className="pr-20" />
                 <Button className="absolute right-0 rounded-l-none  text-white">
                     <Mic className="h-4 w-4 mr-1" /> Search

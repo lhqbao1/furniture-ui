@@ -16,12 +16,9 @@ import { VariantOptionInput, VariantOptionResponse, VariantOptionsResponse } fro
 import { toast } from "sonner"
 import { ProductGroupDetailResponse } from "@/types/product-group"
 import Image from "next/image"
+import { useQuery } from "@tanstack/react-query"
+import { getProductGroupDetail } from "@/features/product-group/api"
 
-interface VariantOption {
-    id: string
-    label: string
-    image_url?: string | null
-}
 
 const ListVariantOption = () => {
     const { watch } = useFormContext()
@@ -31,7 +28,11 @@ const ListVariantOption = () => {
     const [combination, setCombination] = useState<VariantOptionResponse[][]>()
     const [currentVariant, setCurrentVariant] = useState<string | null>(null);
 
-    const { data: groupDetail, isLoading, isError } = useGetProductGroupDetail(parent_id)
+    const { data: groupDetail, isLoading, isError } = useQuery({
+        queryKey: ["product-group-detail", parent_id],
+        queryFn: () => getProductGroupDetail(parent_id),
+        enabled: !!parent_id,
+    })
     const { data: variantOption, isLoading: isLoadingOption, isError: isErrorOption } = useGetVariantOptionByVariant(currentVariant ?? '')
 
     const createVariantOptionMutation = useCreateVariantOption()
@@ -50,20 +51,29 @@ const ListVariantOption = () => {
         return result;
     };
 
-    // Khi load dữ liệu
-    useEffect(() => {
-        if (groupDetail?.variants) {
-            const selectedData = transformGroupDetailToSelected(groupDetail);
-            setSelected(selectedData);
-        }
-    }, [groupDetail]);
+    const handleSaveVariantOption = () => {
+        const combinations = generateVariantCombinations(selected);
+        setCombination(combinations)
+    };
 
-    // 🔥 Khi parent_id hoặc selected thay đổi thì tạo lại combination
     useEffect(() => {
-        if (parent_id && Object.keys(selected).length > 0) {
-            handleSaveVariantOption()
+        if (!parent_id) return;
+
+        // reset khi đổi parent
+        setCombination([]);
+        setSelected({});
+
+        if (groupDetail?.variants) {
+            setSelected(transformGroupDetailToSelected(groupDetail));
         }
-    }, [parent_id, selected])
+    }, [parent_id, groupDetail]);
+
+    useEffect(() => {
+        if (parent_id) {
+            handleSaveVariantOption();
+        }
+    }, [parent_id, selected]);
+
 
 
     const generateVariantCombinations = (selected: Record<string, VariantOptionResponse[]>) => {
@@ -83,11 +93,6 @@ const ListVariantOption = () => {
             );
         };
         return cartesian(optionsList);
-    };
-
-    const handleSaveVariantOption = () => {
-        const combinations = generateVariantCombinations(selected);
-        setCombination(combinations)
     };
 
     const handleAddVariantOption = (variant_id: string, input: { label: string, image_url?: string | null }) => {
@@ -192,7 +197,6 @@ const ListVariantOption = () => {
                 </div>
             )))
             }
-            <Button type="button" onClick={() => handleSaveVariantOption()}>Save attributes</Button>
 
             {!groupDetail ?
                 (<div><Loader2 className="animate-spin" /></div>)

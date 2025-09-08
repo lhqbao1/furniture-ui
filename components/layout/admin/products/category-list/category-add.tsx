@@ -46,6 +46,7 @@ const CategoryAdd = () => {
     const columns = React.useMemo(() => productsColumn, [])
 
 
+    //Create table not in category
     const productsTable = useReactTable({
         data: productsData,
         columns,
@@ -57,6 +58,7 @@ const CategoryAdd = () => {
         enableRowSelection: true,
     });
 
+    //Create table in category
     const categoryProductsTable = useReactTable({
         data: categoryData,
         columns,
@@ -67,6 +69,10 @@ const CategoryAdd = () => {
         getCoreRowModel: getCoreRowModel(),
         enableRowSelection: true,
     });
+
+    // Check row selection for button disable
+    const hasSelectedProducts = productsTable.getSelectedRowModel().rows.length > 0
+    const hasSelectedCategoryProducts = categoryProductsTable.getSelectedRowModel().rows.length > 0
 
     // reset selection khi data thay đổi
     useEffect(() => {
@@ -125,76 +131,90 @@ const CategoryAdd = () => {
 
     return (
         <div className='gap-6 w-full space-y-6'>
-            {/* Search */}
-            <div className="flex justify-start items-center gap-2 relative pt-6">
-                <div className={cn('xl:w-1/2 w-3/4 relative flex')}>
-                    <BannerInput type="email" placeholder="" className='w-full xl:h-12 h-10' />
-                    <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10'>
-                        <Mic stroke='white' size={24} className='xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full' />
-                        Search
-                    </Button>
-                    <Search size={24} className='absolute left-3 xl:top-3 top-2' stroke='gray' />
-                </div>
-            </div>
-
             {/* Tables */}
-            <div className='space-y-4 w-full flex gap-4 justify-between'>
-                {/* Not in category */}
-                <div className="overflow-hidden rounded-md border flex-1">
-                    {categoryProductsLoading ? (
-                        <SkeletonTable columns={productsColumn.length} rows={5} />
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                {productsTable.getHeaderGroups().map(headerGroup => (
-                                    <TableRow key={headerGroup.id}>
-                                        {headerGroup.headers.map(header => (
-                                            <TableHead key={header.id}>
-                                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                            </TableHead>
-                                        ))}
-                                    </TableRow>
-                                ))}
-                            </TableHeader>
-                            <TableBody>
-                                {productsTable.getRowModel().rows.length ? (
-                                    productsTable.getRowModel().rows.map(row => (
-                                        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                            {row.getVisibleCells().map(cell => (
-                                                <TableCell key={cell.id}>
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </TableCell>
+            <div className='space-y-4 w-full grid grid-cols-12 gap-6'>
+                <div className='col-span-12 grid grid-cols-12'>
+                    {/* Search */}
+                    <div className="flex justify-start items-center gap-2 relative pt-6 w-full col-span-5">
+                        <div className={cn('w-full relative flex')}>
+                            <BannerInput type="email" placeholder="" className='w-full xl:h-12 h-10' />
+                            <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10'>
+                                <Mic stroke='white' size={24} className='xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full' />
+                                Search
+                            </Button>
+                            <Search size={24} className='absolute left-3 xl:top-3 top-2' stroke='gray' />
+                        </div>
+                    </div>
+                </div>
+
+                <div className='space-y-6 col-span-5'>
+                    {/* Not in category */}
+                    <div className="overflow-hidden rounded-md border flex-1 space-y-4">
+                        {categoryProductsLoading ? (
+                            <SkeletonTable columns={productsColumn.length} rows={5} />
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    {productsTable.getHeaderGroups().map(headerGroup => (
+                                        <TableRow key={headerGroup.id}>
+                                            {headerGroup.headers.map(header => (
+                                                <TableHead key={header.id}>
+                                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                                </TableHead>
                                             ))}
                                         </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={productsColumn.length} className="h-24 text-center">
-                                            No results.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    )}
+                                    ))}
+                                </TableHeader>
+                                <TableBody>
+                                    {productsTable.getRowModel().rows.length ? (
+                                        productsTable.getRowModel().rows.map(row => (
+                                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                                {row.getVisibleCells().map(cell => (
+                                                    <TableCell key={cell.id}>
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={productsColumn.length} className="h-24 text-center">
+                                                No results.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        )}
+                    </div>
                 </div>
 
                 {/* Add / Remove Buttons */}
-                <div className='flex flex-col gap-8 justify-center'>
-                    <Button onClick={handleAdd}>
+                {/* Add / Remove Buttons */}
+                <div className='flex flex-col gap-8 justify-center col-span-2'>
+                    <Button
+                        onClick={handleAdd}
+                        disabled={!hasSelectedProducts || addProductToCategoryMutation.isPending}
+                    >
                         {addProductToCategoryMutation.isPending ?
                             <Loader2 className='animate-spin' />
                             : 'Add →'}
                     </Button>
-                    <Button onClick={handleRemove}>
+
+                    <Button
+                        onClick={handleRemove}
+                        variant={'secondary'}
+                        disabled={!hasSelectedCategoryProducts || removeProductToCategoryMutation.isPending}
+                    >
                         {removeProductToCategoryMutation.isPending ?
                             <Loader2 className='animate-spin' />
                             : '← Remove'}
                     </Button>
                 </div>
 
+
                 {/* In category */}
-                <div className="overflow-hidden rounded-md border flex-1">
+                <div className="overflow-hidden rounded-md border col-span-5">
                     {categoryProductsLoading ? (
                         <SkeletonTable columns={productsColumn.length} rows={5} />
                     ) : (

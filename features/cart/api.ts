@@ -11,7 +11,7 @@ export async function getCartItems() {
 export async function addToCart(productId: string, quantity: number) {
     const {data} = await api.post(
         `/cart/add-item`,
-        {product_id: productId, quantity},
+        {product_id: productId, quantity, is_active: true},
         {
             headers: {
               "Content-Type": "application/json",
@@ -23,10 +23,10 @@ export async function addToCart(productId: string, quantity: number) {
     return data as CartResponse
   }
 
-  export async function quickAddToCart(productId: string, quantity: number, option_id: string) {
+  export async function quickAddToCart(productId: string, quantity: number) {
     const {data} = await api.post(
         `/cart/add-quick-buy-items`,
-        {product_id: productId, quantity, option_id},
+        {product_id: productId, quantity},
         {
             headers: {
               "Content-Type": "application/json",

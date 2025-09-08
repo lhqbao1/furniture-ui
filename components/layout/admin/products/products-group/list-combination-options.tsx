@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -101,9 +101,10 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
             <h3 className="font-semibold mb-2">Combinations:</h3>
             <div className="space-y-6">
                 {combinations.map((combination, idx) => (
-                    <div key={idx} className="flex items-center gap-6">
+                    <div key={idx} className="grid grid-cols-12 gap-6">
+
                         {/* hiển thị các option */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 col-span-3">
                             {combination.map((option, index) => (
                                 <React.Fragment key={option.id ?? index}>
                                     <div>
@@ -129,73 +130,79 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                         </div>
 
                         {/* Combobox Popover */}
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    className="w-3/4 justify-between"
-                                >
-                                    {selectedAction[idx]
-                                        ?
-                                        <div className="flex gap-2">
-                                            <Image
-                                                src={listProducts?.find((p) => p.id === selectedAction[idx])?.static_files[0].url ?? '/1.png'}
-                                                width={20}
-                                                height={20}
-                                                alt=""
-                                            />
-                                            {listProducts?.find((p) => p.id === selectedAction[idx])?.name}
+                        <div className="col-span-9">
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className="w-full justify-between py-1 h-12"
+                                    >
+                                        <div className="flex gap-4">
+                                            {selectedAction[idx]
+                                                ?
+                                                <div className="flex gap-2 items-center">
+                                                    <Image
+                                                        src={listProducts?.find((p) => p.id === selectedAction[idx])?.static_files[0].url ?? '/1.png'}
+                                                        width={40}
+                                                        height={40}
+                                                        alt=""
+                                                        className="h-10"
+                                                    />
+                                                    <div className="text-base">{listProducts?.find((p) => p.id === selectedAction[idx])?.name}</div>
+                                                </div>
+                                                : "Select product"}
                                         </div>
-                                        : "Select product"}
-                                </Button>
-                            </PopoverTrigger>
+                                        <ChevronRight />
+                                    </Button>
+                                </PopoverTrigger>
 
-                            <PopoverContent className="w-[600px] p-0">
-                                <Command shouldFilter={false}>
-                                    <CommandInput
-                                        placeholder="Search product..."
-                                        value={queryParams}
-                                        onValueChange={(value) => setQueryParams(value)} // cập nhật query
-                                    />
-                                    <CommandEmpty>No product found.</CommandEmpty>
-                                    <CommandGroup>
-                                        {isLoading && <CommandItem disabled>Loading...</CommandItem>}
-                                        {isError && <CommandItem disabled>Error loading products</CommandItem>}
-                                        {listSelect
-                                            .filter((product) =>
-                                                !Object.values(selectedAction).includes(product.id ?? "")
-                                            )
-                                            .map((product) => (
-                                                <CommandItem
-                                                    key={product.id}
-                                                    value={product.id ?? ""}
-                                                    onSelect={(value) =>
-                                                        setSelectedAction((prev) => ({ ...prev, [idx]: value }))
-                                                    }
-                                                    className="flex w-full justify-between"
-                                                >
-                                                    <div className="flex items-center space-x-3">
-                                                        <Image
-                                                            src={
-                                                                product.static_files.length > 0
-                                                                    ? product.static_files[0].url
-                                                                    : "/1.png"
-                                                            }
-                                                            height={25}
-                                                            width={25}
-                                                            alt=""
-                                                        />
-                                                        <span>{product.name}</span>
-                                                    </div>
-                                                    <span>#{product.sku}</span>
-                                                </CommandItem>
-                                            ))}
+                                <PopoverContent className="w-[600px] p-0">
+                                    <Command shouldFilter={false}>
+                                        <CommandInput
+                                            placeholder="Search product..."
+                                            value={queryParams}
+                                            onValueChange={(value) => setQueryParams(value)} // cập nhật query
+                                        />
+                                        <CommandEmpty>No product found.</CommandEmpty>
+                                        <CommandGroup>
+                                            {isLoading && <CommandItem disabled>Loading...</CommandItem>}
+                                            {isError && <CommandItem disabled>Error loading products</CommandItem>}
+                                            {listSelect
+                                                .filter((product) =>
+                                                    !Object.values(selectedAction).includes(product.id ?? "")
+                                                )
+                                                .map((product) => (
+                                                    <CommandItem
+                                                        key={product.id}
+                                                        value={product.id ?? ""}
+                                                        onSelect={(value) =>
+                                                            setSelectedAction((prev) => ({ ...prev, [idx]: value }))
+                                                        }
+                                                        className="flex w-full justify-between"
+                                                    >
+                                                        <div className="flex items-center space-x-3">
+                                                            <Image
+                                                                src={
+                                                                    product.static_files.length > 0
+                                                                        ? product.static_files[0].url
+                                                                        : "/1.png"
+                                                                }
+                                                                height={25}
+                                                                width={25}
+                                                                alt=""
+                                                            />
+                                                            <span>{product.name}</span>
+                                                        </div>
+                                                        <span>#{product.sku}</span>
+                                                    </CommandItem>
+                                                ))}
 
-                                    </CommandGroup>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                                        </CommandGroup>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                     </div>
                 ))}
             </div>

@@ -1,7 +1,7 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useEffect, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import z from 'zod'
 import { Button } from "@/components/ui/button"
 import {
@@ -16,17 +16,18 @@ import { Input } from "@/components/ui/input"
 import "react-quill-new/dist/quill.snow.css"
 import RichTextEditor from '@/components/shared/editor'
 import ImagePickerInput from '@/components/layout/single-product/tabs/review/image-picker-input'
-import { Categories, tags } from '@/data/data'
+import { tags } from '@/data/data'
 import { Switch } from '@/components/ui/switch'
 import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/product'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import { NewProductItem, ProductItem, StaticFile, Variant } from '@/types/products'
+import { NewProductItem, StaticFile } from '@/types/products'
 import { toast } from 'sonner'
 import { ProductPricingFields } from './pricing-field'
 import { MultiSelectField } from './category-select'
 import { CategoryResponse } from '@/types/categories'
+import { FormLabelWithAsterisk } from '@/components/shared/form-label-with-asterisk'
 
 interface AddProductFormProps {
     productValues?: Partial<NewProductItem>
@@ -50,7 +51,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                 ) || [],
         }
     }
-    console.log(productValues)
 
     const form = useForm<z.infer<typeof addProductSchema>>({
         resolver: zodResolver(addProductSchema),
@@ -71,18 +71,22 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             description: "",
             id_provider: '',
             tax: "19%",
-            category: "",
             collection: null as string | null,
             sku: "",
             ean: "",
-            is_active: false,
+            is_active: true,
             tag: "",
             static_files: [] as StaticFile[],
             category_ids: [] as string[],
             price: 0,
             cost: 0,
             discount_amount: 0,
-            discount_percent: 0
+            discount_percent: 0,
+            stock: 0,
+            weight: 0,
+            width: 0,
+            height: 0,
+            length: 0,
         })
     }
 
@@ -98,9 +102,25 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                         toast.error("Please check the form for errors")
                     }
                 )}>
-                    <div className='grid-cols-12 grid gap-5 w-full'>
-                        <div className='col-span-8 flex flex-col gap-4'>
+                    <div className='grid-cols-12 grid gap-12 w-full'>
+                        <div className='col-span-9 flex flex-col gap-4'>
                             <h3 className='text-xl text-[#666666]'>Add New Product</h3>
+                            {/*Product Name */}
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                            Product Name
+                                        </FormLabelWithAsterisk>
+                                        <FormControl>
+                                            <Input placeholder="" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <div className='flex gap-4 w-full'>
                                 {/*Product ID */}
@@ -110,7 +130,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                         name="id_provider"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className='text-[#666666] text-sm'>Product ID</FormLabel>
+                                                <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                                    Product ID
+                                                </FormLabelWithAsterisk>
                                                 <FormControl>
                                                     <Input placeholder="" {...field} className='' />
                                                 </FormControl>
@@ -127,7 +149,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                         name="cost"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[#666666] text-sm">Cost Price</FormLabel>
+                                                <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                                    Cost
+                                                </FormLabelWithAsterisk>
                                                 <FormControl>
                                                     <div className="relative flex items-center">
                                                         <Input
@@ -149,20 +173,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 </div>
                             </div>
 
-                            {/*Product Name */}
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className='text-[#666666] text-sm'>Product Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+
 
                             <ProductPricingFields form={form} />
 
@@ -171,7 +182,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 name='tax'
                                 render={({ field }) => (
                                     <div className='flex gap-4'>
-                                        <FormLabel className='text-[#666666] text-sm'>Tax</FormLabel>
+                                        <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                            Tax
+                                        </FormLabelWithAsterisk>
                                         <RadioGroup
                                             value={field.value}
                                             onValueChange={field.onChange}
@@ -222,13 +235,20 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
                             </div>
                         </div>
-                        <div className='col-span-4 flex flex-col items-end gap-4'>
+                        <div className='col-span-3 flex flex-col items-end gap-4'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end'>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white' type="button" hasEffect>Discard</Button>
-                                <Button className='cursor-pointer bg-primary/95 hover:bg-primary text-lg' type="submit" hasEffect>
-                                    {isPending ? <Loader2 className='animate-spin' /> : 'Submit'}
+                                <Button className="cursor-pointer" type="submit" hasEffect>
+                                    {isPending ? (
+                                        <Loader2 className="animate-spin" />
+                                    ) : productValues ? (
+                                        "Save"
+                                    ) : (
+                                        "Add"
+                                    )}
                                 </Button>
+
                             </div>
 
                             {/*Product Active */}
@@ -242,7 +262,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                             <Switch
                                                 checked={field.value}
                                                 onCheckedChange={field.onChange}
-                                                className='data-[state=unchecked]:bg-gray-400'
+                                                className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
                                             />
                                         </FormControl>
                                     </FormItem>
@@ -255,41 +275,44 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 label="Categories"
                             />
 
-                            <div className="flex items-center gap-4">
-                                {/* Stock toggle */}
-                                <FormField
-                                    control={form.control}
-                                    name="stock"
-                                    render={({ field }) => (
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormLabel className="!mt-0 text-[#666666]">Stock</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    readOnly={isSimple ? false : true}
-                                                    type="number"
-                                                    placeholder="quantity"
-                                                    min={0}
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                                    className={`${isSimple ? '' : 'bg-gray-100 cursor-not-allowed'}`}
-                                                />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                            {/* Stock input */}
+                            <FormField
+                                control={form.control}
+                                name="stock"
+                                render={({ field }) => (
+                                    <FormItem className="grid grid-cols-6 w-full">
+                                        <FormLabelWithAsterisk required className='text-[#666666] text-sm col-span-2'>
+                                            Stock
+                                        </FormLabelWithAsterisk>
+                                        <FormControl>
+                                            <Input
+                                                readOnly={isSimple ? false : true}
+                                                type="number"
+                                                placeholder="0"
+                                                min={0}
+                                                {...field}
+                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                                className={`col-span-4 ${isSimple ? '' : 'bg-gray-100 cursor-not-allowed'}`}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
 
                             {/* SKU input */}
                             <FormField
                                 control={form.control}
                                 name='sku'
                                 render={({ field }) => (
-                                    <FormItem className="flex items-center gap-3">
-                                        <FormLabel className='text-[#666666]'>SKU</FormLabel>
+                                    <FormItem className="grid grid-cols-6 w-full">
+                                        <FormLabelWithAsterisk required className='text-[#666666] text-sm col-span-2'>
+                                            SKU
+                                        </FormLabelWithAsterisk>
                                         <FormControl>
                                             <Input
                                                 type="text"
                                                 placeholder="SKU"
+                                                className='col-span-4'
                                                 {...field}
                                             />
                                         </FormControl>
@@ -297,17 +320,20 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 )}
                             />
 
-                            {/* Barcode input */}
+                            {/* EAN input */}
                             <FormField
                                 control={form.control}
                                 name='ean'
                                 render={({ field }) => (
-                                    <FormItem className="flex items-center gap-3">
-                                        <FormLabel className='text-[#666666]'>EAN</FormLabel>
+                                    <FormItem className="grid grid-cols-6 w-full">
+                                        <FormLabelWithAsterisk required className='text-[#666666] text-sm col-span-2'>
+                                            EAN
+                                        </FormLabelWithAsterisk>
                                         <FormControl>
                                             <Input
                                                 type="text"
                                                 placeholder="Barcode"
+                                                className='col-span-4'
                                                 {...field}
                                             />
                                         </FormControl>
@@ -320,8 +346,10 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 control={form.control}
                                 name='weight'
                                 render={({ field }) => (
-                                    <FormItem className="flex items-center gap-3">
-                                        <FormLabel className='text-[#666666] flex-1'>Weight (kg)</FormLabel>
+                                    <FormItem className="grid grid-cols-6 w-full">
+                                        <FormLabelWithAsterisk required className='text-[#666666] text-sm col-span-2'>
+                                            Weight (kg)
+                                        </FormLabelWithAsterisk>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -329,6 +357,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                 min={0}
                                                 {...field}
                                                 onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                                className='col-span-4'
                                             />
                                         </FormControl>
                                     </FormItem>
@@ -336,9 +365,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             />
 
                             {/* Packaging input */}
-                            <div className='flex gap-3 items-center'>
-                                <span>Packaging (cm)</span>
-                                <div className='flex flex-row gap-1'>
+                            <div className='grid grid-cols-6 w-full'>
+                                <div className='col-span-2'>Packaging (cm)</div>
+                                <div className='flex flex-row gap-1 col-span-4'>
                                     <FormField
                                         control={form.control}
                                         name='length'
@@ -349,12 +378,14 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
-                                                        className="w-14"
+
                                                         {...field}
                                                         onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                                     />
                                                 </FormControl>
-                                                <FormLabel className='text-gray-500'>Length</FormLabel>
+                                                <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                                    Length
+                                                </FormLabelWithAsterisk>
                                             </FormItem>
                                         )}
                                     />
@@ -368,12 +399,14 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
-                                                        className="w-14"
+
                                                         {...field}
                                                         onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                                     />
                                                 </FormControl>
-                                                <FormLabel className='text-gray-500'>Height</FormLabel>
+                                                <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                                    Height
+                                                </FormLabelWithAsterisk>
                                             </FormItem>
                                         )}
                                     />
@@ -387,12 +420,14 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
-                                                        className="w-14"
+
                                                         {...field}
                                                         onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                                     />
                                                 </FormControl>
-                                                <FormLabel className='text-gray-500'>Width</FormLabel>
+                                                <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                                    Width
+                                                </FormLabelWithAsterisk>
                                             </FormItem>
                                         )}
                                     />
@@ -407,7 +442,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="font-bold text-base">Tag</FormLabel>
-                                            <div className="flex flex-row gap-2 flex-wrap">
+                                            <div className="flex flex-row gap-2 flex-wrap justify-end">
                                                 {tags.map((item, idx) => (
                                                     <div
                                                         key={idx}

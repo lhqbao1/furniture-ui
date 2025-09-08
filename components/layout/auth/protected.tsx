@@ -13,7 +13,7 @@ export default function Protected({ children }: ProtectedProps) {
         const adminToken = localStorage.getItem("admin_access_token")
         if (!adminToken) {
             // không có token → redirect login
-            window.location.href = "/login"
+            window.location.href = "/"
         } else {
             setIsAdmin(true)
         }

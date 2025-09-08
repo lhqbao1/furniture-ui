@@ -131,7 +131,7 @@ const SelectProductGroup = () => {
 
                     {/* Combobox gắn với form cha */}
                     <FormControl>
-                        <Popover open={open} onOpenChange={setOpen}>
+                        <Popover open={true}>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
@@ -145,7 +145,11 @@ const SelectProductGroup = () => {
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-full min-w-96">
+
+                            <PopoverContent
+                                align="start"
+                                className="w-[var(--radix-popover-trigger-width)] p-0"
+                            >
                                 <Command>
                                     <CommandInput placeholder="Search group..." />
                                     <CommandEmpty>No group found.</CommandEmpty>
@@ -169,36 +173,6 @@ const SelectProductGroup = () => {
                                                         />
                                                         {g.name}
                                                     </div>
-                                                    {/* <Dialog open={selectedGroupId === g.id} onOpenChange={(open) => !open && setSelectedGroupId(null)}>
-                                                        <DialogTrigger asChild>
-                                                            <div className="cursor-pointer flex items-center" onClick={() => setSelectedGroupId(g.id)}>
-                                                                <X stroke="red" />
-                                                            </div>
-                                                        </DialogTrigger>
-
-                                                        <DialogContent className="w-1/3">
-                                                            <DialogHeader>
-                                                                <DialogTitle>Confirm Delete</DialogTitle>
-                                                            </DialogHeader>
-
-                                                            <p>Bạn có chắc muốn xoá group <b>{g.name}</b> không?</p>
-
-                                                            <div className="flex justify-end gap-2 mt-4">
-                                                                <DialogTrigger asChild>
-                                                                    <Button type="button" variant="outline">
-                                                                        Cancel
-                                                                    </Button>
-                                                                </DialogTrigger>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="destructive"
-                                                                    onClick={() => handleDeleteAddGroup(g.id)}
-                                                                >
-                                                                    Delete
-                                                                </Button>
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog> */}
                                                 </div>
                                             </CommandItem>
                                         ))}
@@ -206,6 +180,7 @@ const SelectProductGroup = () => {
                                 </Command>
                             </PopoverContent>
                         </Popover>
+
                     </FormControl>
                     <FormMessage />
                 </FormItem>

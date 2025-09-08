@@ -59,16 +59,19 @@ const Banner = ({ height }: BannerProps) => {
 
     return (
         <div
-            className={cn('relative',
-                height ? `overflow-hidden` : ''
+            className={cn(
+                "relative w-full flex-shrink-0",
+                !height && "h-[300px] md:h-[500px] lg:h-[600px]" // responsive mặc định
             )}
-            style={{ height: height ? height : 500 }}
+            style={height ? { height } : undefined} // nếu có prop height thì override
         >
+
             <Image
-                src='/banner.jpeg'
+                src="/banner.jpeg"
+                alt="Banner"
                 fill
-                alt=''
-                className='absolute top-0 z-0'
+                className="object-cover"
+                priority
             />
 
             <SidebarTrigger className='absolute border-none text-primary bg-white xl:top-2 xl:left-2 top-4 left-3 cursor-pointer z-20' isMobile={isPhone ? true : false} />
@@ -149,8 +152,6 @@ const Banner = ({ height }: BannerProps) => {
                 }
 
             </div>
-
-
         </div>
     )
 }

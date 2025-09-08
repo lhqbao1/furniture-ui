@@ -7,13 +7,21 @@ import { CategoryResponse } from '@/types/categories'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import { useAtom } from 'jotai'
 import { selectedCategoryAtom } from '@/store/category'
+import { Button } from '@/components/ui/button'
 
 interface CategoryItemProps {
     category: CategoryResponse
     level?: number
+    expandedIds: string[]
+    setExpandedIds: React.Dispatch<React.SetStateAction<string[]>>
 }
 
-const CategoryItem: React.FC<CategoryItemProps> = ({ category, level = 0 }) => {
+const CategoryItem: React.FC<CategoryItemProps> = ({
+    category,
+    level = 0,
+    expandedIds,
+    setExpandedIds
+}) => {
     const [selectedCategory, setSelectedCategory] = useAtom(selectedCategoryAtom)
     const hasChildren = category.children && category.children.length > 0
 
@@ -26,26 +34,47 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, level = 0 }) => {
         }
     }
 
-    const activeClass = isSelectable && selectedCategory === category.id ? 'text-primary' : ''
+    const isOpen = expandedIds.includes(category.id)
+    const toggleOpen = (open: boolean) => {
+        setExpandedIds((prev) =>
+            open ? [...prev, category.id] : prev.filter((id) => id !== category.id)
+        )
+    }
+
+    const activeClass =
+        isSelectable && selectedCategory === category.id ? 'text-primary' : ''
 
     return (
-        <div className={`flex flex-col pl-${category.level === 1 ? 0 : 6} mt-${level > 0 ? 2 : 0}`}>
+        <div className={`flex flex-col pl-${category.level === 1 ? 0 : 7}`}>
             {hasChildren ? (
-                <Collapsible>
+                <Collapsible open={isOpen} onOpenChange={toggleOpen}>
                     <CollapsibleTrigger asChild>
-                        <div className={`cursor-pointer flex items-center gap-1 hover:text-primary`}>
-                            <ChevronRight
-                                stroke="#51BE8C"
-                                className="transition-transform duration-400"
-                                size={18}
-                            />
+                        <div className="cursor-pointer flex items-center gap-1 hover:text-primary">
+                            {category.level === 1 ? (
+                                <ChevronRight
+                                    stroke="#51BE8C"
+                                    className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`}
+                                    size={18}
+                                />
+                            ) : (
+                                <CornerDownRight
+                                    stroke="#51BE8C"
+                                    className={`transition-transform duration-300 ${isOpen ? "text-primary translate-x-1" : ""}`}
+                                    size={18}
+                                />
+                            )}
                             <div>{category.name}</div>
                         </div>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className=''>
+                    <CollapsibleContent>
                         <div className="flex flex-col mt-1">
                             {category.children!.map((child) => (
-                                <CategoryItem key={child.id} category={child} level={level + 1} />
+                                <CategoryItem
+                                    key={child.id}
+                                    category={child}
+                                    expandedIds={expandedIds}
+                                    setExpandedIds={setExpandedIds}
+                                />
                             ))}
                         </div>
                     </CollapsibleContent>
@@ -63,19 +92,55 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, level = 0 }) => {
     )
 }
 
-
 const ListCategories = () => {
-    const { data: categories, isLoading, isError } = useGetCategories()
-    return (
-        <div className='space-y-4'>
-            <AddCategoryDrawer />
-            {isLoading && <Loader2 className='animate-spin' />}
-            {categories ?
-                categories.map((item) => (
-                    <CategoryItem key={item.id} category={item} />
-                ))
-                : <div>No category found</div>
+    const { data: categories, isLoading } = useGetCategories()
+    const [expandedIds, setExpandedIds] = useState<string[]>([])
+
+    const getAllCategoryIdsWithChildren = (items: CategoryResponse[]): string[] => {
+        let ids: string[] = []
+        items.forEach((item) => {
+            if (item.children && item.children.length > 0) {
+                ids.push(item.id)
+                ids = [...ids, ...getAllCategoryIdsWithChildren(item.children)]
             }
+        })
+        return ids
+    }
+
+    const handleExpandAll = () => {
+        if (!categories) return
+        setExpandedIds(getAllCategoryIdsWithChildren(categories))
+    }
+
+    const handleCollapseAll = () => {
+        setExpandedIds([])
+    }
+
+    return (
+        <div className="space-y-8">
+            <div className='space-y-2'>
+                <AddCategoryDrawer />
+                <div className='space-x-4 flex'>
+                    <div className='text-sm hover:text-primary cursor-pointer' onClick={handleExpandAll}>Expand All</div>
+                    <div className='text-sm hover:text-primary cursor-pointer' onClick={handleCollapseAll}>Collapse All</div>
+                </div>
+            </div>
+
+            <div className='space-y-2'>
+                {isLoading && <Loader2 className="animate-spin" />}
+                {categories ? (
+                    categories.map((item) => (
+                        <CategoryItem
+                            key={item.id}
+                            category={item}
+                            expandedIds={expandedIds}
+                            setExpandedIds={setExpandedIds}
+                        />
+                    ))
+                ) : (
+                    'No category found'
+                )}
+            </div>
         </div>
     )
 }

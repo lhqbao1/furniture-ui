@@ -8,7 +8,7 @@ interface CheckOut {
     shipping_address: Address
     invoice_address: Address
     cart: CartResponse
-    status: string
+    status: string  
     note: string
     coupon_amount: number
     voucher_amount: number

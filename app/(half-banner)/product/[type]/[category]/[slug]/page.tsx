@@ -27,12 +27,13 @@ import {
 import { toast } from 'sonner'
 import ListVariant from '@/components/layout/single-product/list-variant'
 import { FormNumberInput } from '@/components/layout/single-product/form-number.input'
-import { useAddToCart } from '@/features/cart/hook'
+import { useAddToCart, useQuickAddToCart } from '@/features/cart/hook'
 import { useQuery } from '@tanstack/react-query'
 import { getProductGroupDetail } from '@/features/product-group/api'
 import { getProductById } from '@/features/products/api'
 import { VariantOptionResponse } from '@/types/variant'
 import { NewProductItem } from '@/types/products'
+import { useAddToWishList } from '@/features/wishlist/hook'
 
 const ProductDetails = () => {
     const params = useParams()
@@ -109,14 +110,42 @@ const ProductDetails = () => {
     // Add to cart mutation
     const createCartMutation = useAddToCart()
 
-    const handleSubmit = (values: z.infer<typeof cartFormSchema>) => {
-        createCartMutation.mutate(values, {
+    //Add to wishlist mutation
+    const addProductToWishlistMutation = useAddToWishList()
+
+    //Add to wishlist mutation
+    const addProductToCheckOutMutation = useQuickAddToCart()
+
+    const handleAddProductToWishlist = () => {
+        addProductToWishlistMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
             onSuccess: () => {
-                router.push('/cart')
+                toast.success('Product is added to wishlist')
+            },
+            onError: () => {
+                toast.error('Add to wishlist failed')
+            },
+        })
+    }
+
+    const handleAddProductToCart = () => {
+        createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+            onSuccess: () => {
                 toast.success('Product is added to cart')
             },
             onError: () => {
                 toast.error('Add to cart failed')
+            },
+        })
+    }
+
+    const handleSubmit = (values: z.infer<typeof cartFormSchema>) => {
+        addProductToCheckOutMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+            onSuccess: () => {
+                toast.success('Product is added to checkout')
+                router.push('/check-out')
+            },
+            onError: () => {
+                toast.error('Add to checkout failed')
             },
         })
     }
@@ -136,7 +165,7 @@ const ProductDetails = () => {
 
     return (
         <div className='py-3'>
-            <CustomBreadCrumb />
+            <CustomBreadCrumb isProductPage />
             {!isLoadingProduct && productDetails && !isErrorProduct ?
                 <FormProvider {...form}>
                     <form
@@ -176,7 +205,6 @@ const ProductDetails = () => {
                                         <Carousel opts={{ loop: true }}>
                                             <CarouselContent className='w-full'>
                                                 {productDetails.static_files.map((item, index) => {
-                                                    console.log(productDetails.static_files.length)
                                                     return (
                                                         <CarouselItem key={index} className={`flex justify-center basis-1/4`}>
                                                             <Image
@@ -229,13 +257,6 @@ const ProductDetails = () => {
                                             parentProduct={parentProduct}
                                         />
                                     }
-
-                                    <div className="flex items-center gap-3">
-                                        <Checkbox id="terms" defaultChecked />
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="terms">Removing service <span className='text-2xl font-bold text-primary'>+30€</span></Label>
-                                        </div>
-                                    </div>
 
                                     <div className='grid grid-cols-2 gap-2'>
                                         <div className='flex flex-row gap-1 items-center'>
@@ -299,11 +320,33 @@ const ProductDetails = () => {
                                                 )}
                                             />
                                         </div>
-                                        <Button className='rounded-full px-10 font-bold text-lg basis-2/5 relative' type='submit'>
+                                        <Button
+                                            className="rounded-full px-10 font-bold text-lg basis-2/5 relative"
+                                            type="submit"
+                                        >
                                             Quick BUY
-                                            <div className='absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0'><Heart /></div>
-                                            <div className='absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0'><Plus /></div>
+                                            <div
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    handleAddProductToWishlist()
+                                                }}
+                                                className="absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0"
+                                            >
+                                                <Heart />
+                                            </div>
+                                            <div
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    handleAddProductToCart()
+                                                }}
+                                                className="absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0"
+                                            >
+                                                <Plus />
+                                            </div>
                                         </Button>
+
                                     </div>
                                 </div>
                             </div>

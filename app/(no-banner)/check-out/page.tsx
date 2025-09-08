@@ -119,6 +119,7 @@ export default function CheckOutPage() {
             },
             onError(error, variables, context) {
                 toast.error('Place order error')
+                console.log(error)
             }
         })
     }, [])

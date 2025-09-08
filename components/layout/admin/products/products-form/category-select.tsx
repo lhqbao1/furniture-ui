@@ -17,6 +17,8 @@ import {
 import { Check, Loader2 } from "lucide-react"
 import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
+import { Checkbox } from "@/components/ui/checkbox"
+import { FormLabelWithAsterisk } from "@/components/shared/form-label-with-asterisk"
 
 interface MultiSelectProps {
     fieldName: string
@@ -27,7 +29,7 @@ interface MultiSelectProps {
 export function MultiSelectField({
     fieldName,
     label,
-    placeholder = "Select options",
+    placeholder = "Select categories",
 }: MultiSelectProps) {
     const { control } = useFormContext()
     const { data: options, isLoading, isError } = useGetCategories()
@@ -68,14 +70,17 @@ export function MultiSelectField({
                 }
 
                 return (
-                    <FormItem>
-                        {label && <FormLabel>{label}</FormLabel>}
+                    <FormItem className="grid grid-cols-6 w-full">
+                        {label &&
+                            <FormLabelWithAsterisk required className='text-[#666666] text-sm col-span-2 text-start'>
+                                Categories
+                            </FormLabelWithAsterisk>}
 
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="w-[200px] justify-between"
+                                    className="w-full justify-between col-span-4"
                                     disabled={isLoading || isError}
                                 >
                                     {isLoading ? (
@@ -97,7 +102,7 @@ export function MultiSelectField({
                                     </div>
                                 ) : isError || !leafOptions || leafOptions.length === 0 ? (
                                     <div className="p-4 text-center text-sm text-muted-foreground">
-                                        No options available
+                                        No categories available
                                     </div>
                                 ) : (
                                     <Command>
@@ -106,20 +111,22 @@ export function MultiSelectField({
                                                 <CommandItem
                                                     key={opt.id}
                                                     onSelect={() => toggleSelect(opt.id)}
-                                                    className="flex items-center justify-between"
+                                                    className="flex items-center gap-2 cursor-pointer"
                                                 >
-                                                    {opt.name}
-                                                    {selected.includes(opt.id) && (
-                                                        <Check className="h-4 w-4" />
-                                                    )}
+                                                    <Checkbox
+                                                        checked={selected.includes(opt.id)}
+                                                        onCheckedChange={() => toggleSelect(opt.id)}
+                                                        className="pointer-events-none"
+                                                    />
+                                                    <span>{opt.name}</span>
                                                 </CommandItem>
+
                                             ))}
                                         </CommandGroup>
                                     </Command>
                                 )}
                             </PopoverContent>
                         </Popover>
-
                         <FormMessage />
                     </FormItem>
                 )

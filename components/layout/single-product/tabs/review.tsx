@@ -76,9 +76,9 @@ const ProductReviewTab = () => {
     }, [])
 
     return (
-        <div className='grid grid-cols-12 gap-8 xl:pt-4 pt-0'>
+        <div className='grid grid-cols-12 lg:gap-28 gap-8 xl:pt-4 pt-0'>
             {/* LEFT: Reviews */}
-            <div className='col-span-7 flex flex-col gap-6'>
+            <div className='lg:col-span-7 col-span-12 flex flex-col gap-6'>
                 {/* Review main */}
                 <div className='grid grid-cols-12 gap-4'>
                     <div className='col-span-2 flex flex-col items-center justify-center'>
@@ -193,7 +193,7 @@ const ProductReviewTab = () => {
             </div>
 
             {/* RIGHT: Videos + Write Review */}
-            <div className="col-span-5 flex flex-col gap-6">
+            <div className="md:col-span-5 col-span-12 flex flex-col gap-6">
                 <div className="w-full aspect-video">
                     <YouTube
                         className="w-full h-full rounded-lg"

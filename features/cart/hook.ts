@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addToCart, deleteCartItem, getCartById, getCartItems, quickAddToCart, updateCartItemQuantity, updateCartItemStatus } from "./api";
-import { CartFormValue } from "@/types/cart";
 
 
 export function useGetCartItems() {
@@ -29,7 +28,7 @@ export function useAddToCart(){
 export function useQuickAddToCart(){
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({productId, quantity, option_id}: {productId: string, quantity: number, option_id: string}) => quickAddToCart(productId, quantity, option_id),
+        mutationFn: ({productId, quantity}: {productId: string, quantity: number}) => quickAddToCart(productId, quantity),
         onSuccess: () => {
             qc.refetchQueries({ queryKey: ["cart-items"] })
         },

@@ -18,12 +18,12 @@ export default function MainLayout({
 }>) {
     return (
         <SidebarProvider>
-            <div className="h-screen w-screen flex overflow-hidden min-h-screen">
+            <div className="w-screen flex overflow-hidden min-h-screen">
                 <div className="">
                     <AppSidebar />
                 </div>
                 <div className="flex flex-col w-full col-span-5 overflow-x-hidden overflow-y-auto">
-                    <main className="flex-1 relative h-full flex flex-col">
+                    <main className="flex-1 relative flex flex-col">
                         <StickyIcon />
                         <Banner height={200} />
                         <div className="container-padding flex-1">
