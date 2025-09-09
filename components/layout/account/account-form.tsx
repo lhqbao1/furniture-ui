@@ -54,6 +54,7 @@ const AccountForm = () => {
     if (isLoading) return <AccountSkeleton />
     if (isError) return <div className="text-red-500">❌ Failed to load user data.</div>
     if (!user) return <AccountSkeleton />
+
     return (
         <FormProvider {...form} >
             <form onSubmit={form.handleSubmit(

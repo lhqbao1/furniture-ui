@@ -234,8 +234,8 @@ const ProductDetails = () => {
                                 <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
                                     <h2 className='text-3xl font-semibold text-secondary'>{productDetails.name}</h2>
                                     <div className='flex gap-2'>
-                                        <p className='text-primary text-3xl font-semibold'>€{productDetails.final_price}</p>
-                                        <p className='text-gray-300 line-through text-3xl font-semibold'>€{productDetails.price}</p>
+                                        <p className='text-primary text-3xl font-semibold'>€{productDetails.final_price.toFixed(2)}</p>
+                                        <p className='text-gray-300 line-through text-3xl font-semibold'>€{productDetails.price.toFixed(2)}</p>
                                     </div>
                                     <div className='flex flex-row justify-start gap-4 items-center'>
                                         <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>

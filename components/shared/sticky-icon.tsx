@@ -66,7 +66,7 @@ export default function StickyIcon() {
         >
             <div className="relative">
                 <Image
-                    src="/cart-logo.svg"
+                    src="/1.png"
                     alt="icon"
                     width={64}
                     height={64}

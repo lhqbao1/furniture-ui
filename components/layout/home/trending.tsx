@@ -3,9 +3,11 @@
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { useGetProductByTag } from "@/features/products/hook";
+import { useTranslations } from "next-intl";
 import React from "react";
 
 const TrendingProducts = () => {
+    const t = useTranslations()
     const { data: products, isLoading, isError } = useGetProductByTag('Trending');
 
     return (

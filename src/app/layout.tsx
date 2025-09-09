@@ -29,9 +29,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
-                <NextIntlClientProvider>
-                    <Providers>{children}</Providers>
-                </NextIntlClientProvider>
+                <Providers>{children}</Providers>
                 <Toaster
                     richColors
                     position="top-right"

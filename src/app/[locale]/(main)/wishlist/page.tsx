@@ -10,14 +10,24 @@ const WishList = () => {
 
     const { data: wishlist, isLoading, isError } = useGetWishlist()
 
+    console.log(wishlist)
+
+    const total =
+        wishlist?.items
+            ?.filter((item) => item.is_active)
+            .reduce(
+                (acc, item) =>
+                    acc + (localQuantities[item.id] ?? item.quantity) * item.item_price,
+                0
+            ) ?? 0
+
     return (
         <div className='pt-3 xl:pb-16 pb-6 space-y-4'>
             <CustomBreadCrumb currentPage='wishlist' />
             <h1 className='text-secondary text-5xl font-bold text-center font-libre'>Wishlist</h1>
             {!wishlist ? <div className='flex w-full justify-center'><Loader2 className='animate-spin' /></div> :
-                <WishlistTable wishlist={wishlist} localQuantities={localQuantities} setLocalQuantities={setLocalQuantities} />
+                <WishlistTable wishlist={wishlist} localQuantities={localQuantities} setLocalQuantities={setLocalQuantities} total={total} />
             }
-
         </div>
     )
 }

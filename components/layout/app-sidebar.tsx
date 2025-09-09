@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
-import { Categories } from "@/data/data"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import Link from "next/link"
+import { useGetCategories } from "@/features/category/hook"
 
 export function AppSidebar() {
     const [open, setOpen] = useState(false)
     const [openItem, setOpenItem] = useState<string | null>(null)
+    const { data: categories, isLoading, isError } = useGetCategories()
 
     const pathname = usePathname()
     const router = useRouter()
@@ -32,10 +33,10 @@ export function AppSidebar() {
             url: "#",
             icon: '/side-category.png',
             // icon: Search,
-            children: Categories.map((category) => ({
+            children: categories && categories.map((category) => ({
                 title: category.name,
                 url: `/${category.name.toLowerCase()}`,
-                icon: category.icon
+                icon: category.img_url
             })),
         },
         { title: "Viewed", url: "/viewed", icon: '/side-view.png' },
@@ -124,11 +125,14 @@ export function AppSidebar() {
                                                                     : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
                                                                     }`}
                                                             >
-                                                                <child.icon
-                                                                    size={24}
-                                                                    className="!size-5"
-                                                                    stroke="#51BE8C"
-                                                                />
+                                                                <div className="w-8">
+                                                                    <Image
+                                                                        src={item.icon === '' ? item.icon : '/1.png'}
+                                                                        height={40}
+                                                                        width={40}
+                                                                        alt=""
+                                                                    />
+                                                                </div>
                                                                 <span>{child.title}</span>
 
                                                                 {/* chỉ render indicator nếu Collapsible mở */}

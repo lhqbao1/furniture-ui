@@ -1,6 +1,6 @@
 'use client'
 
-import { CartItem } from "@/src/app/(no-banner)/check-out/page"
+import { CartItem } from "@/src/app/[locale]/(no-banner)/check-out/page"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Image from "next/image"

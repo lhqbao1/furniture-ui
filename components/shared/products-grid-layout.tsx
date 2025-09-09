@@ -39,9 +39,20 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
         <div>
             <div className='grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4'>
                 {data.map((product, idx) => {
+                    // Lấy đường dẫn category
+                    const categories = product.categories || []
+                    const level1 = categories.find(c => c.level === 1)
+                    const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
+                    const categoryHref = level1 && level2
+                        ? `/${level1.name}/${level2.name}/${product.id}`
+                        : level1
+                            ? `/${level1.name}/${product.id}`
+                            : level2
+                                ? `/${level2.name}/${product.id}`
+                                : `/${product.id}`
                     return (
                         <div key={product.id} className='relative overflow-hidden' ref={el => { if (el) cardRefs.current[idx] = el }}>
-                            <Link href={`/product/indoor/chair/${product.id}`} passHref>
+                            <Link href={`${categoryHref}`} passHref>
                                 <div
                                     className="bg-white p-0 group py-4 cursor-pointer z-0"
                                     style={{
@@ -67,7 +78,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
 
 
                                     <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>
-                                        <h3 className='text-2xl text-gray-600 font-semibold sm:mt-2 text-center lg:min-h-[64px]'>
+                                        <h3 className='text-2xl text-gray-600 font-semibold sm:mt-2 text-center line-clamp-2 px-2 lg:px-4 min-h-[64px]'>
                                             {product.name}
                                         </h3>
 
@@ -85,9 +96,6 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         )}
                                     </div>
 
-                                    {/* {hasBadge && (
-                                    <TagBadge color={product.tag.color} name={product.tag.name} />
-                                )} */}
 
                                     {/* Four lines starting from center of each edge */}
                                     <span className="absolute bottom-0 left-0 w-full h-[1px] bg-orange-500 scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>

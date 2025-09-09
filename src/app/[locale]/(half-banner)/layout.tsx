@@ -4,7 +4,7 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 import Footer from "@/components/shared/footer";
 import StickyIcon from "@/components/shared/sticky-icon";
 import Banner from "@/components/shared/banner";
-import "../globals.css"
+import "../../globals.css"
 
 export const metadata: Metadata = {
     title: "Create Next App",

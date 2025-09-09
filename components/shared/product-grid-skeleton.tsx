@@ -2,10 +2,14 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent } from "@/components/ui/card"
 
-export function ProductGridSkeleton() {
+interface ProductGridSkeletonProps {
+    length?: number
+}
+
+export function ProductGridSkeleton({ length }: ProductGridSkeletonProps) {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-4 sm:mt-6 mt-4">
-            {Array.from({ length: 4 }).map((_, idx) => (
+            {Array.from({ length: length ? length : 4 }).map((_, idx) => (
                 <Card
                     key={idx}
                     className="relative overflow-hidden border-0 rounded-none shadow-none"
