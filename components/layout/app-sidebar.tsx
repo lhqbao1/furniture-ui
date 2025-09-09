@@ -110,7 +110,7 @@ export function AppSidebar() {
                                                                     height={40}
                                                                     width={40}
                                                                     alt=""
-                                                                    className="lg:w-10 lg:h-10 w-6 h-6"
+                                                                    className="lg:w-8 lg:h-8 w-6 h-6"
                                                                 />
                                                             </div>
                                                             <span className="lg:text-xl text-lg">{item.title}</span>
@@ -175,7 +175,7 @@ export function AppSidebar() {
                                                         height={40}
                                                         width={40}
                                                         alt=""
-                                                        className="lg:w-10 lg:h-10 w-6 h-6"
+                                                        className="lg:w-8 lg:h-8 w-6 h-6"
                                                     />
                                                 </div>
                                                 <span className="lg:text-xl text-lg">{item.title}</span>

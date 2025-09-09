@@ -10,7 +10,6 @@ const WishList = () => {
 
     const { data: wishlist, isLoading, isError } = useGetWishlist()
 
-    console.log(wishlist)
 
     const total =
         wishlist?.items
@@ -25,10 +24,29 @@ const WishList = () => {
         <div className='pt-3 xl:pb-16 pb-6 space-y-4'>
             <CustomBreadCrumb currentPage='wishlist' />
             <h1 className='text-secondary text-5xl font-bold text-center font-libre'>Wishlist</h1>
-            {!wishlist ? <div className='flex w-full justify-center'><Loader2 className='animate-spin' /></div> :
-                <WishlistTable wishlist={wishlist} localQuantities={localQuantities} setLocalQuantities={setLocalQuantities} total={total} />
-            }
+
+            {isLoading && (
+                <div className='flex w-full justify-center'>
+                    <Loader2 className='animate-spin' />
+                </div>
+            )}
+
+            {isError && (
+                <div className='text-center text-red-500 text-lg'>
+                    You need to login
+                </div>
+            )}
+
+            {!isLoading && !isError && wishlist && (
+                <WishlistTable
+                    wishlist={wishlist}
+                    localQuantities={localQuantities}
+                    setLocalQuantities={setLocalQuantities}
+                    total={total}
+                />
+            )}
         </div>
+
     )
 }
 

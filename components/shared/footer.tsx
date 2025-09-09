@@ -6,7 +6,7 @@ const Footer = () => {
     return (
         <footer className="bg-white shadow-2xl text-black w-full grid xl:grid-cols-4 grid-cols-2 xl:gap-6 gap-4 p-8 rounded-tl-2xl rounded-tr-2xl">
             {/* Cột 1: Logo */}
-            <div>
+            <div className="col-span-2 xl:col-span-1">
                 <div className="space-y-2">
                     <p className="text-3xl text-secondary font-semibold">
                         Prestige Home GmbH
@@ -17,7 +17,7 @@ const Footer = () => {
             </div>
 
             {/* Cột 2: Các trang */}
-            <div>
+            <div className="col-span-1">
                 <h3 className="font-semibold mb-3">Pages</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     <li><Link href="/" className="">About us</Link></li>
@@ -27,7 +27,7 @@ const Footer = () => {
             </div>
 
             {/* Cột 3: Danh mục sản phẩm */}
-            <div>
+            <div className="col-span-1">
                 <h3 className="font-semibold mb-3">Terms & Policy</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     <li><Link href="/policy" className="">Term & Condition</Link></li>
@@ -37,8 +37,8 @@ const Footer = () => {
             </div>
 
             {/* Cột 4: Bản đồ + Social */}
-            <div>
-                <h3 className="font-semibold mb-3">Contact</h3>
+            <div className="col-span-2 flex items-center justify-center">
+                <h3 className="font-semibold mb-3 hidden md:block">Contact</h3>
                 <div className="flex gap-3 mt-3">
                     <Image
                         src={'/fb.png'}

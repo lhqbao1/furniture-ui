@@ -40,17 +40,14 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
     }
 
     return (
-        <div className="flex items-center gap-4 w-full justify-center">
-            <Pagination>
+        <div className="flex flex-wrap items-center gap-4 w-full justify-center">
+            <Pagination className="flex flex-wrap justify-center gap-2">
                 <PaginationContent>
                     {/* First */}
                     <PaginationItem>
                         <PaginationLink
                             href="#"
-                            onClick={(e) => {
-                                e.preventDefault()
-                                onPageChange(1)
-                            }}
+                            onClick={(e) => { e.preventDefault(); onPageChange(1) }}
                         >
                             ⏮
                         </PaginationLink>
@@ -60,10 +57,7 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
                     <PaginationItem>
                         <PaginationPrevious
                             href="#"
-                            onClick={(e) => {
-                                e.preventDefault()
-                                if (page > 1) onPageChange(page - 1)
-                            }}
+                            onClick={(e) => { e.preventDefault(); if (page > 1) onPageChange(page - 1) }}
                         />
                     </PaginationItem>
 
@@ -76,10 +70,7 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
                                 <PaginationLink
                                     href="#"
                                     isActive={page === p}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        onPageChange(Number(p))
-                                    }}
+                                    onClick={(e) => { e.preventDefault(); onPageChange(Number(p)) }}
                                 >
                                     {p}
                                 </PaginationLink>
@@ -91,10 +82,7 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
                     <PaginationItem>
                         <PaginationNext
                             href="#"
-                            onClick={(e) => {
-                                e.preventDefault()
-                                if (page < totalPages) onPageChange(page + 1)
-                            }}
+                            onClick={(e) => { e.preventDefault(); if (page < totalPages) onPageChange(page + 1) }}
                         />
                     </PaginationItem>
 
@@ -102,10 +90,7 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
                     <PaginationItem>
                         <PaginationLink
                             href="#"
-                            onClick={(e) => {
-                                e.preventDefault()
-                                onPageChange(totalPages)
-                            }}
+                            onClick={(e) => { e.preventDefault(); onPageChange(totalPages) }}
                         >
                             ⏭
                         </PaginationLink>
@@ -114,8 +99,8 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
             </Pagination>
 
             {/* Go to page */}
-            <div className="flex items-center gap-2">
-                <div className="text-sm">Go to</div>
+            <div className="flex flex-wrap gap-2 justify-center w-full sm:w-auto">
+                <div className="text-sm self-center">Go to</div>
                 <Input
                     type="number"
                     min={1}
@@ -139,5 +124,6 @@ export function CustomPagination({ page, totalPages, onPageChange }: CustomPagin
                 </Button>
             </div>
         </div>
+
     )
 }

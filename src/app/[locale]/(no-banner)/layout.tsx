@@ -15,7 +15,7 @@ export default function MainLayout({
 }>) {
     return (
         <SidebarProvider >
-            <div className="h-screen w-screen overflow-hidden overflow-y-scroll min-h-screen">
+            <div className="h-screen w-screen overflow-x-hidden min-h-screen">
                 <main className="flex-1 relative flex flex-col h-full">
                     <div className="flex-1">
                         {children}

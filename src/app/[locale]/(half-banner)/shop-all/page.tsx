@@ -39,7 +39,7 @@ export default function ShopAllPage() {
                             </CollapsibleContent>
                         </Collapsible>
                         {/*Products section */}
-                        <div className='pt-10 pb-12'>
+                        <div className='lg:pt-10 md:pt-3 pt-0 pb-12'>
                             <ProductsGridLayout hasBadge data={products.items} />
                         </div>
                     </div>
