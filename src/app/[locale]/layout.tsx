@@ -9,7 +9,7 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-    return [{ locale: "en" }, { locale: "de" }];
+    return [{ locale: "de" }, { locale: "en" }];
 }
 
 export default async function LocaleLayout({ children, params }: Props) {

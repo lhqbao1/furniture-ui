@@ -12,7 +12,7 @@ const TrendingProducts = () => {
 
     return (
         <div className="section-padding">
-            <h2 className="section-header">Trending</h2>
+            <h2 className="section-header">{t('trending')}</h2>
             <p className="text-primary text-lg text-center">
                 most wanted on social media
             </p>

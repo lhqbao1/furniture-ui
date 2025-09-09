@@ -49,7 +49,7 @@ export default async function Home() {
         <PreOrder />
         <RecentViewed />
         <Collection />
-        <Custom />
+        {/* <Custom /> */}
       </div>
     </HydrationBoundary>
   );
