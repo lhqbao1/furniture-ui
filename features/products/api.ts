@@ -1,4 +1,4 @@
-import { api, apiPublic, apiPublic } from "@/lib/axios"
+import { api, apiPublic, apiAdmin } from "@/lib/axios"
 import { ProductInput } from "@/lib/schema/product"
 import { NewProductItem, Product, ProductItem, ProductResponse } from "@/types/products"
 
@@ -8,7 +8,7 @@ interface GetAllProductsParams {
 }
 
 export async function CreateProduct(input: ProductInput) {
-  const { data } = await apiPublic.post(
+  const { data } = await apiAdmin.post(
     "/products/",
     input,
     {
@@ -49,14 +49,14 @@ export async function getProductByTag(tag: string) {
 }
 
 export async function deleteProduct(id: string){
-  const {data} = await apiPublic.delete(
+  const {data} = await apiAdmin.delete(
     `/products/${id}`
   )
   return data
 }
 
 export async function editProduct(input: ProductInput, id: string) {
-  const { data } = await apiPublic.put(
+  const { data } = await apiAdmin.put(
     `/products/${id}`,
     input,
     {
