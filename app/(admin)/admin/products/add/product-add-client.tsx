@@ -12,8 +12,8 @@ const ProductAddClient = () => {
             onSuccess: () => {
                 toast.success("Product added successfully!")
             },
-            onError: () => {
-                toast.error("Failed to add product")
+            onError: (error) => {
+                toast.error(`Failed to add product ${error}`)
             },
         })
     }

@@ -2,11 +2,11 @@
 import { useGetCategories } from '@/features/category/hook'
 import React, { useState } from 'react'
 import AddCategoryDrawer from './add-category-modal'
-import { ChevronRight, CornerDownRight, Loader2 } from 'lucide-react'
+import { ChevronRight, CornerDownRight, Loader2, Pencil, Trash } from 'lucide-react'
 import { CategoryResponse } from '@/types/categories'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import { useAtom } from 'jotai'
-import { selectedCategoryAtom } from '@/store/category'
+import { selectedCategoryAtom, selectedCategoryNameAtom } from '@/store/category'
 import { Button } from '@/components/ui/button'
 
 interface CategoryItemProps {
@@ -23,6 +23,8 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
     setExpandedIds
 }) => {
     const [selectedCategory, setSelectedCategory] = useAtom(selectedCategoryAtom)
+    const [selectedCategoryName, setSelectedCategoryName] = useAtom(selectedCategoryNameAtom)
+
     const hasChildren = category.children && category.children.length > 0
 
     // chỉ leaf category mới được select
@@ -31,6 +33,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
     const handleClick = () => {
         if (isSelectable) {
             setSelectedCategory(category.id)
+            setSelectedCategoryName(category.name)
         }
     }
 
@@ -49,21 +52,27 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
             {hasChildren ? (
                 <Collapsible open={isOpen} onOpenChange={toggleOpen}>
                     <CollapsibleTrigger asChild>
-                        <div className="cursor-pointer flex items-center gap-1 hover:text-primary">
-                            {category.level === 1 ? (
-                                <ChevronRight
-                                    stroke="#51BE8C"
-                                    className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`}
-                                    size={18}
-                                />
-                            ) : (
-                                <CornerDownRight
-                                    stroke="#51BE8C"
-                                    className={`transition-transform duration-300 ${isOpen ? "text-primary translate-x-1" : ""}`}
-                                    size={18}
-                                />
-                            )}
-                            <div>{category.name}</div>
+                        <div className='gap-4 grid grid-cols-3'>
+                            <div className="cursor-pointer flex items-center gap-1 col-span-2">
+                                {category.level === 1 ? (
+                                    <ChevronRight
+                                        stroke="#51BE8C"
+                                        className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`}
+                                        size={18}
+                                    />
+                                ) : (
+                                    <CornerDownRight
+                                        stroke="#51BE8C"
+                                        className={`transition-transform duration-300 ${isOpen ? "text-primary translate-x-1" : ""}`}
+                                        size={18}
+                                    />
+                                )}
+                                <div>{category.name}</div>
+                            </div>
+                            <div className='flex gap-1 col-span-1'>
+                                <Trash size={18} className='cursor-pointer' />
+                                <Pencil size={18} className='cursor-pointer' />
+                            </div>
                         </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -81,11 +90,17 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                 </Collapsible>
             ) : (
                 <div
-                    className={`cursor-pointer flex items-center gap-1 hover:text-primary ${activeClass}`}
+                    className={`cursor-pointer gap-4 grid grid-cols-3 ${activeClass}`}
                     onClick={handleClick}
                 >
-                    <ChevronRight stroke="#51BE8C" size={18} />
-                    {category.name}
+                    <div className='flex gap-1 items-center col-span-2'>
+                        <ChevronRight stroke="#51BE8C" size={18} />
+                        {category.name}
+                    </div>
+                    <div className='flex gap-2 col-span-1'>
+                        <Trash size={18} className='cursor-pointer' />
+                        <Pencil size={18} className='cursor-pointer' />
+                    </div>
                 </div>
             )}
         </div>

@@ -15,7 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { selectedCategoryAtom } from '@/store/category'
+import { selectedCategoryAtom, selectedCategoryNameAtom } from '@/store/category'
 import { useAtom } from 'jotai'
 import { useQuery } from '@tanstack/react-query'
 import { getCategoryById } from '@/features/category/api'
@@ -26,6 +26,8 @@ import { toast } from 'sonner'
 
 const CategoryAdd = () => {
     const [selectedCategory] = useAtom(selectedCategoryAtom)
+    const [selectedCategoryName, setSelectedCategoryName] = useAtom(selectedCategoryNameAtom)
+
     const [productsSelection, setProductsSelection] = useState({});
     const [categorySelection, setCategorySelection] = useState({});
 
@@ -148,6 +150,7 @@ const CategoryAdd = () => {
                 </div>
 
                 <div className='space-y-6 col-span-5'>
+                    <h2 className='text-[#666666] text-2xl font-semibold text-center'>All products</h2>
                     {/* Not in category */}
                     <div className="overflow-hidden rounded-md border flex-1 space-y-4">
                         {categoryProductsLoading ? (
@@ -214,43 +217,47 @@ const CategoryAdd = () => {
 
 
                 {/* In category */}
-                <div className="overflow-hidden rounded-md border col-span-5">
-                    {categoryProductsLoading ? (
-                        <SkeletonTable columns={productsColumn.length} rows={5} />
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                {categoryProductsTable.getHeaderGroups().map(headerGroup => (
-                                    <TableRow key={headerGroup.id}>
-                                        {headerGroup.headers.map(header => (
-                                            <TableHead key={header.id}>
-                                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                            </TableHead>
-                                        ))}
-                                    </TableRow>
-                                ))}
-                            </TableHeader>
-                            <TableBody>
-                                {categoryProductsTable.getRowModel().rows.length ? (
-                                    categoryProductsTable.getRowModel().rows.map(row => (
-                                        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                            {row.getVisibleCells().map(cell => (
-                                                <TableCell key={cell.id}>
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </TableCell>
+                <div className='col-span-5 space-y-6'>
+                    <h2 className='text-[#666666] text-2xl font-semibold text-center'>{selectedCategoryName}</h2>
+
+                    <div className="overflow-hidden rounded-md border">
+                        {categoryProductsLoading ? (
+                            <SkeletonTable columns={productsColumn.length} rows={5} />
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    {categoryProductsTable.getHeaderGroups().map(headerGroup => (
+                                        <TableRow key={headerGroup.id}>
+                                            {headerGroup.headers.map(header => (
+                                                <TableHead key={header.id}>
+                                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                                </TableHead>
                                             ))}
                                         </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={productsColumn.length} className="h-24 text-center">
-                                            No results.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    )}
+                                    ))}
+                                </TableHeader>
+                                <TableBody>
+                                    {categoryProductsTable.getRowModel().rows.length ? (
+                                        categoryProductsTable.getRowModel().rows.map(row => (
+                                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                                {row.getVisibleCells().map(cell => (
+                                                    <TableCell key={cell.id}>
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={productsColumn.length} className="h-24 text-center">
+                                                No results.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
