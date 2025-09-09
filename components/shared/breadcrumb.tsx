@@ -1,4 +1,5 @@
 "use client"
+
 import {
     Breadcrumb,
     BreadcrumbList,
@@ -18,27 +19,40 @@ interface CustomBreadCrumbProps {
 
 export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomBreadCrumbProps) {
     const params = useParams()
-    const values = Object.values(params)
+    const { slug } = params
+
+    // Normalize slug thành array
+    const slugArray: string[] = slug
+        ? Array.isArray(slug)
+            ? slug
+            : [slug]
+        : []
 
     return (
         <Breadcrumb className="pt-2">
             <BreadcrumbList>
+                {/* Home */}
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/"><Home /></BreadcrumbLink>
                 </BreadcrumbItem>
-                {currentPage ??
+
+                {/* Current page (if provided) */}
+                {currentPage && (
                     <>
                         <BreadcrumbSeparator className="text-primary" />
                         <BreadcrumbItem>
-                            <BreadcrumbPage className="capitalize text-gray-500 font-bold text-lg">{currentPage}</BreadcrumbPage>
+                            <BreadcrumbPage className="capitalize text-gray-500 font-bold text-lg">
+                                {currentPage}
+                            </BreadcrumbPage>
                         </BreadcrumbItem>
                     </>
-                }
+                )}
 
-                {values && values.length > 0 && values.map((item, idx) => {
-                    const href = `/${currentPage}` + values.slice(0, idx + 1).join("/")
-                    const isLast = idx === values.length - 1
+                {/* Slug items */}
+                {slugArray.map((item, idx) => {
+                    const isLast = idx === slugArray.length - 1
                     const hideLast = isLast && isProductPage
+                    const href = "/" + slugArray.slice(0, idx + 1).join("/")
 
                     return (
                         <React.Fragment key={idx}>

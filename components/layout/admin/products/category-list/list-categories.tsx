@@ -8,6 +8,8 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 import { useAtom } from 'jotai'
 import { selectedCategoryAtom, selectedCategoryNameAtom } from '@/store/category'
 import { toast } from 'sonner'
+import DeleteDialog from './delete-dialog'
+import { Button } from '@/components/ui/button'
 
 interface CategoryItemProps {
     category: CategoryResponse
@@ -63,8 +65,8 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
             {hasChildren ? (
                 <Collapsible open={isOpen} onOpenChange={toggleOpen}>
                     <CollapsibleTrigger asChild>
-                        <div className="group gap-4 grid grid-cols-3 cursor-pointer pr-6">
-                            <div className="flex items-center gap-1 col-span-2">
+                        <div className="group gap-4 grid grid-cols-4 cursor-pointer pr-6">
+                            <div className="flex items-center gap-1 col-span-3">
                                 {category.level === 1 ? (
                                     <ChevronRight
                                         stroke="#51BE8C"
@@ -81,8 +83,10 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                                 <div>{category.name}</div>
                             </div>
                             <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                                {/* <Trash size={18} className="cursor-pointer" onClick={() => handleDeleteCategory(category.id)} /> */}
-                                <Pencil size={18} className="cursor-pointer" />
+                                <DeleteDialog categoryId={category.id} />
+                                <Button variant="ghost" size="icon">
+                                    <Pencil size={18} className="cursor-pointer" />
+                                </Button>
                             </div>
                         </div>
                     </CollapsibleTrigger>
@@ -101,16 +105,18 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                 </Collapsible>
             ) : (
                 <div
-                    className={`group gap-4 grid grid-cols-3 cursor-pointer pr-6 ${activeClass}`}
+                    className={`group gap-4 grid grid-cols-4 cursor-pointer pr-6 ${activeClass}`}
                     onClick={handleClick}
                 >
-                    <div className="flex gap-1 items-center col-span-2">
+                    <div className="flex gap-1 items-center col-span-3">
                         <ChevronRight stroke="#51BE8C" size={18} />
                         {category.name}
                     </div>
                     <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Trash size={18} className="cursor-pointer" onClick={() => handleDeleteCategory(category.id)} />
-                        <Pencil size={18} className="cursor-pointer" />
+                        <DeleteDialog categoryId={category.id} />
+                        <Button variant="ghost" size="icon">
+                            <Pencil size={18} className="cursor-pointer" />
+                        </Button>
                     </div>
                 </div>
             )}

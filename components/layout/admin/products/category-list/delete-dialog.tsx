@@ -38,15 +38,17 @@ const DeleteDialog = ({ categoryId }: DeleteDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" onClick={(e) => {
+                    e.stopPropagation()
+                }}>
                     <Trash2 className='size-4 text-red-500' />
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Delete Product</DialogTitle>
+                    <DialogTitle>Delete Category</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to delete this product? This action cannot be undone.
+                        Are you sure you want to delete this Category? This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="sm:justify-start">
@@ -55,11 +57,21 @@ const DeleteDialog = ({ categoryId }: DeleteDialogProps) => {
                             type="button"
                             className='bg-gray-400 text-white hover:bg-gray-500'
                             disabled={deleteCategoryMutation.isPending}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                            }}
                         >
                             Close
                         </Button>
                     </DialogClose>
-                    <Button type="button" onClick={handleDelete} hasEffect variant="secondary" disabled={deleteCategoryMutation.isPending}>
+                    <Button type="button"
+                        onClick={() => {
+                            handleDelete()
+                        }}
+                        hasEffect
+                        variant="secondary"
+                        disabled={deleteCategoryMutation.isPending}
+                    >
                         {deleteCategoryMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (

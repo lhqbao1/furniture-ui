@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import {
@@ -28,11 +27,6 @@ import ImagePickerInput from "@/components/layout/single-product/tabs/review/ima
 import { useCreateCategory, useGetCategories } from "@/features/category/hook";
 import { toast } from "sonner";
 import { CategoryInput } from "@/types/categories";
-
-interface AddCategoryDrawerProps {
-    open: boolean
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
 
 export default function AddCategoryDrawer() {
     const [open, setOpen] = useState(false)

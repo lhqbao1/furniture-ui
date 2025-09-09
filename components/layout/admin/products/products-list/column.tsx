@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { Pencil } from "lucide-react"
+import { Eye, Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import DeleteDialog from "./delete-dialog"
 import { NewProductItem } from "@/types/products"
@@ -54,6 +54,11 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     {
         accessorKey: "name",
         header: "NAME",
+        cell: ({ row }) => {
+            return (
+                <div className="w-46 text-wrap">{row.original.name}</div>
+            )
+        }
     },
     {
         accessorKey: "category",
@@ -110,41 +115,62 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
         cell: ({ row }) => <div>€{(row.original.final_price - (row.original.cost ?? 0)).toFixed(2)}</div>, // fake since not in API
     },
     {
+        id: "default",
+        header: () => <div className="flex justify-center"><Image src="/new-logo.png" alt="default" width={24} height={24} /></div>,
+        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer' /></div>,
+    },
+    {
         id: "amazon",
-        header: () => <Image src="/amazon.png" alt="amazon" width={24} height={24} className="w-auto h-auto" />,
-        cell: () => <Switch />,
+        header: () => <div className="flex justify-center"><Image src="/amazon.png" alt="default" width={36} height={36} /></div>,
+        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-primary cursor-pointer' /></div>,
     },
     {
         id: "ebay",
-        header: () => <Image src="/ebay.png" alt="ebay" width={24} height={24} className="w-auto h-auto" />,
-        cell: () => <Switch />,
+        header: () => <div className="flex justify-center"><Image src="/ebay.png" alt="default" width={36} height={36} /></div>,
+        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-[#0064D4] cursor-pointer' /></div>,
     },
     {
         id: "kaufland",
-        header: () => <Image src="/kaufland.png" alt="kaufland" width={24} height={24} />,
-        cell: () => <Switch />,
-    },
-    {
-        id: "other",
-        header: "Other",
-        cell: () => <Switch />,
+        header: () => <div className="flex justify-center"><Image src="/kau.png" alt="default" width={36} height={36} /></div>,
+        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-[#C40809] cursor-pointer' /></div>,
     },
     {
         id: "actions",
         header: "ACTION",
         cell: ({ row }) => {
-            return (
+            // Lấy đường dẫn category
+            const categories = row.original.categories || []
+            const level1 = categories.find(c => c.level === 1)
+            const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
+            const categoryHref = level1 && level2
+                ? `/${level1.name}/${level2.name}/${row.original.id}`
+                : level1
+                    ? `/${level1.name}/${row.original.id}`
+                    : level2
+                        ? `/${level2.name}/${row.original.id}`
+                        : `/${row.original.id}`
 
+            return (
                 <div className="flex gap-2">
+                    {/* Edit */}
                     <Link href={`/admin/products/${row.original.id}/edit`}>
                         <Button variant="ghost" size="icon">
-                            <Pencil className="w-4 h-4" />
+                            <Pencil className="w-4 h-4 text-primary" />
                         </Button>
                     </Link>
-                    <DeleteDialog product={row.original} />
-                </div>
 
+                    {/* Delete */}
+                    <DeleteDialog product={row.original} />
+
+                    {/* View */}
+                    <Link href={categoryHref}>
+                        <Button variant="ghost" size="icon">
+                            <Eye className="w-4 h-4 text-secondary" />
+                        </Button>
+                    </Link>
+                </div>
             )
         }
-    },
+    }
+
 ]
