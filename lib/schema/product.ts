@@ -21,6 +21,7 @@ export const addProductSchema = z.object({
   sku: z.string().min(1, "You must provide product sku"),
   ean: z.string().min(1, "You must provide product EAN"),
   weight: z.number().min(1, "You must provide product weight").nonnegative(),
+  // weight: z.number().optional().nullable(),
   length: z.number().min(1, "You must provide product length").nonnegative(),
   width: z.number().min(1, "You must provide product width").nonnegative(),
   height: z.number().min(1, "You must provide product height").nonnegative(),
