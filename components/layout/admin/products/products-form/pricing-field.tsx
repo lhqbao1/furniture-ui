@@ -14,11 +14,19 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
     const price = form.watch("price") || 0
     const discountPercent = form.watch("discount_percent") || 0
     const discountAmount = form.watch("discount_amount") || 0
+    const finalPrice = form.watch("final_price") || 0
 
-    const [activeField, setActiveField] = useState<"percent" | "amount" | null>("percent")
+    // activeField cho biết user đang thao tác ô nào
+    const [activeField, setActiveField] = useState<"percent" | "amount" | "final" | null>("percent")
 
-    // Tính toán dựa theo activeField
     useEffect(() => {
+        if (!price) {
+            form.setValue("discount_percent", 0)
+            form.setValue("discount_amount", 0)
+            form.setValue("final_price", 0)
+            return
+        }
+
         if (activeField === "percent") {
             const amount = (price * discountPercent) / 100
             const final = Math.max(price - amount, 0)
@@ -29,8 +37,13 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
             const final = Math.max(price - discountAmount, 0)
             form.setValue("discount_percent", percent)
             form.setValue("final_price", final)
+        } else if (activeField === "final") {
+            const amount = Math.max(price - finalPrice, 0)
+            const percent = price > 0 ? (amount / price) * 100 : 0
+            form.setValue("discount_amount", amount)
+            form.setValue("discount_percent", percent)
         }
-    }, [price, discountPercent, discountAmount, activeField, form])
+    }, [price, discountPercent, discountAmount, finalPrice, activeField, form])
 
     return (
         <div className="grid grid-cols-12 gap-6">
@@ -48,14 +61,14 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                         {...field}
                                         type="number"
                                         min={0}
-                                        className="pl-7"
-                                        step="0.01"            // hoặc "any" để cho phép mọi số thập phân
-                                        inputMode="decimal"    // hint cho bàn phím mobile
-                                        value={field.value ?? ""} // tránh uncontrolled / NaN
+                                        step="0.01"
+                                        inputMode="decimal"
+                                        value={field.value ?? ""}
                                         onChange={(e) => {
-                                            const v = e.target.value;
-                                            field.onChange(v === "" ? undefined : parseFloat(v));
+                                            const v = e.target.value
+                                            field.onChange(v === "" ? undefined : parseFloat(v))
                                         }}
+                                        className="pl-7"
                                     />
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
@@ -90,7 +103,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                             if (val < 0) val = 0
                                             field.onChange(val)
                                         }}
-                                        readOnly={activeField === "amount"} // readonly khi user nhập amount
+                                        readOnly={activeField === "amount" || activeField === "final"}
                                     />
                                     <span className="absolute left-3 text-gray-500">%</span>
                                 </div>
@@ -115,24 +128,21 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                         {...field}
                                         type="number"
                                         min={0}
-                                        className="pl-7"
+                                        step="0.01"
+                                        inputMode="decimal"
+                                        value={field.value ?? ""}
                                         onFocus={() => setActiveField("amount")}
                                         onChange={(e) => {
                                             let val = e.target.valueAsNumber
                                             if (isNaN(val)) val = 0
-
-                                            const price = form.getValues("price") || 0
-                                            if (val > price) val = price
+                                            const p = form.getValues("price") || 0
+                                            if (val > p) val = p
                                             if (val < 0) val = 0
-
                                             field.onChange(val)
                                         }}
-                                        readOnly={activeField === "percent"}
-                                        step="0.01"
-                                        inputMode="decimal"
-                                        value={field.value ?? ""}
+                                        readOnly={activeField === "percent" || activeField === "final"}
+                                        className="pl-7"
                                     />
-
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
                             </FormControl>
@@ -154,10 +164,21 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                 <div className="relative flex items-center">
                                     <Input
                                         {...field}
-                                        readOnly
                                         type="number"
                                         min={0}
-                                        className="pl-7 bg-gray-100 cursor-not-allowed"
+                                        step="0.01"
+                                        inputMode="decimal"
+                                        value={field.value ?? ""}
+                                        onFocus={() => setActiveField("final")}
+                                        onChange={(e) => {
+                                            let val = e.target.valueAsNumber
+                                            if (isNaN(val)) val = 0
+                                            const p = form.getValues("price") || 0
+                                            if (val > p) val = p
+                                            if (val < 0) val = 0
+                                            field.onChange(val)
+                                        }}
+                                        className="pl-7"
                                     />
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
