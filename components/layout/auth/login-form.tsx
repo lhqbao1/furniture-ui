@@ -61,7 +61,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     // Giả sử backend trả về token
                     const token = data.access_token
                     localStorage.setItem("admin_access_token", token)
-                    // router.push("/admin")
+                    router.push("/admin")
                     localStorage.setItem("userId", data.id)
 
                     // Có thể lưu userId nếu cần
