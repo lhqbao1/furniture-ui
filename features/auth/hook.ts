@@ -1,7 +1,7 @@
 // features/auth/hooks.ts
 "use client"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getMe, login, logout, LoginInput, signUp, SignUpInput, forgotPassword, resetPassword } from "./api"
+import { getMe, login, logout, LoginInput, signUp, SignUpInput, forgotPassword, resetPassword, loginAdmin } from "./api"
 import { tokenStore } from "@/lib/token"
 
 export function useMe() {
@@ -16,6 +16,16 @@ export function useLogin() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (input: LoginInput) => login(input),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["me"] })
+    },
+  })
+}
+
+export function useLoginAdmin() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (input: LoginInput) => loginAdmin(input),
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["me"] })
     },

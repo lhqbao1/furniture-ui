@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Chrome, Facebook, Mail, Key, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { useLogin } from "@/features/auth/hook"
+import { useLogin, useLoginAdmin } from "@/features/auth/hook"
 import { useAtom } from "jotai"
 import { userIdAtom } from "@/store/auth"
 import { useRouter } from "next/navigation"
@@ -52,32 +52,49 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     })
 
     const loginMutation = useLogin()
+    const loginAdminMutation = useLoginAdmin()
 
     const onSubmit = (values: z.infer<typeof formSchema>) => {
-        loginMutation.mutate(values, {
-            onSuccess: (data) => {
-                // Giả sử backend trả về token
-                const token = data.access_token
+        if (isAdmin) {
+            loginAdminMutation.mutate(values, {
+                onSuccess: (data) => {
+                    // Giả sử backend trả về token
+                    const token = data.access_token
 
-                if (isAdmin) {
                     localStorage.setItem("admin_access_token", token)
                     router.push("/admin")
-                } else {
+                    localStorage.setItem("userId", data.id)
+
+                    // Có thể lưu userId nếu cần
+                    // setUserId(data.id)
+                    toast.success("Logged in successfully")
+
+                },
+                onError(error, variables, context) {
+                    toast.error(error.message)
+                },
+            })
+        } else {
+            loginMutation.mutate(values, {
+                onSuccess: (data) => {
+                    // Giả sử backend trả về token
+                    const token = data.access_token
+
                     localStorage.setItem("access_token", token)
                     router.push("/")
-                }
+                    localStorage.setItem("userId", data.id)
 
-                localStorage.setItem("userId", data.id)
+                    // Có thể lưu userId nếu cần
+                    // setUserId(data.id)
+                    toast.success("Logged in successfully")
 
-                // Có thể lưu userId nếu cần
-                // setUserId(data.id)
-                toast.success("Logged in successfully")
+                },
+                onError(error, variables, context) {
+                    toast.error(error.message)
+                },
+            })
+        }
 
-            },
-            onError(error, variables, context) {
-                toast.error(error.message)
-            },
-        })
     }
 
     return (

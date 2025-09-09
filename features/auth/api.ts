@@ -19,6 +19,20 @@ export async function login(input: LoginInput) {
     return data as LoginResponse
   }
 
+  export async function loginAdmin(input: LoginInput) {
+    const { data } = await api.post(
+      "/login-admin",
+      qs.stringify(input),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        withCredentials: true,
+      }
+    )
+    return data as LoginResponse
+  }
+
 export async function getMe() {
   const { data } = await api.get("/me")
   return data as User
