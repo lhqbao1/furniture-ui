@@ -103,6 +103,8 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                             if (val < 0) val = 0
                                             field.onChange(val)
                                         }}
+                                        step="0.01"
+                                        inputMode="decimal"
                                         readOnly={activeField === "amount" || activeField === "final"}
                                     />
                                     <span className="absolute left-3 text-gray-500">%</span>
