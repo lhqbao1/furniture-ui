@@ -43,7 +43,7 @@ export async function logout() {
 }
 
 export async function signUp(input: SignUpInput) {
-  const { data } = await api.post(
+  const { data } = await apiPublic.post(
     "/signup",
     input,
     {
@@ -58,7 +58,7 @@ export async function signUp(input: SignUpInput) {
 }
 
 export async function forgotPassword(email: string) {
-  const { data } = await api.post(
+  const { data } = await apiPublic.post(
     "/forgot-password",
     { email },
     {
@@ -72,7 +72,7 @@ export async function forgotPassword(email: string) {
 }
 
 export async function resetPassword(email: string, code: string, new_password: string) {
-  const { data } = await api.post(
+  const { data } = await apiPublic.post(
     "/reset-password",
     { email, code, new_password },
     {
