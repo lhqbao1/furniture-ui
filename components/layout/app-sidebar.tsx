@@ -25,7 +25,7 @@ export function AppSidebar() {
     const pathname = usePathname()
     const router = useRouter()
     const items = [
-        { title: "Home", url: "/", icon: '/side-home.svg' },
+        { title: "Home", url: "/", icon: '/side-home.png' },
         { title: "Best Seller", url: "/best-seller", icon: '/side-best.png' },
         { title: "Flash Sale", url: "/flash-sale", icon: '/side-sale.png' },
         {

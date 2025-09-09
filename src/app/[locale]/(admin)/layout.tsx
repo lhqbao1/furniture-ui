@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../globals.css"
+import "../../globals.css"
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSideBar } from "@/components/shared/admin-sidebar";
 import Protected from "@/components/layout/auth/protected";
