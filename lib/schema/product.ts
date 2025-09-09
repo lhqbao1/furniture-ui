@@ -25,9 +25,10 @@ export const addProductSchema = z.object({
   width: z.number().min(1, "You must provide product width").nonnegative(),
   height: z.number().min(1, "You must provide product height").nonnegative(),
   is_active: z.boolean(),
-  tag: z.string().optional(),
+  tag: z.string().optional().nullable(),
   static_files: z.array(StaticFileSchema),
-  category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
+  category_ids: z.array(z.string())
+  // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 })
 
 
@@ -43,7 +44,6 @@ export const defaultValues = {
   sku: "",
   ean: "",
   is_active: true,
-  tag: "",
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
 }
