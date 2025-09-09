@@ -59,7 +59,7 @@ export default function StickyIcon() {
     return (
         <div
             ref={wrapperRef}
-            className="fixed right-0 top-[150px] z-50 w-24 h-24 cursor-pointer"
+            className="fixed right-0 top-[150px] z-50 w-24 h-24 cursor-pointer hidden md:block"
             onClick={() => {
                 router.push('/cart')
             }}

@@ -5,7 +5,9 @@ import gsap from 'gsap'
 import { useAddToCart } from '@/features/cart/hook'
 import { NewProductItem } from '@/types/products'
 import { toast } from 'sonner'
-import { useAddToWishList, useAddWishlistItemToCart } from '@/features/wishlist/hook'
+import { useAddToWishList } from '@/features/wishlist/hook'
+import { useRouter } from 'next/navigation'
+import { handleApiError } from '@/lib/api-helper'
 
 interface IconListProps {
     currentProduct?: NewProductItem
@@ -15,6 +17,7 @@ const IconList = ({ currentProduct }: IconListProps) => {
     const containersRef = useRef<HTMLDivElement[]>([])
     const addToCartMutation = useAddToCart()
     const addToWishlistMutation = useAddToWishList()
+    const router = useRouter()
 
     const handleAddToCart = () => {
         if (!currentProduct) return
@@ -23,7 +26,9 @@ const IconList = ({ currentProduct }: IconListProps) => {
                 toast.success("Added to cart")
             },
             onError(error, variables, context) {
-                toast.error("Failed to add to cart")
+                const { status, message } = handleApiError(error);
+                toast.error(message)
+                if (status === 401) router.push('/login')
             },
         })
     }
@@ -35,7 +40,9 @@ const IconList = ({ currentProduct }: IconListProps) => {
                 toast.success("Added to wishlist")
             },
             onError(error, variables, context) {
-                toast.error("Failed to add to wishlist")
+                const { status, message } = handleApiError(error);
+                toast.error(message)
+                if (status === 401) router.push('/login')
             },
         })
     }

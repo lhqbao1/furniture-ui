@@ -23,7 +23,7 @@ export const myOrderTableColumns: ColumnDef<CartItem>[] = [
         accessorKey: 'product_price',
         cell: ({ row }) => {
             return (
-                <div>€{row.original.item_price * row.original.quantity}</div>
+                <div>€{(row.original.item_price * row.original.quantity).toFixed(2)}</div>
             )
         }
     }

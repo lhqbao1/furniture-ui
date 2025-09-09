@@ -24,12 +24,6 @@ const OrderList = () => {
 
     return (
         <div className='w-1/2 mx-auto space-y-6'>
-            <div className='flex flex-row justify-between font-semibold'>
-                <div>All(4)</div>
-                <div>Cancelled(1)</div>
-                <div>Returned(0)</div>
-                <div>Delivered(3)</div>
-            </div>
             {order?.map((item, index) => {
                 return (
                     <div key={index}>

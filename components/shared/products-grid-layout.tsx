@@ -6,6 +6,8 @@ import gsap from 'gsap'
 import { NewProductItem, ProductResponse } from '@/types/products'
 import Link from 'next/link'
 import { useMediaQuery } from 'react-responsive'
+import { useAddViewedProduct } from '@/features/viewed/hook'
+import { toast } from 'sonner'
 
 
 interface ProductsGridLayoutProps {
@@ -18,6 +20,7 @@ interface ProductsGridLayoutProps {
 const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsGridLayoutProps) => {
     const cardRefs = useRef<HTMLDivElement[]>([])
     const isMobile = useMediaQuery({ maxWidth: 430 }); // ví dụ mobile breakpoint
+    const addProductToViewMutation = useAddViewedProduct()
 
     useEffect(() => {
         cardRefs.current.forEach((card) => {
@@ -35,6 +38,10 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
         })
     }, [])
 
+    const handleAddProductToViewed = (productId: string) => {
+        addProductToViewMutation.mutate({ productId: productId })
+    }
+
     return (
         <div>
             <div className='grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4'>
@@ -51,7 +58,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                 ? `/${level2.name}/${product.id}`
                                 : `/${product.id}`
                     return (
-                        <div key={product.id} className='relative overflow-hidden' ref={el => { if (el) cardRefs.current[idx] = el }}>
+                        <div key={product.id} className='relative overflow-hidden' ref={el => { if (el) cardRefs.current[idx] = el }} onClick={() => handleAddProductToViewed(product.id)}>
                             <Link href={`${categoryHref}`} passHref>
                                 <div
                                     className="bg-white p-0 group py-4 cursor-pointer z-0"
@@ -78,17 +85,17 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
 
 
                                     <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>
-                                        <h3 className='text-2xl text-gray-600 font-semibold sm:mt-2 text-center line-clamp-2 px-2 lg:px-4 min-h-[64px]'>
+                                        <h3 className='lg:text-2xl text-base text-gray-600 font-semibold sm:mt-2 text-center line-clamp-2 px-2 lg:px-4 lg:min-h-[64px] min-h-[52px]'>
                                             {product.name}
                                         </h3>
 
                                         {product.price ? (
                                             <div className='flex flex-row gap-2 items-end justify-center'>
-                                                <p className='text-xl font-light mb-1 relative line-through text-gray-400'>
-                                                    €{product.price}
+                                                <p className='lg:text-xl text-sm font-light mb-1 relative line-through text-gray-400'>
+                                                    €{product.price.toFixed(2)}
                                                 </p>
-                                                <p className='text-3xl font-bold mb-1 relative text-primary'>
-                                                    €{product.price}
+                                                <p className='lg:text-3xl text-xl font-bold mb-1 relative text-primary'>
+                                                    €{product.final_price.toFixed(2)}
                                                 </p>
                                             </div>
                                         ) : (

@@ -71,21 +71,24 @@ export const getCartColumns = ({
             cell: ({ row }) => {
                 const item = row.original
                 return (
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 max-w-[250px]">
                         <Image
                             src={item.image_url || "/1.png"}
                             alt={item.products.name}
                             width={60}
                             height={60}
-                            className="rounded"
+                            className="rounded shrink-0"
                         />
-                        <div>
-                            <p className="font-semibold">{item.products.name}</p>
+                        <div className="flex-1 min-w-0">
+                            <p className="font-semibold break-words truncate">
+                                {item.products.name}
+                            </p>
                         </div>
                     </div>
                 )
             },
         },
+
         {
             accessorKey: "item_price",
             header: "Price",

@@ -196,7 +196,7 @@ const ProductDetails = () => {
                                             width={500}
                                             height={300}
                                             alt={`${productDetails.name}`}
-                                            className='transition-transform duration-300'
+                                            className='transition-transform duration-300 lg:h-[400px] object-cover'
                                             style={{
                                                 transformOrigin: `${position.x}% ${position.y}%`,
                                                 transform: isHover ? "scale(1.5)" : "scale(1)",
@@ -218,7 +218,7 @@ const ProductDetails = () => {
                                                                 width={100}
                                                                 height={100}
                                                                 alt=''
-                                                                className={` ${mainImageIndex === index && 'border-2 border-primary p-2 rounded-md'}`}
+                                                                className={` ${mainImageIndex === index && 'border-2 border-primary p-2 rounded-md object-cover lg:min-h-[80px]'}`}
                                                             />
                                                         </div>
                                                     </CarouselItem>

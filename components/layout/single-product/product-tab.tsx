@@ -35,24 +35,14 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
         </TabsList>
         <TabsContent value="description">
           <Card>
-            <CardHeader>
-              <CardTitle>Account</CardTitle>
-              <CardDescription>
-                Make changes to your account here. Click save when you&apos;re
-                done.
-              </CardDescription>
-            </CardHeader>
             <CardContent className="grid gap-6">
               <div
                 dangerouslySetInnerHTML={{
                   __html: product?.description ?? "",
                 }}
-                className="w-20 h-20"
+                className=""
               ></div>
             </CardContent>
-            <CardFooter>
-              <Button>Save changes</Button>
-            </CardFooter>
           </Card>
         </TabsContent>
         <TabsContent value="password">

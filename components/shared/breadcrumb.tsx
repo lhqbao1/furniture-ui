@@ -21,6 +21,8 @@ export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomB
     const params = useParams()
     const { slug } = params
 
+    console.log(params)
+
     // Normalize slug thành array
     const slugArray: string[] = slug
         ? Array.isArray(slug)

@@ -23,7 +23,7 @@ import {
 export function useGetVariants() {
   return useQuery({
     queryKey: ["variants"],
-    queryFn: getVariants,
+    queryFn: () => getVariants(),
   })
 }
 

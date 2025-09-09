@@ -28,6 +28,17 @@ import { useMe } from '@/features/auth/hook'
 import { useQueryClient } from '@tanstack/react-query'
 import { useGetCartItems } from '@/features/cart/hook'
 import { useRouter } from 'next/navigation'
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import ProductSearch from './product-search'
 
 interface BannerProps {
     height?: number
@@ -39,13 +50,6 @@ const Banner = ({ height }: BannerProps) => {
     const router = useRouter()
 
     const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useMe()
-    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartItems()
-
-    // if (isLoadingUser) return <div>Loading...</div>
-    // if (isErrorUser) return <div className="text-red-500">❌ Failed to load user.</div>
-    // if (isLoadingCart) return <div>Loading...</div>
-    // if (isErrorCart) return <div className="text-red-500">❌ Failed to load cart.</div>
-    // if (!cart) return <div className="text-red-500">No cart found.</div>
 
     const onLogout = () => {
         localStorage.removeItem("access_token");
@@ -61,11 +65,10 @@ const Banner = ({ height }: BannerProps) => {
         <div
             className={cn(
                 "relative w-full flex-shrink-0",
-                !height && "h-[300px] md:h-[500px] lg:h-[600px]" // responsive mặc định
+                !height ? `h-[200px] lg:h-[400px]` : `lg:h-[${height}px]`
             )}
-            style={height ? { height } : undefined} // nếu có prop height thì override
+            style={isPhone ? { height: 200 } : { height }}
         >
-
             <Image
                 src="/banner.jpeg"
                 alt="Banner"
@@ -74,12 +77,19 @@ const Banner = ({ height }: BannerProps) => {
                 priority
             />
 
-            <SidebarTrigger className='absolute border-none text-primary bg-white xl:top-2 xl:left-2 top-4 left-3 cursor-pointer z-20' isMobile={isPhone ? true : false} />
             <div className='home-banner__content h-full flex flex-col relative z-10'>
-                <div className='home-banner-top__content flex flex-col items-end'>
-                    <div className='flex flex-0 items-center xl:justify-end gap-4 pt-4 pr-4'>
+                <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex flex-col items-end'}`}>
+                    <Image
+                        src={'/new-logo.png'}
+                        width={40}
+                        height={40}
+                        alt=''
+                    />
+
+                    <div className={`flex h-full items-center xl:justify-end gap-4 ${isPhone ? '' : 'flex-0 pt-4 pr-4'}`}>
+                        {/*Language switch */}
                         <Select>
-                            <SelectTrigger className="w-[150px] text-white font-bold text-lg xl:border-0 border-2 border-white">
+                            <SelectTrigger className={`w-[150px] text-white font-bold text-lg xl:border-0 border-2 border-white ${isPhone ? 'hidden' : ''}`}>
                                 <SelectValue placeholder="German" className='text-white' />
                             </SelectTrigger>
                             <SelectContent>
@@ -87,9 +97,11 @@ const Banner = ({ height }: BannerProps) => {
                                 <SelectItem value="English" className='font-semibold '>English</SelectItem>
                             </SelectContent>
                         </Select>
+
+                        {/*User */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <User className="cursor-pointer hover:scale-110 transition-all duration-300 text-primary" stroke='#FAA61A' />
+                                <User className="cursor-pointer hover:scale-110 transition-all duration-300" stroke={`${isPhone ? '#FAA61A' : '#FAA61A'}`} />
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="w-48">
@@ -120,37 +132,40 @@ const Banner = ({ height }: BannerProps) => {
                                 )}
                             </DropdownMenuContent>
                         </DropdownMenu>
+
+                        {/*Search */}
+                        <Drawer>
+                            <DrawerTrigger asChild>
+                                <Search />
+                            </DrawerTrigger>
+                            <DrawerContent>
+                            </DrawerContent>
+                        </Drawer>
+
+                        {/*Search */}
+                        <ShoppingCart />
+                        <SidebarTrigger className={`border-none text-primary  ${isPhone ? 'relative' : 'absolute xl:top-2 xl:left-2 top-4 left-3 cursor-pointer z-20 bg-white'}`} isMobile={isPhone ? true : false} />
                     </div>
                 </div>
 
-                <div className="flex justify-center items-center gap-2 relative pt-6">
-                    <div className={cn('xl:w-1/2 w-3/4 relative flex',
-                        height ? 'mr-0' : 'xl:mr-56'
-                    )}>
-                        <BannerInput type="email" placeholder="" className='w-full xl:h-12 h-10' />
-                        <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10'>
-                            <Mic stroke='white' size={24} className='xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full' />
-                            Search
-                        </Button>
-                        <Search size={24} className='absolute left-3 xl:top-3 top-2' stroke='gray' />
-                    </div>
-                </div>
+
+                <ProductSearch />
 
                 {/* Phần title căn giữa theo chiều cao */}
-                {height ? '' :
-                    <div className="flex-1 flex flex-col justify-center items-center gap-6 xl:mt-12 mt-0 xl:px-0 px-4">
-                        <h1 className="home-banner__title font-bold leading-tight flex xl:flex-row flex-col justify-center items-center xl:gap-4 gap-1">
-                            <span className="text-secondary text-4xl lg:text-6xl font-libre font-semibold">
-                                WELCOME TO
-                            </span>
-                            <span className="text-primary text-4xl lg:text-6xl font-libre font-semibold">
-                                PRESTIGE HOME
-                            </span>
-                        </h1>
-                        <span className='text-white xl:text-3xl text-xl text-center font-medium'>THE PLACE YOU CAN FIND UNIQUE AND TRENDY PRODUCTS</span>
-                    </div>
+                {
+                    isPhone || height ? '' :
+                        <div className="flex-1 flex flex-col justify-center items-center gap-6 xl:mt-12 mt-0 xl:px-0 px-4">
+                            <h1 className="home-banner__title font-bold leading-tight flex xl:flex-row flex-col justify-center items-center xl:gap-4 gap-1">
+                                <span className="text-secondary text-4xl lg:text-6xl font-libre font-semibold">
+                                    WELCOME TO
+                                </span>
+                                <span className="text-primary text-4xl lg:text-6xl font-libre font-semibold">
+                                    PRESTIGE HOME
+                                </span>
+                            </h1>
+                            <span className='text-white xl:text-3xl text-xl text-center font-medium'>THE PLACE YOU CAN FIND UNIQUE AND TRENDY PRODUCTS</span>
+                        </div>
                 }
-
             </div>
         </div>
     )

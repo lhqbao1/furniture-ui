@@ -16,35 +16,49 @@ import { usePathname, useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { useGetCategories } from "@/features/category/hook"
+import { CategoryResponse } from "@/types/categories"
+
+type MenuItem = {
+    title: string;
+    url: string;
+    icon: string;
+    children?: MenuItem[];
+};
 
 export function AppSidebar() {
     const [open, setOpen] = useState(false)
     const [openItem, setOpenItem] = useState<string | null>(null)
     const { data: categories, isLoading, isError } = useGetCategories()
 
+    function mapCategories(categories: CategoryResponse[]): MenuItem[] {
+        return categories.map((category) => ({
+            title: category.name,
+            url: `/${category.name.toLowerCase()}`,
+            icon: category.img_url,
+            children: category.children ? mapCategories(category.children) : undefined
+        }));
+    }
+
     const pathname = usePathname()
     const router = useRouter()
     const items = [
         { title: "Home", url: "/", icon: '/side-home.png' },
+        { title: "Shop All", url: "/shop-all", icon: '/shop-all.png' },
         { title: "Best Seller", url: "/best-seller", icon: '/side-best.png' },
         { title: "Flash Sale", url: "/flash-sale", icon: '/side-sale.png' },
         {
             title: "Categories",
             url: "#",
             icon: '/side-category.png',
-            // icon: Search,
-            children: categories && categories.map((category) => ({
-                title: category.name,
-                url: `/${category.name.toLowerCase()}`,
-                icon: category.img_url
-            })),
+            children: categories && categories.length > 0 ? mapCategories(categories) : undefined
         },
-        { title: "Viewed", url: "/viewed", icon: '/side-view.png' },
+        { title: "Viewed", url: "/recent-viewed", icon: '/side-view.png' },
         { title: "Wishlist", url: "/wishlist", icon: '/side-wishlist.png' },
         { title: "Cart", url: "/cart", icon: '/side-cart.png' },
         { title: "Order", url: "/my-order", icon: '/side-order.png' },
         { title: "Account", url: "/account", icon: '/side-account.png' },
     ]
+
 
     return (
         <Sidebar className="app-sidebar custom-scroll" collapsible="icon">
@@ -125,14 +139,6 @@ export function AppSidebar() {
                                                                     : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
                                                                     }`}
                                                             >
-                                                                <div className="w-8">
-                                                                    <Image
-                                                                        src={item.icon === '' ? item.icon : '/1.png'}
-                                                                        height={40}
-                                                                        width={40}
-                                                                        alt=""
-                                                                    />
-                                                                </div>
                                                                 <span>{child.title}</span>
 
                                                                 {/* chỉ render indicator nếu Collapsible mở */}

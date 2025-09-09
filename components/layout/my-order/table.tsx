@@ -42,7 +42,7 @@ export function MyOrderDataTable<TData, TValue>({
                     <TableRow>
                         <TableHead colSpan={columns.length} className="bg-secondary/15 px-2">
                             <div className="flex justify-between w-full">
-                                <div className="text-base text-[#666666] font-semibold">Order ID: #{orderData.id.slice(0, 7)}</div>
+                                <div className="text-base text-[#666666] font-semibold">Order ID: #{orderData.checkout_code}</div>
                                 <div className="flex gap-3">
                                     <p className="text-sm text-[#666666]">{formatDateTime(orderData.created_at)}</p>
                                     <p>{orderData.status}</p>
@@ -74,7 +74,7 @@ export function MyOrderDataTable<TData, TValue>({
                                     colSpan={columns.length}
                                     className="border-t pt-2 text-right font-semibold"
                                 >
-                                    Total: {orderData.total_amount}
+                                    Total: {(orderData.total_amount).toFixed(2)}
                                 </TableCell>
                             </TableRow>
                         </>

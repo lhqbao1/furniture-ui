@@ -5,8 +5,10 @@ import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { useGetProductByTag } from "@/features/products/hook";
 import { useTranslations } from "next-intl";
 import React from "react";
+import { useMediaQuery } from "react-responsive";
 
 const TrendingProducts = () => {
+    const isPhone = useMediaQuery({ width: 430 })
     const t = useTranslations()
     const { data: products, isLoading, isError } = useGetProductByTag('Trending');
 
@@ -21,7 +23,7 @@ const TrendingProducts = () => {
                 <ProductGridSkeleton />
             ) : (
                 <>
-                    <ProductsGridLayout data={products.slice(0, 8)} />
+                    <ProductsGridLayout data={isPhone ? products.slice(0, 6) : products.slice(0, 8)} />
                 </>
             )}
         </div>

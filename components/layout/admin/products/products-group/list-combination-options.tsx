@@ -194,7 +194,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                             />
                                                             <span>{product.name}</span>
                                                         </div>
-                                                        <span>#{product.sku}</span>
+                                                        <span>#{product.id_provider}</span>
                                                     </CommandItem>
                                                 ))}
 

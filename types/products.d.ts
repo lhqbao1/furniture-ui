@@ -114,7 +114,7 @@ export type StaticFile = {
     height: number
     is_active: boolean
     tag?: string
-    id?: string
+    id: string
     final_price: number
     price_whithout_tax?: number
     created_at?: string

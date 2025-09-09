@@ -262,6 +262,7 @@ export default function CheckOutPage() {
                                     <span>Sub total (include VAT)</span>
                                     <span>
                                         €{cartItems?.items
+                                            .filter((item) => item.is_active === true)
                                             .reduce((total, item) => total + item.final_price, 0)
                                             .toFixed(2)}
                                     </span>
@@ -278,9 +279,15 @@ export default function CheckOutPage() {
                                     <span>Total</span>
                                     <span>
                                         €{(
-                                            (cartItems?.items.reduce((total, item) => total + item.final_price, 0) ?? 0) + 5.95 - (couponAmount ?? 0) - (voucherAmount ?? 0)
+                                            (
+                                                (cartItems?.items
+                                                    .filter((item) => item.is_active === true)
+                                                    .reduce((total, item) => total + item.final_price, 0) ?? 0) +
+                                                5.95 -
+                                                (couponAmount ?? 0) -
+                                                (voucherAmount ?? 0)
+                                            ).toFixed(2)
                                         )}
-
                                     </span>
                                 </div>
                             </div>

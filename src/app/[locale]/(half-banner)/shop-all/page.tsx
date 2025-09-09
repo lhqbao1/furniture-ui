@@ -10,39 +10,16 @@ import { useGetAllProducts } from '@/features/products/hook'
 import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
 import { CustomPagination } from '@/components/shared/custom-pagination'
 
-interface ProductCategoryProps {
-    categorySlugs: string[]
-    tag?: string
-}
-
-function formatTag(slug: string) {
-    return slug
-        .split('-')                // ["best", "seller"]
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // ["Best", "Seller"]
-        .join(' ')                  // "Best Seller"
-}
-
-const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
-    const params = useParams()
-    const paramValues = Object.values(params)
-    const slug = paramValues[paramValues.length - 1]
-    const category = slug && slug[paramValues.length]
+export default function ShopAllPage() {
     const [page, setPage] = useState(1)
-
     const { data: products, isLoading, isError } = useGetAllProducts({ page })
-
     if (!products || isLoading) return <ProductGridSkeleton length={12} />
-
-    // Nếu có tag, lọc sản phẩm
-    const filteredProducts = tag
-        ? products.items.filter((product) => formatTag(product.tag ?? '') === tag)
-        : products.items
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb />
             <div className=''>
-                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{category}</h2>
+                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>Shop All</h2>
                 {isLoading || isError || !products ?
                     <ProductGridSkeleton length={12} /> :
 
@@ -63,7 +40,7 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
                         </Collapsible>
                         {/*Products section */}
                         <div className='pt-10 pb-12'>
-                            <ProductsGridLayout hasBadge data={filteredProducts} />
+                            <ProductsGridLayout hasBadge data={products.items} />
                         </div>
                     </div>
                 }
@@ -73,4 +50,3 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
     )
 }
 
-export default ProductCategory

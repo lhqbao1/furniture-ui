@@ -1,8 +1,8 @@
-import { api } from "@/lib/axios";
+import { api, apiFlexible } from "@/lib/axios";
 import { AddOptionToProductInput, VariantOption, VariantOptionInput, VariantOptionsResponse, VariantResponse } from "@/types/variant";
 
 export async function getVariants(){
-    const {data} = await api.get(
+    const {data} = await apiFlexible.get(
         "/variants/",
         {
         headers: {
@@ -16,21 +16,21 @@ export async function getVariants(){
 }
 
 export async function getVariantById(id: string) {
-  const {data} = await api.get(
+  const {data} = await apiFlexible.get(
       `/variants/${id}`,
   )
   return data as VariantResponse 
 }
 
 export async function getVariantOptionByVariant(name: string) {
-  const {data} = await api.get(
+  const {data} = await apiFlexible.get(
       `/variants/${name}/options`,
   )
   return data as VariantOption[]
 }
 
 export async function createVariant(parent_id: string, name: string) {
-  const { data } = await api.post(
+  const { data } = await apiFlexible.post(
     `/variants/${parent_id}`,
     {name},
     {
@@ -45,7 +45,7 @@ export async function createVariant(parent_id: string, name: string) {
 }
 
 export async function deleteVariant(id: string){
-  const {data} = await api.delete(
+  const {data} = await apiFlexible.delete(
     `/variants/${id}`
   )
   return data

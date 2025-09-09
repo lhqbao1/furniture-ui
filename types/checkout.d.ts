@@ -5,6 +5,7 @@ import { User } from "./user"
 interface CheckOut {
     id: string
     user: User
+    checkout_code: string
     shipping_address: Address
     invoice_address: Address
     cart: CartResponse
@@ -16,7 +17,6 @@ interface CheckOut {
     total_vat: number
     total_shipping: number
     total_amount: number
-
     created_at: Date
     updated_at: Date
 }

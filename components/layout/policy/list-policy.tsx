@@ -52,7 +52,7 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                                                     setCurrentPolicy(policyIndex)
                                                     setCurrentPolicyItem(policyItemIndex)
                                                 }}>
-                                                    {policyItemIndex + 1}. {child.label}
+                                                    {child.label}
                                                 </div>
                                                 <div className={cn('absolute w-1 h-full bg-secondary right-0 top-0',
                                                     currentPolicy === policyIndex && currentPolicyItem === policyItemIndex ? 'block' : 'hidden'
@@ -82,7 +82,16 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                         </div>
                     </Button>
                 </div>
-                <div dangerouslySetInnerHTML={{ __html: policy?.legal_policies[currentPolicy].child_legal_policies[currentPolicyItem].content ?? '' }}></div>
+                {policy?.legal_policies?.[currentPolicy]?.child_legal_policies?.[currentPolicyItem]?.content ? (
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html:
+                                policy.legal_policies[currentPolicy].child_legal_policies[currentPolicyItem].content
+                        }}
+                    />
+                ) : (
+                    <p className="text-gray-500 italic">Updated...</p>
+                )}
             </div >
         </div >
 

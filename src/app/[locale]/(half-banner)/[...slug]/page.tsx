@@ -8,7 +8,7 @@ export default function CatchAllPage() {
     const params = useParams()
     const slugArray = Array.isArray(params.slug) ? params.slug : [params.slug]
     const lastSlug = slugArray[slugArray.length - 1]
-    const validSlugArray = slugArray.filter((s): s is string => !!s) // chỉ lấy string
+    const validSlugArray = slugArray.filter((s): s is string => !!s)
 
 
     // Kiểm tra xem slug cuối có phải UUID không
