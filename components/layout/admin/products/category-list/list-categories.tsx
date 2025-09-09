@@ -1,5 +1,5 @@
 'use client'
-import { useGetCategories } from '@/features/category/hook'
+import { useDeleteCategory, useGetCategories } from '@/features/category/hook'
 import React, { useState } from 'react'
 import AddCategoryDrawer from './add-category-modal'
 import { ChevronRight, CornerDownRight, Loader2, Pencil, Trash } from 'lucide-react'
@@ -7,7 +7,7 @@ import { CategoryResponse } from '@/types/categories'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import { useAtom } from 'jotai'
 import { selectedCategoryAtom, selectedCategoryNameAtom } from '@/store/category'
-import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 interface CategoryItemProps {
     category: CategoryResponse
@@ -25,9 +25,20 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
     const [selectedCategory, setSelectedCategory] = useAtom(selectedCategoryAtom)
     const [selectedCategoryName, setSelectedCategoryName] = useAtom(selectedCategoryNameAtom)
 
-    const hasChildren = category.children && category.children.length > 0
+    const deleteCategoryMutation = useDeleteCategory()
 
-    // chỉ leaf category mới được select
+    const handleDeleteCategory = (id: string) => {
+        deleteCategoryMutation.mutate(id, {
+            onSuccess() {
+                toast.success("Delete category successful")
+            },
+            onError() {
+                toast.error("Delete category fail")
+            },
+        })
+    }
+
+    const hasChildren = category.children && category.children.length > 0
     const isSelectable = !hasChildren
 
     const handleClick = () => {
@@ -52,8 +63,8 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
             {hasChildren ? (
                 <Collapsible open={isOpen} onOpenChange={toggleOpen}>
                     <CollapsibleTrigger asChild>
-                        <div className='gap-4 grid grid-cols-3'>
-                            <div className="cursor-pointer flex items-center gap-1 col-span-2">
+                        <div className="group gap-4 grid grid-cols-3 cursor-pointer pr-6">
+                            <div className="flex items-center gap-1 col-span-2">
                                 {category.level === 1 ? (
                                     <ChevronRight
                                         stroke="#51BE8C"
@@ -69,9 +80,9 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                                 )}
                                 <div>{category.name}</div>
                             </div>
-                            <div className='flex gap-1 col-span-1'>
-                                <Trash size={18} className='cursor-pointer' />
-                                <Pencil size={18} className='cursor-pointer' />
+                            <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Trash size={18} className="cursor-pointer" onClick={() => handleDeleteCategory(category.id)} />
+                                <Pencil size={18} className="cursor-pointer" />
                             </div>
                         </div>
                     </CollapsibleTrigger>
@@ -90,16 +101,16 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                 </Collapsible>
             ) : (
                 <div
-                    className={`cursor-pointer gap-4 grid grid-cols-3 ${activeClass}`}
+                    className={`group gap-4 grid grid-cols-3 cursor-pointer pr-6 ${activeClass}`}
                     onClick={handleClick}
                 >
-                    <div className='flex gap-1 items-center col-span-2'>
+                    <div className="flex gap-1 items-center col-span-2">
                         <ChevronRight stroke="#51BE8C" size={18} />
                         {category.name}
                     </div>
-                    <div className='flex gap-2 col-span-1'>
-                        <Trash size={18} className='cursor-pointer' />
-                        <Pencil size={18} className='cursor-pointer' />
+                    <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash size={18} className="cursor-pointer" onClick={() => handleDeleteCategory(category.id)} />
+                        <Pencil size={18} className="cursor-pointer" />
                     </div>
                 </div>
             )}
