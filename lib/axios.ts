@@ -64,3 +64,37 @@ apiAdmin.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+export const apiFlexible = axios.create({
+  baseURL,
+  withCredentials: true,
+})
+
+apiFlexible.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const userToken = localStorage.getItem("access_token")
+    const adminToken = localStorage.getItem("admin_access_token")
+
+    if (userToken) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${userToken}`
+    } else if (adminToken) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${adminToken}`
+    }
+  }
+  return config
+})
+
+apiFlexible.interceptors.response.use(
+  (res) => res,
+  async (error: AxiosError) => {
+    if (error.response?.status === 401 && typeof window !== "undefined") {
+      // remove tokens khi bị 401
+      localStorage.removeItem("access_token")
+      localStorage.removeItem("admin_access_token")
+      // redirect nếu muốn
+    }
+    return Promise.reject(error)
+  }
+)
