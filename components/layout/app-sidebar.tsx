@@ -72,9 +72,9 @@ export function AppSidebar() {
                                 width={100}
                                 height={100}
                                 priority
-                                className="w-auto h-[80px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
+                                className="w-auto lg:h-[80px] h-[50px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
-                            <div className="font-libre text-[29px] flex gap-1">
+                            <div className="font-libre lg:text-[29px] text-xl flex gap-1">
                                 <span className="text-secondary font-semibold">Prestige</span>
                                 <span className="text-primary font-semibold">Home</span>
                             </div>
@@ -110,9 +110,10 @@ export function AppSidebar() {
                                                                     height={40}
                                                                     width={40}
                                                                     alt=""
+                                                                    className="lg:w-10 lg:h-10 w-6 h-6"
                                                                 />
                                                             </div>
-                                                            <span className="text-xl">{item.title}</span>
+                                                            <span className="lg:text-xl text-lg">{item.title}</span>
                                                             <ChevronDown
                                                                 className={`size-4 opacity-70 transition-transform ${open ? "rotate-180" : ""
                                                                     }`}
@@ -174,9 +175,10 @@ export function AppSidebar() {
                                                         height={40}
                                                         width={40}
                                                         alt=""
+                                                        className="lg:w-10 lg:h-10 w-6 h-6"
                                                     />
                                                 </div>
-                                                <span className="text-xl">{item.title}</span>
+                                                <span className="lg:text-xl text-lg">{item.title}</span>
                                                 {isActive && !open && (
                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>
                                                 )}

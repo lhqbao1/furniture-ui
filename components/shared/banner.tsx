@@ -1,7 +1,7 @@
 'use client'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Mic, Search, ShoppingCart, User } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -48,6 +48,8 @@ const Banner = ({ height }: BannerProps) => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
     const queryClient = useQueryClient();
     const router = useRouter()
+    const [isSticky, setIsSticky] = useState(false);
+
 
     const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useMe()
 
@@ -61,11 +63,27 @@ const Banner = ({ height }: BannerProps) => {
         queryClient.clear(); // tùy chọn xóa tất cả cache
     }
 
+    // Xử lý scroll
+    useEffect(() => {
+        const handleScroll = () => {
+            const bannerHeight = 400; // chiều cao banner (px)
+            if (window.scrollY >= bannerHeight) {
+                setIsSticky(true);
+            } else {
+                setIsSticky(false);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     return (
         <div
             className={cn(
                 "relative w-full flex-shrink-0",
-                !height ? `h-[200px] lg:h-[400px]` : `lg:h-[${height}px]`
+                !height ? `h-[200px] lg:h-[400px]` : `lg:h-[${height}px]`,
+                isPhone ? "mb-16" : ""
             )}
             style={isPhone ? { height: 200 } : { height }}
         >
@@ -73,20 +91,22 @@ const Banner = ({ height }: BannerProps) => {
                 src="/banner.jpeg"
                 alt="Banner"
                 fill
-                className="object-cover"
+                className={`object-cover ${isPhone && 'mt-16'}`}
                 priority
             />
 
             <div className='home-banner__content h-full flex flex-col relative z-10'>
-                <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex flex-col items-end'}`}>
-                    <Image
-                        src={'/new-logo.png'}
-                        width={40}
-                        height={40}
-                        alt=''
-                    />
+                <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex flex-col items-end'}`}>
+                    <div className={`${isPhone ? 'block' : 'hidden'}`}>
+                        <Image
+                            src={'/new-logo.png'}
+                            width={40}
+                            height={40}
+                            alt=''
+                        />
+                    </div>
 
-                    <div className={`flex h-full items-center xl:justify-end gap-4 ${isPhone ? '' : 'flex-0 pt-4 pr-4'}`}>
+                    <div className={`flex h-full items-center justify-end gap-4 ${isPhone ? 'w-full' : 'flex-0 pt-4 pr-4'}`}>
                         {/*Language switch */}
                         <Select>
                             <SelectTrigger className={`w-[150px] text-white font-bold text-lg xl:border-0 border-2 border-white ${isPhone ? 'hidden' : ''}`}>
@@ -101,7 +121,7 @@ const Banner = ({ height }: BannerProps) => {
                         {/*User */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <User className="cursor-pointer hover:scale-110 transition-all duration-300" stroke={`${isPhone ? '#FAA61A' : '#FAA61A'}`} />
+                                <User className="cursor-pointer hover:scale-110 transition-all duration-300" stroke={`${isPhone ? '#51BE8C' : '#FAA61A'}`} />
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="w-48">
@@ -133,23 +153,29 @@ const Banner = ({ height }: BannerProps) => {
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        {/*Search */}
-                        <Drawer>
-                            <DrawerTrigger asChild>
-                                <Search />
-                            </DrawerTrigger>
-                            <DrawerContent>
-                            </DrawerContent>
-                        </Drawer>
+                        <div className={`${isPhone ? 'block' : 'hidden'}`}>
+                            {/*Search */}
+                            <Drawer>
+                                <DrawerTrigger asChild>
+                                    <Search stroke={`${isPhone ? '#51BE8C' : '#FAA61A'}`} />
+                                </DrawerTrigger>
+                                <DrawerContent>
+                                </DrawerContent>
+                            </Drawer>
+                        </div>
 
-                        {/*Search */}
-                        <ShoppingCart />
+                        {/*Shopping cart */}
+                        <div className={`${isPhone ? 'block' : 'hidden'}`}>
+                            <ShoppingCart stroke={`${isPhone ? '#51BE8C' : '#FAA61A'}`} />
+                        </div>
                         <SidebarTrigger className={`border-none text-primary  ${isPhone ? 'relative' : 'absolute xl:top-2 xl:left-2 top-4 left-3 cursor-pointer z-20 bg-white'}`} isMobile={isPhone ? true : false} />
                     </div>
                 </div>
 
 
-                <ProductSearch />
+                <div className={`${isPhone ? 'hidden' : 'block'}`}>
+                    <ProductSearch />
+                </div>
 
                 {/* Phần title căn giữa theo chiều cao */}
                 {
