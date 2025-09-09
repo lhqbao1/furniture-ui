@@ -1,12 +1,12 @@
 // features/auth/api.ts
-import { api } from "@/lib/axios";
+import { api, apiPublic } from "@/lib/axios";
 import { LoginResponse, User } from "@/types/user";
 import qs from 'qs'
 export type LoginInput = { username: string; password: string }
 export type SignUpInput = { email: string; password: string, phone_number: string, first_name: string, last_name: string }
 
 export async function login(input: LoginInput) {
-    const { data } = await api.post(
+    const { data } = await apiPublic.post(
       "/login",
       qs.stringify(input),
       {
@@ -20,7 +20,7 @@ export async function login(input: LoginInput) {
   }
 
   export async function loginAdmin(input: LoginInput) {
-    const { data } = await api.post(
+    const { data } = await apiPublic.post(
       "/login-admin",
       qs.stringify(input),
       {

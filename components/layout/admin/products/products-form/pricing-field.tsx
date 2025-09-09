@@ -94,6 +94,8 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                         type="number"
                                         min={0}
                                         max={100}
+                                        step="0.01"
+                                        inputMode="decimal"
                                         className="pl-7"
                                         onFocus={() => setActiveField("percent")}
                                         onChange={(e) => {

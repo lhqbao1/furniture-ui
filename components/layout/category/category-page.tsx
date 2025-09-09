@@ -1,7 +1,6 @@
 'use client'
 import CustomBreadCrumb from '@/components/shared/breadcrumb'
 import ProductsGridLayout from '@/components/shared/products-grid-layout'
-import { trendingProducts } from '@/data/data'
 import { SlidersHorizontal } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import React from 'react'
@@ -9,10 +8,16 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 import FilterSection from '@/components/layout/single-product/filter-section'
 import { useGetAllProducts } from '@/features/products/hook'
 
-const ProductCategory = () => {
+interface ProductCategoryProps {
+    categorySlugs: string[]
+}
+
+const ProductCategory = ({ categorySlugs }: ProductCategoryProps) => {
     const params = useParams()
     const paramValues = Object.values(params)
     const category = paramValues[paramValues.length - 1]
+
+
 
     const { data: products, isLoading, isError } = useGetAllProducts()
     if (isLoading) return <div>Loading...</div>

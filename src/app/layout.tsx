@@ -3,6 +3,7 @@ import { Figtree, Libre_Caslon_Display, Quicksand } from "next/font/google";
 import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
+import { NextIntlClientProvider } from 'next-intl';
 
 const figtree = Figtree({
     subsets: ["latin"],
@@ -28,7 +29,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
-                <Providers>{children}</Providers>
+                <NextIntlClientProvider>
+                    <Providers>{children}</Providers>
+                </NextIntlClientProvider>
                 <Toaster
                     richColors
                     position="top-right"

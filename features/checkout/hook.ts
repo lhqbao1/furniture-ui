@@ -4,7 +4,7 @@ import { createCheckOut, getCheckOut, getCheckOutByCheckOutId, getCheckOutByUser
 
 export function useGetCheckOut(){
     return useQuery({
-       queryKey: ["products"],
+       queryKey: ["checkout"],
        queryFn: () => getCheckOut(),
        retry: false,
      })

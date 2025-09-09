@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios"
+import { api, apiAdmin } from "@/lib/axios"
 import { CreateOrderFormValues } from "@/lib/schema/checkout"
 import { CheckOut, CheckOutStatistics } from "@/types/checkout"
 
@@ -18,7 +18,7 @@ export async function createCheckOut(item: CreateOrderFormValues) {
   }
 
   export async function getCheckOut() {
-    const {data} = await api.get(
+    const {data} = await apiAdmin.get(
         '/checkout/',
     )
     return data as CheckOut[]
@@ -39,7 +39,7 @@ export async function getCheckOutByUserId(user_id: string) {
 }
 
 export async function getCheckOutStatistics() {
-  const {data} = await api.get(
+  const {data} = await apiAdmin.get(
       '/checkout/statistics',
   )
   return data as CheckOutStatistics

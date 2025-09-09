@@ -9,7 +9,6 @@ export const CreateOrderSchema = z.object({
   note: z.string().optional().nullable(),
   coupon_amount: z.number().optional().nullable(),
   voucher_amount: z.number().optional().nullable(),
-  total_shipping: z.number().optional().nullable(),
   terms: z.boolean().refine(val => val === true, {message: "You must accept the Terms & Conditions",})
 })
 

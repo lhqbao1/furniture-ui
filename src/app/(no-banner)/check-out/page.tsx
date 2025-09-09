@@ -82,7 +82,6 @@ export default function CheckOutPage() {
             note: '',
             coupon_amount: 0,
             voucher_amount: 0,
-            total_shipping: 0,
             terms: false
         },
     })
