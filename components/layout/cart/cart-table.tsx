@@ -111,7 +111,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
         <div className="col-span-12 md:col-span-8 flex-1">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold mb-6">Shopping Cart</h2>
-                <p className="text-xl font-bold mb-6">({cart?.items.length} items)</p>
+                <p className="text-xl font-bold mb-6">({cart?.items.length ? cart.items.length : 0} items)</p>
             </div>
 
             <Table>

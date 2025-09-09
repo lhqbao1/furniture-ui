@@ -35,7 +35,7 @@ export default function CommentImageDialog({ listComments, comment }: { listComm
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <div className="flex justify-between gap-3 pt-4 flex-wrap">
+            <div className="flex lg:justify-between justify-start gap-3 pt-4 flex-wrap">
                 {comment.listImages?.map((image, imgIdx, arr) => {
                     const isLast = imgIdx === arr.length - 1
                     return (

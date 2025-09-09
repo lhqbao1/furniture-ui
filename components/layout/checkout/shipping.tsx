@@ -37,7 +37,7 @@ export default function AddressSelector({ name, addresses, label }: AddressSelec
                 <RadioGroup
                     value={field.value || ""}
                     onValueChange={(value) => field.onChange(value)}
-                    className="grid grid-cols-2 gap-4"
+                    className="grid lg:grid-cols-2 grid-cols-1 gap-4"
                 >
                     {addresses.map((address) => (
                         <Card

@@ -169,7 +169,7 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                                     <div>{formatTime(timeLeft)}</div>
                                 </div>
                                 <p className='text-base text-gray-500 font-bold'>
-                                    €{product.final_price}
+                                    €{product.final_price.toFixed(2)}
                                 </p>
                             </div>
                         </div>

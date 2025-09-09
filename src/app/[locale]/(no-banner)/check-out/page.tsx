@@ -140,7 +140,7 @@ export default function CheckOutPage() {
                 className='flex flex-col gap-8 section-padding'
             >
                 {/* Breadcrumb */}
-                <div className='flex justify-center items-center gap-12 border-b pb-3'>
+                <div className='flex justify-center items-center lg:gap-12 gap-3 border-b pb-3'>
                     {checkOutBreadcrumb.map((item, index) => (
                         <div key={index} className='flex flex-col gap-2 items-center justify-center'>
                             <Image src={`/${item.icon}`} width={50} height={50} alt='' className='size-12' />
@@ -150,7 +150,7 @@ export default function CheckOutPage() {
                 </div>
 
                 {/* Shipping Address */}
-                <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:px-24 md:px-14 px-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:px-24 md:px-14 px-4'>
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
                         <div className='space-y-4'>
                             <div className='text-base font-semibold'>Shipping Address</div>
@@ -204,7 +204,7 @@ export default function CheckOutPage() {
 
                         <div className='space-y-3'>
                             <div className="text-lg font-semibold">Select Voucher</div>
-                            <div className='flex flex-row gap-2'>
+                            <div className='lg:flex lg:flex-row grid grid-cols-1 gap-2'>
                                 {vouchers.map((item, index) => {
                                     return (
                                         <ProductVoucher item={item} key={index} isSelected={selectedVoucher === item.id} onSelect={() => handleSelectVoucher(item.id)} />
@@ -213,7 +213,7 @@ export default function CheckOutPage() {
                             </div>
                         </div>
 
-                        <div className='flex gap-12 items-end'>
+                        <div className='flex lg:flex-row flex-col gap-12 items-end'>
                             <div className='flex-1'>
                                 <FormField
                                     name='note'

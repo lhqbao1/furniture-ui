@@ -181,9 +181,9 @@ const ProductDetails = () => {
                         <div className='flex flex-col gap-8'>
 
                             {/*Product details */}
-                            <div className='grid grid-cols-12 xl:gap-16 gap-8 auto-rows-fr'>
+                            <div className='grid grid-cols-12 xl:gap-16 gap-8'>
                                 {/*Product details images */}
-                                <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
+                                <div className='xl:col-span-6 col-span-12 flex flex-col gap-6 h-fit'>
                                     {/* Main image */}
                                     <div
                                         className='flex justify-center overflow-hidden main-image'
@@ -232,10 +232,10 @@ const ProductDetails = () => {
 
                                 {/*Product details */}
                                 <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
-                                    <h2 className='text-3xl font-semibold text-secondary'>{productDetails.name}</h2>
+                                    <h2 className='lg:text-3xl text-xl font-semibold text-secondary'>{productDetails.name}</h2>
                                     <div className='flex gap-2'>
-                                        <p className='text-primary text-3xl font-semibold'>€{productDetails.final_price.toFixed(2)}</p>
-                                        <p className='text-gray-300 line-through text-3xl font-semibold'>€{productDetails.price.toFixed(2)}</p>
+                                        <p className='text-primary lg:text-3xl text-xl font-semibold'>€{productDetails.final_price.toFixed(2)}</p>
+                                        <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>€{productDetails.price.toFixed(2)}</p>
                                     </div>
                                     <div className='flex flex-row justify-start gap-4 items-center'>
                                         <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>
@@ -301,7 +301,7 @@ const ProductDetails = () => {
                                     </div>
 
                                     <div className='flex flex-row gap-6 items-end'>
-                                        <div className='basis-1/3'>
+                                        <div className='lg:basis-1/3 basis-2/5'>
                                             <FormField
                                                 control={form.control}
                                                 name="quantity"
@@ -317,7 +317,7 @@ const ProductDetails = () => {
                                             />
                                         </div>
                                         <Button
-                                            className="rounded-full px-10 font-bold text-lg basis-2/5 relative"
+                                            className="rounded-full px-10 font-bold text-lg lg:basis-2/5 basis-3/5 relative"
                                             type="submit"
                                         >
                                             Quick BUY
@@ -346,7 +346,7 @@ const ProductDetails = () => {
                                     </div>
 
                                     {/* Voucher */}
-                                    <div className='flex flex-row justify-center gap-2 mt-6'>
+                                    <div className='flex lg:flex-row flex-col justify-center gap-2 mt-6'>
                                         {vouchers.map((item, index) => (
                                             <ProductVoucher
                                                 item={item}

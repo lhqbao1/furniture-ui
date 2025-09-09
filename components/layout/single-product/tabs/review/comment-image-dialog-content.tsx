@@ -22,7 +22,7 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
     return (
         <div className="grid grid-cols-12 gap-6 h-full">
             {/* LEFT */}
-            <div className="col-span-8 bg-gray-100 rounded-lg overflow-hidden flex flex-col justify-center items-center relative">
+            <div className="lg:col-span-8 col-span-12 bg-gray-100 rounded-lg overflow-hidden flex flex-col justify-center items-center relative">
                 <Image
                     src={`/${listImages[selectedIdx]}`}
                     alt=""
@@ -51,7 +51,7 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
             </div>
 
             {/* RIGHT */}
-            <div className="col-span-4 shadow-lg p-6 rounded-lg flex flex-col gap-2 overflow-auto">
+            <div className="lg:col-span-4 col-span-12 shadow-lg p-6 rounded-lg flex flex-col gap-2 overflow-auto">
                 {/* Info */}
                 <div className="flex items-center gap-2">
                     <p className="font-bold text-lg">{comment.name}</p>

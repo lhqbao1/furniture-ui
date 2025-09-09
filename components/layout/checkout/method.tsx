@@ -17,7 +17,7 @@ export default function PaymentMethodSelector() {
             render={({ field }) => (
                 <FormItem>
                     <RadioGroup
-                        className="flex gap-4"
+                        className="lg:flex lg:gap-4 grid grid-cols-2 gap-y-4 mt-4 lg:mt-0"
                         value={field.value}
                         onValueChange={field.onChange}
                     >
