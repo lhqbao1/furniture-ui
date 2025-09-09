@@ -1,4 +1,4 @@
-import { api, apiFlexible } from "@/lib/axios";
+import { api, apiAdmin, apiFlexible } from "@/lib/axios";
 import { AddOptionToProductInput, VariantOption, VariantOptionInput, VariantOptionsResponse, VariantResponse } from "@/types/variant";
 
 export async function getVariants(){
@@ -45,8 +45,15 @@ export async function createVariant(parent_id: string, name: string) {
 }
 
 export async function deleteVariant(id: string){
-  const {data} = await apiFlexible.delete(
+  const {data} = await apiAdmin.delete(
     `/variants/${id}`
+  )
+  return data
+}
+
+export async function deleteVariantOption(option_id: string){
+  const {data} = await apiAdmin.delete(
+    `/variants/options/${option_id}`
   )
   return data
 }

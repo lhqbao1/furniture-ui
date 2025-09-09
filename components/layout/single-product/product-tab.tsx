@@ -26,7 +26,7 @@ interface ProductDetailsTabProps {
 export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
   return (
     <div className="">
-      <Tabs defaultValue="review">
+      <Tabs defaultValue="description">
         <TabsList className="flex flex-row gap-12">
           <TabsTrigger value="description" className="text-xl text-gray-600 font-bold w-fit">Description</TabsTrigger>
           <TabsTrigger value="shipping" className="text-xl text-gray-600 font-bold">Shipping</TabsTrigger>

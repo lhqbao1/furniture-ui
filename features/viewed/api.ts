@@ -15,10 +15,10 @@ export async function getViewedProduct(){
     return data as ProductResponse
 }
 
-export async function addToViewed(productId: string) {
+export async function addToViewed(product_id: string) {
   const { data } = await api.post(
     `/viewed/`,
-    {productId},
+    product_id,
     {
       headers: {
         "Content-Type": "application/json",

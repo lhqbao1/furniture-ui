@@ -10,6 +10,7 @@ import {
   deleteVariant,
   addOptionToProduct,
   createVariantOption,
+  deleteVariantOption,
 } from "@/features/variant/api"
 import {
   AddOptionToProductInput,
@@ -65,6 +66,19 @@ export function useDeleteVariant() {
     mutationFn: (id: string) => deleteVariant(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["variants"] })
+      queryClient.invalidateQueries({ queryKey: ["product-group-detail"] })
+    },
+  })
+}
+
+// DELETE variant option
+export function useDeleteVariantOption() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteVariantOption(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["variants"] })
+      queryClient.invalidateQueries({ queryKey: ["product-group-detail"] })
     },
   })
 }

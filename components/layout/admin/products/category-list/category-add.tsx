@@ -25,6 +25,8 @@ import { AddOrRemoveProductToCategoryInput } from '@/types/categories'
 import { toast } from 'sonner'
 
 const CategoryAdd = () => {
+    const [searchTerm, setSearchTerm] = useState("")
+
     const [selectedCategory] = useAtom(selectedCategoryAtom)
     const [selectedCategoryName, setSelectedCategoryName] = useAtom(selectedCategoryNameAtom)
 
@@ -47,10 +49,19 @@ const CategoryAdd = () => {
     const categoryData = React.useMemo(() => categoryProducts?.in_category ?? [], [categoryProducts])
     const columns = React.useMemo(() => productsColumn, [])
 
+    const filteredProductsData = React.useMemo(() => {
+        if (!searchTerm) return productsData
+        return productsData.filter(product =>
+            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.id_provider.toString().includes(searchTerm)
+        )
+    }, [productsData, searchTerm])
+
+
 
     //Create table not in category
     const productsTable = useReactTable({
-        data: productsData,
+        data: filteredProductsData,
         columns,
         state: {
             rowSelection: productsSelection,
@@ -139,7 +150,12 @@ const CategoryAdd = () => {
                     {/* Search */}
                     <div className="flex justify-start items-center gap-2 relative pt-6 w-full col-span-5">
                         <div className={cn('w-full relative flex')}>
-                            <BannerInput type="email" placeholder="" className='w-full xl:h-12 h-10' />
+                            <BannerInput
+                                type="email"
+                                placeholder=""
+                                className='w-full xl:h-12 h-10'
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                             <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10'>
                                 <Mic stroke='white' size={24} className='xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full' />
                                 Search
@@ -156,43 +172,44 @@ const CategoryAdd = () => {
                         {categoryProductsLoading ? (
                             <SkeletonTable columns={productsColumn.length} rows={5} />
                         ) : (
-                            <Table>
-                                <TableHeader>
-                                    {productsTable.getHeaderGroups().map(headerGroup => (
-                                        <TableRow key={headerGroup.id}>
-                                            {headerGroup.headers.map(header => (
-                                                <TableHead key={header.id}>
-                                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                                </TableHead>
-                                            ))}
-                                        </TableRow>
-                                    ))}
-                                </TableHeader>
-                                <TableBody>
-                                    {productsTable.getRowModel().rows.length ? (
-                                        productsTable.getRowModel().rows.map(row => (
-                                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                                {row.getVisibleCells().map(cell => (
-                                                    <TableCell key={cell.id}>
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </TableCell>
+                            <div className='max-h-[600px] overflow-y-scroll'>
+                                <Table>
+                                    <TableHeader>
+                                        {productsTable.getHeaderGroups().map(headerGroup => (
+                                            <TableRow key={headerGroup.id}>
+                                                {headerGroup.headers.map(header => (
+                                                    <TableHead key={header.id}>
+                                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                                    </TableHead>
                                                 ))}
                                             </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={productsColumn.length} className="h-24 text-center">
-                                                No results.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        ))}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {productsTable.getRowModel().rows.length ? (
+                                            productsTable.getRowModel().rows.map(row => (
+                                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                                    {row.getVisibleCells().map(cell => (
+                                                        <TableCell key={cell.id}>
+                                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={productsColumn.length} className="h-24 text-center">
+                                                    No results.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* Add / Remove Buttons */}
                 {/* Add / Remove Buttons */}
                 <div className='flex flex-col gap-8 justify-center col-span-2'>
                     <Button
@@ -224,39 +241,43 @@ const CategoryAdd = () => {
                         {categoryProductsLoading ? (
                             <SkeletonTable columns={productsColumn.length} rows={5} />
                         ) : (
-                            <Table>
-                                <TableHeader>
-                                    {categoryProductsTable.getHeaderGroups().map(headerGroup => (
-                                        <TableRow key={headerGroup.id}>
-                                            {headerGroup.headers.map(header => (
-                                                <TableHead key={header.id}>
-                                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                                </TableHead>
-                                            ))}
-                                        </TableRow>
-                                    ))}
-                                </TableHeader>
-                                <TableBody>
-                                    {categoryProductsTable.getRowModel().rows.length ? (
-                                        categoryProductsTable.getRowModel().rows.map(row => (
-                                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                                {row.getVisibleCells().map(cell => (
-                                                    <TableCell key={cell.id}>
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </TableCell>
+                            <div className='max-h-[600px] overflow-y-scroll'>
+                                <Table>
+                                    <TableHeader>
+                                        {categoryProductsTable.getHeaderGroups().map(headerGroup => (
+                                            <TableRow key={headerGroup.id}>
+                                                {headerGroup.headers.map(header => (
+                                                    <TableHead key={header.id}>
+                                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                                    </TableHead>
                                                 ))}
                                             </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={productsColumn.length} className="h-24 text-center">
-                                                No results.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        ))}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {categoryProductsTable.getRowModel().rows.length ? (
+                                            categoryProductsTable.getRowModel().rows.map(row => (
+                                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                                    {row.getVisibleCells().map(cell => (
+                                                        <TableCell key={cell.id}>
+                                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={productsColumn.length} className="h-24 text-center">
+                                                    No results.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         )}
+
+
                     </div>
                 </div>
             </div>

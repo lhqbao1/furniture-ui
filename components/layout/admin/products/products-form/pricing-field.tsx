@@ -16,7 +16,6 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
     const discountAmount = form.watch("discount_amount") || 0
     const finalPrice = form.watch("final_price") || 0
 
-    // activeField cho biết user đang thao tác ô nào
     const [activeField, setActiveField] = useState<"percent" | "amount" | "final" | null>("percent")
 
     useEffect(() => {
@@ -30,18 +29,18 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
         if (activeField === "percent") {
             const amount = (price * discountPercent) / 100
             const final = Math.max(price - amount, 0)
-            form.setValue("discount_amount", amount)
-            form.setValue("final_price", final)
+            form.setValue("discount_amount", parseFloat(amount.toFixed(2)))
+            form.setValue("final_price", parseFloat(final.toFixed(2)))
         } else if (activeField === "amount") {
             const percent = price > 0 ? (discountAmount / price) * 100 : 0
             const final = Math.max(price - discountAmount, 0)
-            form.setValue("discount_percent", percent)
-            form.setValue("final_price", final)
+            form.setValue("discount_percent", parseFloat(percent.toFixed(2)))
+            form.setValue("final_price", parseFloat(final.toFixed(2)))
         } else if (activeField === "final") {
             const amount = Math.max(price - finalPrice, 0)
             const percent = price > 0 ? (amount / price) * 100 : 0
-            form.setValue("discount_amount", amount)
-            form.setValue("discount_percent", percent)
+            form.setValue("discount_amount", parseFloat(amount.toFixed(2)))
+            form.setValue("discount_percent", parseFloat(percent.toFixed(2)))
         }
     }, [price, discountPercent, discountAmount, finalPrice, activeField, form])
 
@@ -64,9 +63,18 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                         step="0.01"
                                         inputMode="decimal"
                                         value={field.value ?? ""}
+                                        onFocus={() => setActiveField(null)}
                                         onChange={(e) => {
-                                            const v = e.target.value
-                                            field.onChange(v === "" ? undefined : parseFloat(v))
+                                            const val = e.target.valueAsNumber
+                                            const parsed = isNaN(val) ? 0 : val
+                                            field.onChange(parsed)
+                                            form.setValue("price", parsed, { shouldValidate: true })
+                                        }}
+                                        onBlur={(e) => {
+                                            const val = parseFloat(e.target.value)
+                                            if (!isNaN(val)) {
+                                                form.setValue("price", parseFloat(val.toFixed(2)))
+                                            }
                                         }}
                                         className="pl-7"
                                     />
@@ -96,7 +104,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                         max={100}
                                         step="0.01"
                                         inputMode="decimal"
-                                        className="pl-7"
+                                        value={field.value ?? ""}
                                         onFocus={() => setActiveField("percent")}
                                         onChange={(e) => {
                                             let val = e.target.valueAsNumber
@@ -104,8 +112,16 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                             if (val > 100) val = 100
                                             if (val < 0) val = 0
                                             field.onChange(val)
+                                            form.setValue("discount_percent", val, { shouldValidate: true })
+                                        }}
+                                        onBlur={(e) => {
+                                            const val = parseFloat(e.target.value)
+                                            if (!isNaN(val)) {
+                                                form.setValue("discount_percent", parseFloat(val.toFixed(2)))
+                                            }
                                         }}
                                         readOnly={activeField === "amount" || activeField === "final"}
+                                        className="pl-7"
                                     />
                                     <span className="absolute left-3 text-gray-500">%</span>
                                 </div>
@@ -141,6 +157,13 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                             if (val > p) val = p
                                             if (val < 0) val = 0
                                             field.onChange(val)
+                                            form.setValue("discount_amount", val, { shouldValidate: true })
+                                        }}
+                                        onBlur={(e) => {
+                                            const val = parseFloat(e.target.value)
+                                            if (!isNaN(val)) {
+                                                form.setValue("discount_amount", parseFloat(val.toFixed(2)))
+                                            }
                                         }}
                                         readOnly={activeField === "percent" || activeField === "final"}
                                         className="pl-7"
@@ -179,6 +202,13 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                             if (val > p) val = p
                                             if (val < 0) val = 0
                                             field.onChange(val)
+                                            form.setValue("final_price", val, { shouldValidate: true })
+                                        }}
+                                        onBlur={(e) => {
+                                            const val = parseFloat(e.target.value)
+                                            if (!isNaN(val)) {
+                                                form.setValue("final_price", parseFloat(val.toFixed(2)))
+                                            }
                                         }}
                                         className="pl-7"
                                     />

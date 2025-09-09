@@ -8,7 +8,7 @@ import {
 import { Loader2, Plus, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import AddOptionDialog from "./add-option-modal"
-import { useAddOptionToProduct, useCreateVariantOption, useGetVariantOptionByVariant } from "@/features/variant/hook"
+import { useAddOptionToProduct, useCreateVariantOption, useDeleteVariant, useDeleteVariantOption, useGetVariantOptionByVariant } from "@/features/variant/hook"
 import { useFormContext } from "react-hook-form"
 import { filterProductsByCombinations, VariantCombinations } from "./list-combination-options"
 import { useGetProductGroupDetail } from "@/features/product-group/hook"
@@ -36,6 +36,8 @@ const ListVariantOption = () => {
     const { data: variantOption, isLoading: isLoadingOption, isError: isErrorOption } = useGetVariantOptionByVariant(currentVariant ?? '')
 
     const createVariantOptionMutation = useCreateVariantOption()
+    const deleteVariantMutation = useDeleteVariant()
+    const deleteVariantOptionMutation = useDeleteVariantOption()
 
     const transformGroupDetailToSelected = (groupDetail: ProductGroupDetailResponse) => {
         const result: Record<string, VariantOptionResponse[]> = {};
@@ -112,6 +114,28 @@ const ListVariantOption = () => {
         });
     }
 
+    const handleDeleteVariant = (variant_id: string) => {
+        deleteVariantMutation.mutate(variant_id, {
+            onSuccess(data, variables, context) {
+                toast.success("Delete variant successful")
+            },
+            onError(error, variables, context) {
+                toast.error("Delete variant fail")
+            },
+        })
+    }
+
+    const handleDeleteVariantOption = (option_id: string) => {
+        deleteVariantOptionMutation.mutate(option_id, {
+            onSuccess(data, variables, context) {
+                toast.success("Delete variant option successful")
+            },
+            onError(error, variables, context) {
+                toast.error("Delete variant option fail")
+            },
+        })
+    }
+
     if (!groupDetail) return <div className="text-red-500">You need to choose product group first</div>
     if (isLoading) return <Loader2 className="animate-spin" />
 
@@ -123,7 +147,7 @@ const ListVariantOption = () => {
                 </div>
             ) : (groupDetail.variants.map((variant, index) => (
                 <div key={variant.variant.id} className="flex gap-2 justify-start">
-                    <div className="flex items-center"><X size={18} className="text-red-500 cursor-pointer" /></div>
+                    <div className="flex items-center" onClick={() => handleDeleteVariant(variant.variant.id)}><X size={18} className="text-red-500 cursor-pointer" /></div>
                     <div className="grid grid-cols-6 w-full gap-8">
                         <p className="col-span-1 flex items-center justify-end">
                             {variant.variant.name}:
@@ -131,28 +155,32 @@ const ListVariantOption = () => {
                         <div className="font-semibold col-span-5 flex gap-4 items-center">
                             {/* Hiển thị đã chọn */}
                             <div className="flex gap-2">
-                                {variant.options.map((o) => {
-                                    if (o.image_url) {
-                                        return (
+                                {variant.options.map((o) => (
+                                    <div key={o.id} className="relative inline-block mr-2 mb-2">
+                                        {o.image_url ? (
                                             <Image
                                                 src={o.image_url}
-                                                width={20}
-                                                height={20}
+                                                width={40}
+                                                height={40}
                                                 alt=""
-                                                key={o.id}
+                                                className="w-8 h-8 object-cover rounded"
                                             />
-                                        )
-                                    } else {
-                                        return (
-                                            <span
-                                                key={o.id}
-                                                className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground"
-                                            >
-                                                <div>{o.label}</div>
+                                        ) : (
+                                            <span className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground block">
+                                                {o.label}
                                             </span>
-                                        )
-                                    }
-                                })}
+                                        )}
+
+                                        {/* Delete button */}
+                                        <div
+                                            className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer"
+                                            onClick={() => handleDeleteVariantOption(o.id)}
+                                        >
+                                            <X size={12} className="text-red-500" />
+                                        </div>
+                                    </div>
+                                ))}
+
                             </div>
 
                             <AddOptionDialog variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />

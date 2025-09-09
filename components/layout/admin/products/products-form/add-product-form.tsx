@@ -65,29 +65,30 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     }, [productValues, form])
 
     const handleSubmit = async (values: ProductInput) => {
-        await onSubmit(values)
-        form.reset({
-            name: "",
-            description: "",
-            id_provider: '',
-            tax: "19%",
-            collection: null as string | null,
-            sku: "",
-            ean: "",
-            is_active: true,
-            tag: "",
-            static_files: [] as StaticFile[],
-            category_ids: [] as string[],
-            price: 0,
-            cost: 0,
-            discount_amount: 0,
-            discount_percent: 0,
-            stock: 0,
-            weight: 0,
-            width: 0,
-            height: 0,
-            length: 0,
-        })
+        console.log(values)
+        // await onSubmit(values)
+        // form.reset({
+        //     name: "",
+        //     description: "",
+        //     id_provider: '',
+        //     tax: "19%",
+        //     collection: null as string | null,
+        //     sku: "",
+        //     ean: "",
+        //     is_active: true,
+        //     tag: "",
+        //     static_files: [] as StaticFile[],
+        //     category_ids: [] as string[],
+        //     price: 0,
+        //     cost: 0,
+        //     discount_amount: 0,
+        //     discount_percent: 0,
+        //     stock: 0,
+        //     weight: 0,
+        //     width: 0,
+        //     height: 0,
+        //     length: 0,
+        // })
     }
 
     return (
@@ -439,7 +440,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             </div>
 
                             {/*Tag choose */}
-                            <div className='w-1/2'>
+                            <div className="w-1/2">
                                 <FormField
                                     control={form.control}
                                     name="tag"
@@ -447,22 +448,28 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                         <FormItem>
                                             <FormLabel className="font-bold text-base">Tag</FormLabel>
                                             <div className="flex flex-row gap-2 flex-wrap justify-end">
-                                                {tags.map((item, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        style={{ background: item.color }}
-                                                        onClick={() => field.onChange(item.name)}
-                                                        className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${field.value === item.name ? "ring ring-primary ring-offset-2" : ""
-                                                            }`}
-                                                    >
-                                                        {item.name}
-                                                    </div>
-                                                ))}
+                                                {tags.map((item, idx) => {
+                                                    const isSelected = field.value === item.name
+                                                    return (
+                                                        <div
+                                                            key={idx}
+                                                            style={{ background: item.color }}
+                                                            onClick={() =>
+                                                                field.onChange(isSelected ? "" : item.name) // toggle
+                                                            }
+                                                            className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${isSelected ? `ring-2 ring-primary ring-offset-2` : ""
+                                                                }`}
+                                                        >
+                                                            {item.name}
+                                                        </div>
+                                                    )
+                                                })}
                                             </div>
                                         </FormItem>
                                     )}
                                 />
                             </div>
+
                         </div>
                     </div>
                 </form>
