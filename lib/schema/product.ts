@@ -41,6 +41,7 @@ export const defaultValues = {
   id_provider: '',
   tax: "19%",
   category: "",
+  weight: 0,
   collection: null as string | null,
   sku: "",
   ean: "",
