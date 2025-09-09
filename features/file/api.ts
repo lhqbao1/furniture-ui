@@ -1,9 +1,9 @@
-import api from "@/lib/axios";
+import { apiPublic } from "@/lib/axios";
 import { StaticFile, StaticFileResponse } from "@/types/products";
 
 
 export async function uploadStaticFile(file: FormData){
-    const {data} = await api.post('/static/upload', file, {
+    const {data} = await apiPublic.post('/static/upload', file, {
         headers: {
             "Content-Type": "multipart/form-data",
         }

@@ -81,7 +81,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                                 <div>{category.name}</div>
                             </div>
                             <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Trash size={18} className="cursor-pointer" onClick={() => handleDeleteCategory(category.id)} />
+                                {/* <Trash size={18} className="cursor-pointer" onClick={() => handleDeleteCategory(category.id)} /> */}
                                 <Pencil size={18} className="cursor-pointer" />
                             </div>
                         </div>

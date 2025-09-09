@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api } from "@/lib/axios"
 import { WishListResponse } from "@/types/wishlist"
 
 export async function addToWishList(productId: string, quantity: number) {

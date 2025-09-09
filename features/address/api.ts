@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api } from "@/lib/axios"
 import { AddressFormValues } from "@/lib/schema/address"
 import { Address } from "@/types/address"
 

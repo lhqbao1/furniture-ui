@@ -1,5 +1,5 @@
 // features/auth/api.ts
-import api from "@/lib/axios"
+import { api } from "@/lib/axios";
 import { LoginResponse, User } from "@/types/user";
 import qs from 'qs'
 export type LoginInput = { username: string; password: string }

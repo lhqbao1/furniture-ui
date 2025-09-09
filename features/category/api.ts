@@ -1,8 +1,8 @@
-import api from "@/lib/axios"
+import { api, apiAdmin, apiPublic } from "@/lib/axios"
 import { AddOrRemoveProductToCategoryInput, CategoryByIdResponse, CategoryInput, CategoryResponse } from "@/types/categories"
 
 export async function getCategories(){
-    const {data} = await api.get(
+    const {data} = await apiPublic.get(
         "/categories/",
         {
         headers: {
@@ -17,7 +17,7 @@ export async function getCategories(){
 
 
 export async function getCategoryById(id: string){
-    const {data} = await api.get(
+    const {data} = await apiPublic.get(
         `/categories/${id}`,
         {
         headers: {
@@ -32,7 +32,7 @@ export async function getCategoryById(id: string){
 
 
 export async function createCategory(input: CategoryInput) {
-  const { data } = await api.post(
+  const { data } = await apiAdmin.post(
     "/categories/",
     input,
     {
@@ -47,7 +47,7 @@ export async function createCategory(input: CategoryInput) {
   }
 
   export async function addProductToCategory(input: AddOrRemoveProductToCategoryInput, category_id: string) {
-  const { data } = await api.post(
+  const { data } = await apiAdmin.post(
     `/categories/add-product/${category_id}`,
     input,
     {
@@ -62,7 +62,7 @@ export async function createCategory(input: CategoryInput) {
   }
 
     export async function removeProductFromCategory(input: AddOrRemoveProductToCategoryInput, category_id: string) {
-  const { data } = await api.post(
+  const { data } = await apiAdmin.post(
     `/categories/remove-product/${category_id}`,
     input,
     {
@@ -77,7 +77,7 @@ export async function createCategory(input: CategoryInput) {
   }
 
   export async function editCategory(input: CategoryInput, id: string) {
-  const { data } = await api.put(
+  const { data } = await apiAdmin.put(
     `/categories/${id}`,
     input,
     {
@@ -92,7 +92,7 @@ export async function createCategory(input: CategoryInput) {
   }
 
   export async function deleteCategory(id: string){
-  const {data} = await api.delete(
+  const {data} = await apiAdmin.delete(
     `/categories/${id}`
   )
   return data

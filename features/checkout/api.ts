@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api } from "@/lib/axios"
 import { CreateOrderFormValues } from "@/lib/schema/checkout"
 import { CheckOut, CheckOutStatistics } from "@/types/checkout"
 

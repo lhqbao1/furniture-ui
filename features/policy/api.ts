@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api } from "@/lib/axios"
 import { PolicyResponse, PolicyVersion } from "@/types/policy"
 
 export async function getPolicyVersion() {

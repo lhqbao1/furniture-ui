@@ -1,9 +1,9 @@
-import api from "@/lib/axios"
+import { apiAdmin, apiPublic } from "@/lib/axios"
 import { ProductGroupDetailResponse, ProductGroupResponse } from "@/types/product-group"
 import { NewProductItem, ProductItem } from "@/types/products"
 
 export async function createProductGroup(name: string) {
-  const { data } = await api.post(
+  const { data } = await apiAdmin.post(
     "/parent/",
     {name},
     {
@@ -18,7 +18,7 @@ export async function createProductGroup(name: string) {
   }
 
 export async function getProductGroup(){
-    const {data} = await api.get(
+    const {data} = await apiPublic.get(
         "/parent/",
         {
         headers: {
@@ -32,7 +32,7 @@ export async function getProductGroup(){
 }
 
 export async function getAllProductsSelect(params?: string){
-    const {data} = await api.get(
+    const {data} = await apiPublic.get(
         `/products/all/`,
         {
         params: params ? { search: params } : {}, // backend xử lý param search
@@ -47,7 +47,7 @@ export async function getAllProductsSelect(params?: string){
 }
 
 export async function getProductGroupDetail(parent_id: string){
-    const {data} = await api.get(
+    const {data} = await apiPublic.get(
         `/parent/details/${parent_id}`,
         {
         headers: {
@@ -61,7 +61,7 @@ export async function getProductGroupDetail(parent_id: string){
 }
 
 export async function updateProductGroup(name: string, id: string) {
-  const { data } = await api.put(
+  const { data } = await apiAdmin.put(
     `/parent/${id}`,
     name,
     {
@@ -76,7 +76,7 @@ export async function updateProductGroup(name: string, id: string) {
   }
 
 export async function deleteProductGroup(id: string){
-  const {data} = await api.delete(
+  const {data} = await apiAdmin.delete(
     `/parent/${id}`
   )
   return data

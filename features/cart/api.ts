@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api } from "@/lib/axios"
 import { CartResponse } from "@/types/cart"
 
 export async function getCartItems() {

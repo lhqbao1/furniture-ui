@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api } from "@/lib/axios"
 import { FAQ, FAQTopic } from "@/types/faq"
 
 export async function getFAQTopic() {

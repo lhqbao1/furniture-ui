@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api } from "@/lib/axios"
 import { MailFormValues } from "@/types/mail"
 
 export async function sendMail(item: MailFormValues) {

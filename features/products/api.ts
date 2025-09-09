@@ -1,4 +1,4 @@
-import api from "@/lib/axios"
+import { api, apiPublic } from "@/lib/axios"
 import { ProductInput } from "@/lib/schema/product"
 import { NewProductItem, Product, ProductItem, ProductResponse } from "@/types/products"
 
@@ -24,7 +24,7 @@ export async function CreateProduct(input: ProductInput) {
   
 
 export async function getAllProducts(params?: GetAllProductsParams) {
-  const { data } = await api.get('/products/', {
+  const { data } = await apiPublic.get('/products/', {
     params: {
       ...(params?.page !== undefined && { page: params.page }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
@@ -35,14 +35,14 @@ export async function getAllProducts(params?: GetAllProductsParams) {
 }
 
 export async function getProductById(id: string) {
-  const {data} = await api.get(
+  const {data} = await apiPublic.get(
       `/products/${id}`,
   )
   return data as NewProductItem 
 }
 
 export async function getProductByTag(tag: string) {
-  const {data} = await api.get(
+  const {data} = await apiPublic.get(
       `/products/by-tag/${tag}`,
   )
   return data as NewProductItem[]
