@@ -159,8 +159,12 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                             type="number"
                                                             min={0}
                                                             className="pl-7 w-1/2"
+                                                            step="0.01"            // hoặc "any" để cho phép mọi số thập phân
+                                                            inputMode="decimal"    // hint cho bàn phím mobile
+                                                            value={field.value ?? ""} // tránh uncontrolled / NaN
                                                             onChange={(e) => {
-                                                                field.onChange(e.target.valueAsNumber)
+                                                                const v = e.target.value;
+                                                                field.onChange(v === "" ? undefined : parseFloat(v));
                                                             }}
                                                         />
                                                         <span className="absolute left-3 text-gray-500">€</span>

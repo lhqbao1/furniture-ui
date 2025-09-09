@@ -3,7 +3,6 @@
 import { UseFormReturn } from "react-hook-form"
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ProductItem } from "@/types/products"
 import { useEffect, useState } from "react"
 import { ProductInput } from "@/lib/schema/product"
 
@@ -50,8 +49,12 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                         type="number"
                                         min={0}
                                         className="pl-7"
+                                        step="0.01"            // hoặc "any" để cho phép mọi số thập phân
+                                        inputMode="decimal"    // hint cho bàn phím mobile
+                                        value={field.value ?? ""} // tránh uncontrolled / NaN
                                         onChange={(e) => {
-                                            field.onChange(e.target.valueAsNumber)
+                                            const v = e.target.value;
+                                            field.onChange(v === "" ? undefined : parseFloat(v));
                                         }}
                                     />
                                     <span className="absolute left-3 text-gray-500">€</span>
@@ -124,7 +127,10 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
 
                                             field.onChange(val)
                                         }}
-                                        readOnly={activeField === "percent"} // readonly khi user nhập percent
+                                        readOnly={activeField === "percent"}
+                                        step="0.01"
+                                        inputMode="decimal"
+                                        value={field.value ?? ""}
                                     />
 
                                     <span className="absolute left-3 text-gray-500">€</span>
