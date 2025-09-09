@@ -83,7 +83,7 @@ export async function createCategory(input: CategoryInput) {
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
       },
       withCredentials: true, // nếu backend cần cookie/session
     }

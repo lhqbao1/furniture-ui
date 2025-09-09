@@ -5,7 +5,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
-import { Loader2, Plus } from "lucide-react"
+import { Loader2, Plus, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import AddOptionDialog from "./add-option-modal"
 import { useAddOptionToProduct, useCreateVariantOption, useGetVariantOptionByVariant } from "@/features/variant/hook"
@@ -122,77 +122,80 @@ const ListVariantOption = () => {
                     <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
                 </div>
             ) : (groupDetail.variants.map((variant, index) => (
-                <div key={variant.variant.id} className="grid grid-cols-6 w-full gap-8">
-                    <p className="col-span-1 flex items-center justify-end">
-                        {variant.variant.name}:
-                    </p>
-                    <div className="font-semibold col-span-5 flex gap-4 items-center">
-                        {/* Hiển thị đã chọn */}
-                        <div className="flex gap-2">
-                            {variant.options.map((o) => {
-                                if (o.image_url) {
-                                    return (
-                                        <Image
-                                            src={o.image_url}
-                                            width={20}
-                                            height={20}
-                                            alt=""
-                                            key={o.id}
-                                        />
-                                    )
-                                } else {
-                                    return (
-                                        <span
-                                            key={o.id}
-                                            className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground"
-                                        >
-                                            <div>{o.label}</div>
-                                        </span>
-                                    )
-                                }
-                            })}
+                <div key={variant.variant.id} className="flex gap-2 justify-start">
+                    <div className="flex items-center"><X size={18} className="text-red-500 cursor-pointer" /></div>
+                    <div className="grid grid-cols-6 w-full gap-8">
+                        <p className="col-span-1 flex items-center justify-end">
+                            {variant.variant.name}:
+                        </p>
+                        <div className="font-semibold col-span-5 flex gap-4 items-center">
+                            {/* Hiển thị đã chọn */}
+                            <div className="flex gap-2">
+                                {variant.options.map((o) => {
+                                    if (o.image_url) {
+                                        return (
+                                            <Image
+                                                src={o.image_url}
+                                                width={20}
+                                                height={20}
+                                                alt=""
+                                                key={o.id}
+                                            />
+                                        )
+                                    } else {
+                                        return (
+                                            <span
+                                                key={o.id}
+                                                className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground"
+                                            >
+                                                <div>{o.label}</div>
+                                            </span>
+                                        )
+                                    }
+                                })}
+                            </div>
+
+                            <AddOptionDialog variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
+
+                            <DropdownMenu
+                                key={variant.variant.id}
+                                open={currentVariant === variant.variant.name}
+                                onOpenChange={(open) => setCurrentVariant(open ? variant.variant.name : null)}
+                            >
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm" type="button">
+                                        Select
+                                    </Button>
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent className="w-40">
+                                    {currentVariant === variant.variant.name && isLoading && (
+                                        <div className="px-3 py-2 text-sm">Loading...</div>
+                                    )}
+
+                                    {currentVariant === variant.variant.name &&
+                                        variantOption?.map((option, index) => (
+                                            <DropdownMenuCheckboxItem
+                                                key={option.label + index}
+                                                checked={false}
+                                                onCheckedChange={() => {
+                                                    handleAddVariantOption(variant.variant.id, option)
+                                                }}
+                                            >
+                                                {option.image_url ?
+                                                    <Image
+                                                        src={option.image_url}
+                                                        width={40}
+                                                        height={40}
+                                                        alt=""
+                                                    />
+                                                    : <div>{option.label}</div>
+                                                }
+                                            </DropdownMenuCheckboxItem>
+                                        ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
-
-                        <AddOptionDialog variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
-
-                        <DropdownMenu
-                            key={variant.variant.id}
-                            open={currentVariant === variant.variant.name}
-                            onOpenChange={(open) => setCurrentVariant(open ? variant.variant.name : null)}
-                        >
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" type="button">
-                                    Select
-                                </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent className="w-40">
-                                {currentVariant === variant.variant.name && isLoading && (
-                                    <div className="px-3 py-2 text-sm">Loading...</div>
-                                )}
-
-                                {currentVariant === variant.variant.name &&
-                                    variantOption?.map((option, index) => (
-                                        <DropdownMenuCheckboxItem
-                                            key={option.label + index}
-                                            checked={false}
-                                            onCheckedChange={() => {
-                                                handleAddVariantOption(variant.variant.id, option)
-                                            }}
-                                        >
-                                            {option.image_url ?
-                                                <Image
-                                                    src={option.image_url}
-                                                    width={40}
-                                                    height={40}
-                                                    alt=""
-                                                />
-                                                : <div>{option.label}</div>
-                                            }
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     </div>
                 </div>
             )))
