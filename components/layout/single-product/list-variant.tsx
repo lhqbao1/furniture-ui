@@ -68,13 +68,16 @@ const ListVariant = ({ variant, currentProduct }: ListVariantProps) => {
                                             onClick={() => handleSelect(group.variant.id, option.id)}
                                         >
                                             {option.image_url ? (
-                                                <Image
-                                                    src={option.image_url}
-                                                    width={50}
-                                                    height={50}
-                                                    alt={option.label || group.variant.name}
-                                                    className="shadow-sm bg-white rounded-sm border border-gray-300"
-                                                />
+                                                <div className='shadow-sm bg-white rounded-sm border border-gray-300 p-2'>
+                                                    <Image
+                                                        src={option.image_url}
+                                                        width={50}
+                                                        height={50}
+                                                        alt={option.label || group.variant.name}
+                                                        className=""
+                                                    />
+                                                    {option.img_description}
+                                                </div>
                                             ) : (
                                                 <div
                                                     className={`px-3 py-1 rounded-md text-sm font-semibold`}

@@ -13,6 +13,8 @@ import { toast } from "sonner"
 import { useCreateVariantOption } from "@/features/variant/hook" // hook mutation
 import { Plus } from "lucide-react"
 import { useUploadStaticFile } from "@/features/file/hook"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface AddImageOptionDialogProps {
     variantId: string
@@ -23,9 +25,11 @@ interface AddImageOptionDialogProps {
 const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
     const [open, setOpen] = useState(false)
     const [optionName, setOptionName] = useState("")
+    const [imageDes, setImageDes] = useState("")
     const [file, setFile] = useState<File | null>(null)
     const [preview, setPreview] = useState<string | null>(null)
     const [currentImage, setCurrentImage] = useState<string | null>(null)
+    const [isGlobal, setIsGlobal] = useState<boolean>(false) // default Global
 
     const createVariantOptionMutation = useCreateVariantOption()
     const uploadStaticFile = useUploadStaticFile()
@@ -58,12 +62,12 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
             options: [
                 {
                     label: optionName,
-                    image_url: currentImage
+                    image_url: currentImage,
+                    img_description: imageDes,
+                    is_global: isGlobal
                 }
             ]
         };
-
-        console.log(input)
 
         createVariantOptionMutation.mutate({ variant_id: variantId, input }, {
             onSuccess() {
@@ -95,6 +99,26 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
                 </DialogHeader>
 
                 <div className="space-y-4">
+
+                    {/* Radio buttons: Global / Local */}
+                    <div>
+                        <Label className="mb-2 block text-sm font-medium">Option type</Label>
+                        <RadioGroup
+                            className="flex gap-4"
+                            value={isGlobal ? "global" : "local"}
+                            onValueChange={(val) => setIsGlobal(val === "global")}
+                        >
+                            <div className="flex items-center gap-1">
+                                <RadioGroupItem value="global" id="global" />
+                                <Label htmlFor="global">Global</Label>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <RadioGroupItem value="local" id="local" />
+                                <Label htmlFor="local">Local</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
+
                     {/* Upload box */}
                     <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-6 cursor-pointer">
                         <span className="text-sm text-muted-foreground">
@@ -121,6 +145,14 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
                             />
                         </div>
                     )}
+
+                    {/* Option name input */}
+                    <Input
+                        placeholder="Image description"
+                        value={imageDes}
+                        onChange={(e) => setImageDes(e.target.value)}
+                        disabled={optionName ? true : false}
+                    />
 
                     {/* Option name input */}
                     <Input

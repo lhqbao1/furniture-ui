@@ -9,7 +9,9 @@ export interface VariantResponse {
 type VariantOptionResponse = {
   id: string
   image_url?: string | null
+  img_description: string
   label: string
+  is_global: boolean
   created_at?: string
   updated_at?: string
 }
@@ -21,6 +23,8 @@ type VariantOptionInput = {
 type VariantOption = {
   label: string
   image_url?: string | null
+  img_description?: string | null
+  is_global: boolean
 }
 
 type ProductOptionData = {

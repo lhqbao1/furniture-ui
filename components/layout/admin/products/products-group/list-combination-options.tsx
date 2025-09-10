@@ -164,10 +164,10 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                             <CommandInput
                                                 placeholder="Search product..."
                                                 value={queryParams}
-                                                onValueChange={(value) => setQueryParams(value)} // cập nhật query
+                                                onValueChange={(value) => setQueryParams(value)}
                                             />
                                             <CommandEmpty>No product found.</CommandEmpty>
-                                            <CommandGroup>
+                                            <CommandGroup className="h-[400px] overflow-y-scroll">
                                                 {isLoading && <CommandItem disabled>Loading...</CommandItem>}
                                                 {isError && <CommandItem disabled>Error loading products</CommandItem>}
                                                 {listSelect
