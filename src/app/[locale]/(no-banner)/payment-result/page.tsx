@@ -13,6 +13,7 @@ import { InvoicePDF } from '@/components/layout/pdf/file'
 import { pdf } from '@react-pdf/renderer'
 import Image from 'next/image'
 import { useCapturePayment } from '@/features/payment/hook'
+import { useTranslations } from 'next-intl'
 
 const OrderPlaced = () => {
     const router = useRouter()
@@ -24,6 +25,7 @@ const OrderPlaced = () => {
     const capturePaymentMutation = useCapturePayment()
     const uploadStaticFileMutation = useUploadStaticFile()
     const sendMailMutation = useSendMail()
+    const t = useTranslations()
 
     // Lấy userId từ localStorage
     useEffect(() => {
@@ -117,20 +119,20 @@ const OrderPlaced = () => {
                 <div className="absolute top-0 left-0 w-40 h-32 bg-secondary clip-triangle-top-left" />
                 <div className="absolute bottom-0 right-0 w-40 h-32 bg-primary clip-triangle-bottom-right" />
 
-                <h1 className="text-6xl font-libre text-gray-700 mb-6 italic">Thank You</h1>
+                <h1 className="text-6xl font-libre text-gray-700 mb-6 italic">{t('thankYou')}</h1>
 
                 <p className="text-gray-600 text-lg">
-                    We are happy to let you know that your order has been successfully placed.
+                    {t('orderPlacedMessage')}
                 </p>
                 <p className="text-gray-600 text-lg mt-2">
-                    We will send you another email with tracking information as soon as your order ships.
+                    {t('trackingInfoMessage')}
                 </p>
                 <p className="text-gray-600 text-lg mt-2">
-                    Thank you for shopping with us!
+                    {t('thankYouShopping')}
                 </p>
 
                 <p className="text-primary text-base mt-6">
-                    We will redirect you to home after <span className="font-semibold text-secondary">{counter}</span> seconds.
+                    {t('redirectHome')} <span className="font-semibold text-secondary">{counter}</span> {t('seconds')}.
                 </p>
             </div>
         </div>

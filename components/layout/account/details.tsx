@@ -16,12 +16,14 @@ import AddressForm from './address-form'
 import AddressList from './address-list'
 import { useGetInvoiceAddressByUserId } from '@/features/address/hook'
 import InvoiceAddress from './invoice-address'
+import { useTranslations } from 'next-intl'
 
 interface AccountDetailsProps {
     user: User
 }
 
 const AccountDetails = ({ user }: AccountDetailsProps) => {
+    const t = useTranslations()
     const form = useFormContext()
     const [openAddressDialog, setOpenAddressDialog] = useState(false)
     const { data: invoiceAddress, isLoading, isError } = useGetInvoiceAddressByUserId(user.id)
@@ -31,14 +33,14 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             <div className="grid grid-cols-2 gap-4">
                 <FormField name="first_name" control={form.control} render={({ field }) => (
                     <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>{t('firstName')}</FormLabel>
                         <FormControl><Input {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
                 <FormField name="last_name" control={form.control} render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>{t('lastName')}</FormLabel>
                         <FormControl><Input {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
@@ -49,14 +51,14 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             <div className="grid grid-cols-2 gap-4">
                 <FormField name="email" control={form.control} render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('email')}</FormLabel>
                         <FormControl><Input type="email" {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
                 <FormField name="phone_number" control={form.control} render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Phone</FormLabel>
+                        <FormLabel>{t('phone')}</FormLabel>
                         <FormControl><Input {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
@@ -66,13 +68,13 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             {/* Addresses */}
             <div className='space-y-4'>
                 <div className='flex gap-3 items-center'>
-                    <span>Shipping Address</span>
+                    <span>{t('shippingAddress')}</span>
                     <div className="flex justify-center items-center">
                         <Dialog open={openAddressDialog} onOpenChange={setOpenAddressDialog}>
-                            <Button onClick={() => setOpenAddressDialog(true)} type='button' className="bg-secondary hover:bg-secondary">Add shipping address</Button>
+                            <Button onClick={() => setOpenAddressDialog(true)} type='button' className="bg-secondary hover:bg-secondary">{t('addShippingAddress')}</Button>
                             <DialogContent className='lg:w-[800px]'>
                                 <DialogHeader>
-                                    <DialogTitle>Add Shipping Address</DialogTitle>
+                                    <DialogTitle>{t('addShippingAddress')}</DialogTitle>
                                     <AddressForm setOpen={setOpenAddressDialog} open={openAddressDialog} userId={user.id} />
                                 </DialogHeader>
                             </DialogContent>
@@ -85,14 +87,14 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
 
             <div className='space-y-4'>
                 <div className='flex gap-3 items-center'>
-                    <span>Invoice Address</span>
+                    <span>{t('invoiceAddress')}</span>
                     {!invoiceAddress ?
                         <div className="flex justify-center items-center">
                             <Dialog open={openAddressDialog} onOpenChange={setOpenAddressDialog}>
-                                <Button onClick={() => setOpenAddressDialog(true)} type='button' className="bg-secondary hover:bg-secondary">Add invoice address</Button>
+                                <Button onClick={() => setOpenAddressDialog(true)} type='button' className="bg-secondary hover:bg-secondary">{t('addInvoiceAddress')}</Button>
                                 <DialogContent className='lg:w-[800px]'>
                                     <DialogHeader>
-                                        <DialogTitle>Add Invoice Address</DialogTitle>
+                                        <DialogTitle>{t('addInvoiceAddress')}</DialogTitle>
                                         <AddressForm setOpen={setOpenAddressDialog} open={openAddressDialog} userId={user.id} isInvoice={true} />
                                     </DialogHeader>
                                 </DialogContent>
@@ -107,14 +109,14 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             <div className="grid grid-cols-2 gap-4">
                 <FormField name="language" control={form.control} render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Language</FormLabel>
+                        <FormLabel>{t('language')}</FormLabel>
                         <FormControl><Input {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
                 <FormField name="date_of_birth" control={form.control} render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Date of Birth</FormLabel>
+                        <FormLabel>{t('dateOfBirth')}</FormLabel>
                         <FormControl>
                             <Input type="date" {...field} value={field.value ?? ''} onChange={field.onChange} />
                         </FormControl>
@@ -127,7 +129,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             <FormField name="promotions" control={form.control} render={({ field }) => (
                 <FormItem className="flex items-center gap-2">
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                    <FormLabel className="mb-0">Receive Promotions</FormLabel>
+                    <FormLabel className="mb-0">{t('receivePromotions')}</FormLabel>
                 </FormItem>
             )} />
         </div >

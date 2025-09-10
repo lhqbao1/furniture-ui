@@ -5,6 +5,7 @@ import ListReviewButton from './list-review-buttons'
 import gsap from 'gsap'
 import { useMediaQuery } from 'react-responsive'
 import { NewProductItem } from '@/types/products'
+import { useTranslations } from 'next-intl'
 
 interface CountDownGridLayoutProps {
     products: NewProductItem[]
@@ -19,6 +20,7 @@ interface ProductTime {
 const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
     const cardRefs = useRef<HTMLDivElement[]>([])
     const isMobile = useMediaQuery({ maxWidth: 430 }) // breakpoint mobile
+    const t = useTranslations()
 
     // state riêng cho countdown & progress
     const [productTimes, setProductTimes] = useState<ProductTime[]>(() =>
@@ -165,7 +167,7 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
 
                             <div className='flex xl:flex-row flex-col xl:justify-between items-end xl:items-center w-full'>
                                 <div className='flex flex-row gap-1 text-base text-gray-500'>
-                                    <p>ends in:</p>
+                                    <p>{t('endIn')}:</p>
                                     <div>{formatTime(timeLeft)}</div>
                                 </div>
                                 <p className='text-base text-gray-500 font-bold'>

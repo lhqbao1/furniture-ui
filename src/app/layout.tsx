@@ -3,7 +3,6 @@ import { Figtree, Libre_Caslon_Display, Quicksand } from "next/font/google";
 import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
-import { NextIntlClientProvider } from 'next-intl';
 
 const figtree = Figtree({
     subsets: ["latin"],

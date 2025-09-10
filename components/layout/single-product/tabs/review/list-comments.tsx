@@ -7,6 +7,7 @@ import CommentImageDialog from './comment-image-dialog'
 import { CustomPagination } from '@/components/shared/custom-pagination'
 import { Button } from '@/components/ui/button'
 import { Comment } from '@/types/comment'
+import { useTranslations } from 'next-intl'
 
 interface ListCommentsProps {
     showComments: boolean
@@ -15,6 +16,7 @@ interface ListCommentsProps {
 }
 
 const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps) => {
+    const t = useTranslations()
     const textRefs = useRef<(HTMLDivElement | null)[]>([])
     const [expandedIndexes, setExpandedIndexes] = useState<number[]>([])
     const [showButtonIndexes, setShowButtonIndexes] = useState<number[]>([])
@@ -99,7 +101,7 @@ const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps
                             </div>
                         ))}
                         <div className='py-6 text-center'>
-                            <Button hasEffect className='rounded-full font-bold'>Load More</Button>
+                            <Button hasEffect className='rounded-full font-bold'>{t('loadMore')}</Button>
                         </div>
                         {/* <CustomPagination /> */}
                     </div>

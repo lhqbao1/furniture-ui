@@ -7,17 +7,20 @@ import { CustomPagination } from '@/components/shared/custom-pagination'
 import { useGetViewedProduct } from '@/features/viewed/hook'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 export default function ViewProductPage() {
     const [page, setPage] = useState(1)
     const { data: products, isLoading, isError } = useGetViewedProduct()
+    const t = useTranslations()
     if (!products || isLoading) return <ProductGridSkeleton length={12} />
+
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb />
             <div className=''>
-                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>Viewed Products</h2>
+                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{t('viewedProduct')}</h2>
                 {isLoading || isError || !products || products.items.length === 0 ?
                     <div className='flex justify-center flex-col items-center lg:mt-10 gap-2'>
                         <div className='text-xl'>No Product Found</div>

@@ -18,7 +18,7 @@ export async function getViewedProduct(){
 export async function addToViewed(product_id: string) {
   const { data } = await api.post(
     `/viewed/`,
-    product_id,
+    {product_id},
     {
       headers: {
         "Content-Type": "application/json",

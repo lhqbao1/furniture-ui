@@ -16,7 +16,7 @@ const TrendingProducts = () => {
         <div className="section-padding">
             <h2 className="section-header">{t('trending')}</h2>
             <p className="text-primary text-lg text-center">
-                most wanted on social media
+                {t('mostWanted')}
             </p>
 
             {isLoading || isError || !products ? (

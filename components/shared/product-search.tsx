@@ -16,8 +16,10 @@ import { Input } from "../ui/input"
 import { useGetProductsSelect } from "@/features/product-group/hook"
 import { NewProductItem } from "@/types/products"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 export default function ProductSearch({ height }: { height?: boolean }) {
+    const t = useTranslations()
     const [query, setQuery] = React.useState("")
     const [debouncedQuery, setDebouncedQuery] = React.useState("")
     const router = useRouter()
@@ -47,7 +49,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                 <div className="relative flex">
                     <Input
                         type="text"
-                        placeholder="Search..."
+                        placeholder={`${t('search')}...`}
                         className="w-full xl:h-12 h-10 pl-10 pr-28 rounded-full border bg-white ring-0"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -62,7 +64,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                             size={24}
                             className="xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full"
                         />
-                        Search
+                        {t('search')}
                     </Button>
                     <Search
                         size={24}

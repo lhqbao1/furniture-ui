@@ -2,10 +2,11 @@
 import { Star } from 'lucide-react'
 import Image from 'next/image'
 import React, { useCallback, useMemo, useState } from 'react'
-import CommentForm from './comment-form'
+import { useTranslations } from 'next-intl'
 
 const GiveCommentSection = () => {
     const [rating, setRating] = useState(0)
+    const t = useTranslations()
 
     const handleRating = useCallback((index: number) => {
         setRating(index)
@@ -13,7 +14,7 @@ const GiveCommentSection = () => {
 
     return (
         <div className='flex flex-col gap-4'>
-            <div className='text-gray-600 text-lg font-bold'>Write review</div>
+            <div className='text-gray-600 text-lg font-bold'>{t('writeReview')}</div>
             <div className='flex justify-between items-center'>
                 <div className='flex gap-2 items-center'>
                     <Image src={'/people.webp'} height={100} width={100} alt='' className='rounded-full size-16' />
@@ -35,7 +36,7 @@ const GiveCommentSection = () => {
                             </button>
                         ))}
                     </div>
-                    <p className='text-sm text-gray-600 font-semibold'>Your rating</p>
+                    <p className='text-sm text-gray-600 font-semibold'>{t('yourRating')}</p>
                 </div>
             </div>
             {/* <CommentForm /> */}

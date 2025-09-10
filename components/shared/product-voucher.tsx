@@ -1,4 +1,5 @@
 import { Voucher } from '@/types/voucher'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 interface ProductVoucherProps {
@@ -8,6 +9,7 @@ interface ProductVoucherProps {
 }
 
 const ProductVoucher = ({ isSelected, onSelect, item }: ProductVoucherProps) => {
+    const t = useTranslations()
     return (
         <div
             onClick={onSelect}
@@ -36,14 +38,14 @@ const ProductVoucher = ({ isSelected, onSelect, item }: ProductVoucherProps) => 
                     {item.title}
                 </div>
                 <div className="text-center text-xs">
-                    {item.type} <br /> <span className="font-bold">OFF {item.discountAmount}%</span>
+                    {item.type} <br /> <span className="font-bold">{t('off')} {item.discountAmount}%</span>
                 </div>
             </div>
 
             {/* footer */}
             <div className="flex justify-between items-center">
                 <button className="bg-black text-white text-xs px-3 py-1 rounded-full">
-                    Apply Code
+                    {t('applyCode')}
                 </button>
                 <span className="font-bold text-xs">{item.code}</span>
             </div>

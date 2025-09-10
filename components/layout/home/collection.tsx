@@ -1,14 +1,35 @@
 'use client'
-import { collectionList } from '@/data/data'
 import gsap from 'gsap'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 
+interface Collection {
+    id: number,
+    name: string,
+    image: string,
+    col?: number,
+    row?: number,
+    color?: string
+}
+
 const Collection = () => {
+    const t = useTranslations()
+
+    const collectionList: Collection[] = [
+        { id: 1, name: t('interior'), image: '/collection-1.jpg' },
+        { id: 2, name: t('decoration'), image: '/collection-2.jpg' },
+        { id: 3, name: t('chair'), image: '/collection-3.jpg' },
+        { id: 4, name: t('sofa'), image: '/collection-4.jpg' },
+        { id: 5, name: t('furniture'), image: '/collection-5.jpg' },
+    ]
+
     const [listCollection, setListCollection] = useState(collectionList)
     const containerRefs = useRef<HTMLDivElement[]>([])
     const isMobile = useMediaQuery({ maxWidth: 430 }); // iPhone 12 Pro và nhỏ hơn
+
+
 
     useEffect(() => {
         const updated = collectionList.map((item, idx) => {
@@ -97,10 +118,10 @@ const Collection = () => {
     return (
         <div className='section-padding'>
             <h2 className='section-header mb-2'>
-                New Collections
+                {t('newCollections')}
             </h2>
             <p className='text-primary text-lg text-center font-semibold'>
-                Award winning design 2026
+                {t('awardWinning')}
             </p>
 
             <div className="

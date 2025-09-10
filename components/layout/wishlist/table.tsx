@@ -5,7 +5,7 @@ import { debounce } from "lodash"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { ColumnDef, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, flexRender } from "@tanstack/react-table"
-import { getWishlistColumns } from "./column"
+import { GetWishlistColumns } from "./column"
 import CartTableSkeleton from "../cart/table-skeleton"
 import { WishListItem, WishListResponse } from "@/types/wishlist"
 import { useAddWishlistItemToCart, useAddWishlistToCart, useRemoveWishlistItem, useUpdateWishlistItemQuantity, useUpdateWishlistItemStatus } from "@/features/wishlist/hook"
@@ -13,6 +13,8 @@ import { ArrowLeft, Trash } from "lucide-react"
 import { Checkbox } from "@radix-ui/react-checkbox"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
+import Link from "next/link"
 
 interface WishlistTableProps {
     wishlist?: WishListResponse
@@ -21,11 +23,13 @@ interface WishlistTableProps {
     localQuantities: Record<string, number>
     setLocalQuantities: React.Dispatch<React.SetStateAction<Record<string, number>>>
     total: number
+    currentTable?: string
 }
 
-const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQuantities, setLocalQuantities, total }: WishlistTableProps) => {
+const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQuantities, setLocalQuantities, total, currentTable }: WishlistTableProps) => {
     const [localStatuses, setLocalStatuses] = useState<Record<string, boolean>>({})
     const [barStyle, setBarStyle] = React.useState<React.CSSProperties>({})
+    const t = useTranslations()
 
     const router = useRouter()
     const updateWishlistItemQuantityMutation = useUpdateWishlistItemQuantity()
@@ -99,7 +103,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
         })
     }
 
-    const columns = getWishlistColumns({
+    const columns = GetWishlistColumns({
         localQuantities,
         onUpdateQuantity: handleUpdateWishlistItemQuantity,
         onAddToCart: handleAddToCart,
@@ -126,8 +130,8 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
     return (
         <div className="col-span-12 md:col-span-8 flex-1">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold mb-6">Shopping Cart</h2>
-                <p className="text-xl font-bold mb-6">({wishlist?.items.length} items)</p>
+                <h2 className="text-xl font-bold mb-6">{currentTable ? currentTable : 'Shopping Cart'}</h2>
+                <p className="text-xl font-bold mb-6">({wishlist?.items.length} {t('items')})</p>
             </div>
 
             <Table>
@@ -162,7 +166,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No items
+                                    {t('noItems')}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -174,27 +178,29 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
             <div className="sticky bottom-0 lg:mt-12 bg-secondary text-white p-4 rounded-lg" style={barStyle}>
                 <div className="grid grid-cols-12 gap-4 bg-secondary text-white rounded-lg">
                     <div className="xl:col-span-7 col-span-12 flex justify-between">
-                        <div className="flex flex-col gap-3 justify-between">
-                            <div className="flex items-center gap-2">
+                        <div className="space-y-3">
+                            <div className="flex flex-col gap-3 justify-between">
+                                {/* <div className="flex items-center gap-2">
                                 <Checkbox
                                     checked={table.getIsAllPageRowsSelected()}
                                     onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
                                 />
-                                <span className="text-sm">Select all</span>
+                                <span className="text-sm">{t('selectAll')}</span>
+                            </div> */}
+                                <Link href={'/shop-all'} className="flex gap-2 items-center">
+                                    <ArrowLeft size={20} />
+                                    <span className="text-sm">{t('continueShopping')}</span>
+                                </Link>
                             </div>
-                            <div className="flex gap-2 items-center">
-                                <ArrowLeft size={20} />
-                                <span className="text-sm">Continue Shopping</span>
-                            </div>
-                        </div>
 
-                        <div className="flex flex-col gap-3 justify-between">
-                            <div
-                                // onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
-                                className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
-                            >
-                                <Trash size={20} />
-                                Remove out of stock products
+                            <div className="flex flex-col gap-3 justify-between">
+                                <div
+                                    // onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
+                                    className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
+                                >
+                                    <Trash size={20} />
+                                    {t('removeOutOfStockProducts')}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -202,11 +208,11 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
                     <div className="xl:col-span-5 col-span-12 flex gap-6 xl:justify-end justify-center">
                         <div className="text-right text-xl">
                             <p className="font-semibold">
-                                Total ({wishlist?.items.length} items) <span className="font-bold">€{total.toFixed(2)}</span>
+                                {t('total')} ({wishlist?.items.length} {t('items')}) <span className="font-bold">€{total.toFixed(2)}</span>
                             </p>
                         </div>
                         <Button className="bg-primary/90 hover:bg-primary cursor-pointer text-white rounded-full px-10 py-2 relative" onClick={() => handleAddWishlistToCart(wishlist?.id ?? '')}>
-                            <span className="font-bold">Add to cart</span>
+                            <span className="font-bold">{t('addToCart')}</span>
                         </Button>
                     </div>
                 </div>

@@ -8,7 +8,8 @@ import { useDeleteCartItem, useUpdateCartItemQuantity, useUpdateCartItemStatus }
 import CartTableSkeleton from "./table-skeleton"
 import { toast } from "sonner"
 import { ColumnDef, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, flexRender } from "@tanstack/react-table"
-import { getCartColumns } from "./columns"
+import { GetCartColumns } from "./columns"
+import { useTranslations } from "next-intl"
 
 interface CartTableProps {
     cart?: CartResponse
@@ -20,7 +21,7 @@ interface CartTableProps {
 
 const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, setLocalQuantities }: CartTableProps) => {
     const [localStatuses, setLocalStatuses] = useState<Record<string, boolean>>({})
-
+    const t = useTranslations()
     const updateCartItemQuantityMutation = useUpdateCartItemQuantity()
     const deleteCartItemMutation = useDeleteCartItem()
     const updateCartItemStatusMutation = useUpdateCartItemStatus()
@@ -84,7 +85,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
         })
     }
 
-    const columns = getCartColumns({
+    const columns = GetCartColumns({
         localQuantities,
         onUpdateQuantity: handleUpdateCartItemQuantity,
         onDeleteItem: handleDeleteItem,
@@ -110,8 +111,8 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
     return (
         <div className="col-span-12 md:col-span-8 flex-1">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold mb-6">Shopping Cart</h2>
-                <p className="text-xl font-bold mb-6">({cart?.items.length ? cart.items.length : 0} items)</p>
+                <h2 className="text-xl font-bold mb-6">{t('shoppingCart')}</h2>
+                <p className="text-xl font-bold mb-6">({cart?.items.length ? cart.items.length : 0} {t('items')})</p>
             </div>
 
             <Table>
@@ -146,7 +147,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No items
+                                    {t('noItems')}
                                 </TableCell>
                             </TableRow>
                         )}

@@ -25,7 +25,7 @@ export default function MainLayout({
         <div className="flex flex-col w-full col-span-5 overflow-x-hidden overflow-y-auto">
           <main className="flex-1 relative flex flex-col">
             <StickyIcon />
-            <Banner height={300} />
+            <Banner />
             <div className="container-padding flex-1">
               {children}
             </div>

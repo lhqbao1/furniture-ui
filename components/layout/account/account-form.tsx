@@ -10,10 +10,12 @@ import { accountDefaultValues, AccountFormValues, accountSchema } from '@/lib/sc
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 const AccountForm = () => {
     const [userId, setUserId] = useState<string>("")
     const updateUserMutation = useUpdateUser()
+    const t = useTranslations()
 
     // SSR-safe: chỉ đọc localStorage sau khi client mounted
     useEffect(() => {
@@ -43,17 +45,15 @@ const AccountForm = () => {
         // call API update user
         updateUserMutation.mutate({ id: userId, user: data }, {
             onSuccess(data, variables, context) {
-                toast.success("User updated successfully")
+                toast.success("Update user successfully")
             },
             onError(error, variables, context) {
-                toast.error("Failed to update user")
+                toast.error("Update user fail")
             },
         })
     }
 
-    if (isLoading) return <AccountSkeleton />
-    if (isError) return <div className="text-red-500">❌ Failed to load user data.</div>
-    if (!user) return <AccountSkeleton />
+    if (isLoading || isError || !user) return <AccountSkeleton />
 
     return (
         <FormProvider {...form} >
@@ -76,12 +76,12 @@ const AccountForm = () => {
                 </div>
                 {/* Actions */}
                 <div className="flex gap-2 justify-end pt-6">
-                    <Button variant="destructive" type="button">Delete Account</Button>
+                    <Button variant="destructive" type="button">{t('deleteAccount')}</Button>
                     {/* <Button variant="outline" type="button" className='bg-gray-400 text-white hover:bg-gray-400 hover:text-white'>Cancel</Button> */}
                     <Button type="submit" disabled={updateUserMutation.isPending}>
                         {updateUserMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : 'Submit'}
+                        ) : <div>{t('submit')}</div>}
                     </Button>
                 </div>
             </form>

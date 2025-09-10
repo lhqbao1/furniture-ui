@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Trash } from "lucide-react"
 import Image from "next/image"
 import { WishListItem } from "@/types/wishlist"
+import { useTranslations } from "next-intl"
 
 interface GetWishlistColumnsProps {
     localQuantities: Record<string, number>
@@ -17,7 +18,7 @@ interface GetWishlistColumnsProps {
     isCheckout?: boolean
 }
 
-export const getWishlistColumns = ({
+export const GetWishlistColumns = ({
     localQuantities,
     onUpdateQuantity,
     onDeleteItem,
@@ -25,47 +26,48 @@ export const getWishlistColumns = ({
     onToggleSelect,
     isCheckout,
     localStatuses
-}: GetWishlistColumnsProps): ColumnDef<WishListItem>[] => [
+}: GetWishlistColumnsProps): ColumnDef<WishListItem>[] => {
+    const t = useTranslations()
+
+    return [
         ...(!isCheckout
             ? [
                 {
                     id: "select",
                     header: ({ table }) => {
-                        // Check xem tất cả rows có đang được chọn theo localStatuses không
                         const allSelected = table.getRowModel().rows.every(
                             (row) => localStatuses[row.original.id] ?? row.original.is_active
-                        );
+                        )
 
                         return (
                             <Checkbox
                                 checked={allSelected}
                                 onCheckedChange={(value) => {
                                     table.getRowModel().rows.forEach((row) => {
-                                        onToggleSelect(row.original, value === true);
-                                    });
+                                        onToggleSelect(row.original, value === true)
+                                    })
                                 }}
-                                aria-label="Select all"
+                                aria-label={t('selectAll')}
                             />
-                        );
+                        )
                     },
                     cell: ({ row }) => {
                         return (
                             <Checkbox
                                 checked={Boolean(localStatuses[row.original.id] ?? row.original.is_active)}
                                 onCheckedChange={(value) => onToggleSelect(row.original, value === true)}
-                                aria-label="Select row"
+                                aria-label={t('selectRow')}
                             />
-                        );
+                        )
                     },
                     enableSorting: false,
                     enableHiding: false,
                 } as ColumnDef<WishListItem>
-
             ]
             : []),
         {
             accessorKey: "product_name",
-            header: "Product",
+            header: t('product'),
             cell: ({ row }) => {
                 const item = row.original
                 return (
@@ -84,10 +86,9 @@ export const getWishlistColumns = ({
                 )
             },
         },
-
         {
             accessorKey: "quantity",
-            header: "Quantity",
+            header: t('quantity'),
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
@@ -115,13 +116,12 @@ export const getWishlistColumns = ({
         },
         {
             accessorKey: "item_price",
-            header: "Price",
+            header: t('price'),
             cell: ({ row }) => <span className="font-semibold">€{row.original.item_price.toFixed(2)}</span>,
         },
-
         {
             accessorKey: "total",
-            header: "Total",
+            header: t('total'),
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
@@ -130,14 +130,12 @@ export const getWishlistColumns = ({
         },
         {
             accessorKey: "item_stock",
-            header: "Stock",
-            cell: ({ row }) => {
-                return <span className="">{row.original.products.stock} left</span>
-            },
+            header: t('stock'),
+            cell: ({ row }) => <span>{row.original.products.stock} {t('left')}</span>,
         },
         {
             id: "actions",
-            header: () => <div className="text-start">Actions</div>,
+            header: t('actions'),
             cell: ({ row }) => {
                 const item = row.original
                 return (
@@ -150,10 +148,9 @@ export const getWishlistColumns = ({
                             <Trash />
                         </Button>
                         <Button
-                            className=""
                             onClick={() => onAddToCart(item)}
                         >
-                            Add to cart
+                            {t('addToCart')}
                         </Button>
                     </div>
                 )
@@ -162,9 +159,10 @@ export const getWishlistColumns = ({
         {
             accessorKey: "is_active",
             id: "is_active",
-            enableHiding: true,   // cho phép ẩn
-            enableSorting: true,  // vẫn sort được
-            header: () => null,   // không render header
-            cell: () => null,     // không render cell
+            enableHiding: true,
+            enableSorting: true,
+            header: () => null,
+            cell: () => null,
         },
     ]
+}

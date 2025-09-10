@@ -7,9 +7,7 @@ import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
-import { z } from "zod"
 import PaymentMethodSelector from '@/components/layout/checkout/method'
-import { cartItems, vouchers } from '@/data/data'
 import ProductVoucher from '@/components/shared/product-voucher'
 import { Textarea } from '@/components/ui/textarea'
 import { useGetAddressByUserId, useGetInvoiceAddressByUserId } from '@/features/address/hook'
@@ -27,6 +25,8 @@ import Link from 'next/link'
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import AddressSkeleton from '@/components/layout/checkout/address-skeleton'
+import { useTranslations } from 'next-intl'
+import { Voucher } from '@/types/voucher'
 
 export interface CartItem {
     id: number
@@ -38,12 +38,7 @@ export interface CartItem {
     imageUrl: string
 }
 
-const checkOutBreadcrumb = [
-    { label: 'Wishlist', icon: 'wishlist.svg' },
-    { label: 'Cart', icon: 'cart.svg' },
-    { label: 'Checkout', icon: 'checkout.svg' },
-    { label: 'Tracking', icon: 'tracking.svg' },
-]
+
 
 
 export default function CheckOutPage() {
@@ -52,6 +47,38 @@ export default function CheckOutPage() {
     const [checkout, setCheckOut] = useAtom(checkOutIdAtom)
     const router = useRouter()
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
+    const t = useTranslations()
+
+    const checkOutBreadcrumb = [
+        { label: t('wishlist'), icon: 'wishlist.svg' },
+        { label: t('cart'), icon: 'cart.svg' },
+        { label: t('checkout'), icon: 'checkout.svg' },
+        { label: t('tracking'), icon: 'tracking.svg' },
+    ]
+
+    const vouchers: Voucher[] = [
+        {
+            id: 1,
+            title: t('voucher200'),
+            type: t('discount'),
+            discountAmount: 10,
+            code: 'MO200200'
+        },
+        {
+            id: 2,
+            title: t('voucher300'),
+            type: t('discount'),
+            discountAmount: 15,
+            code: 'MO300300'
+        },
+        {
+            id: 3,
+            title: t('voucher500'),
+            type: t('discount'),
+            discountAmount: 20,
+            code: 'MO500500'
+        }
+    ];
 
 
     // SSR-safe: chỉ đọc localStorage sau khi client mounted
@@ -153,11 +180,11 @@ export default function CheckOutPage() {
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:px-24 md:px-14 px-4'>
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
                         <div className='space-y-4'>
-                            <div className='text-base font-semibold'>Shipping Address</div>
+                            <div className='text-base font-semibold'>{t('shippingAddress')}</div>
                             <AddressSelector addresses={addresses ? addresses : []} name="shipping_address_id" />
                         </div>
                         <div className='space-y-4'>
-                            <div className='text-base font-semibold'>Invoice Address</div>
+                            <div className='text-base font-semibold'>{t('invoiceAddress')}</div>
                             {!invoiceAddress ? <AddressSkeleton /> :
                                 <Card
                                     className={`cursor-pointer transition border-secondary border-2`}
@@ -203,7 +230,7 @@ export default function CheckOutPage() {
                         />
 
                         <div className='space-y-3'>
-                            <div className="text-lg font-semibold">Select Voucher</div>
+                            <div className="text-lg font-semibold">{t('selectVoucher')}</div>
                             <div className='lg:flex lg:flex-row grid grid-cols-1 gap-2'>
                                 {vouchers.map((item, index) => {
                                     return (
@@ -220,7 +247,7 @@ export default function CheckOutPage() {
                                     control={form.control}
                                     render={({ field }) => (
                                         <FormItem className='space-y-1 lg:space-y-1'>
-                                            <FormLabel className="text-lg font-semibold">Note</FormLabel>
+                                            <FormLabel className="text-lg font-semibold">{t('note')}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     className='min-h-24'
@@ -243,15 +270,17 @@ export default function CheckOutPage() {
                                                     onCheckedChange={(checked) => field.onChange(checked)}
                                                 />
                                                 <FormLabel className="text-sm flex flex-row">
-                                                    By placing this order, you accept our
-                                                    <span>
-                                                        <Link href="/" className="text-secondary underline">
-                                                            Terms & Conditions
-                                                        </Link>
+                                                    <span className='space-x-2'>
+                                                        {t('byPlacing')}
+                                                        <span className='pl-2'>
+                                                            <Link href="/policy" className="text-secondary underline">
+                                                                {t('termCondition')}
+                                                            </Link>
+                                                        </span>
                                                     </span>
                                                 </FormLabel>
                                             </div>
-                                            <FormMessage /> {/* hiển thị lỗi nếu chưa tick */}
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -259,7 +288,7 @@ export default function CheckOutPage() {
                             </div>
                             <div className='text-sm space-y-2'>
                                 <div className='flex gap-6 justify-end'>
-                                    <span>Sub total (include VAT)</span>
+                                    <span>{t('subTotalInclude')}</span>
                                     <span>
                                         €{cartItems?.items
                                             .filter((item) => item.is_active === true)
@@ -268,15 +297,15 @@ export default function CheckOutPage() {
                                     </span>
                                 </div>
                                 <div className='flex gap-6 justify-end'>
-                                    <span>Shipping</span>
+                                    <span>{t('shipping')}</span>
                                     <span>€5.95</span>
                                 </div>
                                 <div className='flex gap-6 justify-end'>
-                                    <span>Discount</span>
+                                    <span>{t('discount')}</span>
                                     <span>€0</span>
                                 </div>
                                 <div className='flex gap-6 justify-end text-xl text-primary font-bold'>
-                                    <span>Total</span>
+                                    <span>{t('total')}</span>
                                     <span>
                                         €{(
                                             (
@@ -294,7 +323,7 @@ export default function CheckOutPage() {
                         </div>
 
                         <div className="flex justify-end">
-                            <Button type="submit">Continue</Button>
+                            <Button type="submit">{t('continue')}</Button>
                         </div>
                     </div>
                 </div>

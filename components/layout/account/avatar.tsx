@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { useUploadStaticFile } from '@/features/file/hook'
 import { User } from '@/types/user'
 import { useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useRef, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
@@ -16,7 +17,7 @@ const AccountAvatar = ({ user }: AvatarProps) => {
     const fileInputRef = useRef<HTMLInputElement | null>(null)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [preview, setPreview] = useState<string | null>(user && user.avatar_url ? user.avatar_url : '/default-avatar.jpg')
-
+    const t = useTranslations()
     const formData = new FormData()
     const uploadStaticFileMutation = useUploadStaticFile()
     const qc = useQueryClient()
@@ -59,10 +60,10 @@ const AccountAvatar = ({ user }: AvatarProps) => {
                     onChange={handleFileChange}
                     ref={fileInputRef}
                 />
-                <Button variant={'secondary'} onClick={() => fileInputRef.current?.click()} type='button'>Change</Button>
-                <Button variant={'secondary'}>Remove</Button>
+                <Button variant={'secondary'} onClick={() => fileInputRef.current?.click()} type='button'>{t('change')}</Button>
+                <Button variant={'secondary'}>{t('remove')}</Button>
             </div>
-            <span className='text-sm text-gray-500'>allowed JPG, PNG. Max 2M</span>
+            <span className='text-sm text-gray-500'>{t('allowAvatar')}</span>
         </div>
     )
 }

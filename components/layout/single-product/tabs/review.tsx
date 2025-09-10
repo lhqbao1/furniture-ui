@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog"
 import GiveCommentSection from './review/give-comment-section'
 import { useMediaQuery } from 'react-responsive'
+import { useTranslations } from 'next-intl'
 
 const reviewCount = [
     { title: 5, percent: 70 },
@@ -34,6 +35,7 @@ const reviewCount = [
 ]
 
 const ProductReviewTab = () => {
+    const t = useTranslations()
     const [selectedRate, setSelectedRate] = useState<number>()
     const [showPic, setShowPic] = useState(true)
     const [showComments, setShowComments] = useState(true)
@@ -74,8 +76,8 @@ const ProductReviewTab = () => {
                 <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
                     <div className={`${isMobile ? 'flex flex-row justify-between' : 'col-span-2 flex flex-col items-center justify-center gap-2'}`}>
                         <h3 className='flex flex-row gap-1 items-center'>4.8 <Star /></h3>
-                        <p className='text-center'><span className='text-primary font-semibold'>120</span> happy customer</p>
-                        {!isMobile && <p className='text-gray-500'>70 reviews</p>}
+                        <p className='text-center'><span className='text-primary font-semibold'>120</span> {t('happyCustomer')}</p>
+                        {!isMobile && <p className='text-gray-500'>70 {t('reviews')}</p>}
                     </div>
 
                     {!isMobile && (
@@ -129,7 +131,7 @@ const ProductReviewTab = () => {
                 {/* Filter */}
                 <div className={`grid gap-4 border-b border-gray-300 pb-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
                     <div className={`${isMobile ? 'flex flex-row justify-between items-center' : 'col-span-6 flex flex-row justify-between'}`}>
-                        <p>All</p>
+                        <p>{t('all')}</p>
                         {[...reviewCount].reverse().map((item, index) => (
                             <div key={index} className='flex gap-1 items-center'>
                                 <p>{item.title}</p>
@@ -145,11 +147,11 @@ const ProductReviewTab = () => {
                     <div className={`${isMobile ? 'flex gap-4' : 'col-span-6 flex gap-8'}`}>
                         <div className="flex flex-row-reverse items-center gap-2">
                             <Checkbox id="pic" checked={showPic} onCheckedChange={(val) => setShowPic(!!val)} />
-                            <Label htmlFor="pic">pictures/video</Label>
+                            <Label htmlFor="pic">{t('picOrVid')}</Label>
                         </div>
                         <div className="flex flex-row-reverse items-center gap-2">
                             <Checkbox id="comments" checked={showComments} onCheckedChange={(val) => setShowComments(!!val)} />
-                            <Label htmlFor="comments">comments</Label>
+                            <Label htmlFor="comments">{t('comments')}</Label>
                         </div>
                     </div>
                 </div>

@@ -24,9 +24,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { toast } from 'sonner'
-import { useMe } from '@/features/auth/hook'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useGetCartItems } from '@/features/cart/hook'
 import { useRouter } from 'next/navigation'
 import {
     Drawer,
@@ -40,6 +38,7 @@ import {
 } from "@/components/ui/drawer"
 import ProductSearch from './product-search'
 import { getMe } from '@/features/auth/api'
+import { useTranslations } from 'next-intl'
 
 interface BannerProps {
     height?: number
@@ -50,6 +49,7 @@ const Banner = ({ height }: BannerProps) => {
     const queryClient = useQueryClient();
     const router = useRouter()
     const [isSticky, setIsSticky] = useState(false);
+    const t = useTranslations()
 
     const userId = typeof window !== "undefined" ? localStorage.getItem("id") : null;
 
@@ -119,11 +119,11 @@ const Banner = ({ height }: BannerProps) => {
                         {/*Language switch */}
                         <Select>
                             <SelectTrigger className={`w-[150px] text-white font-bold text-lg xl:border-0 border-2 border-white ${isPhone ? 'hidden' : ''}`}>
-                                <SelectValue placeholder="German" className='text-white' />
+                                <SelectValue placeholder={t('german')} className='text-white' />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="German" className='font-semibold '>German</SelectItem>
-                                <SelectItem value="English" className='font-semibold '>English</SelectItem>
+                                <SelectItem value="German" className='font-semibold '>{t('german')}</SelectItem>
+                                <SelectItem value="English" className='font-semibold '>{t('english')}</SelectItem>
                             </SelectContent>
                         </Select>
 
@@ -138,24 +138,24 @@ const Banner = ({ height }: BannerProps) => {
                                     <div>
                                         <Link href={'/login'} className='cursor-pointer'>
                                             <DropdownMenuItem className='cursor-pointer'>
-                                                Login
+                                                {t('login')}
                                             </DropdownMenuItem>
                                         </Link>
                                         <Link href={'/sign-up'} className='cursor-pointer'>
                                             <DropdownMenuItem className='cursor-pointer'>
-                                                Create an account
+                                                {t('createAccount')}
                                             </DropdownMenuItem>
                                         </Link>
                                     </div>
                                 ) : (
                                     <>
-                                        <DropdownMenuLabel>Hello, {user.last_name}</DropdownMenuLabel>
+                                        <DropdownMenuLabel>{t('greeting')}, {user.last_name}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={() => router.push('/account')}>
-                                            Account information
+                                            {t('accountInformation')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onClick={onLogout}>
-                                            Log out
+                                            {t('logout')}
                                         </DropdownMenuItem>
                                     </>
                                 )}
@@ -191,14 +191,14 @@ const Banner = ({ height }: BannerProps) => {
                     isPhone || height ? '' :
                         <div className="flex-1 flex flex-col justify-center items-center gap-6 xl:mt-12 mt-0 xl:px-0 px-4">
                             <h1 className="home-banner__title font-bold leading-tight flex xl:flex-row flex-col justify-center items-center xl:gap-4 gap-1">
-                                <span className="text-secondary text-4xl lg:text-6xl font-libre font-semibold">
-                                    WELCOME TO
+                                <span className="text-secondary text-4xl lg:text-6xl font-libre font-semibold uppercase">
+                                    {t('welcomeTo')}
                                 </span>
-                                <span className="text-primary text-4xl lg:text-6xl font-libre font-semibold">
+                                <span className="text-primary text-4xl lg:text-6xl font-libre font-semibold uppercase">
                                     PRESTIGE HOME
                                 </span>
                             </h1>
-                            <span className='text-white xl:text-3xl text-xl text-center font-medium'>THE PLACE YOU CAN FIND UNIQUE AND TRENDY PRODUCTS</span>
+                            <span className='text-white xl:text-3xl text-xl text-center font-medium uppercase'>{t('slogan')}</span>
                         </div>
                 }
             </div>

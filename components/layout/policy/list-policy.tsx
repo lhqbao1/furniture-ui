@@ -82,6 +82,7 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                         </div>
                     </Button>
                 </div>
+                <div className='text-xl text-secondary font-bold'>{policy?.legal_policies?.[currentPolicy]?.child_legal_policies?.[currentPolicyItem]?.label ?? ''}</div>
                 {policy?.legal_policies?.[currentPolicy]?.child_legal_policies?.[currentPolicyItem]?.content ? (
                     <div
                         dangerouslySetInnerHTML={{

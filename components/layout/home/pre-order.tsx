@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { preOrderItems } from '@/data/data'
 import { PreOrderProduct } from '@/types/products'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
@@ -9,13 +10,13 @@ import { useMediaQuery } from 'react-responsive'
 const PreOrder = () => {
     const [activeIndex, setActiveIndex] = useState(0) // thẻ đang ở giữa
     const [currentItem, setCurrentItem] = useState<PreOrderProduct | undefined>(preOrderItems[0])
-
+    const t = useTranslations()
     const isPhone = useMediaQuery({ maxWidth: 430 })
     return (
         <div className='section-padding'>
-            <h2 className='section-header'>Pre-Order</h2>
+            <h2 className='section-header'>{t('preOrder')}</h2>
             <p className='text-primary text-lg text-center font-semibold'>
-                start delivery from Sep 10 to Sep 15
+                {t('startDelivery')}
             </p>
 
             <div className='grid grid-cols-12 xl:min-h-[700px] min-h-0 translate-y-1/7 xl:translate-y-0'>

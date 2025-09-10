@@ -9,8 +9,10 @@ import FilterSection from '@/components/layout/single-product/filter-section'
 import { useGetAllProducts } from '@/features/products/hook'
 import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
 import { CustomPagination } from '@/components/shared/custom-pagination'
+import { useTranslations } from 'next-intl'
 
 export default function ShopAllPage() {
+    const t = useTranslations()
     const [page, setPage] = useState(1)
     const { data: products, isLoading, isError } = useGetAllProducts({ page })
     if (!products || isLoading) return <ProductGridSkeleton length={12} />
@@ -19,7 +21,7 @@ export default function ShopAllPage() {
         <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb />
             <div className=''>
-                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>Shop All</h2>
+                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{t('shopAll')}</h2>
                 {isLoading || isError || !products ?
                     <ProductGridSkeleton length={12} /> :
 

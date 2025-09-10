@@ -3,9 +3,6 @@ import CustomBreadCrumb from '@/components/shared/breadcrumb'
 import ProductVoucher from '@/components/shared/product-voucher'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { vouchers } from '@/data/data'
 import { Facebook, Heart, Instagram, Plus, Twitter, Youtube } from 'lucide-react'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
@@ -34,6 +31,8 @@ import { getProductById } from '@/features/products/api'
 import { VariantOptionResponse } from '@/types/variant'
 import { NewProductItem } from '@/types/products'
 import { useAddToWishList } from '@/features/wishlist/hook'
+import { Voucher } from '@/types/voucher'
+import { useTranslations } from 'next-intl'
 
 const ProductDetails = () => {
     const params = useParams()
@@ -41,6 +40,31 @@ const ProductDetails = () => {
     const slugArray = Array.isArray(params.slug) ? params.slug : [params.slug]
     const slug = slugArray[slugArray.length - 1]
     const [mainImageIndex, setMainImageIndex] = useState(0)
+    const t = useTranslations()
+
+    const vouchers: Voucher[] = [
+        {
+            id: 1,
+            title: t('voucher200'),
+            type: t('discount'),
+            discountAmount: 10,
+            code: 'MO200200'
+        },
+        {
+            id: 2,
+            title: t('voucher300'),
+            type: t('discount'),
+            discountAmount: 15,
+            code: 'MO300300'
+        },
+        {
+            id: 3,
+            title: t('voucher500'),
+            type: t('discount'),
+            discountAmount: 20,
+            code: 'MO500500'
+        }
+    ];
 
 
     // Form init
@@ -307,7 +331,7 @@ const ProductDetails = () => {
                                                 name="quantity"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Quantity</FormLabel>
+                                                        <FormLabel>{t('quantity')}</FormLabel>
                                                         <FormControl>
                                                             <FormNumberInput {...field} min={1} stepper={1} placeholder="1" />
                                                         </FormControl>
@@ -320,7 +344,7 @@ const ProductDetails = () => {
                                             className="rounded-full px-10 font-bold text-lg lg:basis-2/5 basis-3/5 relative"
                                             type="submit"
                                         >
-                                            Quick BUY
+                                            {t('quickBuy')}
                                             <div
                                                 onClick={(e) => {
                                                     e.preventDefault()

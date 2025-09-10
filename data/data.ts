@@ -5,6 +5,7 @@ import { Faqs } from "@/types/faqs";
 import { PreOrderProduct, Product } from "@/types/products";
 import { Voucher } from "@/types/voucher";
 import { Bed, Sofa, Table } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export const Categories: Category[] = [
     {
@@ -230,15 +231,6 @@ export const tags = [
     }
 ]
 
-
-export const collectionList: Collection[] = [
-    { id: 1, name: 'Interior', image: '/collection-1.jpg' },
-    { id: 2, name: 'Decoration', image: '/collection-2.jpg' },
-    { id: 3, name: 'Chair', image: '/collection-3.jpg' },
-    { id: 4, name: 'Sofa', image: '/collection-4.jpg' },
-    { id: 5, name: 'Furniture', image: '/collection-5.jpg' },
-]
-
 export const materials = ['Asset1.png', 'Asset2.png', 'Asset3.png', 'Asset4.png']
 export const colors = ['#28abe2', '#009244', '#c1282d', '#93278f']
 export const dimension = [
@@ -314,31 +306,6 @@ export const specialFeatures = ['waterproof', 'reclining', 'dustproof', 'natural
 export const originFilter = ['China (10-15 days)', 'Vietnam (7-10 days)', 'Thailand (12-17 days)', 'Malaysia (30-35 days)']
 export const spaceFilter = ['Living room', 'Dining room', 'Outdoor', 'Office']
 export const brands = ['Asset11.png', 'Asset12.png', 'Asset13.png']
-
-export const vouchers: Voucher[] = [
-    {
-        id: 1,
-        title: 'For all order from 200$',
-        type: 'Discount',
-        discountAmount: 10,
-        code: 'MO200200'
-    },
-    {
-        id: 2,
-        title: 'For all order from 300$',
-        type: 'Discount',
-        discountAmount: 15,
-        code: 'MO300300'
-    },
-    {
-        id: 3,
-        title: 'For all order from 500$',
-        type: 'Discount',
-        discountAmount: 20,
-        code: 'MO500500'
-    }
-
-]
 
 export const faqs: Faqs[] = [
     {

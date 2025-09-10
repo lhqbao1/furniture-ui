@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import AnimatedCarouselSkeleton from "./3d-carousel-skeleton";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const TAU = Math.PI * 2;
 
@@ -25,6 +26,8 @@ const AnimatedCarousel = () => {
     // Responsive breakpoints
     const isMobile = useMediaQuery({ maxWidth: 430 }); // iPhone 12 Pro và nhỏ hơn
     const isTablet = useMediaQuery({ minWidth: 431, maxWidth: 768 });
+    const t = useTranslations()
+
 
     // Các thông số carousel thay đổi theo kích thước màn hình
     const radius = isMobile ? 350 : isTablet ? 500 : 600;
@@ -78,7 +81,7 @@ const AnimatedCarousel = () => {
     return (
         <div className="flex flex-col section-padding">
             <h2 className="section-header mb-6">
-                Categories
+                {t('categories')}
             </h2>
             {!categories || isLoading || isError ?
                 <AnimatedCarouselSkeleton />
@@ -134,7 +137,7 @@ const AnimatedCarousel = () => {
                                                 hasEffect
                                                 onClick={() => router.push(`/`)}
                                             >
-                                                Explore now
+                                                {t('exploreNow')}
                                             </Button>
                                         </div>
                                     )}

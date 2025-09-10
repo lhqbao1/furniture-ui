@@ -97,6 +97,7 @@ import {
 import ProductReviewTab from "./tabs/review"
 import QASection from "./tabs/q&a"
 import { NewProductItem } from "@/types/products"
+import { useTranslations } from 'next-intl'
 
 interface ProductDetailsTabProps {
   product?: NewProductItem
@@ -104,11 +105,12 @@ interface ProductDetailsTabProps {
 
 export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
   const isMobile = useMediaQuery({ maxWidth: 640 }) // mobile breakpoint
+  const t = useTranslations()
 
   const sections = [
-    { value: "description", label: "Description", content: <div dangerouslySetInnerHTML={{ __html: product?.description ?? "" }} /> },
-    { value: "shipping", label: "Shipping", content: <div>Shipping info here</div> },
-    { value: "review", label: "Review", content: <ProductReviewTab /> },
+    { value: "description", label: t('description'), content: <div dangerouslySetInnerHTML={{ __html: product?.description ?? "" }} /> },
+    { value: "shipping", label: t('shipping'), content: <div>Shipping info here</div> },
+    { value: "review", label: t('review'), content: <ProductReviewTab /> },
     { value: "q&a", label: "Q&A", content: <QASection /> },
   ]
 

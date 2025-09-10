@@ -3,11 +3,12 @@ import WishlistTable from '@/components/layout/wishlist/table'
 import CustomBreadCrumb from '@/components/shared/breadcrumb'
 import { useGetWishlist } from '@/features/wishlist/hook'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 const WishList = () => {
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
-
+    const t = useTranslations()
     const { data: wishlist, isLoading, isError } = useGetWishlist()
 
 
@@ -23,7 +24,7 @@ const WishList = () => {
     return (
         <div className='pt-3 xl:pb-16 pb-6 space-y-4'>
             <CustomBreadCrumb currentPage='wishlist' />
-            <h1 className='text-secondary text-5xl font-bold text-center font-libre'>Wishlist</h1>
+            <h1 className='text-secondary text-5xl font-bold text-center font-libre'>{t('wishlist')}</h1>
 
             {isLoading && (
                 <div className='flex w-full justify-center'>
@@ -33,7 +34,7 @@ const WishList = () => {
 
             {isError && (
                 <div className='text-center text-red-500 text-lg'>
-                    You need to login
+                    {t('YouNeedToLogin')}
                 </div>
             )}
 
@@ -43,6 +44,7 @@ const WishList = () => {
                     localQuantities={localQuantities}
                     setLocalQuantities={setLocalQuantities}
                     total={total}
+                    currentTable={t('wishlistProducts')}
                 />
             )}
         </div>

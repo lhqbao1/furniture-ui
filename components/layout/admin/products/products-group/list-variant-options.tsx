@@ -47,6 +47,8 @@ const ListVariantOption = () => {
                 id: o.id,
                 label: o.label,
                 image_url: o.image_url,
+                img_description: o.img_description,
+                is_global: o.is_global
             }));
         });
 
@@ -97,7 +99,7 @@ const ListVariantOption = () => {
         return cartesian(optionsList);
     };
 
-    const handleAddVariantOption = (variant_id: string, input: { label: string, image_url?: string | null }) => {
+    const handleAddVariantOption = (variant_id: string, input: { label: string, image_url?: string | null, is_global: boolean, img_description?: string | null }) => {
         // Convert sang VariantOptionInput
         const payload: VariantOptionInput = {
             options: [input],

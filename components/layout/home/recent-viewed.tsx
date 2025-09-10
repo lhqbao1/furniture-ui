@@ -1,18 +1,23 @@
 'use client'
+import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
 import ProductsGridLayout from '@/components/shared/products-grid-layout'
 import { useGetAllProducts } from '@/features/products/hook'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 const RecentViewed = () => {
-    const { data: products, isLoading, isError } = useGetAllProducts()
-    if (isLoading) return <div>Loading...</div>
-    if (isError) return <div className="text-red-500">❌ Failed to load products.</div>
-    if (!products) return <div className="text-red-500">No products found.</div>
+    const t = useTranslations()
 
+    const { data: products, isLoading, isError } = useGetAllProducts()
     return (
         <div className='section-padding'>
-            <h2 className='section-header'>Recent Viewed</h2>
-            <ProductsGridLayout data={products.items} />
+            <h2 className='section-header'>{t('recentViewed')}</h2>
+            {isLoading || isError || !products ?
+                <ProductGridSkeleton />
+                :
+                <ProductsGridLayout data={products.items} />
+
+            }
         </div>
     )
 }

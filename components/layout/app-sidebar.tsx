@@ -17,6 +17,7 @@ import { Button } from "../ui/button"
 import Link from "next/link"
 import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
+import { useTranslations } from "next-intl"
 
 type MenuItem = {
     title: string;
@@ -29,6 +30,7 @@ export function AppSidebar() {
     const [open, setOpen] = useState(false)
     const [openItem, setOpenItem] = useState<string | null>(null)
     const { data: categories, isLoading, isError } = useGetCategories()
+    const t = useTranslations()
 
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
         return categories.map((category) => ({
@@ -42,23 +44,22 @@ export function AppSidebar() {
     const pathname = usePathname()
     const router = useRouter()
     const items = [
-        { title: "Home", url: "/", icon: '/side-home.png' },
-        { title: "Shop All", url: "/shop-all", icon: '/shop-all.png' },
-        { title: "Best Seller", url: "/best-seller", icon: '/side-best.png' },
-        { title: "Flash Sale", url: "/flash-sale", icon: '/side-sale.png' },
+        { title: t('home'), url: "/", icon: '/side-home.png' },
+        { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png' },
+        { title: t('bestSeller'), url: "/best-seller", icon: '/side-best.png' },
+        { title: t('flashSale'), url: "/flash-sale", icon: '/side-sale.png' },
         {
-            title: "Categories",
+            title: t('categories'),
             url: "#",
             icon: '/side-category.png',
             children: categories && categories.length > 0 ? mapCategories(categories) : undefined
         },
-        { title: "Viewed", url: "/recent-viewed", icon: '/side-view.png' },
-        { title: "Wishlist", url: "/wishlist", icon: '/side-wishlist.png' },
-        { title: "Cart", url: "/cart", icon: '/side-cart.png' },
-        { title: "Order", url: "/my-order", icon: '/side-order.png' },
-        { title: "Account", url: "/account", icon: '/side-account.png' },
+        { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png' },
+        { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png' },
+        { title: t('cart'), url: "/cart", icon: '/side-cart.png' },
+        { title: t('order'), url: "/my-order", icon: '/side-order.png' },
+        { title: t('account'), url: "/account", icon: '/side-account.png' },
     ]
-
 
     return (
         <Sidebar className="app-sidebar custom-scroll" collapsible="icon">
