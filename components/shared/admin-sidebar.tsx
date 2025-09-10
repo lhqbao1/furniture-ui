@@ -9,6 +9,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
@@ -16,13 +17,13 @@ import { usePathname, useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { useState } from "react"
+import { useMediaQuery } from "react-responsive"
 
 export function AdminSideBar() {
     const router = useRouter()
     const pathname = usePathname()
     const [open, setOpen] = useState(false)
     const [openItem, setOpenItem] = useState<string | null>(null)
-
     const items = [
         {
             title: "Products",

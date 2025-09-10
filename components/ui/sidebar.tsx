@@ -284,9 +284,9 @@ function SidebarTrigger({
         <AlignJustify size={24} className="size-6" stroke="#00B159" /> // icon when open
         :
         isOpen ? (
-          <ToggleRight size={24} className="size-8" stroke="black" /> // icon when open
+          <ToggleRight size={24} className="size-8" stroke="#00B159" /> // icon when open
         ) : (
-          <ToggleLeft size={24} className="size-8" stroke="black" /> // icon when closed
+          <ToggleLeft size={24} className="size-8" stroke="#00B159" /> // icon when closed
         )
       }
 
@@ -361,10 +361,12 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
+  const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
   return (
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
+      data-state={state}
       className={cn("flex flex-col gap-2 p-2", className)}
       {...props}
     />

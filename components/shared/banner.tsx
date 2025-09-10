@@ -39,6 +39,7 @@ import {
 import ProductSearch from './product-search'
 import { getMe } from '@/features/auth/api'
 import { useTranslations } from 'next-intl'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface BannerProps {
     height?: number
@@ -191,7 +192,9 @@ const Banner = ({ height }: BannerProps) => {
                         <div className={`${isPhone ? 'block' : 'hidden'}`}>
                             <ShoppingCart stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
                         </div>
-                        <SidebarTrigger className={`border-none text-primary  ${isPhone ? 'relative' : 'absolute xl:top-2 xl:left-2 top-4 left-3 cursor-pointer z-20 bg-white'}`} isMobile={isPhone ? true : false} />
+                        {isPhone ?
+                            <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
+                            : ''}
                     </div>
                 </div>
 

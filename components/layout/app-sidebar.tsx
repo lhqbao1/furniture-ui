@@ -4,11 +4,13 @@ import { ChevronDown } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
@@ -18,6 +20,7 @@ import Link from "next/link"
 import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
 import { useTranslations } from "next-intl"
+import { useMediaQuery } from "react-responsive"
 
 type MenuItem = {
     title: string;
@@ -31,6 +34,8 @@ export function AppSidebar() {
     const [openItem, setOpenItem] = useState<string | null>(null)
     const { data: categories, isLoading, isError } = useGetCategories()
     const t = useTranslations()
+    const isPhone = useMediaQuery({ maxWidth: 650 })
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
         return categories.map((category) => ({
@@ -62,9 +67,10 @@ export function AppSidebar() {
     ]
 
     return (
-        <Sidebar className="app-sidebar custom-scroll" collapsible="icon">
+        <Sidebar className="app-sidebar custom-scroll" collapsible="icon"
+        >
             <SidebarContent>
-                <SidebarGroup>
+                <SidebarGroup className="h-full relative">
                     <Link href={'/'}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
                             <Image
@@ -143,7 +149,6 @@ export function AppSidebar() {
                                                             >
                                                                 <span>{child.title}</span>
 
-                                                                {/* chỉ render indicator nếu Collapsible mở */}
                                                                 {open && isChildActive && (
                                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>
                                                                 )}
@@ -192,6 +197,9 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+            <SidebarFooter className="data-[state=collapsed]:items-center data-[state=expanded]:items-end">
+                <SidebarTrigger className={`cursor-pointer bg-transparent border-none text-secondary`} />
+            </SidebarFooter>
         </Sidebar>
     )
 }
