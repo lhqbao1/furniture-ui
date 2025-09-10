@@ -2,12 +2,25 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { useGetCartItems } from "@/features/cart/hook"
 import { useRouter } from "next/navigation"
+import { getCartItems } from "@/features/cart/api"
+import { useQuery } from "@tanstack/react-query"
 
 export default function StickyIcon() {
     const wrapperRef = useRef<HTMLDivElement | null>(null)
-    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartItems()
+    const userId = typeof window !== "undefined" ? localStorage.getItem("id") : null;
+
+    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
+        queryKey: ["cart-items", userId],
+        queryFn: async () => {
+            const data = await getCartItems()
+            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            return data
+        },
+        enabled: !!userId,
+        retry: false,
+    })
+
     const router = useRouter()
 
     useEffect(() => {

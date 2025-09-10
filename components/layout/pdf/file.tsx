@@ -111,9 +111,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => (
                         <Text style={{ width: 50, textAlign: 'center' }}>{index + 1}</Text>
                         <Text style={{ width: 100, textAlign: 'left' }}>
                             <Text>{item.products.name}</Text>
+                            <Text style={{ marginTop: 5, textAlign: 'left' }}>{item.products.id_provider}</Text>
                         </Text>
-                        <Text style={styles.tableCol}>{item.products.id_provider}</Text>
-                        <Text style={styles.tableCol}>€{item.item_price}</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, textAlign: 'right' }}>€{item.item_price}</Text>
                         <Text style={styles.tableColQuantity}>{item.quantity}</Text>
                         <Text style={styles.tableCol}>19%</Text>
                         <Text style={styles.tableCol}>€{item.final_price}</Text>

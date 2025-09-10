@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { toast } from 'sonner'
 import { useMe } from '@/features/auth/hook'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useGetCartItems } from '@/features/cart/hook'
 import { useRouter } from 'next/navigation'
 import {
@@ -39,6 +39,7 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 import ProductSearch from './product-search'
+import { getMe } from '@/features/auth/api'
 
 interface BannerProps {
     height?: number
@@ -50,12 +51,18 @@ const Banner = ({ height }: BannerProps) => {
     const router = useRouter()
     const [isSticky, setIsSticky] = useState(false);
 
+    const userId = typeof window !== "undefined" ? localStorage.getItem("id") : null;
 
-    const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useMe()
+    const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useQuery({
+        queryKey: ["me", userId],
+        queryFn: () => getMe(),
+        enabled: !!userId,
+        retry: false,
+    });
 
     const onLogout = () => {
         localStorage.removeItem("access_token");
-        localStorage.removeItem("id");
+        localStorage.removeItem("userId");
         toast.success("Logged out successfully")
         // Reset react-query cache
         queryClient.invalidateQueries({ queryKey: ["me"] }); // xóa dữ liệu user cũ
