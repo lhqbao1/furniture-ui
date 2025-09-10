@@ -48,7 +48,7 @@ export function AdminSideBar() {
             url: "/admin/crm",
             icon: ChevronRight,
             children: [
-                { title: "Customer List", url: "/admin/crm/customers", icon: CornerDownRight },
+                { title: "Customer List", url: "/admin/crm/customers/list", icon: CornerDownRight },
             ],
         },
     ];

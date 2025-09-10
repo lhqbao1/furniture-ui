@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { User } from "@/types/user"
-import { getUserById, updateUser } from "./api"
+import { getAllCustomers, getUserById, updateUser } from "./api"
 
 export function useGetUserById(userId: string) {
   return useQuery<User>({
@@ -19,4 +19,12 @@ export function useUpdateUser() {
         qc.refetchQueries({ queryKey: ["user", variables.id] })
       },
     })
+}
+
+export function useGetAllCustomers(){
+    return useQuery({
+       queryKey: ["customers"],
+       queryFn: () => getAllCustomers(),
+       retry: false,
+     })
 }

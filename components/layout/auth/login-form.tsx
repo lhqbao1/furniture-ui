@@ -6,14 +6,13 @@ import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Chrome, Facebook, Mail, Key, Loader2 } from "lucide-react"
+import { Chrome, Facebook, Mail, Key, Loader2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useLogin, useLoginAdmin } from "@/features/auth/hook"
-import { useAtom } from "jotai"
-import { userIdAtom } from "@/store/auth"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import Image from "next/image"
+import { useState } from "react"
 
 const formSchema = z.object({
     username: z
@@ -40,7 +39,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     // const [userId, setUserId] = useAtom(userIdAtom)
-
+    const [seePassword, setSeePassword] = useState(false)
     const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -141,7 +140,10 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                                 <FormControl>
                                     <div className="relative">
                                         <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                                        <Input type="password" placeholder="Password" {...field} className="pl-12 py-3 h-fit" />
+                                        {seePassword === false ?
+                                            <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(true)} /> :
+                                            <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(false)} />}
+                                        <Input type={seePassword ? 'text' : 'password'} placeholder="Password" {...field} className="pl-12 py-3 h-fit" />
                                     </div>
                                 </FormControl>
                                 <FormMessage />

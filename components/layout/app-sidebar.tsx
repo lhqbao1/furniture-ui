@@ -35,7 +35,7 @@ export function AppSidebar() {
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
         return categories.map((category) => ({
             title: category.name,
-            url: `/${category.name.toLowerCase()}`,
+            url: `/product/${category.name.toLowerCase()}`,
             icon: category.img_url,
             children: category.children ? mapCategories(category.children) : undefined
         }));
@@ -46,8 +46,8 @@ export function AppSidebar() {
     const items = [
         { title: t('home'), url: "/", icon: '/side-home.png' },
         { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png' },
-        { title: t('bestSeller'), url: "/best-seller", icon: '/side-best.png' },
-        { title: t('flashSale'), url: "/flash-sale", icon: '/side-sale.png' },
+        { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png' },
+        { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png' },
         {
             title: t('categories'),
             url: "#",

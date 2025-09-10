@@ -206,11 +206,11 @@ function ImagePickerInput<T extends FieldValues>({
                 )}
                 {!isSimple && (
                     <>
-                        <p className="text-gray-500 dark:text-gray-400 text-center">
+                        <div className="text-gray-500 dark:text-gray-400 text-center">
                             {isDragActive
                                 ? <div>{t('dragFile')}</div>
                                 : <div>{t('dragAndDropFile')}</div>}
-                        </p>
+                        </div>
                         {description && (
                             <p className="text-gray-500 text-sm text-center">{description}</p>
                         )}

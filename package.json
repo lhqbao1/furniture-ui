@@ -54,6 +54,7 @@
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.62.0",
     "react-number-format": "^5.4.4",
+    "react-phone-input-2": "^2.15.1",
     "react-quill-new": "^3.6.0",
     "react-responsive": "^10.0.1",
     "react-youtube": "^10.1.0",

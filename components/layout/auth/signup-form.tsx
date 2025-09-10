@@ -4,7 +4,8 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-
+import PhoneInput from "react-phone-input-2"
+import "react-phone-input-2/lib/style.css"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -12,7 +13,7 @@ import Image from "next/image"
 import { useSignUp } from "@/features/auth/hook"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Loader2 } from "lucide-react"
+import { Eye, EyeOff, Key, Loader2 } from "lucide-react"
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -38,6 +39,8 @@ const formSchema = z.object({
 })
 
 export default function SignUpForm() {
+  const [seePassword, setSeePassword] = React.useState(false)
+
   const signUp = useSignUp()
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,7 +53,7 @@ export default function SignUpForm() {
       password: "",
       confirmPassword: "",
     },
-    mode: "onBlur",
+    mode: "onSubmit",
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -110,7 +113,13 @@ export default function SignUpForm() {
               <FormItem>
                 <FormLabel>Mobile</FormLabel>
                 <FormControl>
-                  <Input placeholder="+49" {...field} />
+                  <PhoneInput
+                    country={'de'} // default Germany
+                    value={field.value}
+                    onChange={(phone) => field.onChange(phone)}
+                    inputStyle={{ fontSize: '16px', borderRadius: 6, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", borderColor: '#e5e5e5' }}
+                  />
+                  {/* <Input placeholder="+49" {...field} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -121,7 +130,7 @@ export default function SignUpForm() {
             name="first_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name</FormLabel>
+                <FormLabel className="">First Name</FormLabel>
                 <FormControl>
                   <Input placeholder="John" {...field} />
                 </FormControl>
@@ -149,7 +158,13 @@ export default function SignUpForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <div className="relative">
+                    <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                    {seePassword === false ?
+                      <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(true)} /> :
+                      <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(false)} />}
+                    <Input type={seePassword ? 'text' : 'password'} placeholder="Password" {...field} className="pl-12 py-3 h-fit" />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -162,7 +177,13 @@ export default function SignUpForm() {
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <div className="relative">
+                    <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                    {seePassword === false ?
+                      <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(true)} /> :
+                      <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(false)} />}
+                    <Input type={seePassword ? 'text' : 'password'} placeholder="Password" {...field} className="pl-12 py-3 h-fit" />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
