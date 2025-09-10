@@ -10,7 +10,7 @@ const RecentViewed = () => {
 
     const { data: products, isLoading, isError } = useGetAllProducts()
     return (
-        <div className='section-padding'>
+        <div className='section-padding lg:mt-0 mt-40'>
             <h2 className='section-header'>{t('recentViewed')}</h2>
             {isLoading || isError || !products ?
                 <ProductGridSkeleton />

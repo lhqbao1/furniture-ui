@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
     Drawer,
     DrawerClose,
@@ -47,9 +47,10 @@ interface BannerProps {
 const Banner = ({ height }: BannerProps) => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
     const queryClient = useQueryClient();
-    const router = useRouter()
     const [isSticky, setIsSticky] = useState(false);
     const t = useTranslations()
+    const router = useRouter()
+    const pathname = usePathname()
 
     const userId = typeof window !== "undefined" ? localStorage.getItem("id") : null;
 
@@ -117,15 +118,28 @@ const Banner = ({ height }: BannerProps) => {
 
                     <div className={`flex h-full items-center justify-end gap-4 ${isPhone ? 'w-full' : 'flex-0 pt-4 pr-4'}`}>
                         {/*Language switch */}
-                        <Select>
+                        <Select
+                            defaultValue="de"
+                            onValueChange={(value) => {
+                                if (value === "de") {
+                                    const path = pathname.startsWith('/en') ? pathname.replace('/en', '') : pathname
+                                    router.push(path)
+                                } else if (value === "en") {
+                                    const path = pathname.startsWith('/en') ? pathname : `/en${pathname}`
+                                    router.push(path)
+                                }
+                            }}
+                        >
                             <SelectTrigger className={`w-[150px] text-white font-bold text-lg xl:border-0 border-2 border-white ${isPhone ? 'hidden' : ''}`}>
                                 <SelectValue placeholder={t('german')} className='text-white' />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="German" className='font-semibold '>{t('german')}</SelectItem>
-                                <SelectItem value="English" className='font-semibold '>{t('english')}</SelectItem>
+                                <SelectItem value="de" className='font-semibold'>{t('german')}</SelectItem>
+                                <SelectItem value="en" className='font-semibold'>{t('english')}</SelectItem>
                             </SelectContent>
                         </Select>
+
+
 
                         {/*User */}
                         <DropdownMenu>

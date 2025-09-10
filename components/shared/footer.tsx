@@ -39,7 +39,7 @@ const Footer = () => {
             </div>
 
             {/* Cột 4: Bản đồ + Social */}
-            <div className="lg:col-span-1 col-span-2 flex lg:items-center lg:justify-center lg:flex-col flex-row">
+            <div className="lg:col-span-1 col-span-2 flex lg:items-center lg:justify-center lg:flex-col flex-row justify-center">
                 <h3 className="font-semibold mb-3 hidden md:block">{t('contact')}</h3>
                 <div className="flex gap-3 mt-3">
                     <Image

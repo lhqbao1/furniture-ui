@@ -86,7 +86,10 @@ const AnimatedCarousel = () => {
             {!categories || isLoading || isError ?
                 <AnimatedCarouselSkeleton />
                 :
-                <div className="relative w-full xl:h-[600px] h-[300px] xl:min-h-[500px] [perspective:2000px] [transform-style:preserve-3d]">
+                <div className="relative w-full xl:h-[600px] h-[300px] xl:min-h-[500px]" style={{
+                    perspective: 2000,
+                    transformStyle: 'preserve-3d',
+                }}>
                     {categories.slice(0, 8).map((item, index) => {
                         const angle = index * angleStep + rotation;
 
