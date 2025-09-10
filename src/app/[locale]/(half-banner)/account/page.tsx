@@ -8,7 +8,9 @@ const AccountPage = async () => {
             <div>
                 <CustomBreadCrumb currentPage="Account" />
             </div>
-            <AccountForm />
+            <div className='lg:px-30'>
+                <AccountForm />
+            </div>
         </div>
     )
 }

@@ -12,7 +12,9 @@ const GroupDetails = () => {
         <div className='flex flex-col items-start gap-6 w-full'>
             <div className="grid grid-cols-6 w-full gap-8">
                 <p className='col-span-1 text-right'>Group name:</p>
-                <span className='font-semibold col-span-5'>{currentGroup ? currentGroup : 'None'}</span>
+                <div className='flex gap-4 items-center'>
+                    <span className='font-semibold col-span-5'>{currentGroup ? currentGroup : 'None'}</span>
+                </div>
             </div>
             <div className='w-full space-y-6'>
                 <SelectProductAttributes />

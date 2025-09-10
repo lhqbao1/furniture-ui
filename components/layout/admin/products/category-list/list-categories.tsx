@@ -69,13 +69,13 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                             <div className="flex items-center gap-1 col-span-3">
                                 {category.level === 1 ? (
                                     <ChevronRight
-                                        stroke="#51BE8C"
+                                        stroke="#00B159"
                                         className={`transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`}
                                         size={18}
                                     />
                                 ) : (
                                     <CornerDownRight
-                                        stroke="#51BE8C"
+                                        stroke="#00B159"
                                         className={`transition-transform duration-300 ${isOpen ? "text-primary translate-x-1" : ""}`}
                                         size={18}
                                     />
@@ -109,7 +109,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                     onClick={handleClick}
                 >
                     <div className="flex gap-1 items-center col-span-3">
-                        <ChevronRight stroke="#51BE8C" size={18} />
+                        <ChevronRight stroke="#00B159" size={18} />
                         {category.name}
                     </div>
                     <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">

@@ -281,7 +281,7 @@ function SidebarTrigger({
       {...props}
     >
       {isMobile ?
-        <AlignJustify size={24} className="size-6" stroke="#51BE8C" /> // icon when open
+        <AlignJustify size={24} className="size-6" stroke="#00B159" /> // icon when open
         :
         isOpen ? (
           <ToggleRight size={24} className="size-8" stroke="black" /> // icon when open

@@ -9,7 +9,7 @@ import {
     BreadcrumbPage,
 } from "@/components/ui/breadcrumb"
 import { Home } from "lucide-react"
-import { useParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
 import React from "react"
 
 interface CustomBreadCrumbProps {
@@ -20,8 +20,7 @@ interface CustomBreadCrumbProps {
 export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomBreadCrumbProps) {
     const params = useParams()
     const { slug } = params
-
-    console.log(params)
+    const pathName = usePathname()
 
     // Normalize slug thành array
     const slugArray: string[] = slug
@@ -32,7 +31,7 @@ export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomB
 
     return (
         <Breadcrumb className="pt-2">
-            <BreadcrumbList>
+            <BreadcrumbList className="">
                 {/* Home */}
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/"><Home /></BreadcrumbLink>

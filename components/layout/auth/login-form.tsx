@@ -101,7 +101,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             <div className="flex flex-col items-center mb-12 gap-3">
                 {/* Logo giả */}
                 <Image
-                    src={'/new-logo.png'}
+                    src={'/new-logo.svg'}
                     width={100}
                     height={100}
                     alt=""

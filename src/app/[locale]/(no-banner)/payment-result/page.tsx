@@ -102,7 +102,7 @@ const OrderPlaced = () => {
         <div className='w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10'>
             <div className="px-5 py-6 flex flex-col items-center gap-3">
                 <Image
-                    src="/new-logo.png"
+                    src="/new-logo.svg"
                     alt="Prestige Home logo"
                     width={100}
                     height={100}

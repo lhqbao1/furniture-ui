@@ -17,19 +17,19 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-interface DataTableProps<TData, TValue> {
+interface FileTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
     voucher?: number
     coupon?: number
 }
 
-export function DataTable<TData, TValue>({
+export function FileTable<TData, TValue>({
     columns,
     data,
     voucher,
     coupon
-}: DataTableProps<TData, TValue>) {
+}: FileTableProps<TData, TValue>) {
     const table = useReactTable({
         data,
         columns,

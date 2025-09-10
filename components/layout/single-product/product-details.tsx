@@ -57,13 +57,6 @@ const ProductDetails = () => {
             discountAmount: 15,
             code: 'MO300300'
         },
-        {
-            id: 3,
-            title: t('voucher500'),
-            type: t('discount'),
-            discountAmount: 20,
-            code: 'MO500500'
-        }
     ];
 
 
@@ -191,7 +184,7 @@ const ProductDetails = () => {
     const handleSelectVoucher = (item: number) => setSelectedVoucher(item)
 
     return (
-        <div className='py-3'>
+        <div className='py-3 lg:px-30 lg:pt-6'>
             <CustomBreadCrumb isProductPage />
             {!isLoadingProduct && productDetails && !isErrorProduct ?
                 <FormProvider {...form}>
@@ -242,7 +235,7 @@ const ProductDetails = () => {
                                                                 width={100}
                                                                 height={100}
                                                                 alt=''
-                                                                className={` ${mainImageIndex === index && 'border-2 border-primary p-2 rounded-md object-cover lg:min-h-[80px]'}`}
+                                                                className={` ${mainImageIndex === index && 'border-2 border-primary p-2 rounded-md object-cover'} lg:h-[80px] object-fill`}
                                                             />
                                                         </div>
                                                     </CarouselItem>
@@ -256,7 +249,7 @@ const ProductDetails = () => {
 
                                 {/*Product details */}
                                 <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
-                                    <h2 className='lg:text-3xl text-xl font-semibold text-secondary'>{productDetails.name}</h2>
+                                    <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
                                     <div className='flex gap-2'>
                                         <p className='text-primary lg:text-3xl text-xl font-semibold'>€{productDetails.final_price.toFixed(2)}</p>
                                         <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>€{productDetails.price.toFixed(2)}</p>

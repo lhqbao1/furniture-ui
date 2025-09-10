@@ -149,8 +149,10 @@
 }
 
 @theme static {
-  --color-primary: #FAA61A;
-  --color-secondary: #51BE8C;
+  /* --color-primary: #FAA61A;
+  --color-secondary: #51BE8C; */
+  --color-primary: #F7941D;
+  --color-secondary: #00B159;
 }
 
 

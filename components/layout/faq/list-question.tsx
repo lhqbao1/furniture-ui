@@ -37,8 +37,8 @@ export function ListFAQQuestion({ question }: ListFAQQuestionProps) {
                                 </p>
                             </div>
                             <div className="flex justify-end gap-2">
-                                <ThumbsUp stroke={`${isLike ? '#51BE8C' : '#666666'}`} strokeWidth={isLike ? 2 : 1} className={`cursor-pointer`} onClick={() => setIsLike(true)} />
-                                <ThumbsDown stroke={`${!isLike ? '#FAA61A' : '#666666'}`} strokeWidth={!isLike ? 2 : 1} className="cursor-pointer" onClick={() => setIsLike(false)} />
+                                <ThumbsUp stroke={`${isLike ? '#00B159' : '#666666'}`} strokeWidth={isLike ? 2 : 1} className={`cursor-pointer`} onClick={() => setIsLike(true)} />
+                                <ThumbsDown stroke={`${!isLike ? '#F7941D' : '#666666'}`} strokeWidth={!isLike ? 2 : 1} className="cursor-pointer" onClick={() => setIsLike(false)} />
                             </div>
                         </AccordionContent>
                     </AccordionItem>

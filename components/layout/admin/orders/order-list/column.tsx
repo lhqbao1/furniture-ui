@@ -10,6 +10,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Label } from "@/components/ui/label"
 import { Eye, File } from "lucide-react"
 import Link from "next/link"
+import ViewFileDialog from "./view-file"
 
 
 export const orderColumns: ColumnDef<CheckOut>[] = [
@@ -60,14 +61,8 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="h-12 relative">
-                    {/* {image ? (
-                        <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px"
-                        />
-                    ) : (
-                        <div className="w-12 h-12 bg-gray-200 rounded-md" />
-                    )} */}
-                    <Image src={'/amazon.png'} alt="icon" fill className="object-contain px-4" />
+                <div className="h-8 relative">
+                    <Image src={'/new-logo.svg'} alt="icon" fill className="object-contain px-4" />
                 </div>
             )
         },
@@ -162,36 +157,8 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex gap-1 items-center justify-end">
-                    <div className={`${row.original.total_amount < 0 ? 'text-red-500' : 'text-[#4D4D4D]'}`}>€{row.original.total_amount}</div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="ghost" className="p-0">
-                                <File />
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="">
-                            <DialogHeader>
-                                <DialogTitle>Share link</DialogTitle>
-                                <DialogDescription>
-                                    Anyone who has this link will be able to view this.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="flex items-center gap-2">
-                                <div className="grid flex-1 gap-2">
-                                    <Label htmlFor="link" className="sr-only">
-                                        Link
-                                    </Label>
-                                </div>
-                            </div>
-                            <DialogFooter className="sm:justify-start">
-                                <DialogClose asChild>
-                                    <Button type="button" variant="secondary">
-                                        Close
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <div className={`${row.original.total_amount < 0 ? 'text-red-500' : 'text-[#4D4D4D]'}`}>€{row.original.total_amount.toFixed(2)}</div>
+                    <ViewFileDialog checkoutId={row.original.id} />
                 </div>
             )
         }
@@ -204,7 +171,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
                 <div className="flex justify-center">
                     <Link href={`/admin/orders/${row.original.id}`}>
                         <Button variant="ghost" size="icon">
-                            <Eye className="w-4 h-4" stroke="#FAA61A" />
+                            <Eye className="w-4 h-4" stroke="#F7941D" />
                         </Button>
                     </Link>
                 </div>

@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     tableColQuantity: { flex: 1, textAlign: 'center' },
     tableColName: { flex: 1 },
     title: {
-        fontSize: 20, marginBottom: 20, textAlign: "center", color: '#51BE8C'
+        fontSize: 20, marginBottom: 20, textAlign: "center", color: '#00B159'
     },
     footer: { marginTop: 50, display: 'flex', justifyContent: 'space-between', flexDirection: "row", fontSize: 9 },
     bold: { fontWeight: "bold" },
@@ -71,7 +71,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => (
         <Page size="A4" style={styles.page}>
             {/* Header Logo */}
             <View style={styles.section}>
-                <Image src="/new-logo.png" style={{ width: 80, height: 70 }} />
+                <Image src="/new-logo.svg" style={{ width: 80, height: 70 }} />
             </View>
 
             {/* Customer & Invoice Info */}

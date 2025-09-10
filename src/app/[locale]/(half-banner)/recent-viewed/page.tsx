@@ -18,7 +18,7 @@ export default function ViewProductPage() {
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
-            <CustomBreadCrumb />
+            <CustomBreadCrumb currentPage='Recent Viewed' />
             <div className=''>
                 <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{t('viewedProduct')}</h2>
                 {isLoading || isError || !products || products.items.length === 0 ?

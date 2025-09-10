@@ -14,12 +14,13 @@ import { useTranslations } from 'next-intl'
 export default function ShopAllPage() {
     const t = useTranslations()
     const [page, setPage] = useState(1)
-    const { data: products, isLoading, isError } = useGetAllProducts({ page })
+    const [pageSize, setPageSize] = useState(40)
+    const { data: products, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize })
     if (!products || isLoading) return <ProductGridSkeleton length={12} />
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
-            <CustomBreadCrumb />
+            <CustomBreadCrumb currentPage='Shop All' />
             <div className=''>
                 <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{t('shopAll')}</h2>
                 {isLoading || isError || !products ?

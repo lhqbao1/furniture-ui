@@ -77,7 +77,7 @@ export function AdminSideBar() {
                     <Link href={'/'}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
                             <Image
-                                src="/new-logo.png"
+                                src="/new-logo.svg"
                                 alt="Prestige Home logo"
                                 width={100}
                                 height={100}
@@ -152,7 +152,7 @@ export function AdminSideBar() {
                                                                 <child.icon
                                                                     size={24}
                                                                     className="!size-5"
-                                                                    stroke="#51BE8C"
+                                                                    stroke="#00B159"
                                                                 />
                                                                 <span>{child.title}</span>
 

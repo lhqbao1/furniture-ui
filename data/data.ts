@@ -362,12 +362,12 @@ export const faqs: Faqs[] = [
 export const listDE = [
     {
         id:1,
-        icon: '/new-logo.png',
+        icon: '/new-logo.svg',
         text: 'Default DE'
     },
     {
         id:2,
-        icon: '/new-logo.png',
+        icon: '/new-logo.svg',
         text: 'English'
     },
     {

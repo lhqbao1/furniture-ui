@@ -35,18 +35,20 @@ import { useAddProductGroup, useDeleteProductGroup, useGetProductGroup } from "@
 import { toast } from "sonner"
 import { atom, useAtom } from "jotai"
 import { currentProductGroup } from "@/store/product-group"
+import DeleteGroupDialog from "./delete-group-dialog"
+import AddOrEditParentDialog from "./add-or-edit-parent-dialog"
 
 const SelectProductGroup = () => {
     const [open, setOpen] = React.useState(false)
     const [groupName, setGroupName] = React.useState("")
     const [dialogOpen, setDialogOpen] = React.useState(false)
+    const [dialogAddOpen, setDialogAddOpen] = React.useState(false)
     const [currentGroup, setCurrentGroup] = useAtom(currentProductGroup)
     // const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
 
     const { data: groups, isLoading, isError } = useGetProductGroup()
 
     const addProductGroupMutation = useAddProductGroup()
-    const deleteProductGroupMutation = useDeleteProductGroup()
 
     const form = useFormContext()
 
@@ -64,17 +66,6 @@ const SelectProductGroup = () => {
         })
     }
 
-    const handleDeleteAddGroup = (id: string) => {
-        deleteProductGroupMutation.mutate(id, {
-            onSuccess(data, variables, context) {
-                toast.success("Delete product successful")
-            },
-            onError(error, variables, context) {
-                toast.error("Delete product fail")
-            },
-        })
-    }
-
     return (
         <Controller
             control={form.control}
@@ -84,51 +75,8 @@ const SelectProductGroup = () => {
                     <FormLabel className="flex justify-between items-center">
                         <span>Select product group</span>
                         {/* Dialog Add Group */}
-                        <Dialog open={dialogOpen} onOpenChange={() => setDialogOpen(!dialogOpen)}>
-                            <DialogTrigger asChild>
-                                <Button type="button" variant="secondary">
-                                    Add Group
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="w-1/3">
-                                <DialogHeader>
-                                    <DialogTitle>Add Product Group</DialogTitle>
-                                </DialogHeader>
-
-                                <div className="space-y-4">
-                                    <Input
-                                        value={groupName}
-                                        onChange={(e) => setGroupName(e.target.value)}
-                                        placeholder="Group name"
-                                    />
-
-                                    <div className="flex justify-end gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => setDialogOpen(false)}
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            disabled={addProductGroupMutation.isPending}
-                                            onClick={() => {
-                                                if (groupName.trim()) {
-                                                    handleAddProductGroup(groupName.trim())
-                                                } else {
-                                                    toast.error("Please enter group name")
-                                                }
-                                            }}
-                                        >
-                                            {addProductGroupMutation.isPending ? <Loader2 className="animate-spin" /> : "Save"}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
+                        <AddOrEditParentDialog dialogOpen={dialogAddOpen} setDialogOpen={setDialogAddOpen} groupName={groupName} setGroupName={setGroupName} />
                     </FormLabel>
-
                     {/* Combobox gắn với form cha */}
                     <FormControl>
                         <Popover open={true}>
@@ -173,6 +121,10 @@ const SelectProductGroup = () => {
                                                         />
                                                         {g.name}
                                                     </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <DeleteGroupDialog parentId={g.id} />
+                                                        <AddOrEditParentDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} groupName={groupName} setGroupName={setGroupName} defaultValues={{ id: g.id, name: g.name }} />
+                                                    </div>
                                                 </div>
                                             </CommandItem>
                                         ))}
@@ -180,7 +132,6 @@ const SelectProductGroup = () => {
                                 </Command>
                             </PopoverContent>
                         </Popover>
-
                     </FormControl>
                     <FormMessage />
                 </FormItem>

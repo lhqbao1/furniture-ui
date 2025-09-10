@@ -13,8 +13,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       style={
         {
           "--normal-bg": "white",
-          "--normal-text": "#51BE8C",
-          "--success-text": "#51BE8C",
+          "--normal-text": "#00B159",
+          "--success-text": "#00B159",
           "--normal-border": "var(--border)",
           "--success-bg": '#DCF2E8',
           "--error-bg": '#f0cece',

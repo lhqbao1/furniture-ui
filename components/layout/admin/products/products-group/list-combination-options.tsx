@@ -97,8 +97,13 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
     };
 
     return (
-        <div className="mt-6">
-            <h3 className="font-semibold mb-2">Combinations:</h3>
+        <div className="mt-6 border-t pt-4">
+            <div className="text-right">
+                <Button type="button" onClick={handleSaveGroup} className="mt-4">
+                    Save group
+                </Button>
+            </div>
+            <h3 className="font-semibold mb-4">Combinations:</h3>
             <div className="space-y-6">
                 {combinations
                     .filter((comb) => comb.length > 1)
@@ -208,9 +213,6 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                         </div>
                     ))}
             </div>
-            <Button type="button" onClick={handleSaveGroup} className="mt-4">
-                Save group
-            </Button>
         </div>
     );
 };

@@ -68,7 +68,7 @@ export function AppSidebar() {
                     <Link href={'/'}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
                             <Image
-                                src="/new-logo.png"
+                                src="/new-logo.svg"
                                 alt="Prestige Home logo"
                                 width={100}
                                 height={100}

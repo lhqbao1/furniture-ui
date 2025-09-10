@@ -21,11 +21,11 @@ export const metadata: Metadata = {
     description: 'Prestige Home',
     icons: {
         icon: [
-            { url: '/new-logo.png', type: 'image/png', sizes: '16x16' },
-            { url: '/new-logo.png', type: 'image/png', sizes: '32x32' },
-            { url: '/new-logo.png', type: 'image/png' },
+            { url: '/new-logo.svg', type: 'image/png', sizes: '16x16' },
+            { url: '/new-logo.svg', type: 'image/png', sizes: '32x32' },
+            { url: '/new-logo.svg', type: 'image/png' },
         ],
-        apple: '/new-logo.png', // cho iOS
+        apple: '/new-logo.svg', // cho iOS
     },
 };
 

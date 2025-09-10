@@ -109,7 +109,7 @@ const Banner = ({ height }: BannerProps) => {
                 <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex flex-col items-end'}`}>
                     <div className={`${isPhone ? 'block' : 'hidden'}`}>
                         <Image
-                            src={'/new-logo.png'}
+                            src={'/new-logo.svg'}
                             width={40}
                             height={40}
                             alt=''
@@ -144,7 +144,7 @@ const Banner = ({ height }: BannerProps) => {
                         {/*User */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <User className="cursor-pointer hover:scale-110 transition-all duration-300" stroke={`${isPhone ? '#51BE8C' : '#FAA61A'}`} />
+                                <User className="cursor-pointer hover:scale-110 transition-all duration-300" stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="w-48">
@@ -180,7 +180,7 @@ const Banner = ({ height }: BannerProps) => {
                             {/*Search */}
                             <Drawer>
                                 <DrawerTrigger asChild>
-                                    <Search stroke={`${isPhone ? '#51BE8C' : '#FAA61A'}`} />
+                                    <Search stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
                                 </DrawerTrigger>
                                 <DrawerContent>
                                 </DrawerContent>
@@ -189,7 +189,7 @@ const Banner = ({ height }: BannerProps) => {
 
                         {/*Shopping cart */}
                         <div className={`${isPhone ? 'block' : 'hidden'}`}>
-                            <ShoppingCart stroke={`${isPhone ? '#51BE8C' : '#FAA61A'}`} />
+                            <ShoppingCart stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
                         </div>
                         <SidebarTrigger className={`border-none text-primary  ${isPhone ? 'relative' : 'absolute xl:top-2 xl:left-2 top-4 left-3 cursor-pointer z-20 bg-white'}`} isMobile={isPhone ? true : false} />
                     </div>

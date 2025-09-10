@@ -31,6 +31,7 @@ export function useAddProductGroup() {
       mutationFn: (name: string) => createProductGroup(name),
       onSuccess: (res) => {
         qc.invalidateQueries({ queryKey: ["product-group"] })
+        qc.invalidateQueries({ queryKey: ["product-group-detail"] })
       },
     })
 }
@@ -41,6 +42,7 @@ export function useUpdateProductGroup() {
       mutationFn: ({name,id}: {name: string, id: string}) => updateProductGroup(name, id),
       onSuccess: (res) => {
         qc.invalidateQueries({ queryKey: ["product-group"] })
+        qc.invalidateQueries({ queryKey: ["product-group-detail"] })
       },
     })
 }
@@ -50,7 +52,8 @@ export function useDeleteProductGroup(){
   return useMutation({
     mutationFn: (id: string) => deleteProductGroup(id),
     onSuccess: (res) => {
-      qc.invalidateQueries({ queryKey: ["products"] })
+      qc.invalidateQueries({ queryKey: ["product-group"] })
+      qc.invalidateQueries({ queryKey: ["product-group-detail"] })
     },
   })
 }

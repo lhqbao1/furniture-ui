@@ -87,7 +87,7 @@ const CartPage = () => {
         <div>
             <div className='text-center flex flex-col items-center gap-3 xl:text-5xl text-3xl bg-gray-100 xl:py-10 py-4'>
                 <Image
-                    src={'/new-logo.png'}
+                    src={'/new-logo.svg'}
                     height={100}
                     width={100}
                     alt=''

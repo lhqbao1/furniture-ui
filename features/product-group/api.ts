@@ -63,7 +63,7 @@ export async function getProductGroupDetail(parent_id: string){
 export async function updateProductGroup(name: string, id: string) {
   const { data } = await apiAdmin.put(
     `/parent/${id}`,
-    name,
+    {name},
     {
       headers: {
         "Content-Type": "application/json",
@@ -75,9 +75,9 @@ export async function updateProductGroup(name: string, id: string) {
   return data as ProductGroupResponse
   }
 
-export async function deleteProductGroup(id: string){
+export async function deleteProductGroup(parent_id: string){
   const {data} = await apiAdmin.delete(
-    `/parent/${id}`
+    `/parent/${parent_id}`
   )
   return data
 }
