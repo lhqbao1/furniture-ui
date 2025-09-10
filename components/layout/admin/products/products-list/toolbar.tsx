@@ -14,9 +14,10 @@ import {
 interface TableToolbarProps {
     pageSize: number
     setPageSize: React.Dispatch<React.SetStateAction<number>>
+    addButtonText?: string
 }
 
-export default function TableToolbar({ pageSize, setPageSize }: TableToolbarProps) {
+export default function TableToolbar({ pageSize, setPageSize, addButtonText }: TableToolbarProps) {
     return (
         <div className="flex items-center justify-between gap-4 p-2 w-full">
             {/* Left group */}
@@ -108,7 +109,8 @@ export default function TableToolbar({ pageSize, setPageSize }: TableToolbarProp
                 </DropdownMenu>
 
                 <div className="flex flex-1 w-full justify-end">
-                    <Button className="bg-primary hover:bg-primary font-semibold">Add Product</Button>
+                    {!addButtonText ? '' : <Button className="bg-primary hover:bg-primary font-semibold">{addButtonText ? addButtonText : 'Add Product'}</Button>
+                    }
                 </div>
             </div>
         </div>

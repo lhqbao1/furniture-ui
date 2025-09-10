@@ -1,30 +1,33 @@
-import { CartItem } from "@/types/cart";
-import { ProductItem } from "@/types/products";
-import { ColumnDef } from "@tanstack/react-table";
+'use client'
 
-export const myOrderTableColumns: ColumnDef<CartItem>[] = [
-    {
-        accessorKey: 'product_name',
-        cell: ({ row }) => {
-            return (
+import { ColumnDef } from "@tanstack/react-table"
+import { useTranslations } from "next-intl"
+import { CartItem } from "@/types/cart"
+
+export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
+    const t = useTranslations()
+
+    return [
+        {
+            accessorKey: "product_name",
+            header: t("product"), // ví dụ: "Product"
+            cell: ({ row }) => (
                 <div>{row.original.products.name}</div>
-            )
-        }
-    },
-    {
-        accessorKey: 'quantity',
-        cell: ({ row }) => {
-            return (
+            ),
+        },
+        {
+            accessorKey: "quantity",
+            header: () => <div>{t("quantity")}</div>,
+            cell: ({ row }) => (
                 <div>{row.original.quantity}</div>
-            )
-        }
-    },
-    {
-        accessorKey: 'product_price',
-        cell: ({ row }) => {
-            return (
-                <div>€{(row.original.item_price * row.original.quantity).toFixed(2)}</div>
-            )
-        }
-    }
-]
+            ),
+        },
+        {
+            accessorKey: "product_price",
+            header: () => <div className="text-right">{t("total")}</div>,
+            cell: ({ row }) => (
+                <div className="text-right">€{(row.original.item_price * row.original.quantity).toFixed(2)}</div>
+            ),
+        },
+    ]
+}

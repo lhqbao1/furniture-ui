@@ -14,18 +14,14 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
     cell: ({ row }) => (
       <div>
         <div>{row.original.products.name}</div>
+        <div>{row.original.products.id_provider}</div>
       </div>
     ),
   },
   {
-    accessorKey: "id",
-    header: "Item ID",
-    cell: ({ row }) => `#${row.original.products.id_provider}`
-  },
-  {
     accessorKey: "price",
-    header: "Unit price",
-    cell: ({ row }) => `€${row.original.final_price.toFixed(2)}`,
+    header: () => <div className="text-right">Unit price</div>,
+    cell: ({ row }) => <div className="text-right">€{row.original.final_price.toFixed(2)}</div>,
   },
   {
     accessorKey: "qty",
@@ -48,9 +44,9 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
 
   {
     id: "amount",
-    header: "Amount",
+    header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
-      return `€${row.original.final_price.toFixed(2)}`
+      return <div className="text-right">€{row.original.final_price.toFixed(2)}</div>
     },
   },
 ]

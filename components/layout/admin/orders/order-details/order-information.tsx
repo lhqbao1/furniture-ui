@@ -128,19 +128,19 @@ const OrderInformation = ({
                 <div className='grid grid-cols-2'>
                     <div className='text-end col-span-1'>Sub total</div>
                     <div className='text-end'>
-                        €{sub_total}
+                        €{sub_total?.toFixed(2)}
                     </div>
                 </div>
                 <div className='grid grid-cols-2'>
                     <div className='text-end'>Shipping</div>
                     <div className='text-end'>
-                        €{shipping_amount}
+                        €{shipping_amount?.toFixed(2)}
                     </div>
                 </div>
                 <div className='grid grid-cols-2'>
                     <div className='text-end'>Discount</div>
                     <div className='text-end'>
-                        €{discount_amount}
+                        €{discount_amount?.toFixed(2)}
                     </div>
                 </div>
                 <div className='grid grid-cols-2'>
@@ -149,8 +149,8 @@ const OrderInformation = ({
                         €{tax}
                     </div>
                 </div>
-                <div className='text-end'>
-                    <div className=''>Total €{total_amount}</div>
+                <div className='text-end text-2xl text-primary font-bold'>
+                    <div className=''>Total €{total_amount?.toFixed(2)}</div>
                 </div>
             </div>
         </div>

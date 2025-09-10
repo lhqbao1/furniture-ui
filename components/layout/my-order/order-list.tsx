@@ -3,7 +3,7 @@ import { getCheckOutByUserId } from '@/features/checkout/api'
 import { useQuery } from '@tanstack/react-query'
 import React, { useEffect, useState } from 'react'
 import { MyOrderDataTable } from './table'
-import { myOrderTableColumns } from './columns'
+import { useMyOrderTableColumns } from './columns'
 
 const OrderList = () => {
     const [userId, setUserId] = useState<string | null>(null)
@@ -21,13 +21,15 @@ const OrderList = () => {
         retry: false,
     })
 
+    const columns = useMyOrderTableColumns()
+
 
     return (
         <div className='lg:w-1/2 mx-auto space-y-6'>
             {order?.map((item, index) => {
                 return (
                     <div key={index}>
-                        <MyOrderDataTable columns={myOrderTableColumns} data={item.cart.items} orderData={item} />
+                        <MyOrderDataTable columns={columns} data={item.cart.items} orderData={item} />
                     </div>
                 )
             })}

@@ -21,6 +21,7 @@ interface DataTableProps<TData, TValue> {
     totalItems: number
     hasBackground?: boolean
     totalPages: number
+    addButtonText?: string
 }
 
 export function ProductTable<TData, TValue>({
@@ -32,7 +33,8 @@ export function ProductTable<TData, TValue>({
     setPageSize,
     totalItems,
     hasBackground,
-    totalPages
+    totalPages,
+    addButtonText
 }: DataTableProps<TData, TValue>) {
 
     const table = useReactTable({
@@ -51,6 +53,7 @@ export function ProductTable<TData, TValue>({
             <TableToolbar
                 pageSize={pageSize}
                 setPageSize={setPageSize} // đảm bảo type đúng
+                addButtonText={addButtonText}
             />
             <div className="rounded-md border w-full overflow-x-scroll">
                 <Table>
@@ -71,7 +74,7 @@ export function ProductTable<TData, TValue>({
                         {table.getRowModel().rows.map((row, index) => (
                             <TableRow
                                 key={row.id}
-                                className={hasBackground && index % 2 === 1 ? "bg-secondary/10" : ""}
+                                className={hasBackground && index % 2 === 1 ? "bg-secondary/5" : ""}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id}>

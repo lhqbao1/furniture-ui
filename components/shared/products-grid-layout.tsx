@@ -59,7 +59,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                 : `/${product.id}`
                     return (
                         <div key={product.id} className='relative overflow-hidden' ref={el => { if (el) cardRefs.current[idx] = el }} onClick={() => handleAddProductToViewed(product.id)}>
-                            <Link href={`${categoryHref}`} passHref>
+                            <Link href={`/product/${categoryHref}`} passHref>
                                 <div
                                     className="bg-white p-0 group py-4 cursor-pointer z-0"
                                     style={{

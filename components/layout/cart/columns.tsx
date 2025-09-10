@@ -86,8 +86,8 @@ export const GetCartColumns = ({
         },
         {
             accessorKey: "item_price",
-            header: t('price'),
-            cell: ({ row }) => <span className="font-semibold text-primary">€{row.original.item_price.toFixed(2)}</span>,
+            header: () => <div className="text-right">{t('price')}</div>,
+            cell: ({ row }) => <div className="font-semibold text-primary text-right">€{row.original.item_price.toFixed(2)}</div>,
         },
         {
             accessorKey: "quantity",
@@ -119,11 +119,11 @@ export const GetCartColumns = ({
         },
         {
             accessorKey: "total",
-            header: t('total'),
+            header: () => <div className="text-right">{t('total')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
-                return <span className="font-semibold">{(item.item_price * quantity).toFixed(2)}€</span>
+                return <div className="font-semibold text-right">{(item.item_price * quantity).toFixed(2)}€</div>
             },
         },
         {

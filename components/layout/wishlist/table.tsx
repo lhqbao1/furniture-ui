@@ -180,13 +180,6 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
                     <div className="xl:col-span-7 col-span-12 flex justify-between">
                         <div className="space-y-3">
                             <div className="flex flex-col gap-3 justify-between">
-                                {/* <div className="flex items-center gap-2">
-                                <Checkbox
-                                    checked={table.getIsAllPageRowsSelected()}
-                                    onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-                                />
-                                <span className="text-sm">{t('selectAll')}</span>
-                            </div> */}
                                 <Link href={'/shop-all'} className="flex gap-2 items-center">
                                     <ArrowLeft size={20} />
                                     <span className="text-sm">{t('continueShopping')}</span>
@@ -195,7 +188,6 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
 
                             <div className="flex flex-col gap-3 justify-between">
                                 <div
-                                    // onClick={() => setData((prev) => prev.filter((i) => i.stock > 0))}
                                     className="text-white flex gap-1 cursor-pointer p-0 items-center text-sm"
                                 >
                                     <Trash size={20} />

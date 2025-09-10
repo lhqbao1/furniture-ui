@@ -116,5 +116,18 @@
   "loadMore": "Mehr laden",
   "all": "Alle",
   "picOrVid": "Bilder/Video",
-  "comments": "Kommentare"
+  "comments": "Kommentare",
+  "orderId": "Bestellnummer",
+  "myOrder": "Meine Bestellung",
+  "contactForm": "Kontaktformular",
+  "back": "Zurück",
+  "subject": "Betreff",
+  "relatedToOrder": "Bezogen auf Bestellnummer (optional)",
+  "message": "Nachricht",
+  "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
+  "subjectPlaceholder": "Betreff auswählen",
+  "messagePlaceholder": "Geben Sie die Details Ihrer Anfrage ein...",
+  "browseFile": "Dateien durchsuchen",
+  "dragFile": "Legen Sie Ihre Bilder hier ab",
+  "dragAndDropFile": "Ziehen Sie Ihre Bilder hierher und legen Sie sie ab"
 }

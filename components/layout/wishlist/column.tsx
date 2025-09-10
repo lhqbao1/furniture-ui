@@ -89,11 +89,12 @@ export const GetWishlistColumns = ({
         {
             accessorKey: "quantity",
             header: t('quantity'),
+            size: 80,
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
                 return (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 whitespace-nowrap">
                         <Button
                             variant="outline"
                             size="sm"
@@ -116,22 +117,23 @@ export const GetWishlistColumns = ({
         },
         {
             accessorKey: "item_price",
-            header: t('price'),
-            cell: ({ row }) => <span className="font-semibold">€{row.original.item_price.toFixed(2)}</span>,
+            size: 100,
+            header: () => <div className="text-right">{t('price')}</div>,
+            cell: ({ row }) => <div className="font-semibold text-right">€{row.original.item_price.toFixed(2)}</div>,
         },
         {
             accessorKey: "total",
-            header: t('total'),
+            header: () => <div className="text-right">{t('total')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
-                return <span className="font-semibold text-primary">€{(item.item_price * quantity).toFixed(2)}</span>
+                return <div className="font-semibold text-primary text-right">€{(item.item_price * quantity).toFixed(2)}</div>
             },
         },
         {
             accessorKey: "item_stock",
-            header: t('stock'),
-            cell: ({ row }) => <span>{row.original.products.stock} {t('left')}</span>,
+            header: () => <div className="text-center">{t('stock')}</div>,
+            cell: ({ row }) => <div className="text-center">{row.original.products.stock} {t('left')}</div>,
         },
         {
             id: "actions",

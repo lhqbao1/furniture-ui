@@ -1,8 +1,8 @@
 'use client'
 import WishlistTable from '@/components/layout/wishlist/table'
 import CustomBreadCrumb from '@/components/shared/breadcrumb'
+import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetWishlist } from '@/features/wishlist/hook'
-import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
@@ -26,27 +26,17 @@ const WishList = () => {
             <CustomBreadCrumb currentPage='wishlist' />
             <h1 className='text-secondary text-5xl font-bold text-center font-libre'>{t('wishlist')}</h1>
 
-            {isLoading && (
-                <div className='flex w-full justify-center'>
-                    <Loader2 className='animate-spin' />
-                </div>
-            )}
-
-            {isError && (
-                <div className='text-center text-red-500 text-lg'>
-                    {t('YouNeedToLogin')}
-                </div>
-            )}
-
-            {!isLoading && !isError && wishlist && (
-                <WishlistTable
-                    wishlist={wishlist}
-                    localQuantities={localQuantities}
-                    setLocalQuantities={setLocalQuantities}
-                    total={total}
-                    currentTable={t('wishlistProducts')}
-                />
-            )}
+            {isLoading || isError || !wishlist ?
+                <ProductTableSkeleton />
+                : (
+                    <WishlistTable
+                        wishlist={wishlist}
+                        localQuantities={localQuantities}
+                        setLocalQuantities={setLocalQuantities}
+                        total={total}
+                        currentTable={t('wishlistProducts')}
+                    />
+                )}
         </div>
 
     )

@@ -5,7 +5,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
-import { Loader2, Plus, X } from "lucide-react"
+import { Loader2, Plus, Trash2, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import AddOptionDialog from "./add-option-modal"
 import { useAddOptionToProduct, useCreateVariantOption, useDeleteVariant, useDeleteVariantOption, useGetVariantOptionByVariant } from "@/features/variant/hook"
@@ -148,45 +148,45 @@ const ListVariantOption = () => {
                 </div>
             ) : (groupDetail.variants.map((variant, index) => (
                 <div key={variant.variant.id} className="flex gap-2 justify-start">
-                    <div className="flex items-center" onClick={() => handleDeleteVariant(variant.variant.id)}><X size={18} className="text-red-500 cursor-pointer" /></div>
                     <div className="grid grid-cols-6 w-full gap-8">
                         <p className="col-span-1 flex items-center justify-end">
                             {variant.variant.name}:
                         </p>
-                        <div className="font-semibold col-span-5 flex gap-4 items-center">
+                        <div className="font-semibold col-span-5 flex gap-4 items-center justify-between">
                             {/* Hiển thị đã chọn */}
-                            <div className="flex gap-2">
-                                {variant.options.map((o) => (
-                                    <div key={o.id} className="relative inline-block mr-2 mb-2">
-                                        {o.image_url ? (
-                                            <Image
-                                                src={o.image_url}
-                                                width={40}
-                                                height={40}
-                                                alt=""
-                                                className="w-8 h-8 object-cover rounded"
-                                            />
-                                        ) : (
-                                            <span className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground block">
-                                                {o.label}
-                                            </span>
-                                        )}
+                            <div className="flex gap-6 items-center">
+                                <div className="flex gap-6 items-center justify-start">
+                                    {variant.options.map((o) => (
+                                        <div key={o.id} className="relative inline-block">
+                                            {o.image_url ? (
+                                                <Image
+                                                    src={o.image_url}
+                                                    width={40}
+                                                    height={40}
+                                                    alt=""
+                                                    className="w-10 h-10 object-cover rounded"
+                                                />
+                                            ) : (
+                                                <span className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground block">
+                                                    {o.label}
+                                                </span>
+                                            )}
 
-                                        {/* Delete button */}
-                                        <div
-                                            className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer"
-                                            onClick={() => handleDeleteVariantOption(o.id)}
-                                        >
-                                            <X size={12} className="text-red-500" />
+                                            {/* Delete button */}
+                                            <div
+                                                className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer"
+                                                onClick={() => handleDeleteVariantOption(o.id)}
+                                            >
+                                                <X size={12} className="text-red-500" />
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-
+                                    ))}
+                                </div>
+                                <AddOptionDialog variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
                             </div>
+                            <div className="flex items-center" onClick={() => handleDeleteVariant(variant.variant.id)}><Trash2 size={18} className="text-gray-600 cursor-pointer" /></div>
 
-                            <AddOptionDialog variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
-
-                            <DropdownMenu
+                            {/* <DropdownMenu
                                 key={variant.variant.id}
                                 open={currentVariant === variant.variant.name}
                                 onOpenChange={(open) => setCurrentVariant(open ? variant.variant.name : null)}
@@ -223,7 +223,7 @@ const ListVariantOption = () => {
                                             </DropdownMenuCheckboxItem>
                                         ))}
                                 </DropdownMenuContent>
-                            </DropdownMenu>
+                            </DropdownMenu> */}
                         </div>
                     </div>
                 </div>

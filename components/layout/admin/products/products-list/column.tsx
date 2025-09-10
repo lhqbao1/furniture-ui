@@ -56,7 +56,7 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
         header: "NAME",
         cell: ({ row }) => {
             return (
-                <div className="w-46 text-wrap">{row.original.name}</div>
+                <div className="w-60 text-wrap">{row.original.name}</div>
             )
         }
     },
@@ -96,23 +96,23 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     },
     {
         accessorKey: "cost",
-        header: "COST",
-        cell: ({ row }) => <>€{(row.original.cost).toFixed(2)}</>,
+        header: () => <div className="text-right">COST</div>,
+        cell: ({ row }) => <div className="text-right">€{(row.original.cost).toFixed(2)}</div>,
     },
     {
         accessorKey: "discount_amount",
-        header: "DISCOUNT",
-        cell: ({ row }) => <>€{(row.original.discount_amount)?.toFixed(2)}</>,
+        header: () => <div className="text-right">DISCOUNT</div>,
+        cell: ({ row }) => <div className="text-right">€{(row.original.discount_amount)?.toFixed(2)}</div>,
     },
     {
         accessorKey: "final_price",
-        header: "FINAL PRICE",
-        cell: ({ row }) => <>€{(row.original.final_price)?.toFixed(2)}</>,
+        header: () => <div className="text-right">FINAL PRICE</div>,
+        cell: ({ row }) => <div className="text-right">€{(row.original.final_price)?.toFixed(2)}</div>,
     },
     {
         id: "revenue",
-        header: "REVENUE",
-        cell: ({ row }) => <div>€{(row.original.final_price - (row.original.cost ?? 0)).toFixed(2)}</div>, // fake since not in API
+        header: () => <div className="text-right">REVENUE</div>,
+        cell: ({ row }) => <div className="text-right">€{(row.original.final_price - (row.original.cost ?? 0)).toFixed(2)}</div>,
     },
     {
         id: "default",

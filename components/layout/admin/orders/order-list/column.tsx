@@ -141,8 +141,10 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="h-12 relative">
-                    <Image src={'/dhl.png'} alt="icon" fill className="object-contain px-2" />
+                <div className="w-full flex justify-center">
+                    <div className="h-20 w-20 relative">
+                        <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" />
+                    </div>
                 </div>
             )
         }

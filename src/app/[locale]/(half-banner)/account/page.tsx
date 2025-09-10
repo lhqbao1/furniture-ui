@@ -4,7 +4,7 @@ import React from 'react'
 
 const AccountPage = async () => {
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 lg:pb-12 pb-4">
             <div>
                 <CustomBreadCrumb currentPage="Account" />
             </div>

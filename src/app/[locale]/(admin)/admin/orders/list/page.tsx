@@ -39,7 +39,7 @@ const OrderList = () => {
     return (
         <div className='space-y-12 pb-30'>
             {isLoadingStatistic || !statistic ? <ProductStatisticSkeleton /> : <ProductStatistic statistic={mergedStatistic} />}
-            <div className='text-3xl text-secondary font-bold text-center'>Order List</div>
+            <div className='text-3xl text-secondary font-bold text-center font-libre'>Order List</div>
             {isLoading ? <ProductTableSkeleton columnsCount={6} rowsCount={6} /> :
                 <ProductTable
                     data={data ? data : []}

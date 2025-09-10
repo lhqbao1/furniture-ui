@@ -37,67 +37,67 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     {
         accessorKey: "net_price",
         header: () => (
-            <div className="text-center w-full">Net price</div>
+            <div className="text-right w-full">Net price</div>
         ),
         cell: ({ row }) => {
             const netPrice = row.original.price_whithout_tax / row.original.quantity
             return (
-                <div className="text-center">€{netPrice}</div>
+                <div className="text-right">€{netPrice.toFixed(2)}</div>
             )
         }
     },
     {
         accessorKey: "invoice_amount",
         header: () => (
-            <div className="text-center w-full">Invoice amount</div>
+            <div className="text-right w-full">Invoice amount</div>
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-center">€{row.original.item_price}</div>
+                <div className="text-right">€{row.original.item_price.toFixed(2)}</div>
             )
         }
     },
     {
         accessorKey: "discount",
-        header: () => <div className="text-center w-full">Discount</div>,
+        header: () => <div className="text-right w-full">Discount</div>,
         cell: ({ row }) => {
             const { final_price, cost, discount_percent } = row.original.products;
             const discount = final_price
                 ? ((final_price - cost) / final_price) * 100
                 : 0;
-            return <div className="text-center">{discount_percent?.toFixed(2)}%</div>;
+            return <div className="text-right">{discount_percent?.toFixed(2)}%</div>;
         },
     },
     {
         accessorKey: "surcharge_total",
         header: () => (
-            <div className="text-center w-full">Surcharge</div>
+            <div className="text-right w-full">Surcharge</div>
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-center">€{row.original.final_price}</div>
+                <div className="text-right">€{row.original.final_price.toFixed(2)}</div>
             )
         }
     },
     {
         accessorKey: "total_amount_net",
         header: () => (
-            <div className="text-center w-full">Total amount(net)</div>
+            <div className="text-right w-full">Total amount(net)</div>
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-center">€{row.original.price_whithout_tax}</div>
+                <div className="text-right">€{row.original.price_whithout_tax.toFixed(2)}</div>
             )
         }
     },
     {
         accessorKey: "total_invoice_amount",
         header: () => (
-            <div className="text-center w-full">Total amount</div>
+            <div className="text-right w-full">Total amount</div>
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-center">€{row.original.final_price}</div>
+                <div className="text-right">€{row.original.final_price.toFixed(2)}</div>
             )
         }
     },

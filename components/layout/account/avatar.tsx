@@ -60,8 +60,8 @@ const AccountAvatar = ({ user }: AvatarProps) => {
                     onChange={handleFileChange}
                     ref={fileInputRef}
                 />
-                <Button variant={'secondary'} onClick={() => fileInputRef.current?.click()} type='button'>{t('change')}</Button>
-                <Button variant={'secondary'}>{t('remove')}</Button>
+                <Button variant={'ghost'} className='text-secondary' onClick={() => fileInputRef.current?.click()} type='button'>{t('change')}</Button>
+                <Button variant={'ghost'} className='text-secondary'>{t('remove')}</Button>
             </div>
             <span className='text-sm text-gray-500'>{t('allowAvatar')}</span>
         </div>

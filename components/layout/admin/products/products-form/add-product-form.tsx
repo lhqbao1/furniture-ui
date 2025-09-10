@@ -65,33 +65,48 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     }, [productValues, form])
 
     const handleSubmit = async (values: ProductInput) => {
-        await onSubmit(values)
-        form.reset({
-            name: "",
-            description: "",
-            id_provider: '',
-            tax: "19%",
-            collection: null as string | null,
-            sku: "",
-            ean: "",
-            is_active: true,
-            tag: "",
-            static_files: [] as StaticFile[],
-            category_ids: [] as string[],
-            price: 0,
-            cost: 0,
-            discount_amount: 0,
-            discount_percent: 0,
-            stock: 0,
-            weight: 0,
-            width: 0,
-            height: 0,
-            length: 0,
-        })
+        const payload = {
+            ...values,
+            weight: values.weight || values.weight === 0 ? values.weight : undefined,
+            width: values.width || values.width === 0 ? values.width : undefined,
+            height: values.height || values.height === 0 ? values.height : undefined,
+            length: values.length || values.length === 0 ? values.length : undefined,
+            sku: values.sku?.trim() || undefined,
+        }
+
+        try {
+            await onSubmit(payload) // gọi hàm từ cha
+            form.reset({
+                name: "",
+                description: "",
+                id_provider: '',
+                tax: "19%",
+                collection: null,
+                sku: "",
+                ean: "",
+                is_active: true,
+                tag: "",
+                static_files: [],
+                category_ids: [],
+                price: 0,
+                cost: 0,
+                discount_amount: 0,
+                discount_percent: 0,
+                stock: 0,
+                weight: 0,
+                width: 0,
+                height: 0,
+                length: 0,
+            })
+        } catch (e) {
+            console.log(e)
+            toast.error("An error occurs")
+        }
     }
 
+
     return (
-        <div className='pb-20'>
+        <div className='pb-20 px-30'>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(
                     (values) => {
@@ -100,9 +115,10 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                     },
                     (errors) => {
                         toast.error("Please check the form for errors")
+                        console.log(errors)
                     }
                 )}>
-                    <div className='grid-cols-12 grid gap-12 w-full'>
+                    <div className='grid-cols-12 grid gap-24 w-full'>
                         <div className='col-span-9 flex flex-col gap-4'>
                             {defaultValues ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
                                 : ''}
@@ -318,7 +334,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                 type="text"
                                                 placeholder="SKU"
                                                 className='col-span-4'
-                                                {...field}
+                                                value={field.value ?? ""} // null -> ""
+                                                onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
                                             />
                                         </FormControl>
                                     </FormItem>
@@ -349,10 +366,10 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             {/* Weight input */}
                             <FormField
                                 control={form.control}
-                                name='weight'
+                                name="weight"
                                 render={({ field }) => (
                                     <FormItem className="grid grid-cols-6 w-full">
-                                        <FormLabelWithAsterisk required className='text-[#666666] text-sm col-span-2'>
+                                        <FormLabelWithAsterisk required className="text-[#666666] text-sm col-span-2">
                                             Weight (kg)
                                         </FormLabelWithAsterisk>
                                         <FormControl>
@@ -360,14 +377,19 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                 type="number"
                                                 placeholder="Weight"
                                                 min={0}
-                                                {...field}
-                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                                className='col-span-4'
+                                                value={field.value ?? ""} // null hoặc undefined => ""
+                                                onChange={(e) =>
+                                                    field.onChange(
+                                                        e.target.value === "" ? null : e.target.valueAsNumber
+                                                    )
+                                                }
+                                                className="col-span-4"
                                             />
                                         </FormControl>
                                     </FormItem>
                                 )}
                             />
+
 
                             {/* Packaging input */}
                             <div className='grid grid-cols-6 w-full'>
@@ -383,9 +405,13 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
-
                                                         {...field}
-                                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                                        value={field.value ?? ""} // null hoặc undefined => ""
+                                                        onChange={(e) =>
+                                                            field.onChange(
+                                                                e.target.value === "" ? null : e.target.valueAsNumber
+                                                            )
+                                                        }
                                                     />
                                                 </FormControl>
                                                 <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
@@ -404,10 +430,13 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
-
                                                         {...field}
-                                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                                    />
+                                                        value={field.value ?? ""} // null hoặc undefined => ""
+                                                        onChange={(e) =>
+                                                            field.onChange(
+                                                                e.target.value === "" ? null : e.target.valueAsNumber
+                                                            )
+                                                        } />
                                                 </FormControl>
                                                 <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
                                                     Height
@@ -425,9 +454,13 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
-
                                                         {...field}
-                                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                                        value={field.value ?? ""} // null hoặc undefined => ""
+                                                        onChange={(e) =>
+                                                            field.onChange(
+                                                                e.target.value === "" ? null : e.target.valueAsNumber
+                                                            )
+                                                        }
                                                     />
                                                 </FormControl>
                                                 <FormLabelWithAsterisk required className='text-[#666666] text-sm'>

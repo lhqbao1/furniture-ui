@@ -116,5 +116,18 @@
     "loadMore": "Load More",
     "all": "All",
     "picOrVid": "pictures/video",
-    "comments": "comments"
+    "comments": "comments",
+    "orderId": "Order ID",
+    "myOrder": "My Order",
+    "contactForm": "Contact Form",
+    "back": "Back",
+    "subject": "Subject",
+    "relatedToOrder": "Related to Order ID (optional)",
+    "message": "Message",
+    "emailPlaceholder": "Enter your email",
+    "subjectPlaceholder": "Select subjects",
+    "messagePlaceholder": "Enter details of your request...",
+    "browseFile": "Browse Files",
+    "dragFile": "Drop your images here",
+    "dragAndDropFile": "Drag and drop your images here"
 }

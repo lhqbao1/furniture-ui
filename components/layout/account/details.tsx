@@ -17,6 +17,7 @@ import AddressList from './address-list'
 import { useGetInvoiceAddressByUserId } from '@/features/address/hook'
 import InvoiceAddress from './invoice-address'
 import { useTranslations } from 'next-intl'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface AccountDetailsProps {
     user: User
@@ -85,7 +86,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             </div>
 
 
-            <div className='space-y-4'>
+            <div className='space-y-4 lg:w-1/2'>
                 <div className='flex gap-3 items-center'>
                     <span>{t('invoiceAddress')}</span>
                     {!invoiceAddress ?
@@ -107,13 +108,28 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
 
             {/* Preferences */}
             <div className="grid grid-cols-2 gap-4">
-                <FormField name="language" control={form.control} render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{t('language')}</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )} />
+                <FormField
+                    control={form.control}
+                    name="language"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{t('language')}</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger className='border'>
+                                        <SelectValue placeholder="Select language" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="en">{t('english')}</SelectItem>
+                                    <SelectItem value="de">{t('german')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <FormField name="date_of_birth" control={form.control} render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t('dateOfBirth')}</FormLabel>
@@ -128,7 +144,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             {/* Notifications */}
             <FormField name="promotions" control={form.control} render={({ field }) => (
                 <FormItem className="flex items-center gap-2">
-                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} className='data-[state=checked]:bg-gray-400' /></FormControl>
                     <FormLabel className="mb-0">{t('receivePromotions')}</FormLabel>
                 </FormItem>
             )} />

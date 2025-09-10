@@ -41,7 +41,7 @@ const DeleteGroupDialog = ({ parentId }: DeleteGroupDialogProps) => {
                 <div className='cursor-pointer' onClick={(e) => {
                     e.stopPropagation()
                 }}>
-                    <Trash2 className='size-4 text-red-500' />
+                    <Trash2 className='size-4 text-gray-600' />
                 </div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">

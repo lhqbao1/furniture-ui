@@ -56,9 +56,9 @@ const AddOrEditParentDialog = ({ dialogOpen, setDialogOpen, groupName, setGroupN
                     <div className='cursor-pointer' onClick={(e) => {
                         e.stopPropagation()
                     }}>
-                        <Pencil className='size-4 text-secondary' />
+                        <Pencil className='size-4 text-gray-600' />
                     </div>
-                    : <Button type="button" variant="secondary">
+                    : <Button type="button" variant="ghost" className='text-secondary hover:bg-secondary hover:text-white'>
                         Add Group
                     </Button>}
             </DialogTrigger>

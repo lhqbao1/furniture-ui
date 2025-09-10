@@ -62,14 +62,14 @@ const SelectProductAttributes = () => {
                         <FormLabel className="col-span-1 text-right justify-end">Attributes</FormLabel>
                         <FormControl className=" w-full">
                             <Popover open={open} onOpenChange={setOpen}>
-                                <div className="col-span-5 space-x-2">
+                                <div className="col-span-5 flex gap-2">
                                     <PopoverTrigger asChild onClick={(e) => e.preventDefault()}>
                                         <Button
                                             data-slot="popover-trigger"
                                             variant="outline"
                                             role="combobox"
                                             aria-expanded={open}
-                                            className="w-1/2 justify-between"
+                                            className="flex-1 justify-between"
                                             onClick={() => {
                                                 if (!parent_id) {
                                                     toast.error("You need to choose a parent before choose or create an attribute")

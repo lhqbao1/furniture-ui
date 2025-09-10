@@ -6,7 +6,7 @@ export type Payment = {
     gateway: string
     mop_id: string
     status: string
-    amount: string
+    amount: number
     received_on: string
 }
 
@@ -40,8 +40,8 @@ export const paymentColumns: ColumnDef<Payment>[] = [
     },
     {
         accessorKey: "amount",
-        header: () => <div className="text-left font-bold">Amount</div>,
-        cell: ({ row }) => <div>{row.original.amount}</div>,
+        header: () => <div className="text-right font-bold">Amount</div>,
+        cell: ({ row }) => <div className="text-right">€{row.original.amount.toFixed(2)}</div>,
     },
     {
         accessorKey: "received_on",

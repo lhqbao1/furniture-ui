@@ -44,27 +44,10 @@ const SelectProductGroup = () => {
     const [dialogOpen, setDialogOpen] = React.useState(false)
     const [dialogAddOpen, setDialogAddOpen] = React.useState(false)
     const [currentGroup, setCurrentGroup] = useAtom(currentProductGroup)
-    // const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null)
 
     const { data: groups, isLoading, isError } = useGetProductGroup()
-
     const addProductGroupMutation = useAddProductGroup()
-
     const form = useFormContext()
-
-
-    const handleAddProductGroup = (name: string) => {
-        addProductGroupMutation.mutate(name, {
-            onSuccess: () => {
-                toast.success("Product group created")
-                setDialogOpen(false)
-                setGroupName('')
-            },
-            onError: () => {
-                toast.error("Create product group failed")
-            },
-        })
-    }
 
     return (
         <Controller
@@ -110,6 +93,7 @@ const SelectProductGroup = () => {
                                                     field.onChange(g.id)
                                                     setOpen(false)
                                                 }}
+                                                className="group cursor-pointer"
                                             >
                                                 <div className="flex justify-between w-full">
                                                     <div className="flex gap-1 items-center">
@@ -121,12 +105,21 @@ const SelectProductGroup = () => {
                                                         />
                                                         {g.name}
                                                     </div>
-                                                    <div className="flex items-center gap-2">
+
+                                                    {/* Ẩn mặc định, hover mới hiện */}
+                                                    <div className="items-center gap-2 hidden group-hover:flex">
                                                         <DeleteGroupDialog parentId={g.id} />
-                                                        <AddOrEditParentDialog dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} groupName={groupName} setGroupName={setGroupName} defaultValues={{ id: g.id, name: g.name }} />
+                                                        <AddOrEditParentDialog
+                                                            dialogOpen={dialogOpen}
+                                                            setDialogOpen={setDialogOpen}
+                                                            groupName={groupName}
+                                                            setGroupName={setGroupName}
+                                                            defaultValues={{ id: g.id, name: g.name }}
+                                                        />
                                                     </div>
                                                 </div>
                                             </CommandItem>
+
                                         ))}
                                     </CommandGroup>
                                 </Command>

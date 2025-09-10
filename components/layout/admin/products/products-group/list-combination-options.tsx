@@ -108,10 +108,10 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                 {combinations
                     .filter((comb) => comb.length > 1)
                     .map((combination, idx) => (
-                        <div key={idx} className="grid grid-cols-12 gap-6">
+                        <div key={idx} className="grid grid-cols-3 gap-6">
 
                             {/* hiển thị các option */}
-                            <div className="flex items-center gap-2 col-span-3">
+                            <div className="flex items-center gap-2 col-span-1 justify-end">
                                 {combination.map((option, index) => (
                                     <React.Fragment key={option.id ?? index}>
                                         <div>
@@ -137,7 +137,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                             </div>
 
                             {/* Combobox Popover */}
-                            <div className="col-span-9">
+                            <div className="col-span-2">
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button

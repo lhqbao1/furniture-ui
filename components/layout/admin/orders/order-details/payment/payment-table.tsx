@@ -17,7 +17,7 @@ const paymentData: Payment[] = [
         gateway: "Paypal",
         mop_id: "1921",
         status: "approved",
-        amount: "€899",
+        amount: 899,
         received_on: "Aug 31, 2025 22:05",
     },
     {
@@ -26,7 +26,7 @@ const paymentData: Payment[] = [
         gateway: "Stripe",
         mop_id: "1933",
         status: "pending",
-        amount: "€450",
+        amount: 450,
         received_on: "Sep 1, 2025 10:15",
     },
     {
@@ -35,7 +35,7 @@ const paymentData: Payment[] = [
         gateway: "Bank Transfer",
         mop_id: "2001",
         status: "failed",
-        amount: "€1200",
+        amount: 1200,
         received_on: "Sep 2, 2025 16:40",
     },
 ]

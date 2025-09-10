@@ -27,6 +27,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { StaticFileResponse } from "@/types/products"
+import { useTranslations } from "next-intl"
 
 // ================== TYPES ==================
 export type ImageItem = { id: string; url: string }
@@ -103,7 +104,7 @@ function ImagePickerInput<T extends FieldValues>({
 }: ImagePickerInputProps<T>) {
     const uploadImage = useUploadStaticFile()
     const watched = form.watch(fieldName as Path<T>)
-
+    const t = useTranslations()
     // local items with stable id
     const [items, setItems] = useState<ImageItem[]>([])
 
@@ -207,8 +208,8 @@ function ImagePickerInput<T extends FieldValues>({
                     <>
                         <p className="text-gray-500 dark:text-gray-400 text-center">
                             {isDragActive
-                                ? "Drop your images here"
-                                : "Drag and drop your images here"}
+                                ? <div>{t('dragFile')}</div>
+                                : <div>{t('dragAndDropFile')}</div>}
                         </p>
                         {description && (
                             <p className="text-gray-500 text-sm text-center">{description}</p>
@@ -217,7 +218,7 @@ function ImagePickerInput<T extends FieldValues>({
                 )}
 
                 <Button variant="outline" type="button">
-                    Browse Files
+                    {t('browseFile')}
                 </Button>
                 <input {...getInputProps()} className="hidden" multiple />
             </div>
