@@ -100,7 +100,6 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => (
                 <View style={styles.tableHeader}>
                     <Text style={{ width: 50, textAlign: 'center', fontFamily: 'FigtreeBold' }}>Pos.</Text>
                     <Text style={{ width: 100, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Item(s)</Text>
-                    <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Item ID</Text>
                     <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Unit Price</Text>
                     <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Quantity</Text>
                     <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>VAT</Text>

@@ -48,7 +48,7 @@ export const productsColumn: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "name",
         header: () => (
-            <div className="text-start w-full">Image</div>
+            <div className="text-start w-full">Name</div>
         ),
     },
     {

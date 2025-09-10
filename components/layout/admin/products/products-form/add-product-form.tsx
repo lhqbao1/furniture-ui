@@ -65,30 +65,29 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     }, [productValues, form])
 
     const handleSubmit = async (values: ProductInput) => {
-        console.log(values)
-        // await onSubmit(values)
-        // form.reset({
-        //     name: "",
-        //     description: "",
-        //     id_provider: '',
-        //     tax: "19%",
-        //     collection: null as string | null,
-        //     sku: "",
-        //     ean: "",
-        //     is_active: true,
-        //     tag: "",
-        //     static_files: [] as StaticFile[],
-        //     category_ids: [] as string[],
-        //     price: 0,
-        //     cost: 0,
-        //     discount_amount: 0,
-        //     discount_percent: 0,
-        //     stock: 0,
-        //     weight: 0,
-        //     width: 0,
-        //     height: 0,
-        //     length: 0,
-        // })
+        await onSubmit(values)
+        form.reset({
+            name: "",
+            description: "",
+            id_provider: '',
+            tax: "19%",
+            collection: null as string | null,
+            sku: "",
+            ean: "",
+            is_active: true,
+            tag: "",
+            static_files: [] as StaticFile[],
+            category_ids: [] as string[],
+            price: 0,
+            cost: 0,
+            discount_amount: 0,
+            discount_percent: 0,
+            stock: 0,
+            weight: 0,
+            width: 0,
+            height: 0,
+            length: 0,
+        })
     }
 
     return (
@@ -105,7 +104,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                 )}>
                     <div className='grid-cols-12 grid gap-12 w-full'>
                         <div className='col-span-9 flex flex-col gap-4'>
-                            <h3 className='text-xl text-[#666666]'>Add New Product</h3>
+                            {defaultValues ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
+                                : ''}
                             {/*Product Name */}
                             <FormField
                                 control={form.control}
@@ -244,7 +244,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end'>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white' type="button" hasEffect>Discard</Button>
-                                <Button className="cursor-pointer" type="submit" hasEffect>
+                                <Button className={`cursor-pointer ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect>
                                     {isPending ? (
                                         <Loader2 className="animate-spin" />
                                     ) : productValues ? (

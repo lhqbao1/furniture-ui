@@ -23,7 +23,7 @@ const OrderList = () => {
 
 
     return (
-        <div className='w-1/2 mx-auto space-y-6'>
+        <div className='lg:w-1/2 mx-auto space-y-6'>
             {order?.map((item, index) => {
                 return (
                     <div key={index}>

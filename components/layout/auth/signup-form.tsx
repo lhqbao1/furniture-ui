@@ -105,6 +105,19 @@ export default function SignUpForm() {
           />
           <FormField
             control={form.control}
+            name="phone_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mobile</FormLabel>
+                <FormControl>
+                  <Input placeholder="+49" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="first_name"
             render={({ field }) => (
               <FormItem>
