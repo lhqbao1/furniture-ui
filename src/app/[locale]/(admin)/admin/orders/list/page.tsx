@@ -5,8 +5,7 @@ import ProductStatistic from '@/components/layout/admin/products/products-list/s
 import ProductStatisticSkeleton from '@/components/shared/statistic-skeleton'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetCheckOut, useGetCheckOutStatistic } from '@/features/checkout/hook'
-import { Loader2 } from 'lucide-react'
-import React, { Suspense, useState } from 'react'
+import React, { useState } from 'react'
 
 const OrderList = () => {
     const [page, setPage] = useState(1)
@@ -14,7 +13,6 @@ const OrderList = () => {
     const { data, isLoading, isError } = useGetCheckOut()
     const { data: statistic, isLoading: isLoadingStatistic, isError: isErrorStatistic } = useGetCheckOutStatistic()
 
-    // map statistic từ API vào demo
     const mergedStatistic = [
         {
             total: statistic?.order_processing ?? 0,
@@ -41,6 +39,7 @@ const OrderList = () => {
     return (
         <div className='space-y-12 pb-30'>
             {isLoadingStatistic || !statistic ? <ProductStatisticSkeleton /> : <ProductStatistic statistic={mergedStatistic} />}
+            <div className='text-3xl text-secondary font-bold text-center'>Order List</div>
             {isLoading ? <ProductTableSkeleton columnsCount={6} rowsCount={6} /> :
                 <ProductTable
                     data={data ? data : []}
@@ -51,6 +50,7 @@ const OrderList = () => {
                     setPageSize={setPageSize}
                     totalItems={data?.length ?? 0}
                     totalPages={Math.ceil((data?.length ?? 0) / pageSize)}
+                    hasBackground
                 />
             }
         </div>

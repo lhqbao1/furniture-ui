@@ -41,7 +41,6 @@ export function AdminSideBar() {
             icon: ChevronRight,
             children: [
                 { title: "Order List", url: "/admin/orders/list", icon: CornerDownRight },
-                { title: "Order Details", url: "/admin/orders/details", icon: CornerDownRight },
             ],
         },
         {
@@ -52,29 +51,13 @@ export function AdminSideBar() {
                 { title: "Customer List", url: "/admin/crm/customers", icon: CornerDownRight },
             ],
         },
-        {
-            title: "Invoice",
-            url: "/admin/invoices",
-            icon: ChevronRight,
-            children: [
-                { title: "Invoice List", url: "/admin/invoices/list", icon: CornerDownRight },
-                { title: "Create Invoice", url: "/admin/invoices/create", icon: CornerDownRight },
-            ],
-        },
-        {
-            title: "Setting",
-            url: "/admin/setting",
-            icon: ChevronRight,
-        },
     ];
-
-
 
     return (
         <Sidebar className="app-sidebar custom-scroll">
             <SidebarContent>
                 <SidebarGroup>
-                    <Link href={'/'}>
+                    <Link href={'/admin'}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
                             <Image
                                 src="/new-logo.svg"
@@ -85,8 +68,7 @@ export function AdminSideBar() {
                                 className="w-auto h-[80px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
                             <div className="font-libre text-[29px] flex gap-1">
-                                <span className="text-secondary font-semibold">Prestige</span>
-                                <span className="text-primary font-semibold">Home</span>
+                                <span className="text-secondary font-semibold">Administrator</span>
                             </div>
                         </div>
                     </Link>

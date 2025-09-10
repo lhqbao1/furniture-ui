@@ -24,27 +24,31 @@ import { z } from "zod";
 import { useState } from "react";
 import { categorySchema } from "@/lib/schema/category";
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input";
-import { useCreateCategory, useGetCategories } from "@/features/category/hook";
+import { useCreateCategory, useEditCategory, useGetCategories } from "@/features/category/hook";
 import { toast } from "sonner";
 import { CategoryInput } from "@/types/categories";
+import { defaultValues } from "@/lib/schema/product";
+import { Loader2, Pencil } from "lucide-react";
 
-export default function AddCategoryDrawer() {
+interface AddCategoryDrawerProps {
+    categoryId?: string
+    categoryValues?: CategoryInput
+}
+
+export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCategoryDrawerProps) {
     const [open, setOpen] = useState(false)
     const createCategoryMutation = useCreateCategory()
+    const updateCategoryMutation = useEditCategory()
     const { data: categories, isLoading, isError } = useGetCategories()
 
     const defaultValues: CategoryInput = {
         name: "",
-        meta_title: "",
-        meta_description: "",
-        meta_keywords: "",
         level: 1,
-        // parent_id: "",
         img_url: "",
     };
     const form = useForm<CategoryInput>({
         resolver: zodResolver(categorySchema),
-        defaultValues,
+        defaultValues: categoryValues ? categoryValues : defaultValues,
     });
 
 
@@ -58,16 +62,30 @@ export default function AddCategoryDrawer() {
             payload.level = 1;       // level mặc định là 1
         }
 
-        createCategoryMutation.mutate(payload, {
-            onSuccess(data, variables, context) {
-                toast.success("Category is created successful");
-                form.reset(defaultValues);
-                setOpen(false);
-            },
-            onError(error, variables, context) {
-                toast.error("Category is created fail");
-            },
-        });
+        if (categoryValues) {
+            updateCategoryMutation.mutate({ id: categoryId ?? '', input: payload }, {
+                onSuccess(data, variables, context) {
+                    toast.success("Category is updated successful");
+                    form.reset(defaultValues);
+                    setOpen(false);
+                },
+                onError(error, variables, context) {
+                    toast.error("Category is updated fail");
+                },
+            });
+        } else {
+            createCategoryMutation.mutate(payload, {
+                onSuccess(data, variables, context) {
+                    toast.success("Category is created successful");
+                    form.reset(defaultValues);
+                    setOpen(false);
+                },
+                onError(error, variables, context) {
+                    toast.error("Category is created fail");
+                },
+            });
+        }
+
     };
 
 
@@ -75,7 +93,13 @@ export default function AddCategoryDrawer() {
     return (
         <Drawer open={open} onOpenChange={setOpen} direction="right">
             <DrawerTrigger asChild>
-                <Button variant={'secondary'}>Add Category</Button>
+                {categoryValues ?
+                    <Button variant="ghost" size="icon">
+                        <Pencil size={18} className="cursor-pointer" />
+                    </Button>
+                    :
+                    <Button variant={'secondary'}>Add Category</Button>
+                }
             </DrawerTrigger>
             <DrawerContent className="overflow-y-scroll pb-4">
                 <DrawerHeader>
@@ -179,7 +203,7 @@ export default function AddCategoryDrawer() {
 
                         <DrawerFooter>
                             <Button type="submit">
-                                Add
+                                {updateCategoryMutation.isPending || createCategoryMutation.isPending ? <Loader2 className="animated-spin" /> : <div>{categoryValues ? "Update" : "Add"}</div>}
                             </Button>
                             <Button type="button" variant="outline" onClick={() => {
                                 setOpen(false)

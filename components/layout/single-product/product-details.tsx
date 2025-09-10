@@ -184,7 +184,7 @@ const ProductDetails = () => {
     const handleSelectVoucher = (item: number) => setSelectedVoucher(item)
 
     return (
-        <div className='py-3 lg:px-30 lg:pt-6'>
+        <div className='py-3 lg:pt-6'>
             <CustomBreadCrumb isProductPage />
             {!isLoadingProduct && productDetails && !isErrorProduct ?
                 <FormProvider {...form}>
@@ -193,7 +193,7 @@ const ProductDetails = () => {
                             (values) => handleSubmit(values),
                             (e) => console.error("Please check the form for errors", e)
                         )}
-                        className='space-y-8'
+                        className='space-y-8 lg:px-30'
                     >
                         <div className='flex flex-col gap-8'>
 
@@ -377,7 +377,7 @@ const ProductDetails = () => {
                             </div>
 
                             {/*Product tabs */}
-                            <div className='xl:mt-12 mt-8'>
+                            <div className='lg:mt-12 mt-8'>
                                 <ProductDetailsTab product={productDetails} />
                             </div>
                         </div>

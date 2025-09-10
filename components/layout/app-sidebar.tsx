@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from "react"
-import { Calendar, Home, Inbox, Search, Settings, ChevronDown, User } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -114,7 +114,7 @@ export function AppSidebar() {
                                                                     className="lg:w-8 lg:h-8 w-6 h-6"
                                                                 />
                                                             </div>
-                                                            <span className="lg:text-xl text-lg">{item.title}</span>
+                                                            <span className="lg:text-lg text-lg">{item.title}</span>
                                                             <ChevronDown
                                                                 className={`size-4 opacity-70 transition-transform ${open ? "rotate-180" : ""
                                                                     }`}
@@ -179,7 +179,7 @@ export function AppSidebar() {
                                                         className="lg:w-8 lg:h-8 w-6 h-6"
                                                     />
                                                 </div>
-                                                <span className="lg:text-xl text-lg">{item.title}</span>
+                                                <span className="lg:text-lg text-lg">{item.title}</span>
                                                 {isActive && !open && (
                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>
                                                 )}

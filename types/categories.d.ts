@@ -33,9 +33,9 @@ export interface CategoryResponse {
 export interface CategoryInput {
   name: string;
   img_url?: string;
-  meta_title: string;
-  meta_description: string;
-  meta_keywords: string;
+  meta_title?: string;
+  meta_description?: string;
+  meta_keywords?: string;
   level: number;
   parent_id?: string; // optional
 }

@@ -139,7 +139,7 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
         ))}
       </TabsList>
       {sections.map((section) => (
-        <TabsContent key={section.value} value={section.value}>
+        <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-1/2' : ''}`}>
           {section.content}
         </TabsContent>
       ))}

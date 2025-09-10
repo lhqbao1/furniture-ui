@@ -105,10 +105,10 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
 
 
                                     {/* Four lines starting from center of each edge */}
-                                    <span className="absolute bottom-0 left-0 w-full h-[1px] bg-orange-500 scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>
-                                    <span className="absolute top-0 left-0 h-full w-[1px] bg-orange-500 scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
-                                    <span className="absolute top-0 right-0 w-full h-[1px] bg-orange-500 scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
-                                    <span className="absolute bottom-0 right-0 h-full w-[1px] bg-orange-500 scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
+                                    <span className="absolute bottom-0 left-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>
+                                    <span className="absolute top-0 left-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
+                                    <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
+                                    <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
                                 </div>
                             </Link>
                             <div className="absolute bottom-18 right-0 list-review-btn">

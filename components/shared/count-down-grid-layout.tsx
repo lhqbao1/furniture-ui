@@ -148,19 +148,14 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                                 </div>
 
                                 <div
-                                    className='absolute -top-13 z-10 transform -translate-x-1/2'
+                                    className='absolute -top-12 z-10 transform -translate-x-1/2'
                                     style={{ left: `${100 - barWidth}%` }}
                                 >
                                     <div className='relative bg-primary text-white p-1 rounded min-w-[100px]'>
                                         <p className='text-center text-xl font-bold'>
-                                            €
-                                            {(
-                                                product.final_price +
-                                                ((100 - barWidth) / 100) *
-                                                (product.price - product.final_price)
-                                            ).toFixed(2)}
+                                            €{product.final_price.toFixed(2)}
                                         </p>
-                                        <div className='absolute left-1/2 -bottom-4 w-0 h-0 border-l-16 border-l-transparent border-r-16 border-r-transparent border-t-16 border-t-primary -translate-x-1/2'></div>
+                                        <div className='absolute left-1/2 -bottom-5 w-0 h-0 border-l-16 border-l-transparent border-r-16 border-r-transparent border-t-16 border-t-primary -translate-x-1/2'></div>
                                     </div>
                                 </div>
                             </div>
@@ -171,7 +166,11 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                                     <div>{formatTime(timeLeft)}</div>
                                 </div>
                                 <p className='text-base text-gray-500 font-bold'>
-                                    €{product.final_price.toFixed(2)}
+                                    €{(
+                                        product.final_price +
+                                        ((100 - barWidth) / 100) *
+                                        (product.price - product.final_price)
+                                    ).toFixed(2)}
                                 </p>
                             </div>
                         </div>

@@ -84,9 +84,17 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                             </div>
                             <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                                 <DeleteDialog categoryId={category.id} />
-                                <Button variant="ghost" size="icon">
-                                    <Pencil size={18} className="cursor-pointer" />
-                                </Button>
+                                <AddCategoryDrawer
+                                    categoryValues={{
+                                        name: category.name,
+                                        level: category.level,
+                                        img_url: category.img_url,
+                                        meta_description: category.meta_description,
+                                        meta_keywords: category.meta_keywords,
+                                        meta_title: category.meta_title
+                                    }}
+                                    categoryId={category.id}
+                                />
                             </div>
                         </div>
                     </CollapsibleTrigger>
@@ -114,9 +122,17 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                     </div>
                     <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                         <DeleteDialog categoryId={category.id} />
-                        <Button variant="ghost" size="icon">
-                            <Pencil size={18} className="cursor-pointer" />
-                        </Button>
+                        <AddCategoryDrawer
+                            categoryValues={{
+                                name: category.name,
+                                level: category.level,
+                                img_url: category.img_url,
+                                meta_description: category.meta_description,
+                                meta_keywords: category.meta_keywords,
+                                meta_title: category.meta_title
+                            }}
+                            categoryId={category.id}
+                        />
                     </div>
                 </div>
             )}

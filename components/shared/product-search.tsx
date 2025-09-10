@@ -9,7 +9,9 @@ import {
     CommandEmpty,
     CommandGroup,
     CommandItem,
+    CommandInput,
 } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { Input } from "../ui/input"
@@ -22,9 +24,11 @@ export default function ProductSearch({ height }: { height?: boolean }) {
     const t = useTranslations()
     const [query, setQuery] = React.useState("")
     const [debouncedQuery, setDebouncedQuery] = React.useState("")
+    const [open, setOpen] = React.useState(false)
     const router = useRouter()
+    const containerRef = React.useRef<HTMLDivElement>(null)
 
-    // debounce query để tránh gọi API liên tục
+    // debounce query
     React.useEffect(() => {
         const timeout = setTimeout(() => {
             setDebouncedQuery(query)
@@ -32,39 +36,50 @@ export default function ProductSearch({ height }: { height?: boolean }) {
         return () => clearTimeout(timeout)
     }, [query])
 
-    // gọi API với param search
-    const { data: products, isLoading, isError } = useGetProductsSelect(debouncedQuery)
+    // Đóng khi click ra ngoài
+    React.useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setOpen(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
 
+    const { data: products, isLoading } = useGetProductsSelect(debouncedQuery)
     const results = products ?? []
 
     return (
-        <div className="flex justify-center items-center gap-2 relative pt-6">
+        <div ref={containerRef} className="flex justify-center items-center gap-2 relative pt-6">
             <div
                 className={cn(
                     "xl:w-1/2 w-3/4 relative flex flex-col",
                     height ? "mr-0" : "xl:mr-56"
                 )}
             >
-                {/* Thanh search gốc */}
                 <div className="relative flex">
                     <Input
                         type="text"
-                        placeholder={`${t('search')}...`}
+                        placeholder={`${t("search")}...`}
                         className="w-full xl:h-12 h-10 pl-10 pr-28 rounded-full border bg-white ring-0"
                         value={query}
-                        onChange={(e) => setQuery(e.target.value)}
+                        onChange={(e) => {
+                            setQuery(e.target.value)
+                        }}
+                        onFocus={() => setOpen(true)}
                     />
                     <Button
                         type="button"
                         variant="default"
-                        className="absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10"
+                        className="absolute right-0 top-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10"
                     >
                         <Mic
                             stroke="white"
                             size={24}
                             className="xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full"
                         />
-                        {t('search')}
+                        {t("search")}
                     </Button>
                     <Search
                         size={24}
@@ -74,40 +89,46 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                 </div>
 
                 {/* Dropdown */}
-                {query && (
-                    <Command shouldFilter={false} className="max-h-[300px] overflow-y-scroll mt-1">
-                        <CommandList>
-                            <CommandEmpty>
-                                {isLoading ? "Loading..." : "No results found."}
-                            </CommandEmpty>
-                            {results.length > 0 && (
-                                <CommandGroup>
-                                    {results.map((product: NewProductItem) => (
-                                        <CommandItem
-                                            key={product.id}
-                                            value={product.name}
-                                            onSelect={() => router.push(`/${product.id}`)}
-                                            className="cursor-pointer"
-                                        >
-                                            <div className="flex justify-between items-center w-full">
-                                                <div className="flex gap-3 flex-1 items-center">
-                                                    <Image
-                                                        src={product.static_files ? product.static_files[0].url : '/1.png'}
-                                                        height={50}
-                                                        width={50}
-                                                        alt=""
-                                                        className="h-12 w-12"
-                                                    />
-                                                    <div className="font-semibold">{product.name}</div>
+                {open && query && (
+                    <div className="absolute top-full mt-1 w-full bg-white shadow rounded-md z-50">
+                        <Command shouldFilter={false} className="max-h-[300px] overflow-y-scroll">
+                            <CommandList>
+                                <CommandEmpty>
+                                    {isLoading ? "Loading..." : "No results found."}
+                                </CommandEmpty>
+                                {results.length > 0 && (
+                                    <CommandGroup>
+                                        {results.map((product: NewProductItem) => (
+                                            <CommandItem
+                                                key={product.id}
+                                                value={product.name}
+                                                onSelect={() => {
+                                                    router.push(`/${product.id}`)
+                                                    setQuery("")
+                                                    setOpen(false)
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex justify-between items-center w-full">
+                                                    <div className="flex gap-3 flex-1 items-center">
+                                                        <Image
+                                                            src={product.static_files ? product.static_files[0].url : "/1.png"}
+                                                            height={50}
+                                                            width={50}
+                                                            alt=""
+                                                            className="h-12 w-12"
+                                                        />
+                                                        <div className="font-semibold">{product.name}</div>
+                                                    </div>
+                                                    <div className="text-[#666666]">{product.id_provider}</div>
                                                 </div>
-                                                <div className="text-[#666666]">{product.id_provider}</div>
-                                            </div>
-                                        </CommandItem>
-                                    ))}
-                                </CommandGroup>
-                            )}
-                        </CommandList>
-                    </Command>
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                )}
+                            </CommandList>
+                        </Command>
+                    </div>
                 )}
             </div>
         </div>

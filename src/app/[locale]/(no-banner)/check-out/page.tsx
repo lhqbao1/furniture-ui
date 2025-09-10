@@ -50,10 +50,10 @@ export default function CheckOutPage() {
     const t = useTranslations()
 
     const checkOutBreadcrumb = [
-        { label: t('wishlist'), icon: 'wishlist.svg' },
-        { label: t('cart'), icon: 'cart.svg' },
-        { label: t('checkout'), icon: 'checkout.svg' },
-        { label: t('tracking'), icon: 'tracking.svg' },
+        { label: t('wishlist'), icon: 'wishlist.svg', url: '/wishlist' },
+        { label: t('cart'), icon: 'cart.svg', url: '/cart' },
+        { label: t('checkout'), icon: 'checkout.svg', url: '/checkout' },
+        { label: t('tracking'), icon: 'tracking.svg', url: '/' },
     ]
 
     const vouchers: Voucher[] = [
@@ -169,15 +169,15 @@ export default function CheckOutPage() {
                 {/* Breadcrumb */}
                 <div className='flex justify-center items-center lg:gap-12 gap-3 border-b pb-3'>
                     {checkOutBreadcrumb.map((item, index) => (
-                        <div key={index} className='flex flex-col gap-2 items-center justify-center'>
+                        <Link href={item.url} key={index} className='flex flex-col gap-2 items-center justify-center'>
                             <Image src={`/${item.icon}`} width={50} height={50} alt='' className='size-12' />
                             <div className='font-semibold text-lg text-secondary'>{item.label}</div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 
                 {/* Shipping Address */}
-                <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:px-24 md:px-14 px-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:px-52 md:px-14 px-4'>
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
                         <div className='space-y-4'>
                             <div className='text-base font-semibold'>{t('shippingAddress')}</div>
@@ -280,7 +280,6 @@ export default function CheckOutPage() {
                                                     </span>
                                                 </FormLabel>
                                             </div>
-                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />

@@ -142,12 +142,12 @@ const Banner = ({ height }: BannerProps) => {
 
 
                         {/*User */}
-                        <DropdownMenu>
+                        <DropdownMenu >
                             <DropdownMenuTrigger asChild>
-                                <User className="cursor-pointer hover:scale-110 transition-all duration-300" stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
+                                <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuContent align="end" className="w-48 absolute top-0">
                                 {!user ? (
                                     <div>
                                         <Link href={'/login'} className='cursor-pointer'>
