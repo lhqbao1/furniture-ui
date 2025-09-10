@@ -63,6 +63,8 @@ const Banner = ({ height }: BannerProps) => {
     const onLogout = () => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("userId");
+        localStorage.removeItem("checkout");
+        localStorage.removeItem("payment");
         toast.success("Logged out successfully")
         // Reset react-query cache
         queryClient.invalidateQueries({ queryKey: ["me"] }); // xóa dữ liệu user cũ

@@ -85,7 +85,7 @@ export default function StickyIcon() {
                     height={64}
                     className="w-24 h-24 select-none pointer-events-auto "
                 />
-                <p className="absolute bottom-4 text-lg text-white font-bold left-7.5 text-center flex flex-col leading-3">{isLoadingCart || isErrorCart ? 0 : cart?.items.length} <br /> <span className="text-sm font-semibold">items</span></p>
+                <p className="absolute bottom-4 text-lg text-white font-bold left-7.5 text-center flex flex-col leading-3">{isLoadingCart || isErrorCart || !cart ? 0 : cart?.items.length} <br /> <span className="text-sm font-semibold">items</span></p>
             </div>
         </div>
     )

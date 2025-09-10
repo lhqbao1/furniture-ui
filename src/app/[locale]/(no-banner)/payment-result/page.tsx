@@ -31,8 +31,6 @@ const OrderPlaced = () => {
         if (id) setUserId(id)
     }, [])
 
-    console.log(paymentId)
-
     const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
         queryKey: ["checkout-id", checkoutId],
         queryFn: async () => {
@@ -78,7 +76,7 @@ const OrderPlaced = () => {
                 await sendMailMutation.mutateAsync({
                     to_email: user.email,
                     attachment_url: uploadRes.results[0].url,
-                    checkout_id: checkout.id,
+                    checkout_id: checkout.checkout_code,
                     first_name: user.first_name ?? ''
                 })
             } catch (err) {
