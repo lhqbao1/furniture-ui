@@ -23,7 +23,7 @@ const Footer = () => {
                 <h3 className="font-semibold mb-3">{t('pages')}</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     <li><Link href="/" className="">{t('aboutUs')}</Link></li>
-                    <li><Link href="/" className="">{t('career')}</Link></li>
+                    <li><Link href="/contact" className="">{t('contact')}</Link></li>
                     <li><Link href="/faq" className="">FAQ</Link></li>
                 </ul>
             </div>

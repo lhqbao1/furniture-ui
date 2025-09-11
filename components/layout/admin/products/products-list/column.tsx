@@ -9,6 +9,134 @@ import { Checkbox } from "@/components/ui/checkbox"
 import DeleteDialog from "./delete-dialog"
 import { NewProductItem } from "@/types/products"
 import Link from "next/link"
+import { useState } from "react"
+import { useEditProduct } from "@/features/products/hook"
+import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+
+function EditableNameCell({ product }: { product: NewProductItem }) {
+    const [value, setValue] = useState(product.name)
+    const [editing, setEditing] = useState(false)
+    const EditProductMutation = useEditProduct()
+
+    const handleEditProductName = () => {
+        EditProductMutation.mutate({
+            input: {
+                ...product,
+                name: value,
+                category_ids: product.categories.map((c) => c.id), // map ra id array
+            },
+            id: product.id,
+        }, {
+            onSuccess(data, variables, context) {
+                toast.success("Update product name successful")
+                setEditing(false)
+            },
+            onError(error, variables, context) {
+                toast.error("Update product name fail")
+            },
+        })
+    }
+
+    return (
+        <div className="w-60 text-wrap">
+            {editing ? (
+                <Input
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    onBlur={() => {
+                        if (value !== product.name) {
+                        } else {
+                            setEditing(false)
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            handleEditProductName()
+                        }
+                        if (e.key === "Escape") {
+                            setValue(product.name)
+                            setEditing(false)
+                        }
+                    }}
+                    autoFocus
+                    disabled={EditProductMutation.isPending}
+                    className={cn(EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
+                />
+            ) : (
+                <div
+                    className="cursor-pointer"
+                    onClick={() => setEditing(true)}
+                >
+                    {product.name}
+                </div>
+            )}
+        </div>
+    )
+}
+
+function EditableStockCell({ product }: { product: NewProductItem }) {
+    const [value, setValue] = useState(product.stock)
+    const [editing, setEditing] = useState(false)
+    const EditProductMutation = useEditProduct()
+
+    const handleEditProductStock = () => {
+        EditProductMutation.mutate({
+            input: {
+                ...product,
+                stock: value,
+                category_ids: product.categories.map((c) => c.id), // map ra id array
+            },
+            id: product.id,
+        }, {
+            onSuccess(data, variables, context) {
+                toast.success("Update product stock successful")
+                setEditing(false)
+            },
+            onError(error, variables, context) {
+                toast.error("Update product stock fail")
+            },
+        })
+    }
+
+    return (
+        <div className="">
+            {editing ? (
+                <Input
+                    type="number"
+                    value={value}
+                    onChange={(e) => setValue(e.target.valueAsNumber)}
+                    onBlur={() => {
+                        if (value !== product.stock) {
+                        } else {
+                            setEditing(false)
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            handleEditProductStock()
+                        }
+                        if (e.key === "Escape") {
+                            setValue(product.stock)
+                            setEditing(false)
+                        }
+                    }}
+                    autoFocus
+                    disabled={EditProductMutation.isPending}
+                    className={cn(EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
+                />
+            ) : (
+                <div
+                    className="cursor-pointer"
+                    onClick={() => setEditing(true)}
+                >
+                    {product.stock} pcs.
+                </div>
+            )}
+        </div>
+    )
+}
 
 
 export const productColumns: ColumnDef<NewProductItem>[] = [
@@ -54,11 +182,8 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     {
         accessorKey: "name",
         header: "NAME",
-        cell: ({ row }) => {
-            return (
-                <div className="w-60 text-wrap">{row.original.name}</div>
-            )
-        }
+        cell: ({ row }) => <EditableNameCell product={row.original} />,
+
     },
     {
         accessorKey: "category",
@@ -80,7 +205,7 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     {
         accessorKey: "stock",
         header: "STOCK",
-        cell: ({ row }) => <span>{row.original.stock} pcs.</span>,
+        cell: ({ row }) => <EditableStockCell product={row.original} />,
     },
     {
         accessorKey: "is_active",

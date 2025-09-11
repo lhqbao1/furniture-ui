@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
     Accordion,
     AccordionContent,
@@ -21,53 +21,84 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
     const [currentPolicy, setCurrentPolicy] = useState(0)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
 
-    const { data: policy, isLoading, isError } = useQuery({
+    const { data: policy, isLoading } = useQuery({
         queryKey: ["policy-items", versionId],
         queryFn: () => getPolicyItemsByVersion(versionId),
         enabled: !!versionId,
     })
 
+    // refs cho content bên phải
+    const contentRefs = useRef<Record<string, HTMLDivElement | null>>({})
+
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>
 
     return (
-        <div className='grid grid-cols-12 lg:pt-12 pt-3 h-full min-h-screen'>
-            <div className='col-span-4 border-r'>
+        <div className='grid grid-cols-12 lg:pt-12 pt-3 h-[calc(100vh-200px)]'>
+            {/* Sidebar bên trái */}
+            <div className='col-span-4 border-r overflow-y-auto'>
                 <Accordion
                     type="single"
                     collapsible
                     className="w-full"
                     defaultValue="item-1"
                 >
-                    {policy?.legal_policies.map((item, policyIndex) => {
-                        return (
-                            <AccordionItem value={item.id} key={item.id}>
-                                <AccordionTrigger className='pr-6 cursor-pointer'>{item.name}</AccordionTrigger>
-                                <AccordionContent className="flex flex-col gap-1.5 text-balance">
-                                    {item.child_legal_policies.map((child, policyItemIndex) => {
-                                        return (
-                                            <div key={child.id} className={cn('cursor-pointer hover:underline lg:pl-6 pl-2 relative',
-                                                currentPolicy === policyIndex && currentPolicyItem === policyItemIndex ? 'bg-secondary/20 hover:bg-secondary-20 px-2 py-1 font-semibold' : ''
-                                            )}>
-                                                <div onClick={() => {
-                                                    setCurrentPolicy(policyIndex)
-                                                    setCurrentPolicyItem(policyItemIndex)
-                                                }}>
-                                                    {child.label}
-                                                </div>
-                                                <div className={cn('absolute w-1 h-full bg-secondary right-0 top-0',
-                                                    currentPolicy === policyIndex && currentPolicyItem === policyItemIndex ? 'block' : 'hidden'
-                                                )}></div>
-                                            </div>
-                                        )
-                                    })}
-                                </AccordionContent>
-                            </AccordionItem>
-                        )
-                    })}
+                    {policy?.legal_policies.map((item, policyIndex) => (
+                        <AccordionItem value={item.id} key={item.id}>
+                            <AccordionTrigger className='pr-6 cursor-pointer'>{item.name}</AccordionTrigger>
+                            <AccordionContent className="flex flex-col gap-1.5 text-balance">
+                                {item.child_legal_policies.map((child, policyItemIndex) => (
+                                    <div
+                                        key={child.id}
+                                        className={cn(
+                                            'cursor-pointer hover:underline lg:pl-6 pl-2 relative',
+                                            currentPolicy === policyIndex && currentPolicyItem === policyItemIndex
+                                                ? 'bg-secondary/20 hover:bg-secondary-20 px-2 py-1 font-semibold'
+                                                : ''
+                                        )}
+                                        onClick={() => {
+                                            setCurrentPolicy(policyIndex)
+                                            setCurrentPolicyItem(policyItemIndex)
+
+                                            const refKey = `${policyIndex}-${policyItemIndex}`
+                                            const el = contentRefs.current[refKey]
+                                            if (el) {
+                                                const parent = el.closest(".content-scroll") as HTMLElement // thêm class cho container scroll của bạn
+                                                if (parent) {
+                                                    const top = el.offsetTop - 250 // trừ 40px
+                                                    parent.scrollTo({
+                                                        top,
+                                                        behavior: "smooth",
+                                                    })
+                                                } else {
+                                                    el.scrollIntoView({ behavior: "smooth", block: "start" })
+                                                }
+                                            }
+                                        }}
+
+                                    >
+                                        {child.label}
+                                        <div
+                                            className={cn(
+                                                'absolute w-1 h-full bg-secondary right-0 top-0',
+                                                currentPolicy === policyIndex && currentPolicyItem === policyItemIndex
+                                                    ? 'block'
+                                                    : 'hidden'
+                                            )}
+                                        />
+                                    </div>
+                                ))}
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
                 </Accordion>
             </div>
-            <div className='col-span-8 px-3 lg:px-12 space-y-6 pb-8'>
-                <h1 className='text-center text-3xl text-secondary font-semibold uppercase'>{policy?.legal_policies[currentPolicy].name}</h1>
+
+            {/* Nội dung bên phải */}
+            <div className='col-span-8 px-3 lg:px-12 space-y-6 pb-8 content-scroll overflow-y-auto'>
+                <h1 className='text-center text-3xl text-secondary font-semibold uppercase'>
+                    {policy?.legal_policies[currentPolicy].name}
+                </h1>
+
                 <div className='flex justify-between'>
                     <Button variant={'secondary'}>
                         <div className='flex items-center gap-2'>
@@ -82,20 +113,33 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                         </div>
                     </Button>
                 </div>
-                <div className='text-xl text-secondary font-bold'>{policy?.legal_policies?.[currentPolicy]?.child_legal_policies?.[currentPolicyItem]?.label ?? ''}</div>
-                {policy?.legal_policies?.[currentPolicy]?.child_legal_policies?.[currentPolicyItem]?.content ? (
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html:
-                                policy.legal_policies[currentPolicy].child_legal_policies[currentPolicyItem].content
-                        }}
-                    />
-                ) : (
-                    <p className="text-gray-500 italic">Updated...</p>
-                )}
-            </div >
-        </div >
 
+                {policy?.legal_policies.map((l, index) => (
+                    <div key={l.id} className='space-y-4'>
+                        {l.child_legal_policies.map((cl, clIndex) => {
+                            const refKey = `${index}-${clIndex}`
+                            return (
+                                <div
+                                    key={cl.id}
+                                    ref={(el) => {
+                                        contentRefs.current[refKey] = el
+                                    }}
+                                >
+                                    <div className='text-xl text-secondary font-bold'>{cl.label ?? ''}</div>
+                                    {cl?.content ? (
+                                        <div
+                                            dangerouslySetInnerHTML={{ __html: cl.content }}
+                                        />
+                                    ) : (
+                                        <p className="text-gray-500 italic">Updated...</p>
+                                    )}
+                                </div>
+                            )
+                        })}
+                    </div>
+                ))}
+            </div>
+        </div>
     )
 }
 
