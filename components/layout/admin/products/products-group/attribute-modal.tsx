@@ -65,6 +65,16 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
                         value={attr}
                         onChange={(e) => setAttr(e.target.value)}
                         placeholder="Product Attributes ex: Materials"
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault()
+                                if (attr.trim()) {
+                                    handleCreateVariant(attr.trim())
+                                } else {
+                                    toast.error("Please enter group name")
+                                }
+                            }
+                        }}
                     />
 
                     <div className="flex justify-end gap-2">

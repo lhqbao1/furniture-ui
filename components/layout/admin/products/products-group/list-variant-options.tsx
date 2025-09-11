@@ -183,7 +183,7 @@ const ListVariantOption = () => {
                                         </div>
                                     ))}
                                 </div>
-                                <AddOptionDialog variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
+                                <AddOptionDialog isImage={variant.variant.is_img} variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
                             </div>
                             <div className="flex items-center" onClick={() => handleDeleteVariant(variant.variant.id)}><Trash2 size={18} className="text-gray-600 cursor-pointer" /></div>
 

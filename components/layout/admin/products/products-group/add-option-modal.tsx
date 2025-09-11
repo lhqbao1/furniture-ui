@@ -23,9 +23,10 @@ interface AddImageOptionDialogProps {
     variantId: string
     open: boolean
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    isImage: boolean
 }
 
-const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
+const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
     const [open, setOpen] = useState(false)
     const [optionName, setOptionName] = useState("")
     const [imageDes, setImageDes] = useState("")
@@ -154,49 +155,55 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
                         </RadioGroup>
                     </div>
 
-                    {/* Upload box (disabled if optionName exists) */}
-                    <div
-                        {...getRootProps()}
-                        className={`flex flex-col items-center justify-center border-2 border-dashed rounded-md p-6 cursor-pointer transition ${isDragActive ? "border-primary bg-muted/30" : "border-gray-300"
-                            } ${optionName ? "opacity-50 pointer-events-none" : ""}`}
-                    >
-                        <input {...getInputProps()} />
-                        <span className="text-sm text-muted-foreground">
-                            {isDragActive
-                                ? "Drop file here ..."
-                                : "Drag or Browse an image"}
-                        </span>
-                    </div>
+                    {/* image group */}
+                    {isImage ?
+                        <>
+                            {/* Upload box (disabled if optionName exists) */}
+                            <div
+                                {...getRootProps()}
+                                className={`flex flex-col items-center justify-center border-2 border-dashed rounded-md p-6 cursor-pointer transition ${isDragActive ? "border-primary bg-muted/30" : "border-gray-300"
+                                    } ${optionName ? "opacity-50 pointer-events-none" : ""}`}
+                            >
+                                <input {...getInputProps()} />
+                                <span className="text-sm text-muted-foreground">
+                                    {isDragActive
+                                        ? "Drop file here ..."
+                                        : "Drag or Browse an image"}
+                                </span>
+                            </div>
 
-                    {/* Preview */}
-                    {preview && (
-                        <div className="flex justify-center">
-                            <Image
-                                src={preview}
-                                alt="preview"
-                                width={100}
-                                height={60}
-                                className="rounded-md object-cover"
-                                unoptimized
+                            {/* Preview */}
+                            {preview && (
+                                <div className="flex justify-center">
+                                    <Image
+                                        src={preview}
+                                        alt="preview"
+                                        width={100}
+                                        height={60}
+                                        className="rounded-md object-cover"
+                                        unoptimized
+                                    />
+                                </div>
+                            )}
+
+                            {/* Description (disabled if optionName exists) */}
+                            <Input
+                                placeholder="Image description"
+                                value={imageDes}
+                                onChange={(e) => setImageDes(e.target.value)}
+                                disabled={!!optionName}
                             />
-                        </div>
-                    )}
+                        </>
+                        : ''}
 
-                    {/* Description (disabled if optionName exists) */}
-                    <Input
-                        placeholder="Image description"
-                        value={imageDes}
-                        onChange={(e) => setImageDes(e.target.value)}
-                        disabled={!!optionName}
-                    />
 
                     {/* Option name (disabled if image or description exists) */}
-                    <Input
+                    {isImage ? '' : <Input
                         placeholder="Option name"
                         value={optionName}
                         onChange={(e) => setOptionName(e.target.value)}
                         disabled={hasImageOrDesc}
-                    />
+                    />}
 
                     {/* Buttons */}
                     <div className="flex justify-end gap-2">

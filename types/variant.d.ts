@@ -1,6 +1,7 @@
 export interface VariantResponse {
     id: string
     name: string
+    is_img: boolean
     parent_id: string
     created_at: string
     updated_at: string

@@ -29,10 +29,10 @@ export async function getVariantOptionByVariant(name: string) {
   return data as VariantOption[]
 }
 
-export async function createVariant(parent_id: string, name: string) {
+export async function createVariant(parent_id: string, name: string, is_img?: boolean) {
   const { data } = await apiAdmin.post(
     `/variants/${parent_id}`,
-    {name},
+    {name,is_img},
     {
       headers: {
         "Content-Type": "application/json",

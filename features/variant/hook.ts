@@ -50,8 +50,8 @@ export function useGetVariantOptionByVariant(name: string) {
 export function useCreateVariant() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ parent_id, name }: { parent_id: string; name: string }) =>
-      createVariant(parent_id, name),
+    mutationFn: ({ parent_id, name, is_img }: { parent_id: string; name: string, is_img?: boolean }) =>
+      createVariant(parent_id, name, is_img),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["variants"] })
       queryClient.invalidateQueries({ queryKey: ["product-group-detail"] })
