@@ -131,7 +131,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                 )}>
                     <div className='grid-cols-12 grid gap-24 w-full'>
                         <div className='col-span-9 flex flex-col gap-4'>
-                            {defaultValues ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
+                            {!defaultValues ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
                                 : ''}
                             {/*Product Name */}
                             <FormField
