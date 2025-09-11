@@ -267,6 +267,16 @@ const ProductDetails = () => {
                                 {/*Product details */}
                                 <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
                                     <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
+                                    <div className='flex flex-row justify-start gap-4 items-center'>
+                                        {/* <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>
+                                            {productDetails.tag}
+                                        </div> */}
+
+                                        <div className='flex gap-1 items-center'>
+                                            <p className='text-xl text-gray-500 font-bold'>5</p>
+                                            <ListStars rating={5} />
+                                        </div>
+                                    </div>
                                     <div className='flex gap-2'>
                                         <p className='text-primary lg:text-3xl text-xl font-semibold'>€{productDetails.final_price.toFixed(2)}</p>
                                         <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>€{productDetails.price.toFixed(2)}</p>
@@ -285,16 +295,6 @@ const ProductDetails = () => {
                                                 {t('inStock')}: {productDetails.stock}
                                             </div>
                                             : <div>{t('outStock')}</div>}
-                                        <div className='flex flex-row justify-start gap-4 items-center'>
-                                            {/* <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>
-                                            {productDetails.tag}
-                                        </div> */}
-
-                                            <div className='flex gap-1 items-center'>
-                                                <p className='text-xl text-gray-500 font-bold'>5</p>
-                                                <ListStars rating={5} />
-                                            </div>
-                                        </div>
                                     </div>
 
                                     {parentProduct && parentProduct?.variants?.length > 0 &&
@@ -369,7 +369,7 @@ const ProductDetails = () => {
                                             />
                                         </div>
                                         <Button
-                                            className="rounded-full px-10 font-bold text-lg lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
+                                            className="rounded-xl px-10 font-bold text-lg lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
                                             type="submit"
                                         >
                                             {t('addToCart')}
@@ -379,7 +379,7 @@ const ProductDetails = () => {
                                                     e.stopPropagation()
                                                     handleAddProductToWishlist()
                                                 }}
-                                                className="absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0"
+                                                className="absolute bg-white rounded-xl aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0"
                                             >
                                                 <Heart />
                                             </div>
@@ -389,7 +389,7 @@ const ProductDetails = () => {
                                                     e.stopPropagation()
                                                     handleAddProductToCart()
                                                 }}
-                                                className="absolute bg-white rounded-full aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0"
+                                                className="absolute bg-white rounded-xl aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0"
                                             >
                                                 <Plus />
                                             </div>

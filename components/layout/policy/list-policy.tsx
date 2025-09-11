@@ -11,7 +11,6 @@ import { getPolicyItemsByVersion } from '@/features/policy/api'
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { PolicyResponse } from '@/types/policy'
 
 interface ListPolicyProps {
     versionId: string
@@ -64,7 +63,7 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                                             if (el) {
                                                 const parent = el.closest(".content-scroll") as HTMLElement // thêm class cho container scroll của bạn
                                                 if (parent) {
-                                                    const top = el.offsetTop - 250 // trừ 40px
+                                                    const top = el.offsetTop - 250 // trừ 250
                                                     parent.scrollTo({
                                                         top,
                                                         behavior: "smooth",
@@ -114,30 +113,26 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                     </Button>
                 </div>
 
-                {policy?.legal_policies.map((l, index) => (
-                    <div key={l.id} className='space-y-4'>
-                        {l.child_legal_policies.map((cl, clIndex) => {
-                            const refKey = `${index}-${clIndex}`
-                            return (
+                {policy?.legal_policies[currentPolicy].child_legal_policies.map((cl, clIndex) => {
+                    const refKey = `${currentPolicy}-${clIndex}`
+                    return (
+                        <div
+                            key={cl.id}
+                            ref={(el) => {
+                                contentRefs.current[refKey] = el
+                            }}
+                        >
+                            <div className='text-xl text-secondary font-bold'>{cl.label ?? ''}</div>
+                            {cl?.content ? (
                                 <div
-                                    key={cl.id}
-                                    ref={(el) => {
-                                        contentRefs.current[refKey] = el
-                                    }}
-                                >
-                                    <div className='text-xl text-secondary font-bold'>{cl.label ?? ''}</div>
-                                    {cl?.content ? (
-                                        <div
-                                            dangerouslySetInnerHTML={{ __html: cl.content }}
-                                        />
-                                    ) : (
-                                        <p className="text-gray-500 italic">Updated...</p>
-                                    )}
-                                </div>
-                            )
-                        })}
-                    </div>
-                ))}
+                                    dangerouslySetInnerHTML={{ __html: cl.content }}
+                                />
+                            ) : (
+                                <p className="text-gray-500 italic">Updated...</p>
+                            )}
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
