@@ -33,6 +33,8 @@ import { NewProductItem } from '@/types/products'
 import { useAddToWishList } from '@/features/wishlist/hook'
 import { Voucher } from '@/types/voucher'
 import { useTranslations } from 'next-intl'
+import { HandleApiError } from '@/lib/api-helper'
+import { cn } from '@/lib/utils'
 
 const ProductDetails = () => {
     const params = useParams()
@@ -139,10 +141,11 @@ const ProductDetails = () => {
     const handleAddProductToWishlist = () => {
         addProductToWishlistMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
             onSuccess: () => {
-                toast.success('Product is added to wishlist')
+                toast.success(t('addToWishlistSuccess'))
             },
-            onError: () => {
-                toast.error('Add to wishlist failed')
+            onError: (error) => {
+                const { status, message } = HandleApiError(error, t);
+                toast.error(message)
             },
         })
     }
@@ -150,24 +153,38 @@ const ProductDetails = () => {
     const handleAddProductToCart = () => {
         createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
             onSuccess: () => {
-                toast.success('Product is added to cart')
+                toast.success(t('addToCartSuccess'))
             },
-            onError: () => {
-                toast.error('Add to cart failed')
+            onError: (error) => {
+                const { status, message } = HandleApiError(error, t);
+                toast.error(message)
             },
         })
     }
 
     const handleSubmit = (values: z.infer<typeof cartFormSchema>) => {
-        addProductToCheckOutMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+        createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
             onSuccess: () => {
-                toast.success('Product is added to checkout')
-                router.push('/check-out')
+                toast.success(t('addToCartSuccess'))
             },
-            onError: () => {
-                toast.error('Add to checkout failed')
+            onError: (error) => {
+                const { status, message } = HandleApiError(error, t);
+                toast.error(<div className='flex flex-col'>
+                    <div>{message}</div>
+                    <div className=''>Login now</div>
+                </div>)
             },
         })
+        // addProductToCheckOutMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+        //     onSuccess: () => {
+        //         toast.success(t('addToCheckoutSuccess'))
+        //         router.push('/check-out')
+        //     },
+        //     onError: (error) => {
+        //         const { status, message } = HandleApiError(error, t);
+        //         toast.error(message)
+        //     },
+        // })
     }
 
     // Image zoom
@@ -254,15 +271,32 @@ const ProductDetails = () => {
                                         <p className='text-primary lg:text-3xl text-xl font-semibold'>€{productDetails.final_price.toFixed(2)}</p>
                                         <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>€{productDetails.price.toFixed(2)}</p>
                                     </div>
-                                    <div className='flex flex-row justify-start gap-4 items-center'>
-                                        <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>
+
+                                    <div className='space-y-2'>
+                                        <div>{t('includeVatAndShipping')}</div>
+                                        {productDetails.stock > 0 ?
+                                            <div
+                                                className={cn(`border py-1.5 px-2.5 rounded-md w-fit`,
+                                                    productDetails.stock <= 10 && 'text-red-500 border-red-500',
+                                                    productDetails.stock > 10 && productDetails.stock < 30 ? 'text-primary border-primary' : '',
+                                                    productDetails.stock > 30 && 'text-secondary border-secondary'
+                                                )}
+                                            >
+                                                {t('inStock')}: {productDetails.stock}
+                                            </div>
+                                            : <div>{t('outStock')}</div>}
+                                        <div className='flex flex-row justify-start gap-4 items-center'>
+                                            {/* <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>
                                             {productDetails.tag}
-                                        </div>
-                                        <div className='flex gap-1 items-center'>
-                                            <p className='text-xl text-gray-500 font-bold'>5</p>
-                                            <ListStars rating={5} />
+                                        </div> */}
+
+                                            <div className='flex gap-1 items-center'>
+                                                <p className='text-xl text-gray-500 font-bold'>5</p>
+                                                <ListStars rating={5} />
+                                            </div>
                                         </div>
                                     </div>
+
                                     {parentProduct && parentProduct?.variants?.length > 0 &&
                                         <ListVariant
                                             variant={parentProduct.variants}
@@ -271,7 +305,8 @@ const ProductDetails = () => {
                                         />
                                     }
 
-                                    <div className='grid grid-cols-2 gap-2'>
+
+                                    {/* <div className='grid grid-cols-2 gap-2'>
                                         <div className='flex flex-row gap-1 items-center'>
                                             <Image
                                                 src={'/1.svg'}
@@ -315,7 +350,7 @@ const ProductDetails = () => {
                                             />
                                             <p className='text-base'>Lorem ipsum</p>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className='flex flex-row gap-6 items-end'>
                                         <div className='lg:basis-1/3 basis-2/5'>
@@ -334,10 +369,10 @@ const ProductDetails = () => {
                                             />
                                         </div>
                                         <Button
-                                            className="rounded-full px-10 font-bold text-lg lg:basis-2/5 basis-3/5 relative"
+                                            className="rounded-full px-10 font-bold text-lg lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
                                             type="submit"
                                         >
-                                            {t('quickBuy')}
+                                            {t('addToCart')}
                                             <div
                                                 onClick={(e) => {
                                                     e.preventDefault()
@@ -363,7 +398,7 @@ const ProductDetails = () => {
                                     </div>
 
                                     {/* Voucher */}
-                                    <div className='flex lg:flex-row flex-col justify-center gap-2 mt-6'>
+                                    {/* <div className='flex lg:flex-row flex-col justify-center gap-2 mt-6'>
                                         {vouchers.map((item, index) => (
                                             <ProductVoucher
                                                 item={item}
@@ -372,7 +407,7 @@ const ProductDetails = () => {
                                                 onSelect={() => handleSelectVoucher(item.id)}
                                             />
                                         ))}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
 

@@ -129,5 +129,12 @@
     "messagePlaceholder": "Enter details of your request...",
     "browseFile": "Browse Files",
     "dragFile": "Drop your images here",
-    "dragAndDropFile": "Drag and drop your images here"
+    "dragAndDropFile": "Drag and drop your images here",
+    "401": "Unauthorized. Please login to buy product",
+    "addToCartSuccess": "Product is added to cart",
+    "addToWishlistSuccess": "Product is added to wishlist",
+    "addToCheckoutSuccess": "Product is added to checkout",
+    "inStock": "In stock",
+    "outStock": "Out of stock",
+    "includeVatAndShipping": "Included VAT and shipping cost"
 }

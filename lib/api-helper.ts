@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
+import { useTranslations } from "next-intl";
 
-export function handleApiError(error: unknown) {
+export function HandleApiError(error: unknown,t: (key: string) => string) {
   const axiosError = error as AxiosError<{ detail?: string }>;
   const status = axiosError.response?.status;
   const message =
@@ -10,7 +11,7 @@ export function handleApiError(error: unknown) {
     case 400:
       return { status, message: "Bad request: " + message };
     case 401:
-      return { status, message: "Unauthorized. Please login again." };
+      return { status, message: `${t('401')}` };
     case 403:
       return { status, message: "Forbidden: You don’t have permission." };
     case 404:

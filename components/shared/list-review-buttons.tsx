@@ -7,13 +7,15 @@ import { NewProductItem } from '@/types/products'
 import { toast } from 'sonner'
 import { useAddToWishList } from '@/features/wishlist/hook'
 import { useRouter } from 'next/navigation'
-import { handleApiError } from '@/lib/api-helper'
+import { HandleApiError } from '@/lib/api-helper'
+import { useTranslations } from 'next-intl'
 
 interface IconListProps {
     currentProduct?: NewProductItem
 }
 
 const IconList = ({ currentProduct }: IconListProps) => {
+    const t = useTranslations()
     const containersRef = useRef<HTMLDivElement[]>([])
     const addToCartMutation = useAddToCart()
     const addToWishlistMutation = useAddToWishList()
@@ -26,7 +28,7 @@ const IconList = ({ currentProduct }: IconListProps) => {
                 toast.success("Added to cart")
             },
             onError(error, variables, context) {
-                const { status, message } = handleApiError(error);
+                const { status, message } = HandleApiError(error, t);
                 toast.error(message)
                 if (status === 401) router.push('/login')
             },
@@ -40,7 +42,7 @@ const IconList = ({ currentProduct }: IconListProps) => {
                 toast.success("Added to wishlist")
             },
             onError(error, variables, context) {
-                const { status, message } = handleApiError(error);
+                const { status, message } = HandleApiError(error, t);
                 toast.error(message)
                 if (status === 401) router.push('/login')
             },
