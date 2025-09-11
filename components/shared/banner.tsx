@@ -54,7 +54,6 @@ const Banner = ({ height }: BannerProps) => {
     const pathname = usePathname()
 
     const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
-
     const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useQuery({
         queryKey: ["me", userId],
         queryFn: () => getMe(),

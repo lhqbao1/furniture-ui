@@ -18,7 +18,7 @@ export async function getCategories(){
 
 export async function getCategoryById(id: string){
     const {data} = await apiPublic.get(
-        `/categories/${id}`,
+        `/categories/details/${id}`,
         {
         headers: {
           "Content-Type": "application/json",

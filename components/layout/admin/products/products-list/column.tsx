@@ -288,7 +288,7 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
                     <DeleteDialog product={row.original} />
 
                     {/* View */}
-                    <Link href={categoryHref}>
+                    <Link href={`/product/${categoryHref}`}>
                         <Button variant="ghost" size="icon">
                             <Eye className="w-4 h-4 text-secondary" />
                         </Button>

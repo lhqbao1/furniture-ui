@@ -12,6 +12,8 @@ import { useCreateVariant } from '@/features/variant/hook'
 import { toast } from 'sonner'
 import { useFormContext } from 'react-hook-form'
 import { Loader2 } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 interface AttributesModalProps {
     dialogOpen: boolean
@@ -22,11 +24,13 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
     const { watch } = useFormContext()
     const parent_id = watch('parent_id')
     const [attr, setAttr] = useState("")
+    const [isImage, setIsImage] = useState<boolean>(false)
+
 
     const createVariantMutation = useCreateVariant()
 
     const handleCreateVariant = (name: string) => {
-        createVariantMutation.mutate({ parent_id, name }, {
+        createVariantMutation.mutate({ parent_id, name, is_img: isImage }, {
             onSuccess(data, variables, context) {
                 toast.success("Product attributes created")
                 setDialogOpen(false)
@@ -61,6 +65,23 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
                 </DialogHeader>
 
                 <div className="space-y-4">
+                    <div>
+                        <Label className="mb-2 block text-sm font-medium">Variant type</Label>
+                        <RadioGroup
+                            className="flex gap-4"
+                            value={isImage ? "image" : "text"}
+                            onValueChange={(val) => setIsImage(val === 'image')}
+                        >
+                            <div className="flex items-center gap-1">
+                                <RadioGroupItem value="image" id="image" />
+                                <Label htmlFor="image">Image option</Label>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <RadioGroupItem value="text" id="text" />
+                                <Label htmlFor="text">Text option</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
                     <Input
                         value={attr}
                         onChange={(e) => setAttr(e.target.value)}

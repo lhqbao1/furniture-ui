@@ -3,7 +3,7 @@ import CustomBreadCrumb from '@/components/shared/breadcrumb'
 import ProductVoucher from '@/components/shared/product-voucher'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
-import { Facebook, Heart, Instagram, Plus, Twitter, Youtube } from 'lucide-react'
+import { Eye, Facebook, Heart, Instagram, Plus, Twitter, Youtube } from 'lucide-react'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -199,6 +199,13 @@ const ProductDetails = () => {
 
     const [selectedVoucher, setSelectedVoucher] = useState<number>()
     const handleSelectVoucher = (item: number) => setSelectedVoucher(item)
+    const adminId = typeof window !== "undefined" ? localStorage.getItem("admin_access_token") : null;
+
+    const moveToAdmin = (productId: string) => {
+        if (adminId) {
+            router.push(`/admin/products/${productId}/edit`)
+        }
+    }
 
     return (
         <div className='py-3 lg:pt-6'>
@@ -267,6 +274,11 @@ const ProductDetails = () => {
 
                                 {/*Product details */}
                                 <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
+                                    {adminId ?
+                                        <div className='cursor-pointer text-primary' onClick={() => moveToAdmin(productDetails.id)}>
+                                            <Eye />
+                                        </div>
+                                        : ''}
                                     <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
                                     <div className='flex flex-row justify-start gap-4 items-center'>
                                         {/* <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>

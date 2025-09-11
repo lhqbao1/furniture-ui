@@ -34,12 +34,6 @@ export default async function Home() {
     queryFn: () => getCartItems(),
   })
 
-  // Prefetch trending products
-  await queryClient.prefetchQuery({
-    queryKey: ["me"],
-    queryFn: () => getMe(),
-  })
-
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div id="home" className="w-full">
