@@ -183,7 +183,7 @@ const FilterSection = () => {
                             <FormItem>
                                 <FormLabel className="font-bold text-base">Size (cm)</FormLabel>
                                 <div className="relative flex flex-row justify-center">
-                                    <Image src="/Asset10.png" width={100} height={100} alt="" className="scale-115" />
+                                    <Image src="/Asset10.png" width={100} height={100} alt="" className="scale-115" unoptimized />
                                     <FormField
                                         control={form.control}
                                         name="size.lengthValue"

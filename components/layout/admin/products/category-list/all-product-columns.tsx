@@ -40,6 +40,7 @@ export const productsColumn: ColumnDef<ProductItem>[] = [
                         width={40}
                         height={40}
                         alt=""
+                        unoptimized
                     />
                 </div>
             )

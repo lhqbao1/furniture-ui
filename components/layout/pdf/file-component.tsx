@@ -111,12 +111,14 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                     height={160}
                     width={160}
                     alt=""
+                    unoptimized
                 />
                 <Image
                     src={'/Vector2.png'}
                     height={160}
                     width={160}
                     alt=""
+                    unoptimized
                 />
             </div>
 
@@ -126,12 +128,14 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                     height={160}
                     width={160}
                     alt=""
+                    unoptimized
                 />
                 <Image
                     src={'/Vector4.png'}
                     height={160}
                     width={160}
                     alt=""
+                    unoptimized
                 />
             </div>
         </div>

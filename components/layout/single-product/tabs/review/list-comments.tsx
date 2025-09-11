@@ -50,7 +50,7 @@ const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps
                                         <div className='flex items-center gap-2'>
                                             <p className='text-gray-600 font-bold'>{item.name}</p>
                                             {item.company && (
-                                                <Image src={`/${item.company}`} width={40} height={40} alt='' />
+                                                <Image src={`/${item.company}`} width={40} height={40} alt='' unoptimized />
                                             )}
                                         </div>
                                         <div className='flex gap-2'>

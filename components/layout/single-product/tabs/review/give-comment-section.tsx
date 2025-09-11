@@ -17,7 +17,7 @@ const GiveCommentSection = () => {
             <div className='text-gray-600 text-lg font-bold'>{t('writeReview')}</div>
             <div className='flex justify-between items-center'>
                 <div className='flex gap-2 items-center'>
-                    <Image src={'/people.webp'} height={100} width={100} alt='' className='rounded-full size-16' />
+                    <Image src={'/people.webp'} height={100} width={100} alt='' className='rounded-full size-16' unoptimized />
                     <div>
                         <p className='text-lg text-gray-600 font-bold'>Tom Hank</p>
                         <p className='text-sm text-secondary font-semibold'>Purchased</p>

@@ -79,7 +79,6 @@ export function AppSidebar() {
                                 width={100}
                                 height={100}
                                 priority
-                                unoptimized
                                 className="w-auto lg:h-[80px] h-[50px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
                             <div className="font-libre lg:text-[29px] text-xl flex gap-1">
@@ -119,6 +118,7 @@ export function AppSidebar() {
                                                                     width={40}
                                                                     alt=""
                                                                     className="lg:w-8 lg:h-8 w-6 h-6"
+                                                                    unoptimized
                                                                 />
                                                             </div>
                                                             <span className="lg:text-lg text-lg">{item.title}</span>
@@ -183,6 +183,7 @@ export function AppSidebar() {
                                                         width={40}
                                                         alt=""
                                                         className="lg:w-8 lg:h-8 w-6 h-6"
+                                                        unoptimized
                                                     />
                                                 </div>
                                                 <span className="lg:text-lg text-lg">{item.title}</span>

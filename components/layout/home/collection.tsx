@@ -151,6 +151,7 @@ const Collection = () => {
                                 width={400}
                                 alt={item.name}
                                 className='object-cover absolute w-full h-full top-0 z-0 rounded-2xl'
+                                unoptimized
                             />
                             <div className='collection-details z-10 p-6'>
                                 <h3 className='text-white uppercase text-4xl font-bold absolute top-7 left-7 z-10'>

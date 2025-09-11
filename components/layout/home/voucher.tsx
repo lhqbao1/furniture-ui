@@ -12,6 +12,7 @@ const Voucher = () => {
                     height={200}
                     alt=''
                     className='h-full w-full object-fill rounded-2xl absolute top-0 z-0'
+                    unoptimized
                 />
                 <div className='absolute inset-0 rounded-2xl bg-gradient-to-l from-white/10 to-black/20'></div>
             </div>
@@ -22,6 +23,7 @@ const Voucher = () => {
                     height={200}
                     alt=''
                     className='h-full w-full object-fill rounded-2xl absolute top-0 z-0'
+                    unoptimized
                 />
                 <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 to-black/20'></div>
             </div>

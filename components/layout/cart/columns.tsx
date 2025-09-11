@@ -74,6 +74,7 @@ export const GetCartColumns = ({
                             width={60}
                             height={60}
                             className="rounded shrink-0"
+                            unoptimized
                         />
                         <div className="flex-1 min-w-0">
                             <p className="font-semibold break-words truncate">

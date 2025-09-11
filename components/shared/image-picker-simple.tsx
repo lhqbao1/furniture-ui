@@ -63,6 +63,7 @@ export default function FileDropZone() {
                             alt={file.name}
                             fill
                             className="object-cover"
+                            unoptimized
                         />
                     </div>
                 ))}

@@ -107,7 +107,7 @@ const ProductReviewTab = () => {
                                             className='absolute xl:left-8 left:4 top-5'
                                             style={{ transform: `rotate(${-[(index + 1) * 10]}deg)` }}
                                         >
-                                            <Image src={`/${item}.png`} width={100} height={100} alt='' className='size-full' />
+                                            <Image src={`/${item}.png`} width={100} height={100} alt='' className='size-full' unoptimized />
                                         </div>
                                     ))}
                                 </div>
@@ -118,7 +118,7 @@ const ProductReviewTab = () => {
                                     <DialogDescription className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full h-full pt-4'>
                                         {allProducts.map((item, index) => (
                                             <div key={index}>
-                                                <Image src={item.image} height={200} width={200} alt='' className='w-full object-cover shadow-sm rounded-xl' />
+                                                <Image src={item.image} height={200} width={200} alt='' className='w-full object-cover shadow-sm rounded-xl' unoptimized />
                                             </div>
                                         ))}
                                     </DialogDescription>

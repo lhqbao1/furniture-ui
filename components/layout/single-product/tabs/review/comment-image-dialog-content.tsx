@@ -29,6 +29,7 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
                     width={500}
                     height={500}
                     className="object-cover"
+                    unoptimized
                 />
 
                 {/* Nút điều hướng */}
@@ -60,6 +61,7 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
                         alt=""
                         width={40}
                         height={40}
+                        unoptimized
                     />
                 </div>
                 <ListStars rating={comment.rating} />
@@ -82,6 +84,7 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
                                 width={100}
                                 height={100}
                                 className="rounded-sm"
+                                unoptimized
                             />
                         </div>
                     ))}

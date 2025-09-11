@@ -103,7 +103,7 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
                             {images.map((src, idx) => (
                                 <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group">
-                                    <Image src={src} alt={`Uploaded ${idx}`} fill className="object-cover" />
+                                    <Image src={src} alt={`Uploaded ${idx}`} fill className="object-cover" unoptimized />
                                     <button
                                         type="button"
                                         onClick={() => removeImage(idx)}

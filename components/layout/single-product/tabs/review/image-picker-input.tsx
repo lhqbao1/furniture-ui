@@ -77,6 +77,7 @@ function SortableImage({
                 alt={`Uploaded-${item.id}`}
                 fill
                 className="object-cover z-0"
+                unoptimized
             />
             <button
                 type="button"
@@ -227,7 +228,7 @@ function ImagePickerInput<T extends FieldValues>({
             {isSingle ? (
                 watched ? (
                     <div className="col-span-6 relative h-[100px] w-[100px] aspect-square rounded-lg group">
-                        <Image src={watched as string} alt="Uploaded" fill className="object-cover" />
+                        <Image src={watched as string} alt="Uploaded" fill className="object-cover" unoptimized />
                         <button
                             type="button"
                             onClick={(e) => {

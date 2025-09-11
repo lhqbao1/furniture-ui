@@ -55,6 +55,7 @@ const ImageSinglePicker: React.FC<ImageSinglePickerProps> = ({ item, active, onC
                             height={50}
                             alt=""
                             className="object-fill h-full"
+                            unoptimized
                         />
                     </button>
                 )}
@@ -77,6 +78,7 @@ const ImageSinglePicker: React.FC<ImageSinglePickerProps> = ({ item, active, onC
                 height={50}
                 alt=""
                 className="object-fill h-full"
+                unoptimized
             />
         </button>
     );

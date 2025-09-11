@@ -165,6 +165,7 @@ const ListVariantOption = () => {
                                                     height={40}
                                                     alt=""
                                                     className="w-10 h-10 object-cover rounded"
+                                                    unoptimized
                                                 />
                                             ) : (
                                                 <span className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground block">

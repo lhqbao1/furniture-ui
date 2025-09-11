@@ -122,6 +122,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                     width={30}
                                                     height={30}
                                                     className="w-12 h-12 object-contain rounded"
+                                                    unoptimized
                                                 />
                                             ) : (
                                                 <span className="border-2 rounded-sm py-1 px-2">
@@ -155,6 +156,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                             height={40}
                                                             alt=""
                                                             className="h-10"
+                                                            unoptimized
                                                         />
                                                         <div className="text-base">{listProducts?.find((p) => p.id === selectedAction[idx])?.name}</div>
                                                     </div>
@@ -198,6 +200,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                                     height={25}
                                                                     width={25}
                                                                     alt=""
+                                                                    unoptimized
                                                                 />
                                                                 <span>{product.name}</span>
                                                             </div>

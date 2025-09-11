@@ -75,6 +75,7 @@ const ListVariant = ({ variant, currentProduct }: ListVariantProps) => {
                                                         height={50}
                                                         alt={option.label || group.variant.name}
                                                         className=""
+                                                        unoptimized
                                                     />
                                                     {option.img_description}
                                                 </div>

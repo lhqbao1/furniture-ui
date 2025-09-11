@@ -53,6 +53,7 @@ export default function CommentImageDialog({ listComments, comment }: { listComm
                                         width={80}
                                         height={80}
                                         className="rounded-xl object-contain"
+                                        unoptimized
                                     />
                                     {isLast && (
                                         <div className="absolute inset-0 flex items-center justify-center w-full h-full bg-gray-300/50 rounded-xl">

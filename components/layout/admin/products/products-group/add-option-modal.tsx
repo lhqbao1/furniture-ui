@@ -177,6 +177,7 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
                                 width={100}
                                 height={60}
                                 className="rounded-md object-cover"
+                                unoptimized
                             />
                         </div>
                     )}

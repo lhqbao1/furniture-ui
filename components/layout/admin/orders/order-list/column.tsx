@@ -143,7 +143,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
             return (
                 <div className="w-full flex justify-center">
                     <div className="h-20 w-20 relative">
-                        <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" />
+                        <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />
                     </div>
                 </div>
             )

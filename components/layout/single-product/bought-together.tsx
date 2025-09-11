@@ -23,6 +23,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
                         width={300}
                         height={200}
                         className=''
+                        unoptimized
                     />
                     <div className='flex flex-col items-center'>
                         <p>{productDetails.name}</p>
@@ -44,6 +45,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
                         width={300}
                         height={200}
                         className=''
+                        unoptimized
                     />
                     <div className='flex flex-col items-center relative w-full'>
                         <p>{productDetails.name}</p>
@@ -78,6 +80,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
                         width={300}
                         height={200}
                         className=''
+                        unoptimized
                     />
                     <div className='flex flex-col items-center'>
                         <p>{productDetails.name}</p>

@@ -170,7 +170,7 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
             return (
                 <div className="w-12 h-12 relative">
                     {image ? (
-                        <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px"
+                        <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px" unoptimized
                         />
                     ) : (
                         <div className="w-12 h-12 bg-gray-200 rounded-md" />
@@ -246,17 +246,17 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     },
     {
         id: "amazon",
-        header: () => <div className="flex justify-center"><Image src="/amazon.png" alt="default" width={56} height={36} /></div>,
+        header: () => <div className="flex justify-center"><Image src="/amazon.png" alt="default" width={56} height={36} unoptimized /></div>,
         cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-primary cursor-pointer' /></div>,
     },
     {
         id: "ebay",
-        header: () => <div className="flex justify-center"><Image src="/ebay.png" alt="default" width={56} height={36} /></div>,
+        header: () => <div className="flex justify-center"><Image src="/ebay.png" alt="default" width={56} height={36} unoptimized /></div>,
         cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-[#0064D4] cursor-pointer' /></div>,
     },
     {
         id: "kaufland",
-        header: () => <div className="flex justify-center"><Image src="/kau.png" alt="default" width={64} height={36} /></div>,
+        header: () => <div className="flex justify-center"><Image src="/kau.png" alt="default" width={64} height={36} unoptimized /></div>,
         cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-[#C40809] cursor-pointer' /></div>,
     },
     {

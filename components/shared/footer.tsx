@@ -48,6 +48,7 @@ const Footer = () => {
                         height={50}
                         alt="fb"
                         className="w-12 h-12 object-fill"
+                        unoptimized
                     />
                     <Image
                         src={'/x.png'}
@@ -55,7 +56,7 @@ const Footer = () => {
                         height={50}
                         alt="fb"
                         className="w-12 h-12 object-fill"
-
+                        unoptimized
                     />
                     <Image
                         src={'/insta.png'}
@@ -63,7 +64,7 @@ const Footer = () => {
                         height={50}
                         alt="fb"
                         className="w-12 h-12 object-fill"
-
+                        unoptimized
                     />
                 </div>
             </div>

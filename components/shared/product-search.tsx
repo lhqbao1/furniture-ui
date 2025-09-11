@@ -117,6 +117,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                                                             width={50}
                                                             alt=""
                                                             className="h-12 w-12"
+                                                            unoptimized
                                                         />
                                                         <div className="font-semibold">{product.name}</div>
                                                     </div>

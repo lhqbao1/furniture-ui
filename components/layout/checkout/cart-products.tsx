@@ -33,7 +33,7 @@ export default function CartItemSelector({ field }: CartItemSelectorProps) {
                 return (
                     <div key={item.id} className="grid grid-cols-12 items-center gap-4">
                         <div className="flex gap-2 items-center col-span-5">
-                            <Image src={item.imageUrl} alt={item.name} width={80} height={80} className="rounded-md" />
+                            <Image src={item.imageUrl} alt={item.name} width={80} height={80} className="rounded-md" unoptimized />
                             <div>
                                 <h4 className="text-sm font-semibold">{item.name}</h4>
                                 <div className="text-sm text-muted-foreground">Color: {item.color}</div>

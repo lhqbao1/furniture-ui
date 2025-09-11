@@ -104,7 +104,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     width={100}
                     height={100}
                     alt=""
-                    unoptimized
                 />
                 <h1 className="text-3xl font-semibold text-secondary text-center font-libre flex gap-2">
                     <span>Welcome to</span>

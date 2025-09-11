@@ -78,6 +78,7 @@ export const GetWishlistColumns = ({
                             width={60}
                             height={60}
                             className="rounded"
+                            unoptimized
                         />
                         <div>
                             <p className="font-semibold">{item.products.name}</p>

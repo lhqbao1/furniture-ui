@@ -31,6 +31,7 @@ export default function PaymentMethodSelector() {
                                         height={30}
                                         alt=""
                                         className="size-6"
+                                        unoptimized
                                     />
                                     <span>{option.label}</span>
                                 </Label>

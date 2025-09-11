@@ -29,6 +29,7 @@ const ListDE = () => {
                                         width={60}
                                         height={40}
                                         className=''
+                                        unoptimized
                                     />
                                 </div>
                                 :
@@ -41,6 +42,7 @@ const ListDE = () => {
                                         width={60}
                                         height={30}
                                         className={`${item.id === 1 || item.id === 2 ? 'w-5 h-4' : ''}`}
+                                        unoptimized
                                     />
                                     <span className={cn('text-sm', isSelected && 'text-primary')}>{item.text}</span>
                                 </div>

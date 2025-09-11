@@ -87,6 +87,7 @@ export default function ProductVariants({
                                                     height={50}
                                                     alt={options.label}
                                                     className="shadow-sm bg-white rounded-sm"
+                                                    unoptimized
                                                 />
                                             </div>
                                         ) : (
