@@ -117,12 +117,14 @@ export default function TableToolbar({ pageSize, setPageSize, addButtonText, isA
                         <Button
                             className="bg-primary hover:bg-primary font-semibold"
                             onClick={() => {
+                                // router.push('/')
                                 if (addButtonUrl) {
-                                    router.push(addButtonUrl);
+                                    console.log(addButtonUrl)
+                                    router.push(`${addButtonUrl}`);
                                 }
                             }}
                         >
-                            {addButtonText || 'Add Product'}
+                            {addButtonText || 'Add Product'}asdasd
                         </Button>
                     }
                 </div>
