@@ -80,7 +80,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
             sku: values.sku?.trim() || undefined,
-            id_provider: 'test'
+            idProvider: productValues?.id_provider
+                ? productValues.id_provider  // update
+                : productValues?.id ?? "test"
         }
 
         if (productValues) {
@@ -251,7 +253,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             <div className='flex gap-2 justify-end'>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white' type="button" hasEffect>Discard</Button>
                                 <Button className={`cursor-pointer ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect>
-                                    {isPending ? (
+                                    {addProductMutation || editProductMutation ? (
                                         <Loader2 className="animate-spin" />
                                     ) : productValues ? (
                                         "Save"
