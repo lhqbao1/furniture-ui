@@ -88,7 +88,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
             </div>
 
             {/* Discount Percent */}
-            <div className="col-span-3">
+            {/* <div className="col-span-3">
                 <FormField
                     control={form.control}
                     name="discount_percent"
@@ -130,10 +130,10 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                         </FormItem>
                     )}
                 />
-            </div>
+            </div> */}
 
             {/* Discount Amount */}
-            <div className="col-span-3">
+            {/* <div className="col-span-3">
                 <FormField
                     control={form.control}
                     name="discount_amount"
@@ -175,7 +175,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                         </FormItem>
                     )}
                 />
-            </div>
+            </div> */}
 
             {/* Final Price */}
             <div className="col-span-3">

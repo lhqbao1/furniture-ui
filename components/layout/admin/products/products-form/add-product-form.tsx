@@ -28,6 +28,8 @@ import { ProductPricingFields } from './pricing-field'
 import { MultiSelectField } from './category-select'
 import { CategoryResponse } from '@/types/categories'
 import { FormLabelWithAsterisk } from '@/components/shared/form-label-with-asterisk'
+import { useAddProduct, useEditProduct } from '@/features/products/hook'
+import { useRouter } from 'next/navigation'
 
 interface AddProductFormProps {
     productValues?: Partial<NewProductItem>
@@ -38,6 +40,9 @@ interface AddProductFormProps {
 const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps) => {
     const [description, setDescription] = useState("")
     const [isSimple, setIsSimple] = useState(true)
+    const router = useRouter()
+    const editProductMutation = useEditProduct()
+    const addProductMutation = useAddProduct()
 
     const normalizeProductValues = (productValues?: Partial<NewProductItem>) => {
         if (!productValues) return defaultValues
@@ -58,6 +63,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
         mode: "onBlur",
     })
 
+    const id_provider = form.watch('id_provider')
+
+
     useEffect(() => {
         if (productValues) {
             form.reset(productValues)
@@ -72,38 +80,41 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
             sku: values.sku?.trim() || undefined,
+            id_provider: 'test'
         }
 
-        try {
-            await onSubmit(payload) // gọi hàm từ cha
-            form.reset({
-                name: "",
-                description: "",
-                id_provider: '',
-                tax: "19%",
-                collection: null,
-                sku: "",
-                ean: "",
-                is_active: true,
-                tag: "",
-                static_files: [],
-                category_ids: [],
-                price: 0,
-                cost: 0,
-                discount_amount: 0,
-                discount_percent: 0,
-                stock: 0,
-                weight: 0,
-                width: 0,
-                height: 0,
-                length: 0,
-            })
-        } catch (e) {
-            console.log(e)
-            toast.error("An error occurs")
+        if (productValues) {
+            editProductMutation.mutate(
+                { id: productValues.id ?? "", input: payload },
+                {
+                    onSuccess: () => {
+                        toast.success("Product updated successfully")
+                        router.push("/admin/products/list")
+                    },
+                    onError: () => {
+                        toast.error("Failed to update product")
+                    },
+                }
+            )
+        } else {
+            addProductMutation.mutate(
+                payload,
+                {
+                    onSuccess: () => {
+                        toast.success("Product add successfully")
+                        form.reset()
+                    },
+                    onError: (error) => {
+                        toast.error(<div className='flex flex-col gap-2'>
+                            <div>Failed to add product</div>
+                            <div>Please check duplication for SKU or EAN</div>
+                        </div>)
+                        console.log(error)
+                    },
+                }
+            )
         }
     }
-
 
     return (
         <div className='pb-20 px-30'>
@@ -140,25 +151,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             />
 
                             <div className='flex gap-4 w-full'>
-                                {/*Product ID */}
-                                <div className='w-full'>
-                                    <FormField
-                                        control={form.control}
-                                        name="id_provider"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
-                                                    Product ID
-                                                </FormLabelWithAsterisk>
-                                                <FormControl>
-                                                    <Input placeholder="" {...field} className='' />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
                                 {/*Product Cost */}
                                 <div className='w-full'>
                                     <FormField
@@ -193,8 +185,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                     />
                                 </div>
                             </div>
-
-
 
                             <ProductPricingFields form={form} />
 
@@ -271,7 +261,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 </Button>
 
                             </div>
-
+                            <div>ID: {id_provider}</div>
                             {/*Product Active */}
                             <FormField
                                 control={form.control}

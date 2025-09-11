@@ -11,6 +11,8 @@ export const addProductSchema = z.object({
   description: z.string().optional(),
   price: z.number("You must provide product price").min(1, "You must provide product price").nonnegative(),
   id_provider: z.string().min(1, 'You must provide an ID for product'),
+  // id_provider: z.string().min(1).default("test"),
+
   cost: z.number("You must provide product cost price").min(1, "You must provide product cost price").nonnegative(),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
@@ -42,7 +44,7 @@ export type ProductInput = z.infer<typeof addProductSchema>
 export const defaultValues = {
   name: "",
   description: "",
-  id_provider: '',
+  id_provider: "test",
   tax: "19%",
   category: "",
   weight: 0,

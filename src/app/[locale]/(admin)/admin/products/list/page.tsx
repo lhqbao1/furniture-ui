@@ -38,7 +38,9 @@ const ProductList = () => {
                     setPageSize={setPageSize}
                     totalItems={data?.pagination.total_items ?? 0}
                     totalPages={data?.pagination.total_pages ?? 0}
-                    addButtonText='none'
+                    addButtonText='Add Product'
+                    addButtonUrl='/admin/products/add'
+                    isAddButtonModal
                 />
             }
         </div>

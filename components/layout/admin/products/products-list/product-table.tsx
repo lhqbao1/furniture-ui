@@ -22,6 +22,8 @@ interface DataTableProps<TData, TValue> {
     hasBackground?: boolean
     totalPages: number
     addButtonText?: string
+    addButtonUrl?: string
+    isAddButtonModal?: boolean
 }
 
 export function ProductTable<TData, TValue>({
@@ -34,7 +36,9 @@ export function ProductTable<TData, TValue>({
     totalItems,
     hasBackground,
     totalPages,
-    addButtonText
+    addButtonText,
+    addButtonUrl,
+    isAddButtonModal = false
 }: DataTableProps<TData, TValue>) {
 
     const table = useReactTable({
@@ -54,6 +58,8 @@ export function ProductTable<TData, TValue>({
                 pageSize={pageSize}
                 setPageSize={setPageSize} // đảm bảo type đúng
                 addButtonText={addButtonText}
+                addButtonUrl={addButtonUrl}
+                isAddButtonModal={isAddButtonModal}
             />
             <div className="rounded-md border w-full overflow-x-scroll">
                 <Table>

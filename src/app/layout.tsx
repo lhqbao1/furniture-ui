@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
 import CursorLoadingHandler from "@/components/shared/cursor-loader";
+import Script from "next/script";
 
 const figtree = Figtree({
     subsets: ["latin"],
@@ -36,6 +37,19 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <head>
+                <Script
+                    src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
+                    strategy="afterInteractive"
+                />
+                <Script
+                    id="usercentrics-cmp"
+                    src="https://web.cmp.usercentrics.eu/ui/loader.js"
+                    data-settings-id="RlDaintBne_uoh"
+                    strategy="afterInteractive"
+                    async
+                />
+            </head>
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
                 <CursorLoadingHandler />
                 <Providers>{children}</Providers>

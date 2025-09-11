@@ -10,14 +10,18 @@ import {
     SelectContent,
     SelectItem,
 } from "@/components/ui/select"
+import { useRouter } from "next/navigation"
 
 interface TableToolbarProps {
     pageSize: number
     setPageSize: React.Dispatch<React.SetStateAction<number>>
     addButtonText?: string
+    isAddButtonModal?: boolean
+    addButtonUrl?: string
 }
 
-export default function TableToolbar({ pageSize, setPageSize, addButtonText }: TableToolbarProps) {
+export default function TableToolbar({ pageSize, setPageSize, addButtonText, isAddButtonModal, addButtonUrl }: TableToolbarProps) {
+    const router = useRouter()
     return (
         <div className="flex items-center justify-between gap-4 p-2 w-full">
             {/* Left group */}
@@ -109,7 +113,17 @@ export default function TableToolbar({ pageSize, setPageSize, addButtonText }: T
                 </DropdownMenu>
 
                 <div className="flex flex-1 w-full justify-end">
-                    {!addButtonText ? '' : <Button className="bg-primary hover:bg-primary font-semibold">{addButtonText ? addButtonText : 'Add Product'}</Button>
+                    {!addButtonText ? '' :
+                        <Button
+                            className="bg-primary hover:bg-primary font-semibold"
+                            onClick={() => {
+                                if (addButtonUrl) {
+                                    router.push(addButtonUrl);
+                                }
+                            }}
+                        >
+                            {addButtonText || 'Add Product'}
+                        </Button>
                     }
                 </div>
             </div>
