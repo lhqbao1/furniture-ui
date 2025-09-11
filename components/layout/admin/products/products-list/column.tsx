@@ -241,7 +241,7 @@ export const productColumns: ColumnDef<NewProductItem>[] = [
     },
     {
         id: "default",
-        header: () => <div className="flex justify-center"><Image src="/new-logo.svg" alt="default" width={30} height={30} /></div>,
+        header: () => <div className="flex justify-center"><Image src="/new-logo.svg" alt="default" width={30} height={30} unoptimized /></div>,
         cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer' /></div>,
     },
     {

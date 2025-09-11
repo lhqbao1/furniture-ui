@@ -1,6 +1,6 @@
 import { api, apiAdmin } from "@/lib/axios"
 import { CreateOrderFormValues } from "@/lib/schema/checkout"
-import { CheckOut, CheckOutStatistics } from "@/types/checkout"
+import { CheckOut, CheckOutResponse, CheckOutStatistics } from "@/types/checkout"
 
 export async function createCheckOut(item: CreateOrderFormValues) {
     const {data} = await api.post(
@@ -21,7 +21,7 @@ export async function createCheckOut(item: CreateOrderFormValues) {
     const {data} = await apiAdmin.get(
         '/checkout/',
     )
-    return data as CheckOut[]
+    return data as CheckOutResponse
 }
 
 export async function getCheckOutByCheckOutId(checkout_id: string) {

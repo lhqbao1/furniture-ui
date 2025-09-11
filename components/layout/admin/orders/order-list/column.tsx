@@ -60,7 +60,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         cell: ({ row }) => {
             return (
                 <div className="h-8 relative">
-                    <Image src={'/new-logo.svg'} alt="icon" fill className="object-contain px-4" />
+                    <Image src={'/new-logo.svg'} alt="icon" fill className="object-contain px-4" unoptimized />
                 </div>
             )
         },
@@ -123,7 +123,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         ),
         cell: ({ row }) => (
             <div className="h-12 relative">
-                <Image src={'/paypal.svg'} alt="icon" fill className="object-contain p-2" />
+                <Image src={'/paypal.svg'} alt="icon" fill className="object-contain p-2" unoptimized />
             </div>
         ),
     },

@@ -84,6 +84,7 @@ export default function SignUpForm() {
           width={100}
           height={100}
           alt=""
+          unoptimized
         />
         <h1 className="text-3xl font-semibold text-secondary text-center font-libre flex gap-1">
           <span>Welcome to</span>

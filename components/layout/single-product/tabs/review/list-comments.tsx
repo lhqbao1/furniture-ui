@@ -91,7 +91,7 @@ const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps
                                             <p className='text-gray-600 font-bold'>{item.reply.name}</p>
                                             <div className='flex gap-1 items-center'>
                                                 <p className='text-secondary text-sm font-semibold'>{item.reply.role}</p>
-                                                <Image src={'/logo.svg'} height={30} width={30} alt='' className='size-4' />
+                                                <Image src={'/logo.svg'} height={30} width={30} alt='' className='size-4' unoptimized />
                                             </div>
                                         </div>
                                         <p>{item.reply.comment}</p>

@@ -1,6 +1,12 @@
 import { Address } from "./address"
 import { CartResponse } from "./cart"
+import { Pagination } from "./pagination"
 import { User } from "./user"
+
+interface CheckOutResponse {
+    items: CheckOut[]
+    pagination: Pagination
+}
 
 interface CheckOut {
     id: string

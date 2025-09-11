@@ -42,14 +42,14 @@ const OrderList = () => {
             <div className='text-3xl text-secondary font-bold text-center font-libre'>Order List</div>
             {isLoading ? <ProductTableSkeleton columnsCount={6} rowsCount={6} /> :
                 <ProductTable
-                    data={data ? data : []}
+                    data={data ? data.items : []}
                     columns={orderColumns}
                     page={page}
                     setPage={setPage}
                     pageSize={pageSize}
                     setPageSize={setPageSize}
-                    totalItems={data?.length ?? 0}
-                    totalPages={Math.ceil((data?.length ?? 0) / pageSize)}
+                    totalItems={data?.pagination.total_items ?? 0}
+                    totalPages={data?.pagination.total_pages ?? 0}
                     hasBackground
                 />
             }

@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from "react"
 import {
     Dialog,
@@ -10,11 +12,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Image from "next/image"
 import { toast } from "sonner"
-import { useCreateVariantOption } from "@/features/variant/hook" // hook mutation
+import { useCreateVariantOption } from "@/features/variant/hook"
 import { Plus } from "lucide-react"
 import { useUploadStaticFile } from "@/features/file/hook"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useDropzone } from "react-dropzone"
 
 interface AddImageOptionDialogProps {
     variantId: string
@@ -26,19 +29,23 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
     const [open, setOpen] = useState(false)
     const [optionName, setOptionName] = useState("")
     const [imageDes, setImageDes] = useState("")
-    const [file, setFile] = useState<File | null>(null)
     const [preview, setPreview] = useState<string | null>(null)
     const [currentImage, setCurrentImage] = useState<string | null>(null)
-    const [isGlobal, setIsGlobal] = useState<boolean>(false) // default Global
+    const [isGlobal, setIsGlobal] = useState<boolean>(false)
 
     const createVariantOptionMutation = useCreateVariantOption()
     const uploadStaticFile = useUploadStaticFile()
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = e.target.files?.[0]
+    // === handle drop/upload ===
+    const onDrop = (acceptedFiles: File[]) => {
+        if (optionName) {
+            toast.error("Option name already filled, cannot upload image")
+            return
+        }
+
+        const selectedFile = acceptedFiles[0]
         if (!selectedFile) return
 
-        setFile(selectedFile)
         setPreview(URL.createObjectURL(selectedFile))
 
         const formData = new FormData()
@@ -48,7 +55,6 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
             onSuccess(data) {
                 toast.success("Image uploaded successfully")
                 setCurrentImage(data.results[0].url)
-                console.log("Response:", data)
             },
             onError(error) {
                 toast.error("Image upload failed")
@@ -57,36 +63,66 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
         })
     }
 
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: { "image/*": [] },
+        multiple: false,
+        disabled: !!optionName, // chặn upload nếu đã có optionName
+    })
+
+    // === handle add option ===
     const handleAdd = () => {
+        if (!optionName && !currentImage) {
+            toast.error("Please provide option name OR upload image")
+            return
+        }
+
         const input = {
             options: [
                 {
                     label: optionName,
                     image_url: currentImage,
                     img_description: imageDes,
-                    is_global: isGlobal
-                }
-            ]
-        };
+                    is_global: isGlobal,
+                },
+            ],
+        }
 
-        createVariantOptionMutation.mutate({ variant_id: variantId, input }, {
-            onSuccess() {
-                toast.success("Option added successfully");
-                setOptionName("");
-                setCurrentImage("");
-                setPreview(null);
-                setOpen(false);
-            },
-            onError(error) {
-                toast.error("Failed to add option");
-                console.error(error);
+        createVariantOptionMutation.mutate(
+            { variant_id: variantId, input },
+            {
+                onSuccess() {
+                    toast.success("Option added successfully")
+                    setOptionName("")
+                    setCurrentImage(null)
+                    setPreview(null)
+                    setImageDes("")
+                    setOpen(false)
+                },
+                onError(error) {
+                    toast.error("Failed to add option")
+                    console.error(error)
+                },
             }
-        });
-    };
+        )
+    }
 
+    const hasImageOrDesc = !!preview || !!imageDes
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open}
+            onOpenChange={(val) => {
+                setOpen(val)
+                if (!val) {
+                    // reset toàn bộ state khi đóng
+                    setOptionName("")
+                    setImageDes("")
+                    setPreview(null)
+                    setCurrentImage(null)
+                    setIsGlobal(false)
+                }
+            }}
+        >
             <DialogTrigger asChild>
                 <Plus size={16} className="border cursor-pointer" />
             </DialogTrigger>
@@ -99,8 +135,7 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
                 </DialogHeader>
 
                 <div className="space-y-4">
-
-                    {/* Radio buttons: Global / Local */}
+                    {/* Radio buttons */}
                     <div>
                         <Label className="mb-2 block text-sm font-medium">Option type</Label>
                         <RadioGroup
@@ -119,21 +154,21 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
                         </RadioGroup>
                     </div>
 
-                    {/* Upload box */}
-                    <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-6 cursor-pointer">
+                    {/* Upload box (disabled if optionName exists) */}
+                    <div
+                        {...getRootProps()}
+                        className={`flex flex-col items-center justify-center border-2 border-dashed rounded-md p-6 cursor-pointer transition ${isDragActive ? "border-primary bg-muted/30" : "border-gray-300"
+                            } ${optionName ? "opacity-50 pointer-events-none" : ""}`}
+                    >
+                        <input {...getInputProps()} />
                         <span className="text-sm text-muted-foreground">
-                            Drag or <span className="text-primary font-semibold">Browse</span>
+                            {isDragActive
+                                ? "Drop file here ..."
+                                : "Drag or Browse an image"}
                         </span>
-                        <Input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleFileChange}
-                            disabled={optionName ? true : false}
-                        />
-                    </label>
+                    </div>
 
-                    {/* Preview image */}
+                    {/* Preview */}
                     {preview && (
                         <div className="flex justify-center">
                             <Image
@@ -146,29 +181,25 @@ const AddOptionDialog = ({ variantId }: AddImageOptionDialogProps) => {
                         </div>
                     )}
 
-                    {/* Option name input */}
+                    {/* Description (disabled if optionName exists) */}
                     <Input
                         placeholder="Image description"
                         value={imageDes}
                         onChange={(e) => setImageDes(e.target.value)}
-                        disabled={optionName ? true : false}
+                        disabled={!!optionName}
                     />
 
-                    {/* Option name input */}
+                    {/* Option name (disabled if image or description exists) */}
                     <Input
                         placeholder="Option name"
                         value={optionName}
                         onChange={(e) => setOptionName(e.target.value)}
-                        disabled={preview ? true : false}
+                        disabled={hasImageOrDesc}
                     />
 
                     {/* Buttons */}
                     <div className="flex justify-end gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setOpen(false)}
-                        >
+                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                             Cancel
                         </Button>
                         <Button

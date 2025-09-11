@@ -11,6 +11,7 @@ import { getCartItems } from "@/features/cart/api";
 import { getAllProducts, getProductByTag } from "@/features/products/api";
 import getQueryClient from "@/lib/get-query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import ReactCookieBot from "react-cookiebot";
 
 export default async function Home() {
   const queryClient = getQueryClient()

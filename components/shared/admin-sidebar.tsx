@@ -66,6 +66,7 @@ export function AdminSideBar() {
                                 width={100}
                                 height={100}
                                 priority
+                                unoptimized
                                 className="w-auto h-[80px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
                             <div className="font-libre text-[29px] flex gap-1">

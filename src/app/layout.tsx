@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
 import CursorLoadingHandler from "@/components/shared/cursor-loader";
+import ReactCookieBot from "react-cookiebot"
 import Script from "next/script";
 
 const figtree = Figtree({
@@ -36,18 +37,16 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="de">
             <head>
                 <Script
-                    src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
-                    strategy="afterInteractive"
-                />
-                <Script
-                    id="usercentrics-cmp"
-                    src="https://web.cmp.usercentrics.eu/ui/loader.js"
-                    data-settings-id="RlDaintBne_uoh"
-                    strategy="afterInteractive"
-                    async
+                    id={`Cookiebot`}
+                    async={true}
+                    src={`https://consent.cookiebot.com/uc.js`}
+                    strategy={`beforeInteractive`}
+                    data-cbid={process.env.NEXT_PUBLIC_COOKIE_DOMAIN_URL}
+                    data-blockingmode={`auto`}
+                    type={`text/javascript`}
                 />
             </head>
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>

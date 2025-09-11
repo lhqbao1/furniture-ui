@@ -136,6 +136,7 @@ const PreOrder = () => {
                                 height={36}
                                 alt='1'
                                 style={{ width: 60 }}
+                                unoptimized
                             />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>
@@ -146,6 +147,7 @@ const PreOrder = () => {
                                 height={36}
                                 alt='1'
                                 style={{ width: 60 }}
+                                unoptimized
 
                             />
                             <p className='text-xl'>Lorem ipsum</p>
@@ -158,6 +160,7 @@ const PreOrder = () => {
                                 height={36}
                                 alt='1'
                                 style={{ width: 60 }}
+                                unoptimized
                             />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>
@@ -168,6 +171,7 @@ const PreOrder = () => {
                                 height={36}
                                 alt='1'
                                 style={{ width: 60 }}
+                                unoptimized
                             />
                             <p className='text-xl'>Lorem ipsum</p>
                         </div>

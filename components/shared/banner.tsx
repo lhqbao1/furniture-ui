@@ -114,6 +114,7 @@ const Banner = ({ height }: BannerProps) => {
                             width={40}
                             height={40}
                             alt=''
+                            unoptimized
                         />
                     </div>
 

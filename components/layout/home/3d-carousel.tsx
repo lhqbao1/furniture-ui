@@ -107,11 +107,12 @@ const AnimatedCarousel = () => {
                             <div
                                 key={item.id}
                                 onClick={() => handleClick(index, item.name)}
-                                className="absolute left-1/2 top-10 md:top-20 -translate-x-1/2 cursor-pointer [transform-style:preserve-3d]"
+                                className="absolute left-1/2 top-10 md:top-20 -translate-x-1/2 cursor-pointer"
                                 style={{
                                     width: `${cardSize.w}px`,
                                     height: `${cardSize.h}px`,
                                     transform: `translate3d(${x}px, ${y}px, ${z + zOffset}px) scale3d(${scale},${scale},1)`,
+                                    transformStyle: "preserve-3d",
                                     opacity,
                                     zIndex,
                                 }}

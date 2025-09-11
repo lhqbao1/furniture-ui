@@ -79,6 +79,7 @@ export function AppSidebar() {
                                 width={100}
                                 height={100}
                                 priority
+                                unoptimized
                                 className="w-auto lg:h-[80px] h-[50px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
                             <div className="font-libre lg:text-[29px] text-xl flex gap-1">

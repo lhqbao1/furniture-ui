@@ -8,8 +8,8 @@ import React from "react";
 import { useMediaQuery } from "react-responsive";
 
 const TrendingProducts = () => {
-    const isPhone = useMediaQuery({ width: 430 })
     const t = useTranslations()
+    const isPhone = useMediaQuery({ width: 430 })
     const { data: products, isLoading, isError } = useGetProductByTag('Trending');
 
     return (

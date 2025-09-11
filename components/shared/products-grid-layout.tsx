@@ -7,7 +7,6 @@ import { NewProductItem, ProductResponse } from '@/types/products'
 import Link from 'next/link'
 import { useMediaQuery } from 'react-responsive'
 import { useAddViewedProduct } from '@/features/viewed/hook'
-import { toast } from 'sonner'
 
 
 interface ProductsGridLayoutProps {
