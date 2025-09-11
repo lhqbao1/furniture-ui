@@ -53,7 +53,7 @@ const Banner = ({ height }: BannerProps) => {
     const router = useRouter()
     const pathname = usePathname()
 
-    const userId = typeof window !== "undefined" ? localStorage.getItem("id") : null;
+    const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
     const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useQuery({
         queryKey: ["me", userId],
