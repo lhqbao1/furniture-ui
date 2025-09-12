@@ -46,13 +46,3 @@ export function deslugify(slug: string): string {
 
   return decoded
 }
-
-export function generateMultiLanguageSlug(text: string) {
-  // Example: 'en' for English, 'fr' for French, 'de' for German, etc.
-  return slugify(text, {
-    delimiter: '-',  // replace spaces with replacement character, defaults to `-`  lower: false,      // convert to lower case, defaults to `false`
-  // strict: false, 
-  locale: 'ger',      // language code of the locale to use
-  // trim: true         // trim leading and trailing replacement chars, defaults to `true`
-  });
-}
