@@ -32,7 +32,6 @@ type MenuItem = {
 
 export function AppSidebar() {
     const [open, setOpen] = useState(false)
-    const [openItem, setOpenItem] = useState<string | null>(null)
     const { data: categories, isLoading, isError } = useGetCategories()
     const t = useTranslations()
 
@@ -84,6 +83,11 @@ export function AppSidebar() {
             ]
         },
     ]
+
+    const [openItem, setOpenItem] = useState<string | null>(() => {
+        const defaultItem = items.find((i) => i.id === 5)
+        return defaultItem ? defaultItem.title : null
+    })
 
     return (
         <Sidebar className="app-sidebar custom-scroll" collapsible="icon"
@@ -151,7 +155,7 @@ export function AppSidebar() {
 
                                                 <CollapsibleContent
                                                     style={{ transition: "none" }}
-                                                    className="flex flex-col gap-3 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
+                                                    className="flex flex-col gap-1.5 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
                                                 >
                                                     {item.children.map((child) => {
                                                         const isChildActive = pathname === child.url
@@ -179,7 +183,7 @@ export function AppSidebar() {
                                                                         />
                                                                     </div>
                                                                     : ''}
-                                                                <span className="text-wrap text-start">{child.title}</span>
+                                                                <span className="text-wrap lg:text-[17px] text-start">{child.title}</span>
                                                                 {open && isChildActive && (
                                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>
                                                                 )}
