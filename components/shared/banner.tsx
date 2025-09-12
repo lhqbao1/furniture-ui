@@ -40,6 +40,7 @@ import ProductSearch from './product-search'
 import { getMe } from '@/features/auth/api'
 import { useTranslations } from 'next-intl'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { getCartItems } from '@/features/cart/api'
 
 interface BannerProps {
     height?: number
@@ -61,6 +62,15 @@ const Banner = ({ height }: BannerProps) => {
         retry: false,
     });
 
+    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
+        queryKey: ["cart-items"],
+        queryFn: async () => {
+            const data = await getCartItems()
+            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            return data
+        },
+    })
+
     const onLogout = () => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("userId");
@@ -68,8 +78,8 @@ const Banner = ({ height }: BannerProps) => {
         localStorage.removeItem("payment");
         toast.success("Logged out successfully")
         // Reset react-query cache
-        queryClient.invalidateQueries({ queryKey: ["me"] }); // xóa dữ liệu user cũ
-        queryClient.setQueryData(["me"], null)
+        queryClient.removeQueries({ queryKey: ["me"] }); // xoá query user
+        queryClient.removeQueries({ queryKey: ["cart-items"] }); // xoá cart
         queryClient.clear(); // tùy chọn xóa tất cả cache
     }
 
@@ -106,7 +116,7 @@ const Banner = ({ height }: BannerProps) => {
             />
 
             <div className='home-banner__content h-full flex flex-col relative z-10'>
-                <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex flex-col items-end'}`}>
+                <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex flex-col items-end pt-1'}`}>
                     <div className={`${isPhone ? 'block' : 'hidden'}`}>
                         <Image
                             src={'/new-logo.svg'}
@@ -131,7 +141,7 @@ const Banner = ({ height }: BannerProps) => {
                                 }
                             }}
                         >
-                            <SelectTrigger className={`w-[150px] text-white font-bold text-lg xl:border-0 border-2 border-white ${isPhone ? 'hidden' : ''}`}>
+                            <SelectTrigger className={`w-[150px] text-white text-xl font-bold xl:border-0 border-2 border-white ${isPhone ? 'hidden' : ''}`}>
                                 <SelectValue placeholder={t('german')} className='text-white' />
                             </SelectTrigger>
                             <SelectContent>
@@ -140,16 +150,23 @@ const Banner = ({ height }: BannerProps) => {
                             </SelectContent>
                         </Select>
 
-
+                        {/*Shopping cart */}
+                        <div className={`cursor-pointer relative`}>
+                            <ShoppingCart stroke={`${isPhone ? '#00B159' : 'white'}`} size={30} className='hover:scale-110 transition-all duration-300' />
+                            <div className='absolute -top-4 -right-4 text-white bg-primary py-1 px-3 rounded-full flex items-center text-sm'>{cart && cart.items ? cart.items.length : 0}</div>
+                        </div>
 
                         {/*User */}
                         <DropdownMenu >
                             <DropdownMenuTrigger asChild>
-                                <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
+                                <div className='flex gap-2 justify-start items-end'>
+                                    <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`${isPhone ? '#00B159' : 'white'}`} size={30} />
+                                    {user && userId ? <div className='text-white text-xl font-semibold'>{user.first_name} {user.last_name}</div> : <Link href={'/login'} className='text-white text-xl font-semibold'>{t('login')}</Link>}
+                                </div>
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent side="bottom" className="w-48 !absolute top-0 lg:-left-[180px]">
-                                {!user ? (
+                                {!user || !userId ? (
                                     <div>
                                         <Link href={'/login'} className='cursor-pointer'>
                                             <DropdownMenuItem className='cursor-pointer'>
@@ -188,10 +205,7 @@ const Banner = ({ height }: BannerProps) => {
                             </Drawer>
                         </div>
 
-                        {/*Shopping cart */}
-                        <div className={`${isPhone ? 'block' : 'hidden'}`}>
-                            <ShoppingCart stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
-                        </div>
+
                         {isPhone ?
                             <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
                             : ''}

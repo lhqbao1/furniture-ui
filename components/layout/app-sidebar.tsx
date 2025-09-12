@@ -63,9 +63,9 @@ export function AppSidebar() {
     const router = useRouter()
     const items = [
         { title: t('home'), url: "/", icon: '/side-home.png', id: 1 },
-        { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png', id: 2 },
-        { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png', id: 3 },
-        { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png', id: 4 },
+        // { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png', id: 2 },
+        // { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png', id: 3 },
+        // { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png', id: 4 },
         {
             title: t('categories'),
             url: "#",
@@ -73,11 +73,16 @@ export function AppSidebar() {
             id: 5,
             children: categories && categories.length > 0 ? mapCategories(categories) : undefined
         },
-        { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png', id: 6 },
+        // { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png', id: 6 },
         { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png', id: 7 },
         { title: t('cart'), url: "/cart", icon: '/side-cart.png', id: 8 },
-        { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
-        { title: t('account'), url: "/account", icon: '/side-account.png', id: 10 },
+        {
+            title: t('profile'), url: "", icon: '/side-account.png', id: 9,
+            children: [
+                { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
+                { title: t('account'), url: "/account", icon: '/side-account.png', id: 10 },
+            ]
+        },
     ]
 
     return (
@@ -157,13 +162,24 @@ export function AppSidebar() {
                                                                     router.push(child.url)
                                                                 }}
                                                                 variant={"ghost"}
-                                                                className={`relative flex flex-row items-start justify-start lg:pl-20 pl-4 text-wrap gap-3 h-fit rounded-md py-1 flex-wrap max-w-full text-base transition-colors ${isChildActive
+                                                                className={`relative flex flex-row items-start justify-start lg:pl-16 pl-4 text-wrap gap-3 h-fit rounded-md py-1 flex-wrap max-w-full text-base transition-colors ${isChildActive
                                                                     ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
                                                                     : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
                                                                     }`}
                                                             >
+                                                                {item.id !== 5 ?
+                                                                    <div className="w-8">
+                                                                        <Image
+                                                                            src={child.icon}
+                                                                            height={40}
+                                                                            width={40}
+                                                                            alt=""
+                                                                            className="lg:w-8 lg:h-8 w-6 h-6"
+                                                                            unoptimized
+                                                                        />
+                                                                    </div>
+                                                                    : ''}
                                                                 <span className="text-wrap text-start">{child.title}</span>
-
                                                                 {open && isChildActive && (
                                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>
                                                                 )}
