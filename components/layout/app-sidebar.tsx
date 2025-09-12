@@ -137,10 +137,10 @@ export function AppSidebar() {
                                                             <div className="w-8">
                                                                 <Image
                                                                     src={item.icon}
-                                                                    height={40}
-                                                                    width={40}
+                                                                    height={30}
+                                                                    width={30}
                                                                     alt=""
-                                                                    className="lg:w-8 lg:h-8 w-6 h-6"
+                                                                    className="lg:w-7 lg:h-7 w-6 h-6"
                                                                     unoptimized
                                                                 />
                                                             </div>
@@ -155,7 +155,7 @@ export function AppSidebar() {
 
                                                 <CollapsibleContent
                                                     style={{ transition: "none" }}
-                                                    className="flex flex-col gap-1.5 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
+                                                    className="flex flex-col gap-1.5 mt-1 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
                                                 >
                                                     {item.children.map((child) => {
                                                         const isChildActive = pathname === child.url
@@ -175,10 +175,10 @@ export function AppSidebar() {
                                                                     <div className="w-8">
                                                                         <Image
                                                                             src={child.icon}
-                                                                            height={40}
-                                                                            width={40}
+                                                                            height={30}
+                                                                            width={30}
                                                                             alt=""
-                                                                            className="lg:w-8 lg:h-8 w-6 h-6"
+                                                                            className="lg:w-7 lg:h-7 w-6 h-6"
                                                                             unoptimized
                                                                         />
                                                                     </div>
@@ -213,10 +213,10 @@ export function AppSidebar() {
                                                 <div className="w-8">
                                                     <Image
                                                         src={item.icon}
-                                                        height={40}
-                                                        width={40}
+                                                        height={30}
+                                                        width={30}
                                                         alt=""
-                                                        className="lg:w-8 lg:h-8 w-6 h-6"
+                                                        className="lg:w-7 lg:h-7 w-6 h-6"
                                                         unoptimized
                                                     />
                                                 </div>
