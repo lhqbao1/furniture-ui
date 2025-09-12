@@ -1,13 +1,11 @@
-// export function slugify(name: string): string {
-//   return name
-//     .toLowerCase()
-//     // giữ nguyên ký tự đặc biệt có dấu
-//     .replace(/\s*&\s*/g, "-&-")       // khoảng trắng quanh & → -&-
-//     .replace(/[^a-z0-9äöüß&]+/gi, "-") // chấp nhận cả ký tự có dấu Đức
-//     .replace(/^-+|-+$/g, "");          // bỏ dấu - ở đầu/cuối
-// }
-
-import slugify from "react-slugify";
+export function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    // giữ nguyên ký tự đặc biệt có dấu
+    .replace(/\s*&\s*/g, "-&-")       // khoảng trắng quanh & → -&-
+    .replace(/[^a-z0-9äöüß&]+/gi, "-") // chấp nhận cả ký tự có dấu Đức
+    .replace(/^-+|-+$/g, "");          // bỏ dấu - ở đầu/cuối
+}
 
 
 export function fromSlug(slug: string): string {

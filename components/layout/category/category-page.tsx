@@ -8,7 +8,8 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 import FilterSection from '@/components/layout/single-product/filter-section'
 import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
 import { useGetCategoryByName } from '@/features/category/hook'
-import { decodeSlug, deslugify, fromSlug } from '@/lib/slugify'
+import { slugify } from '@/lib/slugify'
+import { CustomPagination } from '@/components/shared/custom-pagination'
 
 interface ProductCategoryProps {
     categorySlugs: string[]
@@ -30,9 +31,9 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
     const [page, setPage] = useState(1)
 
     const slug = paramValues[paramValues.length - 1] as string
-    // const { data: category, isLoading, isError } = useGetCategoryByName(decoded)
+    const { data: category, isLoading, isError } = useGetCategoryByName(slugify(slug[0]))
 
-    // if (!category || isLoading) return <ProductGridSkeleton length={12} />
+    if (!category || isLoading) return <ProductGridSkeleton length={12} />
 
     // Nếu có tag, lọc sản phẩm
     // const filteredProducts = tag
@@ -44,7 +45,7 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
             <CustomBreadCrumb />
             <div className=''>
                 <h2 className='section-header'>Wohnen</h2>
-                {/* {isLoading || isError || !category ?
+                {isLoading || isError || !category ?
                     <ProductGridSkeleton length={12} /> :
 
                     <div className='filter-section'>
@@ -65,9 +66,9 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
                             <ProductsGridLayout hasBadge data={category} />
                         </div>
                     </div>
-                } */}
+                }
             </div>
-            {/* <CustomPagination totalPages={products.pagination.total_pages} page={page} onPageChange={setPage} /> */}
+            <CustomPagination totalPages={category.length} page={page} onPageChange={setPage} />
         </div >
     )
 }

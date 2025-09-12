@@ -20,10 +20,8 @@ import Link from "next/link"
 import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
 import { useTranslations } from "next-intl"
-// import { slugify } from "@/lib/slugify"
-import slugify from 'react-slugify';
-import { generateMultiLanguageSlug } from "@/lib/slugify"
-
+    ;
+import { slugify } from "@/lib/slugify"
 type MenuItem = {
     title: string;
     url: string;
@@ -52,7 +50,7 @@ export function AppSidebar() {
             category.children
                 ? category.children.map((child) => ({
                     title: child.name,
-                    url: `/product/${generateMultiLanguageSlug(child.name)}`,
+                    url: `/product/${slugify(child.name)}`,
                     icon: child.img_url,
                     id: child.id
                 }))
