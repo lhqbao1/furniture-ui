@@ -20,13 +20,16 @@ import Link from "next/link"
 import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
 import { useTranslations } from "next-intl"
-import { useMediaQuery } from "react-responsive"
+// import { slugify } from "@/lib/slugify"
+import slugify from 'react-slugify';
+import { generateMultiLanguageSlug } from "@/lib/slugify"
 
 type MenuItem = {
     title: string;
     url: string;
     icon: string;
     children?: MenuItem[];
+    id: string
 };
 
 export function AppSidebar() {
@@ -34,36 +37,49 @@ export function AppSidebar() {
     const [openItem, setOpenItem] = useState<string | null>(null)
     const { data: categories, isLoading, isError } = useGetCategories()
     const t = useTranslations()
-    const isPhone = useMediaQuery({ maxWidth: 650 })
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
+    // function mapCategories(categories: CategoryResponse[]): MenuItem[] {
+    //     return categories.map((category) => ({
+    //         title: category.name,
+    //         url: `/product/${category.name.toLowerCase()}`,
+    //         icon: category.img_url,
+    //         children: category.children ? mapCategories(category.children) : undefined
+    //     }));
+    // }
 
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
-        return categories.map((category) => ({
-            title: category.name,
-            url: `/product/${category.name.toLowerCase()}`,
-            icon: category.img_url,
-            children: category.children ? mapCategories(category.children) : undefined
-        }));
+        return categories.flatMap((category) =>
+            category.children
+                ? category.children.map((child) => ({
+                    title: child.name,
+                    url: `/product/${generateMultiLanguageSlug(child.name)}`,
+                    icon: child.img_url,
+                    id: child.id
+                }))
+                : []
+        )
     }
+
 
     const pathname = usePathname()
     const router = useRouter()
     const items = [
-        { title: t('home'), url: "/", icon: '/side-home.png' },
-        { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png' },
-        { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png' },
-        { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png' },
+        { title: t('home'), url: "/", icon: '/side-home.png', id: 1 },
+        { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png', id: 2 },
+        { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png', id: 3 },
+        { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png', id: 4 },
         {
             title: t('categories'),
             url: "#",
             icon: '/side-category.png',
+            id: 5,
             children: categories && categories.length > 0 ? mapCategories(categories) : undefined
         },
-        { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png' },
-        { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png' },
-        { title: t('cart'), url: "/cart", icon: '/side-cart.png' },
-        { title: t('order'), url: "/my-order", icon: '/side-order.png' },
-        { title: t('account'), url: "/account", icon: '/side-account.png' },
+        { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png', id: 6 },
+        { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png', id: 7 },
+        { title: t('cart'), url: "/cart", icon: '/side-cart.png', id: 8 },
+        { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
+        { title: t('account'), url: "/account", icon: '/side-account.png', id: 10 },
     ]
 
     return (
@@ -96,7 +112,7 @@ export function AppSidebar() {
                                 // Nếu có children → dùng Collapsible
                                 if (item.children) {
                                     return (
-                                        <SidebarMenuItem key={item.title} className="flex justify-start">
+                                        <SidebarMenuItem key={item.id} className="flex justify-start">
                                             <Collapsible
                                                 className="w-full"
                                                 open={isOpen}
@@ -132,23 +148,23 @@ export function AppSidebar() {
 
                                                 <CollapsibleContent
                                                     style={{ transition: "none" }}
-                                                    className="flex flex-col gap-3 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
+                                                    className="flex flex-col gap-3 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
                                                 >
                                                     {item.children.map((child) => {
                                                         const isChildActive = pathname === child.url
                                                         return (
                                                             <Button
-                                                                key={child.title}
+                                                                key={child.id}
                                                                 onClick={() => {
                                                                     router.push(child.url)
                                                                 }}
                                                                 variant={"ghost"}
-                                                                className={`relative flex flex-row items-center justify-start pl-12 gap-3 rounded-md py-1 text-base transition-colors ${isChildActive
+                                                                className={`relative flex flex-row items-start justify-start lg:pl-20 pl-4 text-wrap gap-3 h-fit rounded-md py-1 flex-wrap max-w-full text-base transition-colors ${isChildActive
                                                                     ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
                                                                     : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
                                                                     }`}
                                                             >
-                                                                <span>{child.title}</span>
+                                                                <span className="text-wrap text-start">{child.title}</span>
 
                                                                 {open && isChildActive && (
                                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>
@@ -164,7 +180,7 @@ export function AppSidebar() {
 
                                 // Nếu không có children → render bình thường
                                 return (
-                                    <SidebarMenuItem key={item.title} className="flex justify-center">
+                                    <SidebarMenuItem key={item.id} className="flex justify-center">
                                         <SidebarMenuButton asChild>
                                             <Button
                                                 onClick={() => {

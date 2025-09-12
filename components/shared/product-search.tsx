@@ -11,7 +11,6 @@ import {
     CommandItem,
     CommandInput,
 } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { Input } from "../ui/input"
@@ -72,13 +71,13 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                     <Button
                         type="button"
                         variant="default"
-                        className="absolute right-0 top-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10"
+                        className="absolute right-0 top-0 rounded-full bg-primary text-white xl:text-lg text-sm px-6 xl:h-12 h-10"
                     >
-                        <Mic
+                        {/* <Mic
                             stroke="white"
                             size={24}
                             className="xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full"
-                        />
+                        /> */}
                         {t("search")}
                     </Button>
                     <Search

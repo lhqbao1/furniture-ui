@@ -7,6 +7,7 @@ import { BannerInput } from '@/components/shared/banner-input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ListFAQQuestion } from './list-question'
+import { useTranslations } from 'next-intl'
 
 interface ListFAQProps {
     topic_id: string
@@ -15,7 +16,7 @@ interface ListFAQProps {
 
 const ListFAQ = ({ topic_id, height }: ListFAQProps) => {
     const [currentTopic, setCurrentTopic] = useState(topic_id)
-
+    const t = useTranslations()
     const { data: topic, isLoading: isLoadingTopic, isError: isErrorTopic } = useGetFAQTopic()
     const { data: question, isLoading: isLoadingQuestion, isError: isErrorQuestion } = useGetFAQItem(currentTopic)
 
@@ -44,9 +45,9 @@ const ListFAQ = ({ topic_id, height }: ListFAQProps) => {
                 <div className="flex justify-center items-center gap-2 relative pt-6">
                     <div className={cn('w-full relative flex')}>
                         <BannerInput type="email" placeholder="" className='w-full xl:h-12 h-10' />
-                        <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 xl:pr-10 xl:h-12 pl-1 h-10'>
-                            <Mic stroke='white' size={24} className='xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full' />
-                            Search
+                        <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-6 xl:h-12 h-10'>
+                            {/* <Mic stroke='white' size={24} className='xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full' /> */}
+                            {t("search")}
                         </Button>
                         <Search size={24} className='absolute left-3 xl:top-3 top-2' stroke='gray' />
                     </div>

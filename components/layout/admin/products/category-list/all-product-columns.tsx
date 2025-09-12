@@ -1,10 +1,11 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { ProductItem } from "@/types/categories";
 import { NewProductItem } from "@/types/products";
 import { ColumnDef } from "@tanstack/react-table";
+import { Eye } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
-export const productsColumn: ColumnDef<ProductItem>[] = [
+export const productsColumn: ColumnDef<NewProductItem>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -59,7 +60,12 @@ export const productsColumn: ColumnDef<ProductItem>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div>{row.original.id?.slice(0, 7)}</div>
+                <div className="flex items-center justify-start gap-2">
+                    <div>{row.original.id?.slice(0, 7)}</div>
+                    <Link href={`/admin/products/${row.original.id}/edit`}>
+                        <Eye size={20} stroke="#00B159" />
+                    </Link>
+                </div>
             )
         }
     },

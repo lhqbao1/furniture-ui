@@ -1,5 +1,5 @@
 import { LucideIcon } from "lucide-react";
-import { StaticFile } from "./products";
+import { NewProductItem, StaticFile } from "./products";
 import { StaticFileResponse } from "@/features/file/api";
 import { VariantOptionResponse } from "./variant";
 
@@ -70,8 +70,8 @@ export interface ProductItem {
 }
 
 export interface CategoryByIdResponse {
-    in_category: ProductItem[]
-    not_in_category: ProductItem[]
+    in_category: NewProductItem[]
+    not_in_category: NewProductItem[]
 }
 
 

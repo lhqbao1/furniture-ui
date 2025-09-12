@@ -2,13 +2,13 @@
 import CustomBreadCrumb from '@/components/shared/breadcrumb'
 import ProductsGridLayout from '@/components/shared/products-grid-layout'
 import { SlidersHorizontal } from 'lucide-react'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import FilterSection from '@/components/layout/single-product/filter-section'
-import { useGetAllProducts } from '@/features/products/hook'
 import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
-import { CustomPagination } from '@/components/shared/custom-pagination'
+import { useGetCategoryByName } from '@/features/category/hook'
+import { decodeSlug, deslugify, fromSlug } from '@/lib/slugify'
 
 interface ProductCategoryProps {
     categorySlugs: string[]
@@ -25,32 +25,32 @@ function formatTag(slug: string) {
 const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
     const params = useParams()
     const paramValues = Object.values(params)
-    const slug = paramValues[paramValues.length - 1]
-    const category = slug && slug[paramValues.length]
+    const pathname = usePathname()
+    console.log(pathname)
     const [page, setPage] = useState(1)
 
-    const { data: products, isLoading, isError } = useGetAllProducts({ page })
+    const slug = paramValues[paramValues.length - 1] as string
+    // const { data: category, isLoading, isError } = useGetCategoryByName(decoded)
 
-    if (!products || isLoading) return <ProductGridSkeleton length={12} />
+    // if (!category || isLoading) return <ProductGridSkeleton length={12} />
 
     // Nếu có tag, lọc sản phẩm
-    const filteredProducts = tag
-        ? products.items.filter((product) => formatTag(product.tag ?? '') === tag)
-        : products.items
+    // const filteredProducts = tag
+    //     ? products.items.filter((product) => formatTag(product.tag ?? '') === tag)
+    //     : products.items
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb />
             <div className=''>
-                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{category}</h2>
-                {isLoading || isError || !products ?
+                <h2 className='section-header'>Wohnen</h2>
+                {/* {isLoading || isError || !category ?
                     <ProductGridSkeleton length={12} /> :
 
                     <div className='filter-section'>
                         <Collapsible>
-                            {/* Trigger */}
                             <CollapsibleTrigger asChild>
-                                <div className='flex justify-end cursor-pointer mb-2'>
+                                <div className='flex justify-end cursor-pointer mb-2 lg:mr-30'>
                                     <div className='rounded-full border-primary border w-fit flex gap-1 items-center px-2 py-1'>
                                         <SlidersHorizontal className='text-primary' />
                                         <p className='text-lg'>Filter</p>
@@ -61,14 +61,13 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
                                 <FilterSection />
                             </CollapsibleContent>
                         </Collapsible>
-                        {/*Products section */}
                         <div className='pt-10 pb-12'>
-                            <ProductsGridLayout hasBadge data={filteredProducts} />
+                            <ProductsGridLayout hasBadge data={category} />
                         </div>
                     </div>
-                }
+                } */}
             </div>
-            <CustomPagination totalPages={products.pagination.total_pages} page={page} onPageChange={setPage} />
+            {/* <CustomPagination totalPages={products.pagination.total_pages} page={page} onPageChange={setPage} /> */}
         </div >
     )
 }

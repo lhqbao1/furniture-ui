@@ -138,11 +138,11 @@ export const GetWishlistColumns = ({
         },
         {
             id: "actions",
-            header: t('actions'),
+            header: () => <div className="text-center">{t('actions')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 return (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 justify-center">
                         <Button
                             variant="ghost"
                             className="text-red-500 cursor-pointer"

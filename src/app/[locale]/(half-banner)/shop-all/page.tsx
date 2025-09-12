@@ -22,7 +22,7 @@ export default function ShopAllPage() {
         <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb currentPage='Shop All' />
             <div className=''>
-                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{t('shopAll')}</h2>
+                <h2 className='section-header'>{t('shopAll')}</h2>
                 {isLoading || isError || !products ?
                     <ProductGridSkeleton length={12} /> :
 
@@ -30,7 +30,7 @@ export default function ShopAllPage() {
                         <Collapsible>
                             {/* Trigger */}
                             <CollapsibleTrigger asChild>
-                                <div className='flex justify-end cursor-pointer mb-2'>
+                                <div className='flex justify-end cursor-pointer mb-2 lg:ml-30'>
                                     <div className='rounded-full border-primary border w-fit flex gap-1 items-center px-2 py-1'>
                                         <SlidersHorizontal className='text-primary' />
                                         <p className='text-lg'>Filter</p>

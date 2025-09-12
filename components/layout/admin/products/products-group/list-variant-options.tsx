@@ -157,7 +157,7 @@ const ListVariantOption = () => {
                             <div className="flex gap-6 items-center">
                                 <div className="flex gap-6 items-center justify-start">
                                     {variant.options.map((o) => (
-                                        <div key={o.id} className="relative inline-block">
+                                        <div key={o.id} className="relative inline-block group">
                                             {o.image_url ? (
                                                 <Image
                                                     src={o.image_url}
@@ -173,14 +173,15 @@ const ListVariantOption = () => {
                                                 </span>
                                             )}
 
-                                            {/* Delete button */}
+                                            {/* Delete button: chỉ hiện khi hover */}
                                             <div
-                                                className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer"
+                                                className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                                                 onClick={() => handleDeleteVariantOption(o.id)}
                                             >
                                                 <X size={12} className="text-red-500" />
                                             </div>
                                         </div>
+
                                     ))}
                                 </div>
                                 <AddOptionDialog isImage={variant.variant.is_img} variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />

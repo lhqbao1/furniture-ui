@@ -7,7 +7,7 @@ const Voucher = () => {
         <div className='lg:mt-16 mt-24 grid xl:grid-cols-2 grid-cols-1 xl:gap-4 gap-2 w-full section-padding'>
             <div className='lg:h-[300px] h-[200px] relative rounded-2xl'>
                 <Image
-                    src={'/voucher-banner-1.jpg'}
+                    src={'/voucher-1.jpeg'}
                     width={400}
                     height={200}
                     alt=''
@@ -18,7 +18,7 @@ const Voucher = () => {
             </div>
             <div className='lg:h-[300px] h-[200px] relative rounded-2xl'>
                 <Image
-                    src={'/voucher-banner-2.jpg'}
+                    src={'/voucher-2.jpeg'}
                     width={400}
                     height={200}
                     alt=''

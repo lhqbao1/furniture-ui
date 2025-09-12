@@ -33,7 +33,7 @@ const Footer = () => {
                 <h3 className="font-semibold mb-3">{t('termPolicy')}</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     <li><Link href="/policy" className="">{t('termCondition')}</Link></li>
-                    <li><Link href="/policy" className="">{t('disclaimer')}</Link></li>
+                    {/* <li><Link href="/policy" className="">{t('disclaimer')}</Link></li> */}
                     <li><Link href="/policy" className="">{t('privacyPolicy')}</Link></li>
                 </ul>
             </div>

@@ -50,7 +50,8 @@ export default function TableToolbar({ pageSize, setPageSize, addButtonText, isA
             <div className="flex items-center w-full flex-1 relative">
                 <Input placeholder="Search" className="pr-20" />
                 <Button className="absolute right-0 rounded-l-none  text-white">
-                    <Mic className="h-4 w-4 mr-1" /> Search
+                    {/* <Mic className="h-4 w-4 mr-1" />  */}
+                    Search
                 </Button>
             </div>
 

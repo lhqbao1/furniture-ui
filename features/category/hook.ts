@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddOrRemoveProductToCategoryInput, CategoryInput, CategoryResponse } from "@/types/categories";
-import { addProductToCategory, createCategory, deleteCategory, editCategory, getCategories, getCategoryById, removeProductFromCategory } from "./api";
+import { addProductToCategory, createCategory, deleteCategory, editCategory, getCategories, getCategoryById, getCategoryByName, removeProductFromCategory } from "./api";
 
 
 // --- GET ALL CATEGORIES ---
@@ -82,4 +82,11 @@ export function useRemoveProductFromCategory() {
       qc.invalidateQueries({ queryKey: ["category", variables.categoryId] });
     },
   });
+}
+
+export function useGetCategoryByName(params?: string){
+    return useQuery({
+       queryKey: ["category-by-name", params],
+       queryFn: () => getCategoryByName(params),
+    })
 }

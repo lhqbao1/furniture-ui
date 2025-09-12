@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { ChevronDown, ChevronRight, CornerDownRight } from "lucide-react"
+import { ChevronRight, CornerDownRight } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -9,21 +9,16 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import Link from "next/link"
-import { useState } from "react"
-import { useMediaQuery } from "react-responsive"
 
 export function AdminSideBar() {
     const router = useRouter()
     const pathname = usePathname()
-    const [open, setOpen] = useState(false)
-    const [openItem, setOpenItem] = useState<string | null>(null)
+
     const items = [
         {
             title: "Products",
@@ -78,107 +73,64 @@ export function AdminSideBar() {
                         <SidebarMenu className="gap-3">
                             {items.map((item) => {
                                 const isActive = pathname === item.url
-                                const isOpen = openItem === item.title
 
-                                // Nếu có children → dùng Collapsible
                                 if (item.children) {
                                     return (
-                                        <SidebarMenuItem key={item.title} className="flex justify-start">
-                                            <Collapsible
-                                                className="w-full"
-                                                open={isOpen}
-                                                onOpenChange={(open) => setOpenItem(open ? item.title : null)}
-                                            >
-                                                <CollapsibleTrigger asChild>
-                                                    <SidebarMenuButton asChild>
+                                        <SidebarMenuItem key={item.title} className="flex flex-col">
+                                            <SidebarMenuButton asChild>
+                                                <Button
+                                                    className={`flex w-full flex-row items-center justify-start gap-4 rounded-none px-4 py-6 transition-colors ${isActive
+                                                        ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
+                                                        : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
+                                                        }`}
+                                                    variant="ghost"
+                                                >
+                                                    <div className="w-8">
+                                                        <item.icon height={40} width={40} />
+                                                    </div>
+                                                    <span className="text-xl">{item.title}</span>
+                                                </Button>
+                                            </SidebarMenuButton>
+
+                                            {/* Luôn render children thay vì Collapsible */}
+                                            <div className="flex flex-col gap-3 mt-3">
+                                                {item.children.map((child) => {
+                                                    const isChildActive = pathname === child.url
+                                                    return (
                                                         <Button
-                                                            className={`flex w-full flex-row items-center justify-start gap-4 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black ${isActive
+                                                            key={child.title}
+                                                            onClick={() => router.push(child.url)}
+                                                            variant="ghost"
+                                                            className={`relative flex flex-row items-center justify-start pl-12 gap-3 rounded-md py-1 text-base transition-colors ${isChildActive
                                                                 ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 }`}
-                                                            variant={"ghost"}
                                                         >
-                                                            <div className="w-8">
-                                                                <item.icon
-                                                                    // src={item.icon}
-                                                                    height={40}
-                                                                    width={40}
-                                                                // alt=""
-                                                                />
-                                                            </div>
-                                                            <span className="text-xl">{item.title}</span>
-                                                            <ChevronDown
-                                                                className={`size-4 opacity-70 transition-transform ${open ? "rotate-180" : ""
-                                                                    }`}
-                                                            />
+                                                            <child.icon size={20} stroke="#00B159" />
+                                                            <span>{child.title}</span>
                                                         </Button>
-                                                    </SidebarMenuButton>
-                                                </CollapsibleTrigger>
-
-                                                <CollapsibleContent
-                                                    style={{ transition: "none" }}
-                                                    className="flex flex-col gap-3 mt-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
-                                                >
-                                                    {item.children.map((child) => {
-                                                        const isChildActive = pathname === child.url
-                                                        return (
-                                                            <Button
-                                                                key={child.title}
-                                                                onClick={() => {
-                                                                    router.push(child.url)
-                                                                }}
-                                                                variant={"ghost"}
-                                                                className={`relative flex flex-row items-center justify-start pl-12 gap-3 rounded-md py-1 text-base transition-colors ${isChildActive
-                                                                    ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
-                                                                    : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
-                                                                    }`}
-                                                            >
-                                                                <child.icon
-                                                                    size={24}
-                                                                    className="!size-5"
-                                                                    stroke="#00B159"
-                                                                />
-                                                                <span>{child.title}</span>
-
-                                                                {/* chỉ render indicator nếu Collapsible mở */}
-                                                                {open && isChildActive && (
-                                                                    <span className="absolute w-1 h-full bg-secondary right-0"></span>
-                                                                )}
-                                                            </Button>
-                                                        )
-                                                    })}
-                                                </CollapsibleContent>
-                                            </Collapsible>
+                                                    )
+                                                })}
+                                            </div>
                                         </SidebarMenuItem>
                                     )
                                 }
 
-                                // Nếu không có children → render bình thường
                                 return (
-                                    <SidebarMenuItem key={item.title} className="flex justify-center">
+                                    <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton asChild>
                                             <Button
-                                                onClick={() => {
-                                                    router.push(item.url)
-                                                }}
-                                                className={`relative flex flex-row items-center justify-start rounded-none gap-3 px-4 py-6 transition-colors ${isActive
-                                                    ? "bg-secondary/20 text-[#4D4D4D] hover:text-black hover:bg-secondary/20"
+                                                onClick={() => router.push(item.url)}
+                                                className={`relative flex flex-row items-center justify-start gap-3 px-4 py-6 transition-colors ${isActive
+                                                    ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                     : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                     }`}
-                                                variant={"ghost"}
+                                                variant="ghost"
                                             >
                                                 <div className="w-8">
-                                                    <item.icon
-                                                        // src={item.icon}
-                                                        height={40}
-                                                        width={40}
-                                                    // alt=""
-                                                    />
+                                                    <item.icon height={40} width={40} />
                                                 </div>
                                                 <span className="text-xl">{item.title}</span>
-                                                {isActive && !open && (
-                                                    <span className="absolute w-1 h-full bg-secondary right-0"></span>
-                                                )}
                                             </Button>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>

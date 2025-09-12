@@ -20,7 +20,7 @@ export default function ViewProductPage() {
         <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb currentPage='Recent Viewed' />
             <div className=''>
-                <h2 className='text-center text-3xl font-bold capitalize text-secondary'>{t('viewedProduct')}</h2>
+                <h2 className='section-header'>{t('viewedProduct')}</h2>
                 {isLoading || isError || !products || products.items.length === 0 ?
                     <div className='flex justify-center flex-col items-center lg:mt-10 gap-2'>
                         <div className='text-xl'>No Product Found</div>

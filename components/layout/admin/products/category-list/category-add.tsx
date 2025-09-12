@@ -105,6 +105,9 @@ const CategoryAdd = () => {
             products: selectedRows.map(product => product.id),
         };
 
+        console.log('data', data)
+        console.log('selectedCategory', selectedCategory)
+
         if (data.products.length <= 0) {
             toast.error("You need to choose at least one product")
         } else {
@@ -153,14 +156,13 @@ const CategoryAdd = () => {
                             <BannerInput
                                 type="email"
                                 placeholder=""
-                                className='w-full xl:h-12 h-10'
+                                className='w-full h-10 pl-10'
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                            <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-0 pl-1 xl:pr-12 xl:h-12 pr-4 h-10'>
-                                <Mic stroke='white' size={24} className='xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full' />
+                            <Button type="submit" variant="default" className='absolute right-0 rounded-full bg-primary text-white xl:text-lg text-sm px-8 text-center h-10'>
                                 Search
                             </Button>
-                            <Search size={24} className='absolute left-3 xl:top-3 top-2' stroke='gray' />
+                            <Search size={24} className='absolute left-3 top-2' stroke='gray' />
                         </div>
                     </div>
                 </div>
@@ -172,7 +174,7 @@ const CategoryAdd = () => {
                         {categoryProductsLoading ? (
                             <SkeletonTable columns={productsColumn.length} rows={5} />
                         ) : (
-                            <div className='max-h-[600px] overflow-y-scroll'>
+                            <div className='max-h-[850px] overflow-y-scroll'>
                                 <Table>
                                     <TableHeader>
                                         {productsTable.getHeaderGroups().map(headerGroup => (
