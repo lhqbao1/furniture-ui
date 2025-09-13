@@ -1,3 +1,4 @@
+import { BrandResponse } from "./brand";
 import { CategoryResponse } from "./categories";
 import { Pagination } from "./pagination";
 import { VariantOptionResponse } from "./variant";
@@ -69,33 +70,7 @@ export type StaticFile = {
     options: VariantOption[]
   }
 
-  export type ProductItem = {
-    name: string
-    description: string
-    price: number
-    discount_percent?: number
-    discount_amount?: number
-    tax: string
-    category?: string
-    collection?: string | null
-    stock: number
-    sku: string
-    barcode: string
-    weight: number
-    length: number
-    width: number
-    height: number
-    is_active: boolean
-    tag?: string
-    id?: string
-    final_price: number
-    created_at?: string
-    updated_at?: string
-    static_files: StaticFile[]
-    variants: Variant[]
-  }
-
-    export type NewProductItem = {
+    export type ProductItem = {
     name: string
     description: string
     price: number
@@ -108,6 +83,11 @@ export type StaticFile = {
     stock: number
     sku: string
     ean: string
+    carrier: string
+    delivery_time: string
+    manufacture_country: string
+    tariff_number: string
+
     weight: number
     length: number
     width: number
@@ -123,10 +103,11 @@ export type StaticFile = {
     static_files: StaticFile[]
     options: VariantOptionResponse[]
     categories: CategoryResponse[]
+    brand: BrandResponse
   }
   
   export type ProductResponse = {
     pagination: Pagination
-    items: NewProductItem[]
+    items: ProductItem[]
   }
   

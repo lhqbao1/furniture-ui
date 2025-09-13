@@ -22,7 +22,7 @@ import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/prod
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import { NewProductItem, StaticFile } from '@/types/products'
+import { ProductItem, StaticFile } from '@/types/products'
 import { toast } from 'sonner'
 import { ProductPricingFields } from './pricing-field'
 import { MultiSelectField } from './category-select'
@@ -32,7 +32,7 @@ import { useAddProduct, useEditProduct } from '@/features/products/hook'
 import { useRouter } from 'next/navigation'
 
 interface AddProductFormProps {
-    productValues?: Partial<NewProductItem>
+    productValues?: Partial<ProductItem>
     onSubmit: (values: ProductInput) => Promise<void> | void
     isPending?: boolean
 }
@@ -44,7 +44,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
 
-    const normalizeProductValues = (productValues?: Partial<NewProductItem>) => {
+    const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
         if (!productValues) return defaultValues
 
         return {
@@ -63,7 +63,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
         mode: "onBlur",
     })
 
-    const id_provider = form.watch('id_provider')
 
 
     useEffect(() => {
@@ -80,9 +79,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
             sku: values.sku?.trim() || undefined,
-            idProvider: productValues?.id_provider
-                ? productValues.id_provider  // update
-                : productValues?.id ?? "test"
         }
 
         if (productValues) {
@@ -263,7 +259,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 </Button>
 
                             </div>
-                            <div>ID: {id_provider}</div>
+                            <div>ID: {productValues?.id_provider}</div>
                             {/*Product Active */}
                             <FormField
                                 control={form.control}

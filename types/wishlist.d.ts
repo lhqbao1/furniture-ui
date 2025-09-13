@@ -1,10 +1,10 @@
-import { NewProductItem } from "./products"
+import { ProductItem } from "./products"
 
 export type WishListItem = {
   id: string
   wishlist_id: string
   is_active: boolean
-  products: NewProductItem
+  products: ProductItem
   image_url: string
   item_price: number
   final_price: number

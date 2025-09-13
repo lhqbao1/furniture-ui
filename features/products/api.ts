@@ -1,6 +1,6 @@
 import { api, apiAdmin, apiPublic } from "@/lib/axios"
 import { ProductInput } from "@/lib/schema/product"
-import { NewProductItem, Product, ProductItem, ProductResponse } from "@/types/products"
+import { ProductItem, ProductResponse } from "@/types/products"
 
 interface GetAllProductsParams {
   page?: number
@@ -19,7 +19,7 @@ export async function CreateProduct(input: ProductInput) {
       withCredentials: true,
     }
   )
-  return data as NewProductItem
+  return data as ProductItem
   }
   
 
@@ -38,14 +38,14 @@ export async function getProductById(id: string) {
   const {data} = await apiPublic.get(
       `/products/${id}`,
   )
-  return data as NewProductItem 
+  return data as ProductItem 
 }
 
 export async function getProductByTag(tag: string) {
   const {data} = await apiPublic.get(
       `/products/by-tag/${tag}`,
   )
-  return data as NewProductItem[]
+  return data as ProductItem[]
 }
 
 export async function deleteProduct(id: string){
@@ -67,5 +67,5 @@ export async function editProduct(input: ProductInput, id: string) {
       withCredentials: true, // nếu backend cần cookie/session
     }
   )
-  return data as NewProductItem
+  return data as ProductItem
   }

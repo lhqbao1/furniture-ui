@@ -10,9 +10,6 @@ export const addProductSchema = z.object({
   name: z.string().min(2, { message: "Product name is required" }),
   description: z.string().optional(),
   price: z.number("You must provide product price").min(1, "You must provide product price").nonnegative(),
-  id_provider: z.string().min(1, 'You must provide an ID for product'),
-  // id_provider: z.string().min(1).default("test"),
-
   cost: z.number("You must provide product cost price").min(1, "You must provide product cost price").nonnegative(),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
@@ -23,6 +20,11 @@ export const addProductSchema = z.object({
   // sku: z.string().min(1, "You must provide product sku"),
   sku: z.string().optional().nullable(),
   ean: z.string().min(1, "You must provide product EAN"),
+  carrier: z.string().min(1, "You must provide a carrier"),
+  delivery_time:z.string().min(1, "You must provide delivery time"),
+  manufacture_country: z.string().min(1, "You must provide manufacture country"),
+  tariff_number: z.string().min(1, "You must provide tariff number"),
+  brand_id: z.string().min(1, "You must provide product brand"),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
   weight: z.number().optional().nullable(),
   length: z.number().optional().nullable(),
@@ -53,5 +55,10 @@ export const defaultValues = {
   is_active: true,
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
+  brand_id: "",
+  carrier: "",
+  delivery_time: "",
+  manufacture_country: "",
+  tariff_number: ""
 }
   

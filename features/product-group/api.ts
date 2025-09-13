@@ -1,6 +1,6 @@
 import { apiAdmin, apiPublic } from "@/lib/axios"
 import { ProductGroupDetailResponse, ProductGroupResponse } from "@/types/product-group"
-import { NewProductItem, ProductItem } from "@/types/products"
+import { ProductItem } from "@/types/products"
 
 export async function createProductGroup(name: string) {
   const { data } = await apiAdmin.post(
@@ -43,7 +43,7 @@ export async function getAllProductsSelect(params?: string){
       withCredentials: true, // nếu backend cần cookie/session
         }
     )
-    return data as NewProductItem[]
+    return data as ProductItem[]
 }
 
 export async function getProductGroupDetail(parent_id: string){

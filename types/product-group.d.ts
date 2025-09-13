@@ -1,4 +1,4 @@
-import { NewProductItem, ProductItem } from "./products"
+import { ProductItem } from "./products"
 import { VariantOptionsResponse } from "./variant"
 
 export interface ProductGroupResponse {
@@ -16,5 +16,5 @@ export interface ProductGroupDetailResponse {
     created_at: string
     updated_at: string
     variants: VariantOptionsResponse[]
-    products: NewProductItem[]
+    products: ProductItem[]
 }

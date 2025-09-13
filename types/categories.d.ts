@@ -1,5 +1,5 @@
 import { LucideIcon } from "lucide-react";
-import { NewProductItem, StaticFile } from "./products";
+import { ProductItem, StaticFile } from "./products";
 import { StaticFileResponse } from "@/features/file/api";
 import { VariantOptionResponse } from "./variant";
 
@@ -40,38 +40,9 @@ export interface CategoryInput {
   parent_id?: string; // optional
 }
 
-
-export interface ProductItem {
-    name: string
-    description: string
-    price: number
-    id_provider: string
-    discount_percent: number
-    discount_amount: number
-    tax: string
-    collection: string
-    stock: number
-    sku: string
-    ean: string
-    weight: number
-    length: number
-    width: number
-    height: number
-    is_active: boolean
-    tag: string
-    id: string
-    final_price: number
-    price_whithout_tax: number
-    created_at: string
-    updated_at: string
-    static_files: StaticFile[]
-    options: VariantOptionResponse[]
-    categories: CategoryResponse[]
-}
-
 export interface CategoryByIdResponse {
-    in_category: NewProductItem[]
-    not_in_category: NewProductItem[]
+    in_category: ProductItem[]
+    not_in_category: ProductItem[]
 }
 
 

@@ -8,7 +8,7 @@ import { useGetProductsSelect } from "@/features/product-group/hook";
 import { toast } from "sonner";
 import { useAddOptionToProduct } from "@/features/variant/hook";
 import { ProductGroupDetailResponse } from "@/types/product-group";
-import { NewProductItem, ProductItem, VariantOption } from "@/types/products";
+import { ProductItem } from "@/types/products";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 
@@ -19,7 +19,7 @@ interface VariantCombinationsProps {
 }
 
 export function filterProductsByCombinations(
-    products: NewProductItem[],
+    products: ProductItem[],
     combinations: VariantOptionResponse[][]
 ): Record<number, string> {
     const result: Record<number, string> = {}
@@ -53,7 +53,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
     const [localCombinations, setLocalCombinations] = useState(combinations)
 
     const [selectedAction, setSelectedAction] = useState<Record<number, string>>(filteredProduct);
-    const [listSelect, setListSelect] = useState<NewProductItem[]>([])
+    const [listSelect, setListSelect] = useState<ProductItem[]>([])
     const [openIdx, setOpenIdx] = useState<number | null>(null)
 
 
@@ -75,7 +75,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
         setLocalCombinations((prev) => prev.filter((_, i) => i !== idx));
     };
 
-    if (combinations.length === 0) return <p>No combinations selected</p>;
+    if (combinations.length === 0) return <p className="text-red-500">You need to add options to all attributes</p>;
 
     const handleSaveGroup = () => {
         const data = combinations
@@ -111,7 +111,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                     Save group
                 </Button>
             </div>
-            <h3 className="font-semibold mb-4">Combinations:</h3>
+            <h3 className="font-semibold mb-4">Variant list:</h3>
             <div className="space-y-6">
                 {localCombinations
                     .filter((comb) => comb.length > 1)

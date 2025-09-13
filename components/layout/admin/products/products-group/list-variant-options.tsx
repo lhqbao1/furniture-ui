@@ -25,16 +25,13 @@ const ListVariantOption = () => {
     const [selected, setSelected] = useState<Record<string, VariantOptionResponse[]>>({})
     const [openModalAddOption, setOpenModalAddOption] = useState<boolean>(false)
     const [combination, setCombination] = useState<VariantOptionResponse[][]>()
-    const [currentVariant, setCurrentVariant] = useState<string | null>(null);
 
     const { data: groupDetail, isLoading, isError } = useQuery({
         queryKey: ["product-group-detail", parent_id],
         queryFn: () => getProductGroupDetail(parent_id),
         enabled: !!parent_id,
     })
-    const { data: variantOption, isLoading: isLoadingOption, isError: isErrorOption } = useGetVariantOptionByVariant(currentVariant ?? '')
 
-    const createVariantOptionMutation = useCreateVariantOption()
     const deleteVariantMutation = useDeleteVariant()
     const deleteVariantOptionMutation = useDeleteVariantOption()
 
@@ -97,23 +94,6 @@ const ListVariantOption = () => {
         };
         return cartesian(optionsList);
     };
-
-    const handleAddVariantOption = (variant_id: string, input: { label: string, image_url?: string | null, is_global: boolean, img_description?: string | null }) => {
-        // Convert sang VariantOptionInput
-        const payload: VariantOptionInput = {
-            options: [input],
-        };
-
-        createVariantOptionMutation.mutate({ variant_id, input: payload }, {
-            onSuccess() {
-                toast.success("Option added successfully");
-            },
-            onError(error) {
-                toast.error("Failed to add option");
-                console.error(error);
-            }
-        });
-    }
 
     const handleDeleteVariant = (variant_id: string) => {
         deleteVariantMutation.mutate(variant_id, {
@@ -185,6 +165,12 @@ const ListVariantOption = () => {
                                     ))}
                                 </div>
                                 <AddOptionDialog isImage={variant.variant.is_img} variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
+                                {/* Nếu chưa có option thì show cảnh báo */}
+                                {variant.options.length === 0 && (
+                                    <span className="text-red-500 text-sm">
+                                        You need to add options for this attributes
+                                    </span>
+                                )}
                             </div>
                             <div className="flex items-center" onClick={() => handleDeleteVariant(variant.variant.id)}><Trash2 size={18} className="text-gray-600 cursor-pointer" /></div>
 

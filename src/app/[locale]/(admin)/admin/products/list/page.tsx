@@ -40,7 +40,6 @@ const ProductList = () => {
                     totalPages={data?.pagination.total_pages ?? 0}
                     addButtonText='Add Product'
                     addButtonUrl='/admin/products/add'
-                    isAddButtonModal
                 />
             }
         </div>

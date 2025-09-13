@@ -29,7 +29,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getProductGroupDetail } from '@/features/product-group/api'
 import { getProductById } from '@/features/products/api'
 import { VariantOptionResponse } from '@/types/variant'
-import { NewProductItem } from '@/types/products'
+import { ProductItem } from '@/types/products'
 import { useAddToWishList } from '@/features/wishlist/hook'
 import { Voucher } from '@/types/voucher'
 import { useTranslations } from 'next-intl'
@@ -100,7 +100,7 @@ const ProductDetails = () => {
         if (!parentProduct?.products || !optionIds || optionIds.length === 0) return null
 
         return (
-            parentProduct.products.find((p: NewProductItem) => {
+            parentProduct.products.find((p: ProductItem) => {
                 const productOptionIds = p.options.map((o: VariantOptionResponse) => o.id)
                 return (
                     optionIds.length === productOptionIds.length &&

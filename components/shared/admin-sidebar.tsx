@@ -29,6 +29,7 @@ export function AdminSideBar() {
                 { title: "Product List", url: "/admin/products/list", icon: CornerDownRight },
                 { title: "Product Group", url: "/admin/products/group", icon: CornerDownRight },
                 { title: "Category List", url: "/admin/products/categories", icon: CornerDownRight },
+                { title: "Brand List", url: "/admin/products/brand", icon: CornerDownRight },
             ],
         },
         {

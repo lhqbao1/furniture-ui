@@ -1,11 +1,11 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { NewProductItem } from "@/types/products";
+import { ProductItem } from "@/types/products";
 import { ColumnDef } from "@tanstack/react-table";
 import { Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export const productsColumn: ColumnDef<NewProductItem>[] = [
+export const productsColumn: ColumnDef<ProductItem>[] = [
     {
         id: "select",
         header: ({ table }) => (

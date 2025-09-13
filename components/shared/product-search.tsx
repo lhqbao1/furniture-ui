@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { Input } from "../ui/input"
 import { useGetProductsSelect } from "@/features/product-group/hook"
-import { NewProductItem } from "@/types/products"
+import { ProductItem } from "@/types/products"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 
@@ -97,7 +97,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                                 </CommandEmpty>
                                 {results.length > 0 && (
                                     <CommandGroup>
-                                        {results.map((product: NewProductItem) => (
+                                        {results.map((product: ProductItem) => (
                                             <CommandItem
                                                 key={product.id}
                                                 value={product.name}

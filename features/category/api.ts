@@ -1,6 +1,6 @@
 import { api, apiAdmin, apiPublic } from "@/lib/axios"
 import { AddOrRemoveProductToCategoryInput, CategoryByIdResponse, CategoryInput, CategoryResponse } from "@/types/categories"
-import { NewProductItem } from "@/types/products"
+import { ProductItem } from "@/types/products"
 
 export async function getCategories(){
     const {data} = await apiPublic.get(
@@ -43,7 +43,7 @@ export async function getCategoryByName(params?: string){
     withCredentials: true, // nếu backend cần cookie/session
       }
   )
-  return data as NewProductItem[]
+  return data as ProductItem[]
 }
 
 

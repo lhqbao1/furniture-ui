@@ -2,13 +2,13 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { NewProductItem, Product, ProductItem } from '@/types/products'
+import { ProductItem } from '@/types/products'
 import { Equal, Heart, Plus } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 
 interface BoughtTogetherSectionProps {
-    productDetails: NewProductItem
+    productDetails: ProductItem
 }
 
 const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) => {

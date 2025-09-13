@@ -4,12 +4,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import ListReviewButton from './list-review-buttons'
 import gsap from 'gsap'
 import { useMediaQuery } from 'react-responsive'
-import { NewProductItem } from '@/types/products'
+import { ProductItem } from '@/types/products'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 interface CountDownGridLayoutProps {
-    products: NewProductItem[]
+    products: ProductItem[]
 }
 
 interface ProductTime {

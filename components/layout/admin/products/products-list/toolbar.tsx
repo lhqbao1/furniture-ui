@@ -1,7 +1,15 @@
+"use client"
+
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Mic, ChevronDown } from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from "lucide-react"
 import FilterForm from "./toolbar/filter"
 import {
     Select,
@@ -11,6 +19,13 @@ import {
     SelectItem,
 } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import AddBrandForm from "../brand/add-brand-form"
 
 interface TableToolbarProps {
     pageSize: number
@@ -18,10 +33,20 @@ interface TableToolbarProps {
     addButtonText?: string
     isAddButtonModal?: boolean
     addButtonUrl?: string
+    addButtonModalContent?: React.ReactNode
 }
 
-export default function TableToolbar({ pageSize, setPageSize, addButtonText, isAddButtonModal, addButtonUrl }: TableToolbarProps) {
+export default function TableToolbar({
+    pageSize,
+    setPageSize,
+    addButtonText,
+    isAddButtonModal,
+    addButtonUrl,
+    addButtonModalContent
+}: TableToolbarProps) {
     const router = useRouter()
+    const [openAddModal, setOpenAddModal] = useState(false)
+
     return (
         <div className="flex items-center justify-between gap-4 p-2 w-full">
             {/* Left group */}
@@ -49,8 +74,7 @@ export default function TableToolbar({ pageSize, setPageSize, addButtonText, isA
             {/* Search */}
             <div className="flex items-center w-full flex-1 relative">
                 <Input placeholder="Search" className="pr-20" />
-                <Button className="absolute right-0 rounded-l-none  text-white">
-                    {/* <Mic className="h-4 w-4 mr-1" />  */}
+                <Button className="absolute right-0 rounded-l-none text-white">
                     Search
                 </Button>
             </div>
@@ -113,23 +137,40 @@ export default function TableToolbar({ pageSize, setPageSize, addButtonText, isA
                     </DropdownMenuContent>
                 </DropdownMenu>
 
+                {/* Add Button */}
                 <div className="flex flex-1 w-full justify-end">
-                    {!addButtonText ? '' :
+                    {!addButtonText ? null : (
                         <Button
                             className="bg-primary hover:bg-primary font-semibold"
                             onClick={() => {
-                                // router.push('/')
                                 if (addButtonUrl) {
-                                    console.log(addButtonUrl)
-                                    router.push(`${addButtonUrl}`);
+                                    router.push(addButtonUrl)
+                                } else if (isAddButtonModal) {
+                                    setOpenAddModal(true)
                                 }
                             }}
                         >
-                            {addButtonText || 'Add Product'}asdasd
+                            {addButtonText || "Add Product"}
                         </Button>
-                    }
+                    )}
                 </div>
             </div>
+
+            {/* Dialog generic */}
+            {isAddButtonModal && (
+                <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
+                    <DialogContent className="w-1/3">
+                        <DialogHeader>
+                            <DialogTitle>{addButtonText}</DialogTitle>
+                        </DialogHeader>
+                        {addButtonModalContent &&
+                            React.cloneElement(
+                                addButtonModalContent as React.ReactElement<{ onClose?: () => void }>,
+                                { onClose: () => setOpenAddModal(false) }
+                            )}
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     )
 }

@@ -11,6 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarTrigger,
+    useSidebar
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
@@ -31,7 +32,7 @@ type MenuItem = {
 };
 
 export function AppSidebar() {
-    const [open, setOpen] = useState(false)
+    const { open: sidebarOpen } = useSidebar()  // true = expanded, false = collapsed
     const { data: categories, isLoading, isError } = useGetCategories()
     const t = useTranslations()
 
@@ -115,7 +116,6 @@ export function AppSidebar() {
                             {items.map((item) => {
                                 const isActive = pathname === item.url
                                 const isOpen = openItem === item.title
-
                                 // Nếu có children → dùng Collapsible
                                 if (item.children) {
                                     return (
@@ -146,51 +146,54 @@ export function AppSidebar() {
                                                             </div>
                                                             <span className="lg:text-lg text-lg">{item.title}</span>
                                                             <ChevronDown
-                                                                className={`size-4 opacity-70 transition-transform ${open ? "rotate-180" : ""
+                                                                className={`size-4 opacity-70 transition-transform hover:text-gray-600 ${isOpen ? "rotate-180" : ""
                                                                     }`}
                                                             />
                                                         </Button>
                                                     </SidebarMenuButton>
                                                 </CollapsibleTrigger>
 
-                                                <CollapsibleContent
-                                                    style={{ transition: "none" }}
-                                                    className="flex flex-col gap-1.5 mt-1 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
-                                                >
-                                                    {item.children.map((child) => {
-                                                        const isChildActive = pathname === child.url
-                                                        return (
-                                                            <Button
-                                                                key={child.id}
-                                                                onClick={() => {
-                                                                    router.push(child.url)
-                                                                }}
-                                                                variant={"ghost"}
-                                                                className={`relative flex flex-row items-start justify-start lg:pl-16 pl-4 text-wrap gap-3 h-fit rounded-md py-1 flex-wrap max-w-full text-base transition-colors ${isChildActive
-                                                                    ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
-                                                                    : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
-                                                                    }`}
-                                                            >
-                                                                {item.id !== 5 ?
-                                                                    <div className="w-8">
-                                                                        <Image
-                                                                            src={child.icon}
-                                                                            height={30}
-                                                                            width={30}
-                                                                            alt=""
-                                                                            className="lg:w-7 lg:h-7 w-6 h-6"
-                                                                            unoptimized
-                                                                        />
-                                                                    </div>
-                                                                    : ''}
-                                                                <span className="text-wrap lg:text-[17px] text-start">{child.title}</span>
-                                                                {open && isChildActive && (
-                                                                    <span className="absolute w-1 h-full bg-secondary right-0"></span>
-                                                                )}
-                                                            </Button>
-                                                        )
-                                                    })}
-                                                </CollapsibleContent>
+                                                {sidebarOpen && isOpen && (
+                                                    <CollapsibleContent
+                                                        style={{ transition: "none" }}
+                                                        className="flex flex-col gap-1.5 mt-1 overflow-hidden data-[state=closed]:hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
+                                                    >
+                                                        {item.children.map((child) => {
+                                                            const isChildActive = pathname === child.url
+                                                            return (
+                                                                <Button
+                                                                    key={child.id}
+                                                                    onClick={() => {
+                                                                        router.push(child.url)
+                                                                    }}
+                                                                    variant={"ghost"}
+                                                                    className={`relative flex flex-row items-start justify-start lg:pl-16 pl-4 text-wrap gap-3 h-fit rounded-none py-1 flex-wrap max-w-full text-base transition-colors ${isChildActive
+                                                                        ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
+                                                                        : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
+                                                                        }`}
+                                                                >
+                                                                    {item.id !== 5 ?
+                                                                        <div className="w-8">
+                                                                            <Image
+                                                                                src={child.icon}
+                                                                                height={30}
+                                                                                width={30}
+                                                                                alt=""
+                                                                                className="lg:w-7 lg:h-7 w-6 h-6"
+                                                                                unoptimized
+                                                                            />
+                                                                        </div>
+                                                                        : ''}
+                                                                    <span className="text-wrap lg:text-[17px] text-start">{child.title}</span>
+                                                                    {isOpen && isChildActive && (
+                                                                        <span className="absolute w-1 h-full bg-secondary right-0 top-0"></span>
+                                                                    )}
+                                                                </Button>
+                                                            )
+                                                        })}
+                                                    </CollapsibleContent>
+                                                )}
+
                                             </Collapsible>
                                         </SidebarMenuItem>
                                     )
@@ -221,7 +224,7 @@ export function AppSidebar() {
                                                     />
                                                 </div>
                                                 <span className="lg:text-lg text-lg">{item.title}</span>
-                                                {isActive && !open && (
+                                                {isActive && (
                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>
                                                 )}
                                             </Button>

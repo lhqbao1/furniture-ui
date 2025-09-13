@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Eye, Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import DeleteDialog from "./delete-dialog"
-import { NewProductItem } from "@/types/products"
+import { ProductItem } from "@/types/products"
 import Link from "next/link"
 import { useState } from "react"
 import { useEditProduct } from "@/features/products/hook"
@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
-function EditableNameCell({ product }: { product: NewProductItem }) {
+function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
     const [editing, setEditing] = useState(false)
     const EditProductMutation = useEditProduct()
@@ -25,7 +25,8 @@ function EditableNameCell({ product }: { product: NewProductItem }) {
             input: {
                 ...product,
                 name: value,
-                category_ids: product.categories.map((c) => c.id), // map ra id array
+                category_ids: product.categories.map((c) => c.id),
+                brand_id: product.brand.id
             },
             id: product.id,
         }, {
@@ -76,7 +77,7 @@ function EditableNameCell({ product }: { product: NewProductItem }) {
     )
 }
 
-function EditableStockCell({ product }: { product: NewProductItem }) {
+function EditableStockCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.stock)
     const [editing, setEditing] = useState(false)
     const EditProductMutation = useEditProduct()
@@ -87,6 +88,7 @@ function EditableStockCell({ product }: { product: NewProductItem }) {
                 ...product,
                 stock: value,
                 category_ids: product.categories.map((c) => c.id), // map ra id array
+                brand_id: product.brand.id
             },
             id: product.id,
         }, {
@@ -139,7 +141,7 @@ function EditableStockCell({ product }: { product: NewProductItem }) {
 }
 
 
-export const productColumns: ColumnDef<NewProductItem>[] = [
+export const productColumns: ColumnDef<ProductItem>[] = [
     {
         id: "select",
         header: ({ table }) => (

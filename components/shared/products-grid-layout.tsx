@@ -3,7 +3,7 @@ import Image from 'next/image'
 import React, { useEffect, useRef } from 'react'
 import ListReviewButton from './list-review-buttons'
 import gsap from 'gsap'
-import { NewProductItem, ProductResponse } from '@/types/products'
+import { ProductItem, ProductResponse } from '@/types/products'
 import Link from 'next/link'
 import { useMediaQuery } from 'react-responsive'
 import { useAddViewedProduct } from '@/features/viewed/hook'
@@ -12,7 +12,7 @@ import { useAddViewedProduct } from '@/features/viewed/hook'
 interface ProductsGridLayoutProps {
     hasBadge?: boolean
     hasPagination?: boolean
-    data: NewProductItem[]
+    data: ProductItem[]
 }
 
 

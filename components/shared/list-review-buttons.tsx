@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { Heart, Expand, ShoppingCart } from 'lucide-react'
 import gsap from 'gsap'
 import { useAddToCart } from '@/features/cart/hook'
-import { NewProductItem } from '@/types/products'
+import { ProductItem } from '@/types/products'
 import { toast } from 'sonner'
 import { useAddToWishList } from '@/features/wishlist/hook'
 import { useRouter } from 'next/navigation'
@@ -11,7 +11,7 @@ import { HandleApiError } from '@/lib/api-helper'
 import { useTranslations } from 'next-intl'
 
 interface IconListProps {
-    currentProduct?: NewProductItem
+    currentProduct?: ProductItem
 }
 
 const IconList = ({ currentProduct }: IconListProps) => {

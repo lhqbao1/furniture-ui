@@ -17,10 +17,10 @@
 // } from "@/components/ui/tabs"
 // import ProductReviewTab from "./tabs/review"
 // import QASection from "./tabs/q&a"
-// import { NewProductItem } from "@/types/products"
+// import { ProductItem } from "@/types/products"
 
 // interface ProductDetailsTabProps {
-//   product?: NewProductItem
+//   product?: ProductItem
 // }
 
 // export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
@@ -96,11 +96,11 @@ import {
 } from "@/components/ui/accordion"
 import ProductReviewTab from "./tabs/review"
 import QASection from "./tabs/q&a"
-import { NewProductItem } from "@/types/products"
+import { ProductItem } from "@/types/products"
 import { useTranslations } from 'next-intl'
 
 interface ProductDetailsTabProps {
-  product?: NewProductItem
+  product?: ProductItem
 }
 
 export function ProductDetailsTab({ product }: ProductDetailsTabProps) {

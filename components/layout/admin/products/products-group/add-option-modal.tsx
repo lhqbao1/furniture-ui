@@ -18,6 +18,9 @@ import { useUploadStaticFile } from "@/features/file/hook"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDropzone } from "react-dropzone"
+import { useQuery } from "@tanstack/react-query"
+import { useFormContext } from "react-hook-form"
+import { getProductGroupDetail } from "@/features/product-group/api"
 
 interface AddImageOptionDialogProps {
     variantId: string
@@ -27,6 +30,9 @@ interface AddImageOptionDialogProps {
 }
 
 const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
+    const { watch } = useFormContext()
+    const parent_id = watch('parent_id')
+
     const [open, setOpen] = useState(false)
     const [optionName, setOptionName] = useState("")
     const [imageDes, setImageDes] = useState("")
@@ -136,25 +142,6 @@ const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    {/* Radio buttons */}
-                    <div>
-                        <Label className="mb-2 block text-sm font-medium">Option type</Label>
-                        <RadioGroup
-                            className="flex gap-4"
-                            value={isGlobal ? "global" : "local"}
-                            onValueChange={(val) => setIsGlobal(val === "global")}
-                        >
-                            <div className="flex items-center gap-1">
-                                <RadioGroupItem value="global" id="global" />
-                                <Label htmlFor="global">Global</Label>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <RadioGroupItem value="local" id="local" />
-                                <Label htmlFor="local">Local</Label>
-                            </div>
-                        </RadioGroup>
-                    </div>
-
                     {/* image group */}
                     {isImage ?
                         <>

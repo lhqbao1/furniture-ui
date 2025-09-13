@@ -12,26 +12,25 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button'
 import { Loader2, Trash2 } from 'lucide-react'
-import { useDeleteProduct } from '@/features/products/hook'
-import { ProductItem } from '@/types/products'
 import { toast } from 'sonner'
+import { useDeleteBrand } from '@/features/brand/hook'
 
 interface DeleteDialogProps {
-    product: ProductItem
+    brandId: string
 }
 
-const DeleteDialog = ({ product }: DeleteDialogProps) => {
-    const deleteProduct = useDeleteProduct()
+const DeleteDialog = ({ brandId }: DeleteDialogProps) => {
+    const deleteBrandMutation = useDeleteBrand()
     const [open, setOpen] = useState(false)
 
     const handleDelete = () => {
-        deleteProduct.mutate(product.id ?? "", {
+        deleteBrandMutation.mutate(brandId, {
             onSuccess(data, variables, context) {
-                toast.success("Delete product successfully")
+                toast.success("Delete Brand successfully")
                 setOpen(false)
             },
             onError(error, variables, context) {
-                toast.error("Failed to delete product")
+                toast.error("Failed to delete Brand")
                 setOpen(false)
             },
         })
@@ -39,15 +38,17 @@ const DeleteDialog = ({ product }: DeleteDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" onClick={(e) => {
+                    e.stopPropagation()
+                }}>
                     <Trash2 className='size-4 text-red-500' />
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Delete Product</DialogTitle>
+                    <DialogTitle>Delete Brand</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to delete this product? This action cannot be undone.
+                        Are you sure you want to delete this Brand? This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="sm:justify-start">
@@ -55,13 +56,23 @@ const DeleteDialog = ({ product }: DeleteDialogProps) => {
                         <Button
                             type="button"
                             className='bg-gray-400 text-white hover:bg-gray-500'
-                            disabled={deleteProduct.isPending}
+                            disabled={deleteBrandMutation.isPending}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                            }}
                         >
                             Close
                         </Button>
                     </DialogClose>
-                    <Button type="button" onClick={handleDelete} hasEffect variant="secondary" disabled={deleteProduct.isPending}>
-                        {deleteProduct.isPending ? (
+                    <Button type="button"
+                        onClick={() => {
+                            handleDelete()
+                        }}
+                        hasEffect
+                        variant="secondary"
+                        disabled={deleteBrandMutation.isPending}
+                    >
+                        {deleteBrandMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                             "Submit"

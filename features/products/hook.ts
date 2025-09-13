@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { CreateProduct, deleteProduct, editProduct, getAllProducts, getProductById, getProductByTag } from "./api"
-import { NewProductItem, ProductItem } from "@/types/products"
 import { ProductInput } from "@/lib/schema/product"
 
 interface UseGetAllProductsParams {

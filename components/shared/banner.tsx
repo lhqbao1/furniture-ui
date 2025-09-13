@@ -103,17 +103,19 @@ const Banner = ({ height }: BannerProps) => {
             className={cn(
                 "relative w-full flex-shrink-0",
                 !height ? `h-[200px] lg:h-[400px]` : `lg:h-[${height}px]`,
-                isPhone ? "mb-16" : ""
+                isPhone ? "mb-16 h-0" : ""
             )}
-            style={isPhone ? { height: 200 } : { height }}
+            style={isPhone ? { height: 0 } : { height }}
         >
-            <Image
-                src="/banner.jpeg"
-                alt="Banner"
-                fill
-                className={`object-cover ${isPhone && 'mt-16'}`}
-                priority
-            />
+            {!isPhone ?
+                <Image
+                    src="/banner.jpeg"
+                    alt="Banner"
+                    fill
+                    className={`object-cover ${isPhone && 'mt-16'}`}
+                    priority
+                />
+                : ''}
 
             <div className='home-banner__content h-full flex flex-col relative z-10'>
                 <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex flex-col items-end pt-1'}`}>
@@ -150,22 +152,51 @@ const Banner = ({ height }: BannerProps) => {
                             </SelectContent>
                         </Select>
 
+                        <div className={`${isPhone ? 'block' : 'hidden'}`}>
+                            {/*Search */}
+                            <Drawer>
+                                <DrawerTrigger asChild>
+                                    <Search stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
+                                </DrawerTrigger>
+                                <DrawerContent>
+                                </DrawerContent>
+                            </Drawer>
+                        </div>
+
                         {/*Shopping cart */}
                         <div className={`cursor-pointer relative`}>
                             <ShoppingCart stroke={`${isPhone ? '#00B159' : 'white'}`} size={30} className='hover:scale-110 transition-all duration-300' />
                             <div className='absolute -top-4 -right-4 text-white bg-primary py-1 px-3 rounded-full flex items-center text-sm'>{cart && cart.items ? cart.items.length : 0}</div>
                         </div>
 
+                        {isPhone ?
+                            <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
+                            : ''}
+
                         {/*User */}
                         <DropdownMenu >
                             <DropdownMenuTrigger asChild>
                                 <div className='flex gap-2 justify-start items-end'>
                                     <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`${isPhone ? '#00B159' : 'white'}`} size={30} />
-                                    {user && userId ? <div className='text-white text-xl font-semibold'>{user.first_name} {user.last_name}</div> : <Link href={'/login'} className='text-white text-xl font-semibold'>{t('login')}</Link>}
+                                    {!isPhone && (
+                                        user && userId ? (
+                                            <div className="text-white text-xl font-semibold">
+                                                {user.first_name} {user.last_name}
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                href="/login"
+                                                className="text-white text-xl font-semibold"
+                                            >
+                                                {t("login")}
+                                            </Link>
+                                        )
+                                    )}
+
                                 </div>
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent side="bottom" className="w-48 !absolute top-0 lg:-left-[180px]">
+                            <DropdownMenuContent side="bottom" className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]">
                                 {!user || !userId ? (
                                     <div>
                                         <Link href={'/login'} className='cursor-pointer'>
@@ -193,22 +224,6 @@ const Banner = ({ height }: BannerProps) => {
                                 )}
                             </DropdownMenuContent>
                         </DropdownMenu>
-
-                        <div className={`${isPhone ? 'block' : 'hidden'}`}>
-                            {/*Search */}
-                            <Drawer>
-                                <DrawerTrigger asChild>
-                                    <Search stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
-                                </DrawerTrigger>
-                                <DrawerContent>
-                                </DrawerContent>
-                            </Drawer>
-                        </div>
-
-
-                        {isPhone ?
-                            <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
-                            : ''}
                     </div>
                 </div>
 

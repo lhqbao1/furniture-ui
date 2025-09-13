@@ -27,6 +27,8 @@ import {
 import { useCreateVariant, useGetVariants } from "@/features/variant/hook"
 import AttributesModal from "./attribute-modal"
 import { toast } from "sonner"
+import { useQuery } from "@tanstack/react-query"
+import { getProductGroupDetail } from "@/features/product-group/api"
 
 
 const SelectProductAttributes = () => {
@@ -36,6 +38,15 @@ const SelectProductAttributes = () => {
     const { watch } = useFormContext()
     const parent_id = watch('parent_id')
     const createVariantMutation = useCreateVariant()
+
+    const { data: groupDetail } = useQuery({
+        queryKey: ["product-group-detail", parent_id],
+        queryFn: () => getProductGroupDetail(parent_id),
+        enabled: !!parent_id,
+    })
+
+    const existingVariantIds =
+        groupDetail?.variants?.map((v) => v.variant.name) ?? []
 
     const handleCreateVariant = (name: string) => {
         createVariantMutation.mutate({ parent_id, name }, {
@@ -59,7 +70,7 @@ const SelectProductAttributes = () => {
             render={({ field }) => {
                 return (
                     <FormItem className="grid grid-cols-6 gap-8 w-full">
-                        <FormLabel className="col-span-1 text-right justify-end">Attributes</FormLabel>
+                        <FormLabel className="col-span-1 text-right justify-end text-base">Attributes</FormLabel>
                         <FormControl className=" w-full">
                             <Popover open={open} onOpenChange={setOpen}>
                                 <div className="col-span-5 flex gap-2">
@@ -93,27 +104,28 @@ const SelectProductAttributes = () => {
                                         <CommandInput placeholder="Search color..." />
                                         <CommandEmpty>No attributes found.</CommandEmpty>
                                         <CommandGroup>
-                                            {attributes?.map((item: string, index: number) => (
-                                                <CommandItem
-                                                    key={item}
-                                                    onSelect={() => {
-                                                        field.onChange(item)
-                                                        setOpen(false)
-                                                        handleCreateVariant(item)
-                                                    }}
-                                                >
-                                                    <Check
-                                                        className={cn(
-                                                            "mr-2 h-4 w-4",
-                                                            field.value === item
-                                                                ? "opacity-100"
-                                                                : "opacity-0"
-                                                        )}
-                                                    />
-                                                    {item}
-                                                </CommandItem>
-                                            ))}
+                                            {attributes
+                                                ?.filter((item: string) => !existingVariantIds.includes(item)) // lọc bỏ variant đã tồn tại
+                                                .map((item: string, index: number) => (
+                                                    <CommandItem
+                                                        key={index}
+                                                        onSelect={() => {
+                                                            field.onChange(item)
+                                                            setOpen(false)
+                                                            handleCreateVariant(item)
+                                                        }}
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                field.value === item ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {item}
+                                                    </CommandItem>
+                                                ))}
                                         </CommandGroup>
+
                                     </Command>
                                 </PopoverContent>
                             </Popover>

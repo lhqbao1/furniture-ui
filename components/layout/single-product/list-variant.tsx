@@ -2,7 +2,7 @@
 
 import { CartFormValues } from '@/lib/schema/cart'
 import { ProductGroupDetailResponse } from '@/types/product-group'
-import { NewProductItem } from '@/types/products'
+import { ProductItem } from '@/types/products'
 import { VariantOptionsResponse } from '@/types/variant'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
@@ -10,7 +10,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 
 interface ListVariantProps {
     variant: VariantOptionsResponse[]
-    currentProduct: NewProductItem
+    currentProduct: ProductItem
     parentProduct: ProductGroupDetailResponse
 }
 
