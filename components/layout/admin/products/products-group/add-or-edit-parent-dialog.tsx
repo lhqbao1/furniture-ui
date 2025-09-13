@@ -64,14 +64,14 @@ const AddOrEditParentDialog = ({ dialogOpen, setDialogOpen, groupName, setGroupN
             </DialogTrigger>
             <DialogContent className="w-1/3">
                 <DialogHeader>
-                    <DialogTitle>{defaultValues ? 'Edit Group' : 'Add Group'} Product Group</DialogTitle>
+                    <DialogTitle>{defaultValues ? 'Edit Group Name' : 'Add Product Group'}</DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4">
                     <Input
                         value={groupName}
                         onChange={(e) => setGroupName(e.target.value)}
-                        placeholder="Group name"
+                        placeholder={defaultValues ? defaultValues.name : 'Group name'}
                     />
 
                     <div className="flex justify-end gap-2">

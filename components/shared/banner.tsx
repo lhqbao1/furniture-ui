@@ -41,6 +41,7 @@ import { getMe } from '@/features/auth/api'
 import { useTranslations } from 'next-intl'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { getCartItems } from '@/features/cart/api'
+import MobileProductSearch from './mobile-product-search'
 
 interface BannerProps {
     height?: number
@@ -152,15 +153,9 @@ const Banner = ({ height }: BannerProps) => {
                             </SelectContent>
                         </Select>
 
+                        {/*Mobile Search */}
                         <div className={`${isPhone ? 'block' : 'hidden'}`}>
-                            {/*Search */}
-                            <Drawer>
-                                <DrawerTrigger asChild>
-                                    <Search stroke={`${isPhone ? '#00B159' : '#F7941D'}`} />
-                                </DrawerTrigger>
-                                <DrawerContent>
-                                </DrawerContent>
-                            </Drawer>
+                            <MobileProductSearch />
                         </div>
 
                         {/*Shopping cart */}
@@ -227,7 +222,7 @@ const Banner = ({ height }: BannerProps) => {
                     </div>
                 </div>
 
-
+                {/*Product search desktop */}
                 <div className={`${isPhone ? 'hidden' : 'block'}`}>
                     <ProductSearch />
                 </div>

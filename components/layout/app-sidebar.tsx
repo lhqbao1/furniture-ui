@@ -23,6 +23,8 @@ import { CategoryResponse } from "@/types/categories"
 import { useTranslations } from "next-intl"
     ;
 import { slugify } from "@/lib/slugify"
+import { useMediaQuery } from "react-responsive"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 type MenuItem = {
     title: string;
     url: string;
@@ -35,6 +37,7 @@ export function AppSidebar() {
     const { open: sidebarOpen } = useSidebar()  // true = expanded, false = collapsed
     const { data: categories, isLoading, isError } = useGetCategories()
     const t = useTranslations()
+    const isPhone = useMediaQuery({ maxWidth: 630 })
 
     // function mapCategories(categories: CategoryResponse[]): MenuItem[] {
     //     return categories.map((category) => ({
@@ -77,10 +80,10 @@ export function AppSidebar() {
         { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png', id: 7 },
         { title: t('cart'), url: "/cart", icon: '/side-cart.png', id: 8 },
         {
-            title: t('profile'), url: "", icon: '/side-account.png', id: 9,
+            title: t('account'), url: "", icon: '/side-account.png', id: 9,
             children: [
                 { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
-                { title: t('account'), url: "/account", icon: '/side-account.png', id: 10 },
+                { title: t('profile'), url: "/account", icon: '/side-account.png', id: 10 },
             ]
         },
     ]
@@ -105,7 +108,7 @@ export function AppSidebar() {
                                 priority
                                 className="w-auto lg:h-[80px] h-[50px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
-                            <div className="font-libre lg:text-[29px] text-xl flex gap-1">
+                            <div className="font-libre text-[29px] flex gap-1">
                                 <span className="text-secondary font-semibold">Prestige</span>
                                 <span className="text-primary font-semibold">Home</span>
                             </div>
@@ -128,7 +131,7 @@ export function AppSidebar() {
                                                 <CollapsibleTrigger asChild>
                                                     <SidebarMenuButton asChild>
                                                         <Button
-                                                            className={`flex w-full flex-row items-center justify-start gap-4 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black ${isActive
+                                                            className={`flex w-full flex-row items-center justify-start gap-3 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black ${isActive
                                                                 ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 }`}
@@ -236,8 +239,30 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className="data-[state=collapsed]:items-center data-[state=expanded]:items-end">
+            <SidebarFooter className="data-[state=collapsed]:justify-center data-[state=expanded]:justify-end flex-row ">
                 <SidebarTrigger className={`cursor-pointer bg-transparent border-none text-secondary`} />
+                {isPhone ? (
+                    <Select
+                        defaultValue="de"
+                        onValueChange={(value) => {
+                            if (value === "de") {
+                                const path = pathname.startsWith('/en') ? pathname.replace('/en', '') : pathname
+                                router.push(path)
+                            } else if (value === "en") {
+                                const path = pathname.startsWith('/en') ? pathname : `/en${pathname}`
+                                router.push(path)
+                            }
+                        }}
+                    >
+                        <SelectTrigger className={`w-fit text-secondary text-xl font-bold xl:border-0 border-2 border-secondary`} placeholderColor iconColor="#00B159">
+                            <SelectValue placeholder={t('german')} className='text-secondary' />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="de" className='font-semibold'>{t('german')}</SelectItem>
+                            <SelectItem value="en" className='font-semibold'>{t('english')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                ) : ''}
             </SidebarFooter>
         </Sidebar>
     )
