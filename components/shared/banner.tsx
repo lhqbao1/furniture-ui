@@ -64,12 +64,14 @@ const Banner = ({ height }: BannerProps) => {
     });
 
     const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
-        queryKey: ["cart-items"],
+        queryKey: ["cart-items", userId],
         queryFn: async () => {
             const data = await getCartItems()
             data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             return data
         },
+        enabled: !!userId,
+        retry: false,
     })
 
     const onLogout = () => {
