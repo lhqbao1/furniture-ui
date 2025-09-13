@@ -47,7 +47,6 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
                 <h2 className='section-header'>Wohnen</h2>
                 {isLoading || isError || !category ?
                     <ProductGridSkeleton length={12} /> :
-
                     <div className='filter-section'>
                         <Collapsible>
                             <CollapsibleTrigger asChild>

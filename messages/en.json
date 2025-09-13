@@ -137,5 +137,7 @@
     "inStock": "In stock",
     "outStock": "Out of stock",
     "includeVatAndShipping": "Included VAT and shipping cost",
-    "profile": "Profile"
+    "profile": "Profile",
+    "imprint": "Imprint",
+    "cookieSetting": "Cookies setting"
 }

@@ -137,5 +137,7 @@
   "inStock": "Verfügbakeit",
   "outStock": "Nicht auf Lager",
   "includeVatAndShipping": "inkl. MwSt. zzgl.  Versandkosten",
-  "profile": "Profil"
+  "profile": "Profil",
+  "imprint": "Impressum",
+  "cookieSetting": "Cookie-Einstellungen"
 }

@@ -74,7 +74,7 @@ const PageHeader = () => {
     }
 
     return (
-        <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex w-full items-center justify-end px-4 py-3 gap-6'}`}>
+        <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex items-center justify-end px-4 py-3 gap-6 sticky bg-white shadow-secondary/10 shadow-xl z-50 top-0'}`}>
             <div className={`${isPhone ? 'block' : 'hidden'}`}>
                 <Image
                     src={'/new-logo.svg'}
@@ -119,10 +119,10 @@ const PageHeader = () => {
                 </div>
 
                 {/*Shopping cart */}
-                <div className={`cursor-pointer relative`}>
+                <Link href={'/cart'} className={`cursor-pointer relative`}>
                     <ShoppingCart stroke={`${isPhone ? '#00B159' : '#4D4D4D'}`} size={30} className='hover:scale-110 transition-all duration-300' />
                     <div className='absolute -top-4 -right-4 text-white bg-primary py-1 px-3 rounded-full flex items-center text-sm'>{cart && cart.items ? cart.items.length : 0}</div>
-                </div>
+                </Link>
 
                 {isPhone ?
                     <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />

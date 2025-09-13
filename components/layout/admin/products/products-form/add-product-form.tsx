@@ -100,6 +100,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
             sku: values.sku?.trim() || undefined,
+            final_price: values.final_price ? values.final_price : values.price
         }
 
         if (productValues) {

@@ -1,20 +1,9 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
-import Link from 'next/link'
 import Image from 'next/image'
 import { useMediaQuery } from 'react-responsive'
-
-import { toast } from 'sonner'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { usePathname, useRouter } from 'next/navigation'
-
-import ProductSearch from './product-search'
-import { getMe } from '@/features/auth/api'
 import { useTranslations } from 'next-intl'
-import { useIsMobile } from '@/hooks/use-mobile'
-import { getCartItems } from '@/features/cart/api'
-import MobileProductSearch from './mobile-product-search'
 import PageHeader from './header'
 
 interface BannerProps {
@@ -25,9 +14,6 @@ const Banner = ({ height }: BannerProps) => {
     const isPhone = useMediaQuery({ maxWidth: 430 })
     const [isSticky, setIsSticky] = useState(false);
     const t = useTranslations()
-
-
-
 
     // Xử lý scroll
     useEffect(() => {
@@ -45,7 +31,7 @@ const Banner = ({ height }: BannerProps) => {
     }, []);
 
     return (
-        <div>
+        <>
             <PageHeader />
             <div
                 className={cn(
@@ -83,7 +69,7 @@ const Banner = ({ height }: BannerProps) => {
                     }
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

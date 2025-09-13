@@ -53,7 +53,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                     name="price"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">Price</FormLabel>
+                            <FormLabel className="text-[#666666] text-sm">Original Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
                                     <Input
@@ -184,7 +184,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                     name="final_price"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">Final Price</FormLabel>
+                            <FormLabel className="text-[#666666] text-sm">Sale Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
                                     <Input

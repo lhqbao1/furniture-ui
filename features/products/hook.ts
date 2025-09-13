@@ -5,12 +5,13 @@ import { ProductInput } from "@/lib/schema/product"
 interface UseGetAllProductsParams {
   page?: number
   page_size?: number
+  all_products?: boolean
 }
 
-export function useGetAllProducts({ page, page_size }: UseGetAllProductsParams = {}) {
+export function useGetAllProducts({ page, page_size, all_products }: UseGetAllProductsParams = {}) {
   return useQuery({
-    queryKey: ["products", page, page_size], // queryKey thay đổi khi page/page_size thay đổi
-    queryFn: () => getAllProducts({ page, page_size }),
+    queryKey: ["products", page, page_size, all_products], // queryKey thay đổi khi page/page_size thay đổi
+    queryFn: () => getAllProducts({ page, page_size, all_products }),
     retry: false,
   })
 }

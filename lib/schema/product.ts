@@ -13,7 +13,7 @@ export const addProductSchema = z.object({
   cost: z.number("You must provide product cost price").min(1, "You must provide product cost price").nonnegative(),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
-  final_price: z.number().nonnegative(),
+  final_price: z.number().nonnegative().optional(),
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
   stock: z.number().min(0).nonnegative(),

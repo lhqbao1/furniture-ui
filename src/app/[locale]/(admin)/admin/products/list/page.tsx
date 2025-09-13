@@ -19,7 +19,7 @@ const ProductList = () => {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
 
-    const { data, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize })
+    const { data, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize, all_products: true })
 
     if (isError) return <div>No data</div>
     if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>

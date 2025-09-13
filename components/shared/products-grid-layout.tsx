@@ -41,10 +41,12 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
         addProductToViewMutation.mutate({ productId: productId })
     }
 
+
     return (
         <div>
             <div className='grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4'>
                 {data.map((product, idx) => {
+                    console.log(product.static_files)
                     // Lấy đường dẫn category
                     const categories = product.categories || []
                     const level1 = categories.find(c => c.level === 1)
