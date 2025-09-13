@@ -46,8 +46,8 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <Button
                 type="button"
-                variant={'ghost'}
-                className='text-secondary hover:bg-secondary hover:text-white'
+                variant={'secondary'}
+                // className='text-secondary hover:bg-secondary hover:text-white'
                 onClick={() => {
                     if (!parent_id) {
                         toast.error("You need to choose a parent before choose or create an attributes")

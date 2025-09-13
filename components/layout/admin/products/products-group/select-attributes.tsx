@@ -72,7 +72,8 @@ const SelectProductAttributes = () => {
                     <FormItem className="grid grid-cols-6 gap-8 w-full">
                         <FormLabel className="col-span-1 text-right justify-end text-base">Attributes</FormLabel>
                         <FormControl className=" w-full">
-                            <Popover open={open} onOpenChange={setOpen}>
+                            <AttributesModal dialogOpen={openAddAttr} setDialogOpen={setOpenAddAttr} />
+                            {/* <Popover open={open} onOpenChange={setOpen}>
                                 <div className="col-span-5 flex gap-2">
                                     <PopoverTrigger asChild onClick={(e) => e.preventDefault()}>
                                         <Button
@@ -128,7 +129,7 @@ const SelectProductAttributes = () => {
 
                                     </Command>
                                 </PopoverContent>
-                            </Popover>
+                            </Popover> */}
                         </FormControl>
                         <FormMessage />
                     </FormItem>
