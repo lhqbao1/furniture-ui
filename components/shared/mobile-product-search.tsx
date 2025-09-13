@@ -71,7 +71,7 @@ export default function MobileProductSearch() {
                                                 <div className="flex gap-3 flex-1 items-center">
                                                     <Image
                                                         src={
-                                                            product.static_files
+                                                            product.static_files && product.static_files.length > 0
                                                                 ? product.static_files[0].url
                                                                 : "/1.png"
                                                         }

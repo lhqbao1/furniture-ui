@@ -1,4 +1,4 @@
-import { ChevronRight, Plus, X } from "lucide-react";
+import { ChevronRight, Eye, Plus, X } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { ProductGroupDetailResponse } from "@/types/product-group";
 import { ProductItem } from "@/types/products";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import Link from "next/link";
 
 interface VariantCombinationsProps {
     combinations: VariantOptionResponse[][];
@@ -154,18 +155,18 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                 </div>
 
                                 {/* Combobox Popover */}
-                                <div className="col-span-2">
+                                <div className="col-span-2 flex gap-2 items-center">
                                     <Popover open={openIdx === idx} onOpenChange={(isOpen) => setOpenIdx(isOpen ? idx : null)}>
                                         <PopoverTrigger asChild>
                                             <Button
                                                 variant="outline"
                                                 role="combobox"
-                                                className="w-full justify-between py-1 h-12"
+                                                className="flex-1 justify-between py-1 h-12"
                                             >
                                                 <div className="flex gap-4">
                                                     {selectedAction[idx]
                                                         ?
-                                                        <div className="flex gap-2 items-center">
+                                                        <div className="flex gap-2 items-center overflow-x-scroll">
                                                             <Image
                                                                 src={listProducts?.find((p) => p.id === selectedAction[idx])?.static_files[0].url ?? '/1.png'}
                                                                 width={40}
@@ -175,6 +176,9 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                                 unoptimized
                                                             />
                                                             <div className="text-base">{listProducts?.find((p) => p.id === selectedAction[idx])?.name}</div>
+                                                            <Link href={`/product/${listProducts?.find((p) => p.id === selectedAction[idx])?.id}`}>
+                                                                <Eye className="text-secondary cursor-pointer" size={20} />
+                                                            </Link>
                                                         </div>
                                                         : "Select product"}
                                                 </div>
@@ -232,7 +236,6 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                     </Popover>
                                 </div>
                             </div>
-
                         </div>
                     ))}
             </div>

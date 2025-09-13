@@ -75,6 +75,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                 productValues.categories?.map((c: CategoryResponse | number) =>
                     typeof c === "object" ? String(c.id) : String(c)
                 ) || [],
+            brand_id: productValues.brand?.id
         }
     }
 

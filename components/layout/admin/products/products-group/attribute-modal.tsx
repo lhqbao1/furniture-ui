@@ -24,7 +24,7 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
     const { watch } = useFormContext()
     const parent_id = watch('parent_id')
     const [attr, setAttr] = useState("")
-    const [isImage, setIsImage] = useState<boolean>(false)
+    const [isImage, setIsImage] = useState<boolean>()
 
 
     const createVariantMutation = useCreateVariant()
@@ -85,7 +85,7 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
                     <Input
                         value={attr}
                         onChange={(e) => setAttr(e.target.value)}
-                        placeholder="Product Attribute ex: Materials"
+                        placeholder="Product Attribute e.g.: Materials"
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
                                 e.preventDefault()

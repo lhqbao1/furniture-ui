@@ -110,7 +110,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                                                 <div className="flex justify-between items-center w-full">
                                                     <div className="flex gap-3 flex-1 items-center">
                                                         <Image
-                                                            src={product.static_files ? product.static_files[0].url : "/1.png"}
+                                                            src={product.static_files.length > 0 ? product.static_files[0].url : "/1.png"}
                                                             height={50}
                                                             width={50}
                                                             alt=""

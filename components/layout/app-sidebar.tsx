@@ -80,7 +80,7 @@ export function AppSidebar() {
         { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png', id: 7 },
         { title: t('cart'), url: "/cart", icon: '/side-cart.png', id: 8 },
         {
-            title: t('account'), url: "", icon: '/side-account.png', id: 9,
+            title: t('account'), url: "#", icon: '/side-account.png', id: 9,
             children: [
                 { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
                 { title: t('profile'), url: "/account", icon: '/side-account.png', id: 10 },
