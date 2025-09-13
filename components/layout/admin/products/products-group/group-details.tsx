@@ -1,5 +1,4 @@
 import React from 'react'
-import { useFormContext } from 'react-hook-form'
 import SelectProductAttributes from './select-attributes'
 import { useAtom } from 'jotai'
 import { currentProductGroup } from '@/store/product-group'
@@ -13,7 +12,7 @@ const GroupDetails = () => {
             <div className="grid grid-cols-6 w-full gap-8">
                 <p className='col-span-1 text-right'>Group name:</p>
                 <div className='flex gap-4 items-center'>
-                    <span className='font-semibold col-span-5'>{currentGroup ? currentGroup : 'None'}</span>
+                    <span className='font-semibold col-span-5 text-xl text-secondary'>{currentGroup ? currentGroup : 'None'}</span>
                 </div>
             </div>
             <div className='w-full space-y-6'>

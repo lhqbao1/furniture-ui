@@ -168,7 +168,7 @@ const ListVariantOption = () => {
                                 {/* Nếu chưa có option thì show cảnh báo */}
                                 {variant.options.length === 0 && (
                                     <span className="text-red-500 text-sm">
-                                        You need to add options for this attributes
+                                        You need to add options for this attribute
                                     </span>
                                 )}
                             </div>

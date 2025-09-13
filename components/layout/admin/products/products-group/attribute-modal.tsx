@@ -57,16 +57,16 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
                     }
                 }}
             >
-                Add Attributes
+                Add Attribute
             </Button>
             <DialogContent className="w-1/3">
                 <DialogHeader>
-                    <DialogTitle>Add Product Attributes</DialogTitle>
+                    <DialogTitle>Add Product Attribute</DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4">
                     <div>
-                        <Label className="mb-2 block text-sm font-medium">Variant type</Label>
+                        <Label className="mb-2 block text-sm font-medium">Attribute type</Label>
                         <RadioGroup
                             className="flex gap-4"
                             value={isImage ? "image" : "text"}
@@ -74,25 +74,25 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
                         >
                             <div className="flex items-center gap-1">
                                 <RadioGroupItem value="image" id="image" />
-                                <Label htmlFor="image">Image option</Label>
+                                <Label htmlFor="image">Image</Label>
                             </div>
                             <div className="flex items-center gap-1">
                                 <RadioGroupItem value="text" id="text" />
-                                <Label htmlFor="text">Text option</Label>
+                                <Label htmlFor="text">Text</Label>
                             </div>
                         </RadioGroup>
                     </div>
                     <Input
                         value={attr}
                         onChange={(e) => setAttr(e.target.value)}
-                        placeholder="Product Attributes ex: Materials"
+                        placeholder="Product Attribute ex: Materials"
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
                                 e.preventDefault()
                                 if (attr.trim()) {
                                     handleCreateVariant(attr.trim())
                                 } else {
-                                    toast.error("Please enter group name")
+                                    toast.error("Please enter attribute name")
                                 }
                             }
                         }}

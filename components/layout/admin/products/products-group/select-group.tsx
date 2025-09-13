@@ -23,16 +23,7 @@ import {
     FormControl,
     FormMessage,
 } from "@/components/ui/form"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { useAddProductGroup, useDeleteProductGroup, useGetProductGroup } from "@/features/product-group/hook"
-import { toast } from "sonner"
+import { useAddProductGroup, useGetProductGroup } from "@/features/product-group/hook"
 import { atom, useAtom } from "jotai"
 import { currentProductGroup } from "@/store/product-group"
 import DeleteGroupDialog from "./delete-group-dialog"
@@ -64,7 +55,7 @@ const SelectProductGroup = () => {
                     <FormControl>
                         <Popover open={true}>
                             <PopoverTrigger asChild>
-                                <Button
+                                {/* <Button
                                     variant="outline"
                                     role="combobox"
                                     aria-expanded={open}
@@ -74,17 +65,18 @@ const SelectProductGroup = () => {
                                         ? groups?.find((g) => g.id === field.value)?.name
                                         : "Choose group..."}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
+                                </Button> */}
+                                <span />
                             </PopoverTrigger>
 
                             <PopoverContent
                                 align="start"
-                                className="w-[var(--radix-popover-trigger-width)] p-0"
+                                className="w-[var(--radix-popover-trigger-width)] p-0 border-0 shadow-none"
                             >
-                                <Command>
+                                <Command className="border-none">
                                     <CommandInput placeholder="Search group..." />
                                     <CommandEmpty>No group found.</CommandEmpty>
-                                    <CommandGroup>
+                                    <CommandGroup className="mt-6">
                                         {groups?.map((g) => (
                                             <CommandItem
                                                 key={g.id}
@@ -96,7 +88,7 @@ const SelectProductGroup = () => {
                                                 className="group cursor-pointer"
                                             >
                                                 <div className="flex justify-between w-full">
-                                                    <div className="flex gap-1 items-center">
+                                                    <div className="flex gap-1 items-center text-base">
                                                         <Check
                                                             className={cn(
                                                                 "mr-2 h-4 w-4",

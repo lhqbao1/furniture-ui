@@ -30,9 +30,6 @@ interface AddImageOptionDialogProps {
 }
 
 const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
-    const { watch } = useFormContext()
-    const parent_id = watch('parent_id')
-
     const [open, setOpen] = useState(false)
     const [optionName, setOptionName] = useState("")
     const [imageDes, setImageDes] = useState("")
