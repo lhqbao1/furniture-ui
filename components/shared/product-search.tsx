@@ -49,40 +49,40 @@ export default function ProductSearch({ height }: { height?: boolean }) {
     const results = products ?? []
 
     return (
-        <div ref={containerRef} className="flex justify-center items-center gap-2 relative pt-6">
+        <div ref={containerRef} className="flex justify-center items-center gap-2 relative">
             <div
                 className={cn(
-                    "xl:w-1/2 w-3/4 relative flex flex-col",
-                    height ? "mr-0" : "xl:mr-56"
+                    "w-3/4 relative flex flex-col",
+                    height ? "mr-0" : ""
                 )}
             >
                 <div className="relative flex">
                     <Input
                         type="text"
                         placeholder={`${t("search")}...`}
-                        className="w-full xl:h-12 h-10 pl-10 pr-28 rounded-full border bg-white ring-0"
+                        className="w-full xl:h-12 h-10 pl-4 rounded-full border bg-white ring-0"
                         value={query}
                         onChange={(e) => {
                             setQuery(e.target.value)
                         }}
                         onFocus={() => setOpen(true)}
                     />
-                    <Button
+                    {/* <Button
                         type="button"
                         variant="default"
                         className="absolute right-0 top-0 rounded-full bg-primary text-white xl:text-lg text-sm px-6 xl:h-12 h-10"
                     >
-                        {/* <Mic
+                        <Mic
                             stroke="white"
                             size={24}
                             className="xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full"
-                        /> */}
+                        />
                         {t("search")}
-                    </Button>
+                    </Button> */}
                     <Search
                         size={24}
-                        className="absolute left-3 xl:top-3 top-2"
-                        stroke="gray"
+                        className="absolute right-4 xl:top-3 top-2"
+                        stroke="black"
                     />
                 </div>
 
