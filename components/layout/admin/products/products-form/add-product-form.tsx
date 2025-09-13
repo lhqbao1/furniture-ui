@@ -21,7 +21,7 @@ import { Switch } from '@/components/ui/switch'
 import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/product'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Loader2 } from 'lucide-react'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { ProductItem, StaticFile } from '@/types/products'
 import { toast } from 'sonner'
 import { ProductPricingFields } from './pricing-field'
@@ -30,6 +30,13 @@ import { CategoryResponse } from '@/types/categories'
 import { FormLabelWithAsterisk } from '@/components/shared/form-label-with-asterisk'
 import { useAddProduct, useEditProduct } from '@/features/products/hook'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useGetBrands } from '@/features/brand/hook'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import countries from "world-countries"
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -43,6 +50,20 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     const router = useRouter()
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
+
+    const { data: brands, isLoading: isLoadingBrand, isError: isErrorBrand } = useGetBrands()
+
+    const carriers = [
+        { id: "amm", logo: "/amm.jpeg" },
+        { id: "dpd", logo: "/dpd.jpeg" },
+    ]
+
+    const deliveryTimes = ["1-3", "3-5", "5-8", "5-14", "8-14", "14-20"]
+
+    const countryOptions = countries.map((c) => ({
+        value: c.name.common,
+        label: c.name.common,
+    }))
 
     const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
         if (!productValues) return defaultValues
@@ -62,7 +83,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
         defaultValues: normalizeProductValues(productValues) || defaultValues,
         mode: "onBlur",
     })
-
 
 
     useEffect(() => {
@@ -148,24 +168,24 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 )}
                             />
 
-                            <div className='flex gap-4 w-full'>
+                            <div className='grid grid-cols-2 gap-4 justify-end items-end'>
                                 {/*Product Cost */}
-                                <div className='w-full'>
+                                <div className='w-full col-span-1'>
                                     <FormField
                                         control={form.control}
                                         name="cost"
                                         render={({ field }) => (
-                                            <FormItem>
+                                            <FormItem className='grid-cols-1 grid'>
                                                 <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
                                                     Cost
                                                 </FormLabelWithAsterisk>
                                                 <FormControl>
-                                                    <div className="relative flex items-center">
+                                                    <div className="relative flex items-center w-full">
                                                         <Input
                                                             {...field}
                                                             type="number"
                                                             min={0}
-                                                            className="pl-7 w-1/2"
+                                                            className="pl-7"
                                                             step="0.01"            // hoặc "any" để cho phép mọi số thập phân
                                                             inputMode="decimal"    // hint cho bàn phím mobile
                                                             value={field.value ?? ""} // tránh uncontrolled / NaN
@@ -177,20 +197,21 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         <span className="absolute left-3 text-gray-500">€</span>
                                                     </div>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className='col-span-2' />
                                             </FormItem>
                                         )}
                                     />
                                 </div>
+
+                                <ProductPricingFields form={form} />
                             </div>
 
-                            <ProductPricingFields form={form} />
 
                             <FormField
                                 control={form.control}
                                 name='tax'
                                 render={({ field }) => (
-                                    <div className='flex gap-4'>
+                                    <div className='flex gap-4 flex-col'>
                                         <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
                                             Tax
                                         </FormLabelWithAsterisk>
@@ -295,13 +316,17 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                         </FormLabelWithAsterisk>
                                         <FormControl>
                                             <Input
-                                                readOnly={isSimple ? false : true}
+                                                readOnly={!isSimple}
                                                 type="number"
-                                                placeholder="0"
                                                 min={0}
-                                                {...field}
-                                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                                className={`col-span-4 ${isSimple ? '' : 'bg-gray-100 cursor-not-allowed'}`}
+                                                value={field.value ?? ""}
+                                                onChange={(e) =>
+                                                    field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
+                                                }
+                                                className={cn(
+                                                    "col-span-4",
+                                                    isSimple ? "" : "bg-gray-100 cursor-not-allowed"
+                                                )}
                                             />
                                         </FormControl>
                                     </FormItem>
@@ -381,7 +406,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
 
                             {/* Packaging input */}
                             <div className='grid grid-cols-6 w-full'>
-                                <div className='col-span-2'>Packaging (cm)</div>
+                                <div className='col-span-2 text-sm text-[#666666]'>Packaging (cm)</div>
                                 <div className='flex flex-row gap-1 col-span-4'>
                                     <FormField
                                         control={form.control}
@@ -467,7 +492,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                     name="tag"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="font-bold text-base">Tag</FormLabel>
+                                            <FormLabel className="font-bold text-base justify-end">Tag</FormLabel>
                                             <div className="flex flex-row gap-2 flex-wrap justify-end">
                                                 {tags.map((item, idx) => {
                                                     const isSelected = field.value === item.name
@@ -490,6 +515,176 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                     )}
                                 />
                             </div>
+
+                            {/* Carrier field */}
+                            <FormField
+                                control={form.control}
+                                name="carrier"
+                                render={({ field }) => (
+                                    <FormItem className='grid grid-cols-6 w-full'>
+                                        <FormLabelWithAsterisk required className="text-[#666666] text-sm col-span-2">
+                                            Carrier
+                                        </FormLabelWithAsterisk>
+                                        <FormControl>
+                                            <Select value={field.value} onValueChange={field.onChange}>
+                                                <SelectTrigger placeholderColor className='border col-span-4'>
+                                                    <SelectValue placeholder="Select carrier" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {carriers.map((c) => (
+                                                        <SelectItem key={c.id} value={c.id}>
+                                                            <div className="flex items-center gap-2">
+                                                                <Image
+                                                                    src={c.logo}
+                                                                    alt={c.id}
+                                                                    width={30}
+                                                                    height={20}
+                                                                    className="object-contain"
+                                                                />
+                                                                <span className="uppercase">{c.id}</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Delivery time field */}
+                            <FormField
+                                control={form.control}
+                                name="delivery_time"
+                                render={({ field }) => (
+                                    <FormItem className='grid grid-cols-6 w-full'>
+                                        <FormLabelWithAsterisk required className="text-[#666666] text-sm col-span-2">
+                                            Delivery time
+                                        </FormLabelWithAsterisk>
+                                        <FormControl>
+                                            <Select value={field.value} onValueChange={field.onChange}>
+                                                <SelectTrigger placeholderColor className='border col-span-4'>
+                                                    <SelectValue placeholder="Select delivery time" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {deliveryTimes.map((t) => (
+                                                        <SelectItem key={t} value={t}>
+                                                            {t}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Manufacture Country */}
+                            <FormField
+                                control={form.control}
+                                name="manufacture_country"
+                                render={({ field }) => (
+                                    <FormItem className="grid grid-cols-6 w-full">
+                                        <FormLabel className="text-[#666666] text-sm col-span-2">
+                                            Manufacture Country
+                                        </FormLabel>
+                                        <FormControl className="col-span-4">
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        className={cn(
+                                                            "w-full justify-between col-span-4",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {field.value || "Select country..."}
+                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-full p-0">
+                                                    <Command>
+                                                        <CommandInput placeholder="Search country..." className='col-span-4' />
+                                                        <CommandEmpty>No country found.</CommandEmpty>
+                                                        <CommandList className='h-[400px]'>
+                                                            <CommandGroup>
+                                                                {countryOptions.map((c) => (
+                                                                    <CommandItem
+                                                                        key={c.value}
+                                                                        value={c.value}
+                                                                        onSelect={() => field.onChange(c.value)}
+                                                                    >
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "mr-2 h-4 w-4",
+                                                                                field.value === c.value ? "opacity-100" : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                        {c.label}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </FormControl>
+                                        <FormMessage className="col-span-6" />
+                                    </FormItem>
+                                )}
+                            />
+
+
+                            {/* Tariff Number */}
+                            <FormField
+                                control={form.control}
+                                name="tariff_number"
+                                render={({ field }) => (
+                                    <FormItem className='grid grid-cols-6 w-full'>
+                                        <FormLabelWithAsterisk required className="text-[#666666] text-sm col-span-2">
+                                            Tariff Number
+                                        </FormLabelWithAsterisk>
+                                        <FormControl>
+                                            <Input placeholder="Enter tariff number" {...field} className='col-span-4' />
+                                        </FormControl>
+                                        <FormMessage className='col-span-6' />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Brand */}
+                            <FormField
+                                control={form.control}
+                                name="brand_id"
+                                render={({ field }) => (
+                                    <FormItem className='grid grid-cols-6 w-full'>
+                                        <FormLabelWithAsterisk required className="text-[#666666] text-sm col-span-2">
+                                            Brand
+                                        </FormLabelWithAsterisk>
+                                        <FormControl>
+                                            <Select value={field.value} onValueChange={field.onChange}>
+                                                <SelectTrigger placeholderColor className='border col-span-4'>
+                                                    <SelectValue placeholder="Select brand" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {brands ?
+                                                        brands.map((b) => (
+                                                            <SelectItem key={b.id} value={b.id}>
+                                                                {b.name}
+                                                            </SelectItem>
+                                                        ))
+                                                        : <Loader2 className='animate-spin' />}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage className='col-span-6' />
+                                    </FormItem>
+                                )}
+                            />
+
 
                         </div>
                     </div>

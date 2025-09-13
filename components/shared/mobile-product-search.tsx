@@ -11,7 +11,6 @@ import {
     CommandGroup,
 } from "@/components/ui/command"
 import { Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useGetProductsSelect } from "@/features/product-group/hook"
 import { ProductItem } from "@/types/products"
@@ -62,7 +61,7 @@ export default function MobileProductSearch() {
                                             key={product.id}
                                             value={product.name}
                                             onSelect={() => {
-                                                router.push(`/${product.id}`)
+                                                router.push(`/product/${product.id}`)
                                                 setQuery("")
                                                 setOpen(false)
                                             }}

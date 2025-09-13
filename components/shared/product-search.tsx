@@ -101,7 +101,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                                                 key={product.id}
                                                 value={product.name}
                                                 onSelect={() => {
-                                                    router.push(`/${product.id}`)
+                                                    router.push(`/product/${product.id}`)
                                                     setQuery("")
                                                     setOpen(false)
                                                 }}
