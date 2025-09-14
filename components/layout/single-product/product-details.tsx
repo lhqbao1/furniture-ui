@@ -260,7 +260,6 @@ const ProductDetails = () => {
                                                                 height={100}
                                                                 alt=''
                                                                 className={` ${mainImageIndex === index && 'border-2 border-primary p-2 rounded-md object-cover'} lg:h-[80px] object-fill`}
-                                                                unoptimized
                                                             />
                                                         </div>
                                                     </CarouselItem>
