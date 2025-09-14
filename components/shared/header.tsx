@@ -92,14 +92,17 @@ const PageHeader = () => {
             <div className={`flex h-full items-center justify-end gap-6 ${isPhone ? 'w-full' : 'items-end'}`}>
 
                 {/*Language switch */}
-                <Select
-                    defaultValue="de"
+                {/* <Select
                     onValueChange={(value) => {
                         if (value === "de") {
-                            const path = pathname.startsWith('/en') ? pathname.replace('/en', '') : pathname
+                            const path = pathname.startsWith('/en') ? pathname.replace('/en', '/') : pathname
+                            console.log('de', value)
+                            console.log(path)
                             router.push(path)
                         } else if (value === "en") {
                             const path = pathname.startsWith('/en') ? pathname : `/en${pathname}`
+                            console.log('en', value)
+                            console.log(path)
                             router.push(path)
                         }
                     }}
@@ -111,7 +114,7 @@ const PageHeader = () => {
                         <SelectItem value="de" className='font-semibold'>{t('german')}</SelectItem>
                         <SelectItem value="en" className='font-semibold'>{t('english')}</SelectItem>
                     </SelectContent>
-                </Select>
+                </Select> */}
 
                 {/*Mobile Search */}
                 <div className={`${isPhone ? 'block' : 'hidden'}`}>
@@ -133,21 +136,6 @@ const PageHeader = () => {
                     <DropdownMenuTrigger asChild>
                         <div className='flex gap-2 justify-start items-end'>
                             <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`${isPhone ? '#00B159' : '#4D4D4D'}`} size={30} />
-                            {!isPhone && (
-                                user && userId ? (
-                                    <div className="text-[#4D4D4D] text-xl font-semibold">
-                                        {user.first_name} {user.last_name}
-                                    </div>
-                                ) : (
-                                    <Link
-                                        href="/login"
-                                        className="text-[#4D4D4D] text-xl font-semibold"
-                                    >
-                                        {t("login")}
-                                    </Link>
-                                )
-                            )}
-
                         </div>
                     </DropdownMenuTrigger>
 

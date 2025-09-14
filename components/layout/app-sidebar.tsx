@@ -241,7 +241,7 @@ export function AppSidebar() {
             </SidebarContent>
             <SidebarFooter className="data-[state=collapsed]:justify-center data-[state=expanded]:justify-end flex-row ">
                 <SidebarTrigger className={`cursor-pointer bg-transparent border-none text-secondary`} />
-                {isPhone ? (
+                {/* {isPhone ? (
                     <Select
                         defaultValue="de"
                         onValueChange={(value) => {
@@ -262,7 +262,7 @@ export function AppSidebar() {
                             <SelectItem value="en" className='font-semibold'>{t('english')}</SelectItem>
                         </SelectContent>
                     </Select>
-                ) : ''}
+                ) : ''} */}
             </SidebarFooter>
         </Sidebar>
     )

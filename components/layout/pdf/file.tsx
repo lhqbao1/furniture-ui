@@ -88,7 +88,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'column', marginRight: 50 }}>
                         {/* <Text>Invoice ID: {invoice?.id}</Text> */}
-                        <Text>{t('InvoiceID')}: {invoice.invoice_code}</Text>
+                        <Text>Invoice ID: {invoice.invoice_code}</Text>
                         <Text>
                             Invoice date: {invoice?.created_at
                                 ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
