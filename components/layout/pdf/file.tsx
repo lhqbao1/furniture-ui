@@ -2,7 +2,6 @@ import { CheckOut } from "@/types/checkout";
 import { InvoiceResponse } from "@/types/invoice";
 import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
 import { Font } from "@react-pdf/renderer"
-import { useLocale, useTranslations } from "next-intl";
 
 Font.register({
     family: "Roboto",
@@ -68,15 +67,12 @@ interface InvoicePDFProps {
 }
 
 export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
-    const t = useTranslations();
-    const locale = useLocale();
-
     return (
         <Document>
             <Page size="A4" style={styles.page}>
                 {/* Header Logo */}
                 <View style={styles.section}>
-                    <Image src="/invoice-logo.png" style={{ width: 80, height: 70 }} />
+                    <Image src="https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/681cde2c-27cd-45ea-94c2-7d82a35453bc_invoice-logo.png?" style={{ width: 80, height: 70 }} />
                 </View>
 
                 {/* Customer & Invoice Info */}

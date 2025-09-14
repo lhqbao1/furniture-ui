@@ -46,6 +46,7 @@ const OrderPlaced = () => {
             return getCheckOutByCheckOutId(checkoutId)
         },
         enabled: !!checkoutId && !!paymentId, // chỉ chạy khi có cả 2 id
+        retry: false
     })
 
     const { data: invoice } = useQuery({
@@ -57,11 +58,16 @@ const OrderPlaced = () => {
     // Gọi hook trực tiếp
     const { data: user } = useGetUserById(userId || '')
 
-
+    console.log(checkout)
+    console.log(invoice)
+    console.log(user)
 
     // Luồng xử lý khi có user
     useEffect(() => {
         const process = async () => {
+            console.log(checkout)
+            console.log(invoice)
+            console.log(user)
             if (!checkout || !invoice || !user) return
 
             try {
@@ -73,6 +79,7 @@ const OrderPlaced = () => {
                 const file = new File([blob], "invoice.pdf", { type: "application/pdf" })
                 const formData = new FormData()
                 formData.append("files", file)
+                console.log(formData)
                 const uploadRes = await uploadStaticFileMutation.mutateAsync(formData)
 
                 // 3. Send mail
