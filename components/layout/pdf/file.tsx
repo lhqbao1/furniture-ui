@@ -71,7 +71,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => (
         <Page size="A4" style={styles.page}>
             {/* Header Logo */}
             <View style={styles.section}>
-                <Image src="/new-logo.svg" style={{ width: 80, height: 70 }} />
+                <Image src="/invoice-logo.png" style={{ width: 80, height: 70 }} />
             </View>
 
             {/* Customer & Invoice Info */}
@@ -112,10 +112,10 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => (
                             <Text>{item.products.name}</Text>
                             <Text style={{ marginTop: 5, textAlign: 'left' }}>{item.products.id_provider}</Text>
                         </Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, textAlign: 'right' }}>€{item.item_price}</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, textAlign: 'right' }}>€{item.item_price.toFixed(2)}</Text>
                         <Text style={styles.tableColQuantity}>{item.quantity}</Text>
                         <Text style={styles.tableCol}>19%</Text>
-                        <Text style={styles.tableCol}>€{item.final_price}</Text>
+                        <Text style={styles.tableCol}>€{item.final_price.toFixed(2)}</Text>
                     </View>
                 ))}
             </View>
@@ -126,7 +126,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => (
                     <View style={styles.flexEndTotal}>
                         <Text style={styles.gapY10}>Total net amount:</Text>
                         <Text style={styles.minWidth}>
-                            €{(invoice?.total_amount_item ?? 0) - (invoice?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)}
+                            €{((invoice?.total_amount_item ?? 0) - (invoice?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toFixed(2)}
                         </Text>
                     </View>
 

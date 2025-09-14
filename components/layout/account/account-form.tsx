@@ -45,10 +45,10 @@ const AccountForm = () => {
         // call API update user
         updateUserMutation.mutate({ id: userId, user: data }, {
             onSuccess(data, variables, context) {
-                toast.success("Update user successfully")
+                toast.success(t('updateUserSuccess'))
             },
             onError(error, variables, context) {
-                toast.error("Update user fail")
+                toast.error(t('updateUserFail'))
             },
         })
     }
@@ -63,7 +63,7 @@ const AccountForm = () => {
                 },
                 (errors) => {
                     console.log(errors)
-                    toast.error("Please check the form for errors")
+                    toast.error(t('checkFormError'))
                 }
             )}>
                 <div className="grid grid-cols-12 gap-4 lg:gap-12 py-2 lg:py-6">
