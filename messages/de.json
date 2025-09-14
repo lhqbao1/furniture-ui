@@ -142,5 +142,6 @@
   "cookieSetting": "Cookie-Einstellungen",
   "updateUserSuccess": "Benutzer erfolgreich aktualisiert",
   "updateUserFail": "Benutzeraktualisierung fehlgeschlagen",
-  "checkFormError": "Bitte überprüfen Sie das Formular auf Fehler"
+  "checkFormError": "Bitte überprüfen Sie das Formular auf Fehler",
+  "InvoiceID": "Rechnungsnummer"
 }

@@ -142,5 +142,6 @@
     "cookieSetting": "Cookies setting",
     "updateUserSuccess": "Update user successfully",
     "updateUserFail": "Update user fail",
-    "checkFormError": "Please check the form for errors"
+    "checkFormError": "Please check the form for errors",
+    "InvoiceID": "Invoice ID"
 }

@@ -2,6 +2,7 @@ import { CheckOut } from "@/types/checkout";
 import { InvoiceResponse } from "@/types/invoice";
 import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
 import { Font } from "@react-pdf/renderer"
+import { useLocale, useTranslations } from "next-intl";
 
 Font.register({
     family: "Roboto",
@@ -66,127 +67,132 @@ interface InvoicePDFProps {
     invoice: InvoiceResponse;
 }
 
-export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => (
-    <Document>
-        <Page size="A4" style={styles.page}>
-            {/* Header Logo */}
-            <View style={styles.section}>
-                <Image src="/invoice-logo.png" style={{ width: 80, height: 70 }} />
-            </View>
+export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
+    const t = useTranslations();
+    const locale = useLocale();
 
-            {/* Customer & Invoice Info */}
-            <View style={styles.header}>
-                <View style={styles.flexColBlock}>
-                    <Text style={{ fontFamily: "Figtree", fontSize: 12, fontWeight: 'bold' }}>{checkout?.user.first_name} {checkout?.user.last_name}</Text>
-                    <Text>{checkout?.shipping_address.city}</Text>
-                    <Text>{checkout?.shipping_address.address_line}</Text>
+    return (
+        <Document>
+            <Page size="A4" style={styles.page}>
+                {/* Header Logo */}
+                <View style={styles.section}>
+                    <Image src="/invoice-logo.png" style={{ width: 80, height: 70 }} />
                 </View>
-                <View style={{ display: 'flex', flexDirection: 'column', marginRight: 50 }}>
-                    {/* <Text>Invoice ID: {invoice?.id}</Text> */}
-                    <Text>Invoice ID: {invoice.invoice_code}</Text>
-                    <Text>
-                        Invoice date: {invoice?.created_at
-                            ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-                            : ""}
-                    </Text>
-                    {/* <Text>Customer ID: {checkout?.user.id}</Text> */}
-                    <Text>Customer ID: {invoice.user_code}</Text>
-                </View>
-            </View>
 
-            {/* Invoice Table */}
-            <View style={styles.section}>
-                <Text style={styles.title}>Invoice</Text>
-                <View style={styles.tableHeader}>
-                    <Text style={{ width: 50, textAlign: 'center', fontFamily: 'FigtreeBold' }}>Pos.</Text>
-                    <Text style={{ width: 100, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Item(s)</Text>
-                    <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Unit Price</Text>
-                    <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Quantity</Text>
-                    <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>VAT</Text>
-                    <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Amount</Text>
-                </View>
-                {invoice?.cart.items?.map((item, index) => (
-                    <View style={styles.tableRow} key={index}>
-                        <Text style={{ width: 50, textAlign: 'center' }}>{index + 1}</Text>
-                        <Text style={{ width: 100, textAlign: 'left' }}>
-                            <Text>{item.products.name}</Text>
-                            <Text style={{ marginTop: 5, textAlign: 'left' }}>{item.products.id_provider}</Text>
+                {/* Customer & Invoice Info */}
+                <View style={styles.header}>
+                    <View style={styles.flexColBlock}>
+                        <Text style={{ fontFamily: "Figtree", fontSize: 12, fontWeight: 'bold' }}>{checkout?.user.first_name} {checkout?.user.last_name}</Text>
+                        <Text>{checkout?.shipping_address.city}</Text>
+                        <Text>{checkout?.shipping_address.address_line}</Text>
+                    </View>
+                    <View style={{ display: 'flex', flexDirection: 'column', marginRight: 50 }}>
+                        {/* <Text>Invoice ID: {invoice?.id}</Text> */}
+                        <Text>{t('InvoiceID')}: {invoice.invoice_code}</Text>
+                        <Text>
+                            Invoice date: {invoice?.created_at
+                                ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                                : ""}
                         </Text>
-                        <Text style={{ flex: 1, paddingRight: 15, textAlign: 'right' }}>€{item.item_price.toFixed(2)}</Text>
-                        <Text style={styles.tableColQuantity}>{item.quantity}</Text>
-                        <Text style={styles.tableCol}>19%</Text>
-                        <Text style={styles.tableCol}>€{item.final_price.toFixed(2)}</Text>
+                        {/* <Text>Customer ID: {checkout?.user.id}</Text> */}
+                        <Text>Customer ID: {invoice.user_code}</Text>
                     </View>
-                ))}
-            </View>
-
-            {/* Summary */}
-            <View style={styles.flexEnd}>
-                <View style={styles.flexColBlock}>
-                    <View style={styles.flexEndTotal}>
-                        <Text style={styles.gapY10}>Total net amount:</Text>
-                        <Text style={styles.minWidth}>
-                            €{((invoice?.total_amount_item ?? 0) - (invoice?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toFixed(2)}
-                        </Text>
-                    </View>
-
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <Text style={styles.gapY10}>Total VAT:</Text>
-                        <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>€{invoice?.total_vat.toFixed(2)}</Text>
-                    </View>
-
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <Text style={styles.gapY10}>Shipping cost:</Text>
-                        <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', textAlign: 'right' }}>€{invoice?.total_shipping.toFixed(2)}</Text>
-                    </View>
-
-                    <View style={styles.flexEndTotalBg}>
-                        <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Invoice amount:</Text>
-                        <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
-                    </View>
-
-                    <View style={styles.flexEndTotal}>
-                        <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Amount Due:</Text>
-                        <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
-                    </View>
-
-                    <View style={styles.flexEndTotal}>
-                        <Text style={styles.gapY10}>Payment (PayPal Checkout) from 04/29/2025:</Text>
-                        <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
-                    </View>
-
-                    <View style={styles.flexEndTotal}>
-                        <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Open Amount:</Text>
-                        <Text style={styles.minWidth}>€00.00</Text>
-                    </View>
-
-                </View>
-            </View>
-
-            {/* Footer */}
-            <View style={styles.footer}>
-                <View>
-                    <Text style={styles.boldWithGap}>Prestige Home GmbH</Text>
-                    <Text style={styles.gapY5}>Greifswalder Straße 226, 10405 Berlin.</Text>
-                    <Text style={styles.gapY5}>Tel: info@prestige-home.de</Text>
                 </View>
 
-                <View>
-                    <Text style={styles.boldWithGap}>Chief Executive Office</Text>
-                    <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
-                    <Text style={styles.gapY5}>Tax code: DE454714336</Text>
+                {/* Invoice Table */}
+                <View style={styles.section}>
+                    <Text style={styles.title}>Invoice</Text>
+                    <View style={styles.tableHeader}>
+                        <Text style={{ width: 50, textAlign: 'center', fontFamily: 'FigtreeBold' }}>Pos.</Text>
+                        <Text style={{ width: 100, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Item(s)</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Unit Price</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Quantity</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>VAT</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Amount</Text>
+                    </View>
+                    {invoice?.cart.items?.map((item, index) => (
+                        <View style={styles.tableRow} key={index}>
+                            <Text style={{ width: 50, textAlign: 'center' }}>{index + 1}</Text>
+                            <Text style={{ width: 100, textAlign: 'left' }}>
+                                <Text>{item.products.name}</Text>
+                                <Text style={{ marginTop: 5, textAlign: 'left' }}>{item.products.id_provider}</Text>
+                            </Text>
+                            <Text style={{ flex: 1, paddingRight: 15, textAlign: 'right' }}>€{item.item_price.toFixed(2)}</Text>
+                            <Text style={styles.tableColQuantity}>{item.quantity}</Text>
+                            <Text style={styles.tableCol}>19%</Text>
+                            <Text style={styles.tableCol}>€{item.final_price.toFixed(2)}</Text>
+                        </View>
+                    ))}
                 </View>
-            </View>
 
-            <View style={{ position: 'absolute', top: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <Image src="/Vector1.png" style={{ width: 160, height: 160 }} />
-                <Image src="/Vector2.png" style={{ width: 107, height: 114, marginTop: 10 }} />
-            </View>
+                {/* Summary */}
+                <View style={styles.flexEnd}>
+                    <View style={styles.flexColBlock}>
+                        <View style={styles.flexEndTotal}>
+                            <Text style={styles.gapY10}>Total net amount:</Text>
+                            <Text style={styles.minWidth}>
+                                €{((invoice?.total_amount_item ?? 0) - (invoice?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toFixed(2)}
+                            </Text>
+                        </View>
 
-            <View style={{ position: 'absolute', bottom: 0, left: 0, display: 'flex', flexDirection: 'column' }}>
-                <Image src="/Vector3.png" style={{ width: 160, height: 160 }} />
-                <Image src="/Vector4.png" style={{ width: 107, height: 114, marginTop: 10 }} />
-            </View>
-        </Page>
-    </Document >
-);
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <Text style={styles.gapY10}>Total VAT:</Text>
+                            <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>€{invoice?.total_vat.toFixed(2)}</Text>
+                        </View>
+
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <Text style={styles.gapY10}>Shipping cost:</Text>
+                            <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', textAlign: 'right' }}>€{invoice?.total_shipping.toFixed(2)}</Text>
+                        </View>
+
+                        <View style={styles.flexEndTotalBg}>
+                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Invoice amount:</Text>
+                            <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
+                        </View>
+
+                        <View style={styles.flexEndTotal}>
+                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Amount Due:</Text>
+                            <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
+                        </View>
+
+                        <View style={styles.flexEndTotal}>
+                            <Text style={styles.gapY10}>Payment (PayPal Checkout) from 04/29/2025:</Text>
+                            <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
+                        </View>
+
+                        <View style={styles.flexEndTotal}>
+                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Open Amount:</Text>
+                            <Text style={styles.minWidth}>€00.00</Text>
+                        </View>
+
+                    </View>
+                </View>
+
+                {/* Footer */}
+                <View style={styles.footer}>
+                    <View>
+                        <Text style={styles.boldWithGap}>Prestige Home GmbH</Text>
+                        <Text style={styles.gapY5}>Greifswalder Straße 226, 10405 Berlin.</Text>
+                        <Text style={styles.gapY5}>Tel: info@prestige-home.de</Text>
+                    </View>
+
+                    <View>
+                        <Text style={styles.boldWithGap}>Chief Executive Office</Text>
+                        <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
+                        <Text style={styles.gapY5}>Tax code: DE454714336</Text>
+                    </View>
+                </View>
+
+                <View style={{ position: 'absolute', top: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <Image src="/Vector1.png" style={{ width: 160, height: 160 }} />
+                    <Image src="/Vector2.png" style={{ width: 107, height: 114, marginTop: 10 }} />
+                </View>
+
+                <View style={{ position: 'absolute', bottom: 0, left: 0, display: 'flex', flexDirection: 'column' }}>
+                    <Image src="/Vector3.png" style={{ width: 160, height: 160 }} />
+                    <Image src="/Vector4.png" style={{ width: 107, height: 114, marginTop: 10 }} />
+                </View>
+            </Page>
+        </Document >
+    )
+};
