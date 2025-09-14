@@ -15,6 +15,7 @@ export function useCapturePayment() {
     const qc = useQueryClient()
     return useMutation({
       mutationFn: (paymentId: string) => capturePayment(paymentId),
+      retry: false,
       onSuccess: (res) => {
         // qc.invalidateQueries({ queryKey: ["products"] })
       },

@@ -229,7 +229,7 @@ export default function CheckOutPage() {
                             setLocalQuantities={setLocalQuantities}
                         />
 
-                        <div className='space-y-3'>
+                        {/* <div className='space-y-3'>
                             <div className="text-lg font-semibold">{t('selectVoucher')}</div>
                             <div className='lg:flex lg:flex-row grid grid-cols-1 gap-2'>
                                 {vouchers.map((item, index) => {
@@ -238,9 +238,10 @@ export default function CheckOutPage() {
                                     )
                                 })}
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className='flex lg:flex-row flex-col gap-12 items-end'>
+                            {/*Checkout note and term */}
                             <div className='flex-1'>
                                 <FormField
                                     name='note'
@@ -285,6 +286,8 @@ export default function CheckOutPage() {
                                 />
 
                             </div>
+
+                            {/*Checkout total */}
                             <div className='text-sm space-y-2'>
                                 <div className='flex gap-6 justify-end'>
                                     <span>{t('subTotalInclude')}</span>
@@ -318,11 +321,10 @@ export default function CheckOutPage() {
                                         )}
                                     </span>
                                 </div>
+                                <div className='flex justify-end'>
+                                    <Button type="submit">{t('continue')}</Button>
+                                </div>
                             </div>
-                        </div>
-
-                        <div className="flex justify-end">
-                            <Button type="submit">{t('continue')}</Button>
                         </div>
                     </div>
                 </div>

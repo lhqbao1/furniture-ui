@@ -24,11 +24,9 @@ import { useTranslations } from "next-intl"
     ;
 import { slugify } from "@/lib/slugify"
 import { useMediaQuery } from "react-responsive"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 type MenuItem = {
     title: string;
     url: string;
-    icon: string;
     children?: MenuItem[];
     id: string
 };
@@ -40,58 +38,57 @@ export function AppSidebar() {
     const isPhone = useMediaQuery({ maxWidth: 630 })
 
     // function mapCategories(categories: CategoryResponse[]): MenuItem[] {
-    //     return categories.map((category) => ({
-    //         title: category.name,
-    //         url: `/product/${category.name.toLowerCase()}`,
-    //         icon: category.img_url,
-    //         children: category.children ? mapCategories(category.children) : undefined
-    //     }));
+    //     return categories.flatMap((category) =>
+    //         category.children
+    //             ? category.children.map((child) => ({
+    //                 title: child.name,
+    //                 url: `/product/${slugify(child.name)}`,
+    //                 icon: child.img_url,
+    //                 id: child.id
+    //             }))
+    //             : []
+    //     )
     // }
 
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
-        return categories.flatMap((category) =>
-            category.children
-                ? category.children.map((child) => ({
-                    title: child.name,
-                    url: `/product/${slugify(child.name)}`,
-                    icon: child.img_url,
-                    id: child.id
-                }))
-                : []
-        )
+        return categories.map((cat) => ({
+            id: cat.id,
+            title: cat.name,
+            url: `/product/${slugify(cat.name)}`,
+            children: cat.children && cat.children.length > 0 ? mapCategories(cat.children) : undefined,
+        }))
     }
 
 
     const pathname = usePathname()
     const router = useRouter()
-    const items = [
-        { title: t('home'), url: "/", icon: '/side-home.png', id: 1 },
-        // { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png', id: 2 },
-        // { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png', id: 3 },
-        // { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png', id: 4 },
-        {
-            title: t('categories'),
-            url: "#",
-            icon: '/side-category.png',
-            id: 5,
-            children: categories && categories.length > 0 ? mapCategories(categories) : undefined
-        },
-        // { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png', id: 6 },
-        { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png', id: 7 },
-        { title: t('cart'), url: "/cart", icon: '/side-cart.png', id: 8 },
-        {
-            title: t('account'), url: "#", icon: '/side-account.png', id: 9,
-            children: [
-                { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
-                { title: t('profile'), url: "/account", icon: '/side-account.png', id: 10 },
-            ]
-        },
-    ]
+    // const items = [
+    //     { title: t('home'), url: "/", icon: '/side-home.png', id: 1 },
+    //     { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png', id: 2 },
+    //     { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png', id: 3 },
+    //     { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png', id: 4 },
+    //     {
+    //         title: t('categories'),
+    //         url: "#",
+    //         icon: '/side-category.png',
+    //         id: 5,
+    //         children: categories && categories.length > 0 ? mapCategories(categories) : undefined
+    //     },
+    //     { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png', id: 6 },
+    //     { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png', id: 7 },
+    //     { title: t('cart'), url: "/cart", icon: '/side-cart.png', id: 8 },
+    //     {
+    //         title: t('account'), url: "#", icon: '/side-account.png', id: 9,
+    //         children: [
+    //             { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
+    //             { title: t('profile'), url: "/account", icon: '/side-account.png', id: 10 },
+    //         ]
+    //     },
+    // ]
+    const items: MenuItem[] = categories && categories.length > 0 ? mapCategories(categories) : []
 
-    const [openItem, setOpenItem] = useState<string | null>(() => {
-        const defaultItem = items.find((i) => i.id === 5)
-        return defaultItem ? defaultItem.title : null
-    })
+
+    const [openItem, setOpenItem] = useState<string | null>()
 
     return (
         <Sidebar className="app-sidebar custom-scroll" collapsible="icon"
@@ -118,7 +115,7 @@ export function AppSidebar() {
                         <SidebarMenu className="gap-3">
                             {items.map((item) => {
                                 const isActive = pathname === item.url
-                                const isOpen = openItem === item.title
+                                const isOpen = openItem === item.id
                                 // Nếu có children → dùng Collapsible
                                 if (item.children) {
                                     return (
@@ -126,7 +123,7 @@ export function AppSidebar() {
                                             <Collapsible
                                                 className="w-full"
                                                 open={isOpen}
-                                                onOpenChange={(open) => setOpenItem(open ? item.title : null)}
+                                                onOpenChange={(open) => setOpenItem(open ? item.id : null)}
                                             >
                                                 <CollapsibleTrigger asChild>
                                                     <SidebarMenuButton asChild>
@@ -137,16 +134,6 @@ export function AppSidebar() {
                                                                 }`}
                                                             variant={"ghost"}
                                                         >
-                                                            <div className="w-8">
-                                                                <Image
-                                                                    src={item.icon}
-                                                                    height={30}
-                                                                    width={30}
-                                                                    alt=""
-                                                                    className="lg:w-7 lg:h-7 w-6 h-6"
-                                                                    unoptimized
-                                                                />
-                                                            </div>
                                                             <span className="lg:text-lg text-lg">{item.title}</span>
                                                             <ChevronDown
                                                                 className={`size-4 opacity-70 transition-transform hover:text-gray-600 ${isOpen ? "rotate-180" : ""
@@ -158,8 +145,8 @@ export function AppSidebar() {
 
                                                 {sidebarOpen && isOpen && (
                                                     <CollapsibleContent
-                                                        style={{ transition: "none" }}
-                                                        className="flex flex-col gap-1.5 mt-1 overflow-hidden data-[state=closed]:hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down lg:h-[500px] lg:overflow-y-scroll"
+                                                        // style={{ transition: "all" }}
+                                                        className="flex flex-col gap-1.5 mt-1 overflow-hidden [data-state=closed]:hidden [data-state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
                                                     >
                                                         {item.children.map((child) => {
                                                             const isChildActive = pathname === child.url
@@ -175,18 +162,6 @@ export function AppSidebar() {
                                                                         : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
                                                                         }`}
                                                                 >
-                                                                    {item.id !== 5 ?
-                                                                        <div className="w-8">
-                                                                            <Image
-                                                                                src={child.icon}
-                                                                                height={30}
-                                                                                width={30}
-                                                                                alt=""
-                                                                                className="lg:w-7 lg:h-7 w-6 h-6"
-                                                                                unoptimized
-                                                                            />
-                                                                        </div>
-                                                                        : ''}
                                                                     <span className="text-wrap lg:text-[17px] text-start">{child.title}</span>
                                                                     {isOpen && isChildActive && (
                                                                         <span className="absolute w-1 h-full bg-secondary right-0 top-0"></span>
@@ -216,16 +191,6 @@ export function AppSidebar() {
                                                     }`}
                                                 variant={"ghost"}
                                             >
-                                                <div className="w-8">
-                                                    <Image
-                                                        src={item.icon}
-                                                        height={30}
-                                                        width={30}
-                                                        alt=""
-                                                        className="lg:w-7 lg:h-7 w-6 h-6"
-                                                        unoptimized
-                                                    />
-                                                </div>
                                                 <span className="lg:text-lg text-lg">{item.title}</span>
                                                 {isActive && (
                                                     <span className="absolute w-1 h-full bg-secondary right-0"></span>

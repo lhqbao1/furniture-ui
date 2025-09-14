@@ -77,6 +77,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --animate-collapsible-down: collapsible-down 0.8s ease-out forwards;
+  --animate-collapsible-up: collapsible-up 0.8s ease-out forwards;
 }
 
 .dark {
@@ -153,8 +155,19 @@
   --color-secondary: #51BE8C; */
   --color-primary: #F7941D;
   --color-secondary: #00B159;
+  --animate-collapsible-down: collapsible-down 0.8s ease-out forwards;
+  --animate-collapsible-up: collapsible-up 0.8s ease-out forwards;
 }
 
+
+
+/* .data-\[state\=open\]\:animate-collapsible-down[data-state="open"] {
+  animation: collapsible-down 0.8s ease-out forwards;
+}
+
+.data-\[state\=closed\]\:animate-collapsible-up[data-state="closed"] {
+  animation: collapsible-up 0.3s ease-out forwards;
+} */
 
 @keyframes collapsible-down {
   from {
@@ -162,6 +175,7 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     height: var(--radix-collapsible-content-height);
     opacity: 1;
@@ -175,6 +189,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
   to {
     height: 0;
     opacity: 0;
@@ -182,13 +197,6 @@
   }
 }
 
-.data-\[state\=open\]\:animate-collapsible-down[data-state="open"]  {
-  animation: collapsible-down 0.4s ease-out;
-}
-
-.data-\[state\=closed\]\:animate-collapsible-up[data-state="closed"] {
-  animation: collapsible-up 0.3s ease-out;
-}
 
 @keyframes button-wave {
   from {
@@ -256,3 +264,4 @@ input[type=number] {
 .react-tel-input .selected-flag:focus{
   background-color: #f5f5f5 !important;
 }
+

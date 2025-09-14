@@ -35,18 +35,18 @@ const OrderPlaced = () => {
     }, [])
 
     const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
-        queryKey: ["checkout-id", checkoutId],
+        queryKey: ["checkout-id", checkoutId, paymentId],
         queryFn: async () => {
-            if (!checkoutId || !paymentId) return null;
+            if (!checkoutId || !paymentId) return null
 
             // 1. Capture payment trước
-            await capturePaymentMutation.mutateAsync(paymentId);
+            await capturePaymentMutation.mutateAsync(paymentId)
 
             // 2. Sau đó fetch checkout
-            return getCheckOutByCheckOutId(checkoutId);
+            return getCheckOutByCheckOutId(checkoutId)
         },
-        enabled: !!checkoutId && !!paymentId, // chỉ chạy khi có checkoutId và paymentId
-    });
+        enabled: !!checkoutId && !!paymentId, // chỉ chạy khi có cả 2 id
+    })
 
     const { data: invoice } = useQuery({
         queryKey: ["invoice-checkout", checkoutId],
@@ -70,9 +70,9 @@ const OrderPlaced = () => {
                 const blob = await asPdf.toBlob()
 
                 // 2. upload file
-                const file = new File([blob], 'invoice.pdf', { type: 'application/pdf' })
+                const file = new File([blob], "invoice.pdf", { type: "application/pdf" })
                 const formData = new FormData()
-                formData.append('files', file)
+                formData.append("files", file)
                 const uploadRes = await uploadStaticFileMutation.mutateAsync(formData)
 
                 // 3. Send mail
@@ -80,9 +80,15 @@ const OrderPlaced = () => {
                     to_email: user.email,
                     attachment_url: uploadRes.results[0].url,
                     checkout_id: checkout.checkout_code,
-                    first_name: user.first_name ?? '',
-                    german: locale === 'de' ? true : false
+                    first_name: user.first_name ?? "",
+                    german: locale === "de",
                 })
+
+                // ✅ Sau khi gửi mail thành công → clear paymentId & checkoutId
+                localStorage.removeItem("paymentId")
+                localStorage.removeItem("checkoutId")
+                setPaymentId(null)
+                setCheckOutId(null)
             } catch (err) {
                 console.error(err)
             }
@@ -90,15 +96,16 @@ const OrderPlaced = () => {
         process()
     }, [checkout, invoice, user])
 
+
     // Redirect về home sau 5s
-    useEffect(() => {
-        if (counter <= 0) {
-            router.push('/')
-            return
-        }
-        const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
-        return () => clearTimeout(timer)
-    }, [counter, router])
+    // useEffect(() => {
+    //     if (counter <= 0) {
+    //         router.push('/')
+    //         return
+    //     }
+    //     const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
+    //     return () => clearTimeout(timer)
+    // }, [counter, router])
 
     return (
         <div className='w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10'>
