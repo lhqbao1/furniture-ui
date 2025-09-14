@@ -268,6 +268,9 @@ export default function CheckOutPage() {
     const handleSubmit = useCallback(
         async (data: CreateOrderFormValues) => {
             try {
+                // Nếu password hoặc confirmPassword rỗng thì gán Guest@12345
+                if (!data.password) data.password = "Guest@12345";
+                if (!data.confirmPassword) data.confirmPassword = "Guest@12345";
                 let userId = user?.id
                 let invoiceAddressId = invoiceAddress?.id
                 let shippingAddressId = addresses?.find(a => a.is_default)?.id
