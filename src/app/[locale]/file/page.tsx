@@ -32,7 +32,7 @@ export default function InvoicePage() {
                 document={<InvoicePDF checkout={checkout} invoice={invoice} />}
                 fileName="invoice.pdf"
             >
-                {({ loading }) => (loading ? "Generating PDF..." : "Download Invoice PDF")}
+                {({ loading }) => (loading ? "Generating PDF..." : <div className="cursor-pointer">Download Invoice PDF</div>)}
             </PDFDownloadLink>
         </div>
     );

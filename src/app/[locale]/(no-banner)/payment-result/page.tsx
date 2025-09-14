@@ -13,7 +13,7 @@ import { InvoicePDF } from '@/components/layout/pdf/file'
 import { pdf } from '@react-pdf/renderer'
 import Image from 'next/image'
 import { useCapturePayment } from '@/features/payment/hook'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 const OrderPlaced = () => {
     const router = useRouter()
@@ -26,6 +26,7 @@ const OrderPlaced = () => {
     const uploadStaticFileMutation = useUploadStaticFile()
     const sendMailMutation = useSendMail()
     const t = useTranslations()
+    const locale = useLocale()
 
     // Lấy userId từ localStorage
     useEffect(() => {
@@ -79,7 +80,8 @@ const OrderPlaced = () => {
                     to_email: user.email,
                     attachment_url: uploadRes.results[0].url,
                     checkout_id: checkout.checkout_code,
-                    first_name: user.first_name ?? ''
+                    first_name: user.first_name ?? '',
+                    german: locale === 'de' ? true : false
                 })
             } catch (err) {
                 console.error(err)
