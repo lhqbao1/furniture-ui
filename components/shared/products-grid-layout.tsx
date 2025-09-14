@@ -48,18 +48,21 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                 {data.map((product, idx) => {
                     // Lấy đường dẫn category
                     const categories = product.categories || []
+                    const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
+
                     const level1 = categories.find(c => c.level === 1)
                     const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
+
                     const categoryHref = level1 && level2
-                        ? `/${level1.name}/${level2.name}/${product.id}`
+                        ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
                         : level1
-                            ? `/${level1.name}/${product.id}`
+                            ? `/${formatName(level1.name)}/${product.id}`
                             : level2
-                                ? `/${level2.name}/${product.id}`
+                                ? `/${formatName(level2.name)}/${product.id}`
                                 : `/${product.id}`
                     return (
                         <div key={product.id} className='relative overflow-hidden' ref={el => { if (el) cardRefs.current[idx] = el }} onClick={() => handleAddProductToViewed(product.id)}>
-                            <Link href={`/product/${categoryHref}`} passHref>
+                            <Link href={`/product${categoryHref}`} passHref>
                                 <div
                                     className="bg-white p-0 group py-4 cursor-pointer z-0"
                                     style={{

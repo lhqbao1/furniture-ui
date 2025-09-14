@@ -113,12 +113,20 @@ export default function CheckOutPage() {
             })
             .refine((val) => /\d/.test(val), {
                 message: t('passwordNumber'),
-            }),
-        confirmPassword: z.string().min(1, t('confirm_password_required')),
-    }).refine((data) => data.password === data.confirmPassword, {
+            })
+            .optional(),
+        confirmPassword: z
+            .string()
+            .min(1, t('confirm_password_required'))
+            .optional(),
+    }).refine((data) => {
+        if (!data.password && !data.confirmPassword) return true;
+        return data.password === data.confirmPassword;
+    }, {
         message: t('confirm_password_mismatch'),
         path: ["confirmPassword"],
     })
+
 
     type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
 
@@ -271,14 +279,14 @@ export default function CheckOutPage() {
                         last_name: data.last_name,
                         email: data.email,
                         phone_number: data.phone_number,
-                        password: data.password,
+                        password: data.password ? data.password : 'Guest@12345',
                     })
                     userId = newUser.id
 
                     // Sau khi tạo account thành công → gọi login
                     const loginRes = await loginMutation.mutateAsync({
                         username: data.email,
-                        password: data.password,
+                        password: data.password ? data.password : 'Guest@12345',
                     })
 
                     // Lưu token + userId vào localStorage
@@ -343,6 +351,7 @@ export default function CheckOutPage() {
                     // user_id: userId,
                     invoice_address_id: invoiceAddressId,
                     shipping_address_id: shippingAddressId,
+
                 })
                 toast.success("Place order successful")
                 setCheckOut(checkout.id)

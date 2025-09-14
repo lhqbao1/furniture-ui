@@ -35,6 +35,7 @@ import { Voucher } from '@/types/voucher'
 import { useTranslations } from 'next-intl'
 import { HandleApiError } from '@/lib/api-helper'
 import { cn } from '@/lib/utils'
+import { useCartLocal } from '@/hooks/cart'
 
 const ProductDetails = () => {
     const params = useParams()
@@ -43,6 +44,8 @@ const ProductDetails = () => {
     const slug = slugArray[slugArray.length - 1]
     const [mainImageIndex, setMainImageIndex] = useState(0)
     const t = useTranslations()
+    const { addToCartLocal } = useCartLocal()
+
 
     const vouchers: Voucher[] = [
         {
@@ -151,30 +154,76 @@ const ProductDetails = () => {
     }
 
     const handleAddProductToCart = () => {
-        createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
-            onSuccess: () => {
-                toast.success(t('addToCartSuccess'))
-            },
-            onError: (error) => {
-                const { status, message } = HandleApiError(error, t);
-                toast.error(message)
-            },
-        })
+        if (!productDetails) return
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+            addToCartLocal({
+                item: {
+                    product_id: productDetails.id ?? '', quantity: 1, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
+                }
+            }, {
+                onSuccess(data, variables, context) {
+                    toast.success(t('addToCartSuccess'))
+                },
+                onError(error, variables, context) {
+                    toast.error(t('addToCartFail'))
+                },
+            })
+        } else {
+            createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+                onSuccess(data, variables, context) {
+                    toast.success(t('addToCartSuccess'))
+                },
+                onError(error, variables, context) {
+                    const { status, message } = HandleApiError(error, t);
+                    toast.error(message)
+                    if (status === 401) router.push('/login')
+                },
+            })
+        }
+
+        // createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+        //     onSuccess: () => {
+        //         toast.success(t('addToCartSuccess'))
+        //     },
+        //     onError: (error) => {
+        //         const { status, message } = HandleApiError(error, t);
+        //         toast.error(message)
+        //     },
+        // })
     }
 
     const handleSubmit = (values: z.infer<typeof cartFormSchema>) => {
-        createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
-            onSuccess: () => {
-                toast.success(t('addToCartSuccess'))
-            },
-            onError: (error) => {
-                const { status, message } = HandleApiError(error, t);
-                toast.error(<div className='flex flex-col'>
-                    <div>{message}</div>
-                    <div className=''>Login now</div>
-                </div>)
-            },
-        })
+        if (!productDetails) return
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+            addToCartLocal({
+                item: {
+                    product_id: productDetails.id ?? '', quantity: 1, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
+                }
+            }, {
+                onSuccess(data, variables, context) {
+                    toast.success(t('addToCartSuccess'))
+                },
+                onError(error, variables, context) {
+                    toast.error(t('addToCartFail'))
+                },
+            })
+        } else {
+            createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+                onSuccess(data, variables, context) {
+                    toast.success(t('addToCartSuccess'))
+                },
+                onError(error, variables, context) {
+                    const { status, message } = HandleApiError(error, t);
+                    toast.error(message)
+                    if (status === 401) router.push('/login')
+                },
+            })
+        }
+
         // addProductToCheckOutMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
         //     onSuccess: () => {
         //         toast.success(t('addToCheckoutSuccess'))

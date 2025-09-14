@@ -23,12 +23,16 @@ export const CreateOrderSchema = z.object({
     shipping_postal_code: z.string().min(1),
     shipping_city: z.string().min(1),
 
-    password: z.string().min(8),
-    confirmPassword: z.string().min(1),
-}).refine((data) => data.password === data.confirmPassword, {
+    password: z.string().min(8).optional(),
+confirmPassword: z.string().min(1).optional(),
+}).refine((data) => {
+    if (!data.password && !data.confirmPassword) return true;
+    return data.password === data.confirmPassword;
+}, {
     path: ["confirmPassword"],
     message: "Passwords must match",
 })
+
 
 // Export type ra ngoài component
 export type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
