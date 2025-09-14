@@ -84,6 +84,10 @@ const PageHeader = () => {
                     unoptimized
                 />
             </div>
+            <div className="font-libre text-[29px] flex gap-1">
+                <span className="text-secondary font-semibold">Prestige</span>
+                <span className="text-primary font-semibold">Home</span>
+            </div>
             {/*Product search desktop */}
             <div className={`${isPhone ? 'hidden' : 'block w-full'}`}>
                 <ProductSearch />
@@ -127,9 +131,7 @@ const PageHeader = () => {
                     <div className='absolute -top-4 -right-4 text-white bg-primary py-1 px-3 rounded-full flex items-center text-sm'>{cart && cart.items ? cart.items.length : 0}</div>
                 </Link>
 
-                {isPhone ?
-                    <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
-                    : ''}
+                <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
 
                 {/*User */}
                 <DropdownMenu >

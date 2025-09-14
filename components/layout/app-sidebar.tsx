@@ -15,15 +15,15 @@ import {
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import Image from "next/image"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { Button } from "../ui/button"
-import Link from "next/link"
 import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
 import { useTranslations } from "next-intl"
     ;
 import { slugify } from "@/lib/slugify"
 import { useMediaQuery } from "react-responsive"
+import { Link, useRouter } from "@/src/i18n/navigation"
 type MenuItem = {
     title: string;
     url: string;
@@ -91,7 +91,7 @@ export function AppSidebar() {
     const [openItem, setOpenItem] = useState<string | null>()
 
     return (
-        <Sidebar className="app-sidebar custom-scroll" collapsible="icon"
+        <Sidebar className="app-sidebar custom-scroll" collapsible="offcanvas"
         >
             <SidebarContent>
                 <SidebarGroup className="h-full relative">
@@ -105,10 +105,6 @@ export function AppSidebar() {
                                 priority
                                 className="w-auto lg:h-[80px] h-[50px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
-                            <div className="font-libre text-[29px] flex gap-1">
-                                <span className="text-secondary font-semibold">Prestige</span>
-                                <span className="text-primary font-semibold">Home</span>
-                            </div>
                         </div>
                     </Link>
                     <SidebarGroupContent>
@@ -204,9 +200,9 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className="data-[state=collapsed]:justify-center data-[state=expanded]:justify-end flex-row ">
+            {/* <SidebarFooter className="data-[state=collapsed]:justify-center data-[state=expanded]:justify-end flex-row ">
                 <SidebarTrigger className={`cursor-pointer bg-transparent border-none text-secondary`} />
-                {/* {isPhone ? (
+                {isPhone ? (
                     <Select
                         defaultValue="de"
                         onValueChange={(value) => {
@@ -227,8 +223,8 @@ export function AppSidebar() {
                             <SelectItem value="en" className='font-semibold'>{t('english')}</SelectItem>
                         </SelectContent>
                     </Select>
-                ) : ''} */}
-            </SidebarFooter>
+                ) : ''}
+            </SidebarFooter> */}
         </Sidebar>
     )
 }

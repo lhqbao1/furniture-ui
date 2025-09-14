@@ -105,14 +105,14 @@ const OrderPlaced = () => {
 
 
     // Redirect về home sau 5s
-    // useEffect(() => {
-    //     if (counter <= 0) {
-    //         router.push('/')
-    //         return
-    //     }
-    //     const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
-    //     return () => clearTimeout(timer)
-    // }, [counter, router])
+    useEffect(() => {
+        if (counter <= 0) {
+            router.push('/')
+            return
+        }
+        const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
+        return () => clearTimeout(timer)
+    }, [counter, router])
 
     return (
         <div className='w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10'>

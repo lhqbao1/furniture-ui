@@ -84,27 +84,27 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'column', marginRight: 50 }}>
                         {/* <Text>Invoice ID: {invoice?.id}</Text> */}
-                        <Text>Invoice ID: {invoice.invoice_code}</Text>
+                        <Text>IBelegnummer: {invoice.invoice_code}</Text>
                         <Text>
-                            Invoice date: {invoice?.created_at
+                            Datum: {invoice?.created_at
                                 ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
                                 : ""}
                         </Text>
                         {/* <Text>Customer ID: {checkout?.user.id}</Text> */}
-                        <Text>Customer ID: {invoice.user_code}</Text>
+                        <Text>Kunden-Nr: {invoice.user_code}</Text>
                     </View>
                 </View>
 
                 {/* Invoice Table */}
                 <View style={styles.section}>
-                    <Text style={styles.title}>Invoice</Text>
+                    <Text style={styles.title}>Rechnung</Text>
                     <View style={styles.tableHeader}>
                         <Text style={{ width: 50, textAlign: 'center', fontFamily: 'FigtreeBold' }}>Pos.</Text>
-                        <Text style={{ width: 100, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Item(s)</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Unit Price</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Quantity</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>VAT</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Amount</Text>
+                        <Text style={{ width: 150, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Menge</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Bezeichnung</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>MwSt.</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>E-Preis</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>G-Preis</Text>
                     </View>
                     {invoice?.cart.items?.map((item, index) => (
                         <View style={styles.tableRow} key={index}>
@@ -125,39 +125,41 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 <View style={styles.flexEnd}>
                     <View style={styles.flexColBlock}>
                         <View style={styles.flexEndTotal}>
-                            <Text style={styles.gapY10}>Total net amount:</Text>
+                            <Text style={styles.gapY10}>Gesamt Netto</Text>
                             <Text style={styles.minWidth}>
                                 €{((invoice?.total_amount_item ?? 0) - (invoice?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toFixed(2)}
                             </Text>
                         </View>
 
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <Text style={styles.gapY10}>Total VAT:</Text>
+                            <Text style={styles.gapY10}>zzgl. MwSt</Text>
                             <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>€{invoice?.total_vat.toFixed(2)}</Text>
                         </View>
 
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <Text style={styles.gapY10}>Shipping cost:</Text>
+                            <Text style={styles.gapY10}>Versandkosten</Text>
                             <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', textAlign: 'right' }}>€{invoice?.total_shipping.toFixed(2)}</Text>
                         </View>
 
                         <View style={styles.flexEndTotalBg}>
-                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Invoice amount:</Text>
+                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Rechnungsbetrag</Text>
                             <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
                         </View>
 
                         <View style={styles.flexEndTotal}>
-                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Amount Due:</Text>
+                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Zahlbetrag</Text>
                             <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
                         </View>
 
                         <View style={styles.flexEndTotal}>
-                            <Text style={styles.gapY10}>Payment (PayPal Checkout) from 04/29/2025:</Text>
+                            <Text style={styles.gapY10}>Zahlung vom {invoice?.created_at
+                                ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                                : ""}:</Text>
                             <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
                         </View>
 
                         <View style={styles.flexEndTotal}>
-                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Open Amount:</Text>
+                            <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Offener Betrag:</Text>
                             <Text style={styles.minWidth}>€00.00</Text>
                         </View>
 
@@ -173,9 +175,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     </View>
 
                     <View>
-                        <Text style={styles.boldWithGap}>Chief Executive Office</Text>
+                        <Text style={styles.boldWithGap}>Geschäftsführer</Text>
                         <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
-                        <Text style={styles.gapY5}>Tax code: DE454714336</Text>
+                        <Text style={styles.gapY5}>USt-ID: DE454714336</Text>
                     </View>
                 </View>
 

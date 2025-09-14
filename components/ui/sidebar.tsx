@@ -270,9 +270,9 @@ function SidebarTrigger({
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      variant="outline"
+      variant="ghost"
       size="icon"
-      className={cn("", className)}
+      className={cn("px-0 py-0 size-min hover:bg-white", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -280,16 +280,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      {isMobile ?
-        <AlignJustify size={24} className="size-6" stroke="#00B159" /> // icon when open
-        :
-        isOpen ? (
-          <ToggleRight size={24} className="size-8" stroke="#00B159" /> // icon when open
-        ) : (
-          <ToggleLeft size={24} className="size-8" stroke="#00B159" /> // icon when closed
-        )
-      }
-
+      <AlignJustify size={50} className="w-[30px] h-[30px] size-7 hover:scale-110 transition-all duration-300" stroke={`${isMobile ? '#00B159' : '#4D4D4D'}`} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

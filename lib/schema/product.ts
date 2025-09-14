@@ -21,10 +21,10 @@ export const addProductSchema = z.object({
   sku: z.string().optional().nullable(),
   ean: z.string().min(1, "You must provide product EAN"),
   carrier: z.string().min(1, "You must provide a carrier"),
-  delivery_time:z.string().min(1, "You must provide delivery time"),
-  manufacture_country: z.string().min(1, "You must provide manufacture country"),
-  tariff_number: z.string().min(1, "You must provide tariff number"),
-  brand_id: z.string().min(1, "You must provide product brand"),
+  delivery_time:z.string().optional(),
+  manufacture_country: z.string().optional(),
+  tariff_number: z.string().optional(),
+  brand_id: z.string().optional(),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
   weight: z.number().optional().nullable(),
   length: z.number().optional().nullable(),
@@ -55,10 +55,10 @@ export const defaultValues = {
   is_active: true,
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
-  brand_id: "",
-  carrier: "",
-  delivery_time: "",
-  manufacture_country: "",
-  tariff_number: ""
+  // brand_id: "",
+  // carrier: "",
+  // delivery_time: "",
+  // manufacture_country: "",
+  // tariff_number: ""
 }
   
