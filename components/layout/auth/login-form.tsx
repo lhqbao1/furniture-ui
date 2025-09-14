@@ -7,31 +7,15 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Chrome, Facebook, Mail, Key, Loader2, Eye, EyeOff } from "lucide-react"
-import Link from "next/link"
 import { useLogin, useLoginAdmin } from "@/features/auth/hook"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import Image from "next/image"
 import { useState } from "react"
+import { Link, useRouter } from "@/src/i18n/navigation"
+import { useTranslations } from "next-intl"
+import { useSyncLocalCart } from "@/features/cart/hook"
 
-const formSchema = z.object({
-    username: z
-        .string()
-        .min(1, "Email is required")
-        .email("Invalid email address"),
-    password: z
-        .string()
-        .min(8, "Password must be at least 8 characters long")
-        .refine((val) => /[a-z]/.test(val), {
-            message: "Password must contain at least one lowercase letter",
-        })
-        .refine((val) => /[A-Z]/.test(val), {
-            message: "Password must contain at least one uppercase letter",
-        })
-        .refine((val) => /\d/.test(val), {
-            message: "Password must contain at least one number",
-        }),
-})
+
 
 interface LoginFormProps {
     isAdmin?: boolean
@@ -41,6 +25,26 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     // const [userId, setUserId] = useAtom(userIdAtom)
     const [seePassword, setSeePassword] = useState(false)
     const router = useRouter()
+    const t = useTranslations()
+
+    const formSchema = z.object({
+        username: z
+            .string()
+            .min(1, t('emailRequired'))
+            .email(t('invalidEmail')),
+        password: z
+            .string()
+            .min(8, t('passwordMin'))
+            .refine((val) => /[a-z]/.test(val), {
+                message: t('passwordLower'),
+            })
+            .refine((val) => /[A-Z]/.test(val), {
+                message: t('passwordUpper'),
+            })
+            .refine((val) => /\d/.test(val), {
+                message: t('passwordNumber'),
+            }),
+    })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -52,6 +56,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
     const loginMutation = useLogin()
     const loginAdminMutation = useLoginAdmin()
+    const syncLocalCartMutation = useSyncLocalCart();
 
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         if (isAdmin) {
@@ -65,7 +70,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
                     // Có thể lưu userId nếu cần
                     // setUserId(data.id)
-                    toast.success("Logged in successfully")
+                    toast.success(t('loginSuccess'))
 
                 },
                 onError(error, variables, context) {
@@ -82,10 +87,11 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     router.push("/")
                     localStorage.setItem("userId", data.id)
 
+                    syncLocalCartMutation.mutate()
+
                     // Có thể lưu userId nếu cần
                     // setUserId(data.id)
-                    toast.success("Logged in successfully")
-
+                    toast.success(t('loginSuccess'))
                 },
                 onError(error, variables, context) {
                     toast.error(error.message)
@@ -106,7 +112,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     alt=""
                 />
                 <h1 className="text-3xl font-semibold text-secondary text-center font-libre flex gap-2">
-                    <span>Welcome to</span>
+                    <span>{t('welcomeTo')}</span>
                     <span className="text-primary">Prestige Home</span>
                 </h1>
             </div>
@@ -123,7 +129,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                                 <FormControl>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                                        <Input placeholder="Your email" {...field} className="pl-12 py-3 h-fit" />
+                                        <Input placeholder={t('email')} {...field} className="pl-12 py-3 h-fit" />
                                     </div>
                                 </FormControl>
                                 <FormMessage />
@@ -143,7 +149,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                                         {seePassword === false ?
                                             <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(true)} /> :
                                             <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(false)} />}
-                                        <Input type={seePassword ? 'text' : 'password'} placeholder="Password" {...field} className="pl-12 py-3 h-fit" />
+                                        <Input type={seePassword ? 'text' : 'password'} placeholder={t('password')} {...field} className="pl-12 py-3 h-fit capitalize" />
                                     </div>
                                 </FormControl>
                                 <FormMessage />
@@ -159,7 +165,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     >
                         {loginMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : 'Log In'}
+                        ) : t('login')}
 
                     </Button>
                 </form>
@@ -168,19 +174,19 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             {/* Forgot password */}
             <div className="flex justify-end mt-2">
                 <Link href="/forgot-password" className="text-sm text-secondary hover:underline">
-                    Forgot password?
+                    {t('forgotPassword')}?
                 </Link>
             </div>
 
             {/* Divider */}
-            <div className="flex items-center my-6">
+            {/* <div className="flex items-center my-6">
                 <div className="flex-grow h-px bg-gray-300"></div>
                 <span className="px-2 text-sm text-gray-500">or</span>
                 <div className="flex-grow h-px bg-gray-300"></div>
-            </div>
+            </div> */}
 
             {/* Social login */}
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
                 <Button
                     variant="outline"
                     className="flex-1 flex items-center gap-2 cursor-pointer"
@@ -195,15 +201,15 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     <Facebook className="h-5 w-5 text-primary " />
                     Facebook
                 </Button>
-            </div>
+            </div> */}
 
             {/* Sign up link */}
-            <p className="text-sm text-center mt-6">
-                Don’t have an account?{" "}
+            <div className="text-sm text-center mt-6 space-x-1">
+                <span>{t('noAccount')}</span>
                 <Link href="/sign-up" className="text-secondary font-medium hover:underline">
-                    Sign Up
+                    {t('createAccount')}
                 </Link>
-            </p>
+            </div>
         </div>
     )
 }

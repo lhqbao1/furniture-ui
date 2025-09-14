@@ -9,6 +9,7 @@ import { useAddToWishList } from '@/features/wishlist/hook'
 import { useRouter } from 'next/navigation'
 import { HandleApiError } from '@/lib/api-helper'
 import { useTranslations } from 'next-intl'
+import { useCartLocal } from '@/hooks/cart'
 
 interface IconListProps {
     currentProduct?: ProductItem
@@ -19,20 +20,38 @@ const IconList = ({ currentProduct }: IconListProps) => {
     const containersRef = useRef<HTMLDivElement[]>([])
     const addToCartMutation = useAddToCart()
     const addToWishlistMutation = useAddToWishList()
+    const { addToCartLocal } = useCartLocal()
     const router = useRouter()
 
     const handleAddToCart = () => {
         if (!currentProduct) return
-        addToCartMutation.mutate({ productId: currentProduct.id ?? '', quantity: 1 }, {
-            onSuccess(data, variables, context) {
-                toast.success("Added to cart")
-            },
-            onError(error, variables, context) {
-                const { status, message } = HandleApiError(error, t);
-                toast.error(message)
-                if (status === 401) router.push('/login')
-            },
-        })
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+            addToCartLocal({
+                item: {
+                    product_id: currentProduct.id, quantity: 1, is_active: true, item_price: currentProduct.final_price, final_price: currentProduct.final_price, img_url: currentProduct.static_files[0].url, product_name: currentProduct.name, stock: currentProduct.stock
+                }
+            }, {
+                onSuccess(data, variables, context) {
+                    toast.success(t('addToCartSuccess'))
+                },
+                onError(error, variables, context) {
+                    toast.error(t('addToCartFail'))
+                },
+            })
+        } else {
+            addToCartMutation.mutate({ productId: currentProduct.id ?? '', quantity: 1 }, {
+                onSuccess(data, variables, context) {
+                    toast.success(t('addToCartSuccess'))
+                },
+                onError(error, variables, context) {
+                    const { status, message } = HandleApiError(error, t);
+                    toast.error(message)
+                    if (status === 401) router.push('/login')
+                },
+            })
+        }
     }
 
     const handleAddToWishlist = () => {

@@ -441,6 +441,7 @@ export const paymentOptions = [
     { id: "paypal", label: "PayPal", logo: "/paypal.svg" },
     { id: "apple", label: "Apple Pay", logo: "/apple.svg" },
     { id: "google", label: "Google Pay", logo: "/google.svg" },
+    { id: "bank", label: "Vorkasse", logo: "" },
   ]
   
   export const cartItems = [

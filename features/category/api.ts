@@ -5,15 +5,21 @@ import { ProductItem } from "@/types/products"
 export async function getCategories(){
     const {data} = await apiPublic.get(
         "/categories/",
-        {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
-        },
-      withCredentials: true, // nếu backend cần cookie/session
-        }
     )
     return data as CategoryResponse[]
+}
+
+export async function serverGetCategories(): Promise<CategoryResponse[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}categories/`, {
+    next: { revalidate: 3600 }, // revalidate mỗi 1 giờ
+    cache: "force-cache",       // hoặc "no-store" nếu luôn cần fresh
+  })
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch categories")
+  }
+
+  return res.json()
 }
 
 

@@ -262,7 +262,7 @@ function SidebarTrigger({
   onClick,
   isMobile, // thêm props ở đây
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: SidebarTriggerProps) {
   const [isOpen, setIsOpen] = React.useState(true)
   const { toggleSidebar } = useSidebar() // get the open state
 

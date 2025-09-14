@@ -3,7 +3,7 @@
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { useGetProductByTag } from "@/features/products/hook";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 
@@ -23,7 +23,14 @@ const TrendingProducts = () => {
                 <ProductGridSkeleton />
             ) : (
                 <>
-                    <ProductsGridLayout data={isPhone ? products.slice(0, 6) : products.slice(0, 8)} />
+                    <ProductsGridLayout
+                        data={isPhone ?
+                            products.filter(item => item.stock > 0)
+                                .slice(0, 6)
+                            :
+                            products.filter(item => item.stock > 0)
+                                .slice(0, 8)}
+                    />
                 </>
             )}
         </div>

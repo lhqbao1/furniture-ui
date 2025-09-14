@@ -17,22 +17,22 @@ export default function PaymentMethodSelector() {
             render={({ field }) => (
                 <FormItem>
                     <RadioGroup
-                        className="lg:flex lg:gap-4 grid grid-cols-2 gap-y-4 mt-4 lg:mt-0"
+                        className="lg:flex lg:gap-4 grid grid-cols-1 gap-y-4 mt-4 lg:mt-0 lg:justify-between justify-start"
                         value={field.value}
                         onValueChange={field.onChange}
                     >
                         {paymentOptions.map((option) => (
-                            <div key={option.id} className="flex gap-2 items-center">
+                            <div key={option.id} className="flex gap-2 items-center lg:justify-between justify-start">
                                 <RadioGroupItem value={option.id} id={option.id} />
                                 <Label htmlFor={option.id} className="text-base font-medium flex items-center gap-2">
-                                    <Image
+                                    {option.logo ? <Image
                                         src={option.logo}
                                         width={30}
                                         height={30}
                                         alt=""
                                         className="size-6"
                                         unoptimized
-                                    />
+                                    /> : ''}
                                     <span>{option.label}</span>
                                 </Label>
                             </div>

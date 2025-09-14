@@ -51,8 +51,7 @@ const Banner = ({ height }: BannerProps) => {
                     />
                     : ''}
 
-                <div className='home-banner__content h-full flex flex-col relative z-10'>
-                    {/* Phần title căn giữa theo chiều cao */}
+                {/* <div className='home-banner__content h-full flex flex-col relative z-10'>
                     {
                         isPhone || height ? '' :
                             <div className="flex-1 flex flex-col justify-center items-center gap-6 xl:mt-12 mt-0 xl:px-0 px-4">
@@ -67,7 +66,7 @@ const Banner = ({ height }: BannerProps) => {
                                 <span className='text-white xl:text-3xl text-xl text-center font-medium uppercase'>{t('slogan')}</span>
                             </div>
                     }
-                </div>
+                </div> */}
             </div>
         </>
     )

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Figtree, Libre_Caslon_Display, Quicksand } from "next/font/google";
+import { Figtree, Libre_Caslon_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
 import CursorLoadingHandler from "@/components/shared/cursor-loader";
-import ReactCookieBot from "react-cookiebot"
 import Script from "next/script";
 
 const figtree = Figtree({

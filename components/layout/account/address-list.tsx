@@ -17,6 +17,7 @@ import { toast } from 'sonner'
 import { DialogTrigger } from '@radix-ui/react-dialog'
 import { Loader2 } from 'lucide-react'
 import AddressForm from './address-form'
+import { cn } from '@/lib/utils'
 
 interface AddressListProps {
     userId: string
@@ -67,7 +68,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                 .map((address) => (
                     <Card
                         key={address.id}
-                        className={address.is_default ? "border-secondary border-2" : ""}
+                        className={cn('col-span-2 lg:col-span-1', address.is_default ? "border-secondary border-2" : "")}
                     >
                         <CardHeader className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -84,7 +85,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                             {address.recipient_name && <p>Recipient: {address.recipient_name}</p>}
                             {address.phone_number && <p>{address.phone_number}</p>}
                         </CardContent>
-                        <CardFooter>
+                        <CardFooter className='px-2 justify-center'>
                             <div className="flex gap-2">
                                 <Dialog
                                     open={editDialogId === address.id}
@@ -112,7 +113,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                                     onOpenChange={(open) => setDefaultDialogId(open ? address.id : null)}
                                 >
                                     <DialogTrigger asChild>
-                                        <Button variant="outline" size="sm" type='button'>Set as Default</Button>
+                                        <Button variant="outline" size="sm" type='button'>As Default</Button>
                                     </DialogTrigger>
 
                                     <DialogContent className="lg:w-[500px]">

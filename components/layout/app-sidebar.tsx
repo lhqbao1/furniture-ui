@@ -24,6 +24,7 @@ import { useTranslations } from "next-intl"
 import { slugify } from "@/lib/slugify"
 import { useMediaQuery } from "react-responsive"
 import { Link, useRouter } from "@/src/i18n/navigation"
+
 type MenuItem = {
     title: string;
     url: string;
@@ -31,24 +32,11 @@ type MenuItem = {
     id: string
 };
 
-export function AppSidebar() {
-    const { open: sidebarOpen } = useSidebar()  // true = expanded, false = collapsed
-    const { data: categories, isLoading, isError } = useGetCategories()
-    const t = useTranslations()
-    const isPhone = useMediaQuery({ maxWidth: 630 })
+type AppSidebarProps = { categories: CategoryResponse[] }
 
-    // function mapCategories(categories: CategoryResponse[]): MenuItem[] {
-    //     return categories.flatMap((category) =>
-    //         category.children
-    //             ? category.children.map((child) => ({
-    //                 title: child.name,
-    //                 url: `/product/${slugify(child.name)}`,
-    //                 icon: child.img_url,
-    //                 id: child.id
-    //             }))
-    //             : []
-    //     )
-    // }
+export default function AppSidebar({ categories }: AppSidebarProps) {
+    const { open: sidebarOpen } = useSidebar()  // true = expanded, false = collapsed
+    const t = useTranslations()
 
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
         return categories.map((cat) => ({
@@ -62,30 +50,23 @@ export function AppSidebar() {
 
     const pathname = usePathname()
     const router = useRouter()
-    // const items = [
-    //     { title: t('home'), url: "/", icon: '/side-home.png', id: 1 },
-    //     { title: t('shopAll'), url: "/shop-all", icon: '/shop-all.png', id: 2 },
-    //     { title: t('bestSeller'), url: "/product/best-seller", icon: '/side-best.png', id: 3 },
-    //     { title: t('flashSale'), url: "/product/flash-sale", icon: '/side-sale.png', id: 4 },
-    //     {
-    //         title: t('categories'),
-    //         url: "#",
-    //         icon: '/side-category.png',
-    //         id: 5,
-    //         children: categories && categories.length > 0 ? mapCategories(categories) : undefined
-    //     },
-    //     { title: t('viewed'), url: "/recent-viewed", icon: '/side-view.png', id: 6 },
-    //     { title: t('wishlist'), url: "/wishlist", icon: '/side-wishlist.png', id: 7 },
-    //     { title: t('cart'), url: "/cart", icon: '/side-cart.png', id: 8 },
-    //     {
-    //         title: t('account'), url: "#", icon: '/side-account.png', id: 9,
-    //         children: [
-    //             { title: t('order'), url: "/my-order", icon: '/side-order.png', id: 9 },
-    //             { title: t('profile'), url: "/account", icon: '/side-account.png', id: 10 },
-    //         ]
-    //     },
-    // ]
-    const items: MenuItem[] = categories && categories.length > 0 ? mapCategories(categories) : []
+
+    const accountMenu: MenuItem = {
+        title: t("account"),
+        url: "#",
+        id: 'account',
+        children: [
+            { title: t("order"), url: "/my-order", id: 'order' },
+            { title: t("profile"), url: "/account", id: 'profile' },
+            { title: t("wishlist"), url: "/wishlist", id: 'wishlist' },
+            { title: t("cart"), url: "/cart", id: 'cart' },
+        ],
+    };
+
+    const items: MenuItem[] =
+        categories && categories.length > 0
+            ? [...mapCategories(categories), accountMenu] // nối thêm
+            : [accountMenu]; // nếu không có category vẫn có account
 
 
     const [openItem, setOpenItem] = useState<string | null>()
@@ -115,7 +96,7 @@ export function AppSidebar() {
                                 // Nếu có children → dùng Collapsible
                                 if (item.children) {
                                     return (
-                                        <SidebarMenuItem key={item.id} className="flex justify-start">
+                                        <SidebarMenuItem key={item.id} className={`flex justify-start ${item.id === 'account' ? 'border-t-2 border-black/50' : ''}`}>
                                             <Collapsible
                                                 className="w-full"
                                                 open={isOpen}
@@ -124,7 +105,7 @@ export function AppSidebar() {
                                                 <CollapsibleTrigger asChild>
                                                     <SidebarMenuButton asChild>
                                                         <Button
-                                                            className={`flex w-full flex-row items-center justify-start gap-3 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black ${isActive
+                                                            className={`flex w-full flex-row items-center justify-start gap-3 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black hover:[&>svg]:stroke-black ${isActive
                                                                 ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 }`}
@@ -132,7 +113,7 @@ export function AppSidebar() {
                                                         >
                                                             <span className="lg:text-lg text-lg">{item.title}</span>
                                                             <ChevronDown
-                                                                className={`size-4 opacity-70 transition-transform hover:text-gray-600 ${isOpen ? "rotate-180" : ""
+                                                                className={`size-4 opacity-70 transition-transform text-[#4D4D4D] ${isOpen ? "rotate-180" : ""
                                                                     }`}
                                                             />
                                                         </Button>

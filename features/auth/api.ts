@@ -34,6 +34,8 @@ export async function login(input: LoginInput) {
   }
 
 export async function getMe() {
+  const token = localStorage.getItem("access_token")
+  if (!token) throw new Error("No token")
   const { data } = await api.get("/me")
   return data as User
 }
@@ -53,7 +55,7 @@ export async function signUp(input: SignUpInput) {
       withCredentials: true,
     }
   )
-  return data as { message: string }
+  return data as { access_token: string, token_type: string,id: string,  email: string }
 
 }
 

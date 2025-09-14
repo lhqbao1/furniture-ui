@@ -11,38 +11,49 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { useSignUp } from "@/features/auth/hook"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Eye, EyeOff, Key, Loader2 } from "lucide-react"
+import { useRouter } from "@/src/i18n/navigation"
+import { useTranslations } from "next-intl"
 
-const formSchema = z.object({
-  email: z.string().email("Invalid email"),
-  first_name: z.string().min(1, "Required"),
-  last_name: z.string().min(1, "Required"),
-  phone_number: z.string().min(6, "Invalid phone"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters long")
-    .refine((val) => /[a-z]/.test(val), {
-      message: "Password must contain at least one lowercase letter",
-    })
-    .refine((val) => /[A-Z]/.test(val), {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .refine((val) => /\d/.test(val), {
-      message: "Password must contain at least one number",
-    }),
-  confirmPassword: z.string().min(1, "Confirm your password"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-})
 
 export default function SignUpForm() {
   const [seePassword, setSeePassword] = React.useState(false)
-
+  const t = useTranslations()
   const signUp = useSignUp()
   const router = useRouter()
+
+  const formSchema = z.object({
+    email: z
+      .string()
+      .min(1, t('emailRequired'))
+      .email(t('invalidEmail')),
+    first_name: z.string().min(1, { message: t('first_name_required') }),
+    last_name: z.string().min(1, { message: t('last_name_required') }),
+    phone_number: z
+      .string()
+      .min(6, { message: t('phone_number_short') })
+      .refine((val) => /^\+?[0-9]+$/.test(val), {
+        message: t('phone_number_invalid'),
+      }),
+    password: z
+      .string()
+      .min(8, t('passwordMin'))
+      .refine((val) => /[a-z]/.test(val), {
+        message: t('passwordLower'),
+      })
+      .refine((val) => /[A-Z]/.test(val), {
+        message: t('passwordUpper'),
+      })
+      .refine((val) => /\d/.test(val), {
+        message: t('passwordNumber'),
+      }),
+    confirmPassword: z.string().min(1, t('confirm_password_required')),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('confirm_password_mismatch'),
+    path: ["confirmPassword"],
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -86,7 +97,7 @@ export default function SignUpForm() {
           alt=""
         />
         <h1 className="text-3xl font-semibold text-secondary text-center font-libre flex gap-1">
-          <span>Welcome to</span>
+          <span>{t('welcomeTo')}</span>
           <span className="text-primary">Prestige Home</span>
         </h1>
       </div>
@@ -98,9 +109,9 @@ export default function SignUpForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="you@example.com" {...field} />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +122,7 @@ export default function SignUpForm() {
             name="phone_number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mobile</FormLabel>
+                <FormLabel>{t('phone_number')}</FormLabel>
                 <FormControl>
                   <PhoneInput
                     country={'de'} // default Germany
@@ -119,7 +130,6 @@ export default function SignUpForm() {
                     onChange={(phone) => field.onChange(phone)}
                     inputStyle={{ fontSize: '16px', borderRadius: 6, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", borderColor: '#e5e5e5' }}
                   />
-                  {/* <Input placeholder="+49" {...field} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -130,9 +140,9 @@ export default function SignUpForm() {
             name="first_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="">First Name</FormLabel>
+                <FormLabel className="">{t('first_name')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="John" {...field} />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -143,9 +153,9 @@ export default function SignUpForm() {
             name="last_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Last Name</FormLabel>
+                <FormLabel>{t('last_name')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Doe" {...field} />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -156,7 +166,7 @@ export default function SignUpForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('password')}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
@@ -175,7 +185,7 @@ export default function SignUpForm() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>{t('confirm_password')}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
@@ -194,7 +204,7 @@ export default function SignUpForm() {
             <Button type="submit" className="bg-primary/90 hover:bg-primary lg:px-12 px-4 py-6 text-lg" hasEffect>
               {signUp.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : 'Create Account'}
+              ) : <div className="capitalize">{t('createAccount')}</div>}
             </Button>
           </div>
         </form>

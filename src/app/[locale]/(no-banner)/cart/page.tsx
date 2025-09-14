@@ -1,5 +1,4 @@
 'use client'
-import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
@@ -7,16 +6,39 @@ import { useGetCartItems } from '@/features/cart/hook'
 import CartSummary from '@/components/layout/cart/cart-summary'
 import CartTable from '@/components/layout/cart/cart-table'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
+import { useCartLocal } from '@/hooks/cart'
+import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
+import { Link, useRouter } from '@/src/i18n/navigation'
+import { getCartItems } from '@/features/cart/api'
 
 
 const CartPage = () => {
-    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useGetCartItems()
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) setUserId(storedUserId);
+    }, []);
+
+    const { cart: localCart, addToCartLocal, updateCart } = useCartLocal();
+    const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
+        queryKey: ["cart-items", userId],
+        queryFn: async () => {
+            const data = await getCartItems()
+            // Sort theo created_at giảm dần (mới nhất lên trước)
+            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            return data
+        },
+        retry: false,
+        enabled: !!userId
+    })
+
+    const displayedCart = userId ? cart?.items ?? [] : localCart;
+    const { updateStatus } = useCartLocal()
+
     const router = useRouter()
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
-    const [userId, setUserId] = useState<string | null>(null)
 
     // get userId from localStorage (client side)
     useEffect(() => {
@@ -25,29 +47,29 @@ const CartPage = () => {
     }, [])
 
     // Call api get address if userId
-    const { data: addresses } = useQuery({
-        queryKey: ["address-by-user"],
-        queryFn: () => getAddressByUserId(userId!),
-        retry: false,
-        enabled: !!userId,
-    })
+    // const { data: addresses } = useQuery({
+    //     queryKey: ["address-by-user"],
+    //     queryFn: () => getAddressByUserId(userId!),
+    //     retry: false,
+    //     enabled: !!userId,
+    // })
 
-    const { data: invoiceAddress } = useQuery({
-        queryKey: ["invoice-address-by-user"],
-        queryFn: () => getInvoiceAddressByUserId(userId!),
-        retry: false,
-        enabled: !!userId,
-    })
+    // const { data: invoiceAddress } = useQuery({
+    //     queryKey: ["invoice-address-by-user"],
+    //     queryFn: () => getInvoiceAddressByUserId(userId!),
+    //     retry: false,
+    //     enabled: !!userId,
+    // })
 
     //Calculate total amount 
     const total =
-        cart?.items
-            ?.filter((item) => item.is_active)
-            .reduce(
-                (acc, item) =>
-                    acc + (localQuantities[item.id] ?? item.quantity) * item.item_price,
-                0
-            ) ?? 0
+        displayedCart
+            ?.filter(item => item.is_active)
+            .reduce((acc, item) => {
+                const key = 'id' in item ? item.id : item.product_id;
+                const quantity = localQuantities[key ?? ''] ?? item.quantity;
+                return acc + quantity * item.item_price;
+            }, 0) ?? 0;
 
     //Handle when user click proceed to checkout
     // Proceed checkout
@@ -61,25 +83,27 @@ const CartPage = () => {
             }
 
             // Kiểm tra address
-            const hasShippingAddress = (addresses?.length ?? 0) > 0
-            const hasInvoiceAddress = invoiceAddress
+            // const hasShippingAddress = (addresses?.length ?? 0) > 0
+            // const hasInvoiceAddress = invoiceAddress
 
-            if (!hasShippingAddress || !hasInvoiceAddress) {
-                toast.error("Missing addresses", {
-                    description: (
-                        <div className='flex flex-col gap-2'>
-                            You need to create at least one shipping address and one invoice address.
-                            <Link href="/contact" className="underline text-red-600">
-                                Create address
-                            </Link>
-                        </div>
-                    ),
-                })
-                return
-            }
+            // if (!hasShippingAddress || !hasInvoiceAddress) {
+            //     toast.error("Missing addresses", {
+            //         description: (
+            //             <div className='flex flex-col gap-2'>
+            //                 You need to create at least one shipping address and one invoice address.
+            //                 <Link href="/contact" className="underline text-red-600">
+            //                     Create address
+            //                 </Link>
+            //             </div>
+            //         ),
+            //     })
+            //     return
+            // }
 
             // Navigate checkout
             router.push('/check-out')
+        } else {
+            router.push("/check-out")
         }
     }
 
@@ -101,12 +125,26 @@ const CartPage = () => {
                 <div className="w-full max-w-6xl mx-auto p-6">
                     <div className="grid grid-cols-12 xl:gap-16 gap-6">
                         {/* Left: Cart Items */}
-                        <CartTable
-                            isLoadingCart={isLoadingCart}
-                            cart={cart}
-                            localQuantities={localQuantities}
-                            setLocalQuantities={setLocalQuantities}
-                        />
+                        {
+                            userId ? (<CartTable
+                                isLoadingCart={isLoadingCart}
+                                cart={cart}
+                                localQuantities={localQuantities}
+                                setLocalQuantities={setLocalQuantities}
+                            />) :
+                                (
+                                    <CartLocalTable
+                                        data={localCart}
+                                        onToggleItem={(product_id, is_active) =>
+                                            updateStatus({ product_id, is_active })
+                                        }
+                                        onToggleAll={(is_active) => {
+                                            localCart.forEach(item => updateStatus({ product_id: item.product_id, is_active }))
+                                        }}
+                                    />
+
+                                )
+                        }
 
                         {/* Right: Summary */}
                         <div className='col-span-12 md:col-span-4'>

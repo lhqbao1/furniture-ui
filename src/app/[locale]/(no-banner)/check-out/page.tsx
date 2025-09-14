@@ -10,10 +10,9 @@ import { Button } from "@/components/ui/button"
 import PaymentMethodSelector from '@/components/layout/checkout/method'
 import ProductVoucher from '@/components/shared/product-voucher'
 import { Textarea } from '@/components/ui/textarea'
-import { useGetAddressByUserId, useGetInvoiceAddressByUserId } from '@/features/address/hook'
-import { CreateOrderFormValues, CreateOrderSchema } from '@/lib/schema/checkout'
+import { useCreateAddress, useCreateInvoiceAddress, useGetAddressByUserId, useGetInvoiceAddressByUserId } from '@/features/address/hook'
 import { toast } from 'sonner'
-import { useGetCartItems } from '@/features/cart/hook'
+import { useGetCartItems, useSyncLocalCart } from '@/features/cart/hook'
 import CartTable from '@/components/layout/cart/cart-table'
 import { useCreateCheckOut } from '@/features/checkout/hook'
 import { useCreatePayment } from '@/features/payment/hook'
@@ -27,6 +26,19 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import AddressSkeleton from '@/components/layout/checkout/address-skeleton'
 import { useTranslations } from 'next-intl'
 import { Voucher } from '@/types/voucher'
+import z from 'zod'
+import CheckOutInvoiceAddress from '@/components/layout/checkout/invoice-address'
+import { CheckOutShippingAddress } from '@/components/layout/checkout/shipping-address'
+import { CheckOutPassword } from '@/components/layout/checkout/password'
+import { useCartLocal } from '@/hooks/cart'
+import { useGetUserById } from '@/features/users/hook'
+import { useQuery } from '@tanstack/react-query'
+import { User } from '@/types/user'
+import { getUserById } from '@/features/users/api'
+import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
+import { getCartItems } from '@/features/cart/api'
+import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
+import { useLogin, useSignUp } from '@/features/auth/hook'
 
 export interface CartItem {
     id: number
@@ -43,11 +55,15 @@ export interface CartItem {
 
 export default function CheckOutPage() {
     const [userId, setUserId] = useState<string>("")
+    const [isCreatePassword, setIsCreatePassword] = useState<boolean>(false)
     const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
     const [checkout, setCheckOut] = useAtom(checkOutIdAtom)
     const router = useRouter()
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
     const t = useTranslations()
+
+    const { updateStatus } = useCartLocal()
+
 
     const checkOutBreadcrumb = [
         { label: t('wishlist'), icon: 'wishlist.svg', url: '/wishlist' },
@@ -56,29 +72,55 @@ export default function CheckOutPage() {
         { label: t('tracking'), icon: 'tracking.svg', url: '/' },
     ]
 
-    const vouchers: Voucher[] = [
-        {
-            id: 1,
-            title: t('voucher200'),
-            type: t('discount'),
-            discountAmount: 10,
-            code: 'MO200200'
-        },
-        {
-            id: 2,
-            title: t('voucher300'),
-            type: t('discount'),
-            discountAmount: 15,
-            code: 'MO300300'
-        },
-        {
-            id: 3,
-            title: t('voucher500'),
-            type: t('discount'),
-            discountAmount: 20,
-            code: 'MO500500'
-        }
-    ];
+    const CreateOrderSchema = z.object({
+        shipping_address_id: z.string().optional(),
+        invoice_address_id: z.string().optional(),
+        cart_id: z.string().optional(),
+        payment_method: z.string().min(1, "You need to choose payment method"),
+        note: z.string().optional().nullable(),
+        coupon_amount: z.number().optional().nullable(),
+        voucher_amount: z.number().optional().nullable(),
+        terms: z.boolean().refine(val => val === true),
+
+        first_name: z.string().min(1, { message: t('first_name_required') }),
+        last_name: z.string().min(1, { message: t('last_name_required') }),
+        invoice_address_line: z.string().min(1, { message: t('last_name_required') }),
+        invoice_postal_code: z.string().min(1, { message: t('last_name_required') }),
+        invoice_city: z.string().min(1, { message: t('last_name_required') }),
+        email: z
+            .string()
+            .min(1, t('emailRequired'))
+            .email(t('invalidEmail')),
+        phone_number: z
+            .string()
+            .min(6, { message: t('phone_number_short') })
+            .refine((val) => /^\+?[0-9]+$/.test(val), {
+                message: t('phone_number_invalid'),
+            }),
+
+        shipping_address_line: z.string().min(1, { message: t('last_name_required') }),
+        shipping_postal_code: z.string().min(1, { message: t('last_name_required') }),
+        shipping_city: z.string().min(1, { message: t('last_name_required') }),
+
+        password: z
+            .string()
+            .min(8, t('passwordMin'))
+            .refine((val) => /[a-z]/.test(val), {
+                message: t('passwordLower'),
+            })
+            .refine((val) => /[A-Z]/.test(val), {
+                message: t('passwordUpper'),
+            })
+            .refine((val) => /\d/.test(val), {
+                message: t('passwordNumber'),
+            }),
+        confirmPassword: z.string().min(1, t('confirm_password_required')),
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: t('confirm_password_mismatch'),
+        path: ["confirmPassword"],
+    })
+
+    type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
 
 
     // SSR-safe: chỉ đọc localStorage sau khi client mounted
@@ -87,31 +129,119 @@ export default function CheckOutPage() {
         if (storedId) setUserId(storedId)
     }, [])
 
-    const [selectedVoucher, setSelectedVoucher] = useState<number>()
-    const { data: addresses } = useGetAddressByUserId(userId)
-    const { data: cartItems, isLoading: isLoadingCart } = useGetCartItems()
-    const { data: invoiceAddress } = useGetInvoiceAddressByUserId(userId)
+    const { data: user } = useQuery<User>({
+        queryKey: ["user", userId],
+        queryFn: () => getUserById(userId),
+        enabled: !!userId,
+    })
+
+    const { data: addresses } = useQuery({
+        queryKey: ["address-by-user", userId],
+        queryFn: () => getAddressByUserId(userId),
+        retry: false,
+        enabled: !!userId,
+    })
+
+    const { data: invoiceAddress } = useQuery({
+        queryKey: ["invoice-address-by-user", userId],
+        queryFn: () => getInvoiceAddressByUserId(userId),
+        retry: false,
+        enabled: !!userId,
+    })
+
+    const { cart: localCart, addToCartLocal, updateCart } = useCartLocal();
+    const { data: cartItems, isLoading: isLoadingCart } = useQuery({
+        queryKey: ["cart-items", userId],
+        queryFn: async () => {
+            const data = await getCartItems()
+            // Sort theo created_at giảm dần (mới nhất lên trước)
+            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            return data
+        },
+        enabled: !!userId,
+        retry: true
+    })
+
     const createCheckOutMutation = useCreateCheckOut()
     const createPaymentMutation = useCreatePayment()
+    const createUserAccountMutation = useSignUp()
+    const createInvoiceAddressMutation = useCreateInvoiceAddress()
+    const createShippingAddressMutation = useCreateAddress()
+    const loginMutation = useLogin()
+    const syncLocalCartMutation = useSyncLocalCart();
 
 
-    const handleSelectVoucher = useCallback((item: number) => {
-        setSelectedVoucher(item)
-    }, [])
+    // const [selectedVoucher, setSelectedVoucher] = useState<number>()
+
+    // const handleSelectVoucher = useCallback((item: number) => {
+    //     setSelectedVoucher(item)
+    // }, [])
 
     const form = useForm<CreateOrderFormValues>({
         resolver: zodResolver(CreateOrderSchema),
         defaultValues: {
             shipping_address_id: "",
             invoice_address_id: "",
+            cart_id: "",
             payment_method: "paypal",
-            cart_id: '',
-            note: '',
+            note: "",
             coupon_amount: 0,
             voucher_amount: 0,
-            terms: false
+            terms: false,
+
+            first_name: "",
+            last_name: "",
+            invoice_address_line: "",
+            invoice_postal_code: "",
+            invoice_city: "",
+            email: "",
+            phone_number: "",
+
+            shipping_address_line: "",
+            shipping_postal_code: "",
+            shipping_city: "",
+
+            password: "",
+            confirmPassword: "",
         },
     })
+
+    useEffect(() => {
+        const defaults: Partial<CreateOrderFormValues> = {}
+
+        if (user) {
+            defaults.first_name = user.first_name ?? ""
+            defaults.last_name = user.last_name ?? ""
+            defaults.email = user.email ?? ""
+            defaults.phone_number = user.phone_number ?? ""
+        }
+
+        if (invoiceAddress) {
+            defaults.invoice_address_line = invoiceAddress.address_line ?? ""
+            defaults.invoice_postal_code = invoiceAddress.postal_code ?? ""
+            defaults.invoice_city = invoiceAddress.city ?? ""
+            defaults.invoice_address_id = invoiceAddress.id
+        }
+
+        if (addresses && addresses.length > 0) {
+            const shippingAddress = addresses.find(a => a.is_default)
+
+            if (shippingAddress) {
+                defaults.shipping_address_line = shippingAddress.address_line ?? ""
+                defaults.shipping_postal_code = shippingAddress.postal_code ?? ""
+                defaults.shipping_city = shippingAddress.city ?? ""
+                defaults.shipping_address_id = shippingAddress.id
+            }
+        }
+
+        if (Object.keys(defaults).length > 0) {
+            form.reset({
+                ...form.getValues(), // giữ nguyên các field khác
+                ...defaults,         // override field có data
+            })
+        }
+    }, [user, invoiceAddress, addresses, form])
+
 
     const couponAmount = form.watch('coupon_amount')
     const voucherAmount = form.watch('voucher_amount')
@@ -127,28 +257,112 @@ export default function CheckOutPage() {
     }, [cartItems, invoiceAddress, form])
 
 
-    const handleSubmit = useCallback((data: CreateOrderFormValues) => {
-        createCheckOutMutation.mutate(data, {
-            onSuccess(data, variables, context) {
-                toast.success('Place order successful')
-                setCheckOut(data.id)
-                createPaymentMutation.mutate({ checkout_id: data.id }, {
-                    onSuccess(payment, variables, context) {
-                        toast.success('Place payment successful')
-                        setPaymentId(payment.payment_id)
-                        router.push(payment.approve_url)
-                    },
-                    onError(error, variables, context) {
-                        toast.error('Place payment error')
+    const handleSubmit = useCallback(
+        async (data: CreateOrderFormValues) => {
+            try {
+                let userId = user?.id
+                let invoiceAddressId = invoiceAddress?.id
+                let shippingAddressId = addresses?.find(a => a.is_default)?.id
+
+                // Nếu chưa có user thì tạo mới
+                if (!userId) {
+                    const newUser = await createUserAccountMutation.mutateAsync({
+                        first_name: data.first_name,
+                        last_name: data.last_name,
+                        email: data.email,
+                        phone_number: data.phone_number,
+                        password: data.password,
+                    })
+                    userId = newUser.id
+
+                    // Sau khi tạo account thành công → gọi login
+                    const loginRes = await loginMutation.mutateAsync({
+                        username: data.email,
+                        password: data.password,
+                    })
+
+                    // Lưu token + userId vào localStorage
+                    localStorage.setItem("access_token", loginRes.access_token)
+                    localStorage.setItem("userId", loginRes.id)
+
+                    // Sync local cart
+                    syncLocalCartMutation.mutate()
+
+                    toast.success("Account created & logged in successfully")
+                    userId = loginRes.id
+                }
+
+                // Nếu chưa có invoice address thì tạo mới
+                if (!invoiceAddressId) {
+                    const newInvoice = await createInvoiceAddressMutation.mutateAsync({
+                        user_id: userId,
+                        recipient_name: data.first_name + data.last_name,
+                        postal_code: data.invoice_postal_code,
+                        phone_number: data.phone_number,
+                        address_line: data.invoice_address_line,
+                        city: data.invoice_city,
+                        country: data.invoice_city,
+                        name_address: "Invoice",
+                        state: data.invoice_city
+                    })
+                    invoiceAddressId = newInvoice.id
+                }
+
+                // Nếu chưa có shipping address thì tạo mới
+                if (!shippingAddressId) {
+                    const newShipping = await createShippingAddressMutation.mutateAsync({
+                        user_id: userId,
+                        recipient_name: data.first_name + data.last_name,
+                        postal_code: data.invoice_postal_code,
+                        phone_number: data.phone_number,
+                        address_line: data.invoice_address_line,
+                        city: data.shipping_city,
+                        country: data.shipping_city,
+                        name_address: "Rechnung",
+                        is_default: true,
+                        state: data.shipping_city
+                    })
+                    shippingAddressId = newShipping.id
+                }
+
+                // Đợi cartItems
+                if (!cartItems?.id) {
+                    const latestCart = await getCartItems()
+                    if (!latestCart?.id) {
+                        toast.error("Cart not found")
+                        return
                     }
+                    data.cart_id = latestCart.id
+                } else {
+                    data.cart_id = cartItems.id
+                }
+
+                // Tạo checkout
+                const checkout = await createCheckOutMutation.mutateAsync({
+                    ...data,
+                    // user_id: userId,
+                    invoice_address_id: invoiceAddressId,
+                    shipping_address_id: shippingAddressId,
                 })
-            },
-            onError(error, variables, context) {
-                toast.error('Place order error')
-                console.log(error)
+                toast.success("Place order successful")
+                setCheckOut(checkout.id)
+
+                // Tạo payment
+                const payment = await createPaymentMutation.mutateAsync({
+                    checkout_id: checkout.id,
+                })
+
+                toast.success("Place payment successful")
+                setPaymentId(payment.payment_id)
+                router.push(payment.approve_url)
+            } catch (error) {
+                toast.error("Checkout failed")
+                console.error(error)
             }
-        })
-    }, [])
+        },
+        [user, invoiceAddress, addresses]
+    )
+
 
 
     return (
@@ -167,18 +381,21 @@ export default function CheckOutPage() {
                 className='flex flex-col gap-8 section-padding'
             >
                 {/* Breadcrumb */}
-                <div className='flex justify-center items-center lg:gap-12 gap-3 border-b pb-3'>
+                {/* <div className='flex justify-center items-center lg:gap-12 gap-3 border-b pb-3'>
                     {checkOutBreadcrumb.map((item, index) => (
                         <Link href={item.url} key={index} className='flex flex-col gap-2 items-center justify-center'>
                             <Image src={`/${item.icon}`} width={50} height={50} alt='' className='size-12' />
                             <div className='font-semibold text-lg text-secondary'>{item.label}</div>
                         </Link>
                     ))}
-                </div>
+                </div> */}
+                <h2 className='section-header'>{t('order')}</h2>
 
-                {/* Shipping Address */}
+                {/* Main container */}
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:px-52 md:px-14 px-4'>
-                    <div className='col-span-1 space-y-4 lg:space-y-12'>
+
+                    {/* Shipping Address */}
+                    {/* <div className='col-span-1 space-y-4 lg:space-y-12'>
                         <div className='space-y-4'>
                             <div className='text-base font-semibold'>{t('shippingAddress')}</div>
                             <AddressSelector addresses={addresses ? addresses : []} name="shipping_address_id" />
@@ -210,11 +427,16 @@ export default function CheckOutPage() {
                         </div>
 
                         <PaymentMethodSelector />
+                    </div> */}
+                    <div className='col-span-1 space-y-4 lg:space-y-12'>
+                        <CheckOutInvoiceAddress />
+                        <CheckOutShippingAddress />
+                        {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />}
                     </div>
 
-
-                    <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <CartTable
+                    {/* Table cart and total */}
+                    <div className='col-span-1 space-y-4 lg:space-y-4'>
+                        {/* <CartTable
                             cart={
                                 cartItems
                                     ? {
@@ -227,7 +449,37 @@ export default function CheckOutPage() {
                             isCheckout
                             localQuantities={localQuantities}
                             setLocalQuantities={setLocalQuantities}
-                        />
+                        /> */}
+
+                        {
+                            cartItems ? (<CartTable
+                                isLoadingCart={isLoadingCart}
+                                cart={
+                                    cartItems
+                                        ? {
+                                            ...cartItems,
+                                            items: cartItems.items.filter((item) => item.is_active)
+                                        }
+                                        : undefined
+                                }
+                                localQuantities={localQuantities}
+                                setLocalQuantities={setLocalQuantities}
+                                isCheckout
+                            />) :
+                                (
+                                    <CartLocalTable
+                                        data={localCart}
+                                        onToggleItem={(product_id, is_active) =>
+                                            updateStatus({ product_id, is_active })
+                                        }
+                                        onToggleAll={(is_active) => {
+                                            localCart.forEach(item => updateStatus({ product_id: item.product_id, is_active }))
+                                        }}
+                                        isCheckout
+                                    />
+
+                                )
+                        }
 
                         {/* <div className='space-y-3'>
                             <div className="text-lg font-semibold">{t('selectVoucher')}</div>
@@ -240,9 +492,9 @@ export default function CheckOutPage() {
                             </div>
                         </div> */}
 
-                        <div className='flex lg:flex-row flex-col gap-12 items-end'>
+                        <div className='grid grid-cols-2 gap-6 items-start'>
                             {/*Checkout note and term */}
-                            <div className='flex-1'>
+                            <div className='col-span-2 lg:col-span-1'>
                                 <FormField
                                     name='note'
                                     control={form.control}
@@ -251,7 +503,7 @@ export default function CheckOutPage() {
                                             <FormLabel className="text-lg font-semibold">{t('note')}</FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    className='min-h-24'
+                                                    className='min-h-20'
                                                     {...field}
                                                     value={field.value ?? ""}
                                                 />
@@ -260,73 +512,95 @@ export default function CheckOutPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="terms" // chỉ dùng cho validation, không map vào schema gửi lên backend
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <div className="flex flex-row gap-2 mt-4 items-center">
-                                                <Checkbox
-                                                    checked={field.value}
-                                                    onCheckedChange={(checked) => field.onChange(checked)}
-                                                />
-                                                <FormLabel className="text-sm flex flex-row">
-                                                    <span className='space-x-2'>
-                                                        {t('byPlacing')}
-                                                        <span className='pl-2'>
-                                                            <Link href="/policy" className="text-secondary underline">
-                                                                {t('termCondition')}
-                                                            </Link>
-                                                        </span>
-                                                    </span>
-                                                </FormLabel>
-                                            </div>
-                                        </FormItem>
-                                    )}
-                                />
-
                             </div>
 
                             {/*Checkout total */}
-                            <div className='text-sm space-y-2'>
-                                <div className='flex gap-6 justify-end'>
-                                    <span>{t('subTotalInclude')}</span>
-                                    <span>
-                                        €{cartItems?.items
-                                            .filter((item) => item.is_active === true)
-                                            .reduce((total, item) => total + item.final_price, 0)
-                                            .toFixed(2)}
+                            <div className='text-sm space-y-2 col-span-2 lg:col-span-1'>
+                                <div className='grid grid-cols-5'>
+                                    <span className='col-span-3 text-right'>{t('subTotalInclude')}</span>
+                                    <span className='text-right col-span-2'>
+                                        €{(
+                                            (cartItems?.items && cartItems.items.length > 0
+                                                ? cartItems.items
+                                                    .filter((item) => item.is_active)
+                                                    .reduce((total, item) => total + item.final_price, 0)
+                                                : localCart
+                                                    ?.filter((item) => item.is_active)
+                                                    .reduce(
+                                                        (total, item) => total + (item.item_price ?? 0) * (item.quantity ?? 1),
+                                                        0
+                                                    )) ?? 0
+                                        ).toFixed(2)}
                                     </span>
                                 </div>
-                                <div className='flex gap-6 justify-end'>
-                                    <span>{t('shipping')}</span>
-                                    <span>€5.95</span>
+                                <div className='grid grid-cols-5'>
+                                    <span className='col-span-3 text-right'>{t('shipping')}</span>
+                                    <span className='text-right col-span-2'>€5.95</span>
                                 </div>
-                                <div className='flex gap-6 justify-end'>
-                                    <span>{t('discount')}</span>
-                                    <span>€0</span>
+                                <div className='grid grid-cols-5'>
+                                    <span className='col-span-3 text-right'>{t('discount')}</span>
+                                    <span className='text-right col-span-2'>€0</span>
                                 </div>
-                                <div className='flex gap-6 justify-end text-xl text-primary font-bold'>
-                                    <span>{t('total')}</span>
-                                    <span>
-                                        €{(
+                                <div className='grid grid-cols-5 text-xl text-primary font-bold'>
+                                    <span className='col-span-3 text-right'>{t('total')}</span>
+                                    <span className='text-right col-span-2'>
+                                        €{
                                             (
-                                                (cartItems?.items
-                                                    .filter((item) => item.is_active === true)
-                                                    .reduce((total, item) => total + item.final_price, 0) ?? 0) +
+                                                (cartItems?.items && cartItems.items.length > 0
+                                                    ? cartItems.items
+                                                        .filter((item) => item.is_active === true)
+                                                        .reduce((total, item) => total + item.final_price, 0)
+                                                    : localCart
+                                                        ?.filter((item) => item.is_active === true)
+                                                        .reduce(
+                                                            (total, item) => total + (item.item_price ?? 0) * (item.quantity ?? 1),
+                                                            0
+                                                        ) ?? 0) +
                                                 5.95 -
                                                 (couponAmount ?? 0) -
                                                 (voucherAmount ?? 0)
                                             ).toFixed(2)
-                                        )}
+                                        }
+
                                     </span>
-                                </div>
-                                <div className='flex justify-end'>
-                                    <Button type="submit">{t('continue')}</Button>
                                 </div>
                             </div>
                         </div>
+
+                        <div className='space-y-4 py-5 border-y-2'>
+                            <div className='font-bold text-base'>{t('selectPayment')}</div>
+                            <PaymentMethodSelector />
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="terms" // chỉ dùng cho validation, không map vào schema gửi lên backend
+                            render={({ field }) => (
+                                <FormItem>
+                                    <div className="flex flex-row gap-2 mt-4 items-center">
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={(checked) => field.onChange(checked)}
+                                        />
+                                        <FormLabel className="text-sm flex flex-row">
+                                            <span className='space-x-2'>
+                                                {t('byPlacing')}
+                                                <span className='pl-2'>
+                                                    <Link href="/policy" className="text-secondary underline">
+                                                        {t('termCondition')}
+                                                    </Link>
+                                                </span>
+                                            </span>
+                                        </FormLabel>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                        <div className='flex lg:justify-end justify-center'>
+                            <Button type="submit" className='text-lg lg:w-1/3 w-1/2 py-6'>{t('continue')}</Button>
+                        </div>
                     </div>
+
+
                 </div>
             </form>
         </FormProvider>

@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addToCart, deleteCartItem, getCartById, getCartItems, quickAddToCart, updateCartItemQuantity, updateCartItemStatus } from "./api";
+import {  CartItemLocal, getCart, saveCart } from "@/lib/utils/cart";
+import { toast } from "sonner";
 
 
 export function useGetCartItems() {
@@ -73,3 +75,29 @@ export function useUpdateCartItemStatus(){
         },
     })
 }
+
+export function useSyncLocalCart() {
+    const qc = useQueryClient();
+  
+    return useMutation({
+      mutationFn: async () => {
+        const localCart: CartItemLocal[] = getCart();
+        if (!localCart.length) return;
+  
+        for (const item of localCart) {
+          const res =  await addToCart(item.product_id, item.quantity);
+        }
+  
+        saveCart([]); // clear local cart sau khi sync
+        return true;
+      },
+      onSuccess: () => {
+        qc.refetchQueries({ queryKey: ["cart-items"] });
+        toast.success("Cart synced successfully!");
+      },
+      onError: (err) => {
+        console.error("Error syncing cart:", err);
+        toast.error("Failed to sync cart.");
+      },
+    });
+  }

@@ -10,22 +10,11 @@ export const accountSchema = z.object({
   avatar_url: z.string().optional().nullable(),
   date_of_birth: z
   .string()
-  .nullable()
   .optional()
-  .transform((val) => {
-    if (!val) return null
-    return new Date(val).toISOString()
-  }),
+  .nullable()
+  ,
   language: z.string().optional(),
-  is_notified: z.boolean(),
-  created_at: z.string().optional().nullable().transform((val) => {
-    if (!val) return null
-    return new Date(val).toISOString()
-  }),
-  updated_at: z.string().optional().nullable().transform((val) => {
-    if (!val) return null
-    return new Date(val).toISOString()
-  }),
+  is_notified: z.boolean().optional(),
 })
 
 export type AccountFormValues = z.infer<typeof accountSchema>
@@ -38,9 +27,7 @@ export const accountDefaultValues: AccountFormValues = {
   last_name: "",
   is_active: false,
   avatar_url: "",
-  date_of_birth: new Date().toISOString(), // mặc định hôm nay
   language: "en",
   is_notified: false,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
+  date_of_birth: ""
 }

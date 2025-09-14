@@ -88,11 +88,11 @@ export const GetCartColumns = ({
         {
             accessorKey: "item_price",
             header: () => <div className="text-right">{t('price')}</div>,
-            cell: ({ row }) => <div className="font-semibold text-primary text-right">€{row.original.item_price.toFixed(2)}</div>,
+            cell: ({ row }) => <div className="font-semibold text-right">€{row.original.item_price.toFixed(2)}</div>,
         },
         {
             accessorKey: "quantity",
-            header: t('quantity'),
+            header: () => <div className="text-center">{t('quantity')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
@@ -129,17 +129,14 @@ export const GetCartColumns = ({
         },
         {
             id: "actions",
-            header: t('actions'),
+            header: () => <div className="text-right">{t('actions')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 return (
-                    <Button
-                        variant="ghost"
-                        className="text-red-500 cursor-pointer"
-                        onClick={() => onDeleteItem(item)}
-                    >
-                        <Trash />
-                    </Button>
+                    <div className="flex justify-end">
+                        <Trash className="text-red-500 cursor-pointer"
+                            onClick={() => onDeleteItem(item)} size={20} />
+                    </div>
                 )
             },
         },

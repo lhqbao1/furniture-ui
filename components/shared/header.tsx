@@ -10,7 +10,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ChevronDown, Mic, Search, ShoppingCart, User } from 'lucide-react'
@@ -28,21 +27,24 @@ import MobileProductSearch from './mobile-product-search';
 import { getCartItems } from '@/features/cart/api';
 import { toast } from 'sonner';
 import { getMe } from '@/features/auth/api';
-import Link from 'next/link';
+import { Link, useRouter } from '@/src/i18n/navigation';
+import { useCartLocal } from '@/hooks/cart';
 
 
 const PageHeader = () => {
     const router = useRouter()
-    const pathname = usePathname()
     const t = useTranslations()
 
 
     const isPhone = useMediaQuery({ maxWidth: 430 })
     const queryClient = useQueryClient();
 
-    const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+    const [userId, setUserId] = React.useState<string | null>(
+        typeof window !== "undefined" ? localStorage.getItem("userId") : null
+    );
 
-
+    //Get cart local and server
+    const { cart: localCart, addToCartLocal, updateCart } = useCartLocal();
     const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
         queryKey: ["cart-items", userId],
         queryFn: async () => {
@@ -53,6 +55,7 @@ const PageHeader = () => {
         enabled: !!userId,
         retry: false,
     })
+
     const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useQuery({
         queryKey: ["me", userId],
         queryFn: () => getMe(),
@@ -66,12 +69,19 @@ const PageHeader = () => {
         localStorage.removeItem("userId");
         localStorage.removeItem("checkout");
         localStorage.removeItem("payment");
-        toast.success("Logged out successfully")
-        // Reset react-query cache
-        queryClient.removeQueries({ queryKey: ["me"] }); // xoá query user
-        queryClient.removeQueries({ queryKey: ["cart-items"] }); // xoá cart
-        queryClient.clear(); // tùy chọn xóa tất cả cache
+
+        toast.success("Logged out successfully");
+
+        // Reset react-query cache liên quan đến user/session
+        queryClient.removeQueries({ queryKey: ["me"], exact: true });
+        queryClient.removeQueries({ queryKey: ["user"], exact: true });
+
+        setUserId(null); // cập nhật lại state để trigger re-render
+        // queryClient.removeQueries({ queryKey: ["cart-items"], exact: true });
     }
+
+    const displayedCart = userId ? cart?.items ?? [] : localCart;
+
 
     return (
         <div className={`home-banner-top__content ${isPhone ? 'sticky top-0 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 overflow-hidden' : 'flex items-center justify-end px-4 py-3 gap-6 sticky bg-white shadow-secondary/10 shadow-xl z-50 top-0'}`}>
@@ -84,9 +94,9 @@ const PageHeader = () => {
                     unoptimized
                 />
             </div>
-            <div className="font-libre text-[29px] flex gap-1">
-                <span className="text-secondary font-semibold">Prestige</span>
-                <span className="text-primary font-semibold">Home</span>
+            <div className={`font-libre text-[29px] flex gap-1 ${isPhone ? 'hidden' : 'block'}`}>
+                <span className="text-secondary font-bold">Prestige</span>
+                <span className="text-primary font-bold">Home</span>
             </div>
             {/*Product search desktop */}
             <div className={`${isPhone ? 'hidden' : 'block w-full'}`}>
@@ -125,13 +135,18 @@ const PageHeader = () => {
                     <MobileProductSearch />
                 </div>
 
+                <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
                 {/*Shopping cart */}
                 <Link href={'/cart'} className={`cursor-pointer relative`}>
                     <ShoppingCart stroke={`${isPhone ? '#00B159' : '#4D4D4D'}`} size={30} className='hover:scale-110 transition-all duration-300' />
-                    <div className='absolute -top-4 -right-4 text-white bg-primary py-1 px-3 rounded-full flex items-center text-sm'>{cart && cart.items ? cart.items.length : 0}</div>
+                    {displayedCart && displayedCart.length > 0 ?
+                        <span className="absolute -top-1.5 -right-1 flex size-3">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
+                        </span>
+                        : ''}
                 </Link>
 
-                <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
 
                 {/*User */}
                 <DropdownMenu >
@@ -165,6 +180,16 @@ const PageHeader = () => {
                                 <DropdownMenuItem onClick={onLogout}>
                                     {t('logout')}
                                 </DropdownMenuItem>
+                                <Link href={'/cart'} className='cursor-pointer'>
+                                    <DropdownMenuItem className='cursor-pointer'>
+                                        {t('cart')}
+                                    </DropdownMenuItem>
+                                </Link>
+                                <Link href={'/wishlist'} className='cursor-pointer'>
+                                    <DropdownMenuItem className='cursor-pointer'>
+                                        {t('wishlist')}
+                                    </DropdownMenuItem>
+                                </Link>
                             </>
                         )}
                     </DropdownMenuContent>
