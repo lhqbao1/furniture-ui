@@ -184,5 +184,7 @@
     "addressLine": "Address Line",
     "sameAsInvoice": "Same as invoice",
     "streetAndHouse": "Street & House number",
-    "selectPayment": "Select a Payment method"
+    "selectPayment": "Select a Payment method",
+    "newProducts": "New Products",
+    "sale": "Sale"
 }

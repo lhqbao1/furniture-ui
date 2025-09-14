@@ -51,6 +51,9 @@ export default function AppSidebar({ categories }: AppSidebarProps) {
     const pathname = usePathname()
     const router = useRouter()
 
+    const newProducts: MenuItem = { title: t("newProducts"), url: "/new-products", id: "new-products" };
+    const sale: MenuItem = { title: t("sale"), url: "/sale", id: "sale" };
+
     const accountMenu: MenuItem = {
         title: t("account"),
         url: "#",
@@ -63,10 +66,12 @@ export default function AppSidebar({ categories }: AppSidebarProps) {
         ],
     };
 
-    const items: MenuItem[] =
-        categories && categories.length > 0
-            ? [...mapCategories(categories), accountMenu] // nối thêm
-            : [accountMenu]; // nếu không có category vẫn có account
+    const items: MenuItem[] = [
+        newProducts,
+        sale,
+        ...(categories && categories.length > 0 ? mapCategories(categories) : []),
+        accountMenu
+    ];
 
 
     const [openItem, setOpenItem] = useState<string | null>()
@@ -156,7 +161,7 @@ export default function AppSidebar({ categories }: AppSidebarProps) {
 
                                 // Nếu không có children → render bình thường
                                 return (
-                                    <SidebarMenuItem key={item.id} className="flex justify-center">
+                                    <SidebarMenuItem key={item.id} className={`flex justify-start ${item.id === 'sale' ? 'border-b-2 border-black/50' : ''}`}>
                                         <SidebarMenuButton asChild>
                                             <Button
                                                 onClick={() => {

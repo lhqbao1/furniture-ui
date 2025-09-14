@@ -184,5 +184,7 @@
   "addressLine": "Adresse",
   "sameAsInvoice": "Wie die Rechnungsadresse",
   "streetAndHouse": "Straße & Hausnummer",
-  "selectPayment": "Wählen Sie die Zahlungsart aus."
+  "selectPayment": "Wählen Sie die Zahlungsart aus.",
+  "newProducts": "Neuheiten",
+  "sale": "Verkauf"
 }

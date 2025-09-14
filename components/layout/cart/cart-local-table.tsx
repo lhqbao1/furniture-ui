@@ -19,6 +19,7 @@ import Image from "next/image"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useCartLocal } from "@/hooks/cart"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 
 export type CartTableItem = {
     id?: string
@@ -50,6 +51,7 @@ export function CartLocalTable({
     // kiểm tra nếu tất cả đều active
     const allSelected = data.length > 0 && data.every((item) => item.is_active)
     const someSelected = data.some((item) => item.is_active)
+    const t = useTranslations()
 
     const onUpdateQuantity = (item: CartTableItem, newQuantity: number) => {
         if (newQuantity < 1) return
@@ -61,7 +63,7 @@ export function CartLocalTable({
     const baseColumns: ColumnDef<CartTableItem>[] = [
         {
             accessorKey: "product_name",
-            header: "Product",
+            header: () => <div>{t('product')}</div>,
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     {row.original.img_url && (
@@ -79,7 +81,7 @@ export function CartLocalTable({
         },
         {
             accessorKey: "quantity",
-            header: "Quantity",
+            header: () => <div>{t('quantity')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 return (
@@ -107,7 +109,7 @@ export function CartLocalTable({
         },
         {
             accessorKey: "final_price",
-            header: "Price",
+            header: () => <div>{t('price')}</div>,
             cell: ({ row }) => (
                 <div>${(row.original.item_price * row.original.quantity).toFixed(2)}</div>
             ),
