@@ -74,7 +74,7 @@ const PageHeader = () => {
     }
 
     return (
-        <div className={`home-banner-top__content ${isPhone ? 'fixed flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex items-center justify-end px-4 py-3 gap-6 sticky bg-white shadow-secondary/10 shadow-xl z-50 top-0'}`}>
+        <div className={`home-banner-top__content ${isPhone ? 'sticky top-0 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 overflow-hidden' : 'flex items-center justify-end px-4 py-3 gap-6 sticky bg-white shadow-secondary/10 shadow-xl z-50 top-0'}`}>
             <div className={`${isPhone ? 'block' : 'hidden'}`}>
                 <Image
                     src={'/new-logo.svg'}
