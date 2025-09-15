@@ -1,8 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { Mic, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
+import { Input } from "../ui/input"
+import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { useGetProductsSelect } from "@/features/product-group/hook"
+import { ProductItem } from "@/types/products"
+import Image from "next/image"
+import { useTranslations } from "next-intl"
 import {
     Command,
     CommandList,
@@ -10,13 +16,7 @@ import {
     CommandGroup,
     CommandItem,
 } from "@/components/ui/command"
-import { cn } from "@/lib/utils"
-import { useRouter } from "next/navigation"
-import { Input } from "../ui/input"
-import { useGetProductsSelect } from "@/features/product-group/hook"
-import { ProductItem } from "@/types/products"
-import Image from "next/image"
-import { useTranslations } from "next-intl"
+import { createPortal } from "react-dom"
 
 export default function ProductSearch({ height }: { height?: boolean }) {
     const t = useTranslations()
@@ -25,6 +25,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
     const [open, setOpen] = React.useState(false)
     const router = useRouter()
     const containerRef = React.useRef<HTMLDivElement>(null)
+    const inputRef = React.useRef<HTMLInputElement>(null)
 
     // debounce query
     React.useEffect(() => {
@@ -48,14 +49,24 @@ export default function ProductSearch({ height }: { height?: boolean }) {
     const { data: products, isLoading } = useGetProductsSelect(debouncedQuery)
     const results = products ?? []
 
+    // Tính toán vị trí dropdown
+    const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({})
+    React.useEffect(() => {
+        if (open && inputRef.current) {
+            const rect = inputRef.current.getBoundingClientRect()
+            setDropdownStyle({
+                position: "fixed",
+                top: rect.bottom + 4, // 4px cách input
+                left: rect.left,
+                width: rect.width,
+                zIndex: 9999,
+            })
+        }
+    }, [open, query])
+
     return (
         <div ref={containerRef} className="flex justify-center items-center gap-2 relative">
-            <div
-                className={cn(
-                    "w-3/4 relative flex flex-col",
-                    height ? "mr-0" : ""
-                )}
-            >
+            <div className={cn("w-3/4 relative flex flex-col", height ? "mr-0" : "")} ref={inputRef}>
                 <div className="relative flex">
                     <Input
                         type="text"
@@ -67,28 +78,18 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                         }}
                         onFocus={() => setOpen(true)}
                     />
-                    {/* <Button
-                        type="button"
-                        variant="default"
-                        className="absolute right-0 top-0 rounded-full bg-primary text-white xl:text-lg text-sm px-6 xl:h-12 h-10"
-                    >
-                        <Mic
-                            stroke="white"
-                            size={24}
-                            className="xl:bg-secondary xl:size-3 size-5 xl:h-11 xl:w-11 rounded-full"
-                        />
-                        {t("search")}
-                    </Button> */}
                     <Search
                         size={24}
                         className="absolute right-4 xl:top-3 top-2"
                         stroke="black"
                     />
                 </div>
+            </div>
 
-                {/* Dropdown */}
-                {open && query && (
-                    <div className="absolute top-full mt-1 w-full bg-white shadow rounded-md z-50">
+            {/* Dropdown render ra body */}
+            {open && query &&
+                createPortal(
+                    <div style={dropdownStyle} className="bg-white shadow rounded-md">
                         <Command shouldFilter={false} className="max-h-[300px] overflow-y-scroll">
                             <CommandList>
                                 <CommandEmpty>
@@ -127,9 +128,10 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                                 )}
                             </CommandList>
                         </Command>
-                    </div>
-                )}
-            </div>
+                    </div>,
+                    document.body
+                )
+            }
         </div>
     )
 }

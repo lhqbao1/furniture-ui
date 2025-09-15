@@ -150,13 +150,6 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                     />
 
                                     <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>
-                                        <div className='uppercase font-bold text-black'>
-                                            {product.categories.length > 0
-                                                ? product.categories[0].children && product.categories[0].children.length > 0
-                                                    ? product.categories[0].children[0].name
-                                                    : product.categories[0].name
-                                                : t('general')}
-                                        </div>
                                         <h3 className='text-lg text-black text-left line-clamp-2 lg:min-h-[60px] min-h-[52px]'>
                                             {product.name}
                                         </h3>

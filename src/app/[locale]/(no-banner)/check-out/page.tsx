@@ -86,6 +86,8 @@ export default function CheckOutPage() {
         invoice_address_line: z.string().min(1, { message: t('last_name_required') }),
         invoice_postal_code: z.string().min(1, { message: t('last_name_required') }),
         invoice_city: z.string().min(1, { message: t('last_name_required') }),
+        invoice_address_additional: z.string().optional(),
+        gender: z.string().min(1, { message: t('gender_required') }),
         email: z
             .string()
             .min(1, t('emailRequired'))
@@ -204,6 +206,9 @@ export default function CheckOutPage() {
             invoice_city: "",
             email: "",
             phone_number: "",
+            gender: "",
+            invoice_address_additional: "",
+
 
             shipping_address_line: "",
             shipping_postal_code: "",
@@ -447,8 +452,8 @@ export default function CheckOutPage() {
                         <PaymentMethodSelector />
                     </div> */}
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <CheckOutInvoiceAddress />
                         <CheckOutShippingAddress />
+                        <CheckOutInvoiceAddress />
                         {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />}
                     </div>
 

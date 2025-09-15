@@ -198,5 +198,10 @@
   "sendedEmail": "Wir haben den OTP an Ihre E-Mail gesendet, bitte verifizieren Sie, um fortzufahren.",
   "ifNotEnterOtp": "Wenn Sie den OTP nicht eingeben, können Sie diese E-Mail nicht für Einkäufe verwenden.",
   "useDifferentEmail": "Aus Sicherheitsgründen verwenden Sie bitte eine andere E-Mail-Adresse.",
-  "verifyOTP": "OTP verifizieren"
+  "verifyOTP": "OTP verifizieren",
+  "gender": "Gender",
+  "male": "Herr",
+  "female": "Frau",
+  "addressSupplement": "Adresszusatz",
+  "gender_required": "Geschlecht ist erforderlich"
 }

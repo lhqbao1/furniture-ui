@@ -77,24 +77,50 @@ const ListVariantOption = () => {
 
 
 
-    const generateVariantCombinations = (selected: Record<string, VariantOptionResponse[]>) => {
+    // const generateVariantCombinations = (selected: Record<string, VariantOptionResponse[]>) => {
+    //     const variantIds = Object.keys(selected);
+
+    //     if (variantIds.length === 0) return [];
+
+    //     // Lấy danh sách options theo thứ tự variantIds
+    //     const optionsList = variantIds.map(id => selected[id]);
+
+    //     // Hàm Cartesian product
+    //     const cartesian = (arrays: VariantOptionResponse[][]): VariantOptionResponse[][] => {
+    //         return arrays.reduce<VariantOptionResponse[][]>(
+    //             (acc, curr) =>
+    //                 acc.flatMap(a => curr.map(c => [...a, c])),
+    //             [[]]
+    //         );
+    //     };
+    //     return cartesian(optionsList);
+    // };
+
+    const generateVariantCombinations = (
+        selected: Record<string, VariantOptionResponse[]>
+    ) => {
         const variantIds = Object.keys(selected);
 
         if (variantIds.length === 0) return [];
 
-        // Lấy danh sách options theo thứ tự variantIds
-        const optionsList = variantIds.map(id => selected[id]);
+        // Lấy danh sách options, bỏ qua variant không có option
+        const optionsList = variantIds
+            .map((id) => selected[id])
+            .filter((options) => options.length > 0);
 
-        // Hàm Cartesian product
+        if (optionsList.length === 0) return [];
+
+        // Cartesian product
         const cartesian = (arrays: VariantOptionResponse[][]): VariantOptionResponse[][] => {
             return arrays.reduce<VariantOptionResponse[][]>(
-                (acc, curr) =>
-                    acc.flatMap(a => curr.map(c => [...a, c])),
+                (acc, curr) => acc.flatMap((a) => curr.map((c) => [...a, c])),
                 [[]]
             );
         };
+
         return cartesian(optionsList);
     };
+
 
     const handleDeleteVariant = (variant_id: string) => {
         deleteVariantMutation.mutate(variant_id, {
@@ -174,45 +200,6 @@ const ListVariantOption = () => {
                                 )}
                             </div>
                             <div className="flex items-center" onClick={() => handleDeleteVariant(variant.variant.id)}><Trash2 size={18} className="text-gray-600 cursor-pointer" /></div>
-
-                            {/* <DropdownMenu
-                                key={variant.variant.id}
-                                open={currentVariant === variant.variant.name}
-                                onOpenChange={(open) => setCurrentVariant(open ? variant.variant.name : null)}
-                            >
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm" type="button">
-                                        Select
-                                    </Button>
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent className="w-40">
-                                    {currentVariant === variant.variant.name && isLoading && (
-                                        <div className="px-3 py-2 text-sm">Loading...</div>
-                                    )}
-
-                                    {currentVariant === variant.variant.name &&
-                                        variantOption?.map((option, index) => (
-                                            <DropdownMenuCheckboxItem
-                                                key={option.label + index}
-                                                checked={false}
-                                                onCheckedChange={() => {
-                                                    handleAddVariantOption(variant.variant.id, option)
-                                                }}
-                                            >
-                                                {option.image_url ?
-                                                    <Image
-                                                        src={option.image_url}
-                                                        width={40}
-                                                        height={40}
-                                                        alt=""
-                                                    />
-                                                    : <div>{option.label}</div>
-                                                }
-                                            </DropdownMenuCheckboxItem>
-                                        ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu> */}
                         </div>
                     </div>
                 </div>

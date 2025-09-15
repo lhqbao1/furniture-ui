@@ -53,6 +53,8 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
     const [queryParams, setQueryParams] = useState('')
     const [localCombinations, setLocalCombinations] = useState(combinations)
 
+    console.log(combinations)
+
     const [selectedAction, setSelectedAction] = useState<Record<number, string>>(filteredProduct);
     const [listSelect, setListSelect] = useState<ProductItem[]>([])
     const [openIdx, setOpenIdx] = useState<number | null>(null)
@@ -115,7 +117,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
             <h3 className="font-semibold mb-4">Variant list:</h3>
             <div className="space-y-6">
                 {localCombinations
-                    .filter((comb) => comb.length > 1)
+                    .filter((comb) => comb.length > 0)
                     .map((combination, idx) => (
                         <div key={idx} className="flex group items-center">
                             <div

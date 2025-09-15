@@ -161,6 +161,7 @@
     "phone_number": "Phone number",
     "first_name_required": "First name is required",
     "last_name_required": "Last name is required",
+    "gender_required": "Gender is required",
     "phone_number_short": "Phone number is too short",
     "phone_number_invalid": "Phone number must contain only digits",
     "confirm_password": "Confirm password",
@@ -198,5 +199,9 @@
     "sendedEmail": "We have sent the OTP to your email, please verify to continue.",
     "ifNotEnterOtp": "If you do not enter the OTP, you will not be able to use this email to make purchases.",
     "useDifferentEmail": "For security reasons, please use a different email.",
-    "verifyOTP": "Verify OTP"
+    "verifyOTP": "Verify OTP",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "addressSupplement": "Address Supplement"
 }

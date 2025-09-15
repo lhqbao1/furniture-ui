@@ -12,6 +12,7 @@ import "react-phone-input-2/lib/style.css"
 import { useTranslations } from "next-intl"
 import { City, State } from 'country-state-city'
 import { useCheckMailExist } from "@/features/auth/hook"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 const CheckOutInvoiceAddress = () => {
     const form = useFormContext()
@@ -73,6 +74,20 @@ const CheckOutInvoiceAddress = () => {
                     render={({ field }) => (
                         <FormItem className="col-span-2">
                             <FormLabel>{t('streetAndHouse')}</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="invoice_address_additional"
+                    render={({ field }) => (
+                        <FormItem className="col-span-2">
+                            <FormLabel>{t('addressSupplement')}</FormLabel>
                             <FormControl>
                                 <Input placeholder="" {...field} />
                             </FormControl>
@@ -190,6 +205,41 @@ const CheckOutInvoiceAddress = () => {
                                     placeholder="+49"
                                     {...field}
                                 />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="gender"
+                    render={({ field }) => (
+                        <FormItem className="col-span-2">
+                            <FormLabel>{t("gender")}</FormLabel>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="flex gap-4"
+                                >
+                                    <FormItem className="flex items-center space-x-1">
+                                        <FormControl>
+                                            <RadioGroupItem value="male" id="male" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="male" className="font-normal">
+                                            {t("male")}
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-1">
+                                        <FormControl>
+                                            <RadioGroupItem value="female" id="female" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="female" className="font-normal">
+                                            {t("female")}
+                                        </FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
                             </FormControl>
                             <FormMessage />
                         </FormItem>

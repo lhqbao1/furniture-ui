@@ -17,7 +17,7 @@ export default function MainLayout({
       <main className="relative w-full">
         {/* <StickyIcon /> */}
         <HeaderClient hasSideBar />
-        <div className="overflow-x-hidden">
+        <div className="overflow-x-hidden z-0 relative">
           <Banner />
           <div className="container-padding flex-1">
             {children}
