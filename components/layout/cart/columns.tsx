@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Trash } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
+import { useMediaQuery } from "react-responsive"
 
 interface GetCartColumnsProps {
     localQuantities: Record<string, number>
@@ -26,41 +27,57 @@ export const GetCartColumns = ({
     localStatuses
 }: GetCartColumnsProps): ColumnDef<CartItem>[] => {
     const t = useTranslations()
+    const isMobile = useMediaQuery({ maxWidth: 650 })
 
-    return [
-        // ...(!isCheckout
-        //     ? [
-        //         {
-        //             id: "select",
-        //             header: ({ table }) => {
-        //                 const allSelected = table.getRowModel().rows.every(
-        //                     (row) => localStatuses[row.original.id] ?? row.original.is_active
-        //                 );
+    const actionsColumn: ColumnDef<CartItem> = {
+        id: "actions",
+        cell: ({ row }) => {
+            const item = row.original
+            return (
+                <div className="flex justify-end">
+                    <Trash
+                        className="text-red-500 cursor-pointer"
+                        onClick={() => onDeleteItem(item)}
+                        size={20}
+                    />
+                </div>
+            )
+        },
+    }
 
-        //                 return (
-        //                     <Checkbox
-        //                         checked={allSelected}
-        //                         onCheckedChange={(value) => {
-        //                             table.getRowModel().rows.forEach((row) => {
-        //                                 onToggleSelect(row.original, value === true);
-        //                             });
-        //                         }}
-        //                         aria-label={t('selectAll')}
-        //                     />
-        //                 );
-        //             },
-        //             cell: ({ row }) => (
-        //                 <Checkbox
-        //                     checked={Boolean(localStatuses[row.original.id] ?? row.original.is_active)}
-        //                     onCheckedChange={(value) => onToggleSelect(row.original, value === true)}
-        //                     aria-label={t('selectRow')}
-        //                 />
-        //             ),
-        //             enableSorting: false,
-        //             enableHiding: false,
-        //         } as ColumnDef<CartItem>
-        //     ]
-        //     : []),
+    const selectColumn: ColumnDef<CartItem> | undefined = !isCheckout
+        ? {
+            id: "select",
+            header: ({ table }) => {
+                const allSelected = table.getRowModel().rows.every(
+                    (row) => localStatuses[row.original.id] ?? row.original.is_active
+                )
+
+                return (
+                    <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={(value) => {
+                            table.getRowModel().rows.forEach((row) => {
+                                onToggleSelect(row.original, value === true)
+                            })
+                        }}
+                        aria-label={t('selectAll')}
+                    />
+                )
+            },
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={Boolean(localStatuses[row.original.id] ?? row.original.is_active)}
+                    onCheckedChange={(value) => onToggleSelect(row.original, value === true)}
+                    aria-label={t('selectRow')}
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+        }
+        : undefined
+
+    const columns: ColumnDef<CartItem>[] = [
         {
             accessorKey: "product_name",
             header: t('product'),
@@ -128,19 +145,6 @@ export const GetCartColumns = ({
             },
         },
         {
-            id: "actions",
-            header: () => <div className="text-right">{t('actions')}</div>,
-            cell: ({ row }) => {
-                const item = row.original
-                return (
-                    <div className="flex justify-end">
-                        <Trash className="text-red-500 cursor-pointer"
-                            onClick={() => onDeleteItem(item)} size={20} />
-                    </div>
-                )
-            },
-        },
-        {
             accessorKey: "is_active",
             id: "is_active",
             enableHiding: true,
@@ -149,4 +153,18 @@ export const GetCartColumns = ({
             cell: () => null,
         },
     ]
+
+    // Thêm cột select nếu cần
+    // if (selectColumn) {
+    //     columns.unshift(selectColumn)
+    // }
+
+    // Thêm cột actions
+    if (isMobile) {
+        columns.unshift(actionsColumn)
+    } else {
+        columns.push(actionsColumn)
+    }
+
+    return columns
 }
