@@ -103,7 +103,7 @@ const PageHeader = () => {
                 <ProductSearch />
             </div>
 
-            <div className={`flex h-full items-center justify-end gap-6 ${isPhone ? 'w-full' : 'items-end'}`}>
+            <div className={`flex h-full items-center justify-end ${isPhone ? 'w-full gap-3' : 'items-end gap-6'}`}>
 
                 {/*Language switch */}
                 {/* <Select

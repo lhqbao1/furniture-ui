@@ -11,7 +11,7 @@ interface BannerProps {
 }
 
 const Banner = ({ height }: BannerProps) => {
-    const isPhone = useMediaQuery({ maxWidth: 430 })
+    const isPhone = useMediaQuery({ maxWidth: 650 })
     const [isSticky, setIsSticky] = useState(false);
     const t = useTranslations()
 
