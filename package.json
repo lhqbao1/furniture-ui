@@ -43,6 +43,7 @@
     "dompurify": "^3.2.6",
     "drawer": "^0.0.2",
     "embla-carousel-react": "^8.6.0",
+    "googleapis": "^159.0.0",
     "gsap": "^3.13.0",
     "isomorphic-dompurify": "^2.26.0",
     "jotai": "^2.13.1",
