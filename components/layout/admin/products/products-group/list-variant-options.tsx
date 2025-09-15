@@ -44,7 +44,8 @@ const ListVariantOption = () => {
                 label: o.label,
                 image_url: o.image_url,
                 img_description: o.img_description,
-                is_global: o.is_global
+                is_global: o.is_global,
+
             }));
         });
 

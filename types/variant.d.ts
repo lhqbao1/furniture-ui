@@ -12,8 +12,8 @@ type VariantOptionResponse = {
   image_url?: string | null
   img_description: string
   label: string
-  variant_id: string
-  variant_name: string
+  variant_id?: string
+  variant_name?: string
   is_global: boolean
   created_at?: string
   updated_at?: string
