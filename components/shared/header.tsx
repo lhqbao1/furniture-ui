@@ -94,7 +94,7 @@ const PageHeader = () => {
                     unoptimized
                 />
             </div>
-            <div className={`font-libre text-[29px] flex gap-1 ${isPhone ? 'hidden' : 'block'}`}>
+            <div className={`font-libre text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`}>
                 <span className="text-secondary font-bold">Prestige</span>
                 <span className="text-primary font-bold">Home</span>
             </div>
