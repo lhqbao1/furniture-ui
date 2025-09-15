@@ -308,7 +308,7 @@ const ProductDetails = () => {
                                                                 width={100}
                                                                 height={100}
                                                                 alt=''
-                                                                className={` ${mainImageIndex === index && 'border-2 border-primary p-2 rounded-md object-cover'} lg:h-[80px] object-fill`}
+                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[70px] object-fill`}
                                                             />
                                                         </div>
                                                     </CarouselItem>
@@ -413,7 +413,7 @@ const ProductDetails = () => {
                                         </div>
                                     </div> */}
 
-                                    <div className='flex flex-row gap-6 items-end'>
+                                    <div className='flex lg:flex-row flex-col items-start gap-6 lg:items-end'>
                                         <div className='lg:basis-1/3 basis-2/5'>
                                             <FormField
                                                 control={form.control}
@@ -430,7 +430,7 @@ const ProductDetails = () => {
                                             />
                                         </div>
                                         <Button
-                                            className="rounded-xl px-10 font-bold text-lg lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
+                                            className="rounded-xl px-10 font-bold lg:text-lg text-base lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
                                             type="submit"
                                         >
                                             {t('addToCart')}
