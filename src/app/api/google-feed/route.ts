@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/features/products/api";
+import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
 
 export async function GET() {
   try {
@@ -26,16 +27,17 @@ export async function GET() {
 
       return {
         id: p.id,
-        title: p.name,
-        description: p.description,
+        title: p.name.trim(),
+        description: cleanDescription(p.description),
+        // description: p.description,
         link: `https://prestige-home.de/product${categoryHref}`,
-        image_link: p.static_files[0]?.url,
+        image_link: cleanImageLink(p.static_files[0]?.url),
         availability: p.stock > 0 ? "in_stock" : "out_of_stock",
         price: `${p.final_price.toFixed(2)} EUR`,
         identifier_exists: 'yes',
         gtin: p.ean,
         mpn: p.sku,
-        brand: p.brand ? p.brand.name : '',
+        brand: p.brand ? p.brand.name : 'ECONELO',
         condition: "new",
         adult: 'no',
         age_group: 'adult',
