@@ -36,6 +36,7 @@ const Footer = () => {
                     <li><Link href="/policy" className="">{t('termCondition')}</Link></li>
                     {/* <li><Link href="/policy" className="">{t('disclaimer')}</Link></li> */}
                     <li><Link href="/policy" className="">{t('privacyPolicy')}</Link></li>
+                    <li><Link href="/policy" className="">{t('imprint')}</Link></li>
                     <li><Link href="/policy" className="">{t('cookieSetting')}</Link></li>
                 </ul>
             </div>
