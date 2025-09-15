@@ -32,7 +32,7 @@ export async function GET() {
         image_link: p.static_files[0]?.url,
         availability: p.stock > 0 ? "in_stock" : "out_of_stock",
         price: `${p.final_price.toFixed(2)} EUR`,
-        identifier_exists: 'no',
+        identifier_exists: 'yes',
         gtin: p.ean,
         mpn: p.sku,
         brand: p.brand.name,
