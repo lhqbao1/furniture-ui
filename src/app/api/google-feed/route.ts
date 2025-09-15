@@ -35,7 +35,7 @@ export async function GET() {
         identifier_exists: 'yes',
         gtin: p.ean,
         mpn: p.sku,
-        brand: p.brand,
+        brand: p.brand.name,
         condition: "new",
         adult: 'yes',
         age_group: 'adult',
