@@ -64,7 +64,6 @@ export default function CheckOutPage() {
     const router = useRouter()
     const { updateStatus } = useCartLocal()
 
-
     const checkOutBreadcrumb = [
         { label: t('wishlist'), icon: 'wishlist.svg', url: '/wishlist' },
         { label: t('cart'), icon: 'cart.svg', url: '/cart' },
@@ -121,8 +120,6 @@ export default function CheckOutPage() {
         message: "Confirm password does not match",
         path: ["confirmPassword"],
     });
-
-
 
     type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
 

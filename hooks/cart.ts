@@ -2,6 +2,7 @@ import {
     addToLocalCart, 
     CartItemLocal, 
     getCart, 
+    removeFromLocalCart, 
     saveCart, 
     updateLocalCartQuantity, 
     updateLocalCartStatus 
@@ -61,6 +62,16 @@ import {
         queryClient.setQueryData(CART_QUERY_KEY, newCart)
       },
     })
+
+      // mutation: remove item
+  const removeItemMutation = useMutation({
+    mutationFn: async (product_id: string) => {
+      return removeFromLocalCart(product_id)
+    },
+    onSuccess: (newCart) => {
+      queryClient.setQueryData(CART_QUERY_KEY, newCart)
+    },
+  })
   
     return {
       cart: cartQuery.data ?? [],
@@ -68,6 +79,7 @@ import {
       addToCartLocal: addToCartMutation.mutate,
       updateCart: updateCartMutation.mutate,
       updateQuantity: updateQuantityMutation.mutate,
+      removeItem: removeItemMutation.mutate,   // ✅
       updateStatus: updateStatusMutation.mutate,
     }
   }

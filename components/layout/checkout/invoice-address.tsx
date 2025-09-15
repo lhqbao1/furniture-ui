@@ -11,11 +11,14 @@ import { useState } from "react"
 import "react-phone-input-2/lib/style.css"
 import { useTranslations } from "next-intl"
 import { City, State } from 'country-state-city'
+import { useCheckMailExist } from "@/features/auth/hook"
 
 const CheckOutInvoiceAddress = () => {
     const form = useFormContext()
     const t = useTranslations()
     const [open, setOpen] = useState(false)
+    const checkMailExistMutation = useCheckMailExist();
+
 
     // Lấy tất cả bang của Đức
     const states = State.getStatesOfCountry('DE')
@@ -159,7 +162,16 @@ const CheckOutInvoiceAddress = () => {
                         <FormItem>
                             <FormLabel>{t('email')}</FormLabel>
                             <FormControl>
-                                <Input type="email" placeholder="" {...field} />
+                                <Input
+                                    type="email"
+                                    placeholder=""
+                                    {...field}
+                                    onBlur={() => {
+                                        if (field.value) {
+                                            checkMailExistMutation.mutate(field.value)
+                                        }
+                                    }}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

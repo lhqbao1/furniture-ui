@@ -20,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useCartLocal } from "@/hooks/cart"
 import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl"
+import { Trash } from "lucide-react"
 
 export type CartTableItem = {
     id?: string
@@ -53,6 +54,8 @@ export function CartLocalTable({
     const someSelected = data.some((item) => item.is_active)
     const t = useTranslations()
 
+    const { removeItem } = useCartLocal()
+
     const onUpdateQuantity = (item: CartTableItem, newQuantity: number) => {
         if (newQuantity < 1) return
         if (item.stock && newQuantity > item.stock) return
@@ -63,9 +66,9 @@ export function CartLocalTable({
     const baseColumns: ColumnDef<CartTableItem>[] = [
         {
             accessorKey: "product_name",
-            header: () => <div>{t('product')}</div>,
+            header: () => <div className="">{t('product')}</div>,
             cell: ({ row }) => (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-80 text-wrap">
                     {row.original.img_url && (
                         <Image
                             src={row.original.img_url}
@@ -81,7 +84,7 @@ export function CartLocalTable({
         },
         {
             accessorKey: "quantity",
-            header: () => <div>{t('quantity')}</div>,
+            header: () => <div className="text-center">{t('quantity')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 return (
@@ -109,10 +112,23 @@ export function CartLocalTable({
         },
         {
             accessorKey: "final_price",
-            header: () => <div>{t('price')}</div>,
+            header: () => <div className="text-right">{t('price')}</div>,
             cell: ({ row }) => (
-                <div>${(row.original.item_price * row.original.quantity).toFixed(2)}</div>
+                <div className="text-right">${(row.original.item_price * row.original.quantity).toFixed(2)}</div>
             ),
+        },
+        {
+            id: "actions",
+            header: () => <div className="text-right">{t('actions')}</div>,
+            cell: ({ row }) => {
+                const item = row.original
+                return (
+                    <div className="flex justify-end">
+                        <Trash className="text-red-500 cursor-pointer"
+                            onClick={() => removeItem(item.product_id ?? '')} size={20} />
+                    </div>
+                )
+            },
         },
     ]
 
@@ -149,7 +165,7 @@ export function CartLocalTable({
 
     const table = useReactTable({
         data,
-        columns,
+        columns: baseColumns,
         getCoreRowModel: getCoreRowModel(),
     })
 

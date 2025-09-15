@@ -62,6 +62,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                             : level2
                                 ? `/${formatName(level2.name)}/${product.id}`
                                 : `/${product.id}`
+
                     return (
                         <div key={product.id} className='relative overflow-hidden' ref={el => { if (el) cardRefs.current[idx] = el }} onClick={() => handleAddProductToViewed(product.id)}>
                             <Link href={`/product${categoryHref}`} passHref>
@@ -96,7 +97,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                                     : product.categories[0].name
                                                 : t('general')}
                                         </div>
-                                        <h3 className='text-lg text-black text-left line-clamp-2 lg:min-h-[64px] min-h-[52px]'>
+                                        <h3 className='text-lg text-black text-left line-clamp-2 lg:min-h-[60px] min-h-[52px]'>
                                             {product.name}
                                         </h3>
 
@@ -138,9 +139,9 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                     <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
                                 </div>
                             </Link>
-                            <div className="absolute bottom-18 right-0 list-review-btn">
+                            {/* <div className="absolute bottom-18 right-0 list-review-btn">
                                 <ListReviewButton currentProduct={product} />
-                            </div>
+                            </div> */}
                         </div>
                     );
                 })}

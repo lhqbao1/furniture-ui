@@ -34,6 +34,16 @@ export type CartItemLocal = {
     }
     saveCart(cart);
   }
+
+  export function removeFromLocalCart(product_id: string) {
+    let cart = getCart();
+  
+    // lọc ra những sản phẩm khác product_id
+    cart = cart.filter((item) => item.product_id !== product_id);
+  
+    saveCart(cart);
+    return cart;
+  }
   
   export function updateLocalCartQuantity(product_id: string, newQuantity: number) {
     let cart = getCart()

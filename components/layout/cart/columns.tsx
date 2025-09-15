@@ -28,46 +28,46 @@ export const GetCartColumns = ({
     const t = useTranslations()
 
     return [
-        ...(!isCheckout
-            ? [
-                {
-                    id: "select",
-                    header: ({ table }) => {
-                        const allSelected = table.getRowModel().rows.every(
-                            (row) => localStatuses[row.original.id] ?? row.original.is_active
-                        );
+        // ...(!isCheckout
+        //     ? [
+        //         {
+        //             id: "select",
+        //             header: ({ table }) => {
+        //                 const allSelected = table.getRowModel().rows.every(
+        //                     (row) => localStatuses[row.original.id] ?? row.original.is_active
+        //                 );
 
-                        return (
-                            <Checkbox
-                                checked={allSelected}
-                                onCheckedChange={(value) => {
-                                    table.getRowModel().rows.forEach((row) => {
-                                        onToggleSelect(row.original, value === true);
-                                    });
-                                }}
-                                aria-label={t('selectAll')}
-                            />
-                        );
-                    },
-                    cell: ({ row }) => (
-                        <Checkbox
-                            checked={Boolean(localStatuses[row.original.id] ?? row.original.is_active)}
-                            onCheckedChange={(value) => onToggleSelect(row.original, value === true)}
-                            aria-label={t('selectRow')}
-                        />
-                    ),
-                    enableSorting: false,
-                    enableHiding: false,
-                } as ColumnDef<CartItem>
-            ]
-            : []),
+        //                 return (
+        //                     <Checkbox
+        //                         checked={allSelected}
+        //                         onCheckedChange={(value) => {
+        //                             table.getRowModel().rows.forEach((row) => {
+        //                                 onToggleSelect(row.original, value === true);
+        //                             });
+        //                         }}
+        //                         aria-label={t('selectAll')}
+        //                     />
+        //                 );
+        //             },
+        //             cell: ({ row }) => (
+        //                 <Checkbox
+        //                     checked={Boolean(localStatuses[row.original.id] ?? row.original.is_active)}
+        //                     onCheckedChange={(value) => onToggleSelect(row.original, value === true)}
+        //                     aria-label={t('selectRow')}
+        //                 />
+        //             ),
+        //             enableSorting: false,
+        //             enableHiding: false,
+        //         } as ColumnDef<CartItem>
+        //     ]
+        //     : []),
         {
             accessorKey: "product_name",
             header: t('product'),
             cell: ({ row }) => {
                 const item = row.original
                 return (
-                    <div className="flex items-center gap-3 max-w-[250px]">
+                    <div className="flex items-center gap-3 w-60 text-wrap">
                         <Image
                             src={item.image_url || "/1.png"}
                             alt={item.products.name}
