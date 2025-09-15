@@ -102,30 +102,26 @@ export default function CheckOutPage() {
         shipping_postal_code: z.string().min(1, { message: t('last_name_required') }),
         shipping_city: z.string().min(1, { message: t('last_name_required') }),
 
+
         password: z
             .string()
-            .min(8, t('passwordMin'))
-            .refine((val) => /[a-z]/.test(val), {
-                message: t('passwordLower'),
-            })
-            .refine((val) => /[A-Z]/.test(val), {
-                message: t('passwordUpper'),
-            })
-            .refine((val) => /\d/.test(val), {
-                message: t('passwordNumber'),
-            })
-            .optional(),
+            .optional()
+            .refine((val) => !val || val.length >= 8, { message: "Password must be at least 8 characters" })
+            .refine((val) => !val || /[a-z]/.test(val), { message: "Password must include a lowercase letter" })
+            .refine((val) => !val || /[A-Z]/.test(val), { message: "Password must include an uppercase letter" })
+            .refine((val) => !val || /\d/.test(val), { message: "Password must include a number" }),
+
         confirmPassword: z
             .string()
-            .min(1, t('confirm_password_required'))
-            .optional(),
+            .optional()
     }).refine((data) => {
-        if (!data.password && !data.confirmPassword) return true;
+        if (!data.password && !data.confirmPassword) return true; // guest checkout
         return data.password === data.confirmPassword;
     }, {
-        message: t('confirm_password_mismatch'),
+        message: "Confirm password does not match",
         path: ["confirmPassword"],
-    })
+    });
+
 
 
     type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
@@ -209,8 +205,8 @@ export default function CheckOutPage() {
             shipping_postal_code: "",
             shipping_city: "",
 
-            password: "",
-            confirmPassword: "",
+            password: "Guest@12345",
+            confirmPassword: "Guest@12345",
         },
     })
 
