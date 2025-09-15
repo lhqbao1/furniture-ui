@@ -8,3 +8,12 @@ export function formatDateTime(dateString: Date) {
         year: "numeric",
     })
 }
+
+// utils/date.ts
+export function formatDate(dateString: Date) {
+    return new Date(dateString).toLocaleString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    })
+}

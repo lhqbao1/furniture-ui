@@ -8,7 +8,8 @@ import { paymentOptions } from "@/data/data"
 import { FormField, FormItem, FormMessage } from "@/components/ui/form"
 
 export default function PaymentMethodSelector() {
-    const { control } = useFormContext()
+    const { control, watch } = useFormContext()
+    const selectedPayment = watch("payment_method") // watch giá trị hiện tại
 
     return (
         <FormField
@@ -38,6 +39,16 @@ export default function PaymentMethodSelector() {
                             </div>
                         ))}
                     </RadioGroup>
+                    {/* Hiển thị thông tin bank nếu chọn */}
+                    {selectedPayment === "bank" && (
+                        <div className="mt-4 text-sm space-y-1">
+                            <h4 className="font-semibold mb-1 text-secondary text-base">Überweisungsinformationen:</h4>
+                            <div>DE57100101232316418882</div>
+                            <div>Prestige Home GmbH</div>
+                            <div>SWIFT/BIC QNTODEB2XXX</div>
+                            <div>Bankname: QUOTO</div>
+                        </div>
+                    )}
                     <FormMessage />
                 </FormItem>
             )}

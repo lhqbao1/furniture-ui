@@ -186,5 +186,17 @@
     "streetAndHouse": "Street & House number",
     "selectPayment": "Select a Payment method",
     "newProducts": "New Products",
-    "sale": "Sale"
+    "sale": "Sale",
+    "download": "Download",
+    "general": "General",
+    "invalidCredentials": "Wrong email or password",
+    "continueAsGuest": "Continue as Guest",
+    "orderFail": "Place order fail",
+    "otpRequired": "Please enter all 6 OTP digits",
+    "otpDone": "OTP verification successful",
+    "otpError": "Incorrect OTP, please try again",
+    "sendedEmail": "We have sent the OTP to your email, please verify to continue.",
+    "ifNotEnterOtp": "If you do not enter the OTP, you will not be able to use this email to make purchases.",
+    "useDifferentEmail": "For security reasons, please use a different email.",
+    "verifyOTP": "Verify OTP"
 }

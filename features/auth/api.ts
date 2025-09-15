@@ -73,6 +73,23 @@ export async function forgotPassword(email: string) {
   return data as { message: string }
 }
 
+export async function checkMailExist(email: string) {
+  const { data } = await apiPublic.post("/check-email", `"${email}"`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+  return data as boolean
+}
+
+export async function loginOtp(email: string, code: string) {
+  const { data } = await apiPublic.post(
+    "/check-otp",
+    { email, code },
+  )
+  return data as { access_token: string, token_type: string,id: string,  email: string }
+}
+
 export async function resetPassword(email: string, code: string, new_password: string) {
   const { data } = await apiPublic.post(
     "/reset-password",

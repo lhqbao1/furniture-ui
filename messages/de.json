@@ -29,7 +29,7 @@
   "termPolicy": "Bedingungen & Richtlinien",
   "termCondition": "Allgemeine Geschäftsbedingungen",
   "disclaimer": "Haftungsausschluss",
-  "privacyPolicy": "Datenschutzrichtlinie",
+  "privacyPolicy": "Datenschutzerklärung",
   "endIn": "endet in",
   "interior": "Innenraum",
   "decoration": "Dekoration",
@@ -186,5 +186,17 @@
   "streetAndHouse": "Straße & Hausnummer",
   "selectPayment": "Wählen Sie die Zahlungsart aus.",
   "newProducts": "Neuheiten",
-  "sale": "Sale"
+  "sale": "Sale",
+  "download": "Herunterladen",
+  "general": "Generell",
+  "invalidCredentials": "Falsche E-Mail oder falsches Passwort",
+  "continueAsGuest": "Als Gast fortfahren",
+  "orderFail": "Bestellung fehlgeschlagen",
+  "otpRequired": "Bitte geben Sie alle 6 OTP-Ziffern ein",
+  "otpDone": "OTP-Verifizierung erfolgreich",
+  "otpError": "Falscher OTP, bitte erneut versuchen",
+  "sendedEmail": "Wir haben den OTP an Ihre E-Mail gesendet, bitte verifizieren Sie, um fortzufahren.",
+  "ifNotEnterOtp": "Wenn Sie den OTP nicht eingeben, können Sie diese E-Mail nicht für Einkäufe verwenden.",
+  "useDifferentEmail": "Aus Sicherheitsgründen verwenden Sie bitte eine andere E-Mail-Adresse.",
+  "verifyOTP": "OTP verifizieren"
 }

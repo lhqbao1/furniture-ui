@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
     Accordion,
     AccordionContent,
@@ -11,14 +11,23 @@ import { getPolicyItemsByVersion } from '@/features/policy/api'
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { PolicyVersion } from '@/types/policy'
+import { formatDate } from '@/lib/date-formated'
+import { useTranslations } from 'next-intl'
+import Image from 'next/image'
+import { useRouter } from '@/src/i18n/navigation'
 
 interface ListPolicyProps {
-    versionId: string
+    versionId: string;
+    versionDate: PolicyVersion[];
+    policyId?: string
 }
 
-const ListPolicy = ({ versionId }: ListPolicyProps) => {
-    const [currentPolicy, setCurrentPolicy] = useState(0)
+const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
+    const t = useTranslations()
+    const [openAccordion, setOpenAccordion] = useState<string | null>(null)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
+    const router = useRouter()
 
     const { data: policy, isLoading } = useQuery({
         queryKey: ["policy-items", versionId],
@@ -26,10 +35,27 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
         enabled: !!versionId,
     })
 
+    const filteredPolicies = policy?.legal_policies ?? []
+
     // refs cho content bên phải
     const contentRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
+    // khi policyId thay đổi, set accordion mở
+    useEffect(() => {
+        if (policyId) {
+            const exists = filteredPolicies.find(p => p.id === policyId)
+            if (exists) {
+                setOpenAccordion(policyId)
+                const index = filteredPolicies.indexOf(exists)
+                setCurrentPolicyItem(0)
+            }
+        }
+    }, [policyId, filteredPolicies])
+
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>
+
+    // tìm current policy dựa trên accordion đang mở
+    const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
 
     return (
         <div className='grid grid-cols-12 lg:pt-12 pt-3 h-[calc(100vh-200px)]'>
@@ -39,31 +65,61 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                     type="single"
                     collapsible
                     className="w-full"
-                    defaultValue="item-1"
+                    value={openAccordion ?? undefined}
+                    onValueChange={(val) => setOpenAccordion(val)}
                 >
-                    {policy?.legal_policies.map((item, policyIndex) => (
-                        <AccordionItem value={item.id} key={item.id}>
-                            <AccordionTrigger className='pr-6 cursor-pointer'>{item.name}</AccordionTrigger>
+                    {filteredPolicies.map((item) => (
+                        <AccordionItem
+                            value={item.id}
+                            key={item.id}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+
+                                // 1. Mở accordion trước
+                                // setOpenAccordion(item.id)
+
+                                // 2. Delay một chút để animation render children (ví dụ 150ms)
+                                setTimeout(() => {
+                                    switch (item.id) {
+                                        case '19aa3344-f577-41e6-acbd-f0fe8ea92ce5':
+                                            router.push('/agb')
+                                            break
+                                        case '9fc87bb9-44d2-428d-9960-1b6074e11d76':
+                                            router.push('/impressum')
+                                            break
+                                        case '9fc87bb9-44d2-428d-9960-1b6074e11d75':
+                                            router.push('/widerruf')
+                                            break
+                                        case '808a37bc-2ead-4a90-8a24-73a431df55d0':
+                                            router.push('/datenschutzerklarung')
+                                            break
+                                        default:
+                                            router.push('/agb')
+                                    }
+                                }, 150)
+                            }}
+                        >
+                            <div className='pr-6 px-2 py-3 cursor-pointer font-bold'>{item.name}</div>
                             <AccordionContent className="flex flex-col gap-1.5 text-balance">
                                 {item.child_legal_policies.map((child, policyItemIndex) => (
                                     <div
                                         key={child.id}
                                         className={cn(
                                             'cursor-pointer hover:underline lg:pl-6 pl-2 relative',
-                                            currentPolicy === policyIndex && currentPolicyItem === policyItemIndex
+                                            currentPolicy?.id === item.id && currentPolicyItem === policyItemIndex
                                                 ? 'bg-secondary/20 hover:bg-secondary-20 px-2 py-1 font-semibold'
                                                 : ''
                                         )}
                                         onClick={() => {
-                                            setCurrentPolicy(policyIndex)
                                             setCurrentPolicyItem(policyItemIndex)
 
-                                            const refKey = `${policyIndex}-${policyItemIndex}`
+                                            const refKey = `${item.id}-${policyItemIndex}`
                                             const el = contentRefs.current[refKey]
                                             if (el) {
-                                                const parent = el.closest(".content-scroll") as HTMLElement // thêm class cho container scroll của bạn
+                                                const parent = el.closest(".content-scroll") as HTMLElement
                                                 if (parent) {
-                                                    const top = el.offsetTop - 250 // trừ 250
+                                                    const top = el.offsetTop - 250
                                                     parent.scrollTo({
                                                         top,
                                                         behavior: "smooth",
@@ -73,13 +129,12 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                                                 }
                                             }
                                         }}
-
                                     >
                                         {child.label}
                                         <div
                                             className={cn(
                                                 'absolute w-1 h-full bg-secondary right-0 top-0',
-                                                currentPolicy === policyIndex && currentPolicyItem === policyItemIndex
+                                                currentPolicy?.id === item.id && currentPolicyItem === policyItemIndex
                                                     ? 'block'
                                                     : 'hidden'
                                             )}
@@ -95,7 +150,7 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
             {/* Nội dung bên phải */}
             <div className='col-span-8 px-3 lg:px-12 space-y-6 pb-8 content-scroll overflow-y-auto'>
                 <h1 className='text-center text-3xl text-secondary font-semibold uppercase'>
-                    {policy?.legal_policies[currentPolicy].name}
+                    {currentPolicy?.name}
                 </h1>
 
                 <div className='flex justify-between'>
@@ -113,8 +168,8 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                     </Button>
                 </div>
 
-                {policy?.legal_policies[currentPolicy].child_legal_policies.map((cl, clIndex) => {
-                    const refKey = `${currentPolicy}-${clIndex}`
+                {currentPolicy?.child_legal_policies.map((cl, clIndex) => {
+                    const refKey = `${currentPolicy.id}-${clIndex}`
                     return (
                         <div
                             key={cl.id}
@@ -134,6 +189,15 @@ const ListPolicy = ({ versionId }: ListPolicyProps) => {
                     )
                 })}
             </div>
+
+            {/* Version section */}
+            <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4'>
+                {versionDate.map((item) => (
+                    <div key={item.id} className='text-secondary'>Version: {formatDate(item.created_at)}</div>
+                ))}
+            </div>
+
+            {policyId === "19aa3344-f577-41e6-acbd-f0fe8ea92ce5" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
         </div>
     )
 }

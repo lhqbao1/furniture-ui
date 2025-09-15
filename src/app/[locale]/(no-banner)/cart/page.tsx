@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
-import { useGetCartItems } from '@/features/cart/hook'
 import CartSummary from '@/components/layout/cart/cart-summary'
 import CartTable from '@/components/layout/cart/cart-table'
 import { toast } from 'sonner'
@@ -11,10 +10,13 @@ import { useCartLocal } from '@/hooks/cart'
 import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { Link, useRouter } from '@/src/i18n/navigation'
 import { getCartItems } from '@/features/cart/api'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import CartLoginForm from '@/components/layout/cart/login-form-cart'
 
 
 const CartPage = () => {
     const [userId, setUserId] = useState<string | null>(null);
+    const [isLoginOpen, setIsLoginOpen] = useState(false)
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
@@ -46,21 +48,6 @@ const CartPage = () => {
         if (storedUserId) setUserId(storedUserId)
     }, [])
 
-    // Call api get address if userId
-    // const { data: addresses } = useQuery({
-    //     queryKey: ["address-by-user"],
-    //     queryFn: () => getAddressByUserId(userId!),
-    //     retry: false,
-    //     enabled: !!userId,
-    // })
-
-    // const { data: invoiceAddress } = useQuery({
-    //     queryKey: ["invoice-address-by-user"],
-    //     queryFn: () => getInvoiceAddressByUserId(userId!),
-    //     retry: false,
-    //     enabled: !!userId,
-    // })
-
     //Calculate total amount 
     const total =
         displayedCart
@@ -71,41 +58,25 @@ const CartPage = () => {
                 return acc + quantity * item.item_price;
             }, 0) ?? 0;
 
-    //Handle when user click proceed to checkout
     // Proceed checkout
     const proceedToCart = () => {
-        if (cart) {
-            const hasActiveItem = cart.items.some((item) => item.is_active)
+        if (userId) {
+            if (cart) {
+                const hasActiveItem = cart.items.some((item) => item.is_active)
 
-            if (!hasActiveItem) {
-                toast.error("You need to choose at least one product to check out")
-                return
+                if (!hasActiveItem) {
+                    toast.error("You need to choose at least one product to check out")
+                    return
+                }
             }
-
-            // Kiểm tra address
-            // const hasShippingAddress = (addresses?.length ?? 0) > 0
-            // const hasInvoiceAddress = invoiceAddress
-
-            // if (!hasShippingAddress || !hasInvoiceAddress) {
-            //     toast.error("Missing addresses", {
-            //         description: (
-            //             <div className='flex flex-col gap-2'>
-            //                 You need to create at least one shipping address and one invoice address.
-            //                 <Link href="/contact" className="underline text-red-600">
-            //                     Create address
-            //                 </Link>
-            //             </div>
-            //         ),
-            //     })
-            //     return
-            // }
-
             // Navigate checkout
             router.push('/check-out')
         } else {
-            router.push("/check-out")
+            // Nếu chưa login → mở dialog
+            setIsLoginOpen(true)
         }
     }
+
 
     return (
         <div>
@@ -158,6 +129,20 @@ const CartPage = () => {
                     </div>
                 </div>
             </div>
+
+            <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
+                <DialogContent className="sm:max-w-[400px]" >
+                    <DialogHeader>
+                        <DialogTitle>Login to continue</DialogTitle>
+                    </DialogHeader>
+                    <CartLoginForm
+                        onSuccess={() => {
+                            setIsLoginOpen(false)
+                            router.push('/check-out')
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

@@ -94,7 +94,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     toast.success(t('loginSuccess'))
                 },
                 onError(error, variables, context) {
-                    toast.error(error.message)
+                    toast.error(t("invalidCredentials"))
                 },
             })
         }

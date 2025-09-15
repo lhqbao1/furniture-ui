@@ -31,7 +31,9 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("access_token")
-      // có thể redirect về login nếu cần
+
+      // 👉 Redirect về login
+      window.location.href = "/login"
     }
     return Promise.reject(error)
   }
@@ -59,12 +61,15 @@ apiAdmin.interceptors.response.use(
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("admin_access_token")
-      // redirect về admin login nếu cần
+
+      // 👉 Redirect về admin login
+      window.location.href = "/admin-login"
     }
     return Promise.reject(error)
   }
 )
 
+// 4. Flexible API (có thể dùng cho cả user lẫn admin)
 export const apiFlexible = axios.create({
   baseURL,
   withCredentials: true,
@@ -90,10 +95,11 @@ apiFlexible.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
-      // remove tokens khi bị 401
       localStorage.removeItem("access_token")
       localStorage.removeItem("admin_access_token")
-      // redirect nếu muốn
+
+      // 👉 Trường hợp flexible thì redirect về login chung
+      window.location.href = "/login"
     }
     return Promise.reject(error)
   }

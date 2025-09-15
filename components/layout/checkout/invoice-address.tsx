@@ -7,12 +7,10 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import countries from "world-countries"
 import { useState } from "react"
-import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css"
 import { useTranslations } from "next-intl"
-import { City, State, Country } from 'country-state-city'
+import { City, State } from 'country-state-city'
 
 const CheckOutInvoiceAddress = () => {
     const form = useFormContext()
@@ -175,11 +173,10 @@ const CheckOutInvoiceAddress = () => {
                         <FormItem>
                             <FormLabel>{t('phone_number')}</FormLabel>
                             <FormControl>
-                                <PhoneInput
-                                    country={'de'} // default Germany
-                                    value={field.value}
-                                    onChange={(phone) => field.onChange(phone)}
-                                    inputStyle={{ fontSize: '16px', borderRadius: 6, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", borderColor: '#e5e5e5', width: '100%' }}
+                                <Input
+                                    type="number"
+                                    placeholder="+49"
+                                    {...field}
                                 />
                             </FormControl>
                             <FormMessage />

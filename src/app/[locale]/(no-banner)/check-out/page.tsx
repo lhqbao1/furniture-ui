@@ -38,7 +38,8 @@ import { getUserById } from '@/features/users/api'
 import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
 import { getCartItems } from '@/features/cart/api'
 import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
-import { useLogin, useSignUp } from '@/features/auth/hook'
+import { useCheckMailExist, useLogin, useLoginOtp, useSignUp } from '@/features/auth/hook'
+import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 
 export interface CartItem {
     id: number
@@ -50,18 +51,17 @@ export interface CartItem {
     imageUrl: string
 }
 
-
-
-
 export default function CheckOutPage() {
     const [userId, setUserId] = useState<string>("")
     const [isCreatePassword, setIsCreatePassword] = useState<boolean>(false)
     const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
     const [checkout, setCheckOut] = useAtom(checkOutIdAtom)
-    const router = useRouter()
+    const [otpEmail, setOtpEmail] = useState<string>("")
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
+    const [openOtpDialog, setOpenOTPDialog] = useState(false)
     const t = useTranslations()
 
+    const router = useRouter()
     const { updateStatus } = useCartLocal()
 
 
@@ -173,6 +173,13 @@ export default function CheckOutPage() {
     const createShippingAddressMutation = useCreateAddress()
     const loginMutation = useLogin()
     const syncLocalCartMutation = useSyncLocalCart();
+    const checkMailExistMutation = useCheckMailExist();
+    const loginOtpMutation = useLoginOtp()
+
+    const handleOtpSuccess = (verifiedUserId: string) => {
+        setUserId(verifiedUserId)
+        // ở đây bạn có thể tiếp tục sync cart, redirect, v.v.
+    }
 
 
     // const [selectedVoucher, setSelectedVoucher] = useState<number>()
@@ -271,38 +278,47 @@ export default function CheckOutPage() {
                 let invoiceAddressId = invoiceAddress?.id
                 let shippingAddressId = addresses?.find(a => a.is_default)?.id
 
-                // Nếu chưa có user thì tạo mới
-                if (!userId) {
-                    const newUser = await createUserAccountMutation.mutateAsync({
-                        first_name: data.first_name,
-                        last_name: data.last_name,
-                        email: data.email,
-                        phone_number: data.phone_number,
-                        password: data.password ? data.password : 'Guest@12345',
-                    })
-                    userId = newUser.id
+                if (data.email && !userId) {
+                    const exists = await checkMailExistMutation.mutateAsync(data.email)
 
-                    // Sau khi tạo account thành công → gọi login
-                    const loginRes = await loginMutation.mutateAsync({
-                        username: data.email,
-                        password: data.password ? data.password : 'Guest@12345',
-                    })
+                    if (!exists) {
+                        // Email đã tồn tại -> yêu cầu xác minh OTP
+                        setOtpEmail(data.email)
+                        setOpenOTPDialog(true)
+                        return
+                    } else {
+                        // Nếu chưa có user thì tạo mới
+                        if (!userId) {
+                            const newUser = await createUserAccountMutation.mutateAsync({
+                                first_name: data.first_name,
+                                last_name: data.last_name,
+                                email: data.email,
+                                phone_number: data.phone_number,
+                                password: data.password ? data.password : 'Guest@12345',
+                            })
+                            userId = newUser.id
 
-                    // Lưu token + userId vào localStorage
-                    localStorage.setItem("access_token", loginRes.access_token)
-                    localStorage.setItem("userId", loginRes.id)
+                            // Sau khi tạo account thành công → gọi login
+                            const loginRes = await loginMutation.mutateAsync({
+                                username: data.email,
+                                password: data.password ? data.password : 'Guest@12345',
+                            })
 
-                    // Sync local cart
-                    syncLocalCartMutation.mutate()
+                            // Lưu token + userId vào localStorage
+                            localStorage.setItem("access_token", loginRes.access_token)
+                            localStorage.setItem("userId", loginRes.id)
 
-                    toast.success("Account created & logged in successfully")
-                    userId = loginRes.id
+                            // Sync local cart
+                            syncLocalCartMutation.mutate()
+                            userId = loginRes.id
+                        }
+                    }
                 }
 
                 // Nếu chưa có invoice address thì tạo mới
                 if (!invoiceAddressId) {
                     const newInvoice = await createInvoiceAddressMutation.mutateAsync({
-                        user_id: userId,
+                        user_id: userId ?? '',
                         recipient_name: data.first_name + data.last_name,
                         postal_code: data.invoice_postal_code,
                         phone_number: data.phone_number,
@@ -318,7 +334,7 @@ export default function CheckOutPage() {
                 // Nếu chưa có shipping address thì tạo mới
                 if (!shippingAddressId) {
                     const newShipping = await createShippingAddressMutation.mutateAsync({
-                        user_id: userId,
+                        user_id: userId ?? '',
                         recipient_name: data.first_name + data.last_name,
                         postal_code: data.invoice_postal_code,
                         phone_number: data.phone_number,
@@ -364,26 +380,23 @@ export default function CheckOutPage() {
                 setPaymentId(payment.payment_id)
                 router.push(payment.approve_url)
             } catch (error) {
-                toast.error("Checkout failed")
+                toast.error(t('orderFail'))
                 console.error(error)
             }
         },
         [user, invoiceAddress, addresses]
     )
 
-
-
     return (
         <FormProvider {...form}>
             <form
                 onSubmit={form.handleSubmit(
                     (values) => {
-                        console.log("✅ Valid submit", values)
                         handleSubmit(values)
                     },
                     (errors) => {
                         console.log(errors)
-                        toast.error("Please check the form for errors")
+                        toast.error(t('checkFormError'))
                     }
                 )}
                 className='flex flex-col gap-8 section-padding'
@@ -607,9 +620,13 @@ export default function CheckOutPage() {
                             <Button type="submit" className='text-lg lg:w-1/3 w-1/2 py-6'>{t('continue')}</Button>
                         </div>
                     </div>
-
-
                 </div>
+                <OtpDialog
+                    open={openOtpDialog}
+                    onOpenChange={setOpenOTPDialog}
+                    email={otpEmail}
+                    onSuccess={handleOtpSuccess}
+                />
             </form>
         </FormProvider>
     )

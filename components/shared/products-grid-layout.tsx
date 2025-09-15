@@ -3,10 +3,12 @@ import Image from 'next/image'
 import React, { useEffect, useRef } from 'react'
 import ListReviewButton from './list-review-buttons'
 import gsap from 'gsap'
-import { ProductItem, ProductResponse } from '@/types/products'
-import Link from 'next/link'
+import { ProductItem } from '@/types/products'
 import { useMediaQuery } from 'react-responsive'
 import { useAddViewedProduct } from '@/features/viewed/hook'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/src/i18n/navigation'
+import { Star } from 'lucide-react'
 
 
 interface ProductsGridLayoutProps {
@@ -18,8 +20,9 @@ interface ProductsGridLayoutProps {
 
 const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsGridLayoutProps) => {
     const cardRefs = useRef<HTMLDivElement[]>([])
-    const isMobile = useMediaQuery({ maxWidth: 650 }); // ví dụ mobile breakpoint
+    const isMobile = useMediaQuery({ maxWidth: 650 })
     const addProductToViewMutation = useAddViewedProduct()
+    const t = useTranslations()
 
     useEffect(() => {
         cardRefs.current.forEach((card) => {
@@ -40,7 +43,6 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
     const handleAddProductToViewed = (productId: string) => {
         addProductToViewMutation.mutate({ productId: productId })
     }
-
 
     return (
         <div>
@@ -86,26 +88,48 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         className="w-full h-48 object-contain mb-2 rounded"
                                     />
 
-
-                                    <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>
-                                        <h3 className='lg:text-2xl text-base text-gray-600 font-semibold sm:mt-2 text-center line-clamp-2 px-2 lg:px-4 lg:min-h-[64px] min-h-[52px]'>
+                                    <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1 lg:px-4 px-2'>
+                                        <div className='uppercase font-bold text-black'>
+                                            {product.categories.length > 0
+                                                ? product.categories[0].children && product.categories[0].children.length > 0
+                                                    ? product.categories[0].children[0].name
+                                                    : product.categories[0].name
+                                                : t('general')}
+                                        </div>
+                                        <h3 className='text-lg text-black text-left line-clamp-2 lg:min-h-[64px] min-h-[52px]'>
                                             {product.name}
                                         </h3>
 
                                         {product.price ? (
-                                            <div className='flex flex-row gap-2 items-end justify-center'>
-                                                <p className='lg:text-xl text-sm font-light mb-1 relative line-through text-gray-400'>
-                                                    €{product.price.toFixed(2)}
+                                            <div className='flex gap-2 flex-col'>
+                                                <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
+                                                    <div className='text-4xl'>{Math.floor(product.final_price)}</div>
+                                                    <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
+                                                        .{(product.final_price % 1).toFixed(2).split(".")[1]}
+                                                    </div>
+                                                    <div className="text-base font-semibold text-black">€</div>
+                                                </div>
+
+                                                <p className='text-base mb-1'>
+                                                    Vorher: €{product.price.toFixed(2)}
                                                 </p>
-                                                <p className='lg:text-3xl text-xl font-bold mb-1 relative text-primary'>
-                                                    €{product.final_price.toFixed(2)}
-                                                </p>
+                                                <div className='space-x-2 flex items-end'>
+                                                    <div className='flex gap-0.5'>
+                                                        {[1, 2, 3, 4, 5].map(item => {
+                                                            return (
+                                                                <div key={item}>
+                                                                    <Star size={18} />
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                    <p className='leading-4 text-base font-semibold'>(0)</p>
+                                                </div>
                                             </div>
                                         ) : (
                                             <p className='text-xl font-bold mb-1 text-primary'>€{product.final_price}</p>
                                         )}
                                     </div>
-
 
                                     {/* Four lines starting from center of each edge */}
                                     <span className="absolute bottom-0 left-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>

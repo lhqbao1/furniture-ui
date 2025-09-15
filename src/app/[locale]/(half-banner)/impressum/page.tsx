@@ -5,7 +5,7 @@ import React from 'react'
 
 export const revalidate = 3600 // ISR: regenerate mỗi 1h
 
-export default async function Policy() {
+export default async function ImpressumPage() {
     const queryClient = new QueryClient()
 
     // Lấy phiên bản policy
@@ -32,7 +32,7 @@ export default async function Policy() {
         <HydrationBoundary state={dehydratedState}>
             <div className="w-full min-h-screen overflow-scroll">
                 {firstVersion ? (
-                    <ListPolicy versionId={firstVersion} versionDate={version} />
+                    <ListPolicy versionId={firstVersion} policyId='9fc87bb9-44d2-428d-9960-1b6074e11d76' versionDate={version} />
                 ) : (
                     <div className="text-center py-20 text-gray-500">
                         No policy found

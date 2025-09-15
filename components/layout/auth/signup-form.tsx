@@ -4,7 +4,6 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -124,11 +123,10 @@ export default function SignUpForm() {
               <FormItem>
                 <FormLabel>{t('phone_number')}</FormLabel>
                 <FormControl>
-                  <PhoneInput
-                    country={'de'} // default Germany
-                    value={field.value}
-                    onChange={(phone) => field.onChange(phone)}
-                    inputStyle={{ fontSize: '16px', borderRadius: 6, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", borderColor: '#e5e5e5' }}
+                  <Input
+                    type="number"
+                    placeholder="+49"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />

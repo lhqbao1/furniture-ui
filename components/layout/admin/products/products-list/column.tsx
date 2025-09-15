@@ -184,8 +184,8 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "name",
         header: "NAME",
-        cell: ({ row }) => <EditableNameCell product={row.original} />,
-
+        // cell: ({ row }) => <EditableNameCell product={row.original} />,
+        cell: ({ row }) => <div className="w-60 text-wrap">{row.original.name}</div>
     },
     {
         accessorKey: "category",
@@ -207,7 +207,8 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "stock",
         header: "STOCK",
-        cell: ({ row }) => <EditableStockCell product={row.original} />,
+        // cell: ({ row }) => <EditableStockCell product={row.original} />,
+        cell: ({ row }) => <div className="text-center">{row.original.stock} pcs.</div>
     },
     {
         accessorKey: "is_active",

@@ -433,7 +433,7 @@ const ProductDetails = () => {
                                             />
                                         </div>
                                         <Button
-                                            className="rounded-md pr-10 font-bold text-start justify-start lg:text-lg text-base lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
+                                            className="rounded-md pr-10 font-bold text-start justify-start lg:text-lg text-base lg:basis-2/5 w-3/5 relative lg:min-h-[40px] lg:h-fit !h-[40px]"
                                             type="submit"
                                         >
                                             {t('addToCart')}

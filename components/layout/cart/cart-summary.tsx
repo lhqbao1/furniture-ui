@@ -5,7 +5,6 @@ import { BadgePercent } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { CartResponse } from "@/types/cart"
-import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 
 interface CartSummaryProps {
@@ -16,7 +15,6 @@ interface CartSummaryProps {
 }
 
 const CartSummary = ({ total = 0, onApplyCoupon, onCheckout, cart }: CartSummaryProps) => {
-    const router = useRouter()
     const t = useTranslations()
 
     return (

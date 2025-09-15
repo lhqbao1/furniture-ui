@@ -1,7 +1,7 @@
 // features/auth/hooks.ts
 "use client"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getMe, login, logout, LoginInput, signUp, SignUpInput, forgotPassword, resetPassword, loginAdmin } from "./api"
+import { getMe, login, logout, LoginInput, signUp, SignUpInput, forgotPassword, resetPassword, loginAdmin, checkMailExist, loginOtp } from "./api"
 import { tokenStore } from "@/lib/token"
 
 export function useMe() {
@@ -61,5 +61,22 @@ export function useForgotPassword() {
 export function useResetPassword() {
   return useMutation({
     mutationFn: ({email,code,new_password}: {email: string, code: string, new_password: string}) => resetPassword(email, code, new_password),
+  })
+}
+
+export function useCheckMailExist() {
+  return useMutation({
+    mutationFn: (email: string) => checkMailExist(email),
+  })
+}
+
+export function useLoginOtp() {
+  return useMutation({
+    mutationFn: ({ email, code }: { email: string; code: string }) =>
+      loginOtp(email, code),
+    onSuccess(data) {
+      localStorage.setItem("access_token", data.access_token)
+      localStorage.setItem("userId", data.id)
+    },
   })
 }

@@ -17,7 +17,7 @@ const statisticDemo = [
 
 const ProductList = () => {
     const [page, setPage] = useState(1)
-    const [pageSize, setPageSize] = useState(10)
+    const [pageSize, setPageSize] = useState(50)
 
     const { data, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize, all_products: true })
 
