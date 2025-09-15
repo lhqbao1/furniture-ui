@@ -37,7 +37,7 @@ const Banner = ({ height }: BannerProps) => {
                 className={cn(
                     "relative w-full flex-shrink-0",
                     !height ? `h-[200px] lg:h-[400px]` : `lg:h-[${height}px]`,
-                    isPhone ? "mb-16 h-0" : ""
+                    isPhone ? "mb-0 h-0" : ""
                 )}
                 style={isPhone ? { height: 0 } : { height }}
             >

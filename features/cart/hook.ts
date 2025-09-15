@@ -93,7 +93,6 @@ export function useSyncLocalCart() {
       },
       onSuccess: () => {
         qc.refetchQueries({ queryKey: ["cart-items"] });
-        toast.success("Cart synced successfully!");
       },
       onError: (err) => {
         console.error("Error syncing cart:", err);

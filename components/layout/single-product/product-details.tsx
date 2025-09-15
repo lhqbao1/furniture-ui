@@ -291,6 +291,7 @@ const ProductDetails = () => {
                                                 transformOrigin: `${position.x}% ${position.y}%`,
                                                 transform: isHover ? "scale(1.5)" : "scale(1)",
                                             }}
+                                            priority
                                         />
                                     </div>
                                     {/* Sub images */}
@@ -309,6 +310,8 @@ const ProductDetails = () => {
                                                                 height={100}
                                                                 alt=''
                                                                 className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[70px] object-fill`}
+                                                                priority={index < 2} // preload 2 ảnh đầu tiên
+                                                                loading={index < 2 ? 'eager' : 'lazy'} // eager = tải ngay
                                                             />
                                                         </div>
                                                     </CarouselItem>
@@ -430,7 +433,7 @@ const ProductDetails = () => {
                                             />
                                         </div>
                                         <Button
-                                            className="rounded-xl px-10 font-bold lg:text-lg text-base lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
+                                            className="rounded-md pr-10 font-bold text-start justify-start lg:text-lg text-base lg:basis-2/5 basis-3/5 relative lg:min-h-[40px]"
                                             type="submit"
                                         >
                                             {t('addToCart')}
@@ -440,20 +443,20 @@ const ProductDetails = () => {
                                                     e.stopPropagation()
                                                     handleAddProductToWishlist()
                                                 }}
-                                                className="absolute bg-white rounded-xl aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0"
+                                                className="absolute bg-white rounded-md aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0"
                                             >
                                                 <Heart />
                                             </div>
-                                            <div
+                                            {/* <div
                                                 onClick={(e) => {
                                                     e.preventDefault()
                                                     e.stopPropagation()
                                                     handleAddProductToCart()
                                                 }}
-                                                className="absolute bg-white rounded-xl aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0"
+                                                className="absolute bg-white rounded-md aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0"
                                             >
                                                 <Plus />
-                                            </div>
+                                            </div> */}
                                         </Button>
 
                                     </div>
