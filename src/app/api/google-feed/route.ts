@@ -21,8 +21,8 @@ export async function GET() {
             : `/${p.id}`;
 
             const colors = p.options
-  .filter(opt => opt.variant_name?.toLowerCase() === "color")
-  .map(opt => opt.label);
+                .filter(opt => opt.variant_name?.toLowerCase() === "color")
+                .map(opt => opt.label);
 
       return {
         id: p.id,
@@ -35,7 +35,7 @@ export async function GET() {
         identifier_exists: 'yes',
         gtin: p.ean,
         mpn: p.sku,
-        brand: p.brand.name,
+        brand: p.brand ? p.brand.name : '',
         condition: "new",
         adult: 'no',
         age_group: 'adult',
