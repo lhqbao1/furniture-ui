@@ -58,16 +58,9 @@ const OrderPlaced = () => {
     // Gọi hook trực tiếp
     const { data: user } = useGetUserById(userId || '')
 
-    console.log(checkout)
-    console.log(invoice)
-    console.log(user)
-
     // Luồng xử lý khi có user
     useEffect(() => {
         const process = async () => {
-            console.log(checkout)
-            console.log(invoice)
-            console.log(user)
             if (!checkout || !invoice || !user) return
 
             try {

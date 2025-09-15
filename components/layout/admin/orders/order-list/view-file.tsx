@@ -31,7 +31,7 @@ const ViewFileDialog = ({ checkoutId, invoiceId }: ViewFileDialogProps) => {
             </DialogTrigger>
             <DialogContent className="w-fit px-0">
                 <DialogHeader>
-                    <DialogTitle>PDF File</DialogTitle>
+                    <DialogTitle></DialogTitle>
                 </DialogHeader>
                 <InvoiceTable checkoutId={checkoutId} />
             </DialogContent>

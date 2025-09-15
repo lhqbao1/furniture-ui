@@ -20,16 +20,29 @@ export async function GET() {
             ? `/${formatName(level2.name)}/${p.id}`
             : `/${p.id}`;
 
+            const colors = p.options
+  .filter(opt => opt.variant_name?.toLowerCase() === "color")
+  .map(opt => opt.label);
+
       return {
         id: p.id,
         title: p.name,
         description: p.description,
-        link: `https://prestige-home.de${categoryHref}`,
+        link: `https://prestige-home.de/product${categoryHref}`,
         image_link: p.static_files[0]?.url,
-        availability: p.stock > 0 ? "in stock" : "out of stock",
-        price: `€${p.final_price.toFixed(2)}`,
+        availability: p.stock > 0 ? "in_stock" : "out_of_stock",
+        price: `${p.final_price.toFixed(2)} €`,
+        identifier_exists: 'yes',
+        gtin: p.ean,
+        mpn: p.sku,
         brand: p.brand,
         condition: "new",
+        adult: 'yes',
+        age_group: 'adult',
+        item_group_id: p.parent_id,
+        is_bundle: 'no',
+        color: colors.length ? colors.join(", ") : undefined,
+        shipping : { "country": "DE", "service": "Standard", "price": "5.95 EUR" }        
       };
     });
 

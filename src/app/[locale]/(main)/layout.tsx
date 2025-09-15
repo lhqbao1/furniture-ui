@@ -13,7 +13,7 @@ export default function MainLayout({
   return (
     <SidebarProvider>
       <AppSidebarServer />
-      <main className="relative overflow-x-hidden">
+      <main className="relative overflow-x-hidden w-full">
         {/* <StickyIcon /> */}
         <Banner />
         <div className="container-padding flex-1">

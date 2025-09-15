@@ -12,7 +12,7 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
     accessorKey: "name",
     header: "Item(s)",
     cell: ({ row }) => (
-      <div>
+      <div className="max-w-[300px] text-wrap">
         <div>{row.original.products.name}</div>
         <div>{row.original.products.id_provider}</div>
       </div>

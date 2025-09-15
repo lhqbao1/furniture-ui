@@ -27,9 +27,9 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
     })
 
     return (
-        <div id="invoice-table" className="flex flex-col gap-6 items-start w-[794px] p-12 pb-4 relative">
+        <div id="invoice-table" className="flex flex-col gap-6 items-start w-[794px] h-screen overflow-y-scroll p-12 pb-4 relative">
             <Image
-                src="/new-logo.png"
+                src="/invoice-logo.png"
                 height={100}
                 width={100}
                 alt=""
@@ -56,7 +56,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
             </div>
             <div className="text-center w-full space-y-4">
                 <h2 className="text-3xl text-secondary font-bold">Invoice</h2>
-                <FileTable columns={invoiceColumns} data={invoice?.cart.items ?? []} voucher={invoice?.voucher_amount} coupon={invoice?.coupon_amount} />
+                <FileTable columns={invoiceColumns} data={checkout?.cart.items ?? []} voucher={invoice?.voucher_amount} coupon={invoice?.coupon_amount} />
             </div>
 
             <div className="flex flex-col items-end w-full space-y-2">
