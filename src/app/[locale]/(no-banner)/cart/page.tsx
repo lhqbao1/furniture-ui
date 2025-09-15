@@ -79,19 +79,7 @@ const CartPage = () => {
 
 
     return (
-        <div>
-            <div className='text-center flex flex-col items-center gap-3 xl:text-5xl text-3xl bg-gray-100 xl:py-10 py-4'>
-                <Image
-                    src={'/new-logo.svg'}
-                    height={100}
-                    width={100}
-                    alt=''
-                />
-                <Link href={'/'} className='cursor-pointer space-x-2'>
-                    <span className='text-secondary font-libre font-bold'>Prestige</span>
-                    <span className='text-primary font-libre font-bold'>Home</span>
-                </Link>
-            </div>
+        <div className='lg:mt-6 mt-1'>
             <div className='container-padding'>
                 <div className="w-full max-w-6xl mx-auto p-6">
                     <div className="grid grid-cols-12 xl:gap-16 gap-6">

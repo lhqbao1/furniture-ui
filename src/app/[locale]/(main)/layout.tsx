@@ -3,6 +3,7 @@ import Footer from "@/components/shared/footer";
 import Banner from "@/components/shared/banner";
 import "../../globals.css"
 import AppSidebarServer from "@/components/layout/app-sidebar-server";
+import HeaderClient from "@/components/shared/client-header";
 
 export default function MainLayout({
   children,
@@ -13,13 +14,16 @@ export default function MainLayout({
   return (
     <SidebarProvider>
       <AppSidebarServer />
-      <main className="relative overflow-x-hidden w-full">
+      <main className="relative w-full">
         {/* <StickyIcon /> */}
-        <Banner />
-        <div className="container-padding flex-1">
-          {children}
+        <HeaderClient hasSideBar />
+        <div className="overflow-x-hidden">
+          <Banner />
+          <div className="container-padding flex-1">
+            {children}
+          </div>
+          <Footer />
         </div>
-        <Footer />
       </main>
     </SidebarProvider>
   );

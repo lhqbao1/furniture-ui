@@ -3,18 +3,9 @@ import Image from 'next/image';
 import React from 'react'
 import { useMediaQuery } from 'react-responsive';
 import ProductSearch from './product-search';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { useTranslations } from 'next-intl';
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ChevronDown, Mic, Search, ShoppingCart, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { BannerInput } from '@/components/shared/banner-input'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -30,8 +21,11 @@ import { getMe } from '@/features/auth/api';
 import { Link, useRouter } from '@/src/i18n/navigation';
 import { useCartLocal } from '@/hooks/cart';
 
+interface PageHeaderProps {
+    hasSideBar?: boolean
+}
 
-const PageHeader = () => {
+const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     const router = useRouter()
     const t = useTranslations()
 
@@ -84,7 +78,7 @@ const PageHeader = () => {
 
 
     return (
-        <div className={`home-banner-top__content ${isPhone ? 'sticky top-0 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 overflow-hidden' : 'flex items-center justify-end px-4 py-3 gap-6 sticky bg-white shadow-secondary/10 shadow-xl z-50 top-0'}`}>
+        <div className={`home-banner-top__content sticky top-0 overflow-hidden z-50 ${isPhone ? 'flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex items-center justify-end px-4 py-3 gap-6 bg-white shadow-secondary/10 shadow-xl'}`}>
             <div className={`${isPhone ? 'block' : 'hidden'}`}>
                 <Link href={'/'}>
                     <Image
@@ -137,7 +131,9 @@ const PageHeader = () => {
                     <MobileProductSearch />
                 </div>
 
-                <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
+                {hasSideBar ?
+                    <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
+                    : ''}
                 {/*Shopping cart */}
                 <Link href={'/cart'} className={`cursor-pointer relative`}>
                     <ShoppingCart stroke={`${isPhone ? '#00B159' : '#4D4D4D'}`} size={30} className='hover:scale-110 transition-all duration-300' />
