@@ -24,8 +24,8 @@ const AnimatedCarousel = () => {
     const { data: categories, isLoading, isError } = useGetCategories()
     const router = useRouter()
     // Responsive breakpoints
-    const isMobile = useMediaQuery({ maxWidth: 430 }); // iPhone 12 Pro và nhỏ hơn
-    const isTablet = useMediaQuery({ minWidth: 431, maxWidth: 768 });
+    const isMobile = useMediaQuery({ maxWidth: 650 }); // iPhone 12 Pro và nhỏ hơn
+    const isTablet = useMediaQuery({ minWidth: 651, maxWidth: 950 });
     const t = useTranslations()
 
 

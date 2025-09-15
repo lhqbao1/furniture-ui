@@ -18,7 +18,7 @@ interface ProductsGridLayoutProps {
 
 const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsGridLayoutProps) => {
     const cardRefs = useRef<HTMLDivElement[]>([])
-    const isMobile = useMediaQuery({ maxWidth: 430 }); // ví dụ mobile breakpoint
+    const isMobile = useMediaQuery({ maxWidth: 650 }); // ví dụ mobile breakpoint
     const addProductToViewMutation = useAddViewedProduct()
 
     useEffect(() => {

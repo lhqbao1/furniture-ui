@@ -11,7 +11,7 @@ const PreOrder = () => {
     const [activeIndex, setActiveIndex] = useState(0) // thẻ đang ở giữa
     const [currentItem, setCurrentItem] = useState<PreOrderProduct | undefined>(preOrderItems[0])
     const t = useTranslations()
-    const isPhone = useMediaQuery({ maxWidth: 430 })
+    const isPhone = useMediaQuery({ maxWidth: 650 })
     return (
         <div className='section-padding'>
             <h2 className='section-header'>{t('preOrder')}</h2>

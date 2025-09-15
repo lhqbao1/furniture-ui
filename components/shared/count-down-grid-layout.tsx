@@ -20,7 +20,7 @@ interface ProductTime {
 
 const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
     const cardRefs = useRef<HTMLDivElement[]>([])
-    const isMobile = useMediaQuery({ maxWidth: 430 }) // breakpoint mobile
+    const isMobile = useMediaQuery({ maxWidth: 650 }) // breakpoint mobile
     const t = useTranslations()
 
     // state riêng cho countdown & progress

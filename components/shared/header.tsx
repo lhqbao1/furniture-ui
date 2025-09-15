@@ -36,7 +36,7 @@ const PageHeader = () => {
     const t = useTranslations()
 
 
-    const isPhone = useMediaQuery({ maxWidth: 430 })
+    const isPhone = useMediaQuery({ maxWidth: 650 })
     const queryClient = useQueryClient();
 
     const [userId, setUserId] = React.useState<string | null>(

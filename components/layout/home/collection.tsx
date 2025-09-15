@@ -27,7 +27,7 @@ const Collection = () => {
 
     const [listCollection, setListCollection] = useState(collectionList)
     const containerRefs = useRef<HTMLDivElement[]>([])
-    const isMobile = useMediaQuery({ maxWidth: 430 }); // iPhone 12 Pro và nhỏ hơn
+    const isMobile = useMediaQuery({ maxWidth: 650 }); // iPhone 12 Pro và nhỏ hơn
 
 
 
