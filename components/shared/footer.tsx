@@ -25,7 +25,6 @@ const Footer = () => {
                     <li><Link href="/" className="">{t('aboutUs')}</Link></li>
                     <li><Link href="/contact" className="">{t('contact')}</Link></li>
                     <li><Link href="/faq" className="">FAQ</Link></li>
-                    <li><Link href="/" className="">{t('imprint')}</Link></li>
                 </ul>
             </div>
 
