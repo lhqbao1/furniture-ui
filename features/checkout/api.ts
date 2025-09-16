@@ -1,4 +1,4 @@
-import { api, apiAdmin } from "@/lib/axios"
+import { api, apiAdmin, apiFlexible } from "@/lib/axios"
 import { CreateOrderFormValues } from "@/lib/schema/checkout"
 import { CheckOut, CheckOutResponse, CheckOutStatistics } from "@/types/checkout"
 
@@ -25,7 +25,7 @@ export async function createCheckOut(item: CreateOrderFormValues) {
 }
 
 export async function getCheckOutByCheckOutId(checkout_id: string) {
-  const {data} = await api.get(
+  const {data} = await apiFlexible.get(
       `/checkout/details/${checkout_id}`,
   )
   return data as CheckOut 

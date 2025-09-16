@@ -41,10 +41,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
     const { open: sidebarOpen, setOpen } = useSidebar()  // true = expanded, false = collapsed
     const t = useTranslations()
 
-    // Đồng bộ state sidebar với prop defaultOpen
-    React.useEffect(() => {
-        setOpen(defaultOpen)
-    }, [defaultOpen, setOpen])
+
 
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
         return categories.map((cat) => ({
@@ -58,6 +55,15 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
 
     const pathname = usePathname()
     const router = useRouter()
+
+    // Đồng bộ state sidebar với prop defaultOpen
+    React.useEffect(() => {
+        if (pathname === "/cart" || pathname === "/check-out") {
+            setOpen(false)
+        } else {
+            setOpen(defaultOpen)
+        }
+    }, [pathname, defaultOpen, setOpen])
 
     const newProducts: MenuItem = { title: t("newProducts"), url: "/new-products", id: "new-products" };
     const sale: MenuItem = { title: t("sale"), url: "/sale", id: "sale" };

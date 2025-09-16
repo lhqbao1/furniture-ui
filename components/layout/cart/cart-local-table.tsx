@@ -203,13 +203,7 @@ export function CartLocalTable({
                                 ))}
                             </TableRow>
                         ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                No items in cart
-                            </TableCell>
-                        </TableRow>
-                    )}
+                    ) : ''}
                 </TableBody>
             </Table>
         </div>

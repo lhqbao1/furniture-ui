@@ -203,5 +203,6 @@
   "male": "Herr",
   "female": "Frau",
   "addressSupplement": "Adresszusatz",
-  "gender_required": "Geschlecht ist erforderlich"
+  "gender_required": "Geschlecht ist erforderlich",
+  "loginToContinue": "Zum Fortfahren anmelden"
 }

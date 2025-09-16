@@ -131,12 +131,9 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                     <MobileProductSearch />
                 </div>
 
-                {hasSideBar ?
-                    <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
-                    : ''}
                 {/*Shopping cart */}
                 <Link href={'/cart'} className={`cursor-pointer relative`}>
-                    <ShoppingCart stroke={`${isPhone ? '#00B159' : '#4D4D4D'}`} size={30} className='hover:scale-110 transition-all duration-300' />
+                    <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
                     {displayedCart && displayedCart.length > 0 ?
                         <span className="absolute -top-1.5 -right-1 flex size-3">
                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
@@ -150,7 +147,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                 <DropdownMenu >
                     <DropdownMenuTrigger asChild>
                         <div className='flex gap-2 justify-start items-end'>
-                            <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`${isPhone ? '#00B159' : '#4D4D4D'}`} size={30} />
+                            <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`#4D4D4D`} size={30} />
                         </div>
                     </DropdownMenuTrigger>
 
@@ -192,6 +189,10 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                {hasSideBar ?
+                    <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
+                    : ''}
             </div>
         </div>
     )

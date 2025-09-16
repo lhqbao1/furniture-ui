@@ -12,11 +12,13 @@ import { Link, useRouter } from '@/src/i18n/navigation'
 import { getCartItems } from '@/features/cart/api'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import CartLoginForm from '@/components/layout/cart/login-form-cart'
+import { useTranslations } from 'next-intl'
 
 
 const CartPage = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false)
+    const t = useTranslations()
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
@@ -89,6 +91,7 @@ const CartPage = () => {
                             cart={cart}
                             localQuantities={localQuantities}
                             setLocalQuantities={setLocalQuantities}
+                            isCheckout={false}
                         />) :
                             (
                                 <CartLocalTable
@@ -119,7 +122,7 @@ const CartPage = () => {
             <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
                 <DialogContent className="sm:max-w-[400px]" >
                     <DialogHeader>
-                        <DialogTitle>Login to continue</DialogTitle>
+                        <DialogTitle>{t('loginToContinue')}</DialogTitle>
                     </DialogHeader>
                     <CartLoginForm
                         onSuccess={() => {

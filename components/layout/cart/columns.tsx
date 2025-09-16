@@ -4,10 +4,14 @@ import { ColumnDef } from "@tanstack/react-table"
 import { CartItem } from "@/types/cart"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Trash } from "lucide-react"
+import { Heart, Trash } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { useMediaQuery } from "react-responsive"
+import { ProductItem } from "@/types/products"
+import { useAddToWishList } from "@/features/wishlist/hook"
+import { toast } from "sonner"
+import { HandleApiError } from "@/lib/api-helper"
 
 interface GetCartColumnsProps {
     localQuantities: Record<string, number>
@@ -28,18 +32,39 @@ export const GetCartColumns = ({
 }: GetCartColumnsProps): ColumnDef<CartItem>[] => {
     const t = useTranslations()
     const isMobile = useMediaQuery({ maxWidth: 650 })
+    const addToWishlistMutation = useAddToWishList()
+
+    const handleAddToWishlist = (currentProduct: ProductItem) => {
+        if (!currentProduct) return
+        addToWishlistMutation.mutate({ productId: currentProduct.id ?? '', quantity: 1 }, {
+            onSuccess(data, variables, context) {
+                toast.success(t('addToWishlistSuccess'))
+            },
+            onError(error, variables, context) {
+                const { status, message } = HandleApiError(error, t);
+                toast.error(message)
+            },
+        })
+    }
 
     const actionsColumn: ColumnDef<CartItem> = {
         id: "actions",
         cell: ({ row }) => {
             const item = row.original
             return (
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
                     <Trash
                         className="text-red-500 cursor-pointer"
                         onClick={() => onDeleteItem(item)}
                         size={20}
                     />
+                    {isCheckout === true ?
+                        <Heart
+                            className="text-secondary cursor-pointer"
+                            onClick={() => handleAddToWishlist(item.products)}
+                            size={20}
+                        />
+                        : ''}
                 </div>
             )
         },

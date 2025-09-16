@@ -38,17 +38,18 @@ const Footer = () => {
                     <li><Link href="/widerruf" className="">Widerruf</Link></li>
                     <li><Link href="/impressum" className="">{t('imprint')}</Link></li>
                     <li>
-                        <Link
-                            href="#"
+                        <div
+                            // href="#"
                             onClick={(e) => {
-                                e.preventDefault()
+                                // e.preventDefault()
+                                console.log(window.Cookiebot?.show())
                                 if (typeof window !== "undefined" && window.Cookiebot) {
-                                    window.Cookiebot.renew()
+                                    window.Cookiebot.show()
                                 }
                             }}
                         >
                             {t("cookieSetting")}
-                        </Link>
+                        </div>
                     </li>
                 </ul>
             </div>

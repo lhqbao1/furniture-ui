@@ -37,7 +37,7 @@ export default function MobileProductSearch() {
         <div className="block md:hidden">
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Search className="text-[#00B159]" size={30} />
+                    <Search stroke="#4D4D4D" size={30} />
                 </DialogTrigger>
                 <DialogContent className="p-1.5 w-3/4 h-3/4">
                     <Command className="h-full" shouldFilter={false}>

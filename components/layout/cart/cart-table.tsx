@@ -144,13 +144,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
                                     ))}
                                 </TableRow>
                             ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {t('noItems')}
-                                </TableCell>
-                            </TableRow>
-                        )}
+                        ) : ''}
                     </TableBody>
                 )}
             </Table>

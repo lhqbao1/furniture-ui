@@ -85,16 +85,16 @@ export function FileTable<TData, TValue>({
                             <TableRow>
                                 <TableCell className="text-start">{table.getRowModel().rows?.length + 1}</TableCell>
                                 <TableCell className="text-start">Coupon</TableCell>
-                                <TableCell className="text-start">#SALE10</TableCell>
-                                <TableCell className="text-center pr-6">1</TableCell>
+                                <TableCell className="text-start"></TableCell>
+                                <TableCell className="text-center pr-6"></TableCell>
                                 <TableCell className="text-right"></TableCell>
                                 <TableCell className="text-end">€{coupon ? coupon?.toFixed(2) : DEFAULT_SALE.toFixed(2)}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell className="text-start">{table.getRowModel().rows?.length + 2}</TableCell>
                                 <TableCell className="text-start">Voucher</TableCell>
-                                <TableCell className="text-start">#FREESHIP10</TableCell>
-                                <TableCell className="text-center pr-6">1</TableCell>
+                                <TableCell className="text-start"></TableCell>
+                                <TableCell className="text-center pr-6"></TableCell>
                                 <TableCell className="text-right"></TableCell>
                                 <TableCell className="text-end">€{voucher ? voucher.toFixed(2) : DEFAULT_SALE.toFixed(2)}</TableCell>
                             </TableRow>

@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query"
 import { getCheckOutByCheckOutId } from "@/features/checkout/api"
 import { getInvoiceByCheckOut } from "@/features/invoice/api"
 import { FileTable } from "./table"
-import { check } from "zod"
 
 interface InvoiceTableProps {
     checkoutId: string
@@ -17,13 +16,14 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
     const { data: checkout, isLoading: isCheckoutLoading, isError: isCheckoutError } = useQuery({
         queryKey: ["checkout-id", checkoutId],
         queryFn: () => getCheckOutByCheckOutId(checkoutId as string),
-        enabled: !!checkoutId, // chỉ chạy khi có id
+        enabled: !!checkoutId,
     })
 
     const { data: invoice, isLoading: isInvoiceLoading, isError: isInvoiceError } = useQuery({
         queryKey: ["invoice-checkout", checkoutId],
         queryFn: () => getInvoiceByCheckOut(checkoutId as string),
-        enabled: !!checkoutId, // chỉ chạy khi có id
+        enabled: !!checkoutId,
+        retry: false
     })
 
     return (
@@ -43,20 +43,20 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div className="flex flex-col gap-1">
                     <span>Invoice ID: {invoice?.invoice_code}</span>
                     <span>
-                        Invoice date: {checkout?.created_at
-                            ? new Date(checkout.created_at).toLocaleDateString("en-US", {
+                        Invoice date: {invoice?.created_at
+                            ? new Date(invoice.created_at).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
                             })
                             : ""}
                     </span>
-                    <span>Customer ID: {checkout?.user.id.slice(0.7)}</span>
+                    <span>Customer ID: {invoice?.user_code}</span>
                 </div>
             </div>
             <div className="text-center w-full space-y-4">
                 <h2 className="text-3xl text-secondary font-bold">Invoice</h2>
-                <FileTable columns={invoiceColumns} data={checkout?.cart.items ?? []} voucher={invoice?.voucher_amount} coupon={invoice?.coupon_amount} />
+                <FileTable columns={invoiceColumns} data={invoice?.cart.items ?? []} voucher={invoice?.voucher_amount} coupon={invoice?.coupon_amount} />
             </div>
 
             <div className="flex flex-col items-end w-full space-y-2">
@@ -64,28 +64,31 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                     <div>Total net amount</div>
                     <div>
                         €{
-                            (checkout?.total_amount_item ?? 0)
-                            - (checkout?.total_vat ?? 0)
-                            - (checkout?.voucher_amount ?? 0)
-                            - (checkout?.coupon_amount ?? 0)
+                            ((invoice?.total_amount_item ?? 0)
+                                - (invoice?.total_vat ?? 0)
+                                - (invoice?.voucher_amount ?? 0)
+                                - (invoice?.coupon_amount ?? 0)).toFixed(2)
                         }
                     </div>
                 </div>
                 <div className="flex gap-3 justify-end">
                     <div>Total VAT </div>
-                    <div>€{checkout?.total_vat}</div>
+                    <div>€{invoice?.total_vat.toFixed(2)}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Shipping cost</div>
-                    <div>€{checkout?.total_shipping}</div>
+                    <div>€{invoice?.total_shipping.toFixed(2)}</div>
                 </div><div className="flex gap-3 justify-end bg-secondary/20 p-2 rounded-sm">
                     <div className="font-bold">Invoice amount</div>
-                    <div>€{checkout?.total_amount}</div>
+                    <div>€{invoice?.total_amount.toFixed(2)}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div className="font-bold">Amount Due</div>
-                    <div>€{checkout?.total_amount}</div>
+                    <div>€{invoice?.total_amount.toFixed(2)}</div>
                 </div><div className="flex gap-3 justify-end">
-                    <div>Payment (PayPal Checkout) from 04/29/2025</div>
-                    <div>€{checkout?.total_amount}</div>
+                    <div>Payment {invoice?.created_at
+                        ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                        : ""}
+                    </div>
+                    <div>€{invoice?.total_amount.toFixed(2)}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Open Amount</div>
                     <div>€00.00</div>

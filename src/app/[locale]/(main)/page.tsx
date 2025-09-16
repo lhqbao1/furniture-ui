@@ -36,9 +36,9 @@ export default async function Home() {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div id="home" className="w-full">
         <TrendingProducts />
-        <AnimatedCarousel />
-        <Voucher />
-        <FlashSale />
+        {/* <AnimatedCarousel /> */}
+        {/* <Voucher /> */}
+        {/* <FlashSale /> */}
         <PreOrder />
         <RecentViewed />
         <Collection />

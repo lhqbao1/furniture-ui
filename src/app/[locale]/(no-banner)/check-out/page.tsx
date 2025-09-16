@@ -500,7 +500,6 @@ export default function CheckOutPage() {
                                         }}
                                         isCheckout
                                     />
-
                                 )
                         }
 
