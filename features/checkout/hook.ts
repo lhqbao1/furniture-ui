@@ -1,11 +1,11 @@
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCheckOut, getCheckOut, getCheckOutByCheckOutId, getCheckOutByUserId, getCheckOutStatistics } from "./api";
+import { createCheckOut, GetAllCheckoutParams, getCheckOut, getCheckOutByCheckOutId, getCheckOutByUserId, getCheckOutStatistics } from "./api";
 
-export function useGetCheckOut(){
+export function useGetCheckOut({ page, page_size }: GetAllCheckoutParams = {}){
     return useQuery({
-       queryKey: ["checkout"],
-       queryFn: () => getCheckOut(),
+       queryKey: ["checkout", page, page_size],
+       queryFn: () => getCheckOut({ page, page_size }),
        retry: false,
      })
 }

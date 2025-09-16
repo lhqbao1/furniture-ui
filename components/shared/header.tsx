@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { getMe } from '@/features/auth/api';
 import { Link, useRouter } from '@/src/i18n/navigation';
 import { useCartLocal } from '@/hooks/cart';
+import { useIsPhone } from '@/hooks/use-is-phone';
 
 interface PageHeaderProps {
     hasSideBar?: boolean
@@ -28,9 +29,8 @@ interface PageHeaderProps {
 const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     const router = useRouter()
     const t = useTranslations()
+    const isPhone = useIsPhone()
 
-
-    const isPhone = useMediaQuery({ maxWidth: 650 })
     const queryClient = useQueryClient();
 
     const [userId, setUserId] = React.useState<string | null>(
@@ -90,7 +90,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                     />
                 </Link>
             </div>
-            <div className={`font-libre text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`}>
+            <div className={`text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`}>
                 <span className="text-secondary font-bold">Prestige</span>
                 <span className="text-primary font-bold">Home</span>
             </div>
@@ -191,7 +191,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                 </DropdownMenu>
 
                 {hasSideBar ?
-                    <SidebarTrigger className={`border-none text-primary relative`} isMobile={isPhone ? true : false} />
+                    <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isMobile={isPhone ? true : false} />
                     : ''}
             </div>
         </div>

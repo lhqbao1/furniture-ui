@@ -20,7 +20,7 @@ export const addProductSchema = z.object({
   // sku: z.string().min(1, "You must provide product sku"),
   sku: z.string().optional().nullable(),
   ean: z.string().min(1, "You must provide product EAN"),
-  carrier: z.string().min(1, "You must provide a carrier"),
+  carrier: z.string().optional(),
   delivery_time:z.string().optional(),
   manufacture_country: z.string().optional(),
   tariff_number: z.string().optional(),
@@ -36,7 +36,11 @@ export const addProductSchema = z.object({
   is_active: z.boolean(),
   tag: z.string().optional().nullable(),
   static_files: z.array(StaticFileSchema),
-  category_ids: z.array(z.string())
+  category_ids: z.array(z.string()),
+
+  weee_nr: z.string().optional(),
+  eek: z.string().optional(),
+  gpsr_info: z.string().optional(),
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 })
 
@@ -55,6 +59,9 @@ export const defaultValues = {
   is_active: true,
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
+  weee_nr: "",
+  eek: "",
+  gpsr_info: ""
   // brand_id: "",
   // carrier: "",
   // delivery_time: "",

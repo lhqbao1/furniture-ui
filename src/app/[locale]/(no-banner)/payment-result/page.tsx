@@ -118,7 +118,7 @@ const OrderPlaced = () => {
                     priority
                     className="w-auto h-[80px]"
                 />
-                <div className="font-libre text-2xl flex gap-1">
+                <div className="text-2xl flex gap-1">
                     <span className="text-secondary text-[40px] font-semibold">Prestige</span>
                     <span className="text-primary text-[40px] font-semibold">Home</span>
                 </div>
@@ -128,7 +128,7 @@ const OrderPlaced = () => {
                 <div className="absolute top-0 left-0 w-40 h-32 bg-secondary clip-triangle-top-left" />
                 <div className="absolute bottom-0 right-0 w-40 h-32 bg-primary clip-triangle-bottom-right" />
 
-                <h1 className="text-6xl font-libre text-gray-700 mb-6 italic">{t('thankYou')}</h1>
+                <h1 className="text-6xl text-gray-700 mb-6 italic">{t('thankYou')}</h1>
 
                 <p className="text-gray-600 text-lg">
                     {t('orderPlacedMessage')}

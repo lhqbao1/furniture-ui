@@ -1,17 +1,23 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { preOrderItems } from '@/data/data'
+import { useIsPhone } from '@/hooks/use-is-phone'
 import { PreOrderProduct } from '@/types/products'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useState } from 'react'
-import { useMediaQuery } from 'react-responsive'
+import PreOrderSkeleton from './pre-order-skeleton'
 
 const PreOrder = () => {
     const [activeIndex, setActiveIndex] = useState(0) // thẻ đang ở giữa
     const [currentItem, setCurrentItem] = useState<PreOrderProduct | undefined>(preOrderItems[0])
     const t = useTranslations()
-    const isPhone = useMediaQuery({ maxWidth: 650 })
+    const isPhone = useIsPhone()
+
+    if (isPhone === undefined) {
+        // Chưa mount → render skeleton/placeholder hoặc null
+        return <PreOrderSkeleton />
+    }
     return (
         <div className='section-padding'>
             <h2 className='section-header'>{t('preOrder')}</h2>

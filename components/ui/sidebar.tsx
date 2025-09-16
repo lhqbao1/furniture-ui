@@ -280,7 +280,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <AlignJustify size={50} className="w-[30px] h-[30px] size-7 hover:scale-110 transition-all duration-300" stroke={`${isMobile ? '#00B159' : '#4D4D4D'}`} />
+      <AlignJustify size={50} className="w-[30px] h-[30px] size-7 hover:scale-110 transition-all duration-300" stroke={`#4D4D4D`} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

@@ -3,13 +3,13 @@
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { useGetProductByTag } from "@/features/products/hook";
+import { useIsPhone } from "@/hooks/use-is-phone";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { useMediaQuery } from "react-responsive";
 
 const TrendingProducts = () => {
     const t = useTranslations()
-    const isPhone = useMediaQuery({ width: 430 })
+    const isPhone = useIsPhone()
     const { data: products, isLoading, isError } = useGetProductByTag('Trending');
 
     return (

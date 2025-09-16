@@ -2,16 +2,14 @@
 import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-import { useMediaQuery } from 'react-responsive'
-import { useTranslations } from 'next-intl'
-import PageHeader from './header'
+import { useIsPhone } from '@/hooks/use-is-phone'
 
 interface BannerProps {
     height?: number
 }
 
 const Banner = ({ height }: BannerProps) => {
-    const isPhone = useMediaQuery({ maxWidth: 650 })
+    const isPhone = useIsPhone()
     const [isSticky, setIsSticky] = useState(false);
 
     // Xử lý scroll

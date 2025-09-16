@@ -9,8 +9,8 @@ import React, { useState } from 'react'
 
 const OrderList = () => {
     const [page, setPage] = useState(1)
-    const [pageSize, setPageSize] = useState(10)
-    const { data, isLoading, isError } = useGetCheckOut()
+    const [pageSize, setPageSize] = useState(50)
+    const { data, isLoading, isError } = useGetCheckOut({ page, page_size: pageSize })
     const { data: statistic, isLoading: isLoadingStatistic, isError: isErrorStatistic } = useGetCheckOutStatistic()
 
     const mergedStatistic = [
@@ -39,7 +39,7 @@ const OrderList = () => {
     return (
         <div className='space-y-12 pb-30'>
             {isLoadingStatistic || !statistic ? <ProductStatisticSkeleton /> : <ProductStatistic statistic={mergedStatistic} />}
-            <div className='text-3xl text-secondary font-bold text-center font-libre'>Order List</div>
+            <div className='text-3xl text-secondary font-bold text-center'>Order List</div>
             {isLoading ? <ProductTableSkeleton columnsCount={6} rowsCount={6} /> :
                 <ProductTable
                     data={data ? data.items : []}

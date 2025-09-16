@@ -15,7 +15,7 @@ const Footer = () => {
                         Prestige Home GmbH
                     </p>
                     <p className="text-sm text-black-700">Greifswalder Straße 226, 10405 Berlin.</p>
-                    <p className="text-sm text-black-700">Tax code: DE454714336</p>
+                    <p className="text-sm text-black-700">USt IdNr: DE454714336</p>
                 </div>
             </div>
 

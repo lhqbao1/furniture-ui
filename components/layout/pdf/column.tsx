@@ -32,13 +32,7 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
     accessorKey: "vat",
     header: "VAT",
     cell: ({ row }) => {
-      const { price_whithout_tax, final_price } = row.original
-
-      if (!price_whithout_tax || price_whithout_tax === 0) return "0%"
-
-      const vat = ((final_price - price_whithout_tax) / price_whithout_tax) * 100
-
-      return `${vat.toFixed(2)}%`
+      return <div>{row.original.products.tax}</div>
     },
   },
 

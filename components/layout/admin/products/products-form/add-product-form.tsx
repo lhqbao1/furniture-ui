@@ -487,36 +487,50 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 </div>
                             </div>
 
-                            {/*Tag choose */}
-                            <div className="w-1/2">
-                                <FormField
-                                    control={form.control}
-                                    name="tag"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="font-bold text-base justify-end">Tag</FormLabel>
-                                            <div className="flex flex-row gap-2 flex-wrap justify-end">
-                                                {tags.map((item, idx) => {
-                                                    const isSelected = field.value === item.name
-                                                    return (
-                                                        <div
-                                                            key={idx}
-                                                            style={{ background: item.color }}
-                                                            onClick={() =>
-                                                                field.onChange(isSelected ? "" : item.name) // toggle
-                                                            }
-                                                            className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${isSelected ? `ring-2 ring-primary ring-offset-2` : ""
-                                                                }`}
-                                                        >
-                                                            {item.name}
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                            {/* WEEE Nr */}
+                            <FormField
+                                control={form.control}
+                                name="weee_nr"
+                                render={({ field }) => (
+                                    <FormItem className='grid grid-cols-6 w-full'>
+                                        <FormLabel className="text-[#666666] text-sm col-span-2">
+                                            WEEE Nr
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="" {...field} className='col-span-4' />
+                                        </FormControl>
+                                        <FormMessage className='col-span-6' />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* EEK Label: */}
+                            <FormField
+                                control={form.control}
+                                name="weee_nr"
+                                render={({ field }) => (
+                                    <FormItem className="grid grid-cols-6 w-full">
+                                        <FormLabel className="text-[#666666] text-sm col-span-2">
+                                            EEK Label
+                                        </FormLabel>
+                                        <FormControl >
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <SelectTrigger placeholderColor className='border w-full col-span-4 font-light'>
+                                                    <SelectValue placeholder="EEK Label" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {["A", "B", "C", "D", "E", "F"].map((option) => (
+                                                        <SelectItem key={option} value={option}>
+                                                            {option}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage className="col-span-6" />
+                                    </FormItem>
+                                )}
+                            />
 
                             {/* Carrier field */}
                             <FormField
@@ -529,7 +543,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                         </FormLabelWithAsterisk>
                                         <FormControl>
                                             <Select value={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger placeholderColor className='border col-span-4'>
+                                                <SelectTrigger placeholderColor className='border col-span-4 font-light'>
                                                     <SelectValue placeholder="Select carrier" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -566,7 +580,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                         </FormLabelWithAsterisk>
                                         <FormControl>
                                             <Select value={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger placeholderColor className='border col-span-4'>
+                                                <SelectTrigger placeholderColor className='border col-span-4 font-light'>
                                                     <SelectValue placeholder="Select delivery time" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -664,11 +678,11 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 render={({ field }) => (
                                     <FormItem className='grid grid-cols-6 w-full'>
                                         <FormLabelWithAsterisk required className="text-[#666666] text-sm col-span-2">
-                                            Brand
+                                            GPSR Info
                                         </FormLabelWithAsterisk>
                                         <FormControl>
                                             <Select value={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger placeholderColor className='border col-span-4'>
+                                                <SelectTrigger placeholderColor className='border col-span-4 font-light'>
                                                     <SelectValue placeholder="Select brand" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -687,7 +701,36 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 )}
                             />
 
-
+                            {/*Tag choose */}
+                            <div className="w-full">
+                                <FormField
+                                    control={form.control}
+                                    name="tag"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="font-bold text-base justify-end">Tag</FormLabel>
+                                            <div className="flex flex-row gap-2 flex-wrap justify-end">
+                                                {tags.map((item, idx) => {
+                                                    const isSelected = field.value === item.name
+                                                    return (
+                                                        <div
+                                                            key={idx}
+                                                            style={{ background: item.color }}
+                                                            onClick={() =>
+                                                                field.onChange(isSelected ? "" : item.name) // toggle
+                                                            }
+                                                            className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${isSelected ? `ring-2 ring-primary ring-offset-2` : ""
+                                                                }`}
+                                                        >
+                                                            {item.name}
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
                     </div>
                 </form>

@@ -24,7 +24,7 @@ const WishList = () => {
     return (
         <div className='pt-3 xl:pb-16 pb-6 space-y-4'>
             <CustomBreadCrumb currentPage='wishlist' />
-            <h1 className='text-secondary text-5xl font-bold text-center font-libre'>{t('wishlist')}</h1>
+            <h1 className='text-secondary text-5xl font-bold text-center'>{t('wishlist')}</h1>
 
             {isLoading || isError || !wishlist ?
                 <ProductTableSkeleton />

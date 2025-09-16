@@ -28,7 +28,7 @@ const CustomerListPage = () => {
     return (
         <div className='space-y-12'>
             <ProductStatistic statistic={userStatistics} />
-            <div className='text-3xl text-secondary font-bold text-center font-libre'>Customers List</div>
+            <div className='text-3xl text-secondary font-bold text-center'>Customers List</div>
             {isLoading || !data ? <ProductTableSkeleton /> :
                 <ProductTable
                     data={data ? data : []}

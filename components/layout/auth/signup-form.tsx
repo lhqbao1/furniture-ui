@@ -95,7 +95,7 @@ export default function SignUpForm() {
           height={100}
           alt=""
         />
-        <h1 className="text-3xl font-semibold text-secondary text-center font-libre space-x-2 lg:block flex flex-col">
+        <h1 className="text-3xl font-semibold text-secondary text-center space-x-2 lg:block flex flex-col">
           <span>{t('welcomeTo')}</span>
           <span className="text-primary">Prestige Home</span>
         </h1>

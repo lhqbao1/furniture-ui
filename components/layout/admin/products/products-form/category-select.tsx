@@ -77,7 +77,7 @@ export function MultiSelectField({
                             </FormLabelWithAsterisk>}
 
                         <Popover>
-                            <PopoverTrigger asChild>
+                            <PopoverTrigger asChild className="font-light">
                                 <Button
                                     variant="outline"
                                     className="w-full justify-between col-span-4"

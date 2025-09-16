@@ -141,6 +141,9 @@ const ProductDetails = () => {
     //Add to wishlist mutation
     const addProductToCheckOutMutation = useQuickAddToCart()
 
+    const formQuantity = form.getValues("quantity"); // chỉ lấy field quantity
+
+
     const handleAddProductToWishlist = () => {
         addProductToWishlistMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
             onSuccess: () => {
@@ -160,7 +163,7 @@ const ProductDetails = () => {
         if (!userId) {
             addToCartLocal({
                 item: {
-                    product_id: productDetails.id ?? '', quantity: 1, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
+                    product_id: productDetails.id ?? '', quantity: formQuantity, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
                 }
             }, {
                 onSuccess(data, variables, context) {
@@ -171,7 +174,7 @@ const ProductDetails = () => {
                 },
             })
         } else {
-            createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+            createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: formQuantity }, {
                 onSuccess(data, variables, context) {
                     toast.success(t('addToCartSuccess'))
                 },
@@ -201,7 +204,7 @@ const ProductDetails = () => {
         if (!userId) {
             addToCartLocal({
                 item: {
-                    product_id: productDetails.id ?? '', quantity: 1, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
+                    product_id: productDetails.id ?? '', quantity: values.quantity, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
                 }
             }, {
                 onSuccess(data, variables, context) {
@@ -212,7 +215,7 @@ const ProductDetails = () => {
                 },
             })
         } else {
-            createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
+            createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: values.quantity }, {
                 onSuccess(data, variables, context) {
                     toast.success(t('addToCartSuccess'))
                 },
