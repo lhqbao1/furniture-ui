@@ -5,7 +5,7 @@ import React from 'react'
 const LoginPage = () => {
     return (
         <div className='grid grid-cols-12 w-screen h-screen'>
-            <div className='lg:col-span-5 col-span-12 flex lg:items-center items-start justify-center'>
+            <div className='lg:col-span-5 col-span-12 flex items-center justify-center'>
                 <LoginForm />
             </div>
             <div className='lg:col-span-7 lg:block hidden relative'>

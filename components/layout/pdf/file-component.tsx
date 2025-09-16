@@ -43,8 +43,8 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div className="flex flex-col gap-1">
                     <span>Invoice ID: {invoice?.invoice_code}</span>
                     <span>
-                        Invoice date: {invoice?.created_at
-                            ? new Date(invoice.created_at).toLocaleDateString("en-US", {
+                        Invoice date: {checkout?.created_at
+                            ? new Date(checkout.created_at).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
@@ -64,28 +64,28 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                     <div>Total net amount</div>
                     <div>
                         €{
-                            (invoice?.total_amount_item ?? 0)
-                            - (invoice?.total_vat ?? 0)
-                            - (invoice?.voucher_amount ?? 0)
-                            - (invoice?.coupon_amount ?? 0)
+                            (checkout?.total_amount_item ?? 0)
+                            - (checkout?.total_vat ?? 0)
+                            - (checkout?.voucher_amount ?? 0)
+                            - (checkout?.coupon_amount ?? 0)
                         }
                     </div>
                 </div>
                 <div className="flex gap-3 justify-end">
                     <div>Total VAT </div>
-                    <div>€{invoice?.total_vat}</div>
+                    <div>€{checkout?.total_vat}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Shipping cost</div>
-                    <div>€{invoice?.total_shipping}</div>
+                    <div>€{checkout?.total_shipping}</div>
                 </div><div className="flex gap-3 justify-end bg-secondary/20 p-2 rounded-sm">
                     <div className="font-bold">Invoice amount</div>
-                    <div>€{invoice?.total_amount}</div>
+                    <div>€{checkout?.total_amount}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div className="font-bold">Amount Due</div>
-                    <div>€{invoice?.total_amount}</div>
+                    <div>€{checkout?.total_amount}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Payment (PayPal Checkout) from 04/29/2025</div>
-                    <div>€{invoice?.total_amount}</div>
+                    <div>€{checkout?.total_amount}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Open Amount</div>
                     <div>€00.00</div>

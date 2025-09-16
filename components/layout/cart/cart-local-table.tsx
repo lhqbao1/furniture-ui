@@ -114,7 +114,7 @@ export function CartLocalTable({
             accessorKey: "final_price",
             header: () => <div className="text-right">{t('price')}</div>,
             cell: ({ row }) => (
-                <div className="text-right">${(row.original.item_price * row.original.quantity).toFixed(2)}</div>
+                <div className="text-right">€{(row.original.item_price * row.original.quantity).toFixed(2)}</div>
             ),
         },
         {

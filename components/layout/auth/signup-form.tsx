@@ -86,7 +86,7 @@ export default function SignUpForm() {
   }
 
   return (
-    <div className="w-full mt-10 p-20">
+    <div className="w-full p-6">
       <div className="flex flex-col items-center mb-12 gap-3">
         {/* Logo giả */}
         <Image
@@ -95,7 +95,7 @@ export default function SignUpForm() {
           height={100}
           alt=""
         />
-        <h1 className="text-3xl font-semibold text-secondary text-center font-libre flex gap-1">
+        <h1 className="text-3xl font-semibold text-secondary text-center font-libre space-x-2 lg:block flex flex-col">
           <span>{t('welcomeTo')}</span>
           <span className="text-primary">Prestige Home</span>
         </h1>

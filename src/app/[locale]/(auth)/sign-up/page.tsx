@@ -13,7 +13,7 @@ const SignUpPage = () => {
                     className='absolute w-full h-full object-cover top-0'
                 />
             </div>
-            <div className='lg:col-span-5 col-span-12 flex lg:items-center items-start justify-center'>
+            <div className='lg:col-span-5 col-span-12 flex items-center justify-center'>
                 <SignUpForm />
             </div>
         </div>

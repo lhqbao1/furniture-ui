@@ -141,7 +141,7 @@ export const GetCartColumns = ({
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
-                return <div className="font-semibold text-right">{(item.item_price * quantity).toFixed(2)}€</div>
+                return <div className="font-semibold text-right">€{(item.item_price * quantity).toFixed(2)}</div>
             },
         },
         {

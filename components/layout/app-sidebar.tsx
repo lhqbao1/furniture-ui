@@ -32,11 +32,19 @@ type MenuItem = {
     id: string
 };
 
-type AppSidebarProps = { categories: CategoryResponse[] }
+type AppSidebarProps = {
+    categories: CategoryResponse[]
+    defaultOpen?: boolean
+}
 
-export default function AppSidebar({ categories }: AppSidebarProps) {
-    const { open: sidebarOpen } = useSidebar()  // true = expanded, false = collapsed
+export default function AppSidebar({ categories, defaultOpen = true }: AppSidebarProps) {
+    const { open: sidebarOpen, setOpen } = useSidebar()  // true = expanded, false = collapsed
     const t = useTranslations()
+
+    // Đồng bộ state sidebar với prop defaultOpen
+    React.useEffect(() => {
+        setOpen(defaultOpen)
+    }, [defaultOpen, setOpen])
 
     function mapCategories(categories: CategoryResponse[]): MenuItem[] {
         return categories.map((cat) => ({

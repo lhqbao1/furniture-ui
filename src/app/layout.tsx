@@ -46,6 +46,7 @@ export default function RootLayout({
                     data-cbid={process.env.NEXT_PUBLIC_COOKIE_DOMAIN_URL}
                     data-blockingmode={`auto`}
                     type={`text/javascript`}
+                    data-widget="false"
                 />
             </head>
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>

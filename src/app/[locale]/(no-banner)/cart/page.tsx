@@ -79,42 +79,40 @@ const CartPage = () => {
 
 
     return (
-        <div className='lg:mt-6 mt-1'>
-            <div className='container-padding'>
-                <div className="w-full max-w-6xl mx-auto p-6">
-                    <div className="grid grid-cols-12 xl:gap-16 gap-6">
-                        {/* Left: Cart Items */}
-                        {
-                            userId ? (<CartTable
-                                isLoadingCart={isLoadingCart}
-                                cart={cart}
-                                localQuantities={localQuantities}
-                                setLocalQuantities={setLocalQuantities}
-                            />) :
-                                (
-                                    <CartLocalTable
-                                        data={localCart}
-                                        onToggleItem={(product_id, is_active) =>
-                                            updateStatus({ product_id, is_active })
-                                        }
-                                        onToggleAll={(is_active) => {
-                                            localCart.forEach(item => updateStatus({ product_id: item.product_id, is_active }))
-                                        }}
-                                    />
+        <div className='mt-6'>
+            <div className="w-full lg:max-w-6xl mx-auto lg:p-6">
+                <div className="grid grid-cols-12 xl:gap-16 gap-6">
+                    {/* Left: Cart Items */}
+                    {
+                        userId ? (<CartTable
+                            isLoadingCart={isLoadingCart}
+                            cart={cart}
+                            localQuantities={localQuantities}
+                            setLocalQuantities={setLocalQuantities}
+                        />) :
+                            (
+                                <CartLocalTable
+                                    data={localCart}
+                                    onToggleItem={(product_id, is_active) =>
+                                        updateStatus({ product_id, is_active })
+                                    }
+                                    onToggleAll={(is_active) => {
+                                        localCart.forEach(item => updateStatus({ product_id: item.product_id, is_active }))
+                                    }}
+                                />
 
-                                )
-                        }
+                            )
+                    }
 
-                        {/* Right: Summary */}
-                        <div className='col-span-12 md:col-span-4'>
-                            <CartSummary
-                                total={total}
-                                onCheckout={proceedToCart}
-                                cart={cart}
-                            />
-                        </div>
-
+                    {/* Right: Summary */}
+                    <div className='col-span-12 md:col-span-4'>
+                        <CartSummary
+                            total={total}
+                            onCheckout={proceedToCart}
+                            cart={cart}
+                        />
                     </div>
+
                 </div>
             </div>
 
