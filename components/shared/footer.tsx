@@ -42,9 +42,9 @@ const Footer = () => {
                             // href="#"
                             onClick={(e) => {
                                 // e.preventDefault()
-                                console.log(window.Cookiebot?.show())
                                 if (typeof window !== "undefined" && window.Cookiebot) {
                                     window.Cookiebot.show()
+                                    console.log(window.Cookiebot)
                                 }
                             }}
                         >
