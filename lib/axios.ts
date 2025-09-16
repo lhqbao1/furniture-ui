@@ -33,7 +33,7 @@ api.interceptors.response.use(
       localStorage.removeItem("access_token")
 
       // 👉 Redirect về login
-      window.location.href = "/login"
+      // window.location.href = "/login"
     }
     return Promise.reject(error)
   }
@@ -63,7 +63,7 @@ apiAdmin.interceptors.response.use(
       localStorage.removeItem("admin_access_token")
 
       // 👉 Redirect về admin login
-      window.location.href = "/admin-login"
+      // window.location.href = "/admin-login"
     }
     return Promise.reject(error)
   }
@@ -99,7 +99,7 @@ apiFlexible.interceptors.response.use(
       localStorage.removeItem("admin_access_token")
 
       // 👉 Trường hợp flexible thì redirect về login chung
-      window.location.href = "/login"
+      // window.location.href = "/login"
     }
     return Promise.reject(error)
   }
