@@ -16,7 +16,6 @@ import type { BrandResponse } from "@/types/brand";
 import { useCreateBrand, useEditBrand } from "@/features/brand/hook";
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input";
 import { toast } from "sonner";
-import { StaticFile } from "@/types/products";
 import { Loader2 } from "lucide-react";
 
 type AddOrEditBrandFormProps = {
@@ -34,7 +33,10 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                 name: brandValues.name,
                 static_files: [{
                     url: brandValues.img_url
-                }]
+                }],
+                company_address: brandValues.company_address,
+                company_email: brandValues.company_email,
+                company_name: brandValues.company_name
             }
             : brandDefaultValues,
     });
@@ -48,7 +50,10 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                 id: brandValues.id,
                 input: {
                     name: values.name,
-                    img_url: values.static_files[0].url
+                    img_url: values.static_files[0].url,
+                    company_name: values.company_name,
+                    company_address: values.company_address,
+                    company_email: values.company_email
                 }
             }, {
                 onSuccess(data, variables, context) {
@@ -63,7 +68,10 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
         } else {
             createBrand.mutate({
                 name: values.name,
-                img_url: values.static_files[0].url
+                img_url: values.static_files[0].url,
+                company_address: values.company_address,
+                company_email: values.company_email,
+                company_name: values.company_name
             }, {
                 onSuccess(data, variables, context) {
                     toast.success("Create brand successful")
