@@ -36,7 +36,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="de" className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
+        <html lang="de">
             <head>
                 <Script
                     id={`Cookiebot`}
@@ -49,7 +49,7 @@ export default function RootLayout({
                     data-widget-enabled="false"
                 />
             </head>
-            <body>
+            <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
                 <CursorLoadingHandler />
                 <Providers>{children}</Providers>
                 <Toaster

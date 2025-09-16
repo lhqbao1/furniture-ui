@@ -18,7 +18,6 @@ const ProductAddClient = () => {
         })
     }
 
-
     return (
         <ProductForm
             onSubmit={handleAddProduct}

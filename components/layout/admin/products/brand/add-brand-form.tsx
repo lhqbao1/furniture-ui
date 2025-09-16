@@ -50,10 +50,12 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                 id: brandValues.id,
                 input: {
                     name: values.name,
-                    img_url: values.static_files[0].url,
                     company_name: values.company_name,
                     company_address: values.company_address,
-                    company_email: values.company_email
+                    company_email: values.company_email,
+                    ...(values.static_files?.[0]?.url
+                        ? { img_url: values.static_files[0].url }
+                        : {}),
                 }
             }, {
                 onSuccess(data, variables, context) {
@@ -68,10 +70,12 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
         } else {
             createBrand.mutate({
                 name: values.name,
-                img_url: values.static_files[0].url,
+                company_name: values.company_name,
                 company_address: values.company_address,
                 company_email: values.company_email,
-                company_name: values.company_name
+                ...(values.static_files?.[0]?.url
+                    ? { img_url: values.static_files[0].url }
+                    : {}),
             }, {
                 onSuccess(data, variables, context) {
                     toast.success("Create brand successful")
@@ -114,6 +118,46 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                 />
 
                 <ImagePickerInput fieldName="static_files" form={form} />
+
+                <FormField
+                    control={form.control}
+                    name="company_name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Brand company</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="company_email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Brand company email</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="company_address"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Brand company address</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
                 <div className="flex items-center justify-end">
                     <Button

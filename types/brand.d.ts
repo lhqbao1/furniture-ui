@@ -11,7 +11,7 @@ export interface BrandResponse {
 
 export interface BrandInput {
     name: string
-    img_url: string
+    img_url?: string
     company_name: string
     company_address: string
     company_email: string

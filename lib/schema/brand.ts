@@ -6,7 +6,7 @@ const StaticFileSchema = z.object({
 
 export const brandFormSchema = z.object({
   name: z.string().min(1, "You need provide brand name"),
-  static_files: z.array(StaticFileSchema),
+  static_files: z.array(StaticFileSchema).optional(),
   company_name: z.string().min(1, "Company name is required"),
   company_address: z.string().min(1, "Company address is required"),
   company_email: z.string().email().min(1, "Company email is required")

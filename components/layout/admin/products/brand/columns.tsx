@@ -61,10 +61,21 @@ export const brandColumns: ColumnDef<BrandResponse>[] = [
         header: "IMAGE",
         cell: ({ row }) => {
             const image = row.original.img_url
+
             return (
-                <div className="w-12 h-12 relative">
-                    <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px" unoptimized
-                    />
+                <div className="w-12 h-12 relative flex items-center justify-center">
+                    {image ? (
+                        <Image
+                            src={image}
+                            alt="icon"
+                            fill
+                            className="object-cover rounded-md"
+                            sizes="60px"
+                            unoptimized
+                        />
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+                    )}
                 </div>
             )
         },
@@ -75,33 +86,19 @@ export const brandColumns: ColumnDef<BrandResponse>[] = [
         cell: ({ row }) => <div>{row.original.name}</div>
     },
     {
-        accessorKey: "created_at",
-        header: () => (
-            <div className="text-center w-full">CREATED DATE</div>
-        ),
-        cell: ({ row }) => {
-            const isoString = row.original.created_at
-            const date = new Date(isoString)
-
-            const time = date.toLocaleString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false, // bỏ AM/PM nếu muốn
-            })
-
-            const day = date.toLocaleString("en-US", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-            })
-
-            return (
-                <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
-                    <span>{time}</span>
-                    <span>{day}</span>
-                </div>
-            )
-        }
+        accessorKey: "company_name",
+        header: "COMPANY NAME",
+        cell: ({ row }) => <div>{row.original.company_name}</div>
+    },
+    {
+        accessorKey: "company_email",
+        header: "COMPANY EMAIl",
+        cell: ({ row }) => <div>{row.original.company_email}</div>
+    },
+    {
+        accessorKey: "company_address",
+        header: "COMPANY ADDRESS",
+        cell: ({ row }) => <div>{row.original.company_address}</div>
     },
     {
         id: "actions",

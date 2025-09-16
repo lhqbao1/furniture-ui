@@ -37,6 +37,7 @@ import { useGetBrands } from '@/features/brand/hook'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import countries from "world-countries"
+import GpsrInput from './form-input/gpsr'
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -51,7 +52,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
 
-    const { data: brands, isLoading: isLoadingBrand, isError: isErrorBrand } = useGetBrands()
 
     const carriers = [
         { id: "amm", logo: "/amm.jpeg" },
@@ -672,34 +672,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             />
 
                             {/* Brand */}
-                            <FormField
-                                control={form.control}
-                                name="brand_id"
-                                render={({ field }) => (
-                                    <FormItem className='grid grid-cols-6 w-full'>
-                                        <FormLabelWithAsterisk required className="text-[#666666] text-sm col-span-2">
-                                            GPSR Info
-                                        </FormLabelWithAsterisk>
-                                        <FormControl>
-                                            <Select value={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger placeholderColor className='border col-span-4 font-light'>
-                                                    <SelectValue placeholder="Select brand" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {brands ?
-                                                        brands.map((b) => (
-                                                            <SelectItem key={b.id} value={b.id}>
-                                                                {b.name}
-                                                            </SelectItem>
-                                                        ))
-                                                        : <Loader2 className='animate-spin' />}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage className='col-span-6' />
-                                    </FormItem>
-                                )}
-                            />
+                            <GpsrInput />
 
                             {/*Tag choose */}
                             <div className="w-full">
