@@ -50,7 +50,6 @@ export default function RootLayout({
                 />
             </head>
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
-                <CursorLoadingHandler />
                 <Providers>{children}</Providers>
                 <Toaster
                     richColors

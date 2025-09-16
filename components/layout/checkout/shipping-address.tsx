@@ -26,20 +26,6 @@ export function CheckOutShippingAddress() {
     const [open, setOpen] = useState(false)
     const [isSameInvoice, setIsSameInvoice] = useState(false)
 
-    // Watch invoice fields
-    const invoiceAddressLine = useWatch({ name: "invoice_address_line", control: form.control })
-    const invoicePostalCode = useWatch({ name: "invoice_postal_code", control: form.control })
-    const invoiceCity = useWatch({ name: "invoice_city", control: form.control })
-
-    // Khi isSameInvoice = true, cập nhật shipping fields với invoice
-    useEffect(() => {
-        if (isSameInvoice) {
-            form.setValue("shipping_address_line", invoiceAddressLine)
-            form.setValue("shipping_postal_code", invoicePostalCode)
-            form.setValue("shipping_city", invoiceCity)
-        }
-    }, [isSameInvoice, invoiceAddressLine, invoicePostalCode, invoiceCity, form])
-
     const countryOptions = countries.map((c) => ({
         value: c.name.common,
         label: c.name.common,
@@ -49,15 +35,6 @@ export function CheckOutShippingAddress() {
         <div className="space-y-4">
             <div className="flex justify-between bg-secondary/10 p-2">
                 <h2 className="text-lg text-black font-semibold ">{t('shippingAddress')}</h2>
-                <div className="flex items-center space-x-2">
-                    <Label htmlFor="same-invoice">{t('sameAsInvoice')}</Label>
-                    <Switch
-                        id="same-invoice"
-                        checked={isSameInvoice}
-                        onCheckedChange={setIsSameInvoice}
-                        className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary"
-                    />
-                </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
                 {/* Address Line */}
@@ -75,6 +52,20 @@ export function CheckOutShippingAddress() {
                                     {...field}
                                     disabled={isSameInvoice}
                                 />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="shipping_address_additional"
+                    render={({ field }) => (
+                        <FormItem className="col-span-2">
+                            <FormLabel>{t('addressSupplement')}</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

@@ -59,11 +59,9 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
     // Đồng bộ state sidebar với prop defaultOpen
     React.useEffect(() => {
         if (pathname === "/cart" || pathname === "/check-out") {
-            setOpen(false)
-        } else {
-            setOpen(defaultOpen)
+            setOpen(false) // ép đóng khi vào cart/checkout
         }
-    }, [pathname, defaultOpen, setOpen])
+    }, [pathname])
 
     const newProducts: MenuItem = { title: t("newProducts"), url: "/new-products", id: "new-products" };
     const sale: MenuItem = { title: t("sale"), url: "/sale", id: "sale" };

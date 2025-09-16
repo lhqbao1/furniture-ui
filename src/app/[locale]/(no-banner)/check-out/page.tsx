@@ -40,6 +40,7 @@ import { getCartItems } from '@/features/cart/api'
 import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { useCheckMailExist, useLogin, useLoginOtp, useSignUp } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
+import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 
 export interface CartItem {
     id: number
@@ -87,6 +88,7 @@ export default function CheckOutPage() {
         invoice_postal_code: z.string().min(1, { message: t('last_name_required') }),
         invoice_city: z.string().min(1, { message: t('last_name_required') }),
         invoice_address_additional: z.string().optional(),
+        shipping_address_additional: z.string().optional(),
         gender: z.string().min(1, { message: t('gender_required') }),
         email: z
             .string()
@@ -201,18 +203,20 @@ export default function CheckOutPage() {
 
             first_name: "",
             last_name: "",
-            invoice_address_line: "",
-            invoice_postal_code: "",
-            invoice_city: "",
             email: "",
             phone_number: "",
             gender: "",
+
+            invoice_address_line: "",
+            invoice_postal_code: "",
+            invoice_city: "",
             invoice_address_additional: "",
 
 
             shipping_address_line: "",
             shipping_postal_code: "",
             shipping_city: "",
+            shipping_address_additional: "",
 
             password: "Guest@12345",
             confirmPassword: "Guest@12345",
@@ -452,6 +456,7 @@ export default function CheckOutPage() {
                         <PaymentMethodSelector />
                     </div> */}
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
+                        <CheckOutUserInformation />
                         <CheckOutShippingAddress />
                         <CheckOutInvoiceAddress />
                         {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />}

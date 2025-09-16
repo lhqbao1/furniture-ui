@@ -183,7 +183,7 @@
     "noCity": "No city found.",
     "postalCode": "Postal Code",
     "addressLine": "Address Line",
-    "sameAsInvoice": "Same as invoice",
+    "sameAsShipping": "Same as shipping",
     "streetAndHouse": "Street & House number",
     "selectPayment": "Select a Payment method",
     "newProducts": "New Products",
@@ -204,5 +204,7 @@
     "male": "Male",
     "female": "Female",
     "addressSupplement": "Address Supplement",
-    "loginToContinue": "Login to continue"
+    "loginToContinue": "Login to continue",
+    "otherGender": "Other",
+    "userInformation": "User Information"
 }

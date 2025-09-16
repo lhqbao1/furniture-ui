@@ -103,9 +103,9 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-        initialState: {
-            sorting: [{ id: "is_active", desc: true }],
-        },
+        // initialState: {
+        //     sorting: [{ id: "is_active", desc: true }],
+        // },
     })
 
     return (

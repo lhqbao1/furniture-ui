@@ -182,7 +182,7 @@
   "noCity": "Keine Stadt gefunden.",
   "postalCode": "Postleitzahl",
   "addressLine": "Adresse",
-  "sameAsInvoice": "Wie die Rechnungsadresse",
+  "sameAsShipping": "Rechnungsadresse gleich Lieferadresse",
   "streetAndHouse": "Straße & Hausnummer",
   "selectPayment": "Wählen Sie die Zahlungsart aus.",
   "newProducts": "Neuheiten",
@@ -199,10 +199,12 @@
   "ifNotEnterOtp": "Wenn Sie den OTP nicht eingeben, können Sie diese E-Mail nicht für Einkäufe verwenden.",
   "useDifferentEmail": "Aus Sicherheitsgründen verwenden Sie bitte eine andere E-Mail-Adresse.",
   "verifyOTP": "OTP verifizieren",
-  "gender": "Gender",
+  "gender": "Anrede",
   "male": "Herr",
   "female": "Frau",
   "addressSupplement": "Adresszusatz",
   "gender_required": "Geschlecht ist erforderlich",
-  "loginToContinue": "Zum Fortfahren anmelden"
+  "loginToContinue": "Zum Fortfahren anmelden",
+  "otherGender": "Andere",
+  "userInformation": "Benutzerinformationen"
 }

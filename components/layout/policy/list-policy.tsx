@@ -58,9 +58,9 @@ const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
     const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
 
     return (
-        <div className='grid grid-cols-12 lg:pt-12 pt-3 h-[calc(100vh-200px)]'>
+        <div className='grid grid-cols-12 lg:pt-12 pt-3 lg:h-[calc(100vh-200px)] h-fit pb-4'>
             {/* Sidebar bên trái */}
-            <div className='col-span-4 border-r overflow-y-auto'>
+            <div className='col-span-4 border-r overflow-y-auto lg:block hidden'>
                 <Accordion
                     type="single"
                     collapsible
@@ -148,12 +148,12 @@ const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
             </div>
 
             {/* Nội dung bên phải */}
-            <div className='col-span-8 px-3 lg:px-12 space-y-6 pb-8 content-scroll overflow-y-auto'>
-                <h1 className='text-center text-3xl text-secondary font-semibold uppercase'>
+            <div className='lg:col-span-8 col-span-12 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll lg:overflow-y-auto'>
+                <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
 
-                <div className='flex justify-between'>
+                {/* <div className='flex justify-between'>
                     <Button variant={'secondary'}>
                         <div className='flex items-center gap-2'>
                             <ArrowLeft />
@@ -166,7 +166,7 @@ const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
                             <ArrowRight />
                         </div>
                     </Button>
-                </div>
+                </div> */}
 
                 {currentPolicy?.child_legal_policies.map((cl, clIndex) => {
                     const refKey = `${currentPolicy.id}-${clIndex}`
@@ -191,7 +191,7 @@ const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
             </div>
 
             {/* Version section */}
-            <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4'>
+            <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0'>
                 {versionDate.map((item) => (
                     <div key={item.id} className='text-secondary'>Version: {formatDate(item.created_at)}</div>
                 ))}
