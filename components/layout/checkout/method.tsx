@@ -44,7 +44,7 @@ export default function PaymentMethodSelector() {
                         <div className="mt-4 text-sm space-y-1">
                             <h4 className="font-semibold mb-1 text-secondary text-base">Überweisungsinformationen:</h4>
                             <div>DE57100101232316418882</div>
-                            <div>Prestige Home GmbH</div>
+                            <div translate="no">Prestige Home GmbH</div>
                             <div>SWIFT/BIC QNTODEB2XXX</div>
                             <div>Bankname: QUOTO</div>
                         </div>

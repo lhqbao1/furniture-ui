@@ -90,7 +90,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                     />
                 </Link>
             </div>
-            <div className={`text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`}>
+            <div className={`text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`} translate="no">
                 <span className="text-secondary font-bold">Prestige</span>
                 <span className="text-primary font-bold">Home</span>
             </div>

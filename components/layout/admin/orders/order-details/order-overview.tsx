@@ -38,7 +38,7 @@ const OrderDetailOverView = ({ orderId, created_at, updated_at, status }: OrderD
                 <div className='flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold cursor-pointer'>
                     <div className='flex gap-1'>
                         <div>Chanel:</div>
-                        <div>Prestige Home</div>
+                        <div translate='no'>Prestige Home</div>
                     </div>
                     <ArrowRight size={16} />
                 </div>

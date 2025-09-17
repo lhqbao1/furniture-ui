@@ -97,7 +97,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
 
             <div className="flex justify-between mt-20 w-full">
                 <div className="space-y-1">
-                    <div className="font-semibold">Prestige Home GmbH</div>
+                    <div className="font-semibold" translate="no">Prestige Home GmbH</div>
                     <div>Greifswalder Straße 226, 10405 Berlin.</div>
                     <div>Tel: info@prestige-home.de</div>
                 </div>

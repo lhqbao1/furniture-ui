@@ -128,7 +128,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                 />
                 <h1 className="text-3xl font-semibold text-secondary text-center space-x-2 lg:block flex flex-col">
                     <span>{t('welcomeTo')}</span>
-                    <span className="text-primary">Prestige Home</span>
+                    <span className="text-primary" translate="no">Prestige Home</span>
                 </h1>
             </div>
 

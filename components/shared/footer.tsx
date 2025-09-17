@@ -11,7 +11,7 @@ const Footer = () => {
             {/* Cột 1: Logo */}
             <div className="col-span-2 xl:col-span-1">
                 <div className="space-y-2">
-                    <p className="text-3xl text-secondary font-semibold">
+                    <p className="text-3xl text-secondary font-semibold" translate="no">
                         Prestige Home GmbH
                     </p>
                     <p className="text-sm text-black-700">Greifswalder Straße 226, 10405 Berlin.</p>
