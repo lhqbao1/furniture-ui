@@ -89,7 +89,7 @@ export async function GET() {
 
         return `
         <item>
-          <g:id>${p.id}</g:id>
+          <g:id>${p.id_provider}</g:id>
           <g:title><![CDATA[${p.name.trim()}]]></g:title>
           <g:description><![CDATA[${cleanDescription(p.description)}]]></g:description>
           <g:link>https://prestige-home.de/product${categoryHref}</g:link>
