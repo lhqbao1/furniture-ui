@@ -1,0 +1,7 @@
+User-agent: Googlebot
+Disallow:
+
+User-agent: Googlebot-Image
+Disallow:
+
+Sitemap: https://prestige-home.de/sitemap.xml
