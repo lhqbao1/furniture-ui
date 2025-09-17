@@ -95,7 +95,7 @@ export async function GET() {
           <g:link>https://prestige-home.de/product${categoryHref}</g:link>
           <g:image_link>${cleanImageLink(p.static_files[0]?.url)}</g:image_link>
           <g:availability>${p.stock > 0 ? "in stock" : "out of stock"}</g:availability>
-          <g:price>${p.final_price.toFixed(2)} EUR</g:price>
+          <g:price>${p.final_price.toFixed(2)}EUR</g:price>
           <g:identifier_exists>yes</g:identifier_exists>
           <g:gtin>${p.ean}</g:gtin>
           <g:mpn>${p.sku}</g:mpn>
@@ -103,7 +103,6 @@ export async function GET() {
           <g:condition>new</g:condition>
           <g:adult>no</g:adult>
           <g:age_group>adult</g:age_group>
-          <g:item_group_id>${p.parent_id}</g:item_group_id>
           <g:is_bundle>no</g:is_bundle>
           ${colors ? `<g:color>${colors}</g:color>` : ""}
           <g:shipping>

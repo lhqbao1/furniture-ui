@@ -1,7 +1,7 @@
 // features/auth/hooks.ts
 "use client"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getMe, login, logout, LoginInput, signUp, SignUpInput, forgotPassword, resetPassword, loginAdmin, checkMailExist, loginOtp } from "./api"
+import { getMe, login, logout, LoginInput, signUp, SignUpInput, forgotPassword, resetPassword, loginAdmin, checkMailExist, loginOtp, loginCookie } from "./api"
 import { tokenStore } from "@/lib/token"
 
 export function useMe() {
@@ -21,6 +21,23 @@ export function useLogin() {
     },
   })
 }
+
+// export function useLogin() {
+//   return useMutation({
+//     mutationFn: async (input: LoginInput) => {
+//       const res = await fetch("/api/login", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/x-www-form-urlencoded",
+//         },
+//         body: new URLSearchParams(input).toString(),
+//       })
+
+//       if (!res.ok) throw new Error("Login failed")
+//       return res.json()
+//     },
+//   })
+// }
 
 export function useLoginAdmin() {
   const qc = useQueryClient()

@@ -81,9 +81,9 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             loginMutation.mutate(values, {
                 onSuccess: (data) => {
                     // Giả sử backend trả về token
-                    const token = data.access_token
+                    // const token = data.access_token
 
-                    localStorage.setItem("access_token", token)
+                    // localStorage.setItem("access_token", token)
                     router.push("/")
                     localStorage.setItem("userId", data.id)
 
@@ -93,6 +93,21 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     // setUserId(data.id)
                     toast.success(t('loginSuccess'))
                 },
+                // onSuccess: (data) => {
+                //     // Cookie đã được set bởi API proxy
+                //     // Không cần lưu token vào localStorage nữa
+
+                //     // Nếu BE trả về user info (id, name, email...), bạn có thể lưu vào global state (zustand, jotai, react-query cache...)
+                //     // hoặc sessionStorage nếu chỉ cần tạm thời
+                //     // Ví dụ:
+                //     // setUser(data.user)
+
+                //     // Sync giỏ hàng (nếu cần)
+                //     syncLocalCartMutation.mutate()
+
+                //     router.push("/")
+                //     toast.success(t("loginSuccess"))
+                // },
                 onError(error, variables, context) {
                     toast.error(t("invalidCredentials"))
                 },

@@ -19,6 +19,19 @@ export async function login(input: LoginInput) {
     return data as LoginResponse
   }
 
+  export async function loginCookie(input: LoginInput) {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams(input).toString(),
+    })
+  
+    if (!res.ok) throw new Error("Login failed")
+    return res.json()
+  }
+
   export async function loginAdmin(input: LoginInput) {
     const { data } = await apiPublic.post(
       "/login-admin",
@@ -39,6 +52,11 @@ export async function getMe() {
   const { data } = await api.get("/me")
   return data as User
 }
+
+// export async function getMe() {
+//   const { data } = await api.get("/me") // BE đọc token từ cookie
+//   return data as User
+// }
 
 export async function logout() {
   await api.post("/logout")
