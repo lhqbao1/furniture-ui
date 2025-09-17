@@ -94,11 +94,8 @@ export async function GET() {
           <g:description><![CDATA[${cleanDescription(p.description)}]]></g:description>
           <g:link>https://prestige-home.de/product${categoryHref}</g:link>
           <g:image_link>${cleanImageLink(p.static_files[0]?.url)}</g:image_link>
-          <g:availability>${p.stock > 0 ? "in stock" : "out of stock"}</g:availability>
-          <g:price>${p.final_price.toFixed(2)}EUR</g:price>
-          <g:identifier_exists>yes</g:identifier_exists>
-          <g:gtin>${p.ean}</g:gtin>
-          <g:mpn>${p.sku}</g:mpn>
+          <g:availability>${p.stock > 0 ? "in_stock" : "out_stock"}</g:availability>
+          <g:price>${p.final_price.toFixed(2)} EUR</g:price>
           <g:brand>${p.brand?.name || "ECONELO"}</g:brand>
           <g:condition>new</g:condition>
           <g:adult>no</g:adult>
@@ -116,14 +113,14 @@ export async function GET() {
       .join("\n");
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
-  <channel>
-    <title>Prestige Home Feed</title>
-    <link>https://prestige-home.de</link>
-    <description>Product feed</description>
-    ${itemsXml}
-  </channel>
-</rss>`;
+                  <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+                  <channel>
+                    <title>Prestige Home Feed</title>
+                    <link>https://prestige-home.de</link>
+                    <description>Product feed</description>
+                    ${itemsXml}
+                  </channel>
+                </rss>`;
 
     return new Response(xml, {
       headers: {

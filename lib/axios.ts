@@ -64,7 +64,7 @@ apiAdmin.interceptors.response.use(
       localStorage.removeItem("admin_access_token")
 
       // 👉 Redirect về admin login
-      // window.location.href = "/admin-login"
+      window.location.href = "/admin-login"
     }
     return Promise.reject(error)
   }
