@@ -18,6 +18,7 @@ import {
     FormMessage,
 } from '@/components/ui/form'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 // ---------------- ZOD SCHEMA ----------------
 const formSchema = z.object({
@@ -36,6 +37,7 @@ interface ImagePickerFormProps {
 
 export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps) {
     const [images, setImages] = useState<string[]>([])
+    const t = useTranslations()
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const newImages = acceptedFiles.map(file => URL.createObjectURL(file))
@@ -90,10 +92,10 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                     >
                         <UploadIcon className="w-12 h-12 text-gray-400" />
                         <p className="text-gray-500 dark:text-gray-400">
-                            {isDragActive ? 'Drop your images here' : 'Drag and drop your images here'}
+                            {isDragActive ? t('dragFile') : t('dragAndDropFile')}
                         </p>
                         <Button variant="outline" type="button">
-                            Browse Files
+                            {t('browseFile')}
                         </Button>
                         <input {...getInputProps()} className="hidden" />
                     </div>
@@ -136,7 +138,7 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                             render={({ field }) => (
                                 <FormItem className="flex-1">
                                     <FormControl>
-                                        <Textarea {...field} placeholder="Enter your description..." className="xl:h-52 h-full" />
+                                        <Textarea {...field} placeholder={t('enterDes')} className="xl:h-52 h-full" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -150,7 +152,7 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
                                 name="custom_amount"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-row gap-3 items-center lg:justify-start justify-center">
-                                        <FormLabel className='text-base'>Quantity</FormLabel>
+                                        <FormLabel className='text-base'>{t('quantity')}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -168,9 +170,11 @@ export default function ImagePickerForm({ type = 'full' }: ImagePickerFormProps)
 
                             <div className="flex flex-row justify-center lg:justify-start gap-4">
                                 <Button type="button" variant="outline" className='text-xl px-4 py-6'>
-                                    Cancel
+                                    {t('cancel')}
                                 </Button>
-                                <Button type="submit" className='text-xl px-4 py-6' hasEffect>Check out</Button>
+                                <Button type="submit" className='text-xl px-4 py-6' hasEffect>
+                                    {t('checkout')}
+                                </Button>
                             </div>
                         </div>
                     </div>

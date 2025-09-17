@@ -10,6 +10,11 @@ import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
 import { useGetCategoryByName } from '@/features/category/hook'
 import { slugify } from '@/lib/slugify'
 import { CustomPagination } from '@/components/shared/custom-pagination'
+import { useAtom } from 'jotai'
+import { currentCategoryIdAtom, currentCategoryNameAtom } from '@/store/category'
+import { useQuery } from '@tanstack/react-query'
+import { getCategoryById } from '@/features/category/api'
+import { useTranslations } from 'next-intl'
 
 interface ProductCategoryProps {
     categorySlugs: string[]
@@ -24,14 +29,22 @@ function formatTag(slug: string) {
 }
 
 const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
+    const t = useTranslations()
     const params = useParams()
     const paramValues = Object.values(params)
-    const pathname = usePathname()
-    console.log(pathname)
     const [page, setPage] = useState(1)
+    const [currentCategoryId, setCurrentCategoryId] = useAtom(currentCategoryIdAtom)
+    const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
+
+
 
     const slug = paramValues[paramValues.length - 1] as string
-    const { data: category, isLoading, isError } = useGetCategoryByName(slugify(slug[0]))
+    const { data: category, isLoading, isError } = useQuery({
+        queryKey: ["category", currentCategoryId],
+        queryFn: () => getCategoryById(currentCategoryId ?? ''),
+        enabled: !!currentCategoryId,
+        retry: false,
+    });
 
     if (!category || isLoading) return <ProductGridSkeleton length={12} />
 
@@ -42,10 +55,11 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
-            <CustomBreadCrumb />
+            <CustomBreadCrumb currentPage={currentCategoryName ?? ''} />
             <div className=''>
-                <h2 className='section-header'>Wohnen</h2>
-                {isLoading || isError || !category ?
+                <h2 className='section-header'>{currentCategoryName}</h2>
+                <p className='text-center text-lg mt-2'>{category.in_category.length === 0 ? t('emptyCategory') : ''}</p>
+                {isLoading || isError || !category || category.in_category.length === 0 ?
                     <ProductGridSkeleton length={12} /> :
                     <div className='filter-section'>
                         <Collapsible>
@@ -62,12 +76,12 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
                             </CollapsibleContent>
                         </Collapsible>
                         <div className='pt-10 pb-12'>
-                            <ProductsGridLayout hasBadge data={category} />
+                            <ProductsGridLayout hasBadge data={category.in_category} />
                         </div>
                     </div>
                 }
             </div>
-            <CustomPagination totalPages={category.length} page={page} onPageChange={setPage} />
+            <CustomPagination totalPages={category.in_category.length} page={page} onPageChange={setPage} />
         </div >
     )
 }

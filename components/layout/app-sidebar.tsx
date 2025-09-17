@@ -24,6 +24,8 @@ import { useTranslations } from "next-intl"
 import { slugify } from "@/lib/slugify"
 import { useMediaQuery } from "react-responsive"
 import { Link, useRouter } from "@/src/i18n/navigation"
+import { useAtom } from "jotai"
+import { currentCategoryIdAtom, currentCategoryNameAtom } from "@/store/category"
 
 type MenuItem = {
     title: string;
@@ -40,6 +42,8 @@ type AppSidebarProps = {
 export default function AppSidebar({ categories, defaultOpen = true }: AppSidebarProps) {
     const { open: sidebarOpen, setOpen } = useSidebar()  // true = expanded, false = collapsed
     const t = useTranslations()
+    const [currentCategoryId, setCurrentCategoryId] = useAtom(currentCategoryIdAtom)
+    const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
 
 
 
@@ -149,6 +153,10 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                                                     key={child.id}
                                                                     onClick={() => {
                                                                         router.push(child.url)
+                                                                        if (item.url && item.url.includes("product")) {
+                                                                            setCurrentCategoryId(child.id)
+                                                                            setCurrentCategoryName(child.title)
+                                                                        }
                                                                     }}
                                                                     variant={"ghost"}
                                                                     className={`relative flex flex-row items-start justify-start lg:pl-16 pl-4 text-wrap gap-3 h-fit rounded-none py-1 flex-wrap max-w-full text-base transition-colors ${isChildActive

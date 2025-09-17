@@ -57,14 +57,14 @@ const DeleteDialog = ({ product }: DeleteDialogProps) => {
                             className='bg-gray-400 text-white hover:bg-gray-500'
                             disabled={deleteProduct.isPending}
                         >
-                            Close
+                            Cancel
                         </Button>
                     </DialogClose>
                     <Button type="button" onClick={handleDelete} hasEffect variant="secondary" disabled={deleteProduct.isPending}>
                         {deleteProduct.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
-                            "Submit"
+                            "Delete"
                         )}
                     </Button>
                 </DialogFooter>

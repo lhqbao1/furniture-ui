@@ -3,7 +3,7 @@ import CustomBreadCrumb from '@/components/shared/breadcrumb'
 import ProductVoucher from '@/components/shared/product-voucher'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
-import { Eye, Facebook, Heart, Instagram, Plus, Twitter, Youtube } from 'lucide-react'
+import { Eye, Facebook, Heart, Instagram, Plus, Truck, Twitter, Youtube } from 'lucide-react'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -134,15 +134,8 @@ const ProductDetails = () => {
 
     // Add to cart mutation
     const createCartMutation = useAddToCart()
-
     //Add to wishlist mutation
     const addProductToWishlistMutation = useAddToWishList()
-
-    //Add to wishlist mutation
-    const addProductToCheckOutMutation = useQuickAddToCart()
-
-    const formQuantity = form.getValues("quantity"); // chỉ lấy field quantity
-
 
     const handleAddProductToWishlist = () => {
         addProductToWishlistMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
@@ -156,46 +149,6 @@ const ProductDetails = () => {
         })
     }
 
-    const handleAddProductToCart = () => {
-        if (!productDetails) return
-        const userId = localStorage.getItem("userId");
-
-        if (!userId) {
-            addToCartLocal({
-                item: {
-                    product_id: productDetails.id ?? '', quantity: formQuantity, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
-                }
-            }, {
-                onSuccess(data, variables, context) {
-                    toast.success(t('addToCartSuccess'))
-                },
-                onError(error, variables, context) {
-                    toast.error(t('addToCartFail'))
-                },
-            })
-        } else {
-            createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: formQuantity }, {
-                onSuccess(data, variables, context) {
-                    toast.success(t('addToCartSuccess'))
-                },
-                onError(error, variables, context) {
-                    const { status, message } = HandleApiError(error, t);
-                    toast.error(message)
-                    if (status === 401) router.push('/login')
-                },
-            })
-        }
-
-        // createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
-        //     onSuccess: () => {
-        //         toast.success(t('addToCartSuccess'))
-        //     },
-        //     onError: (error) => {
-        //         const { status, message } = HandleApiError(error, t);
-        //         toast.error(message)
-        //     },
-        // })
-    }
 
     const handleSubmit = (values: z.infer<typeof cartFormSchema>) => {
         if (!productDetails) return
@@ -260,8 +213,15 @@ const ProductDetails = () => {
     }
 
     return (
-        <div className='py-3 lg:pt-6'>
-            <CustomBreadCrumb isProductPage />
+        <div className='py-3 lg:pt-3 space-y-4'>
+            <CustomBreadCrumb
+                isProductPage
+                currentPage={
+                    productDetails?.categories[0]?.children?.length
+                        ? productDetails.categories[0].children[0].name
+                        : productDetails?.categories[0]?.name
+                }
+            />
             {!isLoadingProduct && productDetails && !isErrorProduct ?
                 <FormProvider {...form}>
                     <form
@@ -272,7 +232,6 @@ const ProductDetails = () => {
                         className='space-y-8 lg:px-30'
                     >
                         <div className='flex flex-col gap-8'>
-
                             {/*Product details */}
                             <div className='grid grid-cols-12 xl:gap-16 gap-8'>
                                 {/*Product details images */}
@@ -354,13 +313,20 @@ const ProductDetails = () => {
                                             <div
                                                 className={cn(`border py-1.5 px-2.5 rounded-md w-fit`,
                                                     productDetails.stock <= 10 && 'text-red-500 border-red-500',
-                                                    productDetails.stock > 10 && productDetails.stock < 30 ? 'text-primary border-primary' : '',
-                                                    productDetails.stock > 30 && 'text-secondary border-secondary'
+                                                    productDetails.stock > 10 && productDetails.stock < 50 ? 'text-primary border-primary' : '',
+                                                    productDetails.stock > 50 && 'text-secondary border-secondary'
                                                 )}
                                             >
                                                 {t('inStock')}: {productDetails.stock}
                                             </div>
                                             : <div>{t('outStock')}</div>}
+                                        <div className='flex flex-row gap-4 items-start border px-2.5 py-1.5 rounded-md w-fit border-black/40'>
+                                            <Truck size={30} />
+                                            <div>
+                                                <p className='font-bold'>{t('delivery')}</p>
+                                                <p className='font-light'>{productDetails.delivery_time ? t('deliveryTime', { days: productDetails.delivery_time }) : t('updating')}</p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {parentProduct && parentProduct?.variants?.length > 0 &&

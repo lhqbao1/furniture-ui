@@ -20,11 +20,11 @@ export const addProductSchema = z.object({
   // sku: z.string().min(1, "You must provide product sku"),
   sku: z.string().optional().nullable(),
   ean: z.string().min(1, "You must provide product EAN"),
-  carrier: z.string().optional(),
-  delivery_time:z.string().optional(),
-  manufacture_country: z.string().optional(),
-  tariff_number: z.string().optional(),
-  brand_id: z.string().optional(),
+  carrier: z.string().optional().nullable(),
+  delivery_time:z.string().optional().nullable(),
+  manufacture_country: z.string().optional().nullable(),
+  tariff_number: z.string().optional().nullable(),
+  brand_id: z.string().optional().nullable(),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
   weight: z.number().optional().nullable(),
   length: z.number().optional().nullable(),
@@ -38,9 +38,9 @@ export const addProductSchema = z.object({
   static_files: z.array(StaticFileSchema),
   category_ids: z.array(z.string()),
 
-  weee_nr: z.string().optional(),
-  eek: z.string().optional(),
-  gpsr_info: z.string().optional(),
+  weee_nr: z.string().optional().nullable(),
+  eek: z.string().optional().nullable(),
+  gpsr_info: z.string().optional().nullable(),
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 })
 
@@ -56,7 +56,7 @@ export const defaultValues = {
   weight: 0,
   collection: null as string | null,
   ean: "",
-  is_active: true,
+  is_active: false,
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
   weee_nr: "",

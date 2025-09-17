@@ -12,6 +12,7 @@ import {
 import {
     Command,
     CommandGroup,
+    CommandInput,
     CommandItem,
 } from "@/components/ui/command"
 import { Check, Loader2 } from "lucide-react"
@@ -95,7 +96,7 @@ export function MultiSelectField({
                                     )}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-[200px] p-0">
+                            {/* <PopoverContent className="w-[200px] p-0">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center p-4">
                                         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -125,7 +126,46 @@ export function MultiSelectField({
                                         </CommandGroup>
                                     </Command>
                                 )}
+                            </PopoverContent> */}
+                            <PopoverContent className="w-[200px] p-0">
+                                {isLoading ? (
+                                    <div className="flex items-center justify-center p-4">
+                                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                                    </div>
+                                ) : isError || !leafOptions || leafOptions.length === 0 ? (
+                                    <div className="p-4 text-center text-sm text-muted-foreground">
+                                        No categories available
+                                    </div>
+                                ) : (
+                                    <Command>
+                                        {/* INPUT SEARCH */}
+                                        <CommandInput placeholder="Search categories..." className="h-10" />
+                                        <CommandGroup>
+                                            {leafOptions
+                                                .filter((opt) =>
+                                                    opt.name.toLowerCase().includes(
+                                                        (document.querySelector<HTMLInputElement>('input[type="text"]')?.value || "").toLowerCase()
+                                                    )
+                                                )
+                                                .map((opt) => (
+                                                    <CommandItem
+                                                        key={opt.id}
+                                                        onSelect={() => toggleSelect(opt.id)}
+                                                        className="flex items-center gap-2 cursor-pointer"
+                                                    >
+                                                        <Checkbox
+                                                            checked={selected.includes(opt.id)}
+                                                            onCheckedChange={() => toggleSelect(opt.id)}
+                                                            className="pointer-events-none"
+                                                        />
+                                                        <span>{opt.name}</span>
+                                                    </CommandItem>
+                                                ))}
+                                        </CommandGroup>
+                                    </Command>
+                                )}
                             </PopoverContent>
+
                         </Popover>
                         <FormMessage />
                     </FormItem>

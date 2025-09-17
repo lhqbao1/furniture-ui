@@ -206,5 +206,14 @@
   "gender_required": "Geschlecht ist erforderlich",
   "loginToContinue": "Zum Fortfahren anmelden",
   "otherGender": "Andere",
-  "userInformation": "Benutzerinformationen"
+  "userInformation": "Benutzerinformationen",
+  "delivery": "Lieferung",
+  "updating": "Aktualisierung",
+  "deliveryTime": "in {days} Tage",
+  "qaSearch": "Zuerst suchen. 90 % der Fragen wurden bereits beantwortet.",
+  "emptyCategory": "Das ist eine leere Kategorie",
+  "customRequest": "SONDERANFRAGE",
+"getCustom": "Erhalten Sie innerhalb von 24 Stunden ein kostenloses 3D-Mock-up",
+"cancel": "Abbrechen",
+"enterDes": "Geben Sie Ihre Beschreibung ein..."
 }

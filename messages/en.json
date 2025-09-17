@@ -206,5 +206,14 @@
     "addressSupplement": "Address Supplement",
     "loginToContinue": "Login to continue",
     "otherGender": "Other",
-    "userInformation": "User Information"
+    "userInformation": "User Information",
+    "delivery": "Delivery",
+    "updating": "Updating",
+    "deliveryTime": "in {days} Days",
+    "qaSearch": "Search first. 90% of questions have been answered.",
+    "emptyCategory": "This category is empty",
+    "customRequest": "CUSTOM REQUEST",
+    "getCustom": "Get a free 3D mock-up in 24 hours",
+    "cancel": "Cancel",
+    "enterDes": "Enter your description..."
 }

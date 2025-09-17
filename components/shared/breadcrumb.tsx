@@ -21,6 +21,7 @@ export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomB
     const params = useParams()
     const { slug } = params
     const pathName = usePathname()
+    console.log(pathName)
 
     // Normalize slug thành array
     const slugArray: string[] = slug
@@ -38,7 +39,7 @@ export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomB
                 </BreadcrumbItem>
 
                 {/* Current page (if provided) */}
-                {currentPage && (
+                {currentPage ? (
                     <>
                         <BreadcrumbSeparator className="text-primary" />
                         <BreadcrumbItem>
@@ -47,36 +48,38 @@ export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomB
                             </BreadcrumbPage>
                         </BreadcrumbItem>
                     </>
-                )}
+                )
+                    :
+                    (
+                        slugArray.map((item, idx) => {
+                            const isLast = idx === slugArray.length - 1
+                            const hideLast = isLast && isProductPage
+                            const href = "/" + slugArray.slice(0, idx + 1).join("/")
 
-                {/* Slug items */}
-                {slugArray.map((item, idx) => {
-                    const isLast = idx === slugArray.length - 1
-                    const hideLast = isLast && isProductPage
-                    const href = "/" + slugArray.slice(0, idx + 1).join("/")
-
-                    return (
-                        <React.Fragment key={idx}>
-                            {idx === 0 ? '' : <BreadcrumbSeparator className="text-primary" />}
-                            {!hideLast && (
-                                <BreadcrumbItem>
-                                    {isLast ? (
-                                        <BreadcrumbPage className="capitalize text-gray-500 font-bold text-lg">
-                                            {item}
-                                        </BreadcrumbPage>
-                                    ) : (
-                                        <BreadcrumbLink
-                                            className="capitalize text-gray-500 font-bold text-lg"
-                                            href={href}
-                                        >
-                                            {item}
-                                        </BreadcrumbLink>
+                            return (
+                                <React.Fragment key={idx}>
+                                    {idx === 0 ? '' : <BreadcrumbSeparator className="text-primary" />}
+                                    {!hideLast && (
+                                        <BreadcrumbItem>
+                                            {isLast ? (
+                                                <BreadcrumbPage className="capitalize text-gray-500 font-bold text-lg">
+                                                    {item}
+                                                </BreadcrumbPage>
+                                            ) : (
+                                                <BreadcrumbLink
+                                                    className="capitalize text-gray-500 font-bold text-lg"
+                                                    href={href}
+                                                >
+                                                    {item}
+                                                </BreadcrumbLink>
+                                            )}
+                                        </BreadcrumbItem>
                                     )}
-                                </BreadcrumbItem>
-                            )}
-                        </React.Fragment>
+                                </React.Fragment>
+                            )
+                        })
                     )
-                })}
+                }
             </BreadcrumbList>
         </Breadcrumb>
     )

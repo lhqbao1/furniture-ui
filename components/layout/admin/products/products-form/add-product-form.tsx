@@ -33,7 +33,6 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useGetBrands } from '@/features/brand/hook'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import countries from "world-countries"
@@ -497,7 +496,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                             WEEE Nr
                                         </FormLabel>
                                         <FormControl>
-                                            <Input placeholder="" {...field} className='col-span-4' />
+                                            <Input placeholder="" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} className='col-span-4' />
                                         </FormControl>
                                         <FormMessage className='col-span-6' />
                                     </FormItem>
@@ -514,7 +513,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                             EEK Label
                                         </FormLabel>
                                         <FormControl >
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value ?? ""}>
                                                 <SelectTrigger placeholderColor className='border w-full col-span-4 font-light'>
                                                     <SelectValue placeholder="EEK Label" />
                                                 </SelectTrigger>
@@ -542,7 +541,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                             Carrier
                                         </FormLabelWithAsterisk>
                                         <FormControl>
-                                            <Select value={field.value} onValueChange={field.onChange}>
+                                            <Select value={field.value ?? ""} onValueChange={field.onChange}>
                                                 <SelectTrigger placeholderColor className='border col-span-4 font-light'>
                                                     <SelectValue placeholder="Select carrier" />
                                                 </SelectTrigger>
@@ -564,7 +563,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                 </SelectContent>
                                             </Select>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className='col-span-6' />
                                     </FormItem>
                                 )}
                             />
@@ -579,7 +578,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                             Delivery time
                                         </FormLabelWithAsterisk>
                                         <FormControl>
-                                            <Select value={field.value} onValueChange={field.onChange}>
+                                            <Select value={field.value ?? ""} onValueChange={field.onChange}>
                                                 <SelectTrigger placeholderColor className='border col-span-4 font-light'>
                                                     <SelectValue placeholder="Select delivery time" />
                                                 </SelectTrigger>
@@ -664,7 +663,18 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                             Tariff Number
                                         </FormLabelWithAsterisk>
                                         <FormControl>
-                                            <Input placeholder="Enter tariff number" {...field} className='col-span-4' />
+                                            <Input
+                                                className='col-span-4'
+                                                placeholder=""
+                                                min={0}
+                                                {...field}
+                                                value={field.value ?? ""}
+                                                onChange={(e) =>
+                                                    field.onChange(
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
                                         </FormControl>
                                         <FormMessage className='col-span-6' />
                                     </FormItem>
