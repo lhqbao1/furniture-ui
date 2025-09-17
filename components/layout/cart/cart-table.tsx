@@ -115,7 +115,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
                 <p className="text-xl font-bold mb-6">({cart?.items.length ? cart.items.length : 0} {t('items')})</p>
             </div>
 
-            <Table>
+            <Table className="overflow-x-hidden">
                 <TableHeader className="border-t">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>

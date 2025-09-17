@@ -340,8 +340,7 @@ const ProductDetails = () => {
                                         </div> */}
 
                                         <div className='flex gap-1 items-center'>
-                                            <p className='text-xl text-gray-500 font-bold'>5</p>
-                                            <ListStars rating={5} />
+                                            <ListStars rating={0} />
                                         </div>
                                     </div>
                                     <div className='flex gap-2'>

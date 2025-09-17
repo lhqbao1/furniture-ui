@@ -21,6 +21,8 @@ import { useCartLocal } from "@/hooks/cart"
 import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl"
 import { Trash } from "lucide-react"
+import { useIsPhone } from "@/hooks/use-is-phone"
+import { GetCartLocalColumns } from "./local-columns"
 
 export type CartTableItem = {
     id?: string
@@ -47,131 +49,16 @@ export function CartLocalTable({
     onToggleAll,
     isCheckout = false,
 }: CartLocalTableProps) {
-    const { updateQuantity } = useCartLocal()
-
-    // kiểm tra nếu tất cả đều active
-    const allSelected = data.length > 0 && data.every((item) => item.is_active)
-    const someSelected = data.some((item) => item.is_active)
-    const t = useTranslations()
-
-    const { removeItem } = useCartLocal()
-
-    const onUpdateQuantity = (item: CartTableItem, newQuantity: number) => {
-        if (newQuantity < 1) return
-        if (item.stock && newQuantity > item.stock) return
-        updateQuantity({ product_id: item.product_id, quantity: newQuantity })
-    }
-
-    // định nghĩa cột
-    const baseColumns: ColumnDef<CartTableItem>[] = [
-        {
-            accessorKey: "product_name",
-            header: () => <div className="">{t('product')}</div>,
-            cell: ({ row }) => (
-                <div className="flex items-center gap-2 w-80 text-wrap">
-                    {row.original.img_url && (
-                        <Image
-                            src={row.original.img_url}
-                            alt={row.original.product_name}
-                            width={70}
-                            height={70}
-                            className="w-12 h-12 object-cover rounded"
-                        />
-                    )}
-                    <span>{row.original.product_name}</span>
-                </div>
-            ),
-        },
-        {
-            accessorKey: "quantity",
-            header: () => <div className="text-center">{t('quantity')}</div>,
-            cell: ({ row }) => {
-                const item = row.original
-                return (
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onUpdateQuantity(item, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                        >
-                            -
-                        </Button>
-                        <span className="px-2">{item.quantity}</span>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onUpdateQuantity(item, item.quantity + 1)}
-                            disabled={item.stock ? item.quantity >= item.stock : false}
-                        >
-                            +
-                        </Button>
-                    </div>
-                )
-            },
-        },
-        {
-            accessorKey: "final_price",
-            header: () => <div className="text-right">{t('price')}</div>,
-            cell: ({ row }) => (
-                <div className="text-right">€{(row.original.item_price * row.original.quantity).toFixed(2)}</div>
-            ),
-        },
-        {
-            id: "actions",
-            header: () => <div className="text-right">{t('actions')}</div>,
-            cell: ({ row }) => {
-                const item = row.original
-                return (
-                    <div className="flex justify-end">
-                        <Trash className="text-red-500 cursor-pointer"
-                            onClick={() => removeItem(item.product_id ?? '')} size={20} />
-                    </div>
-                )
-            },
-        },
-    ]
-
-    // thêm cột select nếu không phải checkout
-    const columns: ColumnDef<CartTableItem>[] = isCheckout
-        ? baseColumns
-        : [
-            {
-                id: "select",
-                header: () => (
-                    <Checkbox
-                        checked={
-                            allSelected
-                                ? true
-                                : someSelected
-                                    ? "indeterminate"
-                                    : false
-                        }
-                        onCheckedChange={(value) => onToggleAll(!!value)}
-                        aria-label="Select all"
-                    />
-                ),
-                cell: ({ row }) => (
-                    <Checkbox
-                        checked={row.original.is_active}
-                        onCheckedChange={(value) =>
-                            onToggleItem(row.original.product_id, !!value)
-                        }
-                    />
-                ),
-            },
-            ...baseColumns,
-        ]
-
     const table = useReactTable({
         data,
-        columns: baseColumns,
+        // columns: baseColumns,
+        columns: GetCartLocalColumns(),
         getCoreRowModel: getCoreRowModel(),
     })
 
     return (
         <div className="col-span-12 lg:col-span-8 flex-1">
-            <Table>
+            <Table className="overflow-hidden overflow-x-hidden text-wrap">
                 <TableHeader className="border-t">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>

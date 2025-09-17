@@ -31,6 +31,7 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("access_token")
+      localStorage.removeItem("userId")
 
       // 👉 Redirect về login
       // window.location.href = "/login"

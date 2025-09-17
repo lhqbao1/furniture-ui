@@ -81,7 +81,7 @@ const CheckOutInvoiceAddress = () => {
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between bg-secondary/10 p-2">
+            <div className="flex justify-between lg:flex-row flex-col bg-secondary/10 p-2">
                 <h2 className="text-lg text-black font-semibold">{t("invoiceAddress")}</h2>
                 <div className="flex items-center space-x-2">
                     <Label htmlFor="same-invoice">{t("sameAsShipping")}</Label>

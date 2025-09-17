@@ -12,7 +12,7 @@ const ListStars = ({ size = 20, rating = 0 }: ListStarsProps) => {
             {[1, 2, 3, 4, 5].map((item, index) => {
                 return (
                     <div key={item}>
-                        <Star size={size} stroke='#f15a24' fill={item <= rating ? '#f15a24' : 'white'} />
+                        <Star size={size} stroke='black' fill={item <= rating ? '#f15a24' : 'white'} />
                     </div>
                 )
             })}

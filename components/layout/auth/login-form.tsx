@@ -81,9 +81,9 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             loginMutation.mutate(values, {
                 onSuccess: (data) => {
                     // Giả sử backend trả về token
-                    // const token = data.access_token
+                    const token = data.access_token
 
-                    // localStorage.setItem("access_token", token)
+                    localStorage.setItem("access_token", token)
                     router.push("/")
                     localStorage.setItem("userId", data.id)
 

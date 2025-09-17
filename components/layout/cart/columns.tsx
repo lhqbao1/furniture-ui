@@ -262,23 +262,9 @@ export const GetCartColumns = ({
 
                     return (
                         <div className="flex flex-col gap-3.5 p-3">
-                            <div className="flex gap-2 shrink-0">
-                                <Trash
-                                    className="text-red-500 cursor-pointer"
-                                    onClick={() => onDeleteItem(item)}
-                                    size={20}
-                                />
-                                {isCheckout && (
-                                    <Heart
-                                        className="text-secondary cursor-pointer"
-                                        onClick={() => handleAddToWishlist(item.products)}
-                                        size={20}
-                                    />
-                                )}
-                            </div>
                             {/* Hàng 1 */}
                             <div className="flex items-center gap-3 justify-between">
-                                <div className="flex items-center gap-3 min-w-0">
+                                <div className="flex items-center gap-3 max-w-[300px] lg:max-w-full">
                                     <Image
                                         src={item.image_url || "/1.png"}
                                         alt={item.products.name}
@@ -287,12 +273,12 @@ export const GetCartColumns = ({
                                         className="rounded shrink-0"
                                         unoptimized
                                     />
-                                    <p className="font-semibold truncate">{item.products.name}</p>
+                                    <p className="font-semibold text-wrap">{item.products.name}</p>
                                 </div>
                             </div>
 
                             {/* Hàng 2 */}
-                            <div className="flex justify-start items-center text-sm gap-6">
+                            <div className="flex justify-end items-center text-sm gap-6">
                                 {/* <span>€{item.item_price.toFixed(2)}</span> */}
                                 <span className="font-semibold">
                                     €{(item.item_price * quantity).toFixed(2)}
@@ -314,6 +300,20 @@ export const GetCartColumns = ({
                                     >
                                         +
                                     </Button>
+                                </div>
+                                <div className="flex gap-2 shrink-0">
+                                    <Trash
+                                        className="text-red-500 cursor-pointer"
+                                        onClick={() => onDeleteItem(item)}
+                                        size={20}
+                                    />
+                                    {isCheckout && (
+                                        <Heart
+                                            className="text-secondary cursor-pointer"
+                                            onClick={() => handleAddToWishlist(item.products)}
+                                            size={20}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>
