@@ -36,6 +36,13 @@ export async function getAllProducts(params?: GetAllProductsParams) {
   return data as ProductResponse
 }
 
+export async function getProductsFeed() {
+  const {data} = await apiPublic.get(
+      `/products/all-product`,
+  )
+  return data as ProductItem[]
+}
+
 export async function getProductById(id: string) {
   const {data} = await apiPublic.get(
       `/products/${id}`,
