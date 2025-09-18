@@ -37,7 +37,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     const queryClient = useQueryClient();
 
     const [userId, setUserId] = React.useState<string | null>(
-        typeof window !== "undefined" ? localStorage.getItem("userId") : null
+        typeof window !== "undefined" ? localStorage.getItem("userId") : ""
     );
 
     //Get cart local and server
@@ -57,7 +57,6 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
         queryKey: ["me", userId],
         queryFn: () => getMe(),
         enabled: !!userId,
-        retry: false,
     });
 
 
@@ -149,37 +148,16 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
                 {/*User */}
                 {/* User */}
-                {!user || !userId ? (
-                    // Case chưa login -> dialog
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
-                            <div className="flex gap-2 justify-start items-end">
-                                <User
-                                    className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
-                                    stroke="#4D4D4D"
-                                    size={30}
-                                />
-                            </div>
-                        </DialogTrigger>
-                        <DialogContent
-                            isTopRight
-                            className='lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
-                            data-[state=open]:slide-in-from-right duration-500
-                            data-[state=closed]:slide-out-to-left
-                            '>
-                            <DialogTitle className='border-b-2 p-4'>
-                                <div className='uppercase font-bold text-xl'>{t('login')}</div>
-                            </DialogTitle>
-                            {/* Nội dung login/signup ở đây */}
-                            <div className='px-4 pb-6 space-y-2'>
-                                <p className='text-black/70 text-lg'>Melden Sie sich hier mit Ihren Kundendaten an.</p>
-                                <HeaderLoginForm onSuccess={() => setOpen(false)} />
-                            </div>
-                            {/* form login/register component */}
-                        </DialogContent>
-                    </Dialog>
-                ) : (
-                    // Case đã login -> dropdown menu
+                {/* User */}
+                {isLoadingUser ? (
+                    // Loading state
+                    <User
+                        stroke="#4D4D4D"
+                        size={30}
+                        className="animate-pulse opacity-50"
+                    />
+                ) : user ? (
+                    // Logged in -> Dropdown
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <div className="flex gap-2 justify-start items-end">
@@ -193,7 +171,9 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
                         <DropdownMenuContent
                             side="bottom"
-                            className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]"
+                            className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]
+              data-[state=open]:slide-in-from-right duration-500
+              data-[state=closed]:slide-out-to-right"
                         >
                             <DropdownMenuLabel>
                                 {t("greeting")}, {user.last_name}
@@ -202,15 +182,51 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                             <DropdownMenuItem onClick={() => router.push("/account")}>
                                 {t("accountInformation")}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={onLogout}>{t("logout")}</DropdownMenuItem>
-                            {/* <Link href={"/cart"}>
-                                <DropdownMenuItem>{t("cart")}</DropdownMenuItem>
-                            </Link> */}
+                            <DropdownMenuItem onClick={onLogout}>
+                                {t("logout")}
+                            </DropdownMenuItem>
                             <Link href={"/wishlist"}>
                                 <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
                             </Link>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                ) : (
+                    // Not logged in -> Dialog
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogTrigger asChild>
+                            <div className="flex gap-2 justify-start items-end">
+                                <User
+                                    className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
+                                    stroke="#4D4D4D"
+                                    size={30}
+                                />
+                            </div>
+                        </DialogTrigger>
+                        <DialogContent
+                            isTopRight
+                            className="lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
+              data-[state=open]:slide-in-from-right duration-500
+              data-[state=closed]:slide-out-to-left"
+                        >
+                            <DialogTitle className="border-b-2 p-4">
+                                <div className="uppercase font-bold text-xl">{t("login")}</div>
+                            </DialogTitle>
+                            <div className="px-4 pb-6 space-y-2">
+                                <p className="text-black/70 text-lg">
+                                    Melden Sie sich hier mit Ihren Kundendaten an.
+                                </p>
+                                <HeaderLoginForm
+                                    onSuccess={() => {
+                                        const uid = localStorage.getItem("userId")
+                                        setUserId(uid) // cập nhật state
+                                        queryClient.invalidateQueries({ queryKey: ["me"] })
+                                        queryClient.invalidateQueries({ queryKey: ["cart-items"] })
+                                        setOpen(false)
+                                    }}
+                                />
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 )}
 
                 {hasSideBar ?

@@ -17,7 +17,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (input: LoginInput) => login(input),
     onSuccess: (res) => {
-      qc.invalidateQueries({ queryKey: ["me"] })
+      qc.refetchQueries({ queryKey: ["me"] })
     },
   })
 }

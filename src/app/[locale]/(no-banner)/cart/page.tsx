@@ -5,7 +5,7 @@ import Image from 'next/image'
 import CartSummary from '@/components/layout/cart/cart-summary'
 import CartTable from '@/components/layout/cart/cart-table'
 import { toast } from 'sonner'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCartLocal } from '@/hooks/cart'
 import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { Link, useRouter } from '@/src/i18n/navigation'
@@ -19,6 +19,8 @@ const CartPage = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false)
     const t = useTranslations()
+    const queryClient = useQueryClient();
+
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
@@ -127,6 +129,10 @@ const CartPage = () => {
                     <CartLoginForm
                         onSuccess={() => {
                             setIsLoginOpen(false)
+                            const uid = localStorage.getItem("userId")
+                            setUserId(uid) // cập nhật state
+                            queryClient.invalidateQueries({ queryKey: ["me"] })
+                            queryClient.invalidateQueries({ queryKey: ["cart-items"] })
                             router.push('/check-out')
                         }}
                         onError={() => {
