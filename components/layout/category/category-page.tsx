@@ -84,9 +84,9 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
                     </div>
                 }
             </div>
-            {category.in_category.length > 0 &&
-                <CustomPagination totalPages={category.in_category.length} page={page} onPageChange={setPage} />
-            }
+            {/* {category.in_category.length > 0 &&
+                <CustomPagination totalPages={category.in_category.length / 2} page={page} onPageChange={(newPage) => setPage(newPage)} />
+            } */}
         </div >
     )
 }

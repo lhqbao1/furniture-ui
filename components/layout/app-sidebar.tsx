@@ -127,7 +127,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                                     </SidebarMenuButton>
                                                 </CollapsibleTrigger>
 
-                                                {sidebarOpen && isOpen && (
+                                                {isOpen && (
                                                     <CollapsibleContent
                                                         // style={{ transition: "all" }}
                                                         className="flex flex-col gap-1.5 mt-1 overflow-hidden [data-state=closed]:hidden [data-state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
