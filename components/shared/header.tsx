@@ -161,7 +161,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                                 />
                             </div>
                         </DialogTrigger>
-                        <DialogContent isTopRight className='lg:w-[500px] w-full lg:top-10 top-30 right-3  translate-x-0 translate-y-0 lg:!right-10 lg:p-0'>
+                        <DialogContent isTopRight className='lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid'>
                             <DialogTitle className='border-b-2 p-4'>
                                 <div className='uppercase font-bold text-xl'>{t('login')}</div>
                             </DialogTitle>
