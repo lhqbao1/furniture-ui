@@ -14,10 +14,9 @@ credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
     auth,
   })
 
-  const accountId = process.env.MERCHANT_USER_ID
+  const accountId = process.env.NEXT_PUBLIC_MERCHANT_USER_ID
   const datafeedId = process.env.DATA_FEED_ID // đúng là datafeedId, không phải dataSourceId
   const list = await shopping.datafeeds.list({ merchantId: accountId });
-  console.log(list.data); 
   
   const res = await shopping.datafeeds.fetchnow({
     merchantId: accountId,

@@ -36,6 +36,7 @@ import { useTranslations } from 'next-intl'
 import { HandleApiError } from '@/lib/api-helper'
 import { cn } from '@/lib/utils'
 import { useCartLocal } from '@/hooks/cart'
+import { useSwipeable } from "react-swipeable"
 
 const ProductDetails = () => {
     const params = useParams()
@@ -212,6 +213,20 @@ const ProductDetails = () => {
         }
     }
 
+    const handlers = useSwipeable({
+        onSwipedLeft: () => {
+            if (!productDetails?.static_files?.length) return
+            setMainImageIndex((prev) => (prev + 1) % productDetails.static_files.length)
+        },
+        onSwipedRight: () => {
+            if (!productDetails?.static_files?.length) return
+            setMainImageIndex((prev) =>
+                prev === 0 ? productDetails.static_files.length - 1 : prev - 1
+            )
+        },
+        trackTouch: true,
+    })
+
     return (
         <div className='py-3 lg:pt-3 space-y-4'>
             <CustomBreadCrumb
@@ -242,13 +257,14 @@ const ProductDetails = () => {
                                         onMouseMove={handleZoomImage}
                                         onMouseEnter={() => setIsHover(true)}
                                         onMouseLeave={() => setIsHover(false)}
+                                        {...handlers}
                                     >
                                         <Image
                                             src={productDetails.static_files.length > 0 ? productDetails.static_files[mainImageIndex].url : '/2.png'}
                                             width={500}
                                             height={300}
                                             alt={`${productDetails.name}`}
-                                            className='transition-transform duration-300 lg:h-[400px] object-cover'
+                                            className='transition-transform duration-300 lg:h-[400px] h-[300px] object-cover'
                                             style={{
                                                 transformOrigin: `${position.x}% ${position.y}%`,
                                                 transform: isHover ? "scale(1.5)" : "scale(1)",
@@ -259,9 +275,9 @@ const ProductDetails = () => {
                                     {/* Sub images */}
                                     <div className='flex flex-row px-12 w-full'>
                                         <Carousel opts={{ loop: true }}>
-                                            <CarouselContent className='w-full'>
+                                            <CarouselContent className='w-full lg:justify-center justify-between'>
                                                 {productDetails.static_files.map((item, index) => (
-                                                    <CarouselItem key={index} className={`flex justify-center basis-1/4`}>
+                                                    <CarouselItem key={index} className={`flex lg:basis-1/4 basis-1/3`}>
                                                         <div
                                                             className="cursor-pointer"
                                                             onClick={() => setMainImageIndex(index)}
@@ -271,7 +287,7 @@ const ProductDetails = () => {
                                                                 width={100}
                                                                 height={100}
                                                                 alt=''
-                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[70px] object-fill`}
+                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] object-fill`}
                                                                 priority={index < 2} // preload 2 ảnh đầu tiên
                                                                 loading={index < 2 ? 'eager' : 'lazy'} // eager = tải ngay
                                                             />

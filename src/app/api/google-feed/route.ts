@@ -20,23 +20,21 @@ export async function GET() {
   try {
     const products = await getProductsFeed();
 
-    const formatName = (name: string) =>
-      name.trim().toLowerCase().replace(/\s+/g, "-");
-
+    const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
+    console.log(products.length)
     const itemsXml = products
       .map((p) => {
         const categories = p.categories || [];
-        const level1 = categories.find((c) => c.level === 1);
-        const level2 = categories.find((c) => c.level === 2);
+        const level1 = categories.find(c => c.level === 1)
+                    const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
 
-        const categoryHref =
-          level1 && level2
-            ? `/${formatName(level1.name)}/${formatName(level2.name)}/${p.id}`
-            : level1
-            ? `/${formatName(level1.name)}/${p.id}`
-            : level2
-            ? `/${formatName(level2.name)}/${p.id}`
-            : `/${p.id}`;
+                    const categoryHref = level1 && level2
+                        ? `/${formatName(level1.name)}/${formatName(level2.name)}/${p.id}`
+                        : level1
+                            ? `/${formatName(level1.name)}/${p.id}`
+                            : level2
+                                ? `/${formatName(level2.name)}/${p.id}`
+                                : `/${p.id}`
 
         const colors = p.options
           .filter((opt) => opt.variant_name?.toLowerCase() === "color")
@@ -52,15 +50,11 @@ export async function GET() {
   <g:image_link>${escapeXml(cleanImageLink(p.static_files[0]?.url))}</g:image_link>
   <g:availability>${p.stock > 0 ? "in stock" : "out of stock"}</g:availability>
   <g:price>${p.final_price.toFixed(2)} EUR</g:price>
-  <g:identifier_exists>yes</g:identifier_exists>
   <g:gtin>${escapeXml(p.ean)}</g:gtin>
-  <g:mpn>${escapeXml(p.sku)}</g:mpn>
-  <g:brand>${escapeXml(p.brand?.name || "ECONELO")}</g:brand>
   <g:condition>new</g:condition>
   <g:adult>no</g:adult>
   <g:age_group>adult</g:age_group>
   <g:is_bundle>no</g:is_bundle>
-  ${colors ? `<g:color>${escapeXml(colors)}</g:color>` : ""}
   <g:shipping>
     <g:country>DE</g:country>
     <g:service>Standard</g:service>

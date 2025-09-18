@@ -17,6 +17,7 @@ import {
     CommandItem,
 } from "@/components/ui/command"
 import { createPortal } from "react-dom"
+import { Link } from "@/src/i18n/navigation"
 
 export default function ProductSearch({ height }: { height?: boolean }) {
     const t = useTranslations()
@@ -26,6 +27,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
     const router = useRouter()
     const containerRef = React.useRef<HTMLDivElement>(null)
     const inputRef = React.useRef<HTMLInputElement>(null)
+    const dropdownRef = React.useRef<HTMLDivElement>(null)
 
     // debounce query
     React.useEffect(() => {
@@ -35,22 +37,12 @@ export default function ProductSearch({ height }: { height?: boolean }) {
         return () => clearTimeout(timeout)
     }, [query])
 
-    // Đóng khi click ra ngoài
-    React.useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-                setOpen(false)
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside)
-        return () => document.removeEventListener("mousedown", handleClickOutside)
-    }, [])
-
     const { data: products, isLoading } = useGetProductsSelect(debouncedQuery)
     const results = products ?? []
 
     // Tính toán vị trí dropdown
     const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({})
+
     React.useEffect(() => {
         if (open && inputRef.current) {
             const rect = inputRef.current.getBoundingClientRect()
@@ -64,9 +56,24 @@ export default function ProductSearch({ height }: { height?: boolean }) {
         }
     }, [open, query])
 
+    React.useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(e.target as Node) &&
+                dropdownRef.current &&
+                !dropdownRef.current.contains(e.target as Node)
+            ) {
+                setOpen(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
+
     return (
         <div ref={containerRef} className="flex justify-center items-center gap-2 relative">
-            <div className={cn("w-3/4 relative flex flex-col", height ? "mr-0" : "")} ref={inputRef}>
+            <div className={cn("w-3/4 relative flex flex-col", height ? "mr-0" : "")}>
                 <div className="relative flex">
                     <Input
                         type="text"
@@ -77,6 +84,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                             setQuery(e.target.value)
                         }}
                         onFocus={() => setOpen(true)}
+                        ref={inputRef}
                     />
                     <Search
                         size={24}
@@ -89,41 +97,56 @@ export default function ProductSearch({ height }: { height?: boolean }) {
             {/* Dropdown render ra body */}
             {open && query &&
                 createPortal(
-                    <div style={dropdownStyle} className="bg-white shadow rounded-md">
-                        <Command shouldFilter={false} className="max-h-[300px] overflow-y-scroll">
+                    <div style={dropdownStyle} ref={dropdownRef} className="bg-white shadow rounded-md z-50">
+                        <Command shouldFilter={false} className="max-h-[300px] overflow-y-scroll z-50">
                             <CommandList>
                                 <CommandEmpty>
                                     {isLoading ? "Loading..." : "No results found."}
                                 </CommandEmpty>
                                 {results.length > 0 && (
                                     <CommandGroup>
-                                        {results.map((product: ProductItem) => (
-                                            <CommandItem
-                                                key={product.id}
-                                                value={product.name}
-                                                onSelect={() => {
-                                                    router.push(`/product/${product.id}`)
-                                                    setQuery("")
-                                                    setOpen(false)
-                                                }}
-                                                className="cursor-pointer"
-                                            >
-                                                <div className="flex justify-between items-center w-full">
-                                                    <div className="flex gap-3 flex-1 items-center">
-                                                        <Image
-                                                            src={product.static_files.length > 0 ? product.static_files[0].url : "/1.png"}
-                                                            height={50}
-                                                            width={50}
-                                                            alt=""
-                                                            className="h-12 w-12"
-                                                            unoptimized
-                                                        />
-                                                        <div className="font-semibold">{product.name}</div>
-                                                    </div>
-                                                    <div className="text-[#666666]">{product.id_provider}</div>
-                                                </div>
-                                            </CommandItem>
-                                        ))}
+                                        {results.map((product: ProductItem) => {
+                                            const categories = product.categories || []
+                                            const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
+
+                                            const level1 = categories.find(c => c.level === 1)
+                                            const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
+
+                                            const categoryHref = level1 && level2
+                                                ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
+                                                : level1
+                                                    ? `/${formatName(level1.name)}/${product.id}`
+                                                    : level2
+                                                        ? `/${formatName(level2.name)}/${product.id}`
+                                                        : `/${product.id}`
+                                            return (
+                                                <CommandItem asChild key={product.id} value={product.name}>
+                                                    <Link
+                                                        href={`/product${categoryHref}`} passHref
+                                                        className="flex justify-between items-center w-full cursor-pointer"
+                                                        onClick={() => {
+                                                            setQuery("")
+                                                            setOpen(false)
+                                                        }}
+                                                    >
+                                                        <div className="flex gap-3 flex-1 items-center">
+                                                            <Image
+                                                                src={product.static_files.length > 0 ? product.static_files[0].url : "/1.png"}
+                                                                height={50}
+                                                                width={50}
+                                                                alt=""
+                                                                className="h-12 w-12"
+                                                                unoptimized
+                                                            />
+                                                            <div className="font-semibold">{product.name}</div>
+                                                        </div>
+                                                        <div className="text-[#666666]">{product.id_provider}</div>
+                                                    </Link>
+                                                </CommandItem>
+
+                                            )
+                                        }
+                                        )}
                                     </CommandGroup>
                                 )}
                             </CommandList>

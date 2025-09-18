@@ -58,30 +58,35 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
             <CustomBreadCrumb currentPage={currentCategoryName ?? ''} />
             <div className=''>
                 <h2 className='section-header'>{currentCategoryName}</h2>
-                <p className='text-center text-lg mt-2'>{category.in_category.length === 0 ? t('emptyCategory') : ''}</p>
-                {isLoading || isError || !category || category.in_category.length === 0 ?
+                <p className='text-center text-xl font-bold mt-2'>{category.in_category.length === 0 ? t('emptyCategory') : ''}</p>
+                {isLoading || isError || !category ?
                     <ProductGridSkeleton length={12} /> :
                     <div className='filter-section'>
-                        <Collapsible>
-                            <CollapsibleTrigger asChild>
-                                <div className='flex justify-end cursor-pointer mb-2 lg:mr-30'>
-                                    <div className='rounded-full border-primary border w-fit flex gap-1 items-center px-2 py-1'>
-                                        <SlidersHorizontal className='text-primary' />
-                                        <p className='text-lg'>Filter</p>
+                        {
+                            category.in_category.length > 0 &&
+                            <Collapsible>
+                                <CollapsibleTrigger asChild>
+                                    <div className='flex justify-end cursor-pointer mb-2 lg:mr-30'>
+                                        <div className='rounded-full border-primary border w-fit flex gap-1 items-center px-2 py-1'>
+                                            <SlidersHorizontal className='text-primary' />
+                                            <p className='text-lg'>Filter</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent>
-                                <FilterSection />
-                            </CollapsibleContent>
-                        </Collapsible>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                    <FilterSection />
+                                </CollapsibleContent>
+                            </Collapsible>
+                        }
                         <div className='pt-10 pb-12'>
                             <ProductsGridLayout hasBadge data={category.in_category} />
                         </div>
                     </div>
                 }
             </div>
-            <CustomPagination totalPages={category.in_category.length} page={page} onPageChange={setPage} />
+            {category.in_category.length > 0 &&
+                <CustomPagination totalPages={category.in_category.length} page={page} onPageChange={setPage} />
+            }
         </div >
     )
 }

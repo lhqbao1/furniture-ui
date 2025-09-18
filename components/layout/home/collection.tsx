@@ -1,9 +1,9 @@
 'use client'
+import { useIsPhone } from '@/hooks/use-is-phone'
 import gsap from 'gsap'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
-import { useMediaQuery } from 'react-responsive'
 
 interface Collection {
     id: number,
@@ -27,7 +27,7 @@ const Collection = () => {
 
     const [listCollection, setListCollection] = useState(collectionList)
     const containerRefs = useRef<HTMLDivElement[]>([])
-    const isMobile = useMediaQuery({ maxWidth: 650 }); // iPhone 12 Pro và nhỏ hơn
+    const isMobile = useIsPhone()
 
 
 
@@ -48,7 +48,7 @@ const Collection = () => {
             return { ...item, ...layout[idx] }
         })
         setListCollection(updated)
-    }, [])
+    }, [isMobile])
 
     useEffect(() => {
         containerRefs.current.forEach((container) => {
@@ -126,10 +126,10 @@ const Collection = () => {
 
             <div className="
                             grid 
-                            grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 
-                            auto-rows-[150px] sm:auto-rows-[200px] xl:grid-rows-2
+                            grid-cols-1 xl:grid-cols-12 
+                            auto-rows-[150px] sm:auto-rows-[200px] xl:grid-rows-2 grid-rows-1
                             gap-4 sm:gap-6 xl:gap-8
-                            xl:h-[600px] mt-5 sm:mt-6 xl:mt-8
+                            xl:h-[600px] h-[800px] mt-5 sm:mt-6 xl:mt-8
                         "
             >
                 {listCollection.map((item, idx) => {

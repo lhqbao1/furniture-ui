@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, VariantProps } from "class-variance-authority"
-import { AlignJustify, PanelLeftIcon, ToggleLeft, ToggleRight } from "lucide-react"
+import { AlignJustify, PanelLeftIcon, ToggleLeft, ToggleRight, X } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -28,7 +28,7 @@ import {
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "240px"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
+const SIDEBAR_WIDTH_MOBILE = "24rem"
 const SIDEBAR_WIDTH_ICON = "6rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -54,7 +54,7 @@ function useSidebar() {
 }
 
 function SidebarProvider({
-  defaultOpen = true,
+  defaultOpen = false,
   open: openProp,
   onOpenChange: setOpenProp,
   className,
@@ -190,7 +190,7 @@ function Sidebar({
           className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
           style={
             {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              "--sidebar-width": '100%',
             } as React.CSSProperties
           }
           side={side}
@@ -255,12 +255,14 @@ function Sidebar({
 
 type SidebarTriggerProps = React.ComponentProps<typeof Button> & {
   isMobile?: boolean
+  isClose?: boolean
 }
 
 function SidebarTrigger({
   className,
   onClick,
   isMobile, // thêm props ở đây
+  isClose = false,
   ...props
 }: SidebarTriggerProps) {
   const [isOpen, setIsOpen] = React.useState(true)
@@ -280,7 +282,11 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <AlignJustify size={50} className="w-[30px] h-[30px] size-7 hover:scale-110 transition-all duration-300" stroke={`#4D4D4D`} />
+      {isClose ?
+        <X size={50} className="w-[30px] h-[30px] size-7 hover:scale-110 transition-all duration-300" stroke={`#4D4D4D`} />
+        :
+        <AlignJustify size={50} className="w-[30px] h-[30px] size-7 hover:scale-110 transition-all duration-300" stroke={`#4D4D4D`} />
+      }
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

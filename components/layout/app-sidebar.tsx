@@ -7,6 +7,7 @@ import {
     SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -26,6 +27,7 @@ import { useMediaQuery } from "react-responsive"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useAtom } from "jotai"
 import { currentCategoryIdAtom, currentCategoryNameAtom } from "@/store/category"
+import { useIsPhone } from "@/hooks/use-is-phone"
 
 type MenuItem = {
     title: string;
@@ -60,13 +62,6 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
     const pathname = usePathname()
     const router = useRouter()
 
-    // Đồng bộ state sidebar với prop defaultOpen
-    React.useEffect(() => {
-        if (pathname === "/cart" || pathname === "/check-out") {
-            setOpen(false) // ép đóng khi vào cart/checkout
-        }
-    }, [pathname])
-
     const newProducts: MenuItem = { title: t("newProducts"), url: "/new-products", id: "new-products" };
     const sale: MenuItem = { title: t("sale"), url: "/sale", id: "sale" };
 
@@ -91,11 +86,17 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
 
 
     const [openItem, setOpenItem] = useState<string | null>()
+    const isPhone = useIsPhone()
 
     return (
         <Sidebar className="app-sidebar custom-scroll" collapsible="offcanvas"
         >
             <SidebarContent>
+                {isPhone &&
+                    <SidebarHeader className="items-end">
+                        <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isMobile={isPhone ? true : false} isClose />
+                    </SidebarHeader>
+                }
                 <SidebarGroup className="h-full relative">
                     <Link href={'/'}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
@@ -105,7 +106,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                 width={100}
                                 height={100}
                                 priority
-                                className="w-auto lg:h-[80px] h-[50px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
+                                className="w-auto lg:h-[80px] h-[80px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
                         </div>
                     </Link>
