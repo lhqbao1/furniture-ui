@@ -117,7 +117,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="name_address"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>Address Name</FormLabel>
                             <FormControl>
                                 <Input placeholder="Home / Office" {...field} />
@@ -131,7 +131,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="recipient_name"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>Recipient Name</FormLabel>
                             <FormControl>
                                 <Input placeholder="Full name" {...field} />
@@ -145,7 +145,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="phone_number"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>Phone Number</FormLabel>
                             <FormControl>
                                 <Input type="number" placeholder="Phone number" {...field} />
@@ -159,7 +159,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="address_line"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>Address Line</FormLabel>
                             <FormControl>
                                 <Input placeholder="Street, Building, etc." {...field} />
@@ -173,7 +173,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="city"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>City</FormLabel>
                             <FormControl>
                                 <Input placeholder="City" {...field} />
@@ -187,7 +187,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="state"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>State</FormLabel>
                             <FormControl>
                                 <Input placeholder="State" {...field} />
@@ -201,7 +201,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="postal_code"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>Postal Code</FormLabel>
                             <FormControl>
                                 <Input placeholder="Postal code" {...field} />
@@ -215,7 +215,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     control={form.control}
                     name="country"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>Country</FormLabel>
                             <FormControl>
                                 <Input placeholder="Country" {...field} />

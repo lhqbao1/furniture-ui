@@ -215,5 +215,6 @@
     "customRequest": "CUSTOM REQUEST",
     "getCustom": "Get a free 3D mock-up in 24 hours",
     "cancel": "Cancel",
-    "enterDes": "Enter your description..."
+    "enterDes": "Enter your description...",
+    "chooseAtLeastCart": "You need to choose at least one product to check out"
 }

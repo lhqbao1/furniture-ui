@@ -13,15 +13,19 @@ import { useState } from "react"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
+import { useCartLocal } from "@/hooks/cart"
 
 interface CartLoginFormProps {
     onSuccess?: () => void
+    onError?: () => void
 }
 
-export default function CartLoginForm({ onSuccess }: CartLoginFormProps) {
+export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps) {
     const [seePassword, setSeePassword] = useState(false)
     const router = useRouter()
     const t = useTranslations()
+    const { cart: localCart } = useCartLocal();
+
 
     const formSchema = z.object({
         username: z
@@ -143,7 +147,14 @@ export default function CartLoginForm({ onSuccess }: CartLoginFormProps) {
                             type="button"
                             variant={'outline'}
                             disabled={loginMutation.isPending}
-                            onClick={() => router.push('/check-out')}
+                            onClick={() => {
+                                if (!localCart || localCart.length === 0) {
+                                    toast.error(t('chooseAtLeastCart'))
+                                    if (onError) onError()
+                                } else {
+                                    router.push('/check-out')
+                                }
+                            }}
                             className="w-full"
                         >
                             {t('continueAsGuest')}

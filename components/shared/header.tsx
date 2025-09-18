@@ -161,7 +161,12 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                                 />
                             </div>
                         </DialogTrigger>
-                        <DialogContent isTopRight className='lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid'>
+                        <DialogContent
+                            isTopRight
+                            className='lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
+                            data-[state=open]:slide-in-from-right duration-500
+                            data-[state=closed]:slide-out-to-left
+                            '>
                             <DialogTitle className='border-b-2 p-4'>
                                 <div className='uppercase font-bold text-xl'>{t('login')}</div>
                             </DialogTitle>

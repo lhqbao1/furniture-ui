@@ -13,15 +13,7 @@ import {
     useReactTable,
     getCoreRowModel,
     flexRender,
-    ColumnDef,
 } from "@tanstack/react-table"
-import Image from "next/image"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useCartLocal } from "@/hooks/cart"
-import { Button } from "@/components/ui/button"
-import { useTranslations } from "next-intl"
-import { Trash } from "lucide-react"
-import { useIsPhone } from "@/hooks/use-is-phone"
 import { GetCartLocalColumns } from "./local-columns"
 
 export type CartTableItem = {

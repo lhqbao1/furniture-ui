@@ -129,6 +129,9 @@ const CartPage = () => {
                             setIsLoginOpen(false)
                             router.push('/check-out')
                         }}
+                        onError={() => {
+                            setIsLoginOpen(false)
+                        }}
                     />
                 </DialogContent>
             </Dialog>

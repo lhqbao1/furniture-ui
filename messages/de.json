@@ -215,5 +215,6 @@
   "customRequest": "SONDERANFRAGE",
 "getCustom": "Erhalten Sie innerhalb von 24 Stunden ein kostenloses 3D-Mock-up",
 "cancel": "Abbrechen",
-"enterDes": "Geben Sie Ihre Beschreibung ein..."
+"enterDes": "Geben Sie Ihre Beschreibung ein...",
+"chooseAtLeastCart": "Bitte wählen Sie mindestens ein Produkt aus"
 }

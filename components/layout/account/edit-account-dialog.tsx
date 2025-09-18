@@ -80,7 +80,7 @@ export default function EditUserDialog({ setOpen, open, currentUser }: EditUserD
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>{t('email')}</FormLabel>
                             <FormControl>
                                 <Input type="email" {...field} />
@@ -94,7 +94,7 @@ export default function EditUserDialog({ setOpen, open, currentUser }: EditUserD
                     control={form.control}
                     name="phone_number"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>{t('phone_number')}</FormLabel>
                             <FormControl>
                                 <Input type="tel" {...field} />
@@ -108,7 +108,7 @@ export default function EditUserDialog({ setOpen, open, currentUser }: EditUserD
                     control={form.control}
                     name="first_name"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>{t('first_name')}</FormLabel>
                             <FormControl>
                                 <Input type="text" {...field} />
@@ -122,7 +122,7 @@ export default function EditUserDialog({ setOpen, open, currentUser }: EditUserD
                     control={form.control}
                     name="last_name"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 lg:col-span-1">
                             <FormLabel>{t('last_name')}</FormLabel>
                             <FormControl>
                                 <Input type="text" {...field} />

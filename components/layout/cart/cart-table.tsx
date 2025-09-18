@@ -144,7 +144,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
                                     ))}
                                 </TableRow>
                             ))
-                        ) : ''}
+                        ) : <span />}
                     </TableBody>
                 )}
             </Table>
