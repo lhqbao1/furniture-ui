@@ -34,9 +34,9 @@ export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomB
         <Breadcrumb className="pt-2">
             <BreadcrumbList className="">
                 {/* Home */}
-                <BreadcrumbItem>
+                {/* <BreadcrumbItem>
                     <BreadcrumbLink href="/"><Home /></BreadcrumbLink>
-                </BreadcrumbItem>
+                </BreadcrumbItem> */}
 
                 {/* Current page (if provided) */}
                 {currentPage ? (

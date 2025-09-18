@@ -9,7 +9,7 @@ import { Input } from "../ui/input";
 const Footer = () => {
     const t = useTranslations()
     return (
-        <footer className="bg-white shadow-2xl text-black w-full grid xl:grid-cols-6 grid-cols-2 xl:gap-6 gap-4 p-8 rounded-tl-2xl rounded-tr-2xl">
+        <footer className="bg-white shadow-2xl text-black w-full grid lg:grid-cols-6 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:py-10 px-8 py-8 rounded-tl-2lg rounded-tr-2xl">
             {/* Cột 1: Logo */}
             <div className="col-span-6 lg:col-span-3 space-y-3 mb-6 lg:mb-0">
                 <h3 className="font-semibold">
@@ -36,7 +36,7 @@ const Footer = () => {
                     Jetzt anmelden
                 </button>
 
-                <p className="leading-relaxed font-semibold">
+                <p className="leading-relaxed font-semibold text-sm lg:w-1/2 w-full">
                     Die Abmeldung des Newsletters ist jederzeit über den Abmeldelink in jeder Mail oder als Anfrage in unserem Kontaktformular möglich.{" "}
                     <a href="#" className="underline text-gray-600 hover:text-gray-800">Datenschutz</a>
                 </p>

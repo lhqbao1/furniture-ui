@@ -18,12 +18,9 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "../ui/button"
-import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
 import { useTranslations } from "next-intl"
-    ;
 import { slugify } from "@/lib/slugify"
-import { useMediaQuery } from "react-responsive"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useAtom } from "jotai"
 import { currentCategoryIdAtom, currentCategoryNameAtom } from "@/store/category"
@@ -98,18 +95,6 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                     </SidebarHeader>
                 }
                 <SidebarGroup className="h-full relative">
-                    <Link href={'/'}>
-                        <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
-                            <Image
-                                src="/new-logo.svg"
-                                alt="Prestige Home logo"
-                                width={100}
-                                height={100}
-                                priority
-                                className="w-auto lg:h-[80px] h-[80px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
-                            />
-                        </div>
-                    </Link>
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-3">
                             {items.map((item) => {

@@ -109,7 +109,7 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
 
   const sections = [
     { value: "description", label: t('description'), content: <div dangerouslySetInnerHTML={{ __html: product?.description ?? "" }} /> },
-    { value: "shipping", label: t('shipping'), content: <div>Shipping info here</div> },
+    { value: "shipping", label: t('shipping'), content: <div></div> },
     { value: "review", label: t('review'), content: <ProductReviewTab /> },
     { value: "q&a", label: "Q&A", content: <QASection /> },
   ]

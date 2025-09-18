@@ -113,8 +113,6 @@ const Collection = () => {
     }, [listCollection])
 
 
-
-
     return (
         <div className='section-padding'>
             <h2 className='section-header mb-2'>

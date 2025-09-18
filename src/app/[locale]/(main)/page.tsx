@@ -39,10 +39,10 @@ export default async function Home() {
         {/* <AnimatedCarousel /> */}
         {/* <Voucher /> */}
         {/* <FlashSale /> */}
-        <PreOrder />
+        {/* <PreOrder /> */}
         <RecentViewed />
-        <Collection />
-        <Custom />
+        {/* <Collection />
+        <Custom /> */}
       </div>
     </HydrationBoundary>
   );

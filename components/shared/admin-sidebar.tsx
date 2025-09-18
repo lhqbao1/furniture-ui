@@ -9,6 +9,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarProvider,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
@@ -52,6 +53,7 @@ export function AdminSideBar() {
 
     return (
         <Sidebar className="app-sidebar custom-scroll">
+
             <SidebarContent>
                 <SidebarGroup>
                     <Link href={'/admin'}>

@@ -71,8 +71,7 @@ const ProductReviewTab = () => {
     return (
         <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-12 lg:gap-28'}`}>
             {/* LEFT: Reviews */}
-            <div className={`${isMobile ? 'col-span-1' : 'lg:col-span-7 col-span-12'} flex flex-col gap-6`}>
-                {/* Review main */}
+            {/* <div className={`${isMobile ? 'col-span-1' : 'lg:col-span-7 col-span-12'} flex flex-col gap-6`}>
                 <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
                     <div className={`${isMobile ? 'flex flex-row justify-between' : 'col-span-2 flex flex-col items-center justify-center gap-2'}`}>
                         <h3 className='flex flex-row gap-1 items-center'>4.8 <Star /></h3>
@@ -128,7 +127,6 @@ const ProductReviewTab = () => {
                     </div>
                 </div>
 
-                {/* Filter */}
                 <div className={`grid gap-4 border-b border-gray-300 pb-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
                     <div className={`${isMobile ? 'flex flex-row justify-between items-center' : 'col-span-6 flex flex-row justify-between'}`}>
                         <p>{t('all')}</p>
@@ -157,10 +155,10 @@ const ProductReviewTab = () => {
                 </div>
 
                 <ListComments listComments={listComments} showComments={showComments} showPic={showPic} />
-            </div>
+            </div> */}
 
             {/* RIGHT: Videos + Write Review */}
-            <div className={`${isMobile ? 'col-span-1' : 'md:col-span-5 col-span-12'} flex flex-col gap-6`}>
+            {/* <div className={`${isMobile ? 'col-span-1' : 'md:col-span-5 col-span-12'} flex flex-col gap-6`}>
                 <div className="w-full aspect-video">
                     <YouTube className="w-full h-full rounded-lg" iframeClassName="rounded-lg" videoId={videos[0]} opts={mainVideoOpts} />
                 </div>
@@ -182,7 +180,7 @@ const ProductReviewTab = () => {
                 </div>
 
                 <GiveCommentSection />
-            </div>
+            </div> */}
         </div>
     )
 }

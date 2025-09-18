@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import ProductSearch from './product-search';
 import { useTranslations } from 'next-intl';
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { ChevronDown, Mic, Search, ShoppingCart, User } from 'lucide-react'
+import { ChevronDown, Mic, Search, ShoppingCart, User, X } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,6 +21,9 @@ import { getMe } from '@/features/auth/api';
 import { Link, useRouter } from '@/src/i18n/navigation';
 import { useCartLocal } from '@/hooks/cart';
 import { useIsPhone } from '@/hooks/use-is-phone';
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '../ui/dialog';
+import { DialogTitle } from '@radix-ui/react-dialog';
+import HeaderLoginForm from './header-login-form';
 
 interface PageHeaderProps {
     hasSideBar?: boolean
@@ -79,7 +82,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
     return (
         <div className={`home-banner-top__content sticky top-0 overflow-hidden z-50 ${isPhone ? 'flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex items-center justify-end px-4 py-3 gap-6 bg-white shadow-secondary/10 shadow-xl'}`}>
-            <div className={`${isPhone ? 'block' : 'hidden'}`}>
+            <div className={`flex gap-4 items-center`}>
                 <Link href={'/'}>
                     <Image
                         src={'/new-logo.svg'}
@@ -89,13 +92,14 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                         unoptimized
                     />
                 </Link>
+                <div className={`text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`} translate="no">
+                    <span className="text-secondary font-bold">Prestige</span>
+                    <span className="text-primary font-bold">Home</span>
+                </div>
             </div>
-            <div className={`text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`} translate="no">
-                <span className="text-secondary font-bold">Prestige</span>
-                <span className="text-primary font-bold">Home</span>
-            </div>
+
             {/*Product search desktop */}
-            <div className={`${isPhone ? 'hidden' : 'block w-full'}`}>
+            <div className={`${isPhone ? 'hidden' : 'block flex-1'}`}>
                 <ProductSearch />
             </div>
 
@@ -144,51 +148,66 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
 
                 {/*User */}
-                <DropdownMenu >
-                    <DropdownMenuTrigger asChild>
-                        <div className='flex gap-2 justify-start items-end'>
-                            <User className="cursor-pointer hover:scale-110 transition-all duration-300 relative" stroke={`#4D4D4D`} size={30} />
-                        </div>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent side="bottom" className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]">
-                        {!user || !userId ? (
-                            <div>
-                                <Link href={'/login'} className='cursor-pointer'>
-                                    <DropdownMenuItem className='cursor-pointer'>
-                                        {t('login')}
-                                    </DropdownMenuItem>
-                                </Link>
-                                <Link href={'/sign-up'} className='cursor-pointer'>
-                                    <DropdownMenuItem className='cursor-pointer'>
-                                        {t('createAccount')}
-                                    </DropdownMenuItem>
-                                </Link>
+                {/* User */}
+                {!user || !userId ? (
+                    // Case chưa login -> dialog
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <div className="flex gap-2 justify-start items-end">
+                                <User
+                                    className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
+                                    stroke="#4D4D4D"
+                                    size={30}
+                                />
                             </div>
-                        ) : (
-                            <>
-                                <DropdownMenuLabel>{t('greeting')}, {user.last_name}</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => router.push('/account')}>
-                                    {t('accountInformation')}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={onLogout}>
-                                    {t('logout')}
-                                </DropdownMenuItem>
-                                <Link href={'/cart'} className='cursor-pointer'>
-                                    <DropdownMenuItem className='cursor-pointer'>
-                                        {t('cart')}
-                                    </DropdownMenuItem>
-                                </Link>
-                                <Link href={'/wishlist'} className='cursor-pointer'>
-                                    <DropdownMenuItem className='cursor-pointer'>
-                                        {t('wishlist')}
-                                    </DropdownMenuItem>
-                                </Link>
-                            </>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </DialogTrigger>
+                        <DialogContent isTopRight className='lg:w-[500px] w-full lg:top-10 top-30 right-3  translate-x-0 translate-y-0 lg:!right-10 lg:p-0'>
+                            <DialogTitle className='border-b-2 p-4'>
+                                <div className='uppercase font-bold text-xl'>{t('login')}</div>
+                            </DialogTitle>
+                            {/* Nội dung login/signup ở đây */}
+                            <div className='px-4 pb-6 space-y-2'>
+                                <p className='text-black/70 text-lg'>Melden Sie sich hier mit Ihren Kundendaten an.</p>
+                                <HeaderLoginForm />
+                            </div>
+                            {/* form login/register component */}
+                        </DialogContent>
+                    </Dialog>
+                ) : (
+                    // Case đã login -> dropdown menu
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <div className="flex gap-2 justify-start items-end">
+                                <User
+                                    className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
+                                    stroke="#4D4D4D"
+                                    size={30}
+                                />
+                            </div>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent
+                            side="bottom"
+                            className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]"
+                        >
+                            <DropdownMenuLabel>
+                                {t("greeting")}, {user.last_name}
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => router.push("/account")}>
+                                {t("accountInformation")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={onLogout}>{t("logout")}</DropdownMenuItem>
+                            <Link href={"/cart"}>
+                                <DropdownMenuItem>{t("cart")}</DropdownMenuItem>
+                            </Link>
+                            <Link href={"/wishlist"}>
+                                <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
+                            </Link>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
+
 
                 {hasSideBar ?
                     <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isMobile={isPhone ? true : false} />

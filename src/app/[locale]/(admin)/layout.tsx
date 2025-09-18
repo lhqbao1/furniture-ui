@@ -10,7 +10,7 @@ export default function AdminLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={true}>
             <AdminSideBar />
             <div className="container-padding pt-8 w-full overflow-x-scroll">
                 <Protected>
