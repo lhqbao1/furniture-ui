@@ -3,7 +3,6 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Mail } from "lucide-react";
 import { Input } from "../ui/input";
 
 const Footer = () => {
@@ -38,7 +37,7 @@ const Footer = () => {
 
                 <p className="leading-relaxed font-semibold text-sm lg:w-1/2 w-full">
                     Die Abmeldung des Newsletters ist jederzeit über den Abmeldelink in jeder Mail oder als Anfrage in unserem Kontaktformular möglich.{" "}
-                    <a href="#" className="underline text-gray-600 hover:text-gray-800">Datenschutz</a>
+                    <Link href="/datenschutzerklarung" className="underline text-gray-600 hover:text-gray-800">Datenschutz</Link>
                 </p>
             </div>
 
