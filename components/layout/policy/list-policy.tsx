@@ -119,7 +119,7 @@ const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
                                             if (el) {
                                                 const parent = el.closest(".content-scroll") as HTMLElement
                                                 if (parent) {
-                                                    const top = el.offsetTop - 250
+                                                    const top = el.offsetTop - 330
                                                     parent.scrollTo({
                                                         top,
                                                         behavior: "smooth",

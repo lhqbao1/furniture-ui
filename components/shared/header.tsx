@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import React from 'react'
+import React, { useState } from 'react'
 import { useMediaQuery } from 'react-responsive';
 import ProductSearch from './product-search';
 import { useTranslations } from 'next-intl';
@@ -33,7 +33,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     const router = useRouter()
     const t = useTranslations()
     const isPhone = useIsPhone()
-
+    const [open, setOpen] = useState(false)
     const queryClient = useQueryClient();
 
     const [userId, setUserId] = React.useState<string | null>(
@@ -151,7 +151,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                 {/* User */}
                 {!user || !userId ? (
                     // Case chưa login -> dialog
-                    <Dialog>
+                    <Dialog open={open} onOpenChange={setOpen}>
                         <DialogTrigger asChild>
                             <div className="flex gap-2 justify-start items-end">
                                 <User
@@ -168,7 +168,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                             {/* Nội dung login/signup ở đây */}
                             <div className='px-4 pb-6 space-y-2'>
                                 <p className='text-black/70 text-lg'>Melden Sie sich hier mit Ihren Kundendaten an.</p>
-                                <HeaderLoginForm />
+                                <HeaderLoginForm onSuccess={() => setOpen(false)} />
                             </div>
                             {/* form login/register component */}
                         </DialogContent>
@@ -198,16 +198,15 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                                 {t("accountInformation")}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={onLogout}>{t("logout")}</DropdownMenuItem>
-                            <Link href={"/cart"}>
+                            {/* <Link href={"/cart"}>
                                 <DropdownMenuItem>{t("cart")}</DropdownMenuItem>
-                            </Link>
+                            </Link> */}
                             <Link href={"/wishlist"}>
                                 <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
                             </Link>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )}
-
 
                 {hasSideBar ?
                     <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isMobile={isPhone ? true : false} />

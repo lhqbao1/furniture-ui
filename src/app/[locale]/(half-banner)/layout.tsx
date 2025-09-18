@@ -11,7 +11,7 @@ export default function MainLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={false}>
             <AppSidebarServer />
             <main className="relative w-full">
                 {/* <StickyIcon /> */}

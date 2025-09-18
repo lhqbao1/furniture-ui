@@ -39,7 +39,7 @@ type AppSidebarProps = {
 }
 
 export default function AppSidebar({ categories, defaultOpen = true }: AppSidebarProps) {
-    const { open: sidebarOpen, setOpen } = useSidebar()  // true = expanded, false = collapsed
+    const { open: sidebarOpen, setOpen, openMobile, setOpenMobile } = useSidebar()  // true = expanded, false = collapsed
     const t = useTranslations()
     const [currentCategoryId, setCurrentCategoryId] = useAtom(currentCategoryIdAtom)
     const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
@@ -139,6 +139,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                                                     key={child.id}
                                                                     onClick={() => {
                                                                         router.push(child.url)
+                                                                        if (isPhone) setOpenMobile(false)
                                                                         if (item.url && item.url.includes("product")) {
                                                                             setCurrentCategoryId(child.id)
                                                                             setCurrentCategoryName(child.title)

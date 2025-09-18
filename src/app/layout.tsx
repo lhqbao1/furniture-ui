@@ -38,18 +38,36 @@ export default function RootLayout({
         <html lang="de">
             <head>
                 <Script
-                    // id={`Cookiebot`}
-                    // async={true}
-                    // src={`https://consent.cookiebot.com/uc.js`}
-                    // strategy={`beforeInteractive`}
-                    // data-cbid={process.env.NEXT_PUBLIC_COOKIE_DOMAIN_URL}
-                    // data-blockingmode={`auto`}
-                    // type={`text/javascript`}
-                    id="Cookiebot"
-                    src="https://consent.cookiebot.com/uc.js"
-                    data-cbid="8f8acfd3-d7a8-4a90-a3d3-9d0a07828371"
-                    data-blockingmode="auto"
-                    type="text/javascript"
+                // id={`Cookiebot`}
+                // async={true}
+                // src={`https://consent.cookiebot.com/uc.js`}
+                // strategy={`beforeInteractive`}
+                // data-cbid={process.env.NEXT_PUBLIC_COOKIE_DOMAIN_URL}
+                // data-blockingmode={`auto`}
+                // type={`text/javascript`}
+                // id="Cookiebot"
+                // src="https://consent.cookiebot.com/uc.js"
+                // data-cbid="8f8acfd3-d7a8-4a90-a3d3-9d0a07828371"
+                // data-blockingmode="auto"
+                // type="text/javascript"
+                />
+                <Script
+                    src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
+                    strategy="beforeInteractive"
+                />
+                <Script
+                    id="usercentrics-cmp"
+                    src="https://web.cmp.usercentrics.eu/ui/loader.js"
+                    data-settings-id="RlDaintBne_uoh"
+                    async
+                    strategy="afterInteractive"
+                />
+                <Script
+                    id="usercentrics-cmp"
+                    src="https://web.cmp.usercentrics.eu/ui/loader.js"
+                    data-draft="true"
+                    data-settings-id="RlDaintBne_uoh"
+                    async
                 />
 
                 <Script id="GTM" strategy="beforeInteractive">
@@ -76,6 +94,6 @@ export default function RootLayout({
                     }}
                 />
             </body>
-        </html>
+        </html >
     );
 }

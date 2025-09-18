@@ -1,5 +1,6 @@
 import AccountForm from '@/components/layout/account/account-form'
 import CustomBreadCrumb from '@/components/shared/breadcrumb'
+import { Button } from '@/components/ui/button'
 import React from 'react'
 
 const AccountPage = async () => {
