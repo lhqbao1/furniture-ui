@@ -585,7 +585,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                             Delivery time
                                         </FormLabelWithAsterisk>
                                         <FormControl>
-                                            <Select value={field.value ?? ""} onValueChange={field.onChange} defaultValue='3-5'>
+                                            <Select value={field.value ?? ""} onValueChange={field.onChange}>
                                                 <SelectTrigger placeholderColor className='border col-span-4 font-light'>
                                                     <SelectValue placeholder="Select delivery time" />
                                                 </SelectTrigger>
