@@ -65,7 +65,8 @@ export const defaultValues = {
   category_ids: [] as string[],
   weee_nr: "",
   eek: "",
-  gpsr_info: ""
+  gpsr_info: "",
+  delivery_time: "3-5"
   // brand_id: "",
   // carrier: "",
   // delivery_time: "",

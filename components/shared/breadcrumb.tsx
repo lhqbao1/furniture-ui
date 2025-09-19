@@ -20,8 +20,6 @@ interface CustomBreadCrumbProps {
 export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomBreadCrumbProps) {
     const params = useParams()
     const { slug } = params
-    const pathName = usePathname()
-    console.log(pathName)
 
     // Normalize slug thành array
     const slugArray: string[] = slug

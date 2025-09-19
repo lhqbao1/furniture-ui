@@ -24,6 +24,7 @@ import { useIsPhone } from '@/hooks/use-is-phone';
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '../ui/dialog';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import HeaderLoginForm from './header-login-form';
+import CartPage from '@/src/app/[locale]/(no-banner)/cart/page';
 
 interface PageHeaderProps {
     hasSideBar?: boolean
@@ -82,12 +83,19 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     return (
         <div className={`home-banner-top__content sticky top-0 overflow-hidden z-50 ${isPhone ? 'flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex items-center justify-end px-4 py-3 gap-6 bg-white shadow-secondary/10 shadow-xl'}`}>
             <div className={`flex gap-4 items-center`}>
-                <Link href={'/'}>
-                    <Image
+                <Link href={'/'} className='relative w-10 h-10'>
+                    {/* <Image
                         src={'/new-logo.svg'}
                         width={40}
                         height={40}
                         alt=''
+                        unoptimized
+                    /> */}
+                    <Image
+                        src="/new-logo.svg"
+                        alt=""
+                        fill
+                        style={{ objectFit: "contain" }}
                         unoptimized
                     />
                 </Link>
@@ -135,20 +143,47 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                 </div>
 
                 {/*Shopping cart */}
-                <Link href={'/cart'} className={`cursor-pointer relative`}>
-                    <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
-                    {displayedCart && displayedCart.length > 0 ?
-                        <span className="absolute -top-1.5 -right-1 flex size-3">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
-                        </span>
-                        : ''}
-                </Link>
+                {isPhone ?
+                    (
+                        <Dialog open={open} onOpenChange={setOpen}>
+                            <DialogTrigger asChild>
+                                <div className='relative'>
+                                    <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
+                                    {displayedCart && displayedCart.length > 0 ?
+                                        <span className="absolute -top-1.5 -right-1 flex size-3">
+                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
+                                        </span>
+                                        : ''}
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent
+                                isTopRight
+                                className="lg:w-[500px] w-full lg:h-fit overflow-y-scroll h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
+              data-[state=open]:slide-in-from-right duration-500
+              data-[state=closed]:slide-out-to-left"
+                            >
+                                <DialogTitle className="border-b-2 p-4">
+                                    <div className="uppercase font-bold text-xl">{t("cart")}</div>
+                                </DialogTitle>
+                                <CartPage />
+                            </DialogContent>
+                        </Dialog>
+                    )
+                    :
+                    (<Link href={'/cart'} className={`cursor-pointer relative`}>
+                        <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
+                        {displayedCart && displayedCart.length > 0 ?
+                            <span className="absolute -top-1.5 -right-1 flex size-3">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
+                            </span>
+                            : ''}
+                    </Link>)
+                }
 
 
                 {/*User */}
-                {/* User */}
-                {/* User */}
                 {isLoadingUser ? (
                     // Loading state
                     <User

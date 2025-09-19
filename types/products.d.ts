@@ -88,6 +88,10 @@ export type StaticFile = {
     manufacture_country: string
     tariff_number: string
 
+    url_key: string
+    meta_title: string
+    meta_description: string
+
     weight: number
     length: number
     width: number

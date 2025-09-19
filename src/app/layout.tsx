@@ -44,7 +44,7 @@ export default function RootLayout({
                     async
                 />
 
-                <Script
+                {/* <Script
                     id="GTM"
                     dangerouslySetInnerHTML={{
                         __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -55,7 +55,22 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-WKVQP2QH');`,
                     }}
                     async
+                /> */}
+                <Script
+                    src="https://www.googletagmanager.com/gtag/js?id=AW-17548008377"
+                    async
                 />
+                <Script
+                    id="gtag-base"
+                    strategy="afterInteractive"
+                >
+                    {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'AW-17548008377');
+                    `}
+                </Script>
 
                 {/* ✅ CMP loader script (Usercentrics) */}
                 <Script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="RlDaintBne_uoh" async strategy="afterInteractive" />
