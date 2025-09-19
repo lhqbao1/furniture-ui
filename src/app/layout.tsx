@@ -3,9 +3,8 @@ import { Figtree, Libre_Caslon_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
-import Script from "next/script";
-import { GoogleTagManager } from '@next/third-parties/google'
 import Head from "next/head";
+import Script from "next/script";
 
 const figtree = Figtree({
     subsets: ["latin"],
@@ -38,16 +37,14 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="de">
-            <Head>
-                {/* 🚫 Autoblocker script — phải đứng đầu để chặn các dịch vụ trước khi có consent */}
-                <script
+            <head>
+                <Script
                     id="usercentrics-autoblocker"
                     src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
                     async
                 />
 
-                {/* ✅ GTM init script — chèn thủ công để tránh lỗi ESLint */}
-                <script
+                <Script
                     id="GTM"
                     dangerouslySetInnerHTML={{
                         __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -57,18 +54,13 @@ export default function RootLayout({
               f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-WKVQP2QH');`,
                     }}
+                    async
                 />
 
                 {/* ✅ CMP loader script (Usercentrics) */}
-                <script
-                    id="usercentrics-cmp"
-                    src="https://web.cmp.usercentrics.eu/ui/loader.js"
-                    data-settings-id="RlDaintBne_uoh"
-                    async
-                />
-            </Head>
+                <Script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="RlDaintBne_uoh" async strategy="afterInteractive" />
+            </head>
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
-                <GoogleTagManager gtmId="" />
                 {/* Google Tag Manager (noscript) */}
                 <noscript>
                     <iframe
