@@ -267,16 +267,20 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         header: "ACTION",
         cell: ({ row }) => {
             // Lấy đường dẫn category
-            const categories = row.original.categories || []
+            const product = row.original
+            const categories = product.categories || []
+            const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
+
             const level1 = categories.find(c => c.level === 1)
             const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
+
             const categoryHref = level1 && level2
-                ? `/${level1.name}/${level2.name}/${row.original.id}`
+                ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
                 : level1
-                    ? `/${level1.name}/${row.original.id}`
+                    ? `/${formatName(level1.name)}/${product.id}`
                     : level2
-                        ? `/${level2.name}/${row.original.id}`
-                        : `/${row.original.id}`
+                        ? `/${formatName(level2.name)}/${product.id}`
+                        : `/${product.id}`
 
             return (
                 <div className="flex gap-2">
@@ -288,7 +292,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
                     </Link>
 
                     {/* Delete */}
-                    <DeleteDialog product={row.original} />
+                    {/* <DeleteDialog product={row.original} /> */}
 
                     {/* View */}
                     <Link href={`/product/${categoryHref}`} target="_blank" rel="noopener noreferrer">

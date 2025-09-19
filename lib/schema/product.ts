@@ -41,6 +41,10 @@ export const addProductSchema = z.object({
   weee_nr: z.string().optional().nullable(),
   eek: z.string().optional().nullable(),
   gpsr_info: z.string().optional().nullable(),
+
+  url_key: z.string().optional().nullable(),
+  meta_title: z.string().optional().nullable(),
+  meta_description: z.string().optional().nullable(),
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 })
 

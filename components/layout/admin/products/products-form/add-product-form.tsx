@@ -37,6 +37,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import countries from "world-countries"
 import GpsrInput from './form-input/gpsr'
+import SeoFields from './form-input/seo-fields'
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -265,7 +266,11 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 <p className='text-[#666666] text-sm'>Image</p>
                                 <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
                             </div>
+
+                            {/*Product SEO */}
+                            <SeoFields />
                         </div>
+
                         <div className='col-span-3 flex flex-col items-end gap-4'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end'>

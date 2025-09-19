@@ -1,11 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CreateProduct, deleteProduct, editProduct, getAllProducts, getProductById, getProductByTag } from "./api"
+import { CreateProduct, deleteProduct, editProduct, generateSEO, getAllProducts, getProductById, getProductByTag } from "./api"
 import { ProductInput } from "@/lib/schema/product"
 
 interface UseGetAllProductsParams {
   page?: number
   page_size?: number
   all_products?: boolean
+}
+
+interface SEOInput {
+  title: string
+  description: string
 }
 
 export function useGetAllProducts({ page, page_size, all_products }: UseGetAllProductsParams = {}) {
@@ -64,4 +69,12 @@ export function useEditProduct() {
   })
 }
 
-  
+export function useGenerateSEO() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (input: SEOInput) => generateSEO(input),
+    // onSuccess: (res) => {
+    //   qc.invalidateQueries({ queryKey: ["products"] })
+    // },
+  })
+}

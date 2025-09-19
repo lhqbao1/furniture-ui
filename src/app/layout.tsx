@@ -38,20 +38,7 @@ export default function RootLayout({
         <html lang="de">
             <head>
                 <Script
-                // id={`Cookiebot`}
-                // async={true}
-                // src={`https://consent.cookiebot.com/uc.js`}
-                // strategy={`beforeInteractive`}
-                // data-cbid={process.env.NEXT_PUBLIC_COOKIE_DOMAIN_URL}
-                // data-blockingmode={`auto`}
-                // type={`text/javascript`}
-                // id="Cookiebot"
-                // src="https://consent.cookiebot.com/uc.js"
-                // data-cbid="8f8acfd3-d7a8-4a90-a3d3-9d0a07828371"
-                // data-blockingmode="auto"
-                // type="text/javascript"
-                />
-                <Script
+                    id="usercentrics-autoblocker"
                     src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
                     strategy="beforeInteractive"
                 />
@@ -62,14 +49,6 @@ export default function RootLayout({
                     async
                     strategy="afterInteractive"
                 />
-                <Script
-                    id="usercentrics-cmp"
-                    src="https://web.cmp.usercentrics.eu/ui/loader.js"
-                    data-draft="true"
-                    data-settings-id="RlDaintBne_uoh"
-                    async
-                />
-
                 <Script id="GTM" strategy="beforeInteractive">
                     {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-WKVQP2QH');`}
                 </Script>

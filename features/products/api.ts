@@ -8,6 +8,18 @@ interface GetAllProductsParams {
   all_products?: boolean
 }
 
+interface SEOInput {
+  title: string
+  description: string
+}
+
+interface SEOResponse {
+  url_key: string
+  meta_title: string
+  meta_description: string
+  meta_keywords: string
+}
+
 export async function CreateProduct(input: ProductInput) {
   const { data } = await apiAdmin.post(
     "/products/",
@@ -78,3 +90,19 @@ export async function editProduct(input: ProductInput, id: string) {
   )
   return data as ProductItem
   }
+
+
+  export async function generateSEO(input: SEOInput) {
+    const { data } = await apiAdmin.post(
+      "/products/ai-generate-metadata",
+      input,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+        },
+        withCredentials: true,
+      }
+    )
+    return data as SEOResponse
+}
