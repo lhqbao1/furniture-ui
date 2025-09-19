@@ -112,6 +112,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                     onSuccess: () => {
                         toast.success("Product updated successfully")
                         router.push("/admin/products/list")
+                        router.refresh() // đảm bảo dữ liệu list được fetch lại
                     },
                     onError: () => {
                         toast.error("Failed to update product")

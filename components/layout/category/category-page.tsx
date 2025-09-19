@@ -36,8 +36,6 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
     const [currentCategoryId, setCurrentCategoryId] = useAtom(currentCategoryIdAtom)
     const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
 
-
-
     const slug = paramValues[paramValues.length - 1] as string
     const { data: category, isLoading, isError } = useQuery({
         queryKey: ["category", currentCategoryId],
