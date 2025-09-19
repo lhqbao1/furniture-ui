@@ -46,6 +46,19 @@ const SUBJECT_OPTIONS = [
     "Privacy concern",
 ]
 
+const SUBJECT_OPTIONS_DE = [
+    "Frage zu einem Produkt",
+    "Bestellstatus / Sendungsverfolgung",
+    "Bestellung ändern oder stornieren",
+    "Frage zum Versand / zur Lieferung",
+    "Frage zur Zahlung oder Rechnung",
+    "Garantie oder Reklamation",
+    "B2B",
+    "Konto",
+    "Sonstige / Allgemeine Anfrage",
+    "Datenschutzanliegen",
+]
+
 export default function ContactPage() {
     const t = useTranslations()
     const form = useForm<z.infer<typeof formSchema>>({
@@ -102,7 +115,7 @@ export default function ContactPage() {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {SUBJECT_OPTIONS.map((option) => (
+                                        {SUBJECT_OPTIONS_DE.map((option) => (
                                             <SelectItem key={option} value={option}>
                                                 {option}
                                             </SelectItem>
