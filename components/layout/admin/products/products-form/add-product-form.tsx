@@ -51,6 +51,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     const router = useRouter()
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
+    const [isLoadingSEO, setIsLoadingSEO] = useState(false)
+
 
 
     const carriers = [
@@ -268,14 +270,14 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             </div>
 
                             {/*Product SEO */}
-                            <SeoFields />
+                            <SeoFields onLoadingGenerate={setIsLoadingSEO} />
                         </div>
 
                         <div className='col-span-3 flex flex-col items-end gap-4'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end'>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white' type="button" hasEffect>Discard</Button>
-                                <Button className={`cursor-pointer ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect>
+                                <Button className={`cursor-pointer ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (
                                         <Loader2 className="animate-spin" />
                                     ) : productValues ? (

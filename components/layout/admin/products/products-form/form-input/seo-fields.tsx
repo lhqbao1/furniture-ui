@@ -4,11 +4,16 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useGenerateSEO } from '@/features/products/hook'
-import React from 'react'
+import { Loader2 } from 'lucide-react'
+import React, { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
 
-const SeoFields = () => {
+interface SEOFieldsProps {
+    onLoadingGenerate: (loading: boolean) => void
+}
+
+const SeoFields = ({ onLoadingGenerate }: SEOFieldsProps) => {
     const form = useFormContext()
     // const { watch } = useFormContext()
 
@@ -18,13 +23,16 @@ const SeoFields = () => {
 
 
     const handleGenerateSEO = () => {
-        generateSEOMutation.mutate({
+        generateSEOMutation.mutateAsync({
             title: title,
-            description: description
+            description: JSON.stringify(description)
         },
             {
                 onSuccess(data, variables, context) {
                     toast.success("Generate SEO fields success")
+                    form.setValue("url_key", data.url_key)
+                    form.setValue("meta_title", data.meta_title)
+                    form.setValue("meta_description", data.meta_description)
                 },
                 onError(error, variables, context) {
                     toast.error("Generate SEO fields fail")
@@ -33,11 +41,16 @@ const SeoFields = () => {
         )
     }
 
+    // mỗi lần mutation.isPending thay đổi thì báo về cha
+    useEffect(() => {
+        onLoadingGenerate(generateSEOMutation.isPending)
+    }, [generateSEOMutation.isPending, onLoadingGenerate])
+
     return (
         <div className='space-y-4'>
             <div className='flex gap-4 items-center'>
-                <Button onClick={() => handleGenerateSEO()} disabled={!title || !description ? true : false}>
-                    Generate SEO
+                <Button type='button' onClick={() => handleGenerateSEO()} disabled={!title || !description ? true : false}>
+                    {generateSEOMutation.isPending ? <Loader2 className='animate-spin' /> : "Generate SEO"}
                 </Button>
                 {!title || !description ? <p className='text-red-500'>You need to enter product name and product description</p> : ''}
             </div>
@@ -50,7 +63,7 @@ const SeoFields = () => {
                             URL Key
                         </FormLabel>
                         <FormControl>
-                            <Input placeholder="" {...field} />
+                            <Input placeholder="" {...field} value={field.value ?? ""} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -65,7 +78,7 @@ const SeoFields = () => {
                             Meta Title
                         </FormLabel>
                         <FormControl>
-                            <Input placeholder="" {...field} />
+                            <Input placeholder="" {...field} value={field.value ?? ""} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -80,7 +93,7 @@ const SeoFields = () => {
                             Meta Description
                         </FormLabel>
                         <FormControl>
-                            <Textarea placeholder="" {...field} />
+                            <Textarea placeholder="" {...field} value={field.value ?? ""} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
