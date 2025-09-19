@@ -55,7 +55,8 @@ export function ProductTable<TData, TValue>({
     })
 
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col gap-4">
+            <p>{totalItems} products found</p>
             <TableToolbar
                 pageSize={pageSize}
                 setPageSize={setPageSize} // đảm bảo type đúng
