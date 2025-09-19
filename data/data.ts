@@ -437,10 +437,7 @@ export const addresses = [
   
 
 export const paymentOptions = [
-    { id: "klarna", label: "Klarna", logo: "/klarna.svg" },
     { id: "paypal", label: "PayPal", logo: "/paypal.svg" },
-    { id: "apple", label: "Apple Pay", logo: "/apple.svg" },
-    { id: "google", label: "Google Pay", logo: "/google.svg" },
     { id: "bank", label: "Vorkasse", logo: "/bank.svg" },
 ]
   
