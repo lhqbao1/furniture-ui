@@ -4,6 +4,8 @@ import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
 import Script from "next/script";
+import { GoogleTagManager } from '@next/third-parties/google'
+import Head from "next/head";
 
 const figtree = Figtree({
     subsets: ["latin"],
@@ -36,24 +38,37 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="de">
-            <head>
-                {/* <Script id="GTM" strategy="beforeInteractive">
-                    {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-WKVQP2QH');`}
-                </Script> */}
-                {/* <Script
+            <Head>
+                {/* 🚫 Autoblocker script — phải đứng đầu để chặn các dịch vụ trước khi có consent */}
+                <script
                     id="usercentrics-autoblocker"
                     src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
-                    strategy="beforeInteractive"
-                /> */}
-                <Script
+                    async
+                />
+
+                {/* ✅ GTM init script — chèn thủ công để tránh lỗi ESLint */}
+                <script
+                    id="GTM"
+                    dangerouslySetInnerHTML={{
+                        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+              j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+              f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-WKVQP2QH');`,
+                    }}
+                />
+
+                {/* ✅ CMP loader script (Usercentrics) */}
+                <script
                     id="usercentrics-cmp"
                     src="https://web.cmp.usercentrics.eu/ui/loader.js"
                     data-settings-id="RlDaintBne_uoh"
                     async
-                    strategy="afterInteractive"
                 />
-            </head>
+            </Head>
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
+                <GoogleTagManager gtmId="" />
                 {/* Google Tag Manager (noscript) */}
                 <noscript>
                     <iframe
