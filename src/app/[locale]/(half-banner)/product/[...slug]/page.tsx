@@ -4,9 +4,13 @@ import type { Metadata } from 'next'
 import CatchAllPage from './page-client'
 import { StaticFile } from '@/types/products'
 
+interface PageProps {
+    params: Promise<{ slug: string[] }>
+}
+
 // 👇 generateMetadata chạy server-side
-export async function generateMetadata({ params }: { params: { slug: string[] } }): Promise<Metadata> {
-    const { slug } = await params; // 👈 phải await
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
 
     const slugArray = Array.isArray(slug) ? slug : [slug];
     const lastSlug = slugArray[slugArray.length - 1];
