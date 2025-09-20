@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { ColumnDef, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, flexRender } from "@tanstack/react-table"
 import { GetCartColumns } from "./columns"
 import { useTranslations } from "next-intl"
+import { useIsPhone } from "@/hooks/use-is-phone"
 
 interface CartTableProps {
     cart?: CartResponse
@@ -25,7 +26,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
     const updateCartItemQuantityMutation = useUpdateCartItemQuantity()
     const deleteCartItemMutation = useDeleteCartItem()
     const updateCartItemStatusMutation = useUpdateCartItemStatus()
-
+    const isPhone = useIsPhone()
     // const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
     const [rowSelection, setRowSelection] = useState({})
 
@@ -116,17 +117,19 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
             </div>
 
             <Table className="overflow-x-hidden">
-                <TableHeader className="border-t">
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                                <TableHead key={header.id}>
-                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableHeader>
+                {isPhone ? '' :
+                    <TableHeader className="border-t">
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                }
 
                 {isLoadingCart ? (
                     <TableBody>
@@ -144,7 +147,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
                                     ))}
                                 </TableRow>
                             ))
-                        ) : <span />}
+                        ) : ''}
                     </TableBody>
                 )}
             </Table>

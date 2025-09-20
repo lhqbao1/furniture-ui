@@ -43,7 +43,6 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
         return [
             {
                 id: "mobile",
-                header: () => <span />,
                 cell: ({ row }) => {
                     const item = row.original
                     return (

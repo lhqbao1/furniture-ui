@@ -1,25 +1,22 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 
-import Image from 'next/image'
 import CartSummary from '@/components/layout/cart/cart-summary'
 import CartTable from '@/components/layout/cart/cart-table'
 import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCartLocal } from '@/hooks/cart'
 import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
-import { Link, useRouter } from '@/src/i18n/navigation'
+import { useRouter } from '@/src/i18n/navigation'
 import { getCartItems } from '@/features/cart/api'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import CartLoginForm from '@/components/layout/cart/login-form-cart'
 import { useTranslations } from 'next-intl'
+import { LoginDrawer } from '@/components/shared/login-drawer'
 
 
 const CartPage = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false)
     const t = useTranslations()
-    const queryClient = useQueryClient();
 
 
     useEffect(() => {
@@ -65,17 +62,17 @@ const CartPage = () => {
     // Proceed checkout
     const proceedToCart = () => {
         if (userId) {
-            if (cart) {
-                const hasActiveItem = cart.items.some((item) => item.is_active)
-
-                if (!hasActiveItem) {
-                    toast.error("You need to choose at least one product to check out")
-                    return
-                }
+            if (displayedCart.length === 0) {
+                toast.error(t('chooseAtLeastCart'))
+                return
             }
             // Navigate checkout
             router.push('/check-out')
         } else {
+            if (displayedCart.length === 0) {
+                toast.error(t('chooseAtLeastCart'))
+                return
+            }
             // Nếu chưa login → mở dialog
             setIsLoginOpen(true)
         }
@@ -83,7 +80,7 @@ const CartPage = () => {
 
 
     return (
-        <div className='mt-6'>
+        <div className='mt-6 lg:px-0 px-4'>
             <div className="w-full lg:max-w-6xl mx-auto lg:p-6">
                 <div className="grid grid-cols-12 xl:gap-16 gap-6">
                     {/* Left: Cart Items */}
@@ -120,27 +117,7 @@ const CartPage = () => {
 
                 </div>
             </div>
-
-            <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
-                <DialogContent className="sm:max-w-[400px]" >
-                    <DialogHeader>
-                        <DialogTitle>{t('loginToContinue')}</DialogTitle>
-                    </DialogHeader>
-                    <CartLoginForm
-                        onSuccess={() => {
-                            setIsLoginOpen(false)
-                            const uid = localStorage.getItem("userId")
-                            setUserId(uid) // cập nhật state
-                            queryClient.invalidateQueries({ queryKey: ["me"] })
-                            queryClient.invalidateQueries({ queryKey: ["cart-items"] })
-                            router.push('/check-out')
-                        }}
-                        onError={() => {
-                            setIsLoginOpen(false)
-                        }}
-                    />
-                </DialogContent>
-            </Dialog>
+            <LoginDrawer openLogin={isLoginOpen} setOpenLogin={setIsLoginOpen} isCheckOut />
         </div>
     )
 }

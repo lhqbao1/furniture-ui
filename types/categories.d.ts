@@ -46,6 +46,14 @@ export interface CategoryByIdResponse {
     not_in_category: ProductItem[]
 }
 
+export interface CategoryBySlugResponse {
+  products: ProductItem[]
+  page: number
+  total_pages: number
+  total_items: number
+  page_size: number
+}
+
 
 export type AddOrRemoveProductToCategoryInput = {
   products: string[]

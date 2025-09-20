@@ -25,6 +25,8 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from 
 import { DialogTitle } from '@radix-ui/react-dialog';
 import HeaderLoginForm from './header-login-form';
 import CartPage from '@/src/app/[locale]/(no-banner)/cart/page';
+import { CartDrawer } from './cart-drawer';
+import { LoginDrawer } from './login-drawer';
 
 interface PageHeaderProps {
     hasSideBar?: boolean
@@ -147,30 +149,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                 {/*Shopping cart */}
                 {isPhone ?
                     (
-                        <Dialog open={openCart} onOpenChange={setOpenCart}>
-                            <DialogTrigger asChild>
-                                <div className='relative'>
-                                    <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
-                                    {displayedCart && displayedCart.length > 0 ?
-                                        <span className="absolute -top-1.5 -right-1 flex size-3">
-                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
-                                        </span>
-                                        : ''}
-                                </div>
-                            </DialogTrigger>
-                            <DialogContent
-                                isTopRight
-                                className="lg:w-[500px] w-full lg:h-fit overflow-y-scroll h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
-              data-[state=open]:slide-in-from-right duration-500
-              data-[state=closed]:slide-out-to-left"
-                            >
-                                <DialogTitle className="border-b-2 p-4">
-                                    <div className="uppercase font-bold text-xl">{t("cart")}</div>
-                                </DialogTitle>
-                                <CartPage />
-                            </DialogContent>
-                        </Dialog>
+                        <CartDrawer openCart={openCart} setOpenCart={setOpenCart} cartNumber={displayedCart.length} />
                     )
                     :
                     (<Link href={'/cart'} className={`cursor-pointer relative`}>
@@ -229,41 +208,42 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                     </DropdownMenu>
                 ) : (
                     // Not logged in -> Dialog
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
-                            <div className="flex gap-2 justify-start items-end">
-                                <User
-                                    className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
-                                    stroke="#4D4D4D"
-                                    size={30}
-                                />
-                            </div>
-                        </DialogTrigger>
-                        <DialogContent
-                            isTopRight
-                            className="lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
-              data-[state=open]:slide-in-from-right duration-500
-              data-[state=closed]:slide-out-to-left"
-                        >
-                            <DialogTitle className="border-b-2 p-4">
-                                <div className="uppercase font-bold text-xl">{t("login")}</div>
-                            </DialogTitle>
-                            <div className="px-4 pb-6 space-y-2">
-                                <p className="text-black/70 text-lg">
-                                    Melden Sie sich hier mit Ihren Kundendaten an.
-                                </p>
-                                <HeaderLoginForm
-                                    onSuccess={() => {
-                                        const uid = localStorage.getItem("userId")
-                                        setUserId(uid) // cập nhật state
-                                        queryClient.invalidateQueries({ queryKey: ["me"] })
-                                        queryClient.invalidateQueries({ queryKey: ["cart-items"] })
-                                        setOpen(false)
-                                    }}
-                                />
-                            </div>
-                        </DialogContent>
-                    </Dialog>
+                    //         <Dialog open={open} onOpenChange={setOpen}>
+                    //             <DialogTrigger asChild>
+                    //                 <div className="flex gap-2 justify-start items-end">
+                    //                     <User
+                    //                         className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
+                    //                         stroke="#4D4D4D"
+                    //                         size={30}
+                    //                     />
+                    //                 </div>
+                    //             </DialogTrigger>
+                    //             <DialogContent
+                    //                 isTopRight
+                    //                 className="lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
+                    //   data-[state=open]:slide-in-from-right duration-500
+                    //   data-[state=closed]:slide-out-to-left"
+                    //             >
+                    //                 <DialogTitle className="border-b-2 p-4">
+                    //                     <div className="uppercase font-bold text-xl">{t("login")}</div>
+                    //                 </DialogTitle>
+                    //                 <div className="px-4 pb-6 space-y-2">
+                    //                     <p className="text-black/70 text-lg">
+                    //                         Melden Sie sich hier mit Ihren Kundendaten an.
+                    //                     </p>
+                    //                     <HeaderLoginForm
+                    //                         onSuccess={() => {
+                    //                             const uid = localStorage.getItem("userId")
+                    //                             setUserId(uid) // cập nhật state
+                    //                             queryClient.invalidateQueries({ queryKey: ["me"] })
+                    //                             queryClient.invalidateQueries({ queryKey: ["cart-items"] })
+                    //                             setOpen(false)
+                    //                         }}
+                    //                     />
+                    //                 </div>
+                    //             </DialogContent>
+                    //         </Dialog>
+                    <LoginDrawer openLogin={open} setOpenLogin={setOpen} />
                 )}
 
                 {hasSideBar ?

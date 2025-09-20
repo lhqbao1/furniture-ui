@@ -7,61 +7,43 @@ import React, { useState } from 'react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import FilterSection from '@/components/layout/single-product/filter-section'
 import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
-import { useGetCategoryByName } from '@/features/category/hook'
-import { slugify } from '@/lib/slugify'
 import { CustomPagination } from '@/components/shared/custom-pagination'
 import { useAtom } from 'jotai'
 import { currentCategoryIdAtom, currentCategoryNameAtom } from '@/store/category'
-import { useQuery } from '@tanstack/react-query'
-import { getCategoryById } from '@/features/category/api'
 import { useTranslations } from 'next-intl'
+import { CategoryBySlugResponse } from '@/types/categories'
+import { useQuery } from '@tanstack/react-query'
+import { getCategoryBySlug } from '@/features/category/api'
 
 interface ProductCategoryProps {
     categorySlugs: string[]
     tag?: string
+    category?: CategoryBySlugResponse
 }
 
-function formatTag(slug: string) {
-    return slug
-        .split('-')                // ["best", "seller"]
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // ["Best", "Seller"]
-        .join(' ')                  // "Best Seller"
-}
-
-const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
+const ProductCategory = ({ categorySlugs, tag, category }: ProductCategoryProps) => {
     const t = useTranslations()
-    const params = useParams()
-    const paramValues = Object.values(params)
     const [page, setPage] = useState(1)
-    const [currentCategoryId, setCurrentCategoryId] = useAtom(currentCategoryIdAtom)
+    const [pageSize, setPageSize] = useState(16)
     const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
 
-    const slug = paramValues[paramValues.length - 1] as string
-    const { data: category, isLoading, isError } = useQuery({
-        queryKey: ["category", currentCategoryId],
-        queryFn: () => getCategoryById(currentCategoryId ?? ''),
-        enabled: !!currentCategoryId,
-        retry: false,
-    });
-
-    if (!category || isLoading) return <ProductGridSkeleton length={12} />
-
-    // Nếu có tag, lọc sản phẩm
-    // const filteredProducts = tag
-    //     ? products.items.filter((product) => formatTag(product.tag ?? '') === tag)
-    //     : products.items
+    const { data: categoryData, isFetching } = useQuery({
+        queryKey: ['category', categorySlugs, page, pageSize],
+        queryFn: () => getCategoryBySlug(categorySlugs[categorySlugs.length - 1], { page, page_size: pageSize }),
+        initialData: category, // 👈 lấy từ server render lần đầu
+    })
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
             <CustomBreadCrumb currentPage={currentCategoryName ?? ''} />
             <div className=''>
                 <h2 className='section-header'>{currentCategoryName}</h2>
-                <p className='text-center text-xl font-bold mt-2'>{category.in_category.length === 0 ? t('emptyCategory') : ''}</p>
-                {isLoading || isError || !category ?
+                <p className='text-center text-xl font-bold mt-2'>{category?.products.length === 0 ? t('emptyCategory') : ''}</p>
+                {!categoryData || isFetching ?
                     <ProductGridSkeleton length={12} /> :
                     <div className='filter-section'>
                         {
-                            category.in_category.length > 0 &&
+                            categoryData.products.length > 0 &&
                             <Collapsible>
                                 <CollapsibleTrigger asChild>
                                     <div className='flex justify-end cursor-pointer mb-2 lg:mr-30'>
@@ -77,14 +59,14 @@ const ProductCategory = ({ categorySlugs, tag }: ProductCategoryProps) => {
                             </Collapsible>
                         }
                         <div className='pt-10 pb-12'>
-                            <ProductsGridLayout hasBadge data={category.in_category} />
+                            <ProductsGridLayout hasBadge data={categoryData.products} />
                         </div>
                     </div>
                 }
             </div>
-            {/* {category.in_category.length > 0 &&
-                <CustomPagination totalPages={category.in_category.length / 2} page={page} onPageChange={(newPage) => setPage(newPage)} />
-            } */}
+            {categoryData && categoryData.products.length > 16 &&
+                <CustomPagination totalPages={categoryData.total_pages} page={page} onPageChange={(newPage) => setPage(newPage)} />
+            }
         </div >
     )
 }

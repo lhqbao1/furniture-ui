@@ -1,6 +1,12 @@
 import { api, apiAdmin, apiPublic } from "@/lib/axios"
-import { AddOrRemoveProductToCategoryInput, CategoryByIdResponse, CategoryInput, CategoryResponse } from "@/types/categories"
+import { AddOrRemoveProductToCategoryInput, CategoryByIdResponse, CategoryBySlugResponse, CategoryInput, CategoryResponse } from "@/types/categories"
 import { ProductItem } from "@/types/products"
+
+export interface GetCategoryParams {
+  product_name?: string
+  page?: number
+  page_size?: number
+}
 
 export async function getCategories(){
     const {data} = await apiPublic.get(
@@ -35,6 +41,23 @@ export async function getCategoryById(id: string){
         }
     )
     return data as CategoryByIdResponse
+}
+
+export async function getCategoryBySlug(category_slug: string, params?: GetCategoryParams){
+  const {data} = await apiPublic.get(
+      `/categories/slug/${category_slug}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        params: {
+          product_name: params?.product_name,
+          page: params?.page ?? 1,
+          page_size: params?.page_size ?? 8,
+        },
+      }
+  )
+  return data as CategoryBySlugResponse
 }
 
 export async function getCategoryByName(params?: string){
