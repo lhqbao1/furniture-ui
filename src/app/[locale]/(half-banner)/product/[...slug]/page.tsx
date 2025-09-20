@@ -11,6 +11,7 @@ interface PageProps {
 // 👇 generateMetadata chạy server-side
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
+    console.log(slug)
 
     const slugArray = Array.isArray(slug) ? slug : [slug];
     const lastSlug = slugArray[slugArray.length - 1];

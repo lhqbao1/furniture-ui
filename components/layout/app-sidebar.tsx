@@ -4,7 +4,6 @@ import { ChevronDown } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarHeader,
@@ -15,13 +14,12 @@ import {
     useSidebar
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "../ui/button"
 import { CategoryResponse } from "@/types/categories"
 import { useTranslations } from "next-intl"
 import { slugify } from "@/lib/slugify"
-import { Link, useRouter } from "@/src/i18n/navigation"
+import { useRouter } from "@/src/i18n/navigation"
 import { useAtom } from "jotai"
 import { currentCategoryIdAtom, currentCategoryNameAtom } from "@/store/category"
 import { useIsPhone } from "@/hooks/use-is-phone"
@@ -50,7 +48,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
         return categories.map((cat) => ({
             id: cat.id,
             title: cat.name,
-            url: `/product/${slugify(cat.name)}`,
+            url: `/product/${cat.slug}`,
             children: cat.children && cat.children.length > 0 ? mapCategories(cat.children) : undefined,
         }))
     }

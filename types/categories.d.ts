@@ -22,6 +22,7 @@ export interface CategoryResponse {
   meta_title: string;
   meta_description: string;
   meta_keywords: string;
+  slug: string;
   code: string;
   level: number;
   parent_id: string | null;

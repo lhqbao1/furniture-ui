@@ -35,6 +35,8 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     const t = useTranslations()
     const isPhone = useIsPhone()
     const [open, setOpen] = useState(false)
+    const [openCart, setOpenCart] = useState(false)
+
     const queryClient = useQueryClient();
 
     const [userId, setUserId] = React.useState<string | null>(
@@ -145,7 +147,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                 {/*Shopping cart */}
                 {isPhone ?
                     (
-                        <Dialog open={open} onOpenChange={setOpen}>
+                        <Dialog open={openCart} onOpenChange={setOpenCart}>
                             <DialogTrigger asChild>
                                 <div className='relative'>
                                     <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
