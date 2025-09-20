@@ -20,7 +20,7 @@ export default async function CatchAllPage({ params }: PageProps) {
 
     if (isProduct) {
         const product = await getProductById(lastSlug)
-        return <ProductDetails productDetails={product} />
+        return <ProductDetails />
     } else {
         const category = await getCategoryBySlug(lastSlug)
         return <ProductCategory category={category} categorySlugs={validSlugArray} />

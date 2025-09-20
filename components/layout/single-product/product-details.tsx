@@ -37,11 +37,7 @@ import { cn } from '@/lib/utils'
 import { useCartLocal } from '@/hooks/cart'
 import { useSwipeable } from "react-swipeable"
 
-interface ProductDetailsProps {
-    productDetails: ProductItem
-}
-
-const ProductDetails = ({ productDetails }: ProductDetailsProps) => {
+const ProductDetails = () => {
     const params = useParams()
     const router = useRouter()
     const slugArray = Array.isArray(params.slug) ? params.slug : [params.slug]
@@ -103,27 +99,27 @@ const ProductDetails = ({ productDetails }: ProductDetailsProps) => {
     })
 
     // Tìm product match dựa vào option_id user chọn
-    // const matchedProductId = useMemo(() => {
-    //     if (!parentProduct?.products || !optionIds || optionIds.length === 0) return null
+    const matchedProductId = useMemo(() => {
+        if (!parentProduct?.products || !optionIds || optionIds.length === 0) return null
 
-    //     return (
-    //         parentProduct.products.find((p: ProductItem) => {
-    //             const productOptionIds = p.options.map((o: VariantOptionResponse) => o.id)
-    //             return (
-    //                 optionIds.length === productOptionIds.length &&
-    //                 optionIds.every((id: string) => productOptionIds.includes(id))
-    //             )
-    //         })?.id ?? null
-    //     )
-    // }, [parentProduct?.products, optionIds])
+        return (
+            parentProduct.products.find((p: ProductItem) => {
+                const productOptionIds = p.options.map((o: VariantOptionResponse) => o.id)
+                return (
+                    optionIds.length === productOptionIds.length &&
+                    optionIds.every((id: string) => productOptionIds.includes(id))
+                )
+            })?.id ?? null
+        )
+    }, [parentProduct?.products, optionIds])
 
-    // // Query product details (dùng matchedProductId nếu có, fallback slug ban đầu)
-    // const { data: productDetails, isLoading: isLoadingProduct, isError: isErrorProduct } = useQuery({
-    //     queryKey: ["product", matchedProductId || slug],
-    //     queryFn: () => getProductById(matchedProductId || (slug as string)),
-    //     enabled: !!(matchedProductId || slug),
-    //     retry: false,
-    // })
+    // Query product details (dùng matchedProductId nếu có, fallback slug ban đầu)
+    const { data: productDetails, isLoading: isLoadingProduct, isError: isErrorProduct } = useQuery({
+        queryKey: ["product", matchedProductId || slug],
+        queryFn: () => getProductById(matchedProductId || (slug as string)),
+        enabled: !!(matchedProductId || slug),
+        retry: false,
+    })
 
     // Khi có productDetails mới → sync form
     useEffect(() => {
@@ -240,7 +236,7 @@ const ProductDetails = ({ productDetails }: ProductDetailsProps) => {
                         : productDetails?.categories[0]?.name
                 }
             />
-            {productDetails ?
+            {!isLoadingProduct && productDetails && !isErrorProduct ?
                 <FormProvider {...form}>
                     <form
                         onSubmit={form.handleSubmit(
