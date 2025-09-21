@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { FormField, FormMessage } from "@/components/ui/form"
 import { useUploadStaticFile } from "@/features/file/hook"
 import { cn } from "@/lib/utils"
-import { Loader2, UploadIcon } from "lucide-react"
+import { FileIcon, Loader2, UploadIcon } from "lucide-react"
 import Image from "next/image"
 import React, { useCallback, useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
@@ -32,11 +32,10 @@ import { useTranslations } from "next-intl"
 // ================== TYPES ==================
 export type ImageItem = { id: string; url: string }
 
-
 // stable id generator
 const genId = () =>
     typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? (crypto).randomUUID()
+        ? (crypto as Crypto).randomUUID()
         : Math.random().toString(36).slice(2, 9)
 
 interface ImagePickerInputProps<T extends FieldValues> {
@@ -46,6 +45,7 @@ interface ImagePickerInputProps<T extends FieldValues> {
     isSingle?: boolean
     className?: string
     isSimple?: boolean
+    isFile?: boolean,
 }
 
 // ================== SORTABLE ITEM ==================
@@ -81,7 +81,6 @@ function SortableImage({
             />
             <button
                 type="button"
-                // data-dndkit-disabled-drag-handle
                 onClick={(e) => {
                     e.stopPropagation()
                     onRemove()
@@ -100,56 +99,43 @@ function ImagePickerInput<T extends FieldValues>({
     fieldName,
     description,
     isSingle = false,
+    isFile = false,
     className,
     isSimple,
 }: ImagePickerInputProps<T>) {
     const uploadImage = useUploadStaticFile()
     const watched = form.watch(fieldName as Path<T>)
     const t = useTranslations()
-    // local items with stable id
     const [items, setItems] = useState<ImageItem[]>([])
 
-    // sync form value -> local state
+    // Sync form value -> local state (only when multiple)
     useEffect(() => {
-        const vals: string[] | { url: string }[] =
-            (isSingle
-                ? watched
-                    ? [watched as string]
-                    : []
-                : (watched as { url: string }[]) || [])
-
-        const normalized: ImageItem[] = vals.map((v) => {
-            const url = typeof v === "string" ? v : v.url
-            return { id: genId(), url }
-        })
-
-        setItems(normalized)
+        if (!isSingle) {
+            const vals: { url: string }[] = (watched as { url: string }[]) || []
+            const normalized: ImageItem[] = vals.map((v) => ({ id: genId(), url: v.url }))
+            setItems(normalized)
+        }
     }, [watched, isSingle])
 
-    // drop handler
+    // Upload handler
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
-            if (!acceptedFiles || acceptedFiles.length === 0) return
+            if (!acceptedFiles?.length) return
             const formData = new FormData()
             acceptedFiles.forEach((file) => formData.append("files", file))
 
             uploadImage.mutate(formData, {
                 onSuccess(data: StaticFileResponse) {
                     const uploadedUrls = data.results.map((r) => r.url)
-                    const newItems = uploadedUrls.map((url) => ({
-                        id: genId(),
-                        url,
-                    }))
-                    const next = isSingle ? newItems.slice(0, 1) : [...items, ...newItems]
-                    setItems(next)
 
                     if (isSingle) {
-                        form.setValue(
-                            fieldName,
-                            newItems[0] as PathValue<T, Path<T>>,
-                            { shouldValidate: true }
-                        )
+                        form.setValue(fieldName, uploadedUrls[0] as PathValue<T, Path<T>>, {
+                            shouldValidate: true,
+                        })
                     } else {
+                        const newItems = uploadedUrls.map((url) => ({ id: genId(), url }))
+                        const next = [...items, ...newItems]
+                        setItems(next)
                         form.setValue(
                             fieldName,
                             next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
@@ -164,7 +150,6 @@ function ImagePickerInput<T extends FieldValues>({
 
     const removeImage = (index: number) => {
         if (isSingle) {
-            setItems([])
             form.setValue(fieldName, "" as PathValue<T, Path<T>>, { shouldValidate: true })
         } else {
             const next = items.filter((_, idx) => idx !== index)
@@ -179,7 +164,7 @@ function ImagePickerInput<T extends FieldValues>({
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { "image/*": [] },
+        accept: isFile ? undefined : { "image/*": [] },
         multiple: !isSingle,
     })
 
@@ -208,9 +193,7 @@ function ImagePickerInput<T extends FieldValues>({
                 {!isSimple && (
                     <>
                         <div className="text-gray-500 dark:text-gray-400 text-center">
-                            {isDragActive
-                                ? <div>{t('dragFile')}</div>
-                                : <div>{t('dragAndDropFile')}</div>}
+                            {isDragActive ? <div>{t("dragFile")}</div> : <div>{t("dragAndDropFile")}</div>}
                         </div>
                         {description && (
                             <p className="text-gray-500 text-sm text-center">{description}</p>
@@ -219,7 +202,7 @@ function ImagePickerInput<T extends FieldValues>({
                 )}
 
                 <Button variant="outline" type="button">
-                    {t('browseFile')}
+                    {t("browseFile")}
                 </Button>
                 <input {...getInputProps()} className="hidden" multiple />
             </div>
@@ -228,13 +211,24 @@ function ImagePickerInput<T extends FieldValues>({
             {isSingle ? (
                 watched ? (
                     <div className="col-span-6 relative h-[100px] w-[100px] aspect-square rounded-lg group">
-                        <Image src={watched as string} alt="Uploaded" fill className="object-cover" unoptimized />
+                        {isFile ? (
+                            <>
+                                <FileIcon className="w-8 h-8 text-gray-500" />
+                                <span className="text-xs truncate max-w-[90px]">
+                                    {String(watched).split("/").pop()}
+                                </span>
+                            </>
+                        ) : <Image
+                            src={watched as string}
+                            alt="Uploaded"
+                            fill
+                            className="object-cover"
+                            unoptimized
+                        />
+                        }
                         <button
                             type="button"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                removeImage(0)
-                            }}
+                            onClick={() => removeImage(0)}
                             className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                         >
                             ✕
@@ -270,11 +264,7 @@ function ImagePickerInput<T extends FieldValues>({
             ) : null}
 
             {/* Hidden field for errors */}
-            <FormField
-                control={form.control}
-                name={fieldName}
-                render={() => <FormMessage />}
-            />
+            <FormField control={form.control} name={fieldName} render={() => <FormMessage />} />
         </div>
     )
 }

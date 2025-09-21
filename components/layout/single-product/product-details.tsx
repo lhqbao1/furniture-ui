@@ -25,45 +25,29 @@ import ListVariant from '@/components/layout/single-product/list-variant'
 import { FormNumberInput } from '@/components/layout/single-product/form-number.input'
 import { useAddToCart } from '@/features/cart/hook'
 import { useQuery } from '@tanstack/react-query'
-import { getProductGroupDetail } from '@/features/product-group/api'
 import { getProductById } from '@/features/products/api'
 import { VariantOptionResponse } from '@/types/variant'
 import { ProductItem } from '@/types/products'
 import { useAddToWishList } from '@/features/wishlist/hook'
-import { Voucher } from '@/types/voucher'
 import { useTranslations } from 'next-intl'
 import { HandleApiError } from '@/lib/api-helper'
 import { cn } from '@/lib/utils'
 import { useCartLocal } from '@/hooks/cart'
 import { useSwipeable } from "react-swipeable"
+import { ProductGroupDetailResponse } from '@/types/product-group'
+import { getProductGroupDetail } from '@/features/product-group/api'
 
-const ProductDetails = () => {
-    const params = useParams()
-    const router = useRouter()
-    const slugArray = Array.isArray(params.slug) ? params.slug : [params.slug]
-    const slug = slugArray[slugArray.length - 1]
+interface ProductDetailsProps {
+    productDetailsData: ProductItem
+    productId: string
+    parentProductData: ProductGroupDetailResponse | null
+}
+
+const ProductDetails = ({ productDetailsData, productId, parentProductData }: ProductDetailsProps) => {
     const [mainImageIndex, setMainImageIndex] = useState(0)
     const t = useTranslations()
     const { addToCartLocal } = useCartLocal()
-
-
-    const vouchers: Voucher[] = [
-        {
-            id: 1,
-            title: t('voucher200'),
-            type: t('discount'),
-            discountAmount: 10,
-            code: 'MO200200'
-        },
-        {
-            id: 2,
-            title: t('voucher300'),
-            type: t('discount'),
-            discountAmount: 15,
-            code: 'MO300300'
-        },
-    ];
-
+    const router = useRouter()
 
     // Form init
     const form = useForm<z.infer<typeof cartFormSchema>>({
@@ -76,49 +60,17 @@ const ProductDetails = () => {
         },
     })
 
-    // Watch option_id để biết user chọn options nào
-    const optionIds = useWatch({
-        control: form.control,
-        name: "option_id",
+    const { data: productDetails, isLoading: isLoadingProduct } = useQuery({
+        queryKey: ["product", productId],
+        queryFn: () => getProductById(productId),
+        initialData: productDetailsData
     })
 
-    // Query product theo slug ban đầu
-    const { data: initialProduct } = useQuery({
-        queryKey: ["product-initial", slug],
-        queryFn: () => getProductById(slug as string),
-        enabled: !!slug,
-        retry: false,
-    })
-
-    // Query parent group
-    const { data: parentProduct } = useQuery({
-        queryKey: ["product-group-detail", initialProduct?.parent_id],
-        queryFn: () => getProductGroupDetail(initialProduct!.parent_id ?? ''),
-        enabled: !!initialProduct?.parent_id,
-        retry: false,
-    })
-
-    // Tìm product match dựa vào option_id user chọn
-    const matchedProductId = useMemo(() => {
-        if (!parentProduct?.products || !optionIds || optionIds.length === 0) return null
-
-        return (
-            parentProduct.products.find((p: ProductItem) => {
-                const productOptionIds = p.options.map((o: VariantOptionResponse) => o.id)
-                return (
-                    optionIds.length === productOptionIds.length &&
-                    optionIds.every((id: string) => productOptionIds.includes(id))
-                )
-            })?.id ?? null
-        )
-    }, [parentProduct?.products, optionIds])
-
-    // Query product details (dùng matchedProductId nếu có, fallback slug ban đầu)
-    const { data: productDetails, isLoading: isLoadingProduct, isError: isErrorProduct } = useQuery({
-        queryKey: ["product", matchedProductId || slug],
-        queryFn: () => getProductById(matchedProductId || (slug as string)),
-        enabled: !!(matchedProductId || slug),
-        retry: false,
+    const { data: parentProduct, isLoading: isLoadingParent } = useQuery({
+        queryKey: ["product-group-detail", productDetailsData.parent_id],
+        queryFn: () => getProductGroupDetail(productDetailsData.parent_id ?? ''),
+        enabled: !!productDetailsData.parent_id,
+        initialData: parentProductData
     })
 
     // Khi có productDetails mới → sync form
@@ -179,17 +131,6 @@ const ProductDetails = () => {
                 },
             })
         }
-
-        // addProductToCheckOutMutation.mutate({ productId: productDetails?.id ?? '', quantity: 1 }, {
-        //     onSuccess: () => {
-        //         toast.success(t('addToCheckoutSuccess'))
-        //         router.push('/check-out')
-        //     },
-        //     onError: (error) => {
-        //         const { status, message } = HandleApiError(error, t);
-        //         toast.error(message)
-        //     },
-        // })
     }
 
     // Image zoom
@@ -202,8 +143,6 @@ const ProductDetails = () => {
         setPosition({ x, y })
     }
 
-    const [selectedVoucher, setSelectedVoucher] = useState<number>()
-    const handleSelectVoucher = (item: number) => setSelectedVoucher(item)
     const adminId = typeof window !== "undefined" ? localStorage.getItem("admin_access_token") : null;
 
     const moveToAdmin = (productId: string) => {
@@ -236,7 +175,7 @@ const ProductDetails = () => {
                         : productDetails?.categories[0]?.name
                 }
             />
-            {!isLoadingProduct && productDetails && !isErrorProduct ?
+            {!isLoadingProduct && productDetails ?
                 <FormProvider {...form}>
                     <form
                         onSubmit={form.handleSubmit(
@@ -408,7 +347,7 @@ const ProductDetails = () => {
                                                     <FormItem>
                                                         <FormLabel>{t('quantity')}</FormLabel>
                                                         <FormControl>
-                                                            <FormNumberInput {...field} min={1} stepper={1} placeholder="1" />
+                                                            <FormNumberInput {...field} min={1} max={productDetails.stock} stepper={1} placeholder="1" />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>

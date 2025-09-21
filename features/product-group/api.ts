@@ -49,13 +49,6 @@ export async function getAllProductsSelect(params?: string){
 export async function getProductGroupDetail(parent_id: string){
     const {data} = await apiPublic.get(
         `/parent/details/${parent_id}`,
-        {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
-        },
-      withCredentials: true, // nếu backend cần cookie/session
-        }
     )
     return data as ProductGroupDetailResponse
 }

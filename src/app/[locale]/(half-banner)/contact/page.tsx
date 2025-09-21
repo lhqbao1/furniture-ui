@@ -24,27 +24,20 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { useTranslations } from "next-intl"
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input"
+import { useUploadContactForm } from "@/features/contact/hook"
+import { ContactFormInput } from "@/features/contact/api"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
-    email: z.string().email("Invalid email"),
-    subject: z.string().min(1, "Please select a subject"),
-    orderId: z.string().optional(),
-    message: z.string().min(1, "Message is required"),
-    img_url: z.array(z.string())
+    email: z.string().email("Ungültige E-Mail-Adresse"),
+    subject: z.string().min(1, "Bitte wählen Sie ein Thema aus"),
+    order_id: z.string().optional(),
+    message: z.string().min(1, "Bitte geben Sie eine Nachricht ein"),
+    file_url: z.string().optional(),
 })
 
-const SUBJECT_OPTIONS = [
-    "Question about a product",
-    "Order status / tracking",
-    "Change or cancel an order",
-    "Shipping / delivery question",
-    "Payment or invoice question",
-    "Warranty or claim",
-    "B2B",
-    "Account",
-    "Other / General inquiry",
-    "Privacy concern",
-]
+
 
 const SUBJECT_OPTIONS_DE = [
     "Frage zu einem Produkt",
@@ -66,18 +59,35 @@ export default function ContactPage() {
         defaultValues: {
             email: "",
             subject: "",
-            orderId: "",
+            order_id: "",
             message: "",
         },
     })
 
+    const uploadContactFormMutation = useUploadContactForm()
+
     const onSubmit = (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+        const cleanedValues = Object.fromEntries(
+            Object.entries(values).filter(([key, value]) => {
+                if (key === "email" || key === "subject") return true;
+                return value !== null && value !== undefined && value !== "";
+            })
+        ) as unknown as ContactFormInput;
+
+        uploadContactFormMutation.mutate(cleanedValues, {
+            onSuccess() {
+                toast.success("Ihre Nachricht wurde erfolgreich gesendet.");
+                form.reset();
+            },
+            onError() {
+                toast.error("Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut.");
+            },
+        });
     }
 
     return (
         <div className="lg:w-2/5 mx-auto section-padding lg:space-y-12 w-full space-y-4">
-            <h1 className="lg:flex gap-2 section-header justify-center lg:space-x-0 space-x-2 lg:text-5xl !text-3xl">
+            <h1 className="section-header space-x-2">
                 <span className="text-secondary">{t('contact')}</span>
                 <span className="text-primary">Prestige Home</span>
             </h1>
@@ -130,12 +140,12 @@ export default function ContactPage() {
                     {/* Related Order ID */}
                     <FormField
                         control={form.control}
-                        name="orderId"
+                        name="order_id"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel className="lg:text-base font-semibold text-sm">{t('relatedToOrder')}</FormLabel>
                                 <FormControl>
-                                    <Input placeholder={t('orderId')} {...field} />
+                                    <Input placeholder="" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -162,14 +172,16 @@ export default function ContactPage() {
                     />
 
                     {/* Attachments */}
-                    <ImagePickerInput fieldName="img_url" form={form} />
+                    <ImagePickerInput fieldName="file_url" form={form} isSingle isFile />
 
                     {/* Actions */}
                     <div className="flex lg:justify-end justify-center gap-4">
-                        <Button type="button" variant="outline">
+                        <Button type="button" variant="outline" disabled={uploadContactFormMutation.isPending}>
                             {t('back')}
                         </Button>
-                        <Button type="submit">{t('submit')}</Button>
+                        <Button type="submit">
+                            {uploadContactFormMutation.isPending ? <Loader2 className="animate-spin" /> : <>{t('submit')}</>}
+                        </Button>
                     </div>
                 </form>
             </FormProvider>

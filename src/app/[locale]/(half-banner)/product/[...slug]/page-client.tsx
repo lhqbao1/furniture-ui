@@ -4,6 +4,7 @@ import { getProductById } from '@/features/products/api'
 import { getCategoryBySlug } from '@/features/category/api'
 import ProductDetails from '@/components/layout/single-product/product-details'
 import ProductCategory from '@/components/layout/category/category-page'
+import { getProductGroupDetail } from '@/features/product-group/api'
 
 interface PageProps {
     params: { slug: string[] }
@@ -20,7 +21,11 @@ export default async function CatchAllPage({ params }: PageProps) {
 
     if (isProduct) {
         const product = await getProductById(lastSlug)
-        return <ProductDetails />
+        let parentProduct = null
+        if (product?.parent_id) {
+            parentProduct = await getProductGroupDetail(product.parent_id)
+        }
+        return <ProductDetails parentProductData={parentProduct} productDetailsData={product} productId={lastSlug} />
     } else {
         const category = await getCategoryBySlug(lastSlug)
         return <ProductCategory category={category} categorySlugs={validSlugArray} />

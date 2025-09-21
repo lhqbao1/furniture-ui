@@ -96,7 +96,7 @@ export function useSyncLocalCart() {
       },
       onError: (err) => {
         console.error("Error syncing cart:", err);
-        toast.error("Failed to sync cart.");
+        toast.error("Die Produktmenge im Warenkorb überschreitet den Lagerbestand");
       },
     });
   }

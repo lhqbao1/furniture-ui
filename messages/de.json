@@ -209,7 +209,7 @@
   "userInformation": "Benutzerinformationen",
   "delivery": "Lieferung",
   "updating": "Aktualisierung",
-  "deliveryTime": "in {days} Tage",
+  "deliveryTime": "in {days} Werktagen",
   "qaSearch": "Zuerst suchen. 90 % der Fragen wurden bereits beantwortet.",
   "emptyCategory": "Das ist eine leere Kategorie",
   "customRequest": "SONDERANFRAGE",
