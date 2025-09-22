@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { useDropzone } from "react-dropzone"
 import { useImportProducts } from "@/features/file/hook"
 import { toast } from "sonner" // hoặc react-hot-toast nếu bạn dùng lib khác
+import { Loader2 } from "lucide-react"
 
 interface ImportDialogProps {
     setIsImporting: React.Dispatch<React.SetStateAction<boolean>>
@@ -47,6 +48,7 @@ const ImportDialog = ({ setIsImporting }: ImportDialogProps) => {
             onSuccess: () => {
                 setIsImporting(true)
                 toast.success("Import products successful")
+                setOpen(false)
             },
             onError: () => {
                 toast.error("Import products fail")
@@ -56,12 +58,13 @@ const ImportDialog = ({ setIsImporting }: ImportDialogProps) => {
 
         setIsImporting(true)
         toast.info("Uploading products")
+        setOpen(false)
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" className="" disabled={importProductMutation.isPending ? true : false}>Import</Button>
+                <Button variant="ghost" className="" disabled={importProductMutation.isPending ? true : false}>{importProductMutation.isPending ? <Loader2 className="animate-spin" /> : 'Import'}</Button>
             </DialogTrigger>
             <DialogContent className="w-[600px]">
                 <DialogHeader>
