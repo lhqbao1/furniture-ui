@@ -1,11 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import React, { useState } from 'react'
-import { useMediaQuery } from 'react-responsive';
 import ProductSearch from './product-search';
 import { useTranslations } from 'next-intl';
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { ChevronDown, Mic, Search, ShoppingCart, User, X } from 'lucide-react'
+import { ShoppingCart, User, X } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,10 +20,6 @@ import { getMe } from '@/features/auth/api';
 import { Link, useRouter } from '@/src/i18n/navigation';
 import { useCartLocal } from '@/hooks/cart';
 import { useIsPhone } from '@/hooks/use-is-phone';
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '../ui/dialog';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import HeaderLoginForm from './header-login-form';
-import CartPage from '@/src/app/[locale]/(no-banner)/cart/page';
 import { CartDrawer } from './cart-drawer';
 import { LoginDrawer } from './login-drawer';
 
@@ -85,74 +80,40 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
 
     return (
-        <div className={`home-banner-top__content sticky top-0 overflow-hidden z-50 ${isPhone ? 'flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4' : 'flex items-center justify-end px-4 py-3 gap-6 bg-white shadow-secondary/10 shadow-xl'}`}>
+        <div className="home-banner-top__content sticky top-0 overflow-hidden z-50 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 
+    lg:flex lg:items-center lg:justify-end lg:px-4 lg:py-3 lg:gap-6">
             <div className={`flex gap-4 items-center`}>
                 <Link href={'/'} className='relative w-10 h-10'>
-                    {/* <Image
-                        src={'/new-logo.svg'}
-                        width={40}
-                        height={40}
-                        alt=''
-                        unoptimized
-                    /> */}
                     <Image
                         src="/new-logo.svg"
                         alt=""
                         fill
                         style={{ objectFit: "contain" }}
-                        unoptimized
                     />
                 </Link>
-                <div className={`text-[29px] gap-1 ${isPhone ? 'hidden' : 'flex'}`} translate="no">
+                <div className="hidden lg:flex text-[29px] gap-1" translate="no">
                     <span className="text-secondary font-bold">Prestige</span>
                     <span className="text-primary font-bold">Home</span>
                 </div>
             </div>
 
             {/*Product search desktop */}
-            <div className={`${isPhone ? 'hidden' : 'block flex-1'}`}>
+            <div className="hidden lg:block flex-1">
                 <ProductSearch />
             </div>
 
-            <div className={`flex h-full items-center justify-end ${isPhone ? 'w-full gap-3' : 'items-end gap-6'}`}>
-
-                {/*Language switch */}
-                {/* <Select
-                    onValueChange={(value) => {
-                        if (value === "de") {
-                            const path = pathname.startsWith('/en') ? pathname.replace('/en', '/') : pathname
-                            console.log('de', value)
-                            console.log(path)
-                            router.push(path)
-                        } else if (value === "en") {
-                            const path = pathname.startsWith('/en') ? pathname : `/en${pathname}`
-                            console.log('en', value)
-                            console.log(path)
-                            router.push(path)
-                        }
-                    }}
-                >
-                    <SelectTrigger className={`justify-end text-black/70 text-xl font-bold px-0 py-0 !h-[30px]  ${isPhone ? 'hidden' : ''}`} iconColor='#4D4D4D'>
-                        <SelectValue placeholder={t('german')} className='text-secondary' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="de" className='font-semibold'>{t('german')}</SelectItem>
-                        <SelectItem value="en" className='font-semibold'>{t('english')}</SelectItem>
-                    </SelectContent>
-                </Select> */}
-
+            <div className="flex h-full items-center justify-end w-full lg:w-fit gap-3 lg:items-end lg:gap-6">
                 {/*Mobile Search */}
-                <div className={`${isPhone ? 'block' : 'hidden'}`}>
+                <div className="block lg:hidden">
                     <MobileProductSearch />
                 </div>
 
                 {/*Shopping cart */}
-                {isPhone ?
-                    (
-                        <CartDrawer openCart={openCart} setOpenCart={setOpenCart} cartNumber={displayedCart.length} />
-                    )
-                    :
-                    (<Link href={'/cart'} className={`cursor-pointer relative`}>
+                <div className="lg:hidden">
+                    <CartDrawer openCart={openCart} setOpenCart={setOpenCart} cartNumber={displayedCart.length} />
+                </div>
+                <div className="hidden lg:block relative">
+                    <Link href={'/cart'} className={`cursor-pointer relative`}>
                         <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
                         {displayedCart && displayedCart.length > 0 ?
                             <span className="absolute -top-1.5 -right-1 flex size-3">
@@ -160,91 +121,66 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                                 <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
                             </span>
                             : ''}
-                    </Link>)
-                }
-
+                    </Link>
+                </div>
 
                 {/*User */}
                 {isLoadingUser ? (
                     // Loading state
                     <User
                         stroke="#4D4D4D"
-                        size={30}
+                        size={24} // nhỏ gọn hơn cho mobile
                         className="animate-pulse opacity-50"
                     />
                 ) : user ? (
-                    // Logged in -> Dropdown
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <div className="flex gap-2 justify-start items-end">
-                                <User
-                                    className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
-                                    stroke="#4D4D4D"
-                                    size={30}
-                                />
-                            </div>
-                        </DropdownMenuTrigger>
+                    // Logged in -> Dropdown (desktop), Drawer (mobile)
+                    <>
+                        {/* Mobile: luôn mở Drawer */}
+                        <div className="flex lg:hidden">
+                            <LoginDrawer openLogin={open} setOpenLogin={setOpen} />
+                        </div>
 
-                        <DropdownMenuContent
-                            side="bottom"
-                            className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]
-              data-[state=open]:slide-in-from-right duration-500
-              data-[state=closed]:slide-out-to-right"
-                        >
-                            <DropdownMenuLabel>
-                                {t("greeting")}, {user.last_name}
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => router.push("/account")}>
-                                {t("accountInformation")}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={onLogout}>
-                                {t("logout")}
-                            </DropdownMenuItem>
-                            <Link href={"/wishlist"}>
-                                <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
-                            </Link>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        {/* Desktop: dropdown */}
+                        <div className="hidden lg:flex">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <div className="flex gap-2 justify-start items-end">
+                                        <User
+                                            className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
+                                            stroke="#4D4D4D"
+                                            size={30}
+                                        />
+                                    </div>
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuContent
+                                    side="bottom"
+                                    className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]
+            data-[state=open]:slide-in-from-right duration-500
+            data-[state=closed]:slide-out-to-right"
+                                >
+                                    <DropdownMenuLabel>
+                                        {t("greeting")}, {user.last_name}
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => router.push("/account")}>
+                                        {t("accountInformation")}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={onLogout}>
+                                        {t("logout")}
+                                    </DropdownMenuItem>
+                                    <Link href="/wishlist">
+                                        <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
+                                    </Link>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </>
                 ) : (
-                    // Not logged in -> Dialog
-                    //         <Dialog open={open} onOpenChange={setOpen}>
-                    //             <DialogTrigger asChild>
-                    //                 <div className="flex gap-2 justify-start items-end">
-                    //                     <User
-                    //                         className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
-                    //                         stroke="#4D4D4D"
-                    //                         size={30}
-                    //                     />
-                    //                 </div>
-                    //             </DialogTrigger>
-                    //             <DialogContent
-                    //                 isTopRight
-                    //                 className="lg:w-[500px] w-full lg:h-fit h-full lg:top-10 top-0 max-w-full translate-x-0 translate-y-0 lg:!right-10 lg:p-0 flex flex-col lg:grid
-                    //   data-[state=open]:slide-in-from-right duration-500
-                    //   data-[state=closed]:slide-out-to-left"
-                    //             >
-                    //                 <DialogTitle className="border-b-2 p-4">
-                    //                     <div className="uppercase font-bold text-xl">{t("login")}</div>
-                    //                 </DialogTitle>
-                    //                 <div className="px-4 pb-6 space-y-2">
-                    //                     <p className="text-black/70 text-lg">
-                    //                         Melden Sie sich hier mit Ihren Kundendaten an.
-                    //                     </p>
-                    //                     <HeaderLoginForm
-                    //                         onSuccess={() => {
-                    //                             const uid = localStorage.getItem("userId")
-                    //                             setUserId(uid) // cập nhật state
-                    //                             queryClient.invalidateQueries({ queryKey: ["me"] })
-                    //                             queryClient.invalidateQueries({ queryKey: ["cart-items"] })
-                    //                             setOpen(false)
-                    //                         }}
-                    //                     />
-                    //                 </div>
-                    //             </DialogContent>
-                    //         </Dialog>
+                    // Not logged in -> Drawer (mobile & desktop đều dùng được)
                     <LoginDrawer openLogin={open} setOpenLogin={setOpen} />
                 )}
+
 
                 {hasSideBar ?
                     <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isMobile={isPhone ? true : false} />
