@@ -9,10 +9,10 @@ import { Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 const statisticDemo = [
-    { total: 9999999, label: 'Total sale', textColor: 'rgb(81, 190, 140)' },
-    { total: 5654564, label: 'Total cost', textColor: 'rgb(255, 11, 133)' },
-    { total: 2345678, label: 'Total discount', textColor: 'rgb(250, 166, 26)' },
-    { total: 1543234, label: 'ESTIMATED PROFIT 20%', textColor: 'rgb(41, 171, 226)' }
+    { total: 0, label: 'Total sale', textColor: 'rgb(81, 190, 140)' },
+    { total: 0, label: 'Total cost', textColor: 'rgb(255, 11, 133)' },
+    { total: 0, label: 'Total discount', textColor: 'rgb(250, 166, 26)' },
+    { total: 0, label: 'ESTIMATED PROFIT 20%', textColor: 'rgb(41, 171, 226)' }
 ]
 
 const ProductList = () => {
