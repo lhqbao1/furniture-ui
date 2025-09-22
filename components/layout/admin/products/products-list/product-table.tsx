@@ -17,7 +17,6 @@ interface DataTableProps<TData, TValue> {
     page: number
     pageSize: number
     setPage: (page: number) => void
-    setSearchQuery: React.Dispatch<React.SetStateAction<string>>
     setPageSize: React.Dispatch<React.SetStateAction<number>>
     totalItems: number
     hasBackground?: boolean
@@ -36,7 +35,6 @@ export function ProductTable<TData, TValue>({
     pageSize,
     setPage,
     setPageSize,
-    setSearchQuery,
     totalItems,
     hasBackground,
     totalPages,
@@ -45,9 +43,6 @@ export function ProductTable<TData, TValue>({
     isAddButtonModal = false,
     addButtonModalContent
 }: DataTableProps<TData, TValue>) {
-
-
-
     const table = useReactTable({
         data,
         columns,

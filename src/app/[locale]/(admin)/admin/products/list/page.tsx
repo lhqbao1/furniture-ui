@@ -47,7 +47,6 @@ const ProductList = () => {
                     setPageSize={setPageSize}
                     totalItems={data?.pagination.total_items ?? 0}
                     totalPages={data?.pagination.total_pages ?? 0}
-                    setSearchQuery={setSearchQuery}
                 />
             }
         </div>
