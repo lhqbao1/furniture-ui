@@ -376,9 +376,11 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                         <FormControl>
                                             <Input
                                                 type="text"
-                                                placeholder="Barcode"
+                                                placeholder="EAN"
                                                 className='col-span-4'
                                                 {...field}
+                                                value={field.value ?? ""}
+                                                onChange={(e) => field.onChange(e.target.value)}
                                             />
                                         </FormControl>
                                     </FormItem>

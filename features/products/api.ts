@@ -6,6 +6,7 @@ interface GetAllProductsParams {
   page?: number
   page_size?: number
   all_products?: boolean
+  search?: string
 }
 
 interface SEOInput {
@@ -42,6 +43,7 @@ export async function getAllProducts(params?: GetAllProductsParams) {
       ...(params?.page !== undefined && { page: params.page }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
       ...(params?.all_products !== undefined && { all_products: params.all_products }),
+      ...(params?.search !== undefined && { search: params.search }),
     },
   })
 

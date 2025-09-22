@@ -25,6 +25,7 @@ interface DataTableProps<TData, TValue> {
     addButtonUrl?: string
     isAddButtonModal?: boolean
     addButtonModalContent?: React.ReactNode
+
 }
 
 export function ProductTable<TData, TValue>({
@@ -42,7 +43,6 @@ export function ProductTable<TData, TValue>({
     isAddButtonModal = false,
     addButtonModalContent
 }: DataTableProps<TData, TValue>) {
-
     const table = useReactTable({
         data,
         columns,
@@ -57,14 +57,6 @@ export function ProductTable<TData, TValue>({
     return (
         <div className="flex flex-col gap-4">
             <p>{totalItems} products found</p>
-            <TableToolbar
-                pageSize={pageSize}
-                setPageSize={setPageSize} // đảm bảo type đúng
-                addButtonText={addButtonText}
-                addButtonUrl={addButtonUrl}
-                isAddButtonModal={isAddButtonModal}
-                addButtonModalContent={addButtonModalContent}
-            />
             <div className="rounded-md border w-full overflow-x-scroll">
                 <Table>
                     <TableHeader>
