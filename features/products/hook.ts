@@ -6,6 +6,7 @@ interface UseGetAllProductsParams {
   page?: number
   page_size?: number
   all_products?: boolean
+  search?: string
 }
 
 interface SEOInput {
@@ -13,10 +14,10 @@ interface SEOInput {
   description: string
 }
 
-export function useGetAllProducts({ page, page_size, all_products }: UseGetAllProductsParams = {}) {
+export function useGetAllProducts({ page, page_size, all_products, search }: UseGetAllProductsParams = {}) {
   return useQuery({
-    queryKey: ["products", page, page_size, all_products], // queryKey thay đổi khi page/page_size thay đổi
-    queryFn: () => getAllProducts({ page, page_size, all_products }),
+    queryKey: ["products", page, page_size, all_products, search], // queryKey thay đổi khi page/page_size thay đổi
+    queryFn: () => getAllProducts({ page, page_size, all_products,search }),
     retry: false,
   })
 }

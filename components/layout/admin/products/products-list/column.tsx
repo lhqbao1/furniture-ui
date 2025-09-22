@@ -228,9 +228,9 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         cell: ({ row }) => <div className="text-right">€{(row.original.cost).toFixed(2)}</div>,
     },
     {
-        accessorKey: "discount_amount",
-        header: () => <div className="text-right">DISCOUNT</div>,
-        cell: ({ row }) => <div className="text-right">€{(row.original.discount_amount)?.toFixed(2)}</div>,
+        accessorKey: "shipping_cost",
+        header: () => <div className="text-right">DELIVERY COST</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : 'Updating ...'}</div>,
     },
     {
         accessorKey: "final_price",
@@ -238,29 +238,22 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         cell: ({ row }) => <div className="text-right">€{(row.original.final_price)?.toFixed(2)}</div>,
     },
     {
-        id: "revenue",
-        header: () => <div className="text-right">REVENUE</div>,
-        cell: ({ row }) => <div className="text-right">€{(row.original.final_price - (row.original.cost ?? 0)).toFixed(2)}</div>,
+        id: "margin",
+        header: () => <div className="text-right">MARGIN</div>,
+        cell: ({ row }) => {
+            const { final_price, cost } = row.original
+            if (final_price <= 0) return <div className="text-right">N/A</div>
+
+            const profit = final_price - cost
+            const margin = profit / final_price // tỷ suất lợi nhuận
+
+            return <div className="text-right">{margin.toFixed(2)}</div>
+        }
     },
     {
-        id: "default",
-        header: () => <div className="flex justify-center"><Image src="/new-logo.svg" alt="default" width={30} height={30} unoptimized /></div>,
-        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer' /></div>,
-    },
-    {
-        id: "amazon",
-        header: () => <div className="flex justify-center"><Image src="/amazon.png" alt="default" width={56} height={36} unoptimized /></div>,
-        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-primary cursor-pointer' /></div>,
-    },
-    {
-        id: "ebay",
-        header: () => <div className="flex justify-center"><Image src="/ebay.png" alt="default" width={56} height={36} unoptimized /></div>,
-        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-[#0064D4] cursor-pointer' /></div>,
-    },
-    {
-        id: "kaufland",
-        header: () => <div className="flex justify-center"><Image src="/kau.png" alt="default" width={64} height={36} unoptimized /></div>,
-        cell: () => <div className="text-center"><Switch className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-[#C40809] cursor-pointer' /></div>,
+        id: "carrier",
+        header: () => <div className="text-center">CARRIER</div>,
+        cell: ({ row }) => <div>{row.original.carrier}</div>
     },
     {
         id: "actions",

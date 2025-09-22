@@ -19,7 +19,7 @@ export const addProductSchema = z.object({
   stock: z.number().min(0).nonnegative(),
   // sku: z.string().min(1, "You must provide product sku"),
   sku: z.string().optional().nullable(),
-  ean: z.string().min(1, "You must provide product EAN"),
+  ean: z.string().optional().nullable(),
   carrier: z.string().optional().nullable(),
   delivery_time:z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),

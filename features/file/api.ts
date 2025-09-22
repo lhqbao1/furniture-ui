@@ -10,3 +10,12 @@ export async function uploadStaticFile(file: FormData){
     })
     return data as StaticFileResponse
 }
+
+export async function importProduct(file: FormData){
+    const {data} = await apiPublic.post('/import-products', file, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
+    return data
+}

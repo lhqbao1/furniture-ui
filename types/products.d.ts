@@ -92,6 +92,7 @@ export type StaticFile = {
     meta_title: string
     meta_description: string
 
+    delivery_cost: number
     weight: number
     length: number
     width: number
@@ -100,7 +101,7 @@ export type StaticFile = {
     tag?: string
     id: string
     final_price: number
-    price_whithout_tax?: number
+    price_whithout_tax: number
     created_at?: string
     updated_at?: string
     parent_id?: string

@@ -226,8 +226,8 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                                 height={100}
                                                                 alt=''
                                                                 className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] object-fill`}
-                                                                priority={index < 2} // preload 2 ảnh đầu tiên
-                                                                loading={index < 2 ? 'eager' : 'lazy'} // eager = tải ngay
+                                                                priority={index < 2}
+                                                                loading={index < 2 ? 'eager' : 'lazy'}
                                                             />
                                                         </div>
                                                     </CarouselItem>

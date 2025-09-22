@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState } from "react"
-import { Button } from "@/components/ui/button"
+import React, { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
+import { useDebounce } from "use-debounce"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,7 +10,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
-import FilterForm from "./toolbar/filter"
 import {
     Select,
     SelectTrigger,
@@ -18,6 +17,7 @@ import {
     SelectContent,
     SelectItem,
 } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import {
     Dialog,
@@ -25,11 +25,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import AddBrandForm from "../brand/add-brand-form"
+import FilterForm from "./toolbar/filter"
+import ImportDialog from "./toolbar/import"
 
 interface TableToolbarProps {
+    searchQuery: string
     pageSize: number
     setPageSize: React.Dispatch<React.SetStateAction<number>>
+    setSearchQuery: React.Dispatch<React.SetStateAction<string>>
     addButtonText?: string
     isAddButtonModal?: boolean
     addButtonUrl?: string
@@ -37,8 +40,10 @@ interface TableToolbarProps {
 }
 
 export default function TableToolbar({
+    searchQuery,
     pageSize,
     setPageSize,
+    setSearchQuery,
     addButtonText,
     isAddButtonModal,
     addButtonUrl,
@@ -46,12 +51,26 @@ export default function TableToolbar({
 }: TableToolbarProps) {
     const router = useRouter()
     const [openAddModal, setOpenAddModal] = useState(false)
+    const [inputValue, setInputValue] = useState(searchQuery ?? "")
+    const [isImporting, setIsImporting] = useState(false)
+
+    useEffect(() => {
+        setInputValue(searchQuery ?? "")
+    }, [searchQuery])
+
+    // debounce inputValue
+    const [debouncedValue] = useDebounce(inputValue, 400)
+
+    useEffect(() => {
+        if (debouncedValue !== searchQuery) {
+            setSearchQuery(debouncedValue)
+        }
+    }, [debouncedValue, searchQuery, setSearchQuery])
 
     return (
         <div className="flex items-center justify-between gap-4 p-2 w-full">
             {/* Left group */}
             <div className="flex items-center gap-4">
-                {/* Group Action */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="flex items-center gap-1">
@@ -64,24 +83,23 @@ export default function TableToolbar({
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Export / Import */}
                 <div className="flex gap-2 text-sm font-medium">
-                    <button className="hover:underline">Export</button>
-                    <button className="hover:underline">Import</button>
+                    <Button variant="ghost" className="">Export</Button>
+                    <ImportDialog setIsImporting={setIsImporting} />
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="flex items-center w-full flex-1 relative">
-                <Input placeholder="Search" className="pr-20" />
-                <Button className="absolute right-0 rounded-l-none text-white">
-                    Search
-                </Button>
+            {/* Search (auto, no button) */}
+            <div className="flex items-center w-full flex-1">
+                <Input
+                    placeholder="Search"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                />
             </div>
 
             {/* Right group */}
             <div className="flex items-center gap-4">
-                {/* Row selector */}
                 <Select
                     value={String(pageSize)}
                     onValueChange={(value) => setPageSize(Number(value))}
@@ -98,7 +116,6 @@ export default function TableToolbar({
                     </SelectContent>
                 </Select>
 
-                {/* Filter */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="flex items-center gap-1">
@@ -110,7 +127,6 @@ export default function TableToolbar({
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* View */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="flex items-center gap-1">
@@ -123,7 +139,6 @@ export default function TableToolbar({
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Columns */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="flex items-center gap-1">
@@ -137,26 +152,22 @@ export default function TableToolbar({
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Add Button */}
-                <div className="flex flex-1 w-full justify-end">
-                    {!addButtonText ? null : (
-                        <Button
-                            className="bg-primary hover:bg-primary font-semibold"
-                            onClick={() => {
-                                if (addButtonUrl) {
-                                    router.push(addButtonUrl)
-                                } else if (isAddButtonModal) {
-                                    setOpenAddModal(true)
-                                }
-                            }}
-                        >
-                            {addButtonText || "Add Product"}
-                        </Button>
-                    )}
-                </div>
+                {addButtonText && (
+                    <Button
+                        className="bg-primary hover:bg-primary font-semibold"
+                        onClick={() => {
+                            if (addButtonUrl) {
+                                router.push(addButtonUrl)
+                            } else if (isAddButtonModal) {
+                                setOpenAddModal(true)
+                            }
+                        }}
+                    >
+                        {addButtonText}
+                    </Button>
+                )}
             </div>
 
-            {/* Dialog generic */}
             {isAddButtonModal && (
                 <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
                     <DialogContent className="w-1/3">
