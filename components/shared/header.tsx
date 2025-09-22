@@ -1,11 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import React, { useState } from 'react'
-import { useMediaQuery } from 'react-responsive';
 import ProductSearch from './product-search';
 import { useTranslations } from 'next-intl';
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { ChevronDown, Mic, Search, ShoppingCart, User, X } from 'lucide-react'
+import { ShoppingCart, User, X } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,10 +20,6 @@ import { getMe } from '@/features/auth/api';
 import { Link, useRouter } from '@/src/i18n/navigation';
 import { useCartLocal } from '@/hooks/cart';
 import { useIsPhone } from '@/hooks/use-is-phone';
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTrigger } from '../ui/dialog';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import HeaderLoginForm from './header-login-form';
-import CartPage from '@/src/app/[locale]/(no-banner)/cart/page';
 import { CartDrawer } from './cart-drawer';
 import { LoginDrawer } from './login-drawer';
 
