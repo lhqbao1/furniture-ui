@@ -4,7 +4,6 @@ import * as React from "react"
 import { Search } from "lucide-react"
 import { Input } from "../ui/input"
 import { cn } from "@/lib/utils"
-import { useRouter } from "next/navigation"
 import { useGetProductsSelect } from "@/features/product-group/hook"
 import { ProductItem } from "@/types/products"
 import Image from "next/image"
@@ -24,7 +23,6 @@ export default function ProductSearch({ height }: { height?: boolean }) {
     const [query, setQuery] = React.useState("")
     const [debouncedQuery, setDebouncedQuery] = React.useState("")
     const [open, setOpen] = React.useState(false)
-    const router = useRouter()
     const containerRef = React.useRef<HTMLDivElement>(null)
     const inputRef = React.useRef<HTMLInputElement>(null)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
@@ -101,7 +99,7 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                         <Command shouldFilter={false} className="max-h-[300px] overflow-y-scroll z-50">
                             <CommandList>
                                 <CommandEmpty>
-                                    {isLoading ? "Loading..." : "No results found."}
+                                    {isLoading ? `${t('loading')}...` : `${t('noResult')}`}
                                 </CommandEmpty>
                                 {results.length > 0 && (
                                     <CommandGroup>

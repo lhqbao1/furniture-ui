@@ -38,8 +38,6 @@ export default function RootLayout({
     return (
         <html lang="de">
             <head>
-
-
                 {/* <Script
                     id="GTM"
                     dangerouslySetInnerHTML={{

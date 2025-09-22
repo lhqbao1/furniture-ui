@@ -216,5 +216,8 @@
 "getCustom": "Erhalten Sie innerhalb von 24 Stunden ein kostenloses 3D-Mock-up",
 "cancel": "Abbrechen",
 "enterDes": "Geben Sie Ihre Beschreibung ein...",
-"chooseAtLeastCart": "Bitte wählen Sie mindestens ein Produkt aus"
+"chooseAtLeastCart": "Bitte wählen Sie mindestens ein Produkt aus",
+"searchProduct": "Produkte suchen",
+"noResult": "Keine Ergebnisse gefunden",
+"loading": "Loading"
 }
