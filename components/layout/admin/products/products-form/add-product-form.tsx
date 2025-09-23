@@ -613,7 +613,7 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 render={({ field }) => (
                                     <FormItem className="grid grid-cols-6 w-full">
                                         <FormLabel className="text-[#666666] text-sm col-span-2">
-                                            Manufacture Country
+                                            Manufacturing Country
                                         </FormLabel>
                                         <FormControl className="col-span-4">
                                             <Popover>

@@ -79,7 +79,8 @@
   "note": "Hinweis",
   "byPlacing": "Indem Sie diese Bestellung aufgeben, akzeptieren Sie unsere",
   "subTotalInclude": "Zwischensumme (inkl. MwSt.)",
-  "shipping": "Versand",
+  "shipping": "Standardversand",
+  "shippingSpedition": "Speditionsversand",
   "continue": "Fortfahren",
   "prestigeHome": "Prestige Home",
   "thankYou": "Vielen Dank",
@@ -219,5 +220,6 @@
 "chooseAtLeastCart": "Bitte wählen Sie mindestens ein Produkt aus",
 "searchProduct": "Produkte suchen",
 "noResult": "Keine Ergebnisse gefunden",
-"loading": "Loading"
+"loading": "Loading",
+"notEnoughStock": "Nicht genug Bestand"
 }

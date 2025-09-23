@@ -58,7 +58,7 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                                         className="rounded shrink-0"
                                         unoptimized
                                     />
-                                    <p className="font-semibold text-wrap">{item.product_name}</p>
+                                    <p className="font-semibold text-wrap line-clamp-3">{item.product_name}</p>
                                 </div>
                             </div>
 

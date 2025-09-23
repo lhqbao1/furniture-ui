@@ -245,9 +245,9 @@ export const productColumns: ColumnDef<ProductItem>[] = [
             if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating ...</div>
 
             const profit = final_price - cost
-            const margin = profit / final_price // tỷ suất lợi nhuận
+            const margin = profit / final_price * 100 // tỷ suất lợi nhuận
 
-            return <div className="text-right">{margin.toFixed(2)}</div>
+            return <div className="text-right">{margin.toFixed(2)}%</div>
         }
     },
     {

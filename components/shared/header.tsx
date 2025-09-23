@@ -41,7 +41,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     );
 
     //Get cart local and server
-    const { cart: localCart, addToCartLocal, updateCart } = useCartLocal();
+    const { cart: localCart } = useCartLocal();
     const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
         queryKey: ["cart-items", userId],
         queryFn: async () => {

@@ -41,6 +41,7 @@ import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { useCheckMailExist, useLogin, useLoginOtp, useSignUp } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
+import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
 
 export interface CartItem {
     id: number
@@ -154,7 +155,7 @@ export default function CheckOutPage() {
         enabled: !!userId,
     })
 
-    const { cart: localCart, addToCartLocal, updateCart } = useCartLocal();
+    const { cart: localCart } = useCartLocal();
     const { data: cartItems, isLoading: isLoadingCart } = useQuery({
         queryKey: ["cart-items", userId],
         queryFn: async () => {
@@ -393,6 +394,10 @@ export default function CheckOutPage() {
         [user, invoiceAddress, addresses]
     )
 
+    const normalizedItems = normalizeCartItems(cartItems && cartItems.items.length > 0 ? cartItems.items : localCart, cartItems && cartItems.items.length > 0 ? true : false)
+    const shippingCost = calculateShipping(normalizedItems)
+    const hasOtherCarrier = checkShippingType(normalizedItems)
+
     return (
         <FormProvider {...form}>
             <form
@@ -464,21 +469,6 @@ export default function CheckOutPage() {
 
                     {/* Table cart and total */}
                     <div className='col-span-1 space-y-4 lg:space-y-4'>
-                        {/* <CartTable
-                            cart={
-                                cartItems
-                                    ? {
-                                        ...cartItems,
-                                        items: cartItems.items.filter((item) => item.is_active)
-                                    }
-                                    : undefined
-                            }
-                            isLoadingCart={isLoadingCart}
-                            isCheckout
-                            localQuantities={localQuantities}
-                            setLocalQuantities={setLocalQuantities}
-                        /> */}
-
                         {
                             cartItems ? (<CartTable
                                 isLoadingCart={isLoadingCart}
@@ -561,8 +551,8 @@ export default function CheckOutPage() {
                                     </span>
                                 </div>
                                 <div className='grid grid-cols-5'>
-                                    <span className='col-span-3 text-right'>{t('shipping')}</span>
-                                    <span className='text-right col-span-2'>€5.95</span>
+                                    <span className='col-span-3 text-right'>{hasOtherCarrier ? t('shippingSpedition') : t('shipping')}</span>
+                                    <span className='text-right col-span-2'>€{shippingCost}</span>
                                 </div>
                                 <div className='grid grid-cols-5'>
                                     <span className='col-span-3 text-right'>{t('discount')}</span>
@@ -583,7 +573,7 @@ export default function CheckOutPage() {
                                                             (total, item) => total + (item.item_price ?? 0) * (item.quantity ?? 1),
                                                             0
                                                         ) ?? 0) +
-                                                5.95 -
+                                                shippingCost -
                                                 (couponAmount ?? 0) -
                                                 (voucherAmount ?? 0)
                                             ).toFixed(2)
@@ -600,7 +590,7 @@ export default function CheckOutPage() {
                         </div>
                         <FormField
                             control={form.control}
-                            name="terms" // chỉ dùng cho validation, không map vào schema gửi lên backend
+                            name="terms"
                             render={({ field }) => (
                                 <FormItem>
                                     <div className="flex flex-row gap-2 mt-4 items-center">

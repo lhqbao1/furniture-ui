@@ -24,7 +24,7 @@ const CartPage = () => {
         if (storedUserId) setUserId(storedUserId);
     }, []);
 
-    const { cart: localCart, addToCartLocal, updateCart } = useCartLocal();
+    const { cart: localCart } = useCartLocal();
     const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
         queryKey: ["cart-items", userId],
         queryFn: async () => {

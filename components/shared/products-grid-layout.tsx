@@ -15,6 +15,7 @@ import { useAddToWishList } from '@/features/wishlist/hook'
 import { useCartLocal } from '@/hooks/cart'
 import { toast } from 'sonner'
 import { HandleApiError } from '@/lib/api-helper'
+import { CartItemLocal } from '@/lib/utils/cart'
 
 
 interface ProductsGridLayoutProps {
@@ -33,7 +34,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
 
     const addToCartMutation = useAddToCart()
     const addToWishlistMutation = useAddToWishList()
-    const { addToCartLocal } = useCartLocal()
+    const { addToCartLocal, cart } = useCartLocal()
 
     useEffect(() => {
         cardRefs.current.forEach((card) => {
@@ -60,9 +61,24 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
         const userId = localStorage.getItem("userId");
 
         if (!userId) {
+            const existingItem = cart.find((item: CartItemLocal) => item.product_id === currentProduct.id)
+            const totalQuantity = (existingItem?.quantity || 0) + 1
+            if (totalQuantity > currentProduct.stock) {
+                toast.error(
+                    t('notEnoughStock')
+                )
+                return
+            }
             addToCartLocal({
                 item: {
-                    product_id: currentProduct.id, quantity: 1, is_active: true, item_price: currentProduct.final_price, final_price: currentProduct.final_price, img_url: currentProduct.static_files[0].url, product_name: currentProduct.name, stock: currentProduct.stock
+                    product_id: currentProduct.id,
+                    quantity: 1, is_active: true,
+                    item_price: currentProduct.final_price,
+                    final_price: currentProduct.final_price,
+                    img_url: currentProduct.static_files[0].url,
+                    product_name: currentProduct.name,
+                    stock: currentProduct.stock,
+                    carrier: currentProduct.carrier ? currentProduct.carrier : 'amm'
                 }
             }, {
                 onSuccess(data, variables, context) {
@@ -79,6 +95,12 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                 },
                 onError(error, variables, context) {
                     const { status, message } = HandleApiError(error, t);
+                    if (status === 400) {
+                        toast.error(
+                            t('notEnoughStock')
+                        )
+                        return
+                    }
                     toast.error(message)
                     if (status === 401) router.push('/login')
                 },
@@ -94,6 +116,12 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
             },
             onError(error, variables, context) {
                 const { status, message } = HandleApiError(error, t);
+                if (status === 400) {
+                    toast.error(
+                        t('notEnoughStock')
+                    )
+                    return
+                }
                 toast.error(message)
                 if (status === 401) router.push('/login')
             },

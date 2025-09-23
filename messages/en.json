@@ -81,6 +81,7 @@
     "byPlacing": "By placing this order, you accept our",
     "subTotalInclude": "Sub total (included VAT)",
     "shipping": "Shipping",
+    "shippingSpedition": "Freight shipping",
     "continue": "Continue",
     "prestigeHome": "Prestige Home",
     "thankYou": "Thank You",
@@ -219,5 +220,6 @@
     "chooseAtLeastCart": "You need to choose at least one product to check out",
     "searchProduct": "Search Products",
     "noResult": "No result found",
-    "loading": "Wird geladen"
+    "loading": "Wird geladen",
+    "notEnoughStock": "Not enough stock"
 }

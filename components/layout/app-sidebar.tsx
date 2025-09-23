@@ -48,7 +48,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
         return categories.map((cat) => ({
             id: cat.id,
             title: cat.name,
-            url: `/product/${cat.slug}`,
+            url: `/category/${cat.slug}`,
             children: cat.children && cat.children.length > 0 ? mapCategories(cat.children) : undefined,
         }))
     }
@@ -138,7 +138,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                                                     onClick={() => {
                                                                         router.push(child.url)
                                                                         if (isPhone) setOpenMobile(false)
-                                                                        if (item.url && item.url.includes("product")) {
+                                                                        if (item.url && item.url.includes("category")) {
                                                                             setCurrentCategoryId(child.id)
                                                                             setCurrentCategoryName(child.title)
                                                                         }
