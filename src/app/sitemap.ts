@@ -77,13 +77,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let products: ProductItem[] = []
   try {
     const res = await apiPublic.get("/products/")
+    console.log(res.data.items)
     products = res.data.items
   } catch (e) {
     products = []
   }
 
   const productUrls: MetadataRoute.Sitemap = products.map((p: ProductItem) => ({
-    url: `https://www.prestige-home.de/product/${p.url_key}`,
+    url: `https://www.prestige-home.de/product/${p.id}`,
     lastModified: new Date(p.updated_at || new Date()),
     changeFrequency: "weekly",
     priority: 0.6,
