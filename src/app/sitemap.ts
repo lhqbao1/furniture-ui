@@ -3,6 +3,28 @@ import { CategoryResponse } from "@/types/categories"
 import { ProductItem } from "@/types/products"
 import { MetadataRoute } from "next"
 
+function collectCategoryUrls(categories: CategoryResponse[]): MetadataRoute.Sitemap {
+    const urls: MetadataRoute.Sitemap = []
+  
+    const traverse = (cats: CategoryResponse[]) => {
+      cats.forEach((cat) => {
+        urls.push({
+          url: `https://www.prestige-home.de/category/${cat.slug}`,
+          lastModified: new Date(cat.updated_at || new Date()),
+          changeFrequency: "weekly",
+          priority: 0.7,
+        })
+  
+        if (cat.children && cat.children.length > 0) {
+          traverse(cat.children)
+        }
+      })
+    }
+  
+    traverse(categories)
+    return urls
+  }
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL tĩnh
   const staticUrls: MetadataRoute.Sitemap = [
@@ -65,20 +87,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categories = []
   }
 
-  const categoryUrls: MetadataRoute.Sitemap = categories.map((cat: CategoryResponse) => ({
-    url: `https://www.prestige-home.de/product/${cat.slug}`,
-    lastModified: new Date(cat.updated_at || new Date()),
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }))
-
+  const categoryUrls = collectCategoryUrls(categories)
 
   // URL động cho product
   let products: ProductItem[] = []
   try {
-    const res = await apiPublic.get("/products/")
-    console.log(res.data.items)
-    products = res.data.items
+    const res = await apiPublic.get("/products/all")
+    products = res.data
   } catch (e) {
     products = []
   }
