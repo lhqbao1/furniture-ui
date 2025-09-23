@@ -31,6 +31,7 @@ const CustomerListPage = () => {
             <div className='text-3xl text-secondary font-bold text-center'>Customers List</div>
             {isLoading || !data ? <ProductTableSkeleton /> :
                 <ProductTable
+
                     data={data ? data : []}
                     columns={customerColumns}
                     page={page}
