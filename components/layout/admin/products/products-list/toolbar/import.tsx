@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { useDropzone } from "react-dropzone"
 import { useImportProducts } from "@/features/file/hook"
 import { toast } from "sonner" // hoặc react-hot-toast nếu bạn dùng lib khác
-import { Loader2 } from "lucide-react"
+import { File, Loader2 } from "lucide-react"
 
 interface ImportDialogProps {
     setIsImporting: React.Dispatch<React.SetStateAction<boolean>>
@@ -78,7 +78,10 @@ const ImportDialog = ({ setIsImporting }: ImportDialogProps) => {
                 >
                     <input {...getInputProps()} />
                     {file ? (
-                        <p className="text-sm text-gray-600">{file.name}</p>
+                        <div className="flex gap-2">
+                            <File />
+                            <p className="text-sm text-gray-600">{file.name}</p>
+                        </div>
                     ) : (
                         <p className="text-sm text-gray-500">
                             Drag & drop file here, or click to select
