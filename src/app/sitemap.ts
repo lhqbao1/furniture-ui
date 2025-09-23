@@ -60,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL động cho category
   let categories: CategoryResponse[] = []
   try {
-    const res = await apiPublic.get("/categories")
+    const res = await apiPublic.get("/categories/")
     categories = res.data
   } catch (e) {
     categories = []
@@ -77,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL động cho product
   let products: ProductItem[] = []
   try {
-    const res = await apiPublic.get("/products")
+    const res = await apiPublic.get("/products/")
     products = res.data
   } catch (e) {
     products = []
