@@ -24,7 +24,7 @@ import { toast } from 'sonner'
 import ListVariant from '@/components/layout/single-product/list-variant'
 import { FormNumberInput } from '@/components/layout/single-product/form-number.input'
 import { useAddToCart } from '@/features/cart/hook'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getProductById } from '@/features/products/api'
 import { VariantOptionResponse } from '@/types/variant'
 import { ProductItem } from '@/types/products'
@@ -36,6 +36,9 @@ import { useCartLocal } from '@/hooks/cart'
 import { useSwipeable } from "react-swipeable"
 import { ProductGroupDetailResponse } from '@/types/product-group'
 import { getProductGroupDetail } from '@/features/product-group/api'
+import ProductImageDialog from './main-image-dialog'
+import { CartItemLocal } from '@/lib/utils/cart'
+import { CartItem } from '@/types/cart'
 
 interface ProductDetailsProps {
     productDetailsData: ProductItem
@@ -46,8 +49,9 @@ interface ProductDetailsProps {
 const ProductDetails = ({ productDetailsData, productId, parentProductData }: ProductDetailsProps) => {
     const [mainImageIndex, setMainImageIndex] = useState(0)
     const t = useTranslations()
-    const { addToCartLocal } = useCartLocal()
+    const { addToCartLocal, cart } = useCartLocal()
     const router = useRouter()
+    const queryClient = useQueryClient()
 
     // Form init
     const form = useForm<z.infer<typeof cartFormSchema>>({
@@ -107,9 +111,25 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
         const userId = localStorage.getItem("userId");
 
         if (!userId) {
+            const existingItem = cart.find((item: CartItemLocal) => item.product_id === productDetails.id)
+            const totalQuantity = (existingItem?.quantity || 0) + values.quantity
+
+            if (totalQuantity > productDetails.stock) {
+                toast.error(
+                    t('notEnoughStock')
+                )
+                return
+            }
             addToCartLocal({
                 item: {
-                    product_id: productDetails.id ?? '', quantity: values.quantity, is_active: true, item_price: productDetails.final_price, final_price: productDetails.final_price, img_url: productDetails.static_files[0].url, product_name: productDetails.name, stock: productDetails.stock
+                    product_id: productDetails.id ?? '',
+                    quantity: values.quantity, is_active: true,
+                    item_price: productDetails.final_price,
+                    final_price: productDetails.final_price,
+                    img_url: productDetails.static_files[0].url,
+                    product_name: productDetails.name,
+                    stock: productDetails.stock,
+                    carrier: productDetails.carrier ? productDetails.carrier : 'amm'
                 }
             }, {
                 onSuccess(data, variables, context) {
@@ -120,12 +140,30 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                 },
             })
         } else {
+            // const serverCart: CartItem[] = queryClient.getQueryData(["cart-items"]) || []
+            // console.log(serverCart)
+            // const existingItem = serverCart.find((item) => item.products.id === productDetails.id)
+            // const totalQuantity = (existingItem?.quantity || 0) + values.quantity
+
+            // if (totalQuantity > productDetails.stock) {
+            // toast.error(
+            //     t('notEnoughStock')
+            // )
+            //     return
+            // }
+
             createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: values.quantity }, {
                 onSuccess(data, variables, context) {
                     toast.success(t('addToCartSuccess'))
                 },
                 onError(error, variables, context) {
                     const { status, message } = HandleApiError(error, t);
+                    if (status === 400) {
+                        toast.error(
+                            t('notEnoughStock')
+                        )
+                        return
+                    }
                     toast.error(message)
                     if (status === 401) router.push('/login')
                 },
@@ -190,32 +228,35 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                 {/*Product details images */}
                                 <div className='xl:col-span-6 col-span-12 flex flex-col gap-6 h-fit'>
                                     {/* Main image */}
-                                    <div
-                                        className='flex justify-center overflow-hidden main-image'
-                                        onMouseMove={handleZoomImage}
-                                        onMouseEnter={() => setIsHover(true)}
-                                        onMouseLeave={() => setIsHover(false)}
-                                        {...handlers}
-                                    >
-                                        <Image
-                                            src={productDetails.static_files.length > 0 ? productDetails.static_files[mainImageIndex].url : '/2.png'}
-                                            width={500}
-                                            height={300}
-                                            alt={`${productDetails.name}`}
-                                            className='transition-transform duration-300 lg:h-[400px] h-[300px] object-cover'
-                                            style={{
-                                                transformOrigin: `${position.x}% ${position.y}%`,
-                                                transform: isHover ? "scale(1.5)" : "scale(1)",
-                                            }}
-                                            priority
-                                        />
-                                    </div>
+                                    <ProductImageDialog productDetails={productDetails}>
+                                        <div
+                                            className='flex justify-center overflow-hidden main-image'
+                                            onMouseMove={handleZoomImage}
+                                            onMouseEnter={() => setIsHover(true)}
+                                            onMouseLeave={() => setIsHover(false)}
+                                            {...handlers}
+                                        >
+                                            <Image
+                                                src={productDetails.static_files.length > 0 ? productDetails.static_files[mainImageIndex].url : '/2.png'}
+                                                width={500}
+                                                height={300}
+                                                alt={`${productDetails.name}`}
+                                                className='transition-transform duration-300 lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer'
+                                                style={{
+                                                    transformOrigin: `${position.x}% ${position.y}%`,
+                                                    transform: isHover ? "scale(1.5)" : "scale(1)",
+                                                }}
+                                                priority
+                                            />
+                                        </div>
+                                    </ProductImageDialog>
+
                                     {/* Sub images */}
                                     <div className='flex flex-row px-12 w-full'>
-                                        <Carousel opts={{ loop: true }}>
-                                            <CarouselContent className='w-full lg:justify-center justify-between'>
+                                        <Carousel opts={{ loop: true, align: 'start' }}>
+                                            <CarouselContent className='w-full flex'>
                                                 {productDetails.static_files.map((item, index) => (
-                                                    <CarouselItem key={index} className={`flex lg:basis-1/4 basis-1/3`}>
+                                                    <CarouselItem key={index} className={`lg:basis-1/4 basis-1/3`}>
                                                         <div
                                                             className="cursor-pointer"
                                                             onClick={() => setMainImageIndex(index)}
@@ -225,7 +266,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                                 width={100}
                                                                 height={100}
                                                                 alt=''
-                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] object-fill`}
+                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] w-auto object-fill`}
                                                                 priority={index < 2}
                                                                 loading={index < 2 ? 'eager' : 'lazy'}
                                                             />
@@ -257,8 +298,8 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         </div>
                                     </div>
                                     <div className='flex gap-2'>
-                                        <p className='text-primary lg:text-3xl text-xl font-semibold'>€{productDetails.final_price.toFixed(2)}</p>
-                                        <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>€{productDetails.price.toFixed(2)}</p>
+                                        <p className='text-primary lg:text-3xl text-xl font-semibold'>{productDetails.final_price ? <>€{productDetails.final_price.toFixed(2)}</> : ''}</p>
+                                        <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>{productDetails.price ? <>€{productDetails.price.toFixed(2)}</> : ''}</p>
                                     </div>
 
                                     <div className='space-y-2'>

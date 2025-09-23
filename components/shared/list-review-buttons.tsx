@@ -30,7 +30,15 @@ const IconList = ({ currentProduct }: IconListProps) => {
         if (!userId) {
             addToCartLocal({
                 item: {
-                    product_id: currentProduct.id, quantity: 1, is_active: true, item_price: currentProduct.final_price, final_price: currentProduct.final_price, img_url: currentProduct.static_files[0].url, product_name: currentProduct.name, stock: currentProduct.stock
+                    product_id: currentProduct.id,
+                    quantity: 1, is_active: true,
+                    item_price: currentProduct.final_price,
+                    final_price: currentProduct.final_price,
+                    img_url: currentProduct.static_files[0].url,
+                    product_name: currentProduct.name,
+                    stock: currentProduct.stock,
+                    carrier: currentProduct.carrier ? currentProduct.carrier : 'amm'
+
                 }
             }, {
                 onSuccess(data, variables, context) {

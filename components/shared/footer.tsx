@@ -8,7 +8,7 @@ import { Input } from "../ui/input";
 const Footer = () => {
     const t = useTranslations()
     return (
-        <footer className="bg-white shadow-2xl text-black w-full grid lg:grid-cols-6 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:py-10 px-8 py-8 rounded-tl-2lg rounded-tr-2xl">
+        <footer className="bg-white shadow-2xl mt-10 lg:mt-20 text-black w-full grid lg:grid-cols-6 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:py-10 px-8 py-8 rounded-tl-2lg rounded-tr-2xl">
             {/* Cột 1: Logo */}
             <div className="col-span-6 lg:col-span-3 space-y-3 mb-6 lg:mb-0">
                 <h3 className="font-semibold">

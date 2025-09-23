@@ -1,5 +1,4 @@
 import { AxiosError } from "axios";
-import { useTranslations } from "next-intl";
 
 export function HandleApiError(error: unknown,t: (key: string) => string) {
   const axiosError = error as AxiosError<{ detail?: string }>;

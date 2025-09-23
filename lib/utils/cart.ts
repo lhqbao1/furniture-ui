@@ -10,6 +10,7 @@ export type CartItemLocal = {
     img_url: string;
     product_name: string;
     stock: number
+    carrier: string
 };
   
   const CART_KEY = "guest_cart";
