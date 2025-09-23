@@ -225,7 +225,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "cost",
         header: () => <div className="text-right">COST</div>,
-        cell: ({ row }) => <div className="text-right">€{(row.original.cost).toFixed(2)}</div>,
+        cell: ({ row }) => <div className="text-right">€{row.original.cost ? (row.original.cost).toFixed(2) : 'Updating ...'}</div>,
     },
     {
         accessorKey: "shipping_cost",
@@ -235,14 +235,14 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "final_price",
         header: () => <div className="text-right">FINAL PRICE</div>,
-        cell: ({ row }) => <div className="text-right">€{(row.original.final_price)?.toFixed(2)}</div>,
+        cell: ({ row }) => <div className="text-right">€{row.original.final_price ? (row.original.final_price)?.toFixed(2) : "Updating ..."}</div>,
     },
     {
         id: "margin",
         header: () => <div className="text-right">MARGIN</div>,
         cell: ({ row }) => {
             const { final_price, cost } = row.original
-            if (final_price <= 0) return <div className="text-right">N/A</div>
+            if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating ...</div>
 
             const profit = final_price - cost
             const margin = profit / final_price // tỷ suất lợi nhuận
