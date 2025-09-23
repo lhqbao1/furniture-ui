@@ -1,7 +1,6 @@
 import { apiPublic } from "@/lib/axios"
 import { CategoryResponse } from "@/types/categories"
 import { ProductItem } from "@/types/products"
-import axios from "axios"
 import { MetadataRoute } from "next"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -67,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const categoryUrls: MetadataRoute.Sitemap = categories.map((cat: CategoryResponse) => ({
-    url: `https://www.prestige-home.de/category/${cat.slug}`,
+    url: `https://www.prestige-home.de/product/${cat.slug}`,
     lastModified: new Date(cat.updated_at || new Date()),
     changeFrequency: "weekly",
     priority: 0.7,
@@ -78,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let products: ProductItem[] = []
   try {
     const res = await apiPublic.get("/products/")
-    products = res.data
+    products = res.data.items
   } catch (e) {
     products = []
   }
