@@ -4,12 +4,13 @@ import { getCategoryBySlug } from "@/features/category/api"
 import ProductCategory from "@/components/layout/category/category-page"
 
 interface PageProps {
-    params: { slug: string[] }
+    params: Promise<{ slug: string[] }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const slugArray = params.slug ?? []
-    const lastSlug = slugArray.at(-1) ?? ""
+    const { slug } = await params;
+    const slugArray = Array.isArray(slug) ? slug : [slug]
+    const lastSlug = slugArray[slugArray.length - 1]
 
     try {
         const category = await getCategoryBySlug(lastSlug)
@@ -35,8 +36,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function Page({ params }: PageProps) {
-    const slugArray = params.slug ?? []
-    const lastSlug = slugArray.at(-1) ?? ""
+    const resolvedParams = await params;
+    const slugArray = Array.isArray(resolvedParams.slug) ? resolvedParams.slug : [resolvedParams.slug]
+    const lastSlug = slugArray[slugArray.length - 1]
 
     const category = await getCategoryBySlug(lastSlug).catch(() => null)
     if (!category) return notFound()
