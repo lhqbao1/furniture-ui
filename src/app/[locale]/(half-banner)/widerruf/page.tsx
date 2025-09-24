@@ -32,7 +32,7 @@ export default async function WiderrufPage() {
         <HydrationBoundary state={dehydratedState}>
             <div className="w-full min-h-screen overflow-scroll">
                 {firstVersion ? (
-                    <ListPolicy versionId={firstVersion} versionDate={version} policyId='9fc87bb9-44d2-428d-9960-1b6074e11d75' />
+                    <ListPolicy versionId={firstVersion} versionDate={version} policyId='9fc87bb9-44d2-428d-9960-1b6074e11d75' versionName={version[0].name} />
                 ) : (
                     <div className="text-center py-20 text-gray-500">
                         No policy found

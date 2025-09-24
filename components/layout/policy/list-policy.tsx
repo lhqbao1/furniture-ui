@@ -20,10 +20,11 @@ import { useRouter } from '@/src/i18n/navigation'
 interface ListPolicyProps {
     versionId: string;
     versionDate: PolicyVersion[];
-    policyId?: string
+    policyId?: string;
+    versionName?: string
 }
 
-const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
+const ListPolicy = ({ versionId, versionDate, policyId, versionName }: ListPolicyProps) => {
     const t = useTranslations()
     const [openAccordion, setOpenAccordion] = useState<string | null>(null)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
@@ -153,21 +154,6 @@ const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
                     {currentPolicy?.name}
                 </h1>
 
-                {/* <div className='flex justify-between'>
-                    <Button variant={'secondary'}>
-                        <div className='flex items-center gap-2'>
-                            <ArrowLeft />
-                            <p>Previous</p>
-                        </div>
-                    </Button>
-                    <Button variant={'secondary'}>
-                        <div className='flex items-center gap-2'>
-                            <p>Next</p>
-                            <ArrowRight />
-                        </div>
-                    </Button>
-                </div> */}
-
                 {currentPolicy?.child_legal_policies.map((cl, clIndex) => {
                     const refKey = `${currentPolicy.id}-${clIndex}`
                     return (
@@ -193,10 +179,11 @@ const ListPolicy = ({ versionId, versionDate, policyId }: ListPolicyProps) => {
             {/* Version section */}
             <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0'>
                 {versionDate.map((item) => (
-                    <div key={item.id} className='text-secondary'>Version: {formatDate(item.created_at)}</div>
+                    <div key={item.id} className='text-secondary'>Version: {versionName}</div>
                 ))}
             </div>
 
+            {policyId === "9fc87bb9-44d2-428d-9960-1b6074e11d75" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
             {policyId === "19aa3344-f577-41e6-acbd-f0fe8ea92ce5" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
         </div>
     )
