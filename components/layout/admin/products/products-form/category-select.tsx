@@ -19,7 +19,6 @@ import { Check, Loader2 } from "lucide-react"
 import { useGetCategories } from "@/features/category/hook"
 import { CategoryResponse } from "@/types/categories"
 import { Checkbox } from "@/components/ui/checkbox"
-import { FormLabelWithAsterisk } from "@/components/shared/form-label-with-asterisk"
 
 interface MultiSelectProps {
     fieldName: string
@@ -71,17 +70,17 @@ export function MultiSelectField({
                 }
 
                 return (
-                    <FormItem className="grid grid-cols-6 w-full">
+                    <FormItem className="flex flex-col w-full">
                         {label &&
-                            <FormLabelWithAsterisk required className='text-[#666666] text-sm col-span-2 text-start'>
+                            <FormLabel className='text-[#666666] text-sm text-start'>
                                 Categories
-                            </FormLabelWithAsterisk>}
+                            </FormLabel>}
 
                         <Popover>
                             <PopoverTrigger asChild className="font-light">
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-between col-span-4"
+                                    className="w-full justify-between"
                                     disabled={isLoading || isError}
                                 >
                                     {isLoading ? (
@@ -96,38 +95,7 @@ export function MultiSelectField({
                                     )}
                                 </Button>
                             </PopoverTrigger>
-                            {/* <PopoverContent className="w-[200px] p-0">
-                                {isLoading ? (
-                                    <div className="flex items-center justify-center p-4">
-                                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                                    </div>
-                                ) : isError || !leafOptions || leafOptions.length === 0 ? (
-                                    <div className="p-4 text-center text-sm text-muted-foreground">
-                                        No categories available
-                                    </div>
-                                ) : (
-                                    <Command>
-                                        <CommandGroup>
-                                            {leafOptions.map((opt) => (
-                                                <CommandItem
-                                                    key={opt.id}
-                                                    onSelect={() => toggleSelect(opt.id)}
-                                                    className="flex items-center gap-2 cursor-pointer"
-                                                >
-                                                    <Checkbox
-                                                        checked={selected.includes(opt.id)}
-                                                        onCheckedChange={() => toggleSelect(opt.id)}
-                                                        className="pointer-events-none"
-                                                    />
-                                                    <span>{opt.name}</span>
-                                                </CommandItem>
-
-                                            ))}
-                                        </CommandGroup>
-                                    </Command>
-                                )}
-                            </PopoverContent> */}
-                            <PopoverContent className="w-[200px] p-0">
+                            <PopoverContent className="w-[200px] max-h-[400px] overflow-y-scroll p-0">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center p-4">
                                         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

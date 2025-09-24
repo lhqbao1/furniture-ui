@@ -2,11 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
-import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Eye, Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
-import DeleteDialog from "./delete-dialog"
 import { ProductItem } from "@/types/products"
 import Link from "next/link"
 import { useState } from "react"
@@ -225,7 +223,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "cost",
         header: () => <div className="text-right">COST</div>,
-        cell: ({ row }) => <div className="text-right">€{row.original.cost ? (row.original.cost).toFixed(2) : 'Updating ...'}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : 'Updating ...'}</div>,
     },
     {
         accessorKey: "shipping_cost",
@@ -241,19 +239,46 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         id: "margin",
         header: () => <div className="text-right">MARGIN</div>,
         cell: ({ row }) => {
-            const { final_price, cost } = row.original
+            const { final_price, cost, tax } = row.original
+            const taxRate = parseFloat(tax) / 100
             if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating ...</div>
 
-            const profit = final_price - cost
-            const margin = profit / final_price * 100 // tỷ suất lợi nhuận
-
+            const margin = ((1 / (1 + taxRate)) - (cost / final_price)) * 100
             return <div className="text-right">{margin.toFixed(1)}%</div>
         }
     },
     {
         id: "carrier",
         header: () => <div className="text-center">CARRIER</div>,
-        cell: ({ row }) => <div>{row.original.carrier}</div>
+        cell: ({ row }) => {
+            const carrier = row.original.carrier?.toLowerCase()
+
+            let image: string | null = null
+            if (carrier === "amm") {
+                image = "/amm.jpeg"
+            } else if (carrier === "dpd") {
+                image = "/dpd.jpeg"
+            }
+
+            return (
+                <div className="flex items-center justify-center">
+                    {image ? (
+                        <Image
+                            src={image}
+                            alt={carrier}
+                            width={60}
+                            height={60}
+                            unoptimized
+                            className="object-fill"
+                        />
+                    ) : (
+                        <div>
+                            Updating ...
+                        </div>
+                    )}
+                </div>
+            )
+        },
     },
     {
         id: "actions",

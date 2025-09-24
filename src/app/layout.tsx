@@ -47,7 +47,7 @@ export default function RootLayout({
                     async
                 /> */}
 
-                <Script
+                {/* <Script
                     src="https://www.googletagmanager.com/gtag/js?id=AW-17548008377"
                     async
                 />
@@ -62,13 +62,21 @@ export default function RootLayout({
                         gtag('config', 'AW-17548008377');
                     `}
                 </Script>
+                <Script id="google-ads-conversion" strategy="afterInteractive">
+                    {`
+                        gtag('event', 'conversion', {
+                        'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
+                        'transaction_id': ''
+                        });
+                    `}
+                </Script>
 
                 <Script
                     id="usercentrics-autoblocker"
                     src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
                     async
                 />
-                <Script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="RlDaintBne_uoh" async strategy="afterInteractive" />
+                <Script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="RlDaintBne_uoh" async strategy="afterInteractive" /> */}
             </head>
             <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
                 {/* Google Tag Manager (noscript) */}
