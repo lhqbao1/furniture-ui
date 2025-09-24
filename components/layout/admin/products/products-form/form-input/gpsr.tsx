@@ -26,7 +26,7 @@ const GpsrInput = () => {
                 return (
                     <FormItem className="grid grid-cols-6 w-full">
                         <FormLabel className="text-[#666666] text-sm col-span-6">
-                            GPSR Info
+                            Brand
                         </FormLabel>
                         <FormControl className="col-span-6">
                             <div>
