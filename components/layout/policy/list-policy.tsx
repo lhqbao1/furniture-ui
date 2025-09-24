@@ -4,11 +4,10 @@ import {
     Accordion,
     AccordionContent,
     AccordionItem,
-    AccordionTrigger,
 } from "@/components/ui/accordion"
 import { useQuery } from '@tanstack/react-query'
 import { getPolicyItemsByVersion } from '@/features/policy/api'
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { PolicyVersion } from '@/types/policy'
@@ -59,7 +58,7 @@ const ListPolicy = ({ versionId, versionDate, policyId, versionName }: ListPolic
     const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
 
     return (
-        <div className='grid grid-cols-12 lg:pt-12 pt-3 lg:h-[calc(100vh-200px)] h-fit pb-4'>
+        <div className='grid grid-cols-12 lg:pt-12 pt-3 lg:h-[calc(100vh-100px)] h-fit pb-4'>
             {/* Sidebar bên trái */}
             <div className='col-span-4 border-r overflow-y-auto lg:block hidden'>
                 <Accordion
@@ -176,15 +175,19 @@ const ListPolicy = ({ versionId, versionDate, policyId, versionName }: ListPolic
                 })}
             </div>
 
+            <div className='col-span-4'></div>
+
+            <div className='col-span-12 lg:col-span-8 lg:mt-12 mt-6'>
+                {policyId === "9fc87bb9-44d2-428d-9960-1b6074e11d75" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
+                {policyId === "19aa3344-f577-41e6-acbd-f0fe8ea92ce5" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
+            </div>
+
             {/* Version section */}
             <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0'>
                 {versionDate.map((item) => (
                     <div key={item.id} className='text-secondary'>Version: {versionName}</div>
                 ))}
             </div>
-
-            {policyId === "9fc87bb9-44d2-428d-9960-1b6074e11d75" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
-            {policyId === "19aa3344-f577-41e6-acbd-f0fe8ea92ce5" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
         </div>
     )
 }

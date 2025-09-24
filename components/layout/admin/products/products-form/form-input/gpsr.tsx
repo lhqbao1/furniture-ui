@@ -25,7 +25,7 @@ const GpsrInput = () => {
 
                 return (
                     <FormItem className="grid grid-cols-6 w-full">
-                        <FormLabel className="text-[#666666] text-sm col-span-6">
+                        <FormLabel className="text-black font-semibold text-sm col-span-6">
                             Brand
                         </FormLabel>
                         <FormControl className="col-span-6">
@@ -35,7 +35,7 @@ const GpsrInput = () => {
                                         value={field.value}
                                         onValueChange={field.onChange}
                                     >
-                                        <SelectTrigger className="w-full border font-light">
+                                        <SelectTrigger className="w-full border font-light" placeholderColor>
                                             <SelectValue placeholder="Select brand" />
                                         </SelectTrigger>
                                         <SelectContent>

@@ -1,17 +1,18 @@
 "use client"
 
-import { UseFormReturn } from "react-hook-form"
+import { useFormContext, UseFormReturn } from "react-hook-form"
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react"
 import { ProductInput } from "@/lib/schema/product"
 import { FormLabelWithAsterisk } from "@/components/shared/form-label-with-asterisk"
 
-interface ProductPricingFieldsProps {
-    form: UseFormReturn<ProductInput>
-}
+// interface ProductPricingFieldsProps {
+//     form: UseFormReturn<ProductInput>
+// }
 
-export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
+export function ProductPricingFields() {
+    const form = useFormContext()
     const price = form.watch("price") || 0
     const discountPercent = form.watch("discount_percent") || 0
     const discountAmount = form.watch("discount_amount") || 0
@@ -42,7 +43,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
             form.setValue("discount_amount", parseFloat(amount.toFixed(2)))
             form.setValue("discount_percent", parseFloat(percent.toFixed(2)))
         }
-    }, [price, discountPercent, discountAmount, finalPrice, activeField, form])
+    }, [price, discountPercent, discountAmount, finalPrice, activeField])
 
     return (
         <div className="grid grid-cols-12 gap-6">
@@ -51,10 +52,10 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                     control={form.control}
                     name="cost"
                     render={({ field }) => (
-                        <FormItem className='grid-cols-1 grid'>
-                            <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                        <FormItem className='flex flex-col'>
+                            <FormLabel className='text-[#666666] text-sm'>
                                 Cost
-                            </FormLabelWithAsterisk>
+                            </FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center w-full">
                                     <Input
@@ -74,7 +75,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
                             </FormControl>
-                            <FormMessage className='col-span-1' />
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -85,7 +86,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                     control={form.control}
                     name="delivery_cost"
                     render={({ field }) => (
-                        <FormItem className='grid-cols-1 grid'>
+                        <FormItem className='flex flex-col'>
                             <FormLabel className='text-[#666666] text-sm'>
                                 Delivery cost
                             </FormLabel>
@@ -108,7 +109,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
                             </FormControl>
-                            <FormMessage className='col-span-1' />
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -119,7 +120,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                     control={form.control}
                     name="price"
                     render={({ field }) => (
-                        <FormItem className="grid-cols-1 grid">
+                        <FormItem className='flex flex-col'>
                             <FormLabel className="text-[#666666] text-sm">Original Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
@@ -147,7 +148,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
                             </FormControl>
-                            <FormMessage className="col-span-1" />
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -159,7 +160,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                     control={form.control}
                     name="final_price"
                     render={({ field }) => (
-                        <FormItem className="grid-cols-1 grid">
+                        <FormItem className='flex flex-col'>
                             <FormLabel className="text-[#666666] text-sm">Sale Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
@@ -190,7 +191,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
                             </FormControl>
-                            <FormMessage className="col-span-1" />
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
