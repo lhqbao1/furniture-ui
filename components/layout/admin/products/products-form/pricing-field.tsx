@@ -5,6 +5,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react"
 import { ProductInput } from "@/lib/schema/product"
+import { FormLabelWithAsterisk } from "@/components/shared/form-label-with-asterisk"
 
 interface ProductPricingFieldsProps {
     form: UseFormReturn<ProductInput>
@@ -22,7 +23,6 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
         if (!price) {
             form.setValue("discount_percent", 0)
             form.setValue("discount_amount", 0)
-            form.setValue("final_price", 0)
             return
         }
 
@@ -46,20 +46,86 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
 
     return (
         <div className="grid grid-cols-12 gap-6">
+            <div className="col-span-3">
+                <FormField
+                    control={form.control}
+                    name="cost"
+                    render={({ field }) => (
+                        <FormItem className='grid-cols-1 grid'>
+                            <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
+                                Cost
+                            </FormLabelWithAsterisk>
+                            <FormControl>
+                                <div className="relative flex items-center w-full">
+                                    <Input
+                                        {...field}
+                                        type="number"
+                                        min={0}
+                                        className="pl-7"
+                                        step="0.01"            // hoặc "any" để cho phép mọi số thập phân
+                                        inputMode="decimal"    // hint cho bàn phím mobile
+                                        value={field.value ?? ""} // tránh uncontrolled / NaN
+                                        onChange={(e) =>
+                                            field.onChange(
+                                                e.target.value === "" ? null : e.target.valueAsNumber
+                                            )
+                                        }
+                                    />
+                                    <span className="absolute left-3 text-gray-500">€</span>
+                                </div>
+                            </FormControl>
+                            <FormMessage className='col-span-1' />
+                        </FormItem>
+                    )}
+                />
+            </div>
+
+            <div className="col-span-3">
+                <FormField
+                    control={form.control}
+                    name="delivery_cost"
+                    render={({ field }) => (
+                        <FormItem className='grid-cols-1 grid'>
+                            <FormLabel className='text-[#666666] text-sm'>
+                                Delivery cost
+                            </FormLabel>
+                            <FormControl>
+                                <div className="relative flex items-center w-full">
+                                    <Input
+                                        {...field}
+                                        type="number"
+                                        // min={0}
+                                        className="pl-7"
+                                        step="0.01"            // hoặc "any" để cho phép mọi số thập phân
+                                        inputMode="decimal"    // hint cho bàn phím mobile
+                                        value={field.value ?? ""} // tránh uncontrolled / NaN
+                                        onChange={(e) =>
+                                            field.onChange(
+                                                e.target.value === "" ? null : e.target.valueAsNumber
+                                            )
+                                        }
+                                    />
+                                    <span className="absolute left-3 text-gray-500">€</span>
+                                </div>
+                            </FormControl>
+                            <FormMessage className='col-span-1' />
+                        </FormItem>
+                    )}
+                />
+            </div>
             {/* Price */}
-            <div className="col-span-6">
+            <div className="col-span-3">
                 <FormField
                     control={form.control}
                     name="price"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="grid-cols-1 grid">
                             <FormLabel className="text-[#666666] text-sm">Original Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
                                     <Input
                                         {...field}
                                         type="number"
-                                        min={0}
                                         step="0.01"
                                         inputMode="decimal"
                                         value={field.value ?? ""}
@@ -81,116 +147,25 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="col-span-1" />
                         </FormItem>
                     )}
                 />
             </div>
 
-            {/* Discount Percent */}
-            {/* <div className="col-span-6">
-                <FormField
-                    control={form.control}
-                    name="discount_percent"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">Discount %</FormLabel>
-                            <FormControl>
-                                <div className="relative flex items-center">
-                                    <Input
-                                        {...field}
-                                        type="number"
-                                        min={0}
-                                        max={100}
-                                        step="0.01"
-                                        inputMode="decimal"
-                                        value={field.value ?? ""}
-                                        onFocus={() => setActiveField("percent")}
-                                        onChange={(e) => {
-                                            let val = e.target.valueAsNumber
-                                            if (isNaN(val)) val = 0
-                                            if (val > 100) val = 100
-                                            if (val < 0) val = 0
-                                            field.onChange(val)
-                                            form.setValue("discount_percent", val, { shouldValidate: true })
-                                        }}
-                                        onBlur={(e) => {
-                                            const val = parseFloat(e.target.value)
-                                            if (!isNaN(val)) {
-                                                form.setValue("discount_percent", parseFloat(val.toFixed(2)))
-                                            }
-                                        }}
-                                        readOnly={activeField === "amount" || activeField === "final"}
-                                        className="pl-7"
-                                    />
-                                    <span className="absolute left-3 text-gray-500">%</span>
-                                </div>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div> */}
-
-            {/* Discount Amount */}
-            {/* <div className="col-span-6">
-                <FormField
-                    control={form.control}
-                    name="discount_amount"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">Discount Amount</FormLabel>
-                            <FormControl>
-                                <div className="relative flex items-center">
-                                    <Input
-                                        {...field}
-                                        type="number"
-                                        min={0}
-                                        step="0.01"
-                                        inputMode="decimal"
-                                        value={field.value ?? ""}
-                                        onFocus={() => setActiveField("amount")}
-                                        onChange={(e) => {
-                                            let val = e.target.valueAsNumber
-                                            if (isNaN(val)) val = 0
-                                            const p = form.getValues("price") || 0
-                                            if (val > p) val = p
-                                            if (val < 0) val = 0
-                                            field.onChange(val)
-                                            form.setValue("discount_amount", val, { shouldValidate: true })
-                                        }}
-                                        onBlur={(e) => {
-                                            const val = parseFloat(e.target.value)
-                                            if (!isNaN(val)) {
-                                                form.setValue("discount_amount", parseFloat(val.toFixed(2)))
-                                            }
-                                        }}
-                                        readOnly={activeField === "percent" || activeField === "final"}
-                                        className="pl-7"
-                                    />
-                                    <span className="absolute left-3 text-gray-500">€</span>
-                                </div>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div> */}
-
             {/* Final Price */}
-            <div className="col-span-6">
+            <div className="col-span-3">
                 <FormField
                     control={form.control}
                     name="final_price"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="grid-cols-1 grid">
                             <FormLabel className="text-[#666666] text-sm">Sale Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
                                     <Input
                                         {...field}
                                         type="number"
-                                        min={0}
                                         step="0.01"
                                         inputMode="decimal"
                                         value={field.value ?? ""}
@@ -199,7 +174,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                             let val = e.target.valueAsNumber
                                             if (isNaN(val)) val = 0
                                             const p = form.getValues("price") || 0
-                                            if (val > p) val = p
+                                            // if (val > p) val = p
                                             if (val < 0) val = 0
                                             field.onChange(val)
                                             form.setValue("final_price", val, { shouldValidate: true })
@@ -215,7 +190,7 @@ export function ProductPricingFields({ form }: ProductPricingFieldsProps) {
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="col-span-1" />
                         </FormItem>
                     )}
                 />

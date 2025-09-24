@@ -98,11 +98,13 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
         const payload = {
             ...values,
             weight: values.weight || values.weight === 0 ? values.weight : undefined,
+            delivery_cost: values.delivery_cost || values.delivery_cost === 0 ? values.delivery_cost : undefined,
             width: values.width || values.width === 0 ? values.width : undefined,
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
             sku: values.sku?.trim() || undefined,
-            final_price: values.final_price ? values.final_price : values.price
+            final_price: values.final_price ? values.final_price : values.price,
+            price: values.price ? values.price : values.final_price
         }
 
         if (productValues) {
@@ -173,43 +175,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 )}
                             />
 
-                            <div className='grid grid-cols-2 gap-4 justify-end items-end'>
-                                {/*Product Cost */}
-                                <div className='w-full col-span-1'>
-                                    <FormField
-                                        control={form.control}
-                                        name="cost"
-                                        render={({ field }) => (
-                                            <FormItem className='grid-cols-1 grid'>
-                                                <FormLabelWithAsterisk required className='text-[#666666] text-sm'>
-                                                    Cost
-                                                </FormLabelWithAsterisk>
-                                                <FormControl>
-                                                    <div className="relative flex items-center w-full">
-                                                        <Input
-                                                            {...field}
-                                                            type="number"
-                                                            min={0}
-                                                            className="pl-7"
-                                                            step="0.01"            // hoặc "any" để cho phép mọi số thập phân
-                                                            inputMode="decimal"    // hint cho bàn phím mobile
-                                                            value={field.value ?? ""} // tránh uncontrolled / NaN
-                                                            onChange={(e) => {
-                                                                const v = e.target.value;
-                                                                field.onChange(v === "" ? undefined : parseFloat(v));
-                                                            }}
-                                                        />
-                                                        <span className="absolute left-3 text-gray-500">€</span>
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage className='col-span-2' />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
 
-                                <ProductPricingFields form={form} />
-                            </div>
+                            <ProductPricingFields form={form} />
 
 
                             <FormField
@@ -401,7 +368,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                 type="number"
                                                 placeholder="Weight"
                                                 min={0}
-                                                value={field.value ?? ""} // null hoặc undefined => ""
+                                                step="0.01"
+                                                inputMode="decimal"
+                                                value={field.value ?? ""}
                                                 onChange={(e) =>
                                                     field.onChange(
                                                         e.target.value === "" ? null : e.target.valueAsNumber
@@ -429,6 +398,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
+                                                        step="0.01"
+                                                        inputMode="decimal"
                                                         {...field}
                                                         value={field.value ?? ""} // null hoặc undefined => ""
                                                         onChange={(e) =>
@@ -454,6 +425,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
+                                                        step="0.01"
+                                                        inputMode="decimal"
                                                         {...field}
                                                         value={field.value ?? ""} // null hoặc undefined => ""
                                                         onChange={(e) =>
@@ -478,6 +451,8 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                                         type="number"
                                                         placeholder=""
                                                         min={0}
+                                                        step="0.01"
+                                                        inputMode="decimal"
                                                         {...field}
                                                         value={field.value ?? ""} // null hoặc undefined => ""
                                                         onChange={(e) =>

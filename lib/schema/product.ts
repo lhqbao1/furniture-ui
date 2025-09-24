@@ -9,8 +9,9 @@ const StaticFileSchema = z.object({
 export const addProductSchema = z.object({
   name: z.string().min(2, { message: "Product name is required" }),
   description: z.string().optional(),
-  price: z.number("You must provide product price").min(1, "You must provide product price").nonnegative(),
+  price: z.number().nonnegative().optional(),
   cost: z.number("You must provide product cost price").min(1, "You must provide product cost price").nonnegative(),
+  delivery_cost: z.number().optional().nullable(),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
   final_price: z.number().nonnegative().optional(),
@@ -58,6 +59,7 @@ export const defaultValues = {
   tax: "19%",
   category: "",
   weight: 0,
+  delivery_cost: 0,
   collection: null as string | null,
   ean: "",
   is_active: false,
