@@ -1,21 +1,42 @@
 'use client'
 import ProductFormSkeleton from "@/components/layout/admin/products/products-form/product-form-skeleton"
-import { EditProductFormClient } from "./product-edit-client"
-import { useGetProductById } from "@/features/products/hook"
+import { useEditProduct, useGetProductById } from "@/features/products/hook"
 import React from "react"
+import { useRouter } from "@/src/i18n/navigation"
+import { ProductInput } from "@/lib/schema/product"
+import { toast } from "sonner"
+import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
 
 const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = React.use(params) // unwrap Promise
+    const router = useRouter()
+    const editProduct = useEditProduct()
 
     const { data, isLoading, isError } = useGetProductById(id)
     if (isError) return <div>No data</div>
     if (isLoading || !data) return <ProductFormSkeleton />
 
 
+
+    const handleEdit = (values: ProductInput) => {
+        editProduct.mutate(
+            { id: data.id ?? "", input: values },
+            {
+                onSuccess: () => {
+                    toast.success("Product updated successfully")
+                    router.push("/admin/products/list")
+                },
+                onError: () => {
+                    toast.error("Failed to update product")
+                },
+            }
+        )
+    }
+
     return (
         <div className="p-6">
             <h1 className="text-xl font-bold mb-4">Edit Product</h1>
-            <EditProductFormClient product={data} />
+            <ProductForm productValues={data} onSubmit={handleEdit} isPending={editProduct.isPending} />
         </div>
     )
 }

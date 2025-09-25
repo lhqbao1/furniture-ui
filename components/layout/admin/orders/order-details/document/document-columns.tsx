@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
-import { FileText } from "lucide-react"
+import ViewFileDialog from "../../order-list/view-file"
 
 // Kiểu dữ liệu cho mỗi row
 export type DocumentRow = {
     document: string
     code: string
     dateSent: string
-    viewUrl?: string
+    viewType?: string
+    checkOutId?: string
 }
 
 export const documentColumns: ColumnDef<DocumentRow>[] = [
@@ -29,14 +29,11 @@ export const documentColumns: ColumnDef<DocumentRow>[] = [
     {
         id: "view",
         header: () => <div className="text-center font-bold">View</div>,
-        cell: ({ row }) => (
-            <div className="flex justify-center">
-                <Button variant="ghost" size="icon" asChild>
-                    <a href={row.original.viewUrl ?? "#"} target="_blank" rel="noopener noreferrer">
-                        <FileText className="h-4 w-4" />
-                    </a>
-                </Button>
-            </div>
-        ),
+        cell: ({ row }) => {
+            const type = row.original.viewType
+            return (
+                <ViewFileDialog checkoutId={row.original.checkOutId ?? ''} type={type} />
+            )
+        }
     },
 ]

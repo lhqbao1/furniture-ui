@@ -220,28 +220,20 @@ const ProductAdditionalInputs = () => {
                         </FormItem>
                     )}
                 />
+            </div>
 
-                {/* Tariff Number */}
+            <div className='grid grid-cols-4 gap-6'>
+                {/* Product length */}
                 <FormField
                     control={form.control}
-                    name="tariff_number"
+                    name="product_length"
                     render={({ field }) => (
-                        <FormItem className='flex flex-col w-full'>
-                            <FormLabel className="text-black font-semibold text-sm col-span-2">
-                                Tariff Number
+                        <FormItem className='flex flex-col'>
+                            <FormLabel className='text-black font-semibold text-sm'>
+                                Product Length
                             </FormLabel>
                             <FormControl>
-                                <Input
-                                    className='col-span-4'
-                                    placeholder=""
-                                    min={0}
-                                    {...field}
-                                    value={field.value ?? ""}
-                                    onChange={(e) =>
-                                        field.onChange(
-                                            e.target.value
-                                        )
-                                    }
+                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -249,17 +241,54 @@ const ProductAdditionalInputs = () => {
                     )}
                 />
 
-                {/*Incoterm */}
+                {/* Product width */}
                 <FormField
                     control={form.control}
-                    name="incoterm"
+                    name="product_width"
                     render={({ field }) => (
-                        <FormItem className='flex flex-col w-full'>
-                            <FormLabel className="text-black font-semibold text-sm col-span-2">
-                                Incoterm
+                        <FormItem className='flex flex-col'>
+                            <FormLabel className='text-black font-semibold text-sm'>
+                                Product Width
                             </FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} className='col-span-4' />
+                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {/* Product height */}
+                <FormField
+                    control={form.control}
+                    name="product_height"
+                    render={({ field }) => (
+                        <FormItem className='flex flex-col'>
+                            <FormLabel className='text-black font-semibold text-sm'>
+                                Product Height
+                            </FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {/* Product net weight */}
+                <FormField
+                    control={form.control}
+                    name="product_net_weight"
+                    render={({ field }) => (
+                        <FormItem className='flex flex-col'>
+                            <FormLabel className='text-black font-semibold text-sm'>
+                                Product Net. Weight
+                            </FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

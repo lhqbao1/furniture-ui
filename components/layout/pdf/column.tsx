@@ -14,7 +14,7 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
     cell: ({ row }) => (
       <div className="max-w-[300px] text-wrap">
         <div>{row.original.products.name}</div>
-        <div>{row.original.products.id_provider}</div>
+        <div>#{row.original.products.id_provider}</div>
       </div>
     ),
   },

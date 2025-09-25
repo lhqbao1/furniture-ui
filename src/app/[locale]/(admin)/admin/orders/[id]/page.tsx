@@ -4,7 +4,6 @@ import DocumentTable from '@/components/layout/admin/orders/order-details/docume
 import OrderInformation from '@/components/layout/admin/orders/order-details/order-information'
 import OrderDetailOverView from '@/components/layout/admin/orders/order-details/order-overview'
 import OrderDetailUser from '@/components/layout/admin/orders/order-details/order-user'
-import PaymentTable from '@/components/layout/admin/orders/order-details/payment/payment-table'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import { useGetCheckOutByCheckOutId } from '@/features/checkout/hook'
 import { formatDateTime } from '@/lib/date-formated'
@@ -45,10 +44,12 @@ const OrderDetails = () => {
                 totalPages={Math.ceil(order.cart.items.length / pageSize)}
             />
             <OrderInformation language={order.user.language ?? ''} sub_total={order.total_amount_item} shipping_amount={order.total_shipping} discount_amount={order.voucher_amount + order.coupon_amount} tax={order.total_vat} total_amount={order.total_amount} />
-            <div className='flex gap-12'>
-                <DocumentTable />
-                {/* <PaymentTable /> */}
-            </div>
+            {order.status !== "Pending" ?
+                <div className='flex gap-12'>
+                    <DocumentTable order={order} />
+                    {/* <PaymentTable /> */}
+                </div>
+                : ''}
         </div>
     )
 }

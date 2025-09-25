@@ -88,12 +88,81 @@ const ProductLogisticsGroup = () => {
                     render={({ field }) => (
                         <FormItem className='flex flex-col col-span-1'>
                             <FormLabel className='text-black font-semibold text-sm'>
-                                Packaging Amount
+                                Number of packages
                             </FormLabel>
                             <FormControl>
                                 <Input placeholder="" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} className='col-span-4' />
                             </FormControl>
                             <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
+            <div className='flex gap-6'>
+                {/* Tariff Number */}
+                <FormField
+                    control={form.control}
+                    name="tariff_number"
+                    render={({ field }) => (
+                        <FormItem className='flex flex-col w-full'>
+                            <FormLabel className="text-black font-semibold text-sm col-span-2">
+                                Tariff Number
+                            </FormLabel>
+                            <FormControl>
+                                <Input
+                                    className='col-span-4'
+                                    placeholder=""
+                                    min={0}
+                                    {...field}
+                                    value={field.value ?? ""}
+                                    onChange={(e) =>
+                                        field.onChange(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {/*Incoterm */}
+                <FormField
+                    control={form.control}
+                    name="incoterm"
+                    render={({ field }) => (
+                        <FormItem className='flex flex-col w-full'>
+                            <FormLabel className="text-black font-semibold text-sm col-span-2">
+                                Incoterm
+                            </FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} className='col-span-4' />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {/* Pallet unit input */}
+                <FormField
+                    control={form.control}
+                    name="pallet_unit"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col w-full">
+                            <FormLabel className='text-black font-semibold text-sm'>
+                                Pallet unit
+                            </FormLabel>
+                            <FormControl>
+                                <Input
+                                    type="number"
+                                    min={0}
+                                    value={field.value ?? ""}
+                                    onChange={(e) =>
+                                        field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
+                                    }
+                                />
+                            </FormControl>
                         </FormItem>
                     )}
                 />

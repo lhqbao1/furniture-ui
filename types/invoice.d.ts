@@ -15,6 +15,6 @@ interface InvoiceResponse {
     cart: CartResponse
     shipping_address: Address
     invoice_address: Address
-    created_at: string
-    updated_at: string
+    created_at: Date
+    updated_at: Date
 }

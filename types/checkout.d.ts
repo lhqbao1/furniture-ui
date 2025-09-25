@@ -1,7 +1,7 @@
 import { Address } from "./address"
 import { CartResponse } from "./cart"
 import { Pagination } from "./pagination"
-import { User } from "./user"
+import { Customer, User } from "./user"
 
 interface CheckOutResponse {
     items: CheckOut[]
@@ -10,7 +10,7 @@ interface CheckOutResponse {
 
 interface CheckOut {
     id: string
-    user: User
+    user: Customer
     checkout_code: string
     shipping_address: Address
     invoice_address: Address

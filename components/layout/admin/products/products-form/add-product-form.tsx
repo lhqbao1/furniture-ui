@@ -31,9 +31,10 @@ interface AddProductFormProps {
     productValues?: Partial<ProductItem>
     onSubmit: (values: ProductInput) => Promise<void> | void
     isPending?: boolean
+    productValuesClone?: Partial<ProductItem>
 }
 
-const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps) => {
+const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormProps) => {
     const router = useRouter()
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
@@ -49,22 +50,25 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                 productValues.categories?.map((c: CategoryResponse | number) =>
                     typeof c === "object" ? String(c.id) : String(c)
                 ) || [],
-            brand_id: productValues.brand?.id
+            brand_id: productValues.brand?.id,
         }
     }
 
+    const initialValues = normalizeProductValues(productValuesClone || productValues)
+
     const form = useForm<z.infer<typeof addProductSchema>>({
         resolver: zodResolver(addProductSchema),
-        defaultValues: normalizeProductValues(productValues) || defaultValues,
+        defaultValues: initialValues,
         mode: "onBlur",
     })
 
-
     useEffect(() => {
-        if (productValues) {
-            form.reset(productValues)
+        if (productValuesClone) {
+            form.reset(normalizeProductValues(productValuesClone))
+        } else if (productValues) {
+            form.reset(normalizeProductValues(productValues))
         }
-    }, [productValues, form])
+    }, [productValuesClone, productValues, form])
 
     const handleSubmit = async (values: ProductInput) => {
         const payload = {
@@ -81,14 +85,33 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             stock: values.stock ?? 1
         }
 
-        if (productValues) {
+        if (productValuesClone) {
+            // 🟢 Clone thì vẫn gọi add
+            addProductMutation.mutate(payload, {
+                onSuccess: () => {
+                    toast.success("Product add successfully")
+                    form.reset()
+                    router.push("/admin/products/list")
+                },
+                onError: (error) => {
+                    toast.error(
+                        <div className="flex flex-col gap-2">
+                            <div>Failed to add product</div>
+                            <div>Please check duplication for SKU or EAN</div>
+                        </div>
+                    )
+                    console.log(error)
+                },
+            })
+        } else if (productValues) {
+            // 🟡 Edit
             editProductMutation.mutate(
                 { id: productValues.id ?? "", input: payload },
                 {
                     onSuccess: () => {
                         toast.success("Product updated successfully")
                         router.push("/admin/products/list")
-                        router.refresh() // đảm bảo dữ liệu list được fetch lại
+                        router.refresh()
                     },
                     onError: () => {
                         toast.error("Failed to update product")
@@ -96,23 +119,24 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                 }
             )
         } else {
-            addProductMutation.mutate(
-                payload,
-                {
-                    onSuccess: () => {
-                        toast.success("Product add successfully")
-                        form.reset()
-                    },
-                    onError: (error) => {
-                        toast.error(<div className='flex flex-col gap-2'>
+            // 🔵 Add mới
+            addProductMutation.mutate(payload, {
+                onSuccess: () => {
+                    toast.success("Product add successfully")
+                    form.reset()
+                },
+                onError: (error) => {
+                    toast.error(
+                        <div className="flex flex-col gap-2">
                             <div>Failed to add product</div>
                             <div>Please check duplication for SKU or EAN</div>
-                        </div>)
-                        console.log(error)
-                    },
-                }
-            )
+                        </div>
+                    )
+                    console.log(error)
+                },
+            })
         }
+
     }
 
     return (
@@ -181,9 +205,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                             </Accordion>
                         </div>
 
-                        <div className='col-span-3 flex flex-col items-end gap-4'>
+                        <div className='col-span-3 flex flex-col items-end gap-4 relative'>
                             {/*Form Button */}
-                            <div className='flex gap-2 justify-end'>
+                            <div className='flex gap-2 justify-end top-24 fixed'>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>Discard</Button>
                                 <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (

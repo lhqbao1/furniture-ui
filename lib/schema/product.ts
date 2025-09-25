@@ -8,13 +8,13 @@ const StaticFileSchema = z.object({
 
 export const addProductSchema = z.object({
   name: z.string().min(2, { message: "Product name is required" }),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
   cost: z.number().optional().nullable(),
   delivery_cost: z.number().optional().nullable(),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
-  final_price: z.number().nonnegative().optional(),
+  final_price: z.number().nonnegative().optional().nullable(),
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
   stock: z.number().nonnegative().optional().nullable(),
@@ -54,6 +54,13 @@ export const addProductSchema = z.object({
   url_key: z.string().optional().nullable(),
   meta_title: z.string().optional().nullable(),
   meta_description: z.string().optional().nullable(),
+
+  pallet_unit: z.number().optional().nullable(),
+  product_height: z.number().optional().nullable(),
+  product_length: z.number().optional().nullable(),
+  product_width: z.number().optional().nullable(),
+  product_net_weight: z.number().optional().nullable(),
+
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 })
 
@@ -63,21 +70,15 @@ export type ProductInput = z.infer<typeof addProductSchema>
 export const defaultValues = {
   name: "",
   description: "",
-  id_provider: "test",
   tax: "19%",
   category: "",
   ebay: false,
-  weight: 0,
   // delivery_cost: 0,
   collection: null as string | null,
-  ean: "",
+  // ean: "",
   is_active: false,
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
-  weee_nr: "",
-  eek: "",
-  gpsr_info: "",
-  delivery_time: "3-5"
   // brand_id: "",
   // carrier: "",
   // delivery_time: "",

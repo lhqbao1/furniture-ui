@@ -1,6 +1,12 @@
-import React, { useMemo } from 'react'
-import { documentColumns, DocumentRow } from './document-columns'
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+"use client"
+
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
+
 import {
     Table,
     TableBody,
@@ -9,46 +15,34 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { CheckOut } from '@/types/checkout'
-import { formatDateTime } from '@/lib/date-formated'
+import { useTranslations } from "next-intl"
 
-interface DocumentTableProps {
-    order?: CheckOut
+interface PackagingDialogTableProps<TData, TValue> {
+    columns: ColumnDef<TData, TValue>[]
+    data: TData[]
 }
 
-const DocumentTable = ({ order }: DocumentTableProps) => {
-    const data = useMemo<DocumentRow[]>(() => [
-        {
-            document: "Invoice",
-            code: order?.checkout_code ?? '',
-            dateSent: formatDateTime(order?.created_at ? new Date(order.created_at) : new Date()),
-            viewType: 'invoice',
-            checkOutId: order?.id
-        },
-        {
-            document: "Package Slip",
-            code: "AR-12365489",
-            dateSent: formatDateTime(order?.created_at ? new Date(order.created_at) : new Date()),
-            viewType: 'package',
-            checkOutId: order?.id
-        },
-    ], [order])
-
+export function PackagingDialogTable<TData, TValue>({
+    columns,
+    data,
+}: PackagingDialogTableProps<TData, TValue>) {
+    const t = useTranslations()
     const table = useReactTable({
         data,
-        columns: documentColumns,
+        columns,
         getCoreRowModel: getCoreRowModel(),
     })
+
 
     return (
         <div className="overflow-hidden rounded-md border">
             <Table>
-                <TableHeader>
+                <TableHeader className="bg-secondary/90">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <TableHead key={header.id} className='bg-gray-200'>
+                                    <TableHead key={header.id}>
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
@@ -77,8 +71,8 @@ const DocumentTable = ({ order }: DocumentTableProps) => {
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={documentColumns.length} className="h-24 text-center">
-                                No results.
+                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                {t('noResult')}
                             </TableCell>
                         </TableRow>
                     )}
@@ -87,5 +81,3 @@ const DocumentTable = ({ order }: DocumentTableProps) => {
         </div>
     )
 }
-
-export default DocumentTable

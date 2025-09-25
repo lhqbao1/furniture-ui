@@ -39,7 +39,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         header: "ORDER ID",
         cell: ({ row }) => {
             return (
-                <div>#{row.original.id.slice(0, 7)}</div>
+                <div>#{row.original.checkout_code}</div>
             )
         }
     },

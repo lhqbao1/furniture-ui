@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Eye, Pencil } from "lucide-react"
+import { CopyCheck, Eye, Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ProductItem } from "@/types/products"
 import Link from "next/link"
@@ -316,6 +316,12 @@ export const productColumns: ColumnDef<ProductItem>[] = [
                     <Link href={`/product/${categoryHref}`} target="_blank" rel="noopener noreferrer">
                         <Button variant="ghost" size="icon">
                             <Eye className="w-4 h-4 text-secondary" />
+                        </Button>
+                    </Link>
+
+                    <Link href={`/admin/products/${row.original.id}/clone`}>
+                        <Button variant="ghost" size="icon">
+                            <CopyCheck className="w-4 h-4 text-secondary" />
                         </Button>
                     </Link>
                 </div>
