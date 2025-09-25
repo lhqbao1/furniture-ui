@@ -18,7 +18,7 @@ export default function PaymentMethodSelector() {
             render={({ field }) => (
                 <FormItem>
                     <RadioGroup
-                        className="lg:flex lg:gap-4 grid grid-cols-1 gap-y-4 mt-4 lg:mt-0 lg:justify-between justify-start"
+                        className="lg:flex lg:gap-4 grid grid-cols-1 gap-y-4 mt-4 lg:mt-0 lg:justify-start justify-start"
                         value={field.value}
                         onValueChange={field.onChange}
                     >
@@ -39,16 +39,6 @@ export default function PaymentMethodSelector() {
                             </div>
                         ))}
                     </RadioGroup>
-                    {/* Hiển thị thông tin bank nếu chọn */}
-                    {selectedPayment === "bank" && (
-                        <div className="mt-4 text-sm space-y-1">
-                            <h4 className="font-semibold mb-1 text-secondary text-base">Überweisungsinformationen:</h4>
-                            <div>DE57100101232316418882</div>
-                            <div translate="no">Prestige Home GmbH</div>
-                            <div>SWIFT/BIC QNTODEB2XXX</div>
-                            <div>Bankname: QUOTO</div>
-                        </div>
-                    )}
                     <FormMessage />
                 </FormItem>
             )}

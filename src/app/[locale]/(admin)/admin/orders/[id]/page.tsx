@@ -47,7 +47,7 @@ const OrderDetails = () => {
             <OrderInformation language={order.user.language ?? ''} sub_total={order.total_amount_item} shipping_amount={order.total_shipping} discount_amount={order.voucher_amount + order.coupon_amount} tax={order.total_vat} total_amount={order.total_amount} />
             <div className='flex gap-12'>
                 <DocumentTable />
-                <PaymentTable />
+                {/* <PaymentTable /> */}
             </div>
         </div>
     )

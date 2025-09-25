@@ -192,7 +192,7 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
             {/*Product Images */}
             <div className='flex flex-col gap-2'>
                 <p className='text-[#666666] text-sm'>Image</p>
-                <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' />
+                <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' isAddProduct />
             </div>
         </div>
     )

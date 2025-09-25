@@ -10,7 +10,7 @@ export default async function ImpressumPage() {
 
     // Lấy phiên bản policy
     const version = await getPolicyVersion()
-    const firstVersion = version.length > 0 ? version[0].id : null
+    const firstVersion = version.length > 0 ? version[1].id : null
 
     // Prefetch version list
     await queryClient.prefetchQuery({

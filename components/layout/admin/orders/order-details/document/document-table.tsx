@@ -12,8 +12,8 @@ import {
 
 const data: DocumentRow[] = [
     { document: "Invoice", code: "IN-32465793", dateSent: "Aug 20, 2025 14:21", viewUrl: "#" },
-    { document: "Contract", code: "AR-12365489", dateSent: "Aug 22, 2025 12:21", viewUrl: "#" },
-    { document: "Proof of delivery", code: "PR-231324134", dateSent: "Aug 23, 2025 11:21", viewUrl: "#" },
+    // { document: "Contract", code: "AR-12365489", dateSent: "Aug 22, 2025 12:21", viewUrl: "#" },
+    // { document: "Proof of delivery", code: "PR-231324134", dateSent: "Aug 23, 2025 11:21", viewUrl: "#" },
 ]
 
 const DocumentTable = () => {

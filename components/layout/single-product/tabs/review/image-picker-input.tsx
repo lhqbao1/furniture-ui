@@ -46,6 +46,7 @@ interface ImagePickerInputProps<T extends FieldValues> {
     className?: string
     isSimple?: boolean
     isFile?: boolean,
+    isAddProduct?: boolean
 }
 
 // ================== SORTABLE ITEM ==================
@@ -100,6 +101,7 @@ function ImagePickerInput<T extends FieldValues>({
     description,
     isSingle = false,
     isFile = false,
+    isAddProduct = false,
     className,
     isSimple,
 }: ImagePickerInputProps<T>) {
@@ -174,12 +176,12 @@ function ImagePickerInput<T extends FieldValues>({
     )
 
     return (
-        <div className={cn("col-span-12 flex flex-col gap-4", className)}>
+        <div className={cn("col-span-12 grid grid-cols-12 gap-4", className)}>
             {/* Dropzone */}
             <div
                 {...getRootProps()}
                 className={`h-full w-full border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center space-y-4 transition-colors cursor-pointer
-          ${isDragActive ? "border-primary bg-primary/5" : "border-gray-300 dark:border-gray-700"}`}
+          ${isDragActive ? "border-primary bg-primary/5" : "border-gray-300 dark:border-gray-700"} ${isAddProduct ? 'col-span-3' : 'col-span-12'}`}
             >
                 {uploadImage.isPending ? (
                     <Loader2
@@ -236,31 +238,35 @@ function ImagePickerInput<T extends FieldValues>({
                     </div>
                 ) : null
             ) : items.length > 0 ? (
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={({ active, over }) => {
-                        if (!over || active.id === over.id) return
-                        const oldIndex = items.findIndex((it) => it.id === active.id)
-                        const newIndex = items.findIndex((it) => it.id === over.id)
-                        if (oldIndex === -1 || newIndex === -1) return
-                        const next = arrayMove(items, oldIndex, newIndex)
-                        setItems(next)
-                        form.setValue(
-                            fieldName,
-                            next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
-                            { shouldValidate: true }
-                        )
-                    }}
-                >
-                    <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
-                        <div className="gap-8 w-full h-[144px] flex justify-start">
-                            {items.map((it, idx) => (
-                                <SortableImage key={it.id} item={it} onRemove={() => removeImage(idx)} />
-                            ))}
-                        </div>
-                    </SortableContext>
-                </DndContext>
+                <div className={`overflow-y-scroll ${isAddProduct ? 'col-span-9' : 'col-span-12'}`}>
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={({ active, over }) => {
+                            if (!over || active.id === over.id) return
+                            const oldIndex = items.findIndex((it) => it.id === active.id)
+                            const newIndex = items.findIndex((it) => it.id === over.id)
+                            if (oldIndex === -1 || newIndex === -1) return
+                            const next = arrayMove(items, oldIndex, newIndex)
+                            setItems(next)
+                            form.setValue(
+                                fieldName,
+                                next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
+                                { shouldValidate: true }
+                            )
+                        }}
+                    >
+                        <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
+                            <div className="w-full h-[144px] flex flex-wrap gap-4">
+                                {items.map((it, idx) => (
+                                    <div key={it.id} className="flex-1 min-w-[120px] max-w-[200px]">
+                                        <SortableImage item={it} onRemove={() => removeImage(idx)} />
+                                    </div>
+                                ))}
+                            </div>
+                        </SortableContext>
+                    </DndContext>
+                </div>
             ) : null}
 
             {/* Hidden field for errors */}

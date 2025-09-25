@@ -6,37 +6,15 @@ import z from 'zod'
 import { Button } from "@/components/ui/button"
 import {
     Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import "react-quill-new/dist/quill.snow.css"
-import RichTextEditor from '@/components/shared/editor'
-import ImagePickerInput from '@/components/layout/single-product/tabs/review/image-picker-input'
-import { Switch } from '@/components/ui/switch'
 import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/product'
-import { Label } from '@/components/ui/label'
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { ProductItem, StaticFile } from '@/types/products'
 import { toast } from 'sonner'
-import { ProductPricingFields } from './pricing-field'
-import { MultiSelectField } from './category-select'
 import { CategoryResponse } from '@/types/categories'
-import { FormLabelWithAsterisk } from '@/components/shared/form-label-with-asterisk'
 import { useAddProduct, useEditProduct } from '@/features/products/hook'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { cn } from '@/lib/utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import countries from "world-countries"
-import GpsrInput from './form-input/gpsr'
-import SeoFields from './form-input/seo-fields'
-import FirstGroupInputs from './fisrt-group'
 import {
     Accordion,
     AccordionContent,
@@ -60,11 +38,6 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
     const [isLoadingSEO, setIsLoadingSEO] = useState(false)
-
-
-
-
-
 
     const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
         if (!productValues) return defaultValues
@@ -101,9 +74,11 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
             width: values.width || values.width === 0 ? values.width : undefined,
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
+            cost: values.cost || values.cost === 0 ? values.cost : undefined,
             sku: values.sku?.trim() || undefined,
-            final_price: values.final_price ? values.final_price : values.price,
-            price: values.price ? values.price : values.final_price
+            final_price: values.final_price ?? values.price ?? undefined,
+            price: values.price ?? values.final_price ?? undefined,
+            stock: values.stock ?? 1
         }
 
         if (productValues) {
@@ -159,10 +134,9 @@ const ProductForm = ({ productValues, onSubmit, isPending }: AddProductFormProps
                                 : ''}
 
                             <Accordion
-                                type="single"
-                                collapsible
+                                type="multiple"
                                 className="w-full space-y-8"
-                                defaultValue="details"
+                                defaultValue={["details"]}
                             >
                                 <AccordionItem value="details">
                                     <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Details</AccordionTrigger>

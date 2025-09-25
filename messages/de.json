@@ -221,5 +221,6 @@
 "searchProduct": "Produkte suchen",
 "noResult": "Keine Ergebnisse gefunden",
 "loading": "Loading",
-"notEnoughStock": "Nicht genug Bestand"
+"notEnoughStock": "Nicht genug Bestand",
+"bankInfor": "Überweisungsinformationen"
 }
