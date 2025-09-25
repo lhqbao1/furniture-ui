@@ -11,7 +11,7 @@ export default async function AGBPage() {
     // Lấy phiên bản policy
     const version = await getPolicyVersion()
     const firstVersion = version.length > 0 ? version[1].id : null
-
+    console.log(version)
     // Prefetch version list
     await queryClient.prefetchQuery({
         queryKey: ['policy-version'],
@@ -32,10 +32,10 @@ export default async function AGBPage() {
         <HydrationBoundary state={dehydratedState}>
             <div className="w-full min-h-screen overflow-scroll">
                 {firstVersion ? (
-                    <ListPolicy versionId={firstVersion} versionDate={version} policyId='19aa3344-f577-41e6-acbd-f0fe8ea92ce5' versionName={version[0].name} />
+                    <ListPolicy versionId={firstVersion} versionData={version} policyId='19aa3344-f577-41e6-acbd-f0fe8ea92ce5' versionName={version[0].name} />
                 ) : (
                     <div className="text-center py-20 text-gray-500">
-                        No policy found
+                        Keine Richtlinie gefunden
                     </div>
                 )}
             </div>

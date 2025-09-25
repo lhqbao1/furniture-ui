@@ -32,10 +32,10 @@ export default async function datenPage() {
         <HydrationBoundary state={dehydratedState}>
             <div className="w-full min-h-screen overflow-scroll">
                 {firstVersion ? (
-                    <ListPolicy versionId={firstVersion} versionDate={version} policyId='808a37bc-2ead-4a90-8a24-73a431df55d0' versionName={version[0].name} />
+                    <ListPolicy versionId={firstVersion} versionData={version} policyId='808a37bc-2ead-4a90-8a24-73a431df55d0' versionName={version[0].name} />
                 ) : (
                     <div className="text-center py-20 text-gray-500">
-                        No policy found
+                        Keine Richtlinie gefunden
                     </div>
                 )}
             </div>

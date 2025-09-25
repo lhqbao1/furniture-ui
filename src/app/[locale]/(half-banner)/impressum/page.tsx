@@ -32,10 +32,10 @@ export default async function ImpressumPage() {
         <HydrationBoundary state={dehydratedState}>
             <div className="w-full min-h-screen overflow-scroll">
                 {firstVersion ? (
-                    <ListPolicy versionId={firstVersion} policyId='9fc87bb9-44d2-428d-9960-1b6074e11d76' versionDate={version} versionName={version[0].name} />
+                    <ListPolicy versionId={firstVersion} policyId='9fc87bb9-44d2-428d-9960-1b6074e11d76' versionData={version} versionName={version[0].name} />
                 ) : (
                     <div className="text-center py-20 text-gray-500">
-                        No policy found
+                        Keine Richtlinie gefunden
                     </div>
                 )}
             </div>

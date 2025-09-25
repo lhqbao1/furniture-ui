@@ -222,5 +222,15 @@
     "noResult": "No result found",
     "loading": "Wird geladen",
     "notEnoughStock": "Not enough stock",
-    "bankInfor": "Bank transfer details"
+    "bankInfor": "Bank transfer details",
+    "noPolicy": "No policy found",
+    "packaging": {
+          "title": "Package Slip",
+          "subtitle": "Package",
+          "packageNumber": "Package #",
+          "orderDate": "Order Date #",
+          "salesOrder": "Sales Order #",
+          "billTo": "Bill to:",
+          "shipTo": "Ship to:"
+    }
 }

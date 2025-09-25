@@ -11,19 +11,19 @@ import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { PolicyVersion } from '@/types/policy'
-import { formatDate } from '@/lib/date-formated'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { useRouter } from '@/src/i18n/navigation'
+import { formatDate } from '@/lib/date-formated'
 
 interface ListPolicyProps {
     versionId: string;
-    versionDate: PolicyVersion[];
+    versionData: PolicyVersion[];
     policyId?: string;
     versionName?: string
 }
 
-const ListPolicy = ({ versionId, versionDate, policyId, versionName }: ListPolicyProps) => {
+const ListPolicy = ({ versionId, versionData, policyId, versionName }: ListPolicyProps) => {
     const t = useTranslations()
     const [openAccordion, setOpenAccordion] = useState<string | null>(null)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
@@ -184,8 +184,8 @@ const ListPolicy = ({ versionId, versionDate, policyId, versionName }: ListPolic
 
             {/* Version section */}
             <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0'>
-                {versionDate.map((item) => (
-                    <div key={item.id} className='text-secondary'>Version: {versionName}</div>
+                {versionData.map((item) => (
+                    <div key={item.id} className='text-secondary'>Stand: {formatDate(item.created_at)}</div>
                 ))}
             </div>
         </div>

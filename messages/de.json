@@ -222,5 +222,15 @@
 "noResult": "Keine Ergebnisse gefunden",
 "loading": "Loading",
 "notEnoughStock": "Nicht genug Bestand",
-"bankInfor": "Überweisungsinformationen"
+"bankInfor": "Überweisungsinformationen",
+"noPolicy": "Keine Richtlinie gefunden",
+"packaging": {
+    "title": "Lieferschein",
+    "subtitle": "Paket",
+    "packageNumber": "Paketnummer",
+    "orderDate": "Bestelldatum",
+    "salesOrder": "Auftragsnummer",
+    "billTo": "Rechnung an:",
+    "shipTo": "Lieferung an:"
+  }
 }

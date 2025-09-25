@@ -13,13 +13,15 @@ import {
 import { Button } from '@/components/ui/button'
 import { Eye, File, Loader2, Trash2 } from 'lucide-react'
 import InvoiceTable from '@/components/layout/pdf/file-component'
+import PackagingDialogComponent from '@/components/layout/packaging-dialog/packaging-dialog-component'
 
 interface ViewFileDialogProps {
     checkoutId: string
     invoiceId?: string
+    type?: string
 }
 
-const ViewFileDialog = ({ checkoutId, invoiceId }: ViewFileDialogProps) => {
+const ViewFileDialog = ({ checkoutId, invoiceId, type }: ViewFileDialogProps) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -29,11 +31,12 @@ const ViewFileDialog = ({ checkoutId, invoiceId }: ViewFileDialogProps) => {
                     <File className="w-4 h-4 text-secondary" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="w-fit px-0">
+            <DialogContent className="w-fit h-[calc(100%-3rem)] px-0">
                 <DialogHeader>
                     <DialogTitle></DialogTitle>
                 </DialogHeader>
-                <InvoiceTable checkoutId={checkoutId} />
+                {type === "invoice" ? <InvoiceTable checkoutId={checkoutId} /> : ''}
+                {type === "package" ? <PackagingDialogComponent checkoutId={checkoutId} /> : ''}
             </DialogContent>
         </Dialog>
     )
