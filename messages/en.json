@@ -221,5 +221,6 @@
     "searchProduct": "Search Products",
     "noResult": "No result found",
     "loading": "Wird geladen",
-    "notEnoughStock": "Not enough stock"
+    "notEnoughStock": "Not enough stock",
+    "bankInfor": "Bank transfer details"
 }

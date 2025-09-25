@@ -63,9 +63,9 @@ export function ProductPricingFields() {
                                         type="number"
                                         min={0}
                                         className="pl-7"
-                                        step="0.01"            // hoặc "any" để cho phép mọi số thập phân
-                                        inputMode="decimal"    // hint cho bàn phím mobile
-                                        value={field.value ?? ""} // tránh uncontrolled / NaN
+                                        step="0.01"
+                                        inputMode="decimal"
+                                        value={field.value ?? ""}
                                         onChange={(e) =>
                                             field.onChange(
                                                 e.target.value === "" ? null : e.target.valueAsNumber

@@ -42,6 +42,7 @@ import { useCheckMailExist, useLogin, useLoginOtp, useSignUp } from '@/features/
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
+import BankDialog from '@/components/layout/checkout/bank-dialog'
 
 export interface CartItem {
     id: number
@@ -59,19 +60,13 @@ export default function CheckOutPage() {
     const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
     const [checkout, setCheckOut] = useAtom(checkOutIdAtom)
     const [otpEmail, setOtpEmail] = useState<string>("")
+    const [openBankDialog, setOpenBankDialog] = useState(false)
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
     const [openOtpDialog, setOpenOTPDialog] = useState(false)
     const t = useTranslations()
 
     const router = useRouter()
     const { updateStatus } = useCartLocal()
-
-    const checkOutBreadcrumb = [
-        { label: t('wishlist'), icon: 'wishlist.svg', url: '/wishlist' },
-        { label: t('cart'), icon: 'cart.svg', url: '/cart' },
-        { label: t('checkout'), icon: 'checkout.svg', url: '/checkout' },
-        { label: t('tracking'), icon: 'tracking.svg', url: '/' },
-    ]
 
     const CreateOrderSchema = z.object({
         shipping_address_id: z.string().optional(),
@@ -378,14 +373,21 @@ export default function CheckOutPage() {
                 toast.success("Place order successful")
                 setCheckOut(checkout.id)
 
-                // Tạo payment
-                const payment = await createPaymentMutation.mutateAsync({
-                    checkout_id: checkout.id,
-                })
+                if (data.payment_method === "paypal") {
+                    // Tạo payment
+                    const payment = await createPaymentMutation.mutateAsync({
+                        checkout_id: checkout.id,
+                    })
 
-                toast.success("Place payment successful")
-                setPaymentId(payment.payment_id)
-                router.push(payment.approve_url)
+                    toast.success("Place payment successful")
+                    setPaymentId(payment.payment_id)
+                    router.push(payment.approve_url)
+                }
+
+                if (data.payment_method === "bank") {
+                    console.log('bank')
+                    setOpenBankDialog(true)
+                }
             } catch (error) {
                 toast.error(t('orderFail'))
                 console.error(error)
@@ -412,15 +414,6 @@ export default function CheckOutPage() {
                 )}
                 className='flex flex-col gap-8 section-padding'
             >
-                {/* Breadcrumb */}
-                {/* <div className='flex justify-center items-center lg:gap-12 gap-3 border-b pb-3'>
-                    {checkOutBreadcrumb.map((item, index) => (
-                        <Link href={item.url} key={index} className='flex flex-col gap-2 items-center justify-center'>
-                            <Image src={`/${item.icon}`} width={50} height={50} alt='' className='size-12' />
-                            <div className='font-semibold text-lg text-secondary'>{item.label}</div>
-                        </Link>
-                    ))}
-                </div> */}
                 <h2 className='section-header'>{t('order')}</h2>
 
                 {/* Main container */}
@@ -622,6 +615,12 @@ export default function CheckOutPage() {
                     onOpenChange={setOpenOTPDialog}
                     email={otpEmail}
                     onSuccess={handleOtpSuccess}
+                />
+
+
+                <BankDialog
+                    open={openBankDialog}
+                    onOpenChange={setOpenBankDialog}
                 />
             </form>
         </FormProvider>

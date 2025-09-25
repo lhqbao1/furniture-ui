@@ -56,19 +56,12 @@ const OrderInformation = ({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-4">External order ID:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {external_id ?? '21-13452-00796'}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-10 items-center gap-2">
+                {/* <div className="grid grid-cols-10 items-center gap-2">
                     <div className="text-right col-span-4">Warehouse:</div>
                     <div className="rounded-sm border px-2 py-1 w-full col-span-6">
                         {warehouse ?? 'Norma NF / DE'}
                     </div>
-                </div>
+                </div> */}
 
                 <div className="grid grid-cols-10 items-center gap-2">
                     <div className="text-right col-span-4">Order referrer:</div>
@@ -100,12 +93,12 @@ const OrderInformation = ({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-10 items-center gap-2">
+                {/* <div className="grid grid-cols-10 items-center gap-2">
                     <div className="text-right col-span-4">Package numbers:</div>
                     <div className="rounded-sm border px-2 py-1 w-full col-span-6">
                         {package_number ?? '21-13452-00796'}
                     </div>
-                </div>
+                </div> */}
 
                 <div className="grid grid-cols-10 items-center gap-2">
                     <div className="text-right col-span-4">Entry date:</div>
@@ -116,12 +109,12 @@ const OrderInformation = ({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-10 items-center gap-2">
+                {/* <div className="grid grid-cols-10 items-center gap-2">
                     <div className="text-right col-span-4">Client:</div>
                     <div className="rounded-sm border px-2 py-1 w-full col-span-6">
                         {client ?? '43350 | NORMAShopware'}
                     </div>
-                </div>
+                </div> */}
             </div>
 
             <div className='space-y-3 col-span-1'>

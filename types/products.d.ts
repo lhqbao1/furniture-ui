@@ -87,10 +87,14 @@ export type StaticFile = {
     delivery_time: string
     manufacture_country: string
     tariff_number: string
+    ebay: boolean
+    unit: string
+    amount_unit: string
 
     url_key: string
     meta_title: string
     meta_description: string
+    ebay_offer_id: string
 
     delivery_cost: number
     weight: number

@@ -19,7 +19,7 @@ const ProductAdditionalInputs = () => {
     const unit = [
         { id: "pcs." },
         { id: "set" },
-        { id: "litter" },
+        { id: "liter" },
         { id: "kg" },
         { id: "m2" },
     ]
@@ -144,7 +144,7 @@ const ProductAdditionalInputs = () => {
                                     <SelectContent>
                                         {unit.map((c) => (
                                             <SelectItem key={c.id} value={c.id}>
-                                                <span className="uppercase">{c.id}</span>
+                                                <span className="">{c.id}</span>
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
