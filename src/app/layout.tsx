@@ -3,7 +3,6 @@ import { Figtree, Libre_Caslon_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "./provider";
 import { Toaster } from "@/components/ui/sonner"
-import Head from "next/head";
 import Script from "next/script";
 
 const figtree = Figtree({

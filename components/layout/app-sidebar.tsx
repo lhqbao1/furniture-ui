@@ -42,16 +42,22 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
     const [currentCategoryId, setCurrentCategoryId] = useAtom(currentCategoryIdAtom)
     const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
 
+    function mapCategories(categories: CategoryResponse[], parentSlug = ""): MenuItem[] {
+        return categories.map((cat) => {
+            const currentSlug = parentSlug ? `${parentSlug}/${cat.slug}` : cat.slug
 
-
-    function mapCategories(categories: CategoryResponse[]): MenuItem[] {
-        return categories.map((cat) => ({
-            id: cat.id,
-            title: cat.name,
-            url: `/category/${cat.slug}`,
-            children: cat.children && cat.children.length > 0 ? mapCategories(cat.children) : undefined,
-        }))
+            return {
+                id: cat.id,
+                title: cat.name,
+                url: `/category/${currentSlug}`,
+                children:
+                    cat.children && cat.children.length > 0
+                        ? mapCategories(cat.children, currentSlug)
+                        : undefined,
+            }
+        })
     }
+
 
 
     const pathname = usePathname()
