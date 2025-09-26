@@ -44,17 +44,6 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
     // refs cho content bên phải
     const contentRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
-    // khi policyId thay đổi, set accordion mở
-    // useEffect(() => {
-    //     if (policyId) {
-    //         const exists = filteredPolicies.find(p => p.id === policyId)
-    //         if (exists) {
-    //             setOpenAccordion(policyId)
-    //             const index = filteredPolicies.indexOf(exists)
-    //             setCurrentPolicyItem(0)
-    //         }
-    //     }
-    // }, [policyId, filteredPolicies])
     useEffect(() => {
         const path = pathname?.toLowerCase()
 
@@ -178,7 +167,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
             </div>
 
             {/* Nội dung bên phải */}
-            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden'>
+            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll'>
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
