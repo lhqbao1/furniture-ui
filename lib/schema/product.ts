@@ -7,14 +7,14 @@ const StaticFileSchema = z.object({
 })
 
 export const addProductSchema = z.object({
-  name: z.string().min(2, { message: "Product name is required" }),
+  name: z.string().min(1, { message: "Product name is required" }).max(18, {message: "Product name must be less than 18 characters"}),
   description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
   cost: z.number().optional().nullable(),
   delivery_cost: z.number().optional().nullable(),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
-  final_price: z.number().nonnegative().optional().nullable(),
+  final_price: z.number().optional().nullable(),
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
   stock: z.number().nonnegative().optional().nullable(),

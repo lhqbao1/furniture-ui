@@ -179,7 +179,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName }: ListPolic
 
             <div className='col-span-12 lg:col-span-8 lg:mt-12 mt-6'>
                 {policyId === "9fc87bb9-44d2-428d-9960-1b6074e11d75" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
-                {policyId === "19aa3344-f577-41e6-acbd-f0fe8ea92ce5" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
+                {policyId === "19aa3344-f577-41e6-acbd-f0fe8ea92ce5" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG2.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
             </div>
 
             {/* Version section */}
