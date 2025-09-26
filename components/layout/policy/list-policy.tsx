@@ -29,11 +29,12 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
     const [openAccordion, setOpenAccordion] = useState<string | null>(null)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
     const router = useRouter()
+    const [currentVersion, setCurrentVersion] = useState(versionId)
 
     const { data: policy, isLoading } = useQuery({
-        queryKey: ["policy-items", versionId],
-        queryFn: () => getPolicyItemsByVersion(versionId),
-        enabled: !!versionId,
+        queryKey: ["policy-items", currentVersion],
+        queryFn: () => getPolicyItemsByVersion(currentVersion),
+        enabled: !!currentVersion,
     })
 
     const filteredPolicies = policy?.legal_policies ?? []
@@ -186,7 +187,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
             {/* Version section */}
             <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0'>
                 {versionData.map((item) => (
-                    <div key={item.id} className='text-secondary'>Stand: {formatDate(item.created_at)}</div>
+                    <div key={item.id} className={`text-secondary cursor-pointer ${item.id === currentVersion ? 'font-bold' : ''}`} onClick={() => setCurrentVersion(item.id)}>Stand: {formatDate(item.created_at)}</div>
                 ))}
             </div>
         </div>

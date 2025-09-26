@@ -10,8 +10,8 @@ export default async function AGBPage() {
 
     // Lấy phiên bản policy
     const version = await getPolicyVersion()
-    const firstVersion = version.length > 0 ? version[1].id : null
-    console.log(version)
+    const firstVersion = version.length > 0 ? version[0].id : null
+
     // Prefetch version list
     await queryClient.prefetchQuery({
         queryKey: ['policy-version'],
