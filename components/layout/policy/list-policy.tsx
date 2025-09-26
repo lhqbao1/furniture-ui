@@ -21,9 +21,10 @@ interface ListPolicyProps {
     versionData: PolicyVersion[];
     policyId?: string;
     versionName?: string
+    isAdmin?: boolean
 }
 
-const ListPolicy = ({ versionId, versionData, policyId, versionName }: ListPolicyProps) => {
+const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = false }: ListPolicyProps) => {
     const t = useTranslations()
     const [openAccordion, setOpenAccordion] = useState<string | null>(null)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
@@ -53,6 +54,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName }: ListPolic
     }, [policyId, filteredPolicies])
 
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>
+    if (!versionId) return <></>
 
     // tìm current policy dựa trên accordion đang mở
     const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
@@ -75,29 +77,28 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName }: ListPolic
                             onClick={(e) => {
                                 e.preventDefault()
                                 e.stopPropagation()
-
-                                // 1. Mở accordion trước
-                                // setOpenAccordion(item.id)
-
-                                // 2. Delay một chút để animation render children (ví dụ 150ms)
-                                setTimeout(() => {
-                                    switch (item.id) {
-                                        case '19aa3344-f577-41e6-acbd-f0fe8ea92ce5':
-                                            router.push('/agb')
-                                            break
-                                        case '9fc87bb9-44d2-428d-9960-1b6074e11d76':
-                                            router.push('/impressum')
-                                            break
-                                        case '9fc87bb9-44d2-428d-9960-1b6074e11d75':
-                                            router.push('/widerruf')
-                                            break
-                                        case '808a37bc-2ead-4a90-8a24-73a431df55d0':
-                                            router.push('/datenschutzerklarung')
-                                            break
-                                        default:
-                                            router.push('/agb')
-                                    }
-                                }, 150)
+                                if (isAdmin) {
+                                    setOpenAccordion(item.id)
+                                } else {
+                                    setTimeout(() => {
+                                        switch (item.id) {
+                                            case '19aa3344-f577-41e6-acbd-f0fe8ea92ce5':
+                                                router.push('/agb')
+                                                break
+                                            case '9fc87bb9-44d2-428d-9960-1b6074e11d76':
+                                                router.push('/impressum')
+                                                break
+                                            case '9fc87bb9-44d2-428d-9960-1b6074e11d75':
+                                                router.push('/widerruf')
+                                                break
+                                            case '808a37bc-2ead-4a90-8a24-73a431df55d0':
+                                                router.push('/datenschutzerklarung')
+                                                break
+                                            default:
+                                                router.push('/agb')
+                                        }
+                                    }, 150)
+                                }
                             }}
                         >
                             <div className='pr-6 px-2 py-3 cursor-pointer font-bold'>{item.name}</div>

@@ -15,11 +15,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     try {
         const category = await getCategoryBySlug(lastSlug)
         return {
-            // title: category?.meta_title || category?.name || "Prestige Home",
-            // description:
-            //     category?.meta_description ||
-            //     category?.description?.slice(0, 150) ||
-            //     "Danh mục sản phẩm",
+            title: category?.meta_title || "Prestige Home",
+            description:
+                category?.meta_description ||
+                "Category",
             // openGraph: {
             //     title: category?.meta_title || category?.name,
             //     description:

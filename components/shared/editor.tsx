@@ -2,7 +2,7 @@
 
 import { Editor } from "@tinymce/tinymce-react"
 
-export default function RichTextEditor({ value, onChange, content, setContent }: { value: string, onChange: (val: string) => void, content: string, setContent: (val: string) => void }) {
+export default function RichTextEditor({ value, onChange, content, setContent }: { value: string, onChange: (val: string) => void, content?: string, setContent?: (val: string) => void }) {
     return (
         <Editor
             apiKey={process.env.NEXT_PUBLIC_TINY_API_KEY}
@@ -22,10 +22,11 @@ export default function RichTextEditor({ value, onChange, content, setContent }:
                 // content_css: "light",       // theme cho nội dung bên trong
             }}
             onEditorChange={(newValue) => {
-                setContent(newValue)
+                // setContent(newValue)
                 onChange(newValue)
             }}
             value={value}
+        // initialValue={value}
         />
 
     )

@@ -52,6 +52,10 @@ export interface CategoryBySlugResponse {
   total_pages: number
   total_items: number
   page_size: number
+  meta_title: string
+  meta_description: string
+  meta_keywords: string
+  name: string
 }
 
 

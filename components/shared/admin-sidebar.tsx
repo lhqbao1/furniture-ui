@@ -49,6 +49,14 @@ export function AdminSideBar() {
                 { title: "Customer List", url: "/admin/crm/customers/list", icon: CornerDownRight },
             ],
         },
+        {
+            title: "Settings",
+            url: "/admin/settings",
+            icon: ChevronRight,
+            children: [
+                { title: "Policy", url: "/admin/settings/policy", icon: CornerDownRight },
+            ],
+        },
     ];
 
     return (

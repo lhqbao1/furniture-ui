@@ -12,6 +12,7 @@ import { useEditProduct } from "@/features/products/hook"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useSyncToEbay } from "@/features/ebay/hook"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -79,6 +80,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.stock)
     const [editing, setEditing] = useState(false)
     const EditProductMutation = useEditProduct()
+    const syncToEbayMutation = useSyncToEbay()
 
     const handleEditProductStock = () => {
         EditProductMutation.mutate({
@@ -138,6 +140,30 @@ function EditableStockCell({ product }: { product: ProductItem }) {
     )
 }
 
+function SyncToEbay({ product }: { product: ProductItem }) {
+    const syncToEbayMutation = useSyncToEbay()
+
+    const handleSyncToEbay = () => {
+        syncToEbayMutation.mutate({
+            price: product.final_price,
+            sku: product.sku,
+            stock: product.stock,
+            tax: product.tax ? product.tax : null,
+            product: {
+                description: JSON.stringify(product.description),
+                title: JSON.stringify(product.name),
+                imageUrls: product.static_files?.map(file => file.url) ?? [],
+                ean: product.ean ? [product.ean] : [],
+            }
+        })
+    }
+
+    return (
+        <div className="flex justify-start">
+            {product.ebay ? '' : <Button onClick={() => handleSyncToEbay()} variant={'outline'}>Ebay</Button>}
+        </div>
+    )
+}
 
 export const productColumns: ColumnDef<ProductItem>[] = [
     {
@@ -327,6 +353,14 @@ export const productColumns: ColumnDef<ProductItem>[] = [
                 </div>
             )
         }
+    },
+    {
+        id: 'sync',
+        header: "SYNC",
+        cell: ({ row }) => {
+            return (
+                <SyncToEbay product={row.original} />
+            )
+        }
     }
-
 ]

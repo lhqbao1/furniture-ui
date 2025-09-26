@@ -35,9 +35,9 @@ const ProductCategory = ({ categorySlugs, tag, category }: ProductCategoryProps)
 
     return (
         <div className='pt-3 xl:pb-16 pb-6'>
-            <CustomBreadCrumb currentPage={currentCategoryName ?? ''} />
+            <CustomBreadCrumb currentPage={category?.name ?? ''} />
             <div className=''>
-                <h2 className='section-header'>{currentCategoryName}</h2>
+                <h2 className='section-header'>{category?.name}</h2>
                 <p className='text-center text-xl font-bold mt-2'>{category?.products.length === 0 ? t('emptyCategory') : ''}</p>
                 {!categoryData || isFetching ?
                     <ProductGridSkeleton length={12} /> :

@@ -1,8 +1,8 @@
-import { apiPublic } from "@/lib/axios"
+import { apiAdmin, apiPublic } from "@/lib/axios"
 
-interface EbayProduct {
+export interface EbayProduct {
     title: string
-    ean: string[]
+    ean?: string[]
     description: string
     imageUrls: string[]
 }
@@ -12,10 +12,10 @@ export interface syncToEbayInput {
     product: EbayProduct
     stock: number
     price: number
-    tax: string
+    tax?: string | null
 }
 export async function syncToEbay(input: syncToEbayInput) {
-  const { data } = await apiPublic.post(
+  const { data } = await apiAdmin.post(
     "/ebay/publish",
     input,
     {
@@ -28,7 +28,7 @@ export async function syncToEbay(input: syncToEbayInput) {
 }
 
 export async function removeFromEbay(sku: string){
-    const {data} = await apiPublic.delete(
+    const {data} = await apiAdmin.delete(
         `/ebay/product/${sku}`
     )
     return data
