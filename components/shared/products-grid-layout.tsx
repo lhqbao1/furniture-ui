@@ -181,36 +181,31 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         <h3 className='text-lg text-black text-left line-clamp-2 lg:min-h-[60px] min-h-[52px]'>
                                             {product.name}
                                         </h3>
-
-                                        {product.price ? (
-                                            <div className='flex gap-2 flex-col'>
-                                                <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
-                                                    <div className='text-4xl'>{Math.floor(product.final_price)}</div>
-                                                    <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                                                        .{(product.final_price % 1).toFixed(2).split(".")[1]}
-                                                    </div>
-                                                    <div className="text-base font-semibold text-black">€</div>
+                                        <div className='flex gap-2 flex-col'>
+                                            <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
+                                                <div className='text-4xl'>{Math.floor(product.final_price ? product.final_price : product.price)}</div>
+                                                <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
+                                                    .{((product.final_price ? product.final_price : product.price) % 1).toFixed(2).split(".")[1]}
                                                 </div>
-
-                                                <p className='text-base mb-1'>
-                                                    Vorher: €{product.price.toFixed(2)}
-                                                </p>
-                                                <div className='space-x-2 flex items-end'>
-                                                    <div className='flex gap-0.5'>
-                                                        {[1, 2, 3, 4, 5].map(item => {
-                                                            return (
-                                                                <div key={item}>
-                                                                    <Star size={18} />
-                                                                </div>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                    <p className='leading-4 text-base font-semibold'>(0)</p>
-                                                </div>
+                                                <div className="text-base font-semibold text-black">€</div>
                                             </div>
-                                        ) : (
-                                            <p className='text-xl font-bold mb-1 text-primary'>€{product.final_price}</p>
-                                        )}
+
+                                            <p className='text-base mb-1'>
+                                                Vorher: €{(product.price ? product.price : product.final_price).toFixed(2)}
+                                            </p>
+                                            <div className='space-x-2 flex items-end'>
+                                                <div className='flex gap-0.5'>
+                                                    {[1, 2, 3, 4, 5].map(item => {
+                                                        return (
+                                                            <div key={item}>
+                                                                <Star size={18} />
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                                <p className='leading-4 text-base font-semibold'>(0)</p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* Four lines starting from center of each edge */}
