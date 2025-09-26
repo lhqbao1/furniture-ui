@@ -15,31 +15,39 @@ import {
 import { Input } from "@/components/ui/input"
 import { useForgotPassword, useResetPassword } from '@/features/auth/hook'
 import { toast } from 'sonner'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Key, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { OtpInput } from './otp-input'
+import { useTranslations } from 'next-intl'
 
-const formSchema = z.object({
-    email: z.string().email("Invalid email address"),
-    code: z.string().min(6, "Code must be at least 6 characters long"),
-    password: z
-        .string()
-        .min(8, "Password must be at least 8 characters long")
-        .refine((val) => /[a-z]/.test(val), {
-            message: "Password must contain at least one lowercase letter",
-        })
-        .refine((val) => /[A-Z]/.test(val), {
-            message: "Password must contain at least one uppercase letter",
-        })
-        .refine((val) => /\d/.test(val), {
-            message: "Password must contain at least one number",
-        }),
-})
+
 
 const ResetPasswordForm = () => {
     const router = useRouter()
     const [showPass, setShowPass] = useState(false)
     const resetPasswordMutation = useResetPassword()
+    const t = useTranslations()
+
+    const formSchema = z.object({
+        email: z.string().email("Invalid email address"),
+        code: z.string().min(6, "Code must be at least 6 characters long"),
+        password: z
+            .string()
+            .min(8, t('passwordMin'))
+            .refine((val) => /[a-z]/.test(val), {
+                message: t('passwordLower'),
+            })
+            .refine((val) => /[A-Z]/.test(val), {
+                message: t('passwordUpper'),
+            })
+            .refine((val) => /\d/.test(val), {
+                message: t('passwordNumber'),
+            }),
+        confirmPassword: z.string().min(1, t('confirm_password_required')),
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: t('confirm_password_mismatch'),
+        path: ["confirmPassword"],
+    })
 
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -103,10 +111,28 @@ const ResetPasswordForm = () => {
                                 <FormLabel>New password</FormLabel>
                                 <FormControl>
                                     <div className='relative'>
-                                        <Input type={showPass ? 'text' : 'password'} placeholder="" {...field} />
-                                        <Button type="button" variant="link" className="absolute top-0 right-0 text-secondary" onClick={() => setShowPass(!showPass)}>
-                                            {showPass ? <EyeOff /> : <Eye />}
-                                        </Button>
+                                        <Input type={showPass ? 'text' : 'password'} placeholder="" {...field} className="py-3 h-fit" />
+                                        {showPass === false ?
+                                            <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setShowPass(true)} /> :
+                                            <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setShowPass(false)} />}
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{t('confirm_password')}</FormLabel>
+                                <FormControl>
+                                    <div className="relative">
+                                        {showPass === false ?
+                                            <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setShowPass(true)} /> :
+                                            <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setShowPass(false)} />}
+                                        <Input type={showPass ? 'text' : 'password'} placeholder="" {...field} className="py-3 h-fit" />
                                     </div>
                                 </FormControl>
                                 <FormMessage />

@@ -245,24 +245,6 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                     )
                 })}
             </div>
-
-            {/* Footer */}
-            <div className='col-span-12 lg:col-span-8 lg:mt-12 mt-6'>
-                {policyId === "9fc87bb9-44d2-428d-9960-1b6074e11d75" &&
-                    <div className='flex justify-center'>
-                        <Button variant={'outline'} className='border border-black rounded-sm'>
-                            <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center">
-                                {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized />
-                            </a>
-                        </Button>
-                    </div>}
-            </div>
-
-            <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0'>
-                {versionData.map((item) => (
-                    <div key={item.id} className='text-secondary'>Stand: {formatDate(item.created_at)}</div>
-                ))}
-            </div>
         </div>
     )
 }
