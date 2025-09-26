@@ -137,7 +137,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                                 if (el) {
                                                     const parent = el.closest(".content-scroll") as HTMLElement
                                                     if (parent) {
-                                                        const top = el.offsetTop - 330
+                                                        const top = el.offsetTop - 120
                                                         parent.scrollTo({
                                                             top,
                                                             behavior: "smooth",
@@ -167,7 +167,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
             </div>
 
             {/* Nội dung bên phải */}
-            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll'>
+            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll max-h-[calc(100vh-5rem)] overflow-y-auto'>
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
@@ -200,9 +200,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
 
                 {/* Version section */}
                 <div className='flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0'>
-                    {versionData.map((item) => (
-                        <div key={item.id} className={`text-secondary cursor-pointer ${item.id === currentVersion ? 'font-bold' : ''}`} onClick={() => setCurrentVersion(item.id)}>Stand: {formatDate(item.created_at)}</div>
-                    ))}
+                    <div className={`text-secondary cursor-pointer ${versionData[0].id === currentVersion ? 'font-bold' : ''}`} onClick={() => setCurrentVersion(versionData[0].id)}>Stand: {formatDate(versionData[0].created_at)}</div>
                 </div>
             </div>
         </div>
