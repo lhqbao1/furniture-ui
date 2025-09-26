@@ -15,6 +15,7 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { useRouter } from '@/src/i18n/navigation'
 import { formatDate } from '@/lib/date-formated'
+import { usePathname } from 'next/navigation'
 
 interface ListPolicyProps {
     versionId: string;
@@ -30,6 +31,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
     const router = useRouter()
     const [currentVersion, setCurrentVersion] = useState(versionId)
+    const pathname = usePathname()
 
     const { data: policy, isLoading } = useQuery({
         queryKey: ["policy-items", currentVersion],
@@ -43,16 +45,36 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
     const contentRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
     // khi policyId thay đổi, set accordion mở
+    // useEffect(() => {
+    //     if (policyId) {
+    //         const exists = filteredPolicies.find(p => p.id === policyId)
+    //         if (exists) {
+    //             setOpenAccordion(policyId)
+    //             const index = filteredPolicies.indexOf(exists)
+    //             setCurrentPolicyItem(0)
+    //         }
+    //     }
+    // }, [policyId, filteredPolicies])
     useEffect(() => {
-        if (policyId) {
-            const exists = filteredPolicies.find(p => p.id === policyId)
-            if (exists) {
-                setOpenAccordion(policyId)
-                const index = filteredPolicies.indexOf(exists)
-                setCurrentPolicyItem(0)
-            }
+        const path = pathname?.toLowerCase()
+
+        const matchedItem = filteredPolicies.find((item) => {
+            const name = item.name.toLowerCase()
+            return (
+                (path.includes("agb") && name.includes("agb")) ||
+                (path.includes("impressum") && name.includes("impressum")) ||
+                (path.includes("widerruf") && name.includes("widerruf")) ||
+                (path.includes("datenschutzerklarung") && name.includes("datenschutzer"))
+            )
+        })
+
+        if (matchedItem) {
+            setOpenAccordion(matchedItem.id)
+            setCurrentPolicyItem(0)
         }
-    }, [policyId, filteredPolicies])
+    }, [pathname, filteredPolicies])
+
+
 
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>
     if (!versionId) return <></>
@@ -83,21 +105,25 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                         setOpenAccordion(item.id)
                                     } else {
                                         setTimeout(() => {
-                                            switch (item.id) {
-                                                case '19aa3344-f577-41e6-acbd-f0fe8ea92ce5':
-                                                    router.push('/agb')
+                                            switch (true) {
+                                                case item.name.toLowerCase().includes("agb"):
+                                                    router.push("/agb")
                                                     break
-                                                case '9fc87bb9-44d2-428d-9960-1b6074e11d76':
-                                                    router.push('/impressum')
+
+                                                case item.name.toLowerCase().includes("impressum"):
+                                                    router.push("/impressum")
                                                     break
-                                                case '9fc87bb9-44d2-428d-9960-1b6074e11d75':
-                                                    router.push('/widerruf')
+
+                                                case item.name.toLowerCase().includes("widerruf"):
+                                                    router.push("/widerruf")
                                                     break
-                                                case '808a37bc-2ead-4a90-8a24-73a431df55d0':
-                                                    router.push('/datenschutzerklarung')
+
+                                                case item.name.toLowerCase().includes("datenschutzer"):
+                                                    router.push("/datenschutzerklarung")
                                                     break
+
                                                 default:
-                                                    router.push('/agb')
+                                                    router.push("/agb")
                                             }
                                         }, 150)
                                     }
