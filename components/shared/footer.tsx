@@ -46,7 +46,7 @@ const Footer = () => {
                 <h3 className="font-semibold mb-3">{t('pages')}</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     <li><Link href="/uber-uns" className="">{t('aboutUs')}</Link></li>
-                    <li><Link href="/contact" className="">{t('contact')}</Link></li>
+                    <li><Link href="/kontaktieren-sie-uns" className="">{t('contact')}</Link></li>
                     <li><Link href="/faq" className="">FAQ</Link></li>
                     <li><Link href="/impressum" className="">{t('imprint')}</Link></li>
                 </ul>
@@ -57,8 +57,8 @@ const Footer = () => {
                 <h3 className="font-semibold mb-3">{t('termPolicy')}</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     <li><Link href="/agb" className="">{t('termCondition')}</Link></li>
-                    <li><Link href="/datenschutzerklarung" className="">{t('privacyPolicy')}</Link></li>
-                    <li><Link href="/widerruf" className="">Widerruf</Link></li>
+                    <li><Link href="/privacy-policy" className="">{t('privacyPolicy')}</Link></li>
+                    <li><Link href="/cancellation" className="">Widerruf</Link></li>
                     <li>
                         <Link
                             href="#"

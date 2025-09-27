@@ -52,8 +52,8 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
             return (
                 (path.includes("agb") && name.includes("agb")) ||
                 (path.includes("impressum") && name.includes("impressum")) ||
-                (path.includes("widerruf") && name.includes("widerruf")) ||
-                (path.includes("datenschutzerklarung") && name.includes("datenschutzer"))
+                (path.includes("cancellation") && name.includes("widerruf")) ||
+                (path.includes("privacy-policy") && name.includes("datenschutzer"))
             )
         })
 
@@ -70,6 +70,8 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
 
     // tìm current policy dựa trên accordion đang mở
     const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
+    console.log(currentPolicy)
+    console.log(filteredPolicies)
 
     return (
         <div className="flex lg:pt-12 pt-3 pb-4 gap-6">
@@ -104,11 +106,11 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                                     break
 
                                                 case item.name.toLowerCase().includes("widerruf"):
-                                                    router.push("/widerruf")
+                                                    router.push("/cancellation")
                                                     break
 
                                                 case item.name.toLowerCase().includes("datenschutzer"):
-                                                    router.push("/datenschutzerklarung")
+                                                    router.push("/privacy-policy")
                                                     break
 
                                                 default:
@@ -192,8 +194,8 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                 })}
 
                 <div className='lg:mt-12 mt-6'>
-                    {policyId === "9fc87bb9-44d2-428d-9960-1b6074e11d75" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
-                    {policyId === "19aa3344-f577-41e6-acbd-f0fe8ea92ce5" && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG2.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
+                    {currentPolicy.name.toLowerCase().includes("widerruf") && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
+                    {currentPolicy.name.toLowerCase().includes("agb") && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG2.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
                 </div>
 
                 {/* Version section */}
