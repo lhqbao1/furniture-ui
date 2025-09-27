@@ -51,7 +51,6 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
     const t = useTranslations()
     const { addToCartLocal, cart } = useCartLocal()
     const router = useRouter()
-    const queryClient = useQueryClient()
 
     // Form init
     const form = useForm<z.infer<typeof cartFormSchema>>({
@@ -266,7 +265,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                                 width={100}
                                                                 height={100}
                                                                 alt=''
-                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] w-auto object-fill`}
+                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] object-fill`}
                                                                 priority={index < 2}
                                                                 loading={index < 2 ? 'eager' : 'lazy'}
                                                             />

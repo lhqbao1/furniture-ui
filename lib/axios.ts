@@ -29,12 +29,16 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
-    if (error.response?.status === 401 && typeof window !== "undefined") {
+    if (error.response?.status === 401  && typeof window !== "undefined") {
       localStorage.removeItem("access_token")
       localStorage.removeItem("userId")
 
       // 👉 Redirect về login
       // window.location.href = "/login"
+    }
+    if(error.response?.data === 'Token expired'){
+      // 👉 Redirect về login
+      window.location.href = "/login"
     }
     return Promise.reject(error)
   }
