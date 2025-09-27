@@ -85,7 +85,7 @@ export default function CheckOutPage() {
         invoice_city: z.string().min(1, { message: t('last_name_required') }),
         invoice_address_additional: z.string().optional(),
         shipping_address_additional: z.string().optional(),
-        gender: z.string().optional(),
+        gender: z.string().optional().nullable(),
         email: z
             .string()
             .min(1, t('emailRequired'))
