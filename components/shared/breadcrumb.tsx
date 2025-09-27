@@ -14,10 +14,11 @@ import React from "react"
 
 interface CustomBreadCrumbProps {
     currentPage?: string
+    parentPage?: string
     isProductPage?: boolean
 }
 
-export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomBreadCrumbProps) {
+export default function CustomBreadCrumb({ currentPage, isProductPage, parentPage }: CustomBreadCrumbProps) {
     const params = useParams()
     const { slug } = params
 
@@ -35,6 +36,17 @@ export default function CustomBreadCrumb({ currentPage, isProductPage }: CustomB
                 {/* <BreadcrumbItem>
                     <BreadcrumbLink href="/"><Home /></BreadcrumbLink>
                 </BreadcrumbItem> */}
+
+                {parentPage ? (
+                    <>
+                        <BreadcrumbSeparator className="text-primary" />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage className="capitalize text-gray-500 font-bold text-lg">
+                                {parentPage}
+                            </BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </>
+                ) : ''}
 
                 {/* Current page (if provided) */}
                 {currentPage ? (
