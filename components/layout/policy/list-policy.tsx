@@ -16,6 +16,7 @@ import Image from 'next/image'
 import { useRouter } from '@/src/i18n/navigation'
 import { formatDate } from '@/lib/date-formated'
 import { usePathname } from 'next/navigation'
+import { useSmoothScrollToRef } from '@/hooks/scrollToRef'
 
 interface ListPolicyProps {
     versionId: string;
@@ -27,11 +28,17 @@ interface ListPolicyProps {
 
 const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = false }: ListPolicyProps) => {
     const t = useTranslations()
-    const [openAccordion, setOpenAccordion] = useState<string | null>(null)
+    const [openAccordion, setOpenAccordion] = useState<string>("") // mặc định là chuỗi rỗng
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
     const router = useRouter()
     const [currentVersion, setCurrentVersion] = useState(versionId)
     const pathname = usePathname()
+    const { scrollTo, registerRef } = useSmoothScrollToRef<HTMLDivElement>()
+
+    // Khi click vào item
+    const handleClick = (key: string) => {
+        scrollTo(key, -80) // scroll lên trên một chút để tránh bị che bởi header
+    }
 
     const { data: policy, isLoading } = useQuery({
         queryKey: ["policy-items", currentVersion],
@@ -40,9 +47,6 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
     })
 
     const filteredPolicies = policy?.legal_policies ?? []
-
-    // refs cho content bên phải
-    const contentRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
     useEffect(() => {
         const path = pathname?.toLowerCase()
@@ -59,20 +63,12 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
 
         if (matchedItem) {
             setOpenAccordion(matchedItem.id)
-            setCurrentPolicyItem(0)
+            // setCurrentPolicyItem(0)
         }
     }, [pathname, filteredPolicies])
 
     // tìm current policy dựa trên accordion đang mở
     const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
-
-    useEffect(() => {
-        const refKey = `${currentPolicy?.id}-${currentPolicyItem}`
-        const el = contentRefs.current[refKey]
-        if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: 'start' })
-        }
-    }, [currentPolicyItem])
 
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>
     if (!versionId) return <></>
@@ -137,21 +133,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                             )}
                                             onClick={() => {
                                                 setCurrentPolicyItem(policyItemIndex)
-
-                                                const refKey = `${item.id}-${policyItemIndex}`
-                                                const el = contentRefs.current[refKey]
-                                                if (el) {
-                                                    const parent = el.closest(".content-scroll") as HTMLElement
-                                                    if (parent) {
-                                                        const top = el.offsetTop + 100
-                                                        parent.scrollTo({
-                                                            top,
-                                                            behavior: "smooth",
-                                                        })
-                                                    } else {
-                                                        el.scrollIntoView({ behavior: "smooth", block: "start" })
-                                                    }
-                                                }
+                                                scrollTo(`${item.id}-${policyItemIndex}`, -80)
                                             }}
                                         >
                                             {child.label}
@@ -173,19 +155,17 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
             </div>
 
             {/* Nội dung bên phải */}
-            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll h-full overflow-y-auto'>
+            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll min-h-screen max-h-full overflow-y-auto'>
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
 
                 {currentPolicy?.child_legal_policies.map((cl, clIndex) => {
-                    const refKey = `${currentPolicy.id}-${clIndex}`
+                    // const refKey = `${cl.id}-${clIndex}`
                     return (
                         <div
                             key={cl.id}
-                            ref={(el) => {
-                                contentRefs.current[refKey] = el
-                            }}
+                            ref={(el) => registerRef(`${currentPolicy.id}-${clIndex}`, el)}
                         >
                             <div className='text-xl text-secondary font-bold'>{cl.label ?? ''}</div>
                             {typeof cl?.content === 'string' && cl.content.trim() !== '' ? (
