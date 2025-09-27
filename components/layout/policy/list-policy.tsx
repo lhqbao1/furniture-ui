@@ -63,15 +63,19 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
         }
     }, [pathname, filteredPolicies])
 
+    // tìm current policy dựa trên accordion đang mở
+    const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
 
+    useEffect(() => {
+        const refKey = `${currentPolicy?.id}-${currentPolicyItem}`
+        const el = contentRefs.current[refKey]
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: 'start' })
+        }
+    }, [currentPolicyItem])
 
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>
     if (!versionId) return <></>
-
-    // tìm current policy dựa trên accordion đang mở
-    const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
-    console.log(currentPolicy)
-    console.log(filteredPolicies)
 
     return (
         <div className="flex lg:pt-12 pt-3 pb-4 gap-6">
@@ -139,7 +143,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                                 if (el) {
                                                     const parent = el.closest(".content-scroll") as HTMLElement
                                                     if (parent) {
-                                                        const top = el.offsetTop - 120
+                                                        const top = el.offsetTop + 100
                                                         parent.scrollTo({
                                                             top,
                                                             behavior: "smooth",
@@ -169,7 +173,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
             </div>
 
             {/* Nội dung bên phải */}
-            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll overflow-y-auto'>
+            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll h-full overflow-y-auto'>
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>

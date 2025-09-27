@@ -45,8 +45,8 @@ const Footer = () => {
             <div className="lg:col-span-1 col-span-6">
                 <h3 className="font-semibold mb-3">{t('pages')}</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
-                    <li><Link href="/uber-uns" className="">{t('aboutUs')}</Link></li>
-                    <li><Link href="/kontaktieren-sie-uns" className="">{t('contact')}</Link></li>
+                    <li><Link href="/about-us" className="">{t('aboutUs')}</Link></li>
+                    <li><Link href="/contact" className="">{t('contact')}</Link></li>
                     <li><Link href="/faq" className="">FAQ</Link></li>
                     <li><Link href="/impressum" className="">{t('imprint')}</Link></li>
                 </ul>
@@ -77,8 +77,8 @@ const Footer = () => {
 
             {/* Cột 4: Bản đồ + Social */}
             <div className="lg:col-span-1 col-span-6 flex lg:items-start lg:justify-start lg:flex-col flex-row justify-center">
-                <h3 className="font-semibold hidden lg:mb-3 mb-0 md:block">{t('contact')}</h3>
-                <div className="flex gap-3 mt-2 lg:mt-0">
+                <h3 className="font-semibold hi dden lg:mb-3 mb-0 md:block">Mehr entdecken</h3>
+                <div className="flex gap-1 mt-2 lg:mt-0">
                     <Link
                         href={'https://www.facebook.com/profile.php?id=61578621160298'}
                         target="_blank"

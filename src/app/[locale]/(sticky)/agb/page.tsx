@@ -1,9 +1,27 @@
 import ListPolicy from '@/components/layout/policy/list-policy'
 import { getPolicyItemsByVersion, getPolicyVersion } from '@/features/policy/api'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
+import { Metadata } from 'next'
 import React from 'react'
 
 export const revalidate = 3600
+
+// ✅ Metadata SEO của Next.js
+export const metadata: Metadata = {
+    title: "Allgemeine Geschäftsbedingungen (AGB) | Prestige Home",
+    description: "Hier finden Sie die allgemeinen Geschäftsbedingungen (AGB) von Prestige Home. Transparente Regeln und faire Konditionen.",
+    alternates: {
+        canonical: "/agb",
+    },
+    openGraph: {
+        title: "AGB - Prestige Home",
+        description: "Unsere Allgemeinen Geschäftsbedingungen (AGB) im Überblick.",
+        url: "https://www.prestige-home.de/agb",
+        siteName: "Prestige Home",
+        locale: "de_DE",
+        type: "article",
+    },
+}
 
 export default async function AGBPage() {
     const queryClient = new QueryClient()
@@ -11,7 +29,7 @@ export default async function AGBPage() {
     // Lấy phiên bản policy
     const version = await getPolicyVersion()
     const firstVersion = version.length > 0 ? version[0].id : null
-    const versionDetails = await getPolicyItemsByVersion(firstVersion ?? '')
+
     // Prefetch version list
     await queryClient.prefetchQuery({
         queryKey: ['policy-version'],
@@ -21,7 +39,7 @@ export default async function AGBPage() {
     // Prefetch items nếu có version
     if (firstVersion) {
         await queryClient.prefetchQuery({
-            queryKey: ['policy-item', firstVersion],
+            queryKey: ['policy-items', firstVersion],
             queryFn: () => getPolicyItemsByVersion(firstVersion),
         })
     }

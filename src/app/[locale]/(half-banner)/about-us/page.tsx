@@ -1,4 +1,21 @@
+import { Metadata } from 'next'
 import React from 'react'
+
+export const metadata: Metadata = {
+    title: 'Über uns | Prestige Home',
+    description:
+        'Erfahren Sie mehr über Prestige Home – unsere Geschichte, unsere Mission und wie wir hochwertige, erschwingliche Produkte für Ihr Zuhause anbieten.',
+    openGraph: {
+        title: 'Über uns | Prestige Home',
+        description:
+            'Entdecken Sie, wie Prestige Home praktische, stilvolle Produkte für jeden Bereich Ihres Zuhauses anbietet.',
+        url: 'https://www.prestige-home.de/about-us',
+        siteName: 'Prestige Home',
+        locale: 'de_DE',
+        type: 'website',
+    },
+}
+
 const AboutUsPage = () => {
     return (
         <div className='section-padding flex flex-col items-center gap-4'>

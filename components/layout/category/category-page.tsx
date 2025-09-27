@@ -42,7 +42,7 @@ const ProductCategory = ({ categorySlugs, tag, category }: ProductCategoryProps)
                 {!categoryData || isFetching ?
                     <ProductGridSkeleton length={12} /> :
                     <div className='filter-section'>
-                        {
+                        {/* {
                             categoryData.products.length > 0 &&
                             <Collapsible>
                                 <CollapsibleTrigger asChild>
@@ -57,7 +57,7 @@ const ProductCategory = ({ categorySlugs, tag, category }: ProductCategoryProps)
                                     <FilterSection />
                                 </CollapsibleContent>
                             </Collapsible>
-                        }
+                        } */}
                         <div className='pt-10 pb-12'>
                             <ProductsGridLayout hasBadge data={categoryData.products} />
                         </div>

@@ -1,9 +1,30 @@
 import ListPolicy from '@/components/layout/policy/list-policy'
 import { getPolicyItemsByVersion, getPolicyVersion } from '@/features/policy/api'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
+import { Metadata } from 'next'
 import React from 'react'
 
 export const revalidate = 3600 // ISR: regenerate mỗi 1h
+
+// ✅ Metadata cho SEO + OpenGraph
+export const metadata: Metadata = {
+    title: "Impressum | Prestige Home",
+    description:
+        "Das Impressum von Prestige Home – Rechtliche Angaben, Kontaktdaten und gesetzliche Informationen gemäß deutscher Gesetzgebung.",
+    alternates: {
+        canonical: "/impressum",
+    },
+    openGraph: {
+        title: "Impressum | Prestige Home",
+        description:
+            "Alle rechtlichen Informationen und Kontaktdaten von Prestige Home finden Sie hier.",
+        url: "https://www.prestige-home.de/impressum",
+        siteName: "Prestige Home",
+        locale: "de_DE",
+        type: "article",
+    },
+}
+
 
 export default async function ImpressumPage() {
     const queryClient = new QueryClient()
@@ -21,7 +42,7 @@ export default async function ImpressumPage() {
     // Prefetch items nếu có version
     if (firstVersion) {
         await queryClient.prefetchQuery({
-            queryKey: ['policy-item', firstVersion],
+            queryKey: ['policy-items', firstVersion], // ✅ đồng bộ với ListPolicy
             queryFn: () => getPolicyItemsByVersion(firstVersion),
         })
     }
@@ -32,7 +53,12 @@ export default async function ImpressumPage() {
         <HydrationBoundary state={dehydratedState}>
             <div className="w-full min-h-screen">
                 {firstVersion ? (
-                    <ListPolicy versionId={firstVersion} policyId='9fc87bb9-44d2-428d-9960-1b6074e11d76' versionData={version} versionName={version[0].name} />
+                    <ListPolicy
+                        versionId={firstVersion}
+                        policyId="9fc87bb9-44d2-428d-9960-1b6074e11d76"
+                        versionData={version}
+                        versionName={version[0].name}
+                    />
                 ) : (
                     <div className="text-center py-20 text-gray-500">
                         Keine Richtlinie gefunden
