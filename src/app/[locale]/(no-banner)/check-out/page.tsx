@@ -595,7 +595,7 @@ export default function CheckOutPage() {
                                             <span className='space-x-2'>
                                                 {t('byPlacing')}
                                                 <span className='pl-2'>
-                                                    <Link href="/policy" className="text-secondary underline">
+                                                    <Link href="/agb" className="text-secondary underline">
                                                         {t('termCondition')}
                                                     </Link>
                                                 </span>
