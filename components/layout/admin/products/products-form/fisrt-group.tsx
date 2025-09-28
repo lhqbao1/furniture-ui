@@ -10,6 +10,7 @@ import ImagePickerInput from '@/components/layout/single-product/tabs/review/ima
 import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
+import RichEditor from '@/components/shared/tiptap/tiptap-editor'
 
 interface ProductDetailInputsProps {
     isEdit?: boolean
@@ -177,12 +178,16 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                     <FormItem>
                         <FormLabel className='text-[#666666] text-sm'>Description</FormLabel>
                         <FormControl>
-                            <RichTextEditor
+                            <RichEditor
+                                value={field.value || ""}
+                                onChangeValue={field.onChange}
+                            />
+                            {/* <RichTextEditor
                                 value={field.value || ""}
                                 onChange={field.onChange}
                                 content={description}
                                 setContent={setDescription}
-                            />
+                            /> */}
                         </FormControl>
                         <FormMessage />
                     </FormItem>

@@ -59,9 +59,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="h-8 relative">
-                    <Image src={'/new-logo.svg'} alt="icon" fill className="object-contain px-4" unoptimized />
-                </div>
+                <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
             )
         },
     },
