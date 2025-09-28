@@ -59,7 +59,7 @@ const SeoFields = ({ onLoadingGenerate }: SEOFieldsProps) => {
                 name="url_key"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel className='text-[#666666] text-sm'>
+                        <FormLabel className='text-black font-semibold text-sm'>
                             URL Key
                         </FormLabel>
                         <FormControl>
@@ -74,7 +74,7 @@ const SeoFields = ({ onLoadingGenerate }: SEOFieldsProps) => {
                 name="meta_title"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel className='text-[#666666] text-sm'>
+                        <FormLabel className='text-black font-semibold text-sm'>
                             Meta Title
                         </FormLabel>
                         <FormControl>
@@ -89,11 +89,26 @@ const SeoFields = ({ onLoadingGenerate }: SEOFieldsProps) => {
                 name="meta_description"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel className='text-[#666666] text-sm'>
+                        <FormLabel className='text-black font-semibold text-sm'>
                             Meta Description
                         </FormLabel>
                         <FormControl>
                             <Textarea placeholder="" {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="meta_keywords"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel className='text-black font-semibold text-sm'>
+                            Meta Keywords
+                        </FormLabel>
+                        <FormControl>
+                            <Input placeholder="" {...field} value={field.value ?? ""} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

@@ -260,7 +260,7 @@ const ProductLogisticsGroup = () => {
                     control={form.control}
                     name="weight"
                     render={({ field }) => (
-                        <FormItem className="flex flex-col w-full">
+                        <FormItem className="flex flex-col w-full justify-end">
                             <FormLabel className="text-black font-semibold text-sm col-span-2">
                                 Weight (kg)
                             </FormLabel>

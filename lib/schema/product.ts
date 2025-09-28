@@ -54,6 +54,7 @@ export const addProductSchema = z.object({
   url_key: z.string().optional().nullable(),
   meta_title: z.string().optional().nullable(),
   meta_description: z.string().optional().nullable(),
+  meta_keywords: z.string().optional().nullable(),
 
   pallet_unit: z.number().optional().nullable(),
   product_height: z.number().optional().nullable(),
