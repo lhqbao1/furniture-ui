@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 
 export function useRemoveFormEbay() {
     return useMutation({
-      mutationFn: (sku: string) => removeFromEbay(sku),
+      mutationFn: (sku: string) => removeFromEbay(sku), 
     });
   }
 

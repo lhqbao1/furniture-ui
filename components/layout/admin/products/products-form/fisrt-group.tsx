@@ -3,15 +3,19 @@ import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import RichTextEditor from '@/components/shared/editor'
 import { ProductPricingFields } from './pricing-field'
 import { MultiSelectField } from './category-select'
 import ImagePickerInput from '@/components/layout/single-product/tabs/review/image-picker-input'
 import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import RichEditor from '@/components/shared/tiptap/tiptap-editor'
+import dynamic from "next/dynamic"
 
+// import RichEditor dynamically to avoid SSR issues
+const RichEditor = dynamic(() => import("@/components/shared/tiptap/tiptap-editor"), {
+    ssr: false,
+    loading: () => <div className="min-h-[200px] border rounded-md p-4">Loading editor...</div>,
+})
 interface ProductDetailInputsProps {
     isEdit?: boolean
     productId?: string | null
@@ -19,7 +23,6 @@ interface ProductDetailInputsProps {
 
 const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) => {
     const form = useFormContext()
-    const [description, setDescription] = useState("")
 
     return (
         <div className='space-y-6'>

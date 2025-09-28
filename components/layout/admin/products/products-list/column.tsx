@@ -290,7 +290,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "final_price",
         header: () => <div className="text-right">FINAL PRICE</div>,
-        cell: ({ row }) => <div className="text-right">€{row.original.final_price ? (row.original.final_price)?.toFixed(2) : "Updating ..."}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.final_price ? <>€{(row.original.final_price)?.toFixed(2)}</> : 'Updating ...'}</div>,
     },
     {
         id: "margin",

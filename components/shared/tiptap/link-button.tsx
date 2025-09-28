@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { LinkIcon, Unlink } from "lucide-react"
+import { LinkIcon } from "lucide-react"
 import { useState } from "react"
 import type { Editor } from "@tiptap/react"
 
