@@ -1,16 +1,13 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
 import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion"
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { createVersion, getPolicyItemsByVersion } from '@/features/policy/api'
+import { useQuery } from '@tanstack/react-query'
+import { getPolicyItemsByVersion } from '@/features/policy/api'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ChildLegalPolicy, PolicyVersion } from '@/types/policy'
 import { useTranslations } from 'next-intl'
-import Image from 'next/image'
-import { formatDate } from '@/lib/date-formated'
-import RichTextEditor from '@/components/shared/editor'
 import { Input } from '@/components/ui/input'
 import {
     Dialog,
