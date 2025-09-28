@@ -48,12 +48,12 @@ const SeoFields = ({ onLoadingGenerate }: SEOFieldsProps) => {
 
     return (
         <div className='space-y-4'>
-            <div className='flex gap-4 items-center'>
+            {/* <div className='flex gap-4 items-center'>
                 <Button type='button' onClick={() => handleGenerateSEO()} disabled={!title || !description ? true : false}>
                     {generateSEOMutation.isPending ? <Loader2 className='animate-spin' /> : "Generate SEO"}
                 </Button>
                 {!title || !description ? <p className='text-red-500'>You need to enter product name and product description</p> : ''}
-            </div>
+            </div> */}
             <FormField
                 control={form.control}
                 name="url_key"

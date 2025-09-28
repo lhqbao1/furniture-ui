@@ -94,6 +94,7 @@ export type StaticFile = {
     url_key: string
     meta_title: string
     meta_description: string
+    meta_keywords: string
     ebay_offer_id: string
 
     delivery_cost: number

@@ -39,6 +39,7 @@ export function AdminSideBar() {
             icon: ChevronRight,
             children: [
                 { title: "Order List", url: "/admin/orders/list", icon: CornerDownRight },
+                { title: "Create Order", url: "/admin/orders/add", icon: CornerDownRight },
             ],
         },
         {

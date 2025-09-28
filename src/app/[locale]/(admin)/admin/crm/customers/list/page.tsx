@@ -24,14 +24,12 @@ const CustomerListPage = () => {
     if (isError) return <div>No data</div>
     if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
 
-
     return (
         <div className='space-y-12'>
-            <ProductStatistic statistic={userStatistics} />
+            {/* <ProductStatistic statistic={userStatistics} /> */}
             <div className='text-3xl text-secondary font-bold text-center'>Customers List</div>
             {isLoading || !data ? <ProductTableSkeleton /> :
                 <ProductTable
-
                     data={data ? data : []}
                     columns={customerColumns}
                     page={page}

@@ -102,20 +102,20 @@ export const customerColumns: ColumnDef<Customer>[] = [
             )
         }
     },
-    {
-        id: "actions",
-        header: "ACTION",
-        cell: ({ row }) => {
-            return (
-                <div className="flex justify-center">
-                    <Link href={`/admin/orders/${row.original.id}`}>
-                        <Button variant="ghost" size="icon">
-                            <Eye className="w-4 h-4" stroke="#F7941D" />
-                        </Button>
-                    </Link>
-                </div>
+    // {
+    //     id: "actions",
+    //     header: "ACTION",
+    //     cell: ({ row }) => {
+    //         return (
+    //             <div className="flex justify-center">
+    //                 <Link href={`/admin/orders/${row.original.id}`}>
+    //                     <Button variant="ghost" size="icon">
+    //                         <Eye className="w-4 h-4" stroke="#F7941D" />
+    //                     </Button>
+    //                 </Link>
+    //             </div>
 
-            )
-        }
-    },
+    //         )
+    //     }
+    // },
 ]

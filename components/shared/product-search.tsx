@@ -17,8 +17,10 @@ import {
 } from "@/components/ui/command"
 import { createPortal } from "react-dom"
 import { Link } from "@/src/i18n/navigation"
+import { useCartLocal } from "@/hooks/cart"
+import { toast } from "sonner"
 
-export default function ProductSearch({ height }: { height?: boolean }) {
+export default function ProductSearch({ height, isAdmin = false }: { height?: boolean, isAdmin?: boolean }) {
     const t = useTranslations()
     const [query, setQuery] = React.useState("")
     const [debouncedQuery, setDebouncedQuery] = React.useState("")
@@ -26,6 +28,31 @@ export default function ProductSearch({ height }: { height?: boolean }) {
     const containerRef = React.useRef<HTMLDivElement>(null)
     const inputRef = React.useRef<HTMLInputElement>(null)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
+    const { addToCartLocal } = useCartLocal()
+
+    const handleAddToCartLocal = (productDetails: ProductItem) => {
+        addToCartLocal({
+            item: {
+                product_id: productDetails.id ?? '',
+                quantity: 1,
+                is_active: true,
+                item_price: productDetails.final_price,
+                final_price: productDetails.final_price,
+                img_url: productDetails.static_files[0].url,
+                product_name: productDetails.name,
+                stock: productDetails.stock,
+                carrier: productDetails.carrier ? productDetails.carrier : 'amm'
+            }
+        }, {
+            onSuccess(data, variables, context) {
+                toast.success(t('addToCartSuccess'))
+            },
+            onError(error, variables, context) {
+                toast.error(t('addToCartFail'))
+            },
+        })
+    }
+
 
     // debounce query
     React.useEffect(() => {
@@ -119,27 +146,60 @@ export default function ProductSearch({ height }: { height?: boolean }) {
                                                         : `/${product.id}`
                                             return (
                                                 <CommandItem asChild key={product.id} value={product.name}>
-                                                    <Link
-                                                        href={`/product${categoryHref}`} passHref
-                                                        className="flex justify-between items-center w-full cursor-pointer"
-                                                        onClick={() => {
-                                                            setQuery("")
-                                                            setOpen(false)
-                                                        }}
-                                                    >
-                                                        <div className="flex gap-3 flex-1 items-center">
-                                                            <Image
-                                                                src={product.static_files.length > 0 ? product.static_files[0].url : "/1.png"}
-                                                                height={50}
-                                                                width={50}
-                                                                alt=""
-                                                                className="h-12 w-12"
-                                                                unoptimized
-                                                            />
-                                                            <div className="font-semibold">{product.name}</div>
+                                                    {isAdmin ? (
+                                                        <div
+                                                            className="flex justify-between items-center w-full cursor-pointer"
+                                                            onClick={() => {
+                                                                handleAddToCartLocal(product)
+                                                                setQuery("")
+                                                                setOpen(false)
+                                                            }}
+                                                        >
+                                                            <div className="flex gap-3 flex-1 items-center">
+                                                                <Image
+                                                                    src={
+                                                                        product.static_files.length > 0
+                                                                            ? product.static_files[0].url
+                                                                            : "/1.png"
+                                                                    }
+                                                                    height={50}
+                                                                    width={50}
+                                                                    alt=""
+                                                                    className="h-12 w-12"
+                                                                    unoptimized
+                                                                />
+                                                                <div className="font-semibold">{product.name}</div>
+                                                            </div>
+                                                            <div className="text-[#666666]">{product.id_provider}</div>
                                                         </div>
-                                                        <div className="text-[#666666]">{product.id_provider}</div>
-                                                    </Link>
+                                                    ) : (
+                                                        <Link
+                                                            href={`/product${categoryHref}`}
+                                                            passHref
+                                                            className="flex justify-between items-center w-full cursor-pointer"
+                                                            onClick={() => {
+                                                                setQuery("")
+                                                                setOpen(false)
+                                                            }}
+                                                        >
+                                                            <div className="flex gap-3 flex-1 items-center">
+                                                                <Image
+                                                                    src={
+                                                                        product.static_files.length > 0
+                                                                            ? product.static_files[0].url
+                                                                            : "/1.png"
+                                                                    }
+                                                                    height={50}
+                                                                    width={50}
+                                                                    alt=""
+                                                                    className="h-12 w-12"
+                                                                    unoptimized
+                                                                />
+                                                                <div className="font-semibold">{product.name}</div>
+                                                            </div>
+                                                            <div className="text-[#666666]">{product.id_provider}</div>
+                                                        </Link>
+                                                    )}
                                                 </CommandItem>
 
                                             )

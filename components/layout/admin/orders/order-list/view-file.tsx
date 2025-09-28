@@ -21,7 +21,7 @@ interface ViewFileDialogProps {
     type?: string
 }
 
-const ViewFileDialog = ({ checkoutId, invoiceId, type }: ViewFileDialogProps) => {
+const ViewFileDialog = ({ checkoutId, invoiceId, type = 'invoice' }: ViewFileDialogProps) => {
     const [open, setOpen] = useState(false)
 
     return (
