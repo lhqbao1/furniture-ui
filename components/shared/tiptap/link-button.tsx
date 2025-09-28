@@ -1,94 +1,65 @@
 "use client"
 
-import { useCallback, useState } from "react"
-import { Editor } from "@tiptap/react"
-import { LinkIcon } from "lucide-react"
-import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { LinkIcon, Unlink } from "lucide-react"
+import { useState } from "react"
+import type { Editor } from "@tiptap/react"
 
-interface LinkButtonProps {
-    editor: Editor
-}
-
-export function LinkButton({ editor }: LinkButtonProps) {
+export default function LinkControls({ editor }: { editor: Editor }) {
     const [open, setOpen] = useState(false)
     const [url, setUrl] = useState("")
 
-    const applyLink = useCallback(() => {
-        const previousUrl = editor.getAttributes('link').href
-        const url = window.prompt('URL', previousUrl)
-
-        // cancelled
-        if (url === null) {
-            return
-        }
-
-        // empty
-        if (url === '') {
-            editor.chain().focus().extendMarkRange('link').unsetLink().run()
-
-            return
-        }
-
-        // update link
-        try {
-            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
-        } catch (e) {
-            alert("Invalid URL")
-        }
-    }, [editor])
-
-
-    const removeLink = () => {
-        editor.chain().focus().unsetLink().run()
-        setOpen(false)
-        setUrl("")
+    const handleOpen = () => {
+        const previousUrl = editor.getAttributes("link").href
+        setUrl(previousUrl || "")
+        setOpen(true)
     }
 
-    if (!editor) return null
+    const handleSetLink = () => {
+        if (url === "") {
+            editor.chain().focus().extendMarkRange("link").unsetLink().run()
+        } else {
+            editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run()
+        }
+        setOpen(false)
+    }
+
+    const handleUnsetLink = () => {
+        editor.chain().focus().extendMarkRange("link").unsetLink().run()
+        setUrl("")
+        setOpen(false)
+    }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
                 <Button
                     type="button"
-                    variant="outline"
-                    size="sm"
-                    // className={editor.isActive("link") ? "bg-secondary text-white" : ""}
-                    onClick={() => {
-                        editor.chain().focus().setLink({ href: url }).run()
-                    }}
+                    variant={editor.isActive("link") ? "secondary" : "outline"}
+                    size="icon"
+                    onClick={handleOpen}
+                    title="Edit Link"
                 >
                     <LinkIcon className="w-4 h-4" />
                 </Button>
-            </DialogTrigger>
-            <DialogContent className="w-[300px]">
-                <DialogHeader>
-                    <DialogTitle>Insert Link</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                    <Input
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="https://example.com"
-                        type="url"
-                    />
-                    <DialogFooter className="flex gap-2">
-                        <Button onClick={applyLink}>Apply</Button>
-                        <Button variant="outline" onClick={removeLink}>
-                            Remove
-                        </Button>
-                    </DialogFooter>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 space-y-2">
+                <Input
+                    placeholder="https://example.com"
+                    value={url}
+                    onChange={e => setUrl(e.target.value)}
+                />
+                <div className="flex justify-start gap-2">
+                    <Button variant="outline" size="sm" onClick={handleSetLink}>
+                        Apply
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={handleUnsetLink}>
+                        Remove Link
+                    </Button>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </PopoverContent>
+        </Popover>
     )
 }

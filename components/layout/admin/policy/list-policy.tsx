@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog"
 import { useCreateChildLegalPolicy, useCreateLegalPolicy, useCreateVersion } from '@/features/policy/hook'
 import { toast } from 'sonner'
+import RichEditor from '@/components/shared/tiptap/tiptap-editor'
 
 
 interface ListPolicyAdminProps {
@@ -237,9 +238,9 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                                 className="w-full text-xl text-secondary font-bold border rounded px-2 py-1 mb-2"
                             />
 
-                            <RichTextEditor
+                            <RichEditor
                                 value={policies[currentPolicy.id]?.[cl.id]?.content || ""}
-                                onChange={(val) => handleContentChange(currentPolicy.id, cl.id, val)}
+                                onChangeValue={(val) => handleContentChange(currentPolicy.id, cl.id, val)}
                             />
                         </div>
                     )
