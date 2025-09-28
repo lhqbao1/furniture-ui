@@ -4,6 +4,7 @@ import {
     Accordion,
     AccordionContent,
     AccordionItem,
+    AccordionTrigger,
 } from "@/components/ui/accordion"
 import { useQuery } from '@tanstack/react-query'
 import { getPolicyItemsByVersion } from '@/features/policy/api'
@@ -28,17 +29,20 @@ interface ListPolicyProps {
 
 const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = false }: ListPolicyProps) => {
     const t = useTranslations()
-    const [openAccordion, setOpenAccordion] = useState<string>("") // mặc định là chuỗi rỗng
+    const [openAccordion, setOpenAccordion] = useState<string>("")
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
     const router = useRouter()
     const [currentVersion, setCurrentVersion] = useState(versionId)
     const pathname = usePathname()
-    const { scrollTo, registerRef } = useSmoothScrollToRef<HTMLDivElement>()
-
+    const { scrollTo, registerRef, setContainer } = useSmoothScrollToRef<HTMLDivElement>()
     // Khi click vào item
     const handleClick = (key: string) => {
         scrollTo(key, -80) // scroll lên trên một chút để tránh bị che bởi header
     }
+
+    useEffect(() => {
+        console.log('hehe')
+    })
 
     const { data: policy, isLoading } = useQuery({
         queryKey: ["policy-items", currentVersion],
@@ -89,38 +93,42 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                             <AccordionItem
                                 value={item.id}
                                 key={item.id}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    if (isAdmin) {
-                                        setOpenAccordion(item.id)
-                                    } else {
-                                        setTimeout(() => {
-                                            switch (true) {
-                                                case item.name.toLowerCase().includes("agb"):
-                                                    router.push("/agb")
-                                                    break
-
-                                                case item.name.toLowerCase().includes("impressum"):
-                                                    router.push("/impressum")
-                                                    break
-
-                                                case item.name.toLowerCase().includes("widerruf"):
-                                                    router.push("/cancellation")
-                                                    break
-
-                                                case item.name.toLowerCase().includes("datenschutzer"):
-                                                    router.push("/privacy-policy")
-                                                    break
-
-                                                default:
-                                                    router.push("/agb")
-                                            }
-                                        }, 150)
-                                    }
-                                }}
                             >
-                                <div className='pr-6 px-2 py-3 cursor-pointer font-bold'>{item.name}</div>
+                                <AccordionTrigger
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+
+                                        if (isAdmin) {
+                                            setOpenAccordion(item.id)
+                                        } else {
+                                            setTimeout(() => {
+                                                switch (true) {
+                                                    case item.name.toLowerCase().includes("agb"):
+                                                        router.push("/agb")
+                                                        break
+
+                                                    case item.name.toLowerCase().includes("impressum"):
+                                                        router.push("/impressum")
+                                                        break
+
+                                                    case item.name.toLowerCase().includes("widerruf"):
+                                                        router.push("/cancellation")
+                                                        break
+
+                                                    case item.name.toLowerCase().includes("datenschutzer"):
+                                                        router.push("/privacy-policy")
+                                                        break
+
+                                                    default:
+                                                        router.push("/agb")
+                                                }
+                                            }, 150)
+                                        }
+                                    }}
+                                >
+                                    <div className='pr-6 cursor-pointer font-bold'>{item.name}</div>
+                                </AccordionTrigger>
                                 <AccordionContent className="flex flex-col gap-1.5 text-balance">
                                     {item.child_legal_policies.map((child, policyItemIndex) => (
                                         <div
@@ -133,7 +141,10 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                             )}
                                             onClick={() => {
                                                 setCurrentPolicyItem(policyItemIndex)
-                                                scrollTo(`${item.id}-${policyItemIndex}`, -80)
+                                                // delay 1 tick để đảm bảo DOM ổn định rồi mới scroll
+                                                setTimeout(() => {
+                                                    scrollTo(`${item.id}-${policyItemIndex}`, -80)
+                                                }, 200)
                                             }}
                                         >
                                             {child.label}
@@ -155,7 +166,9 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
             </div>
 
             {/* Nội dung bên phải */}
-            <div className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll min-h-screen max-h-full overflow-y-auto'>
+            <div
+                // ref={setContainer}
+                className='w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll min-h-screen flex-1 max-h-full overflow-y-auto'>
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
@@ -192,3 +205,5 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
 }
 
 export default ListPolicy
+
+

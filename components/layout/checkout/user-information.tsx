@@ -12,12 +12,15 @@ import { Input } from "@/components/ui/input"
 import { useTranslations } from "next-intl"
 import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useGetAllCustomers } from "@/features/users/hook"
 
 
 export function CheckOutUserInformation() {
     const form = useFormContext()
     const t = useTranslations()
     const [open, setOpen] = useState(false)
+
+    const { data: listUser, isLoading } = useGetAllCustomers()
 
     return (
         <div className="space-y-4">

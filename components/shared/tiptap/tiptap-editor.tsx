@@ -158,7 +158,9 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
             {editor && <MenuBar editor={editor} />}
             <EditorContent
                 editor={editor}
-                className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]"
+                className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
+                [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-secondary [&_h2]:mt-6 [&_h2]:mb-3
+                "
             />
         </div>
     )

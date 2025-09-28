@@ -14,6 +14,7 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook"
 import { Axios, AxiosError } from "axios"
+import { stripHtmlRegex } from "@/hooks/simplifyHtml"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -163,7 +164,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
             stock: product.stock,
             tax: product.tax ? product.tax : null,
             product: {
-                description: JSON.stringify(product.description),
+                description: stripHtmlRegex(product.description),
                 title: JSON.stringify(product.name),
                 imageUrls: product.static_files?.map(file => file.url) ?? [],
                 ean: product.ean ? [product.ean] : [],
