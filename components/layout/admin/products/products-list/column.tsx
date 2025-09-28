@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { CopyCheck, Eye, Pencil } from "lucide-react"
+import { CopyCheck, Eye, Loader2, Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ProductItem } from "@/types/products"
 import Link from "next/link"
@@ -12,7 +12,7 @@ import { useEditProduct } from "@/features/products/hook"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { useSyncToEbay } from "@/features/ebay/hook"
+import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -142,6 +142,18 @@ function EditableStockCell({ product }: { product: ProductItem }) {
 
 function SyncToEbay({ product }: { product: ProductItem }) {
     const syncToEbayMutation = useSyncToEbay()
+    const removeFromEbayMutation = useRemoveFormEbay()
+
+    const handleRemoveFromEbay = () => {
+        removeFromEbayMutation.mutate(product.sku, {
+            onSuccess(data, variables, context) {
+                toast.success("Remove from Ebay successful")
+            },
+            onError(error, variables, context) {
+                toast.error("Remove from Ebay fail")
+            },
+        })
+    }
 
     const handleSyncToEbay = () => {
         syncToEbayMutation.mutate({
@@ -155,12 +167,27 @@ function SyncToEbay({ product }: { product: ProductItem }) {
                 imageUrls: product.static_files?.map(file => file.url) ?? [],
                 ean: product.ean ? [product.ean] : [],
             }
+        }, {
+            onSuccess(data, variables, context) {
+                toast.success("Sync to Ebay successful")
+            },
+            onError(error, variables, context) {
+                toast.error("Sync to Ebay fail")
+            },
         })
     }
 
     return (
         <div className="flex justify-start">
-            {product.ebay ? '' : <Button onClick={() => handleSyncToEbay()} variant={'outline'}>Ebay</Button>}
+            {product.ebay ?
+                <Button onClick={() => handleRemoveFromEbay()} variant={'outline'} className="text-red-600 border-red-600" disabled={removeFromEbayMutation.isPending || syncToEbayMutation.isPending}>
+                    {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Remove'}
+                </Button>
+                :
+                <Button onClick={() => handleSyncToEbay()} variant={'outline'} disabled={syncToEbayMutation.isPending || removeFromEbayMutation.isPending}>
+                    {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Sync'}
+                </Button>
+            }
         </div>
     )
 }
@@ -356,7 +383,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     },
     {
         id: 'sync',
-        header: "SYNC",
+        header: "EBAY",
         cell: ({ row }) => {
             return (
                 <SyncToEbay product={row.original} />
