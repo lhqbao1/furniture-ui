@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook"
+import { Axios, AxiosError } from "axios"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -171,8 +172,11 @@ function SyncToEbay({ product }: { product: ProductItem }) {
             onSuccess(data, variables, context) {
                 toast.success("Sync to Ebay successful")
             },
-            onError(error, variables, context) {
-                toast.error("Sync to Ebay fail")
+
+            onError(error) {
+                const message =
+                    error.response?.data?.detail?.errors?.[0]?.message ?? "Fail to sync to Ebay"
+                toast.error(message)
             },
         })
     }

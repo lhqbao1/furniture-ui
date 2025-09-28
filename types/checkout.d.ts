@@ -22,6 +22,8 @@ interface CheckOut {
     total_amount_item: number
     total_vat: number
     total_shipping: number
+    from_marketplace: string
+    marketplace_order_id: string
     total_amount: number
     created_at: Date
     updated_at: Date
