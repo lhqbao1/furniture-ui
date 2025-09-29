@@ -64,10 +64,10 @@ const CartPage = () => {
         if (userId) {
             if (displayedCart.length === 0) {
                 toast.error(t('chooseAtLeastCart'))
-                return
+            } else {
+                // Navigate checkout
+                router.push('/check-out')
             }
-            // Navigate checkout
-            router.push('/check-out')
         } else {
             if (displayedCart.length === 0) {
                 toast.error(t('chooseAtLeastCart'))
@@ -77,7 +77,6 @@ const CartPage = () => {
             setIsLoginOpen(true)
         }
     }
-
 
     return (
         <div className='mt-6 lg:px-0 px-4'>

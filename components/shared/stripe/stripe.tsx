@@ -122,7 +122,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
                 try {
                     const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
                         payment_method: { billing_details: { email: "customer@example.com", address: { country: "DE" } } },
-                        return_url: `http://prestige-home.de/payment-result?clientSecret=${clientSecret}`,
+                        return_url: `http://prestige-home.de/payment-result?paymentIntentId=${clientSecret}`,
                     });
                     if (error) {
                         toast.error(error.message || t("klarnaNotAllow"));

@@ -40,7 +40,6 @@ const CartSummary = ({ total = 0, onApplyCoupon, onCheckout, cart }: CartSummary
                     </div>
                     <Button
                         className="w-full bg-primary py-5 cursor-pointer"
-                        hasEffect
                         onClick={onCheckout}
                     >
                         {t('proceedToCheckout')}
