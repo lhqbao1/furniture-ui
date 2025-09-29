@@ -51,7 +51,7 @@ const OrderPlaced = () => {
             // 2. Sau đó fetch checkout
             return getCheckOutByCheckOutId(checkoutId)
         },
-        enabled: !!checkoutId && !!paymentId, // chỉ chạy khi có cả 2 id
+        enabled: !!checkoutId,
         retry: false
     })
 
