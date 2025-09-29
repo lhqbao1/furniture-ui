@@ -19,6 +19,7 @@ import Image from "next/image";
 import { paymentOptions } from "@/data/data";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
+import { toast } from "sonner";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK!);
 
@@ -43,7 +44,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
 
     const handlePaymentSuccess = (paymentIntentId: string) => {
         // Redirect sang trang kết quả và gửi PaymentIntent.id vào query
-        router.push(`/payment-results?paymentIntentId=${paymentIntentId}`);
+        router.push(`/payment-result?paymentIntentId=${paymentIntentId}`);
     };
 
     // Reset clientSecret & PaymentRequest khi đổi phương thức
@@ -65,6 +66,17 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
             requestPayerEmail: true,
         });
 
+        pr.canMakePayment().then((result) => {
+            if (result) {
+                setPaymentRequest(pr);
+                pr.show(); // hiển thị popup
+            } else {
+                // Không hỗ trợ Apple/Google Pay trên trình duyệt hoặc quốc gia
+                toast.error(t("browserNotSupport"));
+                setClientSecret(null); // Hủy clientSecret nếu muốn
+            }
+        });
+
         const handlePaymentMethod = async (ev: PaymentRequestPaymentMethodEvent) => {
             try {
                 const { error, paymentIntent } = await stripe.confirmCardPayment(
@@ -75,7 +87,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
 
                 if (error) {
                     ev.complete("fail");
-                    alert("❌ " + error.message);
+                    toast.error(error.message || t("paymentFailed"));
                     return;
                 }
 
@@ -126,7 +138,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
         });
 
         if (error) {
-            alert("❌ " + error.message);
+            toast.error(error.message || t("paymentFailed"));
             return;
         }
 
@@ -137,16 +149,30 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
 
     const handleKlarnaPay = async () => {
         if (!stripe || !clientSecret) return;
-        const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
-            payment_method: {
-                billing_details: { email: "customer@example.com", address: { country: "DE" } },
-            },
-            return_url: `/payment-results?clientSecret=${clientSecret}`,
-        });
 
-        if (error) alert("❌ " + error.message);
+        try {
+            const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
+                payment_method: {
+                    billing_details: { email: "customer@example.com", address: { country: "DE" } },
+                },
+                return_url: `/payment-result?clientSecret=${clientSecret}`,
+            });
 
+            if (error) {
+                if (error.code === "not_supported") {
+                    toast.error(t("browserNotSupport"));
+                } else {
+                    toast.error(error.message || t("klarnaNotAllow"));
+
+                }
+                return;
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error(t("klarnaNotAllow"));
+        }
     };
+
 
     return (
         <Card className="mx-auto p-4 shadow-lg">
