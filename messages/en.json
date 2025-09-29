@@ -232,5 +232,7 @@
           "salesOrder": "Sales Order #",
           "billTo": "Bill to:",
           "shipTo": "Ship to:"
-    }
+    },
+    "browserNotSupport": "⚠️ Your browser or country does not support this payment method",
+    "klarnaNotAllow": "⚠️ Klarna payment failed. Please try another method"
 }

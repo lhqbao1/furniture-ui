@@ -232,5 +232,7 @@
     "salesOrder": "Auftragsnummer",
     "billTo": "Rechnung an:",
     "shipTo": "Lieferung an:"
-  }
+  },
+  "browserNotSupport": "⚠️ Ihr Browser oder Ihr Land unterstützt diese Zahlungsmethode nicht",
+  "klarnaNotAllow": "⚠️ Klarna-Zahlung fehlgeschlagen. Bitte versuchen Sie eine andere Zahlungsmethode"
 }
