@@ -235,5 +235,7 @@
     },
     "browserNotSupport": "⚠️ Your browser or country does not support this payment method",
     "klarnaNotAllow": "⚠️ Klarna payment failed. Please try another method",
-    "paymentFailed": "Payment failed"
+    "paymentFailed": "Payment failed",
+    "enterCardDetails": "Enter Card Details",
+  "payWithCard": "Pay with Card"
 }

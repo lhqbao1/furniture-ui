@@ -69,7 +69,7 @@ export default function CheckOutPage() {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [total, setTotal] = useState<number>(0);
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
-
+    const [openCardDialog, setOpenCardDialog] = useState(false)
 
     const router = useRouter()
     const { updateStatus } = useCartLocal()
@@ -409,6 +409,9 @@ export default function CheckOutPage() {
                     if (data.payment_method === "paypal") {
                         router.push(payment.approve_url)
                     } else {
+                        if (data.payment_method === "card") {
+                            setOpenCardDialog(true)
+                        }
                         // createPaymentIntent(data.payment_method as PaymentMethod);
                         setTotal(payment.amount)
                         setClientSecret(payment.clientSecret);
@@ -616,6 +619,8 @@ export default function CheckOutPage() {
                                 setClientSecret={setClientSecret}
                                 total={total ?? undefined}
                                 setTotal={setTotal}
+                                openDialog={openCardDialog}
+                                setOpenDialog={setOpenCardDialog}
                             />
                         </div>
                         <FormField
