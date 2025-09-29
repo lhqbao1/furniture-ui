@@ -358,13 +358,29 @@ export const faqs: Faqs[] = [
       ]
     },
   ]
+
+export const listChanel = [
+    {
+        id: 1,
+        name: 'Prestige Home',
+        icon: 'new-logo.svg',
+    },
+    {
+        id:2,
+        name: 'ebay',
+        icon: 'ebay.png',
+    },{
+        id:3,
+        name: 'amazon',
+        icon: 'amazon.png',
+    },{
+        id:4,
+        name: 'kaufland',
+        icon: 'kau.png',
+    }
+]
   
 export const listDE = [
-    {
-        id:1,
-        icon: '/new-logo.svg',
-        text: 'Default DE'
-    },
     {
         id:2,
         icon: '/new-logo.svg',

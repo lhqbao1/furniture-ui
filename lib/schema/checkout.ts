@@ -18,6 +18,7 @@ export const CreateOrderSchema = z.object({
     invoice_city: z.string().min(1),
     email: z.string().min(1).email(),
     phone_number: z.string().min(6),
+    total_shipping: z.number().nonnegative().optional().nullable(),
 
     shipping_address_line: z.string().min(1),
     shipping_postal_code: z.string().min(1),

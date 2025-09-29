@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Eye } from "lucide-react"
 import Link from "next/link"
 import ViewFileDialog from "./view-file"
+import { listChanel } from "@/data/data"
 
 
 export const orderColumns: ColumnDef<CheckOut>[] = [
@@ -58,8 +59,13 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
             <div className="text-center w-full">CHANNEL</div>
         ),
         cell: ({ row }) => {
+            const currentChanel = row.original.from_marketplace
+            const channelLogo = listChanel.find(ch => ch.name === currentChanel)?.icon || 'new-logo.svg'
             return (
-                <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
+                <div className="h-12 relative">
+                    <Image src={`/${channelLogo}`} alt="icon" fill className="object-contain p-2" unoptimized />
+                </div>
+                // <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
             )
         },
     },

@@ -392,7 +392,7 @@ export default function CheckOutPage() {
                     // user_id: userId,
                     invoice_address_id: invoiceAddressId,
                     shipping_address_id: shippingAddressId,
-
+                    total_shipping: calculateShipping(normalizeCartItems(cartItems && cartItems.items.length > 0 ? cartItems.items : localCart, cartItems && cartItems.items.length > 0 ? true : false)),
                 })
                 toast.success("Place order successful")
                 setCheckOut(checkout.id)

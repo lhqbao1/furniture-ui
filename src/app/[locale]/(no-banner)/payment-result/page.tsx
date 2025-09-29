@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useUploadStaticFile } from '@/features/file/hook'
 import { useSendMail } from '@/features/mail/hook'
 import { useGetUserById } from '@/features/users/hook'
@@ -17,6 +17,10 @@ import { useLocale, useTranslations } from 'next-intl'
 
 const OrderPlaced = () => {
     const router = useRouter()
+    const params = useSearchParams()
+    const paymentIntentId = params?.get('paymentIntentId') // Lấy param paymentIntent.id nếu có
+
+
     const [counter, setCounter] = useState(5)
     const [userId, setUserId] = useState<string | null>(null)
     const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom)
@@ -37,10 +41,12 @@ const OrderPlaced = () => {
     const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
         queryKey: ["checkout-id", checkoutId, paymentId],
         queryFn: async () => {
-            if (!checkoutId || !paymentId) return null
+            if (!checkoutId) return null
 
-            // 1. Capture payment trước
-            await capturePaymentMutation.mutateAsync(paymentId)
+            // Chỉ capture payment khi không có paymentIntentId
+            if (!paymentIntentId && paymentId) {
+                await capturePaymentMutation.mutateAsync(paymentId)
+            }
 
             // 2. Sau đó fetch checkout
             return getCheckOutByCheckOutId(checkoutId)
