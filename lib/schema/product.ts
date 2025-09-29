@@ -32,7 +32,7 @@ export const addProductSchema = z.object({
   manufacture_country: z.string().optional().nullable(),
   tariff_number: z.string().optional().nullable(),
   brand_id: z.string().optional().nullable(),
-  ebay: z.boolean(),
+  ebay: z.boolean().optional().nullable(),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
   weight: z.number().optional().nullable(),
   length: z.number().optional().nullable(),

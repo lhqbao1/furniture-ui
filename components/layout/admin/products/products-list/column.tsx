@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook"
 import { Axios, AxiosError } from "axios"
 import { stripHtmlRegex } from "@/hooks/simplifyHtml"
+import { Switch } from "@/components/ui/switch"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -197,6 +198,38 @@ function SyncToEbay({ product }: { product: ProductItem }) {
     )
 }
 
+function ToogleProductStatus({ product }: { product: ProductItem }) {
+    const editProductMutation = useEditProduct()
+    const handleToogleStatus = () => {
+        editProductMutation.mutate({
+            input: {
+                ...product,
+                is_active: !product.is_active,
+                category_ids: product.categories.map((c) => c.id), // map ra id array
+                // brand_id: product.brand.id
+            },
+            id: product.id,
+        }, {
+            onSuccess(data, variables, context) {
+                toast.success("Update product status successful")
+            },
+            onError(error, variables, context) {
+                toast.error("Update product status fail")
+            },
+        })
+    }
+
+    return (
+        <Switch
+            checked={product.is_active}
+            onCheckedChange={handleToogleStatus}
+            disabled={editProductMutation.isPending}
+            className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
+        />
+    )
+
+}
+
 export const productColumns: ColumnDef<ProductItem>[] = [
     {
         id: "select",
@@ -270,12 +303,13 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         accessorKey: "is_active",
         header: "STATUS",
         cell: ({ row }) => (
-            <span
-                className={`px-2 py-1 rounded-md text-xs ${row.original.is_active ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-                    }`}
-            >
-                {row.original.is_active ? "active" : "inactive"}
-            </span>
+            // <span
+            //     className={`px-2 py-1 rounded-md text-xs ${row.original.is_active ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+            //         }`}
+            // >
+            //     {row.original.is_active ? "active" : "inactive"}
+            // </span>
+            <ToogleProductStatus product={row.original} />
         ),
     },
     {
