@@ -87,7 +87,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
 
                 if (error) {
                     ev.complete("fail");
-                    alert("❌ " + error.message);
+                    toast.error(error.message || t("paymentFailed"));
                     return;
                 }
 
@@ -138,7 +138,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
         });
 
         if (error) {
-            alert("❌ " + error.message);
+            toast.error(error.message || t("paymentFailed"));
             return;
         }
 

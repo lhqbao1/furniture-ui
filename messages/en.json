@@ -234,5 +234,6 @@
           "shipTo": "Ship to:"
     },
     "browserNotSupport": "⚠️ Your browser or country does not support this payment method",
-    "klarnaNotAllow": "⚠️ Klarna payment failed. Please try another method"
+    "klarnaNotAllow": "⚠️ Klarna payment failed. Please try another method",
+    "paymentFailed": "Payment failed"
 }
