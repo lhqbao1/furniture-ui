@@ -1,17 +1,10 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { CartItem } from "@/types/cart"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Heart, Trash } from "lucide-react"
+import { Trash } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import { useMediaQuery } from "react-responsive"
-import { ProductItem } from "@/types/products"
-import { useAddToWishList } from "@/features/wishlist/hook"
-import { toast } from "sonner"
-import { HandleApiError } from "@/lib/api-helper"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { CartTableItem } from "./cart-local-table"
 import { useCartLocal } from "@/hooks/cart"
@@ -70,6 +63,7 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <Button
+                                        type="button"
                                         variant="outline"
                                         size="sm"
                                         onClick={() => onUpdateQuantity(item, item.quantity - 1)}
@@ -78,6 +72,7 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                                     </Button>
                                     <span>{item.quantity}</span>
                                     <Button
+                                        type="button"
                                         variant="outline"
                                         size="sm"
                                         onClick={() => onUpdateQuantity(item, item.quantity + 1)}
@@ -131,6 +126,7 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                 return (
                     <div className="flex items-center gap-2">
                         <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => onUpdateQuantity(item, item.quantity - 1)}
@@ -140,6 +136,7 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                         </Button>
                         <span className="px-2">{item.quantity}</span>
                         <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => onUpdateQuantity(item, item.quantity + 1)}

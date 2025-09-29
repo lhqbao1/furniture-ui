@@ -33,7 +33,7 @@ export default function ProductImageDialog({
                 <DialogTitle className="hidden"></DialogTitle>
                 <div className="grid grid-cols-12 gap-6 h-full">
                     {/* Cột 8: main image (không scroll, chỉ theo ảnh) */}
-                    <div className="col-span-12 lg:col-span-8 flex items-center justify-center lg:max-h-[78vh] max-h-[55vh]">
+                    <div className="col-span-12 lg:col-span-8 flex items-center justify-center lg:max-h-[75vh] max-h-[55vh]">
                         <Image
                             src={
                                 productDetails.static_files.length > 0
@@ -43,7 +43,7 @@ export default function ProductImageDialog({
                             alt={productDetails.name}
                             width={600}
                             height={600}
-                            className="object-fill h-full w-full lg:p-20"
+                            className="object-contain h-full w-full lg:p-20"
                         />
                     </div>
 
