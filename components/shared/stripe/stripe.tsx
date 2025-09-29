@@ -56,75 +56,85 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
     // PaymentRequest logic (Apple/Google Pay)
     useEffect(() => {
         if (!stripe || !clientSecret) return;
-        if (selectedMethod !== "applepay" && selectedMethod !== "googlepay") return;
 
-        const pr = stripe.paymentRequest({
-            country: "DE",
-            currency: "eur",
-            total: { label: "Demo Payment", amount: total ?? 0 },
-            requestPayerName: true,
-            requestPayerEmail: true,
-        });
+        // Reset paymentRequest cũ
+        if (paymentRequest) {
+            paymentRequest.abort?.();
+            setPaymentRequest(null);
+        }
 
-        pr.canMakePayment().then((result) => {
-            if (result) {
-                setPaymentRequest(pr);
-                pr.show(); // hiển thị popup
-            } else {
-                // Không hỗ trợ Apple/Google Pay trên trình duyệt hoặc quốc gia
-                toast.error(t("browserNotSupport"));
-                setClientSecret(null); // Hủy clientSecret nếu muốn
-            }
-        });
+        // Apple / Google Pay
+        if (selectedMethod === "applepay" || selectedMethod === "googlepay") {
+            const pr = stripe.paymentRequest({
+                country: "DE",
+                currency: "eur",
+                total: { label: "Demo Payment", amount: total ?? 0 },
+                requestPayerName: true,
+                requestPayerEmail: true,
+            });
 
-        const handlePaymentMethod = async (ev: PaymentRequestPaymentMethodEvent) => {
-            try {
-                const { error, paymentIntent } = await stripe.confirmCardPayment(
-                    clientSecret,
-                    { payment_method: ev.paymentMethod.id },
-                    { handleActions: false }
-                );
-
-                if (error) {
+            const handlePaymentMethod = async (ev: PaymentRequestPaymentMethodEvent) => {
+                try {
+                    const { error, paymentIntent } = await stripe.confirmCardPayment(
+                        clientSecret,
+                        { payment_method: ev.paymentMethod.id },
+                        { handleActions: false }
+                    );
+                    if (error) {
+                        ev.complete("fail");
+                        toast.error(error.message || t("paymentFailed"));
+                        return;
+                    }
+                    ev.complete("success");
+                    if (paymentIntent?.status === "requires_action") {
+                        await stripe.confirmCardPayment(clientSecret);
+                    }
+                    if (paymentIntent?.status === "succeeded") handlePaymentSuccess(paymentIntent.id);
+                } catch (err) {
                     ev.complete("fail");
-                    toast.error(error.message || t("paymentFailed"));
-                    return;
+                    console.error(err);
                 }
+            };
 
-                ev.complete("success");
+            pr.on("paymentmethod", handlePaymentMethod);
 
-                if (paymentIntent?.status === "requires_action") {
-                    await stripe.confirmCardPayment(clientSecret);
+            pr.canMakePayment().then((result) => {
+                if (result) {
+                    setPaymentRequest(pr);
+                    pr.show();
+                } else {
+                    toast.error(t("browserNotSupport"));
+                    setClientSecret(null);
                 }
+            });
 
-                if (paymentIntent?.status === "succeeded") {
-                    handlePaymentSuccess(paymentIntent.id);
+            pr.on("cancel", () => setClientSecret(null));
+
+            return () => {
+                pr.off("paymentmethod", handlePaymentMethod);
+                pr.abort?.();
+            };
+        }
+
+        // Klarna
+        if (selectedMethod === "klarna") {
+            const confirmKlarna = async () => {
+                try {
+                    const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
+                        payment_method: { billing_details: { email: "customer@example.com", address: { country: "DE" } } },
+                        return_url: `http://prestige-home.de/payment-result?clientSecret=${clientSecret}`,
+                    });
+                    if (error) {
+                        toast.error(error.message || t("klarnaNotAllow"));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    toast.error(t("klarnaNotAllow"));
                 }
-            } catch (err) {
-                ev.complete("fail");
-                console.error(err);
-            }
-        };
-
-        pr.on("paymentmethod", handlePaymentMethod);
-
-        pr.canMakePayment().then((result) => {
-            if (result) {
-                setPaymentRequest(pr);
-                pr.show(); // tự động show popup
-            }
-        });
-
-        pr.on("cancel", () => {
-            console.log("User canceled Apple/Google Pay");
-            setClientSecret(null);
-        });
-
-        return () => {
-            pr.off("paymentmethod", handlePaymentMethod);
-            pr.abort?.();
-        };
-    }, [stripe, clientSecret, selectedMethod, total, router]);
+            };
+            confirmKlarna();
+        }
+    }, [stripe, clientSecret, selectedMethod, total]);
 
     if (!stripe || !elements) return <p>Loading Stripe...</p>;
 
@@ -223,14 +233,14 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
                     </div>
                 )}
 
-                {selectedMethod === "klarna" && clientSecret && (
+                {/* {selectedMethod === "klarna" && clientSecret && (
                     <div className="space-y-2">
                         <p className="font-medium">Klarna Checkout</p>
                         <Button className="w-full" onClick={handleKlarnaPay}>
                             Proceed with Klarna
                         </Button>
                     </div>
-                )}
+                )} */}
             </CardContent>
         </Card>
     );
