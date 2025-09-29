@@ -51,7 +51,7 @@ const OrderPlaced = () => {
             // 2. Sau đó fetch checkout
             return getCheckOutByCheckOutId(checkoutId)
         },
-        enabled: !!checkoutId && !!paymentId, // chỉ chạy khi có cả 2 id
+        enabled: !!checkoutId, // chỉ chạy khi có cả 2 id
         retry: false
     })
 
@@ -78,7 +78,6 @@ const OrderPlaced = () => {
                 const file = new File([blob], "invoice.pdf", { type: "application/pdf" })
                 const formData = new FormData()
                 formData.append("files", file)
-                console.log(formData)
                 const uploadRes = await uploadStaticFileMutation.mutateAsync(formData)
 
                 // 3. Send mail

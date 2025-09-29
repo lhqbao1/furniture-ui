@@ -44,7 +44,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
 
     const handlePaymentSuccess = (paymentIntentId: string) => {
         // Redirect sang trang kết quả và gửi PaymentIntent.id vào query
-        router.push(`/payment-result?paymentIntentId=${paymentIntentId}`);
+        router.push(`http://prestige-home.de/payment-result?paymentIntentId=${paymentIntentId}`);
     };
 
     // Reset clientSecret & PaymentRequest khi đổi phương thức
@@ -155,7 +155,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
                 payment_method: {
                     billing_details: { email: "customer@example.com", address: { country: "DE" } },
                 },
-                return_url: `/payment-result?clientSecret=${clientSecret}`,
+                return_url: `http://prestige-home.de/payment-result?clientSecret=${clientSecret}`,
             });
 
             if (error) {
