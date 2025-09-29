@@ -101,7 +101,7 @@ const CheckOutInvoiceAddress = () => {
                         <FormItem className="col-span-2">
                             <FormLabel>{t("streetAndHouse")}</FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} />
+                                <Input placeholder="" {...field} disabled={isSameShipping} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -115,7 +115,7 @@ const CheckOutInvoiceAddress = () => {
                         <FormItem className="col-span-2">
                             <FormLabel>{t("addressSupplement")}</FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} />
+                                <Input placeholder="" {...field} disabled={isSameShipping} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -129,7 +129,7 @@ const CheckOutInvoiceAddress = () => {
                         <FormItem>
                             <FormLabel>{t("postalCode")}</FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} />
+                                <Input placeholder="" {...field} disabled={isSameShipping} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -144,7 +144,7 @@ const CheckOutInvoiceAddress = () => {
                             <FormLabel className="text-[#666666] text-sm">{t("city")}</FormLabel>
                             <FormControl>
                                 <Popover open={open} onOpenChange={setOpen}>
-                                    <PopoverTrigger asChild>
+                                    <PopoverTrigger asChild disabled={isSameShipping}>
                                         <Button
                                             variant="outline"
                                             role="combobox"

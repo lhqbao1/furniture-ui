@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Textarea } from '@/components/ui/textarea'
-import { useCreateAddress, useCreateInvoiceAddress, useGetAddressByUserId, useGetInvoiceAddressByUserId } from '@/features/address/hook'
+import { useCreateAddress, useCreateInvoiceAddress, useGetAddressByUserId, useGetInvoiceAddressByUserId, useUpdateInvoiceAddress } from '@/features/address/hook'
 import { toast } from 'sonner'
 import { useGetCartItems, useSyncLocalCart } from '@/features/cart/hook'
 import CartTable from '@/components/layout/cart/cart-table'
@@ -177,7 +177,8 @@ export default function CheckOutPage() {
     const loginMutation = useLogin()
     const syncLocalCartMutation = useSyncLocalCart();
     const checkMailExistMutation = useCheckMailExist();
-    const loginOtpMutation = useLoginOtp()
+    const editInvoiceAddressMutation = useUpdateInvoiceAddress()
+
 
     const handleOtpSuccess = (verifiedUserId: string) => {
         setUserId(verifiedUserId)
@@ -303,6 +304,7 @@ export default function CheckOutPage() {
                 let userId = user?.id
                 let invoiceAddressId = invoiceAddress?.id
                 let shippingAddressId = addresses?.find(a => a.is_default)?.id
+                const invoiceAddressCountry = invoiceAddress?.country;
 
                 if (data.email && !userId) {
                     const exists = await checkMailExistMutation.mutateAsync(data.email)
@@ -342,7 +344,8 @@ export default function CheckOutPage() {
                 }
 
                 // Nếu chưa có invoice address thì tạo mới
-                if (!invoiceAddressId) {
+                // Nếu chưa có invoice address thì tạo mới
+                if (!invoiceAddressCountry || invoiceAddressCountry === "" || !invoiceAddressId) {
                     const newInvoice = await createInvoiceAddressMutation.mutateAsync({
                         user_id: userId ?? '',
                         recipient_name: data.first_name + data.last_name,
@@ -355,6 +358,27 @@ export default function CheckOutPage() {
                         state: data.invoice_city
                     })
                     invoiceAddressId = newInvoice.id
+                } else {
+                    if (data.invoice_address_line !== invoiceAddress?.address_line ||
+                        data.invoice_postal_code !== invoiceAddress?.postal_code ||
+                        data.invoice_city !== invoiceAddress?.city ||
+                        data.phone_number !== invoiceAddress?.phone_number) {
+                        const newInvoice = await editInvoiceAddressMutation.mutateAsync({
+                            addressId: invoiceAddressId,
+                            address: {
+                                user_id: userId ?? '',
+                                recipient_name: data.first_name + data.last_name,
+                                postal_code: data.invoice_postal_code,
+                                phone_number: data.phone_number,
+                                address_line: data.invoice_address_line,
+                                city: data.invoice_city,
+                                country: data.invoice_city,
+                                name_address: "Invoice",
+                                state: data.invoice_city
+                            }
+                        })
+                        invoiceAddressId = newInvoice.id
+                    }
                 }
 
                 // Nếu chưa có shipping address thì tạo mới
@@ -372,6 +396,25 @@ export default function CheckOutPage() {
                         state: data.shipping_city
                     })
                     shippingAddressId = newShipping.id
+                } else {
+                    if (data.shipping_address_line !== addresses?.find(a => a.is_default)?.address_line ||
+                        data.shipping_postal_code !== addresses?.find(a => a.is_default)?.postal_code ||
+                        data.shipping_city !== addresses?.find(a => a.is_default)?.city ||
+                        data.phone_number !== addresses?.find(a => a.is_default)?.phone_number) {
+                        const newShipping = await createShippingAddressMutation.mutateAsync({
+                            user_id: userId ?? '',
+                            recipient_name: data.first_name + data.last_name,
+                            postal_code: data.shipping_postal_code,
+                            phone_number: data.phone_number,
+                            address_line: data.shipping_address_line,
+                            city: data.shipping_city,
+                            country: data.shipping_city,
+                            name_address: "Rechnung",
+                            is_default: true,
+                            state: data.shipping_city
+                        })
+                        shippingAddressId = newShipping.id
+                    }
                 }
 
                 // Đợi cartItems
@@ -489,7 +532,7 @@ export default function CheckOutPage() {
                         <PaymentMethodSelector />
                     </div> */}
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <CheckOutUserInformation />
+                        <CheckOutUserInformation isLogin={user ? true : false} />
                         <CheckOutShippingAddress />
                         <CheckOutInvoiceAddress />
                         {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />}

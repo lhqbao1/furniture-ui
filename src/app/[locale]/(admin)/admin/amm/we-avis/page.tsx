@@ -67,7 +67,6 @@ const AmmWeAvisPage = () => {
                     <DialogHeader>
                         <DialogTitle>Upload file</DialogTitle>
                     </DialogHeader>
-
                     <div
                         {...getRootProps()}
                         className={`mt-4 flex h-40 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition 

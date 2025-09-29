@@ -374,7 +374,7 @@ export default function CreateCheckoutpage() {
                 }
 
                 // Tạo checkout
-                const checkout = await createCheckOutMutation.mutateAsync({
+                await createCheckOutMutation.mutateAsync({
                     ...data,
                     // user_id: userId,
                     invoice_address_id: invoiceAddressId,
@@ -382,23 +382,6 @@ export default function CreateCheckoutpage() {
 
                 })
                 toast.success("Place order successful")
-                // setCheckOut(checkout.id)
-
-                // if (data.payment_method === "paypal") {
-                //     // Tạo payment
-                //     const payment = await createPaymentMutation.mutateAsync({
-                //         checkout_id: checkout.id,
-                //     })
-
-                //     // toast.success("Place payment successful")
-                //     setPaymentId(payment.payment_id)
-                //     router.push(payment.approve_url)
-                // }
-
-                // if (data.payment_method === "bank") {
-                //     console.log('bank')
-                //     setOpenBankDialog(true)
-                // }
             } catch (error) {
                 toast.error(t('orderFail'))
                 console.error(error)

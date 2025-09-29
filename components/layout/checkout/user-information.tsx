@@ -15,12 +15,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useGetAllCustomers } from "@/features/users/hook"
 
 
-export function CheckOutUserInformation() {
+interface CheckOutUserInformationProps {
+    isLogin: boolean
+}
+export function CheckOutUserInformation({ isLogin }: CheckOutUserInformationProps) {
     const form = useFormContext()
     const t = useTranslations()
-    const [open, setOpen] = useState(false)
-
-    const { data: listUser, isLoading } = useGetAllCustomers()
 
     return (
         <div className="space-y-4">
@@ -35,7 +35,7 @@ export function CheckOutUserInformation() {
                         <FormItem>
                             <FormLabel>{t('firstName')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter first name" {...field} />
+                                <Input placeholder="Enter first name" {...field} disabled={isLogin} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -49,7 +49,7 @@ export function CheckOutUserInformation() {
                         <FormItem>
                             <FormLabel>{t('lastName')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter last name" {...field} />
+                                <Input placeholder="Enter last name" {...field} disabled={isLogin} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -66,6 +66,7 @@ export function CheckOutUserInformation() {
                                     type="email"
                                     placeholder=""
                                     {...field}
+                                    disabled={isLogin}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -84,6 +85,7 @@ export function CheckOutUserInformation() {
                                     type="number"
                                     placeholder="+49"
                                     {...field}
+                                    disabled={isLogin}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -101,7 +103,7 @@ export function CheckOutUserInformation() {
                                     value={field.value}
                                     onValueChange={field.onChange}
                                 >
-                                    <SelectTrigger className="w-full border" placeholderColor>
+                                    <SelectTrigger className="w-full border" placeholderColor disabled={isLogin}>
                                         <SelectValue placeholder={t("gender")} />
                                     </SelectTrigger>
                                     <SelectContent>
