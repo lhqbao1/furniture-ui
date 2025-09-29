@@ -235,5 +235,7 @@
   },
   "browserNotSupport": "⚠️ Ihr Browser oder Ihr Land unterstützt diese Zahlungsmethode nicht",
   "klarnaNotAllow": "⚠️ Klarna-Zahlung fehlgeschlagen. Bitte versuchen Sie eine andere Zahlungsmethode",
-  "paymentFailed": "Zahlung fehlgeschlagen"
+  "paymentFailed": "Zahlung fehlgeschlagen",
+  "enterCardDetails": "Kartendaten eingeben",
+  "payWithCard": "Mit Karte bezahlen"
 }

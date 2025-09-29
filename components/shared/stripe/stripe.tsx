@@ -6,7 +6,6 @@ import {
     CardElement,
     useStripe,
     useElements,
-    PaymentRequestButtonElement,
 } from "@stripe/react-stripe-js";
 import { loadStripe, PaymentRequest, PaymentRequestPaymentMethodEvent } from "@stripe/stripe-js";
 
@@ -20,6 +19,7 @@ import { paymentOptions } from "@/data/data";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK!);
 
@@ -30,9 +30,11 @@ interface CheckoutFormProps {
     setClientSecret: React.Dispatch<React.SetStateAction<string | null>>;
     total?: number;
     setTotal?: React.Dispatch<React.SetStateAction<number>>;
+    openDialog?: boolean
+    setOpenDialog?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProps) {
+function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpenDialog }: CheckoutFormProps) {
     const stripe = useStripe();
     const elements = useElements();
     const { control, watch } = useFormContext();
@@ -222,25 +224,24 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
                 />
 
                 {selectedMethod === "card" && clientSecret && (
-                    <div className="space-y-2">
-                        <p className="font-medium">Enter Card Details</p>
-                        <div className="border rounded-md p-2">
-                            <CardElement options={{ hidePostalCode: true }} />
-                        </div>
-                        <Button className="w-full" onClick={handleCardPay}>
-                            Pay with Card
-                        </Button>
-                    </div>
+                    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>{t("enterCardDetails")}</DialogTitle>
+                            </DialogHeader>
+
+                            <div className="space-y-4">
+                                <div className="border rounded-md p-2">
+                                    <CardElement options={{ hidePostalCode: true }} />
+                                </div>
+                                <Button type="button" className="w-full" onClick={handleCardPay}>
+                                    {t("payWithCard")}
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 )}
 
-                {/* {selectedMethod === "klarna" && clientSecret && (
-                    <div className="space-y-2">
-                        <p className="font-medium">Klarna Checkout</p>
-                        <Button className="w-full" onClick={handleKlarnaPay}>
-                            Proceed with Klarna
-                        </Button>
-                    </div>
-                )} */}
             </CardContent>
         </Card>
     );

@@ -58,11 +58,18 @@ export function AdminSideBar() {
                 { title: "Policy", url: "/admin/settings/policy", icon: CornerDownRight },
             ],
         },
+        {
+            title: "AMM",
+            url: "/admin/amm",
+            icon: ChevronRight,
+            children: [
+                { title: "We Avis", url: "/admin/amm/we-avis", icon: CornerDownRight },
+            ],
+        },
     ];
 
     return (
         <Sidebar className="app-sidebar custom-scroll">
-
             <SidebarContent>
                 <SidebarGroup>
                     <Link href={'/admin'}>
