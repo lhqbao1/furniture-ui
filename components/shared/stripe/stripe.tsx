@@ -43,7 +43,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
 
     const handlePaymentSuccess = (paymentIntentId: string) => {
         // Redirect sang trang kết quả và gửi PaymentIntent.id vào query
-        router.push(`/payment-results?paymentIntentId=${paymentIntentId}`);
+        router.push(`/payment-result?paymentIntentId=${paymentIntentId}`);
     };
 
     // Reset clientSecret & PaymentRequest khi đổi phương thức
@@ -141,7 +141,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProp
             payment_method: {
                 billing_details: { email: "customer@example.com", address: { country: "DE" } },
             },
-            return_url: `/payment-results?clientSecret=${clientSecret}`,
+            return_url: `/payment-result?clientSecret=${clientSecret}`,
         });
 
         if (error) alert("❌ " + error.message);
