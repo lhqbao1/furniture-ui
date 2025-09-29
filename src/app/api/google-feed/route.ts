@@ -21,9 +21,9 @@ export async function GET() {
     const products = await getProductsFeed();
 
     const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
-    console.log(products.length)
     const itemsXml = products
-      .map((p) => {
+    .filter(p => p.final_price > 0 && p.is_active) // lọc cả giá và active
+    .map((p) => {
         const categories = p.categories || [];
         const level1 = categories.find(c => c.level === 1)
                     const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
