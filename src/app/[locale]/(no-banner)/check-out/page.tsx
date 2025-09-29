@@ -43,6 +43,7 @@ import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
 import BankDialog from '@/components/layout/checkout/bank-dialog'
+import StripeLayout from '@/components/shared/stripe/stripe'
 
 export interface CartItem {
     id: number
@@ -605,6 +606,8 @@ export default function CheckOutPage() {
                                 </FormItem>
                             )}
                         />
+
+                        <StripeLayout />
                         <div className='flex lg:justify-end justify-center'>
                             <Button type="submit" className='text-lg lg:w-1/3 w-1/2 py-6'>{t('continue')}</Button>
                         </div>
