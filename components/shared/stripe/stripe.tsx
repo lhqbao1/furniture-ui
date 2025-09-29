@@ -95,7 +95,7 @@ function Stripe() {
         if (!stripe || !clientSecret) return;
 
         const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
-            payment_method: { billing_details: { email: "customer@example.com" } },
+            // payment_method: { billing_details: { email: "customer@example.com" } },
             return_url: "https://your-site.com/order/complete",
         });
 
@@ -109,9 +109,9 @@ function Stripe() {
             <h2>Checkout Demo</h2>
 
             <Button type="button" onClick={() => createPaymentIntent("card")}>Pay with Card</Button>
-            <button onClick={() => createPaymentIntent("applepay")}>Apple Pay</button>
-            <button onClick={() => createPaymentIntent("googlepay")}>Google Pay</button>
-            <button onClick={() => createPaymentIntent("klarna")}>Klarna</button>
+            <Button type="button" onClick={() => createPaymentIntent("applepay")}>Apple Pay</Button>
+            <Button type="button" onClick={() => createPaymentIntent("googlepay")}>Google Pay</Button>
+            <Button type="button" onClick={() => createPaymentIntent("klarna")}>Klarna</Button>
 
             {method === "card" && clientSecret && (
                 <div style={{ marginTop: "20px" }}>
