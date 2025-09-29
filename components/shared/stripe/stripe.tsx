@@ -20,6 +20,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK!);
 
@@ -46,7 +47,7 @@ function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpe
 
     const handlePaymentSuccess = (paymentIntentId: string) => {
         // Redirect sang trang kết quả và gửi PaymentIntent.id vào query
-        router.push(`http://prestige-home.de/payment-result?paymentIntentId=${paymentIntentId}`);
+        router.push(`http://prestige-home.de/payment-result?payment_intent=${paymentIntentId}`);
     };
 
     // Reset clientSecret & PaymentRequest khi đổi phương thức
@@ -123,22 +124,32 @@ function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpe
             const confirmKlarna = async () => {
                 try {
                     const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
-                        payment_method: { billing_details: { email: "customer@example.com", address: { country: "DE" } } },
-                        return_url: `http://prestige-home.de/payment-result?paymentIntentId=${clientSecret}`,
+                        payment_method: {
+                            billing_details: {
+                                email: "customer@example.com",
+                                address: { country: "DE" },
+                            },
+                        },
+                        return_url: `https://www.prestige-home.de/payment-result`,
                     });
+
                     if (error) {
+                        // Nếu có lỗi ngay lập tức (VD: không đủ thông tin, không support Klarna)
                         toast.error(error.message || t("klarnaNotAllow"));
+                        router.push("/check-out");
                     }
                 } catch (err) {
                     console.error(err);
                     toast.error(t("klarnaNotAllow"));
+                    router.push("https://www.prestige-home.de/check-out");
                 }
             };
             confirmKlarna();
         }
+
     }, [stripe, clientSecret, selectedMethod, total]);
 
-    if (!stripe || !elements) return <p>Loading Stripe...</p>;
+    if (!stripe || !elements) return <Loader2 className="animate-spin" />
 
     const handleCardPay = async () => {
         if (!stripe || !elements || !clientSecret) return;
@@ -159,31 +170,31 @@ function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpe
         }
     };
 
-    const handleKlarnaPay = async () => {
-        if (!stripe || !clientSecret) return;
+    // const handleKlarnaPay = async () => {
+    //     if (!stripe || !clientSecret) return;
 
-        try {
-            const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
-                payment_method: {
-                    billing_details: { email: "customer@example.com", address: { country: "DE" } },
-                },
-                return_url: `http://prestige-home.de/payment-result?clientSecret=${clientSecret}`,
-            });
+    //     try {
+    //         const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
+    //             payment_method: {
+    //                 billing_details: { email: "customer@example.com", address: { country: "DE" } },
+    //             },
+    //             return_url: `http://prestige-home.de/payment-result?clientSecret=${clientSecret}`,
+    //         });
 
-            if (error) {
-                if (error.code === "not_supported") {
-                    toast.error(t("browserNotSupport"));
-                } else {
-                    toast.error(error.message || t("klarnaNotAllow"));
+    //         if (error) {
+    //             if (error.code === "not_supported") {
+    //                 toast.error(t("browserNotSupport"));
+    //             } else {
+    //                 toast.error(error.message || t("klarnaNotAllow"));
 
-                }
-                return;
-            }
-        } catch (err) {
-            console.error(err);
-            toast.error(t("klarnaNotAllow"));
-        }
-    };
+    //             }
+    //             return;
+    //         }
+    //     } catch (err) {
+    //         console.error(err);
+    //         toast.error(t("klarnaNotAllow"));
+    //     }
+    // };
 
 
     return (
@@ -229,7 +240,6 @@ function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpe
                             <DialogHeader>
                                 <DialogTitle>{t("enterCardDetails")}</DialogTitle>
                             </DialogHeader>
-
                             <div className="space-y-4">
                                 <div className="border rounded-md p-2">
                                     <CardElement options={{ hidePostalCode: true }} />
