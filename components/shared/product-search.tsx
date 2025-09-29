@@ -98,7 +98,7 @@ export default function ProductSearch({ height, isAdmin = false }: { height?: bo
 
     return (
         <div ref={containerRef} className="flex justify-center items-center gap-2 relative">
-            <div className={cn("w-3/4 relative flex flex-col", height ? "mr-0" : "")}>
+            <div className={cn("w-3/4 relative flex flex-col", height ? "mr-0" : "", isAdmin ? 'w-full' : 'w-3/4')}>
                 <div className="relative flex">
                     <Input
                         type="text"

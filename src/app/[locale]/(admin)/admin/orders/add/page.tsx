@@ -468,17 +468,6 @@ export default function CreateCheckoutpage() {
                                 )
                         }
 
-                        {/* <div className='space-y-3'>
-                            <div className="text-lg font-semibold">{t('selectVoucher')}</div>
-                            <div className='lg:flex lg:flex-row grid grid-cols-1 gap-2'>
-                                {vouchers.map((item, index) => {
-                                    return (
-                                        <ProductVoucher item={item} key={index} isSelected={selectedVoucher === item.id} onSelect={() => handleSelectVoucher(item.id)} />
-                                    )
-                                })}
-                            </div>
-                        </div> */}
-
                         <div className='grid grid-cols-2 gap-6 items-start'>
                             {/*Checkout note and term */}
                             <div className='col-span-2 lg:col-span-1'>

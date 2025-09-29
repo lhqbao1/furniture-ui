@@ -7,8 +7,6 @@ import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
-import PaymentMethodSelector from '@/components/layout/checkout/method'
-import ProductVoucher from '@/components/shared/product-voucher'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateAddress, useCreateInvoiceAddress, useGetAddressByUserId, useGetInvoiceAddressByUserId } from '@/features/address/hook'
 import { toast } from 'sonner'
@@ -43,7 +41,9 @@ import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
 import BankDialog from '@/components/layout/checkout/bank-dialog'
-import StripeLayout from '@/components/shared/stripe/stripe'
+import StripeLayout, { PaymentMethod } from '@/components/shared/stripe/stripe'
+import { useStripe } from '@stripe/react-stripe-js'
+import { PaymentRequest } from '@stripe/stripe-js'
 
 export interface CartItem {
     id: number
@@ -56,6 +56,7 @@ export interface CartItem {
 }
 
 export default function CheckOutPage() {
+    // const stripe = useStripe();
     const [userId, setUserId] = useState<string>("")
     const [isCreatePassword, setIsCreatePassword] = useState<boolean>(false)
     const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
@@ -65,6 +66,10 @@ export default function CheckOutPage() {
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
     const [openOtpDialog, setOpenOTPDialog] = useState(false)
     const t = useTranslations()
+    const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const [total, setTotal] = useState<number>(0);
+    const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+
 
     const router = useRouter()
     const { updateStatus } = useCartLocal()
@@ -271,8 +276,26 @@ export default function CheckOutPage() {
     }, [cartItems, invoiceAddress, form])
 
 
+    // const createPaymentIntent = async (method: PaymentMethod) => {
+    //     if (stripe) {
+    //         if (method === "applepay" || method === "googlepay") {
+    //             const pr = stripe.paymentRequest({
+    //                 country: "DE",
+    //                 currency: "eur",
+    //                 total: { label: "Demo Payment", amount: total ?? 0 },
+    //                 requestPayerName: true,
+    //                 requestPayerEmail: true,
+    //             });
+
+    //             const result = await pr.canMakePayment();
+    //             if (result) setPaymentRequest(pr);
+    //         }
+    //     }
+    // };
+
     const handleSubmit = useCallback(
         async (data: CreateOrderFormValues) => {
+            console.log(data.payment_method)
             try {
                 // Nếu password hoặc confirmPassword rỗng thì gán Guest@12345
                 if (!data.password) data.password = "Guest@12345";
@@ -374,19 +397,25 @@ export default function CheckOutPage() {
                 toast.success("Place order successful")
                 setCheckOut(checkout.id)
 
-                if (data.payment_method === "paypal") {
+                if (data.payment_method !== "bank") {
                     // Tạo payment
                     const payment = await createPaymentMutation.mutateAsync({
                         checkout_id: checkout.id,
+                        pay_channel: data.payment_method,
                     })
 
                     toast.success("Place payment successful")
                     setPaymentId(payment.payment_id)
-                    router.push(payment.approve_url)
+                    if (data.payment_method === "paypal") {
+                        router.push(payment.approve_url)
+                    } else {
+                        // createPaymentIntent(data.payment_method as PaymentMethod);
+                        setTotal(payment.amount)
+                        setClientSecret(payment.clientSecret);
+                    }
                 }
 
                 if (data.payment_method === "bank") {
-                    console.log('bank')
                     setOpenBankDialog(true)
                 }
             } catch (error) {
@@ -396,6 +425,8 @@ export default function CheckOutPage() {
         },
         [user, invoiceAddress, addresses]
     )
+
+
 
     const normalizedItems = normalizeCartItems(cartItems && cartItems.items.length > 0 ? cartItems.items : localCart, cartItems && cartItems.items.length > 0 ? true : false)
     const shippingCost = calculateShipping(normalizedItems)
@@ -579,8 +610,13 @@ export default function CheckOutPage() {
                         </div>
 
                         <div className='space-y-4 py-5 border-y-2'>
-                            <div className='font-bold text-base'>{t('selectPayment')}</div>
-                            <PaymentMethodSelector />
+                            {/* <PaymentMethodSelector /> */}
+                            <StripeLayout
+                                clientSecret={clientSecret}
+                                setClientSecret={setClientSecret}
+                                total={total ?? undefined}
+                                setTotal={setTotal}
+                            />
                         </div>
                         <FormField
                             control={form.control}
@@ -607,7 +643,7 @@ export default function CheckOutPage() {
                             )}
                         />
 
-                        <StripeLayout />
+
                         <div className='flex lg:justify-end justify-center'>
                             <Button type="submit" className='text-lg lg:w-1/3 w-1/2 py-6'>{t('continue')}</Button>
                         </div>

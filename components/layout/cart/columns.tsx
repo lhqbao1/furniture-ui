@@ -85,6 +85,7 @@ export const GetCartColumns = ({
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <Button
+                                        type="button"
                                         variant="outline"
                                         size="sm"
                                         onClick={() => onUpdateQuantity(item, quantity - 1)}
@@ -93,6 +94,7 @@ export const GetCartColumns = ({
                                     </Button>
                                     <span>{quantity}</span>
                                     <Button
+                                        type="button"
                                         variant="outline"
                                         size="sm"
                                         onClick={() => onUpdateQuantity(item, quantity + 1)}
@@ -169,6 +171,7 @@ export const GetCartColumns = ({
                 return (
                     <div className="flex items-center justify-center gap-2">
                         <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => onUpdateQuantity(item, quantity - 1)}
@@ -177,6 +180,7 @@ export const GetCartColumns = ({
                         </Button>
                         <span className="px-2">{quantity}</span>
                         <Button
+                            type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => onUpdateQuantity(item, quantity + 1)}

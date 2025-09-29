@@ -66,7 +66,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
     {
         accessorKey: "created_at",
         header: () => (
-            <div className="text-center w-full">DATE</div>
+            <div className="text-center w-full">DATE CREATED</div>
         ),
         cell: ({ row }) => {
             const isoString = row.original.created_at

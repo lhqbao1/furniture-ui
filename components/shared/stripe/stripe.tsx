@@ -1,154 +1,192 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useEffect, useState, useCallback } from "react";
 import {
     Elements,
     CardElement,
     useStripe,
     useElements,
-    PaymentRequestButtonElement,
 } from "@stripe/react-stripe-js";
-import {
-    loadStripe,
-    PaymentRequest,
-    PaymentIntent,
-} from "@stripe/stripe-js";
+import { loadStripe, PaymentRequest, PaymentRequestPaymentMethodEvent } from "@stripe/stripe-js";
+
+import { useFormContext } from "react-hook-form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import Image from "next/image";
+import { paymentOptions } from "@/data/data";
+import { useTranslations } from "next-intl";
 
-const stripePromise = loadStripe("pk_test_xxx"); // Public key
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK!);
 
-type PaymentMethod = "card" | "applepay" | "googlepay" | "klarna" | null;
+export type PaymentMethod = "card" | "applepay" | "googlepay" | "klarna";
 
-function Stripe() {
+interface CheckoutFormProps {
+    clientSecret: string | null;
+    setClientSecret: React.Dispatch<React.SetStateAction<string | null>>;
+    total?: number;
+    setTotal?: React.Dispatch<React.SetStateAction<number>>;
+}
+
+function CheckoutForm({ clientSecret, setClientSecret, total }: CheckoutFormProps) {
     const stripe = useStripe();
     const elements = useElements();
+    const { control, watch } = useFormContext();
+    const selectedMethod = watch("payment_method");
+    const t = useTranslations()
 
-    const [clientSecret, setClientSecret] = useState<string | null>(null);
-    const [method, setMethod] = useState<PaymentMethod>(null);
-    const [paymentRequest, setPaymentRequest] =
-        useState<PaymentRequest | null>(null);
+    const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+    const [readyToShowPR, setReadyToShowPR] = useState(false);
 
-    if (!stripe || !elements) {
-        return <div>Loading...</div>;
-    }
+    // Reset clientSecret & PaymentRequest khi đổi phương thức
+    useEffect(() => {
+        setClientSecret(null);
+        setPaymentRequest(null);
+        setReadyToShowPR(false);
+    }, [selectedMethod, setClientSecret]);
 
-    const createPaymentIntent = async (selectedMethod: PaymentMethod) => {
-        if (!selectedMethod) return;
-        setMethod(selectedMethod);
+    useEffect(() => {
+        if (!stripe) return;
 
-        try {
-            const res = await fetch(`/ api / create - payment - intent ? method = ${selectedMethod} `, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: 5000, currency: "eur" }),
-            });
-
-            if (!res.ok) {
-                throw new Error(`Server error: ${res.status} `);
-            }
-
-            const data: { clientSecret: string } = await res.json();
-            setClientSecret(data.clientSecret);
-
-            if (selectedMethod === "applepay" || selectedMethod === "googlepay") {
-                const pr = stripe.paymentRequest({
-                    country: "DE",
-                    currency: "eur",
-                    total: { label: "Demo Payment", amount: 5000 },
-                    requestPayerName: true,
-                    requestPayerEmail: true,
-                });
-
-                const result = await pr.canMakePayment();
-                if (result) {
-                    setPaymentRequest(pr);
-                } else {
-                    alert("Apple Pay / Google Pay không khả dụng trên thiết bị này.");
-                }
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Không thể tạo Payment Intent.");
+        // Cleanup popup cũ
+        if (paymentRequest) {
+            paymentRequest.abort?.();
+            setPaymentRequest(null);
+            setReadyToShowPR(false);
         }
-    };
+
+        if (!clientSecret) return;
+        if (selectedMethod !== "applepay" && selectedMethod !== "googlepay") return;
+
+        const pr = stripe.paymentRequest({
+            country: "DE",
+            currency: "eur",
+            total: { label: "Demo Payment", amount: total ?? 0 },
+            requestPayerName: true,
+            requestPayerEmail: true,
+        });
+
+        const handlePaymentMethod = async (ev: PaymentRequestPaymentMethodEvent) => {
+            try {
+                const { error, paymentIntent } = await stripe.confirmCardPayment(
+                    clientSecret,
+                    { payment_method: ev.paymentMethod.id },
+                    { handleActions: false }
+                );
+
+                if (error) {
+                    ev.complete("fail");
+                    alert("❌ " + error.message);
+                    return;
+                }
+
+                ev.complete("success");
+
+                if (paymentIntent?.status === "requires_action") {
+                    await stripe.confirmCardPayment(clientSecret);
+                }
+
+                alert("✅ Payment success: " + paymentIntent?.id);
+            } catch (err) {
+                ev.complete("fail");
+                console.error(err);
+            }
+        };
+
+        pr.on("paymentmethod", handlePaymentMethod);
+
+        pr.canMakePayment().then((result) => {
+            if (result) {
+                setPaymentRequest(pr);
+                pr.show(); // popup chỉ show khi instance mới
+            }
+        });
+
+        pr.on("cancel", () => {
+            console.log("User canceled Apple/Google Pay");
+            setClientSecret(null);
+        });
+
+        return () => {
+            pr.off("paymentmethod", handlePaymentMethod);
+            pr.abort?.(); // abort instance mới nếu cleanup
+        };
+    }, [stripe, clientSecret, selectedMethod, total]);
+
+    if (!stripe || !elements) return <p>Loading Stripe...</p>;
 
     const handleCardPay = async () => {
         if (!stripe || !elements || !clientSecret) return;
+        const card = elements.getElement(CardElement);
+        if (!card) return;
 
-        const cardElement = elements.getElement(CardElement);
-        if (!cardElement) {
-            alert("Card element không tồn tại.");
-            return;
-        }
-
-        const { error, paymentIntent } = await stripe.confirmCardPayment(
-            clientSecret,
-            { payment_method: { card: cardElement } }
-        );
-
-        if (error) {
-            alert("❌ " + error.message);
-        } else if (paymentIntent) {
-            alert("✅ Payment success: " + paymentIntent.id);
-        }
-    };
-
-    const handleKlarnaPay = async () => {
-        if (!stripe || !clientSecret) return;
-
-        const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
-            // payment_method: { billing_details: { email: "customer@example.com" } },
-            return_url: "https://your-site.com/order/complete",
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: { card },
         });
 
-        if (error) {
-            alert("❌ " + error.message);
-        }
+        if (error) alert("❌ " + error.message);
+        else alert("✅ Payment success: " + paymentIntent?.id);
     };
 
     return (
-        <div>
-            <h2>Checkout Demo</h2>
+        <Card className="mx-auto p-4 shadow-lg">
+            <CardHeader>
+                <div className='font-bold text-base'>{t('selectPayment')}</div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <FormField
+                    control={control}
+                    name="payment_method"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <RadioGroup
+                                    className="grid grid-cols-1 gap-y-3"
+                                    value={field.value}
+                                    onValueChange={(val) => field.onChange(val)}
+                                >
+                                    {paymentOptions.map((option) => (
+                                        <FormItem key={option.id} className="flex items-center gap-2 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value={option.id} id={option.id} />
+                                            </FormControl>
+                                            <FormLabel htmlFor={option.id} className="flex items-center gap-2 cursor-pointer">
+                                                {option.logo && (
+                                                    <Image src={option.logo} width={30} height={30} alt={option.label} unoptimized />
+                                                )}
+                                                <span>{option.label}</span>
+                                            </FormLabel>
+                                        </FormItem>
+                                    ))}
+                                </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-            <Button type="button" onClick={() => createPaymentIntent("card")}>Pay with Card</Button>
-            <Button type="button" onClick={() => createPaymentIntent("applepay")}>Apple Pay</Button>
-            <Button type="button" onClick={() => createPaymentIntent("googlepay")}>Google Pay</Button>
-            <Button type="button" onClick={() => createPaymentIntent("klarna")}>Klarna</Button>
-
-            {method === "card" && clientSecret && (
-                <div style={{ marginTop: "20px" }}>
-                    <h3>Enter Card Details</h3>
-                    <CardElement options={{ hidePostalCode: true }} />
-                    <button onClick={handleCardPay}>Submit Card Payment</button>
-                </div>
-            )}
-
-            {method === "applepay" && paymentRequest && (
-                <div style={{ marginTop: "20px" }}>
-                    <h3>Apple Pay</h3>
-                    <PaymentRequestButtonElement options={{ paymentRequest }} />
-                </div>
-            )}
-
-            {method === "googlepay" && paymentRequest && (
-                <div style={{ marginTop: "20px" }}>
-                    <h3>Google Pay</h3>
-                    <PaymentRequestButtonElement options={{ paymentRequest }} />
-                </div>
-            )}
-
-            {method === "klarna" && clientSecret && (
-                <div style={{ marginTop: "20px" }}>
-                    <h3>Klarna Checkout</h3>
-                    <button onClick={handleKlarnaPay}>Proceed with Klarna</button>
-                </div>
-            )}
-        </div>
+                {selectedMethod === "card" && clientSecret && (
+                    <div className="space-y-2">
+                        <p className="font-medium">Enter Card Details</p>
+                        <div className="border rounded-md p-2">
+                            <CardElement options={{ hidePostalCode: true }} />
+                        </div>
+                        <Button className="w-full" onClick={handleCardPay}>
+                            Pay with Card
+                        </Button>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
     );
 }
 
-export default function StripeLayout() {
+export default function StripeLayout(props: CheckoutFormProps) {
     return (
         <Elements stripe={stripePromise}>
-            <Stripe />
+            <CheckoutForm {...props} />
         </Elements>
     );
 }
