@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook"
-import { Axios, AxiosError } from "axios"
 import { stripHtmlRegex } from "@/hooks/simplifyHtml"
 import { Switch } from "@/components/ui/switch"
 
@@ -137,6 +136,71 @@ function EditableStockCell({ product }: { product: ProductItem }) {
                     onClick={() => setEditing(true)}
                 >
                     {product.stock} pcs.
+                </div>
+            )}
+        </div>
+    )
+}
+
+function EdittbalePriceCell({ product }: { product: ProductItem }) {
+    const [value, setValue] = useState(product.final_price)
+    const [editing, setEditing] = useState(false)
+    const EditProductMutation = useEditProduct()
+
+    const handleEditProductPrice = () => {
+        EditProductMutation.mutate({
+            input: {
+                ...product,
+                final_price: value,
+                ...(product.categories?.length
+                    ? { category_ids: product.categories.map((c) => c.id) }
+                    : {}),
+                ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+            },
+            id: product.id,
+        }, {
+            onSuccess(data, variables, context) {
+                toast.success("Update product price successful")
+                setEditing(false)
+            },
+            onError(error, variables, context) {
+                toast.error("Update product price fail")
+            },
+        })
+    }
+
+    return (
+        <div className="">
+            {editing ? (
+                <Input
+                    type="number"
+                    value={value}
+                    onChange={(e) => setValue(e.target.valueAsNumber)}
+                    onBlur={() => {
+                        if (value !== product.final_price) {
+                        } else {
+                            setEditing(false)
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            handleEditProductPrice()
+                        }
+                        if (e.key === "Escape") {
+                            setValue(product.final_price)
+                            setEditing(false)
+                        }
+                    }}
+                    autoFocus
+                    disabled={EditProductMutation.isPending}
+                    className={cn(EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
+                />
+            ) : (
+                <div
+                    className="cursor-pointer"
+                    onClick={() => setEditing(true)}
+                >
+                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : 'Updating ...'}
                 </div>
             )}
         </div>
@@ -326,7 +390,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "final_price",
         header: () => <div className="text-right">FINAL PRICE</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.final_price ? <>€{(row.original.final_price)?.toFixed(2)}</> : 'Updating ...'}</div>,
+        cell: ({ row }) => <EdittbalePriceCell product={row.original} />,
     },
     {
         id: "margin",

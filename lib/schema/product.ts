@@ -45,7 +45,7 @@ export const addProductSchema = z.object({
   is_active: z.boolean(),
   tag: z.string().optional().nullable(),
   static_files: z.array(StaticFileSchema),
-  category_ids: z.array(z.string()),
+  category_ids: z.array(z.string()).optional().nullable(),
 
   weee_nr: z.string().optional().nullable(),
   eek: z.string().optional().nullable(),

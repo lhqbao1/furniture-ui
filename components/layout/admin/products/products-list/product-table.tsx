@@ -4,6 +4,8 @@ import {
     ColumnDef,
     flexRender,
     getCoreRowModel,
+    getSortedRowModel,
+    SortingState,
     useReactTable,
 } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -43,6 +45,10 @@ export function ProductTable<TData, TValue>({
     isAddButtonModal = false,
     addButtonModalContent
 }: DataTableProps<TData, TValue>) {
+    const [sorting, setSorting] = React.useState<SortingState>([
+        { id: "updated_at", desc: true }, // mặc định sort theo updated_at giảm dần
+    ])
+
     const table = useReactTable({
         data,
         columns,
@@ -50,8 +56,11 @@ export function ProductTable<TData, TValue>({
         state: {
             pagination: { pageIndex: page - 1, pageSize },
         },
-        manualPagination: true, // phân trang server-side
+        manualPagination: true,
         getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        onSortingChange: setSorting,
+        manualSorting: true,    // sort server-side
     })
 
     return (

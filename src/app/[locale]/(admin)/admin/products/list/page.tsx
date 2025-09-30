@@ -8,12 +8,6 @@ import { useGetAllProducts } from '@/features/products/hook'
 import { Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
-const statisticDemo = [
-    { total: 0, label: 'Total sale', textColor: 'rgb(81, 190, 140)' },
-    { total: 0, label: 'Total cost', textColor: 'rgb(255, 11, 133)' },
-    { total: 0, label: 'Total discount', textColor: 'rgb(250, 166, 26)' },
-    { total: 0, label: 'ESTIMATED PROFIT 20%', textColor: 'rgb(41, 171, 226)' }
-]
 
 const ProductList = () => {
     const [page, setPage] = useState(1)
