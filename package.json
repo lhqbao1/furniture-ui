@@ -7,6 +7,7 @@
     "dev:https": "tsx watch server.ts",
     "build": "next build",
     "start": "next start",
+    "analyze": "next analyze",
     "lint": "next lint"
   },
   "dependencies": {

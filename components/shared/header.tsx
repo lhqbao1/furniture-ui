@@ -137,7 +137,6 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                         className="animate-pulse opacity-50"
                     />
                 ) : user ? (
-                    // Logged in -> Dropdown (desktop), Drawer (mobile)
                     <>
                         {/* Desktop: dropdown */}
                         <div className="flex">

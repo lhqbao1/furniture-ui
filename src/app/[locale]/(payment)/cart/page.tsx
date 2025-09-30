@@ -6,11 +6,11 @@ import CartTable from '@/components/layout/cart/cart-table'
 import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
 import { useCartLocal } from '@/hooks/cart'
-import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { useRouter } from '@/src/i18n/navigation'
 import { getCartItems } from '@/features/cart/api'
 import { useTranslations } from 'next-intl'
 import { LoginDrawer } from '@/components/shared/login-drawer'
+import CartLocalTable from '@/components/layout/cart/cart-local-table'
 
 
 const CartPage = () => {

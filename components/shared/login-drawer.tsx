@@ -40,7 +40,7 @@ export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false, setUs
                 </DrawerTrigger>)
             }
 
-            <DrawerContent className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500">
+            <DrawerContent forceMount className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500">
                 <DrawerTitle className="border-b-2 p-4 flex justify-between">
                     <div className="uppercase font-bold text-xl">{t("login")}</div>
                     <DrawerClose>
@@ -64,6 +64,7 @@ export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false, setUs
                             }}
                             onError={() => {
                                 setOpenLogin(false)
+                                router.push('/check-out')
                             }}
                         />) :
                         (<HeaderLoginForm

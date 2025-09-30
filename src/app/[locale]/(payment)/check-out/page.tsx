@@ -1,7 +1,5 @@
 'use client'
 
-import AddressSelector from '@/components/layout/checkout/shipping'
-import Image from 'next/image'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { useCreateAddress, useCreateInvoiceAddress, useGetAddressByUserId, useGetInvoiceAddressByUserId, useUpdateInvoiceAddress } from '@/features/address/hook'
 import { toast } from 'sonner'
 import { useGetCartItems, useSyncLocalCart } from '@/features/cart/hook'
-import CartTable from '@/components/layout/cart/cart-table'
 import { useCreateCheckOut } from '@/features/checkout/hook'
 import { useCreatePayment } from '@/features/payment/hook'
 import { useAtom } from 'jotai'
@@ -19,14 +16,9 @@ import { checkOutIdAtom, paymentIdAtom } from '@/store/payment'
 import { useRouter } from 'next/navigation'
 import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
-import { Label } from "@/components/ui/label"
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
-import AddressSkeleton from '@/components/layout/checkout/address-skeleton'
 import { useTranslations } from 'next-intl'
-import { Voucher } from '@/types/voucher'
 import z from 'zod'
-import CheckOutInvoiceAddress from '@/components/layout/checkout/invoice-address'
-import { CheckOutShippingAddress } from '@/components/layout/checkout/shipping-address'
+// import CheckOutInvoiceAddress from '@/components/layout/checkout/invoice-address'
 import { CheckOutPassword } from '@/components/layout/checkout/password'
 import { useCartLocal } from '@/hooks/cart'
 import { useGetUserById } from '@/features/users/hook'
@@ -35,16 +27,40 @@ import { User } from '@/types/user'
 import { getUserById } from '@/features/users/api'
 import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
 import { getCartItems } from '@/features/cart/api'
-import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
+// import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { useCheckMailExist, useLogin, useLoginOtp, useSignUp } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
-import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
+// import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
 import BankDialog from '@/components/layout/checkout/bank-dialog'
-import StripeLayout, { PaymentMethod } from '@/components/shared/stripe/stripe'
-import { useStripe } from '@stripe/react-stripe-js'
-import { PaymentRequest } from '@stripe/stripe-js'
+import dynamic from 'next/dynamic'
+import { SectionSkeleton } from '@/components/layout/checkout/section-skeleton'
+import StripeLayout from '@/components/shared/stripe/stripe'
+const CartTable = dynamic(() => import('@/components/layout/cart/cart-table'), { ssr: false })
+const CartLocalTable = dynamic(() => import('@/components/layout/cart/cart-local-table'), { ssr: false })
+const CheckOutShippingAddress = dynamic(
+    () => import('@/components/layout/checkout/shipping-address').then(m => m.default),
+    {
+        ssr: false,
+        loading: () => <SectionSkeleton />
+    }
+)
+const CheckOutUserInformation = dynamic(
+    () => import('@/components/layout/checkout/user-information').then(m => m.default),
+    {
+        ssr: false,
+        loading: () => <SectionSkeleton />
+    }
+)
 
+
+const CheckOutInvoiceAddress = dynamic(
+    () => import('@/components/layout/checkout/invoice-address').then(m => m.default),
+    {
+        ssr: false,
+        loading: () => <SectionSkeleton />
+    }
+)
 export interface CartItem {
     id: number
     name: string
@@ -56,7 +72,6 @@ export interface CartItem {
 }
 
 export default function CheckOutPage() {
-    // const stripe = useStripe();
     const [userId, setUserId] = useState<string>("")
     const [isCreatePassword, setIsCreatePassword] = useState<boolean>(false)
     const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
@@ -68,7 +83,6 @@ export default function CheckOutPage() {
     const t = useTranslations()
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [total, setTotal] = useState<number>(0);
-    const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
     const [openCardDialog, setOpenCardDialog] = useState(false)
 
     const router = useRouter()
@@ -129,6 +143,11 @@ export default function CheckOutPage() {
 
     type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
 
+    // preload từ khi component cha mount
+    useEffect(() => {
+        import('@/components/layout/checkout/user-information')
+    }, [])
+
 
     // SSR-safe: chỉ đọc localStorage sau khi client mounted
     useEffect(() => {
@@ -162,7 +181,7 @@ export default function CheckOutPage() {
         queryFn: async () => {
             const data = await getCartItems()
             // Sort theo created_at giảm dần (mới nhất lên trước)
-            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            // data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             return data
         },
         enabled: !!userId,
@@ -182,15 +201,7 @@ export default function CheckOutPage() {
 
     const handleOtpSuccess = (verifiedUserId: string) => {
         setUserId(verifiedUserId)
-        // ở đây bạn có thể tiếp tục sync cart, redirect, v.v.
     }
-
-
-    // const [selectedVoucher, setSelectedVoucher] = useState<number>()
-
-    // const handleSelectVoucher = useCallback((item: number) => {
-    //     setSelectedVoucher(item)
-    // }, [])
 
     const form = useForm<CreateOrderFormValues>({
         resolver: zodResolver(CreateOrderSchema),
@@ -276,23 +287,6 @@ export default function CheckOutPage() {
         }
     }, [cartItems, invoiceAddress, form])
 
-
-    // const createPaymentIntent = async (method: PaymentMethod) => {
-    //     if (stripe) {
-    //         if (method === "applepay" || method === "googlepay") {
-    //             const pr = stripe.paymentRequest({
-    //                 country: "DE",
-    //                 currency: "eur",
-    //                 total: { label: "Demo Payment", amount: total ?? 0 },
-    //                 requestPayerName: true,
-    //                 requestPayerEmail: true,
-    //             });
-
-    //             const result = await pr.canMakePayment();
-    //             if (result) setPaymentRequest(pr);
-    //         }
-    //     }
-    // };
 
     const handleSubmit = useCallback(
         async (data: CreateOrderFormValues) => {
@@ -472,8 +466,6 @@ export default function CheckOutPage() {
         [user, invoiceAddress, addresses]
     )
 
-
-
     const normalizedItems = normalizeCartItems(cartItems && cartItems.items.length > 0 ? cartItems.items : localCart, cartItems && cartItems.items.length > 0 ? true : false)
     const shippingCost = calculateShipping(normalizedItems)
     const hasOtherCarrier = checkShippingType(normalizedItems)
@@ -528,17 +520,19 @@ export default function CheckOutPage() {
                                 </Card>
                             }
                         </div>
-
-                        <PaymentMethodSelector />
                     </div> */}
+
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <CheckOutUserInformation isLogin={user ? true : false} />
-                        <CheckOutShippingAddress />
-                        <CheckOutInvoiceAddress />
+                        <CheckOutUserInformation isLogin={userId !== '' ? true : false} key={userId} />
+                        <CheckOutShippingAddress key={`shipping-${userId}`} />
+                        <CheckOutInvoiceAddress key={`invoice-${userId}`} />
                         {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />}
                     </div>
 
                     {/* Table cart and total */}
+                    {/* Order summary 
+
+                    */}
                     <div className='col-span-1 space-y-4 lg:space-y-4'>
                         {
                             cartItems ? (<CartTable
