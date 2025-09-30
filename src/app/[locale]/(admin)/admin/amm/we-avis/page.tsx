@@ -13,12 +13,37 @@ import { useDropzone } from "react-dropzone"
 import { toast } from "sonner" // hoặc react-hot-toast nếu bạn dùng lib khác
 import { File, Loader, Loader2 } from "lucide-react"
 import { useImportAmmProducts } from "@/features/amm/hook"
-
-
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import z from "zod"
+import { ammWeAvisDefaultValues, ammWeAvisSchema } from "@/lib/schema/amm-weavis"
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input"
 
 const AmmWeAvisPage = () => {
     const [file, setFile] = useState<File | null>(null)
     const [open, setOpen] = useState(false)
+    // 1. Define your form.
+    const form = useForm<z.infer<typeof ammWeAvisSchema>>({
+        resolver: zodResolver(ammWeAvisSchema),
+        defaultValues: ammWeAvisDefaultValues,
+    })
+
+    // 2. Define a submit handler.
+    function onSubmit(values: z.infer<typeof ammWeAvisSchema>) {
+        // Do something with the form values.
+        // ✅ This will be type-safe and validated.
+        console.log(values)
+    }
 
     const importAmmProductMutation = useImportAmmProducts()
 
@@ -57,46 +82,170 @@ const AmmWeAvisPage = () => {
     }
 
     return (
-        <div>
-            <h2 className="section-header">Import We Avis to AMM</h2>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                    <Button variant="secondary" className="" disabled={importAmmProductMutation.isPending ? true : false}>{importAmmProductMutation.isPending ? <Loader2 className="animate-spin" /> : 'Import'}</Button>
-                </DialogTrigger>
-                <DialogContent className="w-[600px]">
-                    <DialogHeader>
-                        <DialogTitle>Upload file</DialogTitle>
-                    </DialogHeader>
-                    <div
-                        {...getRootProps()}
-                        className={`mt-4 flex h-40 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition 
-                        ${isDragActive ? "border-primary bg-primary/10" : "border-gray-300"}`}
-                    >
-                        <input {...getInputProps()} />
-                        {file ? (
-                            <div className="flex gap-2">
-                                <File />
-                                <p className="text-sm text-gray-600">{file.name}</p>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-gray-500">
-                                Drag & drop file here, or click to select
-                            </p>
-                        )}
-                    </div>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                    control={form.control}
+                    name="client"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Client</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="order_number"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Order Number</FormLabel>
+                            <FormControl>
+                                <Input placeholder="AZ000000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="supplier_id"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Supplier ID</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="supplier_name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Supplier Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="supplier_city"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Supplier City</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="supplier_postal_code"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Supplier Postal Code</FormLabel>
+                            <FormControl>
+                                <Input placeholder="shadcn" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="supplier_country"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Supplier Country</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="delivery_date"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Delivery Date</FormLabel>
+                            <FormControl>
+                                <Input placeholder="shadcn" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="warehouse"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Warehouse</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                    {/* Action buttons */}
-                    <div className="mt-6 flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setOpen(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSubmit} disabled={!file || importAmmProductMutation.isPending}>
-                            {importAmmProductMutation.isPending ? <Loader2 className="animate-spin" /> : "Submit"}
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </div>
+                <ImagePickerInput form={form} fieldName="file" isFile />
+                <Button type="submit">Submit</Button>
+            </form>
+        </Form>
+        // <div>
+        //     <h2 className="section-header">Import We Avis to AMM</h2>
+        //     <Dialog open={open} onOpenChange={setOpen}>
+        //         <DialogTrigger asChild>
+        //             <Button variant="secondary" className="" disabled={importAmmProductMutation.isPending ? true : false}>{importAmmProductMutation.isPending ? <Loader2 className="animate-spin" /> : 'Import'}</Button>
+        //         </DialogTrigger>
+        //         <DialogContent className="w-[600px]">
+        //             <DialogHeader>
+        //                 <DialogTitle>Upload file</DialogTitle>
+        //             </DialogHeader>
+        //             <div
+        //                 {...getRootProps()}
+        //                 className={`mt-4 flex h-40 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition 
+        //                 ${isDragActive ? "border-primary bg-primary/10" : "border-gray-300"}`}
+        //             >
+        //                 <input {...getInputProps()} />
+        //                 {file ? (
+        //                     <div className="flex gap-2">
+        //                         <File />
+        //                         <p className="text-sm text-gray-600">{file.name}</p>
+        //                     </div>
+        //                 ) : (
+        //                     <p className="text-sm text-gray-500">
+        //                         Drag & drop file here, or click to select
+        //                     </p>
+        //                 )}
+        //             </div>
+
+        //             {/* Action buttons */}
+        //             <div className="mt-6 flex justify-end gap-2">
+        //                 <Button variant="outline" onClick={() => setOpen(false)}>
+        //                     Cancel
+        //                 </Button>
+        //                 <Button onClick={handleSubmit} disabled={!file || importAmmProductMutation.isPending}>
+        //                     {importAmmProductMutation.isPending ? <Loader2 className="animate-spin" /> : "Submit"}
+        //                 </Button>
+        //             </div>
+        //         </DialogContent>
+        //     </Dialog>
+        // </div>
     )
 }
 
