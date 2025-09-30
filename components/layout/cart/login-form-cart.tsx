@@ -10,10 +10,11 @@ import { Mail, Key, Loader2, Eye, EyeOff } from "lucide-react"
 import { useLogin } from "@/features/auth/hook"
 import { toast } from "sonner"
 import { useState } from "react"
-import { Link, useRouter } from "@/src/i18n/navigation"
+// import { Link, usePathname, useRouter } from "@/src/i18n/navigation"
 import { useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { useCartLocal } from "@/hooks/cart"
+import { Link, useRouter } from "@/src/i18n/navigation"
 
 interface CartLoginFormProps {
     onSuccess?: () => void
@@ -51,6 +52,14 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
     const loginMutation = useLogin()
     const syncLocalCartMutation = useSyncLocalCart()
 
+    const handleRedirectToCheckOut = () => {
+        if (!localCart || localCart.length === 0) {
+            toast.error(t('chooseAtLeastCart'))
+        } else {
+            if (onError) onError()
+        }
+    }
+
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
         loginMutation.mutate(values, {
             onSuccess: (data) => {
@@ -63,7 +72,6 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                 router.push('/check-out')
                 // gọi callback onSuccess nếu được truyền
                 if (onSuccess) onSuccess()
-
             },
             onError(error) {
                 toast.error(t("invalidCredentials"))
@@ -146,15 +154,8 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                             type="button"
                             variant={'outline'}
                             disabled={loginMutation.isPending}
-                            onClick={() => {
-                                if (!localCart || localCart.length === 0) {
-                                    toast.error(t('chooseAtLeastCart'))
-                                    if (onError) onError()
-                                } else {
-                                    router.push('/check-out')
-                                }
-                            }}
-                            className="w-full"
+                            onClick={() => handleRedirectToCheckOut()}
+                            className="w-full active:scale-95 active:bg-accent"
                         >
                             {t('continueAsGuest')}
                         </Button>

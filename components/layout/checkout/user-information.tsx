@@ -18,7 +18,7 @@ import { useGetAllCustomers } from "@/features/users/hook"
 interface CheckOutUserInformationProps {
     isLogin: boolean
 }
-export function CheckOutUserInformation({ isLogin }: CheckOutUserInformationProps) {
+export default function CheckOutUserInformation({ isLogin }: CheckOutUserInformationProps) {
     const form = useFormContext()
     const t = useTranslations()
 

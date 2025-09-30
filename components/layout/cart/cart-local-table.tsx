@@ -37,7 +37,7 @@ interface CartLocalTableProps {
     isCheckout?: boolean
 }
 
-export function CartLocalTable({
+export default function CartLocalTable({
     data,
     onToggleItem,
     onToggleAll,

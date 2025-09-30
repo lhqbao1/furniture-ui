@@ -17,18 +17,25 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import countries from "world-countries"
 import { Check, ChevronsUpDown } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 
-export function CheckOutShippingAddress() {
+export default function CheckOutShippingAddress() {
     const form = useFormContext()
     const t = useTranslations()
     const [open, setOpen] = useState(false)
     const [isSameInvoice, setIsSameInvoice] = useState(false)
+    const [countries, setCountries] = useState<{ value: string; label: string }[]>([])
+
+    useEffect(() => {
+        import("world-countries").then((module) => {
+            setCountries(
+                module.default.map((c) => ({ value: c.name.common, label: c.name.common }))
+            )
+        })
+    }, [])
 
     const countryOptions = countries.map((c) => ({
-        value: c.name.common,
-        label: c.name.common,
+        value: c.value,
+        label: c.label,
     }))
 
     return (
