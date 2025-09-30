@@ -27,13 +27,13 @@ export default function ProductImageDialog({
                 {children}
             </DialogTrigger>
             <DialogContent
-                className="p-6 lg:h-[80vh] lg:w-[calc(100%-10rem)] h-[calc(100%-3rem)] w-full left-0"
+                className="p-6 lg:h-[90vh] lg:w-[calc(100%-8rem)] h-[calc(100%-3rem)] w-full left-0"
                 aria-describedby=""
             >
                 <DialogTitle className="hidden"></DialogTitle>
                 <div className="grid grid-cols-12 gap-6 h-full">
                     {/* Cột 8: main image (không scroll, chỉ theo ảnh) */}
-                    <div className="col-span-12 lg:col-span-8 flex items-center justify-center lg:max-h-[75vh] max-h-[55vh]">
+                    <div className="col-span-12 lg:col-span-8 flex items-center justify-center lg:max-h-[85vh] max-h-[40vh]">
                         <Image
                             src={
                                 productDetails.static_files.length > 0
@@ -43,12 +43,14 @@ export default function ProductImageDialog({
                             alt={productDetails.name}
                             width={600}
                             height={600}
-                            className="object-contain h-full w-full lg:p-20"
+                            className="object-cover h-full w-full"
+                            priority
+                            unoptimized
                         />
                     </div>
 
                     {/* Cột 4: thumbnails + name (scroll riêng) */}
-                    <div className="col-span-12 lg:col-span-4 flex flex-col gap-4 overflow-y-auto pr-2 lg:max-h-[70vh] max-h-[55vh]">
+                    <div className="col-span-12 lg:col-span-4 flex flex-col gap-4 overflow-y-auto pr-2 lg:max-h-[80vh] max-h-[55vh]">
                         <h2 className="text-2xl font-semibold">{productDetails.name}</h2>
 
                         <div className="grid grid-cols-4 gap-2">
@@ -65,6 +67,7 @@ export default function ProductImageDialog({
                                         width={120}
                                         height={120}
                                         className="object-cover w-full h-full"
+                                        unoptimized
                                     />
                                 </button>
                             ))}

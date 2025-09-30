@@ -57,14 +57,13 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                 const token = data.access_token
                 localStorage.setItem("access_token", token)
                 localStorage.setItem("userId", data.id)
-
                 syncLocalCartMutation.mutate()
 
                 toast.success(t("loginSuccess"))
-
+                router.push('/check-out')
                 // gọi callback onSuccess nếu được truyền
                 if (onSuccess) onSuccess()
-                else router.push("/")
+
             },
             onError(error) {
                 toast.error(t("invalidCredentials"))

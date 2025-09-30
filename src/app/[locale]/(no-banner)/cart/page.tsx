@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import CartSummary from '@/components/layout/cart/cart-summary'
 import CartTable from '@/components/layout/cart/cart-table'
 import { toast } from 'sonner'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useCartLocal } from '@/hooks/cart'
 import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { useRouter } from '@/src/i18n/navigation'
@@ -14,17 +14,24 @@ import { LoginDrawer } from '@/components/shared/login-drawer'
 
 
 const CartPage = () => {
-    const [userId, setUserId] = useState<string | null>(null);
+    const [userId, setUserId] = React.useState<string | null>(
+        typeof window !== "undefined" ? localStorage.getItem("userId") : ""
+    );
     const [isLoginOpen, setIsLoginOpen] = useState(false)
     const t = useTranslations()
 
-
     useEffect(() => {
-        const storedUserId = localStorage.getItem('userId');
-        if (storedUserId) setUserId(storedUserId);
+        const handleStorageChange = () => {
+            const newUserId = localStorage.getItem("userId");
+            setUserId(newUserId);
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
 
     const { cart: localCart } = useCartLocal();
+
     const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
         queryKey: ["cart-items", userId],
         queryFn: async () => {
@@ -43,11 +50,7 @@ const CartPage = () => {
     const router = useRouter()
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
 
-    // get userId from localStorage (client side)
-    useEffect(() => {
-        const storedUserId = localStorage.getItem('userId')
-        if (storedUserId) setUserId(storedUserId)
-    }, [])
+
 
     //Calculate total amount 
     const total =
@@ -116,7 +119,7 @@ const CartPage = () => {
 
                 </div>
             </div>
-            <LoginDrawer openLogin={isLoginOpen} setOpenLogin={setIsLoginOpen} isCheckOut />
+            <LoginDrawer openLogin={isLoginOpen} setOpenLogin={setIsLoginOpen} isCheckOut setUserId={setUserId} />
         </div>
     )
 }

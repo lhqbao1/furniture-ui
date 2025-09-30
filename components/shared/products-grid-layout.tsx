@@ -78,7 +78,8 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                     img_url: currentProduct.static_files[0].url,
                     product_name: currentProduct.name,
                     stock: currentProduct.stock,
-                    carrier: currentProduct.carrier ? currentProduct.carrier : 'amm'
+                    carrier: currentProduct.carrier ? currentProduct.carrier : 'amm',
+                    id_provider: currentProduct.id_provider ? currentProduct.id_provider : ''
                 }
             }, {
                 onSuccess(data, variables, context) {

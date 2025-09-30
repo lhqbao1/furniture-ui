@@ -9,15 +9,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { CartTableItem } from "./cart-local-table"
 import { useCartLocal } from "@/hooks/cart"
 
-// interface GetCartLocalColumnsProps {
-//     localQuantities: Record<string, number>
-//     localStatuses: Record<string, boolean>
-//     onUpdateQuantity: (item: CartItem, newQuantity: number) => void
-//     onDeleteItem: (item: CartItem) => void
-//     onToggleSelect: (item: CartItem, checked: boolean) => void
-//     isCheckout?: boolean
-// }
-
 export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
     const t = useTranslations()
     const isMobile = useIsMobile()
@@ -51,7 +42,10 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                                         className="rounded shrink-0"
                                         unoptimized
                                     />
-                                    <p className="font-semibold text-wrap line-clamp-3">{item.product_name}</p>
+                                    <div>
+                                        <p className="font-semibold text-wrap line-clamp-3">{item.product_name}</p>
+                                        <p>#{item.id_provider}</p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -114,7 +108,12 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                             className="w-12 h-12 object-cover rounded"
                         />
                     )}
-                    <span>{row.original.product_name}</span>
+                    <div className="flex-1 min-w-0">
+                        <p className="font-semibold line-clamp-3">
+                            {row.original.product_name}
+                        </p>
+                        <p>#{row.original.id_provider}</p>
+                    </div>
                 </div>
             ),
         },

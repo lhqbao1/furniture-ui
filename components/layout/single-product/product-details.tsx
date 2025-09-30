@@ -128,7 +128,8 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                     img_url: productDetails.static_files[0].url,
                     product_name: productDetails.name,
                     stock: productDetails.stock,
-                    carrier: productDetails.carrier ? productDetails.carrier : 'amm'
+                    carrier: productDetails.carrier ? productDetails.carrier : 'amm',
+                    id_provider: productDetails.id_provider ? productDetails.id_provider : ''
                 }
             }, {
                 onSuccess(data, variables, context) {
@@ -139,18 +140,6 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                 },
             })
         } else {
-            // const serverCart: CartItem[] = queryClient.getQueryData(["cart-items"]) || []
-            // console.log(serverCart)
-            // const existingItem = serverCart.find((item) => item.products.id === productDetails.id)
-            // const totalQuantity = (existingItem?.quantity || 0) + values.quantity
-
-            // if (totalQuantity > productDetails.stock) {
-            // toast.error(
-            //     t('notEnoughStock')
-            // )
-            //     return
-            // }
-
             createCartMutation.mutate({ productId: productDetails?.id ?? '', quantity: values.quantity }, {
                 onSuccess(data, variables, context) {
                     toast.success(t('addToCartSuccess'))

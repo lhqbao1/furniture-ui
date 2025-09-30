@@ -11,6 +11,7 @@ export type CartItemLocal = {
     product_name: string;
     stock: number
     carrier: string
+    id_provider?: string
 };
   
   const CART_KEY = "guest_cart";
