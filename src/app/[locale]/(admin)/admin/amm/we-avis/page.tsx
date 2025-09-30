@@ -83,131 +83,179 @@ const AmmWeAvisPage = () => {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                    control={form.control}
-                    name="client"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Client</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="order_number"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Order Number</FormLabel>
-                            <FormControl>
-                                <Input placeholder="AZ000000" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="supplier_id"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Supplier ID</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="supplier_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Supplier Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="supplier_city"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Supplier City</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="supplier_postal_code"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Supplier Postal Code</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="supplier_country"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Supplier Country</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="delivery_date"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Delivery Date</FormLabel>
-                            <FormControl>
-                                <Input placeholder="shadcn" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="warehouse"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Warehouse</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <ImagePickerInput form={form} fieldName="file" isFile />
-                <Button type="submit">Submit</Button>
+            <h2 className="section-header mb-12">Import We Avis to AMM</h2>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                <div className="grid grid-cols-3 gap-8">
+                    <FormField
+                        control={form.control}
+                        name="client"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Client</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="order_number"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Order Number</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="AZ000000" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="supplier_id"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Supplier ID</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="supplier_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Supplier Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="supplier_city"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Supplier City</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="supplier_postal_code"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Supplier Postal Code</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="shadcn" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="supplier_country"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Supplier Country</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="delivery_date"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Delivery Date</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="date"
+                                        value={
+                                            field.value
+                                                ? `${field.value.slice(0, 4)}-${field.value.slice(4, 6)}-${field.value.slice(6, 8)}`
+                                                : ""
+                                        }
+                                        onChange={(e) => {
+                                            const raw = e.target.value // yyyy-mm-dd
+                                            const compact = raw.replace(/-/g, "") // yyyymmdd
+                                            field.onChange(compact)
+                                        }}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="warehouse"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Warehouse</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="file"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <div
+                                        {...getRootProps()} // KHÔNG chặn onClick ở đây
+                                        className={`mt-4 flex h-40 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition
+              ${isDragActive ? "border-primary bg-primary/10" : "border-gray-300"}`}
+                                    >
+                                        <input
+                                            {...getInputProps({
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                    const f = e.target.files?.[0]
+                                                    if (f) {
+                                                        field.onChange(f) // set File object vào form
+                                                    }
+                                                },
+                                            })}
+                                        />
+                                        {field.value ? (
+                                            <div className="flex gap-2 items-center">
+                                                <File />
+                                                <p className="text-sm text-gray-600">{field.value.name}</p>
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-gray-500">
+                                                Drag & drop file here, or click to select
+                                            </p>
+                                        )}
+                                    </div>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                <Button type="submit" className="mt-8 text-lg px-8 py-1.5">Submit</Button>
             </form>
         </Form>
         // <div>
-        //     <h2 className="section-header">Import We Avis to AMM</h2>
         //     <Dialog open={open} onOpenChange={setOpen}>
         //         <DialogTrigger asChild>
         //             <Button variant="secondary" className="" disabled={importAmmProductMutation.isPending ? true : false}>{importAmmProductMutation.isPending ? <Loader2 className="animate-spin" /> : 'Import'}</Button>
