@@ -38,6 +38,8 @@ import { SectionSkeleton } from '@/components/layout/checkout/section-skeleton'
 import StripeLayout from '@/components/shared/stripe/stripe'
 const CartTable = dynamic(() => import('@/components/layout/cart/cart-table'), { ssr: false })
 const CartLocalTable = dynamic(() => import('@/components/layout/cart/cart-local-table'), { ssr: false })
+
+
 const CheckOutShippingAddress = dynamic(
     () => import('@/components/layout/checkout/shipping-address').then(m => m.default),
     {
@@ -84,6 +86,24 @@ export default function CheckOutPage() {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [total, setTotal] = useState<number>(0);
     const [openCardDialog, setOpenCardDialog] = useState(false)
+
+    // useEffect(() => {
+    //     import('@/components/layout/checkout/user-information')
+    //     import('@/components/layout/checkout/shipping-address')
+    //     import('@/components/layout/checkout/invoice-address')
+    //     import('@/components/layout/cart/cart-table')
+    //     import('@/components/layout/cart/cart-local-table')
+    //     console.log('Preloaded checkout components')
+    // })
+    useEffect(() => {
+        const hasReloaded = sessionStorage.getItem("checkout_reloaded")
+        if (!hasReloaded) {
+            sessionStorage.setItem("checkout_reloaded", "true")
+            setTimeout(() => {
+                window.location.reload()
+            }, 1500)
+        }
+    }, [])
 
     const router = useRouter()
     const { updateStatus } = useCartLocal()
@@ -142,12 +162,6 @@ export default function CheckOutPage() {
     });
 
     type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
-
-    // preload từ khi component cha mount
-    useEffect(() => {
-        import('@/components/layout/checkout/user-information')
-    }, [])
-
 
     // SSR-safe: chỉ đọc localStorage sau khi client mounted
     useEffect(() => {
@@ -523,7 +537,7 @@ export default function CheckOutPage() {
                     </div> */}
 
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <CheckOutUserInformation isLogin={userId !== '' ? true : false} key={userId} />
+                        <CheckOutUserInformation isLogin={userId !== '' ? true : false} />
                         <CheckOutShippingAddress key={`shipping-${userId}`} />
                         <CheckOutInvoiceAddress key={`invoice-${userId}`} />
                         {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />}

@@ -13,14 +13,38 @@ import { useTranslations } from "next-intl"
 import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useGetAllCustomers } from "@/features/users/hook"
+import { useQuery } from "@tanstack/react-query"
+import { getUserById } from "@/features/users/api"
 
 
 interface CheckOutUserInformationProps {
     isLogin: boolean
+    userId?: string
 }
-export default function CheckOutUserInformation({ isLogin }: CheckOutUserInformationProps) {
+export default function CheckOutUserInformation({ isLogin, userId }: CheckOutUserInformationProps) {
     const form = useFormContext()
     const t = useTranslations()
+
+    // // Query user info nếu có userId
+    // const { data: user, isLoading } = useQuery({
+    //     queryKey: ["user", userId],
+    //     queryFn: () => getUserById(userId!),
+    //     enabled: !!userId,
+    //     retry: false,
+    // })
+
+    // // Khi có user thì patch giá trị vào form
+    // useEffect(() => {
+    //     if (user) {
+    //         form.reset({
+    //             ...form.getValues(),
+    //             first_name: user.first_name || '',
+    //             last_name: user.last_name || '',
+    //             email: user.email || '',
+    //             phone_number: user.phone_number || '',
+    //         })
+    //     }
+    // }, [user, form])
 
     return (
         <div className="space-y-4">
