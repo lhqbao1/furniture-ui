@@ -17,7 +17,7 @@ import MobileProductSearch from './mobile-product-search';
 import { getCartItems } from '@/features/cart/api';
 import { toast } from 'sonner';
 import { getMe } from '@/features/auth/api';
-import { Link, useRouter } from '@/src/i18n/navigation';
+import { Link, usePathname, useRouter } from '@/src/i18n/navigation';
 import { useCartLocal } from '@/hooks/cart';
 import { useIsPhone } from '@/hooks/use-is-phone';
 import { CartDrawer } from './cart-drawer';
@@ -33,6 +33,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     const isPhone = useIsPhone()
     const [open, setOpen] = useState(false)
     const [openCart, setOpenCart] = useState(false)
+    const pathName = usePathname()
 
     const queryClient = useQueryClient();
 

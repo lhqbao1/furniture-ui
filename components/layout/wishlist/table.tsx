@@ -71,7 +71,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
         }
 
         if (newQuantity > item.products.stock) {
-            toast.error("Product's stock is not enough")
+            toast.error(t("notEnoughStock"))
             return
         }
 
@@ -81,25 +81,25 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
 
     const handleDeleteItem = (item: WishListItem) => {
         deleteWishlistItemMutation.mutate({ itemId: item.id }, {
-            onSuccess: () => toast.success("Remove item successful"),
-            onError: () => toast.error("Remove item fail"),
+            onSuccess: () => toast.success(t("removeItemWishlistSuccess")),
+            onError: () => toast.error(t("removeItemWishlistFail")),
         })
     }
 
     const handleAddToCart = (item: WishListItem) => {
         addItemToWishlistMutation.mutate({ itemId: item.id }, {
-            onSuccess: () => toast.success("Add item to cart successful"),
-            onError: () => toast.error("Add item to cart fail"),
+            onSuccess: () => toast.success(t("addToCartSuccess")),
+            onError: () => toast.error(t("addToCartFail")),
         })
     }
 
     const handleAddWishlistToCart = (wishlistId: string) => {
         addWishlistToCartMutation.mutate({ wishlistId: wishlistId }, {
             onSuccess: () => {
-                toast.success("Add item to cart successful")
+                toast.success(t("addToCartSuccess"))
                 router.push('/cart')
             },
-            onError: () => toast.error("Add item to cart fail"),
+            onError: () => toast.error(t("addToCartFail")),
         })
     }
 

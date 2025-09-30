@@ -237,5 +237,10 @@
     "klarnaNotAllow": "⚠️ Klarna payment failed. Please try another method",
     "paymentFailed": "Payment failed",
     "enterCardDetails": "Enter Card Details",
-  "payWithCard": "Pay with Card"
+  "payWithCard": "Pay with Card",
+    "removeItemCartSuccess": "Item removed from cart successfully",
+    "removeItemCartFail": "Failed to remove item from cart",
+    "removeItemWishlistSuccess": "Item removed from wishlist successfully",
+    "removeItemWishlistFail": "Failed to remove item from wishlist"
+  
 }
