@@ -27,6 +27,7 @@ export type CartTableItem = {
     is_active: boolean
     item_price: number
     stock: number
+    id_provider?: string
 }
 
 interface CartLocalTableProps {

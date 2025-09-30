@@ -10,6 +10,7 @@ import { useAddToWishList } from "@/features/wishlist/hook"
 import { toast } from "sonner"
 import { HandleApiError } from "@/lib/api-helper"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useDeleteCartItem } from "@/features/cart/hook"
 
 interface GetCartColumnsProps {
     localQuantities: Record<string, number>
@@ -31,14 +32,16 @@ export const GetCartColumns = ({
     const t = useTranslations()
     const isMobile = useIsMobile()
     const addToWishlistMutation = useAddToWishList()
+    const removeItemFromCartMutation = useDeleteCartItem()
 
-    const handleAddToWishlist = (currentProduct: ProductItem) => {
+    const handleAddToWishlist = (currentProduct: ProductItem, deleteItem: CartItem) => {
         if (!currentProduct) return
         addToWishlistMutation.mutate(
             { productId: currentProduct.id ?? "", quantity: 1 },
             {
                 onSuccess() {
                     toast.success(t("addToWishlistSuccess"))
+                    onDeleteItem(deleteItem) // Cast to CartItem to match the function signature
                 },
                 onError(error) {
                     const { message } = HandleApiError(error, t)
@@ -112,7 +115,7 @@ export const GetCartColumns = ({
                                     {isCheckout && (
                                         <Heart
                                             className="text-secondary cursor-pointer"
-                                            onClick={() => handleAddToWishlist(item.products)}
+                                            onClick={() => handleAddToWishlist(item.products, item)}
                                             size={20}
                                         />
                                     )}
@@ -145,9 +148,10 @@ export const GetCartColumns = ({
                             unoptimized
                         />
                         <div className="flex-1 min-w-0">
-                            <p className="font-semibold break-words truncate">
+                            <p className="font-semibold break-words line-clamp-3">
                                 {item.products.name}
                             </p>
+                            <p>#{item.products.id_provider}</p>
                         </div>
                     </div>
                 )
@@ -219,7 +223,7 @@ export const GetCartColumns = ({
                         {isCheckout && (
                             <Heart
                                 className="text-secondary cursor-pointer"
-                                onClick={() => handleAddToWishlist(item.products)}
+                                onClick={() => handleAddToWishlist(item.products, item)}
                                 size={20}
                             />
                         )}

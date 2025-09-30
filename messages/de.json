@@ -237,5 +237,9 @@
   "klarnaNotAllow": "⚠️ Klarna-Zahlung fehlgeschlagen. Bitte versuchen Sie eine andere Zahlungsmethode",
   "paymentFailed": "Zahlung fehlgeschlagen",
   "enterCardDetails": "Kartendaten eingeben",
-  "payWithCard": "Mit Karte bezahlen"
+  "payWithCard": "Mit Karte bezahlen",
+  "removeItemCartSuccess": "Artikel wurde erfolgreich aus dem Warenkorb entfernt",
+  "removeItemCartFail": "Artikel konnte nicht aus dem Warenkorb entfernt werden",
+  "removeItemWishlistSuccess": "Artikel wurde erfolgreich von der Wunschliste entfernt",
+  "removeItemWishlistFail": "Artikel konnte nicht von der Wunschliste entfernt werden"
 }

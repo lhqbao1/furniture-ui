@@ -17,7 +17,7 @@ import MobileProductSearch from './mobile-product-search';
 import { getCartItems } from '@/features/cart/api';
 import { toast } from 'sonner';
 import { getMe } from '@/features/auth/api';
-import { Link, useRouter } from '@/src/i18n/navigation';
+import { Link, usePathname, useRouter } from '@/src/i18n/navigation';
 import { useCartLocal } from '@/hooks/cart';
 import { useIsPhone } from '@/hooks/use-is-phone';
 import { CartDrawer } from './cart-drawer';
@@ -33,6 +33,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     const isPhone = useIsPhone()
     const [open, setOpen] = useState(false)
     const [openCart, setOpenCart] = useState(false)
+    const pathName = usePathname()
 
     const queryClient = useQueryClient();
 
@@ -70,7 +71,10 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
         // Reset react-query cache liên quan đến user/session
         queryClient.removeQueries({ queryKey: ["me"], exact: true });
+        queryClient.refetchQueries({ queryKey: ["me"], exact: true });
         queryClient.removeQueries({ queryKey: ["user"], exact: true });
+        queryClient.refetchQueries({ queryKey: ["user"], exact: true });
+        queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true });
 
         setUserId(null); // cập nhật lại state để trigger re-render
         // queryClient.removeQueries({ queryKey: ["cart-items"], exact: true });
@@ -135,13 +139,8 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                 ) : user ? (
                     // Logged in -> Dropdown (desktop), Drawer (mobile)
                     <>
-                        {/* Mobile: luôn mở Drawer */}
-                        <div className="flex lg:hidden">
-                            <LoginDrawer openLogin={open} setOpenLogin={setOpen} />
-                        </div>
-
                         {/* Desktop: dropdown */}
-                        <div className="hidden lg:flex">
+                        <div className="flex">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <div className="flex gap-2 justify-start items-end">
@@ -178,7 +177,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                     </>
                 ) : (
                     // Not logged in -> Drawer (mobile & desktop đều dùng được)
-                    <LoginDrawer openLogin={open} setOpenLogin={setOpen} />
+                    <LoginDrawer openLogin={open} setOpenLogin={setOpen} setUserId={setUserId} />
                 )}
 
 

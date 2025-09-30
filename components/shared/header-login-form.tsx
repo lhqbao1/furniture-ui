@@ -14,6 +14,7 @@ import { Link, useRouter } from "@/src/i18n/navigation"
 import { useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { Switch } from "../ui/switch"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface HeaderLoginFormProps {
     onSuccess?: () => void
@@ -23,6 +24,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
     const [seePassword, setSeePassword] = useState(false)
     const router = useRouter()
     const t = useTranslations()
+    const queryClient = useQueryClient()
 
     const formSchema = z.object({
         username: z
@@ -54,7 +56,8 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                 const token = data.access_token
                 localStorage.setItem("access_token", token)
                 localStorage.setItem("userId", data.id)
-
+                queryClient.refetchQueries({ queryKey: ["me"], exact: true })
+                queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true })
                 syncLocalCartMutation.mutate()
 
                 toast.success(t("loginSuccess"))

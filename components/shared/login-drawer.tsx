@@ -18,14 +18,12 @@ import { useRouter } from "@/src/i18n/navigation"
 export interface LoginDrawerProps {
     openLogin: boolean
     setOpenLogin: (open: boolean) => void
+    setUserId: (id: string | null) => void
     isCheckOut?: boolean
 }
 
-export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false }: LoginDrawerProps) {
+export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false, setUserId }: LoginDrawerProps) {
     const t = useTranslations()
-    const [userId, setUserId] = useState<string | null>(
-        typeof window !== "undefined" ? localStorage.getItem("userId") : ""
-    );
     const queryClient = useQueryClient();
     const router = useRouter()
     return (
@@ -60,8 +58,8 @@ export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false }: Log
                                 setOpenLogin(false)
                                 const uid = localStorage.getItem("userId")
                                 setUserId(uid) // cập nhật state
-                                queryClient.invalidateQueries({ queryKey: ["me"] })
-                                queryClient.invalidateQueries({ queryKey: ["cart-items"] })
+                                queryClient.refetchQueries({ queryKey: ["me"] })
+                                queryClient.refetchQueries({ queryKey: ["cart-items"] })
                                 router.push('/check-out')
                             }}
                             onError={() => {
@@ -72,8 +70,8 @@ export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false }: Log
                             onSuccess={() => {
                                 const uid = localStorage.getItem("userId")
                                 setUserId(uid) // cập nhật state
-                                queryClient.invalidateQueries({ queryKey: ["me"] })
-                                queryClient.invalidateQueries({ queryKey: ["cart-items"] })
+                                queryClient.refetchQueries({ queryKey: ["me"] })
+                                queryClient.refetchQueries({ queryKey: ["cart-items"] })
                                 setOpenLogin(false)
                             }}
                         />)

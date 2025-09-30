@@ -17,7 +17,7 @@ const WishList = () => {
             ?.filter((item) => item.is_active)
             .reduce(
                 (acc, item) =>
-                    acc + (localQuantities[item.id] ?? item.quantity) * item.item_price,
+                    acc + (localQuantities[item.id] ?? item.quantity) * item.final_price,
                 0
             ) ?? 0
 
