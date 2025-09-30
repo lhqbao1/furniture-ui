@@ -60,7 +60,7 @@ export function ProductTable<TData, TValue>({
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onSortingChange: setSorting,
-        manualSorting: true,    // sort server-side
+        manualSorting: true,
     })
 
     return (

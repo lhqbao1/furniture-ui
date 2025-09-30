@@ -17,7 +17,7 @@ export const ammWeAvisSchema = z.object({
   warehouse: z.string().min(1, "Warehouse is required"),
   file: z
     .any()
-    .refine((file) => file instanceof File, "File is required")
+    // .refine((file) => file instanceof File, "File is required")
 })
 
 export type AmmWeAvisFormValues = z.infer<typeof ammWeAvisSchema>
