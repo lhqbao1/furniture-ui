@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Eye } from "lucide-react"
 import Link from "next/link"
 import ViewFileDialog from "./view-file"
-import { listChanel } from "@/data/data"
+import { listChanel, paymentOptions } from "@/data/data"
 
 
 export const orderColumns: ColumnDef<CheckOut>[] = [
@@ -122,14 +122,24 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
     },
     {
         accessorKey: "payment",
-        header: () => (
-            <div className="text-center w-full">PAYMENT</div>
-        ),
-        cell: ({ row }) => (
-            <div className="h-12 relative">
-                <Image src={'/paypal.svg'} alt="icon" fill className="object-contain p-2" unoptimized />
-            </div>
-        ),
+        header: () => <div className="text-center w-full">PAYMENT</div>,
+        cell: ({ row }) => {
+            const method = row.original.payment_method;
+            const option = paymentOptions.find((opt) => opt.id === method);
+            const logo = option?.logo || "/paypal.svg"; // default Paypal
+
+            return (
+                <div className="h-12 relative">
+                    <Image
+                        src={logo}
+                        alt={option?.label || "PayPal"}
+                        fill
+                        className="object-contain p-2"
+                        unoptimized
+                    />
+                </div>
+            );
+        },
     },
     {
         accessorKey: "status",

@@ -21,6 +21,7 @@ interface CheckOut {
     voucher_amount: number
     total_amount_item: number
     total_vat: number
+    payment_method: string
     total_shipping: number
     from_marketplace: string
     marketplace_order_id: string

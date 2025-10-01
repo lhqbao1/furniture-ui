@@ -87,21 +87,13 @@ export default function CheckOutPage() {
     const [total, setTotal] = useState<number>(0);
     const [openCardDialog, setOpenCardDialog] = useState(false)
 
-    // useEffect(() => {
-    //     import('@/components/layout/checkout/user-information')
-    //     import('@/components/layout/checkout/shipping-address')
-    //     import('@/components/layout/checkout/invoice-address')
-    //     import('@/components/layout/cart/cart-table')
-    //     import('@/components/layout/cart/cart-local-table')
-    //     console.log('Preloaded checkout components')
-    // })
     useEffect(() => {
         const hasReloaded = sessionStorage.getItem("checkout_reloaded")
         if (!hasReloaded) {
             sessionStorage.setItem("checkout_reloaded", "true")
             setTimeout(() => {
                 window.location.reload()
-            }, 1500)
+            }, 500)
         }
     }, [])
 
