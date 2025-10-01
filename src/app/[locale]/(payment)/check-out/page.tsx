@@ -93,7 +93,7 @@ export default function CheckOutPage() {
             sessionStorage.setItem("checkout_reloaded", "true")
             setTimeout(() => {
                 window.location.reload()
-            }, 1500)
+            }, 500)
         }
     }, [])
 
