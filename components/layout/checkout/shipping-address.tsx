@@ -15,10 +15,13 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandI
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import countries from "world-countries"
 import { Check, ChevronsUpDown } from "lucide-react"
 
-export default function CheckOutShippingAddress() {
+interface CheckOutShippingAddressProps {
+    isAdmin?: boolean
+}
+
+export default function CheckOutShippingAddress({ isAdmin = false }: CheckOutShippingAddressProps) {
     const form = useFormContext()
     const t = useTranslations()
     const [open, setOpen] = useState(false)
@@ -41,7 +44,7 @@ export default function CheckOutShippingAddress() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between bg-secondary/10 p-2">
-                <h2 className="text-lg text-black font-semibold ">{t('shippingAddress')}</h2>
+                <h2 className="text-lg text-black font-semibold ">{isAdmin ? "Shipping Address" : t('shippingAddress')}</h2>
             </div>
             <div className="grid grid-cols-2 gap-4">
                 {/* Address Line */}
@@ -51,11 +54,11 @@ export default function CheckOutShippingAddress() {
                     render={({ field }) => (
                         <FormItem className="col-span-2">
                             <FormLabel className="text-[#666666] text-sm">
-                                {t('streetAndHouse')}
+                                {isAdmin ? "Address Line" : t('addressLine')}
                             </FormLabel>
                             <FormControl>
                                 <Input
-                                    placeholder="Enter your shipping address"
+                                    placeholder=""
                                     {...field}
                                     disabled={isSameInvoice}
                                 />
@@ -70,7 +73,7 @@ export default function CheckOutShippingAddress() {
                     name="shipping_address_additional"
                     render={({ field }) => (
                         <FormItem className="col-span-2">
-                            <FormLabel>{t('addressSupplement')}</FormLabel>
+                            <FormLabel>{isAdmin ? "Additional Address" : t('addressSupplement')}</FormLabel>
                             <FormControl>
                                 <Input placeholder="" {...field} />
                             </FormControl>
@@ -86,11 +89,11 @@ export default function CheckOutShippingAddress() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel className="text-[#666666] text-sm">
-                                {t('postalCode')}
+                                {isAdmin ? "Postal Code" : t('postalCode')}
                             </FormLabel>
                             <FormControl>
                                 <Input
-                                    placeholder="Postal Code"
+                                    placeholder=""
                                     {...field}
                                     disabled={isSameInvoice}
                                 />
@@ -106,7 +109,7 @@ export default function CheckOutShippingAddress() {
                     name="shipping_city"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">{t('city')}</FormLabel>
+                            <FormLabel className="text-[#666666] text-sm">{isAdmin ? "City" : t('city')}</FormLabel>
                             <FormControl>
                                 <Popover open={open && !isSameInvoice} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild>
@@ -119,7 +122,7 @@ export default function CheckOutShippingAddress() {
                                             )}
                                             disabled={isSameInvoice}
                                         >
-                                            {field.value || t('selectCity')}
+                                            {field.value || (isAdmin ? "Select City" : t('selectCity'))}
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                         </Button>
                                     </PopoverTrigger>

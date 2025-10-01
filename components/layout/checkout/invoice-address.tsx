@@ -21,7 +21,11 @@ interface InvoiceAddressValues {
     invoice_city: string
 }
 
-const CheckOutInvoiceAddress = () => {
+interface CheckOutInvoiceAddressProps {
+    isAdmin?: boolean
+}
+
+const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps) => {
     const form = useFormContext()
     const t = useTranslations()
     const [open, setOpen] = useState(false)
@@ -82,9 +86,9 @@ const CheckOutInvoiceAddress = () => {
     return (
         <div className="space-y-4">
             <div className="flex justify-between lg:flex-row flex-col bg-secondary/10 p-2">
-                <h2 className="text-lg text-black font-semibold">{t("invoiceAddress")}</h2>
+                <h2 className="text-lg text-black font-semibold">{isAdmin ? "Invoice Address" : t("invoiceAddress")}</h2>
                 <div className="flex items-center space-x-2">
-                    <Label htmlFor="same-invoice">{t("sameAsShipping")}</Label>
+                    <Label htmlFor="same-invoice">{isAdmin ? "Same as Shipping" : t("sameAsShipping")}</Label>
                     <Switch
                         id="same-invoice"
                         checked={isSameShipping}
@@ -99,7 +103,7 @@ const CheckOutInvoiceAddress = () => {
                     name="invoice_address_line"
                     render={({ field }) => (
                         <FormItem className="col-span-2">
-                            <FormLabel>{t("streetAndHouse")}</FormLabel>
+                            <FormLabel>{isAdmin ? "Address line" : t("streetAndHouse")}</FormLabel>
                             <FormControl>
                                 <Input placeholder="" {...field} disabled={isSameShipping} />
                             </FormControl>
@@ -113,7 +117,7 @@ const CheckOutInvoiceAddress = () => {
                     name="invoice_address_additional"
                     render={({ field }) => (
                         <FormItem className="col-span-2">
-                            <FormLabel>{t("addressSupplement")}</FormLabel>
+                            <FormLabel>{isAdmin ? "Additional Address" : t("addressSupplement")}</FormLabel>
                             <FormControl>
                                 <Input placeholder="" {...field} disabled={isSameShipping} />
                             </FormControl>
@@ -127,7 +131,7 @@ const CheckOutInvoiceAddress = () => {
                     name="invoice_postal_code"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t("postalCode")}</FormLabel>
+                            <FormLabel>{isAdmin ? "Postal Code" : t("postalCode")}</FormLabel>
                             <FormControl>
                                 <Input placeholder="" {...field} disabled={isSameShipping} />
                             </FormControl>
@@ -141,7 +145,7 @@ const CheckOutInvoiceAddress = () => {
                     name="invoice_city"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">{t("city")}</FormLabel>
+                            <FormLabel className="text-[#666666] text-sm">{isAdmin ? "City" : t("city")}</FormLabel>
                             <FormControl>
                                 <Popover open={open} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild disabled={isSameShipping}>
@@ -150,7 +154,7 @@ const CheckOutInvoiceAddress = () => {
                                             role="combobox"
                                             className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
                                         >
-                                            {field.value || t("selectCity")}
+                                            {field.value || (isAdmin ? "Select City" : t('selectCity'))}
                                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                         </Button>
                                     </PopoverTrigger>

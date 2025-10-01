@@ -49,16 +49,12 @@ export interface CartItem {
 
 export default function CreateCheckoutpage() {
     const [userId, setUserId] = useState<string>("")
-    const [isCreatePassword, setIsCreatePassword] = useState<boolean>(false)
-    const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
-    const [checkout, setCheckOut] = useAtom(checkOutIdAtom)
     const [otpEmail, setOtpEmail] = useState<string>("")
     const [openBankDialog, setOpenBankDialog] = useState(false)
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
     const [openOtpDialog, setOpenOTPDialog] = useState(false)
     const t = useTranslations()
 
-    const router = useRouter()
     const { updateStatus } = useCartLocal()
 
     const CreateOrderSchema = z.object({
@@ -153,7 +149,6 @@ export default function CreateCheckoutpage() {
     })
 
     const createCheckOutMutation = useCreateCheckOut()
-    const createPaymentMutation = useCreatePayment()
     const createUserAccountMutation = useSignUp()
     const createInvoiceAddressMutation = useCreateInvoiceAddress()
     const editInvoiceAddressMutation = useUpdateInvoiceAddress()
@@ -406,7 +401,7 @@ export default function CreateCheckoutpage() {
                         toast.error(t('checkFormError'))
                     }
                 )}
-                className='flex flex-col gap-8'
+                className='flex flex-col gap-8 pb-12'
             >
                 <h2 className='section-header'>Create Order</h2>
 
@@ -414,9 +409,9 @@ export default function CreateCheckoutpage() {
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12'>
                     {/* User information and address */}
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <CheckOutUserInformation setUserId={setUserId} />
-                        <CheckOutShippingAddress />
-                        <CheckOutInvoiceAddress />
+                        <CheckOutUserInformation setUserId={setUserId} isAdmin />
+                        <CheckOutShippingAddress isAdmin />
+                        <CheckOutInvoiceAddress isAdmin />
                     </div>
 
                     {/* Table cart and total */}

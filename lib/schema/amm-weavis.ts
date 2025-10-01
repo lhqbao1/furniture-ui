@@ -4,7 +4,7 @@ export const ammWeAvisSchema = z.object({
   client: z.string().min(1, "Client is required"),
   order_number: z
   .string()
-  .regex(/^AZ\d{6}$/, "Order number must follow format AZ000000"),
+  .regex(/^[A-Za-z0-9]+$/, "Order number must contain only letters and numbers"),
     supplier_id: z.string().min(1, "Supplier ID is required"),
   supplier_name: z.string().min(1, "Supplier name is required"),
   supplier_city: z.string().min(1, "Supplier city is required"),
@@ -17,20 +17,20 @@ export const ammWeAvisSchema = z.object({
   warehouse: z.string().min(1, "Warehouse is required"),
   file: z
     .any()
-    // .refine((file) => file instanceof File, "File is required")
+    .refine((file) => file instanceof File, "File is required")
 })
 
 export type AmmWeAvisFormValues = z.infer<typeof ammWeAvisSchema>
 
 export const ammWeAvisDefaultValues: AmmWeAvisFormValues = {
-  client: "",
+  client: "243",
   order_number: "",
-  supplier_id: "",
-  supplier_name: "",
-  supplier_city: "",
-  supplier_postal_code: "",
-  supplier_country: "",
+  supplier_id: "29",
+  supplier_name: "NORMA24 Online-Shop GmbH &amp; Co. KG",
+  supplier_city: "Röttenbach",
+  supplier_postal_code: "91341",
+  supplier_country: "DE",
   delivery_date: "",
-  warehouse: "",
+  warehouse: "9_1 Amm GmbH",
   file: null
 }

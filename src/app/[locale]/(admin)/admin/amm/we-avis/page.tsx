@@ -1,13 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
+
 import { Button } from "@/components/ui/button"
 import { useDropzone } from "react-dropzone"
 import { toast } from "sonner" // hoặc react-hot-toast nếu bạn dùng lib khác
@@ -20,14 +14,12 @@ import { ammWeAvisDefaultValues, ammWeAvisSchema } from "@/lib/schema/amm-weavis
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input"
 
 const AmmWeAvisPage = () => {
     const [file, setFile] = useState<File | null>(null)
@@ -37,15 +29,37 @@ const AmmWeAvisPage = () => {
         resolver: zodResolver(ammWeAvisSchema),
         defaultValues: ammWeAvisDefaultValues,
     })
+    const importAmmProductMutation = useImportAmmProducts()
 
-    // 2. Define a submit handler.
     function onSubmit(values: z.infer<typeof ammWeAvisSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+        const formData = new FormData()
+
+        // append tất cả các field text
+        Object.entries(values).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                formData.append(key, String(value))
+            }
+        })
+
+        // append file nếu có
+        if (values.file) {
+            formData.append("file", values.file)
+        }
+
+        importAmmProductMutation.mutate(formData, {
+            onSuccess: () => {
+                toast.success("Import products successful")
+                setOpen(false)
+            },
+            onError: () => {
+                toast.error("Import products fail")
+            },
+        })
+
+        toast.info("Uploading products…")
     }
 
-    const importAmmProductMutation = useImportAmmProducts()
+
 
     const onDrop = (acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -58,28 +72,7 @@ const AmmWeAvisPage = () => {
         multiple: false,
     })
 
-    const handleSubmit = () => {
-        if (!file) {
-            toast.error("You need to choose at least one file")
-            return
-        }
 
-        const formData = new FormData()
-        formData.append("file", file)
-
-        importAmmProductMutation.mutate(formData, {
-            onSuccess: () => {
-                toast.success("Import products successful")
-                setOpen(false)
-            },
-            onError: () => {
-                toast.error("Import products fail")
-            },
-        })
-
-        toast.info("Uploading products")
-        setOpen(false)
-    }
 
     return (
         <Form {...form}>
@@ -248,6 +241,7 @@ const AmmWeAvisPage = () => {
                                         )}
                                     </div>
                                 </FormControl>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
@@ -255,45 +249,6 @@ const AmmWeAvisPage = () => {
                 <Button type="submit" className="mt-8 text-lg px-8 py-1.5">Submit</Button>
             </form>
         </Form>
-        // <div>
-        //     <Dialog open={open} onOpenChange={setOpen}>
-        //         <DialogTrigger asChild>
-        //             <Button variant="secondary" className="" disabled={importAmmProductMutation.isPending ? true : false}>{importAmmProductMutation.isPending ? <Loader2 className="animate-spin" /> : 'Import'}</Button>
-        //         </DialogTrigger>
-        //         <DialogContent className="w-[600px]">
-        //             <DialogHeader>
-        //                 <DialogTitle>Upload file</DialogTitle>
-        //             </DialogHeader>
-        //             <div
-        //                 {...getRootProps()}
-        //                 className={`mt-4 flex h-40 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition 
-        //                 ${isDragActive ? "border-primary bg-primary/10" : "border-gray-300"}`}
-        //             >
-        //                 <input {...getInputProps()} />
-        //                 {file ? (
-        //                     <div className="flex gap-2">
-        //                         <File />
-        //                         <p className="text-sm text-gray-600">{file.name}</p>
-        //                     </div>
-        //                 ) : (
-        //                     <p className="text-sm text-gray-500">
-        //                         Drag & drop file here, or click to select
-        //                     </p>
-        //                 )}
-        //             </div>
-
-        //             {/* Action buttons */}
-        //             <div className="mt-6 flex justify-end gap-2">
-        //                 <Button variant="outline" onClick={() => setOpen(false)}>
-        //                     Cancel
-        //                 </Button>
-        //                 <Button onClick={handleSubmit} disabled={!file || importAmmProductMutation.isPending}>
-        //                     {importAmmProductMutation.isPending ? <Loader2 className="animate-spin" /> : "Submit"}
-        //                 </Button>
-        //             </div>
-        //         </DialogContent>
-        //     </Dialog>
-        // </div>
     )
 }
 

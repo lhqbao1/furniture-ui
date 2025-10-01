@@ -19,9 +19,10 @@ import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui
 interface CheckOutUserInformationProps {
     userId?: string
     setUserId?: (id: string) => void
+    isAdmin?: boolean
 }
 
-export function CheckOutUserInformation({ userId, setUserId }: CheckOutUserInformationProps) {
+export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: CheckOutUserInformationProps) {
     const form = useFormContext()
     const t = useTranslations()
     const [open, setOpen] = useState(false)
@@ -31,7 +32,7 @@ export function CheckOutUserInformation({ userId, setUserId }: CheckOutUserInfor
     return (
         <div className="space-y-4">
             <div className="flex justify-between bg-secondary/10 p-2">
-                <h2 className="text-lg text-black font-semibold ">{t('userInformation')}</h2>
+                <h2 className="text-lg text-black font-semibold ">{isAdmin ? "User Information" : t('userInformation')}</h2>
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -39,9 +40,9 @@ export function CheckOutUserInformation({ userId, setUserId }: CheckOutUserInfor
                     name="first_name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('firstName')}</FormLabel>
+                            <FormLabel>{isAdmin ? "First Name" : t('firstName')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter first name" {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -53,9 +54,9 @@ export function CheckOutUserInformation({ userId, setUserId }: CheckOutUserInfor
                     name="last_name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('lastName')}</FormLabel>
+                            <FormLabel>{isAdmin ? "Last Name" : t('lastName')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter last name" {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -145,7 +146,7 @@ export function CheckOutUserInformation({ userId, setUserId }: CheckOutUserInfor
                     name="phone_number"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('phone_number')}</FormLabel>
+                            <FormLabel>{isAdmin ? "Phone Number" : t('phone_number')}</FormLabel>
                             <FormControl>
                                 <Input
                                     type="number"
@@ -162,19 +163,19 @@ export function CheckOutUserInformation({ userId, setUserId }: CheckOutUserInfor
                     name="gender"
                     render={({ field }) => (
                         <FormItem className="col-span-2">
-                            <FormLabel>{t("gender")}</FormLabel>
+                            <FormLabel>{isAdmin ? "Gender" : t("gender")}</FormLabel>
                             <FormControl>
                                 <Select
                                     value={field.value}
                                     onValueChange={field.onChange}
                                 >
                                     <SelectTrigger className="w-full border" placeholderColor>
-                                        <SelectValue placeholder={t("gender")} />
+                                        <SelectValue placeholder={isAdmin ? "Gender" : t("gender")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="male">{t("male")}</SelectItem>
-                                        <SelectItem value="female">{t("female")}</SelectItem>
-                                        <SelectItem value="other">{t("otherGender")}</SelectItem>
+                                        <SelectItem value="male">{isAdmin ? "Male" : t("male")}</SelectItem>
+                                        <SelectItem value="female">{isAdmin ? "Female" : t("female")}</SelectItem>
+                                        <SelectItem value="other">{isAdmin ? 'Other' : t("otherGender")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </FormControl>
