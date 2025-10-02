@@ -190,7 +190,7 @@
   "sale": "Sale",
   "download": "Herunterladen",
   "general": "Generell",
-  "invalidCredentials": "Falsche E-Mail oder falsches Passwort",
+  "invalidCredentials": "Falscher OTP, bitte erneut versuchen",
   "continueAsGuest": "Als Gast fortfahren",
   "orderFail": "Bestellung fehlgeschlagen",
   "otpRequired": "Bitte geben Sie alle 6 OTP-Ziffern ein",
@@ -241,5 +241,6 @@
   "removeItemCartSuccess": "Artikel wurde erfolgreich aus dem Warenkorb entfernt",
   "removeItemCartFail": "Artikel konnte nicht aus dem Warenkorb entfernt werden",
   "removeItemWishlistSuccess": "Artikel wurde erfolgreich von der Wunschliste entfernt",
-  "removeItemWishlistFail": "Artikel konnte nicht von der Wunschliste entfernt werden"
+  "removeItemWishlistFail": "Artikel konnte nicht von der Wunschliste entfernt werden",
+  "getOtp": "OTP anfordern"
 }

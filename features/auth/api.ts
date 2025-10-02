@@ -2,8 +2,8 @@
 import { api, apiPublic } from "@/lib/axios";
 import { LoginResponse, User } from "@/types/user";
 import qs from 'qs'
-export type LoginInput = { username: string; password: string }
-export type SignUpInput = { email: string; password: string, phone_number: string, first_name: string, last_name: string }
+export type LoginInput = { username: string; code: string }
+export type SignUpInput = { email: string; phone_number: string, first_name: string, last_name: string }
 
 export async function login(input: LoginInput) {
     const { data } = await apiPublic.post(
@@ -74,7 +74,19 @@ export async function signUp(input: SignUpInput) {
     }
   )
   return data as { access_token: string, token_type: string,id: string,  email: string }
+}
 
+export async function signUpGuess(input: SignUpInput) {
+  const { data } = await apiPublic.post(
+    "/signup-guess",
+    input,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+  return data as { access_token: string, token_type: string,id: string,  email: string }
 }
 
 export async function forgotPassword(email: string) {
@@ -106,6 +118,14 @@ export async function loginOtp(email: string, code: string) {
     { email, code },
   )
   return data as { access_token: string, token_type: string,id: string,  email: string }
+}
+
+export async function sendOtp(email: string) {
+  const { data } = await apiPublic.post(
+    "/login-symlink",
+    { email },
+  )
+  return data
 }
 
 export async function resetPassword(email: string, code: string, new_password: string) {

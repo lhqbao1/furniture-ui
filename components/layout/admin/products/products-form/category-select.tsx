@@ -105,30 +105,49 @@ export function MultiSelectField({
                                         No categories available
                                     </div>
                                 ) : (
+                                    // <Command>
+                                    //     {/* INPUT SEARCH */}
+                                    //     <CommandInput placeholder="Search categories..." className="h-10" />
+                                    //     <CommandGroup>
+                                    //         {leafOptions
+                                    //             .filter((opt) =>
+                                    //                 opt.name.toLowerCase().includes(
+                                    //                     (document.querySelector<HTMLInputElement>('input[type="text"]')?.value || "").toLowerCase()
+                                    //                 )
+                                    //             )
+                                    //             .map((opt) => (
+                                    //                 <CommandItem
+                                    //                     key={opt.id}
+                                    //                     onSelect={() => toggleSelect(opt.id)}
+                                    //                     className="flex items-center gap-2 cursor-pointer"
+                                    //                 >
+                                    //                     <Checkbox
+                                    //                         checked={selected.includes(opt.id)}
+                                    //                         onCheckedChange={() => toggleSelect(opt.id)}
+                                    //                         className="pointer-events-none"
+                                    //                     />
+                                    //                     <span>{opt.name}</span>
+                                    //                 </CommandItem>
+                                    //             ))}
+                                    //     </CommandGroup>
+                                    // </Command>
                                     <Command>
-                                        {/* INPUT SEARCH */}
                                         <CommandInput placeholder="Search categories..." className="h-10" />
                                         <CommandGroup>
-                                            {leafOptions
-                                                .filter((opt) =>
-                                                    opt.name.toLowerCase().includes(
-                                                        (document.querySelector<HTMLInputElement>('input[type="text"]')?.value || "").toLowerCase()
-                                                    )
-                                                )
-                                                .map((opt) => (
-                                                    <CommandItem
-                                                        key={opt.id}
-                                                        onSelect={() => toggleSelect(opt.id)}
-                                                        className="flex items-center gap-2 cursor-pointer"
-                                                    >
-                                                        <Checkbox
-                                                            checked={selected.includes(opt.id)}
-                                                            onCheckedChange={() => toggleSelect(opt.id)}
-                                                            className="pointer-events-none"
-                                                        />
-                                                        <span>{opt.name}</span>
-                                                    </CommandItem>
-                                                ))}
+                                            {leafOptions.map((opt) => (
+                                                <CommandItem
+                                                    key={opt.id}
+                                                    onSelect={() => toggleSelect(opt.id)}
+                                                    className="flex items-center gap-2 cursor-pointer"
+                                                >
+                                                    <Checkbox
+                                                        checked={selected.includes(opt.id)}
+                                                        onCheckedChange={() => toggleSelect(opt.id)}
+                                                        className="pointer-events-none"
+                                                    />
+                                                    <span>{opt.name}</span>
+                                                </CommandItem>
+                                            ))}
                                         </CommandGroup>
                                     </Command>
                                 )}

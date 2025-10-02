@@ -195,8 +195,6 @@ function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpe
     //         toast.error(t("klarnaNotAllow"));
     //     }
     // };
-
-
     return (
         <Card className="mx-auto p-4 shadow-lg">
             <CardHeader>

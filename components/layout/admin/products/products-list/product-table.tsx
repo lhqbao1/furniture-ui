@@ -65,7 +65,7 @@ export function ProductTable<TData, TValue>({
 
     return (
         <div className="flex flex-col gap-4">
-            <p>{totalItems} products found</p>
+            <p>{totalItems} items found</p>
             <div className="rounded-md border w-full overflow-x-scroll">
                 <Table>
                     <TableHeader>

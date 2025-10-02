@@ -6,14 +6,15 @@ import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Chrome, Facebook, Mail, Key, Loader2, Eye, EyeOff } from "lucide-react"
-import { useLogin, useLoginAdmin } from "@/features/auth/hook"
+import { Mail, Loader2 } from "lucide-react"
+import { useLogin, useLoginAdmin, useLoginOtp, useSendOtp } from "@/features/auth/hook"
 import { toast } from "sonner"
 import Image from "next/image"
 import { useState } from "react"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
+import { OtpInput } from "./otp-input"
 
 
 
@@ -32,35 +33,38 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             .string()
             .min(1, t('emailRequired'))
             .email(t('invalidEmail')),
-        password: z
-            .string()
-            .min(8, t('passwordMin'))
-            .refine((val) => /[a-z]/.test(val), {
-                message: t('passwordLower'),
-            })
-            .refine((val) => /[A-Z]/.test(val), {
-                message: t('passwordUpper'),
-            })
-            .refine((val) => /\d/.test(val), {
-                message: t('passwordNumber'),
-            }),
+        code: z.string().optional().nullable(),
     })
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             username: "",
-            password: "",
         },
     })
 
     const loginMutation = useLogin()
     const loginAdminMutation = useLoginAdmin()
     const syncLocalCartMutation = useSyncLocalCart();
+    const sendOtpMutation = useSendOtp()
+    const submitOtpMutation = useLoginOtp()
 
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        if (isAdmin) {
-            loginAdminMutation.mutate(values, {
+    const handleSubmit = (values: z.infer<typeof formSchema>) => {
+        if (!seePassword) {
+            sendOtpMutation.mutate(values.username, {
+                onSuccess: (data) => {
+                    toast.success(t('sendedEmail'))
+                    setSeePassword(true)
+                },
+                onError(error, variables, context) {
+                    toast.error(t("invalidCredentials"))
+                },
+            })
+        } else if (isAdmin) {
+            loginAdminMutation.mutate({
+                username: values.username,
+                code: values.code ?? ''
+            }, {
                 onSuccess: (data) => {
                     // Giả sử backend trả về token
                     const token = data.access_token
@@ -77,8 +81,11 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     toast.error(error.message)
                 },
             })
-        } else {
-            loginMutation.mutate(values, {
+        } else if (seePassword) {
+            submitOtpMutation.mutate({
+                email: values.username,
+                code: values.code ?? ''
+            }, {
                 onSuccess: (data) => {
                     // Giả sử backend trả về token
                     const token = data.access_token
@@ -93,27 +100,11 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     // setUserId(data.id)
                     toast.success(t('loginSuccess'))
                 },
-                // onSuccess: (data) => {
-                //     // Cookie đã được set bởi API proxy
-                //     // Không cần lưu token vào localStorage nữa
-
-                //     // Nếu BE trả về user info (id, name, email...), bạn có thể lưu vào global state (zustand, jotai, react-query cache...)
-                //     // hoặc sessionStorage nếu chỉ cần tạm thời
-                //     // Ví dụ:
-                //     // setUser(data.user)
-
-                //     // Sync giỏ hàng (nếu cần)
-                //     syncLocalCartMutation.mutate()
-
-                //     router.push("/")
-                //     toast.success(t("loginSuccess"))
-                // },
                 onError(error, variables, context) {
                     toast.error(t("invalidCredentials"))
                 },
             })
         }
-
     }
 
     return (
@@ -134,8 +125,16 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
             {/* <h2 className="text-2xl font-bold mb-6 lg:text-start text-center">Log In</h2> */}
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    {/* Email */}
+                <form className="space-y-6" onSubmit={form.handleSubmit(
+                    (values) => {
+                        console.log("✅ Valid submit", values)
+                        handleSubmit(values)
+                    },
+                    (errors) => {
+                        // toast.error("Please check the form for errors")
+                        console.log(errors)
+                    }
+                )}>                    {/* Email */}
                     <FormField
                         control={form.control}
                         name="username"
@@ -144,7 +143,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                                 <FormControl>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                                        <Input placeholder={t('email')} {...field} className="pl-12 py-3 h-fit" />
+                                        <Input placeholder={t('email')} {...field} className="pl-12 py-3 h-fit" disabled={seePassword} />
                                     </div>
                                 </FormControl>
                                 <FormMessage />
@@ -153,35 +152,52 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     />
 
                     {/* Password */}
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <div className="relative">
-                                        <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                                        {seePassword === false ?
-                                            <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(true)} /> :
-                                            <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(false)} />}
-                                        <Input type={seePassword ? 'text' : 'password'} placeholder={t('password')} {...field} className="pl-12 py-3 h-fit capitalize" />
-                                    </div>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {seePassword ? (
+                        <FormField
+                            control={form.control}
+                            name="code"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <div className="flex gap-2 justify-center mb-4 w-full">
+                                            {Array.from({ length: 6 }).map((_, idx) => (
+                                                <Input
+                                                    key={idx}
+                                                    id={`otp-${idx}`}
+                                                    value={field.value?.[idx] ?? ""}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/\D/g, "").slice(-1) // chỉ số 1 ký tự
+                                                        const current = field.value ?? ""
+                                                        const newValue =
+                                                            current.substring(0, idx) + val + current.substring(idx + 1)
+
+                                                        field.onChange(newValue)
+
+                                                        // tự động focus sang input kế
+                                                        if (val && idx < 5) {
+                                                            const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
+                                                            next?.focus()
+                                                        }
+                                                    }}
+                                                    className="h-12 flex-1 text-center text-lg"
+                                                    maxLength={1}
+                                                />
+                                            ))}
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    ) : ''}
 
                     <Button
                         type="submit"
                         className="w-full bg-secondary/95 hover:bg-secondary"
                         hasEffect
-                        disabled={loginMutation.isPending}
+                        disabled={submitOtpMutation.isPending || sendOtpMutation.isPending}
                     >
-                        {loginMutation.isPending ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : t('login')}
-
+                        {(submitOtpMutation.isPending || sendOtpMutation.isPending) ? seePassword ? <Loader2 className="animate-spin" /> : t('login') : t('getOtp')}
                     </Button>
                 </form>
             </Form>
@@ -192,31 +208,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     {t('forgotPassword')}?
                 </Link>
             </div>
-
-            {/* Divider */}
-            {/* <div className="flex items-center my-6">
-                <div className="flex-grow h-px bg-gray-300"></div>
-                <span className="px-2 text-sm text-gray-500">or</span>
-                <div className="flex-grow h-px bg-gray-300"></div>
-            </div> */}
-
-            {/* Social login */}
-            {/* <div className="flex gap-3">
-                <Button
-                    variant="outline"
-                    className="flex-1 flex items-center gap-2 cursor-pointer"
-                >
-                    <Chrome className="h-5 w-5 text-primary" />
-                    Google
-                </Button>
-                <Button
-                    variant="outline"
-                    className="flex-1 flex items-center gap-2 cursor-pointer"
-                >
-                    <Facebook className="h-5 w-5 text-primary " />
-                    Facebook
-                </Button>
-            </div> */}
 
             {/* Sign up link */}
             <div className="text-sm text-center mt-6 space-x-1">

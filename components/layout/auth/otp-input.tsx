@@ -47,7 +47,7 @@ export function OtpInput({
                     maxLength={1}
                     value={value[i] ?? ""}
                     className={cn(
-                        "text-center text-xl aspect-square h-12",
+                        "text-center text-xl aspect-square h-12 text-black",
                         value[i] ? "bg-gray-200" : "bg-white"
                     )} onChange={(e) => handleChange(e, i)}
                     onKeyDown={(e) => handleKeyDown(e, i)}

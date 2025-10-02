@@ -19,16 +19,14 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import z from 'zod'
 // import CheckOutInvoiceAddress from '@/components/layout/checkout/invoice-address'
-import { CheckOutPassword } from '@/components/layout/checkout/password'
 import { useCartLocal } from '@/hooks/cart'
-import { useGetUserById } from '@/features/users/hook'
 import { useQuery } from '@tanstack/react-query'
 import { User } from '@/types/user'
 import { getUserById } from '@/features/users/api'
 import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
 import { getCartItems } from '@/features/cart/api'
 // import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
-import { useCheckMailExist, useLogin, useLoginOtp, useSignUp } from '@/features/auth/hook'
+import { useCheckMailExist, useLogin, useLoginOtp, useSignUp, useSignUpGuess } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 // import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
@@ -36,6 +34,7 @@ import BankDialog from '@/components/layout/checkout/bank-dialog'
 import dynamic from 'next/dynamic'
 import { SectionSkeleton } from '@/components/layout/checkout/section-skeleton'
 import StripeLayout from '@/components/shared/stripe/stripe'
+import { Loader2 } from 'lucide-react'
 const CartTable = dynamic(() => import('@/components/layout/cart/cart-table'), { ssr: false })
 const CartLocalTable = dynamic(() => import('@/components/layout/cart/cart-local-table'), { ssr: false })
 
@@ -75,7 +74,8 @@ export interface CartItem {
 
 export default function CheckOutPage() {
     const [userId, setUserId] = useState<string>("")
-    const [isCreatePassword, setIsCreatePassword] = useState<boolean>(false)
+    const [userIdLogin, setUserIdLogin] = useState<string>("")
+
     const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
     const [checkout, setCheckOut] = useAtom(checkOutIdAtom)
     const [otpEmail, setOtpEmail] = useState<string>("")
@@ -132,74 +132,57 @@ export default function CheckOutPage() {
         shipping_address_line: z.string().min(1, { message: t('last_name_required') }),
         shipping_postal_code: z.string().min(1, { message: t('last_name_required') }),
         shipping_city: z.string().min(1, { message: t('last_name_required') }),
-
-
-        password: z
-            .string()
-            .optional()
-            .refine((val) => !val || val.length >= 8, { message: "Password must be at least 8 characters" })
-            .refine((val) => !val || /[a-z]/.test(val), { message: "Password must include a lowercase letter" })
-            .refine((val) => !val || /[A-Z]/.test(val), { message: "Password must include an uppercase letter" })
-            .refine((val) => !val || /\d/.test(val), { message: "Password must include a number" }),
-
-        confirmPassword: z
-            .string()
-            .optional()
-    }).refine((data) => {
-        if (!data.password && !data.confirmPassword) return true; // guest checkout
-        return data.password === data.confirmPassword;
-    }, {
-        message: "Confirm password does not match",
-        path: ["confirmPassword"],
     });
 
     type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
 
     // SSR-safe: chỉ đọc localStorage sau khi client mounted
     useEffect(() => {
-        const storedId = localStorage.getItem("userId")
+        const storedId = localStorage.getItem("userIdGuest")
+        const storedIdLogin = localStorage.getItem("userId")
+        if (storedIdLogin) setUserIdLogin(storedIdLogin)
         if (storedId) setUserId(storedId)
     }, [])
 
     const { data: user } = useQuery<User>({
-        queryKey: ["user", userId],
-        queryFn: () => getUserById(userId),
-        enabled: !!userId,
+        queryKey: ["user", userIdLogin ? userIdLogin : userId],
+        queryFn: () => getUserById(userIdLogin ? userIdLogin : userId),
+        enabled: !!(userIdLogin ? userIdLogin : userId),
+        retry: false,
     })
 
     const { data: addresses } = useQuery({
-        queryKey: ["address-by-user", userId],
-        queryFn: () => getAddressByUserId(userId),
+        queryKey: ["address-by-user", userIdLogin ? userIdLogin : userId],
+        queryFn: () => getAddressByUserId(userIdLogin ? userIdLogin : userId),
         retry: false,
-        enabled: !!userId,
+        enabled: !!(userIdLogin ? userIdLogin : userId),
     })
 
     const { data: invoiceAddress } = useQuery({
-        queryKey: ["invoice-address-by-user", userId],
-        queryFn: () => getInvoiceAddressByUserId(userId),
+        queryKey: ["invoice-address-by-user", userIdLogin ? userIdLogin : userId],
+        queryFn: () => getInvoiceAddressByUserId(userIdLogin ? userIdLogin : userId),
         retry: false,
-        enabled: !!userId,
+        enabled: !!(userIdLogin ? userIdLogin : userId),
     })
 
     const { cart: localCart } = useCartLocal();
     const { data: cartItems, isLoading: isLoadingCart } = useQuery({
-        queryKey: ["cart-items", userId],
+        queryKey: ["cart-items", userIdLogin ? userIdLogin : userId],
         queryFn: async () => {
             const data = await getCartItems()
             // Sort theo created_at giảm dần (mới nhất lên trước)
             // data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             return data
         },
-        enabled: !!userId,
-        retry: true
+        enabled: !!(userIdLogin ? userIdLogin : userId),
+        retry: false
     })
 
     const createCheckOutMutation = useCreateCheckOut()
     const createPaymentMutation = useCreatePayment()
-    const createUserAccountMutation = useSignUp()
+    const createUserAccountMutation = useSignUpGuess()
     const createInvoiceAddressMutation = useCreateInvoiceAddress()
     const createShippingAddressMutation = useCreateAddress()
-    const loginMutation = useLogin()
     const syncLocalCartMutation = useSyncLocalCart();
     const checkMailExistMutation = useCheckMailExist();
     const editInvoiceAddressMutation = useUpdateInvoiceAddress()
@@ -237,9 +220,6 @@ export default function CheckOutPage() {
             shipping_postal_code: "",
             shipping_city: "",
             shipping_address_additional: "",
-
-            password: "Guest@12345",
-            confirmPassword: "Guest@12345",
         },
     })
 
@@ -296,11 +276,7 @@ export default function CheckOutPage() {
 
     const handleSubmit = useCallback(
         async (data: CreateOrderFormValues) => {
-            console.log(data.payment_method)
             try {
-                // Nếu password hoặc confirmPassword rỗng thì gán Guest@12345
-                if (!data.password) data.password = "Guest@12345";
-                if (!data.confirmPassword) data.confirmPassword = "Guest@12345";
                 let userId = user?.id
                 let invoiceAddressId = invoiceAddress?.id
                 let shippingAddressId = addresses?.find(a => a.is_default)?.id
@@ -322,28 +298,19 @@ export default function CheckOutPage() {
                                 last_name: data.last_name,
                                 email: data.email,
                                 phone_number: data.phone_number,
-                                password: data.password ? data.password : 'Guest@12345',
                             })
                             userId = newUser.id
 
-                            // Sau khi tạo account thành công → gọi login
-                            const loginRes = await loginMutation.mutateAsync({
-                                username: data.email,
-                                password: data.password ? data.password : 'Guest@12345',
-                            })
-
                             // Lưu token + userId vào localStorage
-                            localStorage.setItem("access_token", loginRes.access_token)
-                            localStorage.setItem("userId", loginRes.id)
+                            localStorage.setItem("access_token", newUser.access_token)
+                            localStorage.setItem("userIdGuest", newUser.id)
 
                             // Sync local cart
                             syncLocalCartMutation.mutate()
-                            userId = loginRes.id
                         }
                     }
                 }
 
-                // Nếu chưa có invoice address thì tạo mới
                 // Nếu chưa có invoice address thì tạo mới
                 if (!invoiceAddressCountry || invoiceAddressCountry === "" || !invoiceAddressId) {
                     const newInvoice = await createInvoiceAddressMutation.mutateAsync({
@@ -466,6 +433,9 @@ export default function CheckOutPage() {
                 }
             } catch (error) {
                 toast.error(t('orderFail'))
+                localStorage.removeItem("userIdGuest")
+                localStorage.removeItem("access_token")
+                form.reset()
                 console.error(error)
             }
         },
@@ -529,10 +499,10 @@ export default function CheckOutPage() {
                     </div> */}
 
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
-                        <CheckOutUserInformation isLogin={userId !== '' ? true : false} />
+                        <CheckOutUserInformation isLogin={userIdLogin ? true : false} />
                         <CheckOutShippingAddress key={`shipping-${userId}`} />
                         <CheckOutInvoiceAddress key={`invoice-${userId}`} />
-                        {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />}
+                        {/* {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />} */}
                     </div>
 
                     {/* Table cart and total */}
@@ -693,7 +663,25 @@ export default function CheckOutPage() {
 
 
                         <div className='flex lg:justify-end justify-center'>
-                            <Button type="submit" className='text-lg lg:w-1/3 w-1/2 py-6'>{t('continue')}</Button>
+                            <Button
+                                type="submit"
+                                className='text-lg lg:w-1/3 w-1/2 py-6'
+                                disabled={
+                                    createCheckOutMutation.isPending
+                                        || createInvoiceAddressMutation.isPending
+                                        || createPaymentMutation.isPending
+                                        || createShippingAddressMutation.isPending
+                                        || createUserAccountMutation.isPending
+                                        ? true : false
+                                }
+                            >{
+                                    createCheckOutMutation.isPending
+                                        || createInvoiceAddressMutation.isPending
+                                        || createPaymentMutation.isPending
+                                        || createShippingAddressMutation.isPending
+                                        || createUserAccountMutation.isPending
+                                        ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> :
+                                        t('continue')}</Button>
                         </div>
                     </div>
                 </div>

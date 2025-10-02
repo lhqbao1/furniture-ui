@@ -21,7 +21,7 @@ export default function Protected({ children }: ProtectedProps) {
 
     if (isAdmin === null) {
         // chưa kiểm tra xong
-        return <div className="p-6">Loading...</div>
+        return <div className="p-6">Loading admin...</div>
     }
 
     return <>{children}</>

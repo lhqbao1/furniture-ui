@@ -16,8 +16,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     if (isError) return <div>No data</div>
     if (isLoading || !data) return <ProductFormSkeleton />
 
-
-
     const handleEdit = (values: ProductInput) => {
         editProduct.mutate(
             { id: data.id ?? "", input: values },
