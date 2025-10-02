@@ -17,7 +17,6 @@ import { useTranslations } from "next-intl"
 
 
 export default function SignUpForm() {
-  const [seePassword, setSeePassword] = React.useState(false)
   const t = useTranslations()
   const signUp = useSignUp()
   const router = useRouter()
@@ -34,23 +33,7 @@ export default function SignUpForm() {
       .min(6, { message: t('phone_number_short') })
       .refine((val) => /^\+?[0-9]+$/.test(val), {
         message: t('phone_number_invalid'),
-      }),
-    password: z
-      .string()
-      .min(8, t('passwordMin'))
-      .refine((val) => /[a-z]/.test(val), {
-        message: t('passwordLower'),
       })
-      .refine((val) => /[A-Z]/.test(val), {
-        message: t('passwordUpper'),
-      })
-      .refine((val) => /\d/.test(val), {
-        message: t('passwordNumber'),
-      }),
-    confirmPassword: z.string().min(1, t('confirm_password_required')),
-  }).refine((data) => data.password === data.confirmPassword, {
-    message: t('confirm_password_mismatch'),
-    path: ["confirmPassword"],
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,8 +43,6 @@ export default function SignUpForm() {
       first_name: "",
       last_name: "",
       phone_number: "",
-      password: "",
-      confirmPassword: "",
     },
     mode: "onSubmit",
   })
@@ -69,7 +50,6 @@ export default function SignUpForm() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     signUp.mutate({
       email: values.email,
-      password: values.password,
       phone_number: values.phone_number,
       first_name: values.first_name,
       last_name: values.last_name
@@ -159,45 +139,6 @@ export default function SignUpForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('password')}</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                    {seePassword === false ?
-                      <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(true)} /> :
-                      <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(false)} />}
-                    <Input type={seePassword ? 'text' : 'password'} placeholder="Password" {...field} className="pl-12 py-3 h-fit" />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('confirm_password')}</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Key className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                    {seePassword === false ?
-                      <Eye className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(true)} /> :
-                      <EyeOff className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 cursor-pointer" onClick={() => setSeePassword(false)} />}
-                    <Input type={seePassword ? 'text' : 'password'} placeholder="Password" {...field} className="pl-12 py-3 h-fit" />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
             <Button type="submit" className="bg-primary/90 hover:bg-primary lg:px-12 px-4 py-6 text-lg" hasEffect>
               {signUp.isPending ? (

@@ -64,6 +64,13 @@ export async function getProductById(id: string) {
   return data as ProductItem 
 }
 
+export async function getProductBySlug(product_slug: string) {
+  const {data} = await apiPublic.get(
+      `/products/by-slug/${product_slug}`,
+  )
+  return data as ProductItem
+}
+
 export async function getProductByTag(tag: string) {
   const {data} = await apiPublic.get(
       `/products/by-tag/${tag}`,

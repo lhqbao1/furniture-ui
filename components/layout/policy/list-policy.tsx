@@ -40,10 +40,6 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
         scrollTo(key, -80) // scroll lên trên một chút để tránh bị che bởi header
     }
 
-    useEffect(() => {
-        console.log('hehe')
-    })
-
     const { data: policy, isLoading } = useQuery({
         queryKey: ["policy-items", currentVersion],
         queryFn: () => getPolicyItemsByVersion(currentVersion),

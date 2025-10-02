@@ -20,7 +20,6 @@ const OrderPlaced = () => {
     const router = useRouter()
     const params = useSearchParams()
     const paymentIntentId = params?.get('payment_intent') // Lấy param paymentIntent.id nếu có
-    const status = params?.get("redirect_status")
 
     const [counter, setCounter] = useState(5)
     const [userId, setUserId] = useState<string | null>(null)
@@ -35,7 +34,7 @@ const OrderPlaced = () => {
 
     // Lấy userId từ localStorage
     useEffect(() => {
-        const id = localStorage.getItem('userId')
+        const id = localStorage.getItem('userIdGuest')
         if (id) setUserId(id)
     }, [])
 

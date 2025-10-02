@@ -29,10 +29,10 @@ import FilterForm from "./toolbar/filter"
 import ImportDialog from "./toolbar/import"
 
 interface TableToolbarProps {
-    searchQuery: string
+    searchQuery?: string
     pageSize: number
     setPageSize: React.Dispatch<React.SetStateAction<number>>
-    setSearchQuery: React.Dispatch<React.SetStateAction<string>>
+    setSearchQuery?: React.Dispatch<React.SetStateAction<string>>
     addButtonText?: string
     isAddButtonModal?: boolean
     addButtonUrl?: string
@@ -62,7 +62,7 @@ export default function TableToolbar({
     const [debouncedValue] = useDebounce(inputValue, 400)
 
     useEffect(() => {
-        if (debouncedValue !== searchQuery) {
+        if (debouncedValue !== searchQuery && setSearchQuery) {
             setSearchQuery(debouncedValue)
         }
     }, [debouncedValue, searchQuery, setSearchQuery])

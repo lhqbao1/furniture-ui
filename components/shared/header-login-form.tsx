@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Mail, Key, Loader2, Eye, EyeOff } from "lucide-react"
-import { useLogin } from "@/features/auth/hook"
+import { useLogin, useLoginOtp, useSendOtp } from "@/features/auth/hook"
 import { toast } from "sonner"
 import { useState } from "react"
 import { Link, useRouter } from "@/src/i18n/navigation"
@@ -29,46 +29,59 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
     const formSchema = z.object({
         username: z
             .string()
-            .min(1, t("emailRequired"))
-            .email(t("invalidEmail")),
-        password: z
-            .string()
-            .min(8, t("passwordMin"))
-            .refine((val) => /[a-z]/.test(val), { message: t("passwordLower") })
-            .refine((val) => /[A-Z]/.test(val), { message: t("passwordUpper") })
-            .refine((val) => /\d/.test(val), { message: t("passwordNumber") }),
+            .min(1, t('emailRequired'))
+            .email(t('invalidEmail')),
+        code: z.string().optional().nullable(),
     })
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             username: "",
-            password: "",
         },
     })
 
     const loginMutation = useLogin()
     const syncLocalCartMutation = useSyncLocalCart()
+    const sendOtpMutation = useSendOtp()
+    const submitOtpMutation = useLoginOtp()
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        loginMutation.mutate(values, {
-            onSuccess: (data) => {
-                const token = data.access_token
-                localStorage.setItem("access_token", token)
-                localStorage.setItem("userId", data.id)
-                queryClient.refetchQueries({ queryKey: ["me"], exact: true })
-                queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true })
-                syncLocalCartMutation.mutate()
+        if (!seePassword) {
+            sendOtpMutation.mutate(values.username, {
+                onSuccess: (data) => {
+                    toast.success(t('sendedEmail'))
+                    setSeePassword(true)
+                },
+                onError(error, variables, context) {
+                    toast.error(t("invalidCredentials"))
+                },
+            })
+        } else {
+            submitOtpMutation.mutate({
+                email: values.username,
+                code: values.code ?? ''
+            }, {
+                onSuccess(data, variables, context) {
+                    const token = data.access_token
+                    localStorage.setItem("access_token", token)
+                    localStorage.setItem("userId", data.id)
+                    queryClient.refetchQueries({ queryKey: ["me"], exact: true })
+                    queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true })
+                    syncLocalCartMutation.mutate()
 
-                toast.success(t("loginSuccess"))
+                    toast.success(t("loginSuccess"))
 
-                // gọi callback onSuccess nếu được truyền
-                if (onSuccess) onSuccess()
-            },
-            onError(error) {
-                toast.error(t("invalidCredentials"))
-            },
-        })
+                    // gọi callback onSuccess nếu được truyền
+                    if (onSuccess) onSuccess()
+                },
+                onError(error) {
+                    toast.error(t("invalidCredentials"))
+                },
+            }
+            )
+        }
     }
 
     return (
@@ -96,36 +109,44 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                     />
 
                     {/* Password */}
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <div className="relative flex items-center" >
-                                        {seePassword ? (
-                                            <EyeOff
-                                                className="absolute right-3 h-5 w-5 text-gray-400 cursor-pointer"
-                                                onClick={() => setSeePassword(false)}
-                                            />
-                                        ) : (
-                                            <Eye
-                                                className="absolute right-3 h-5 w-5 text-gray-400 cursor-pointer"
-                                                onClick={() => setSeePassword(true)}
-                                            />
-                                        )}
-                                        <Input
-                                            type={seePassword ? "text" : "password"}
-                                            placeholder={t("password")}
-                                            {...field}
-                                            className="lg:h-16 h-14 bg-gray-100 rounded-xs "
-                                        />
-                                    </div>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {seePassword ? (
+                        <FormField
+                            control={form.control}
+                            name="code"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <div className="flex gap-2 justify-center mb-4 w-full">
+                                            {Array.from({ length: 6 }).map((_, idx) => (
+                                                <Input
+                                                    key={idx}
+                                                    id={`otp-${idx}`}
+                                                    value={field.value?.[idx] ?? ""}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/\D/g, "").slice(-1) // chỉ số 1 ký tự
+                                                        const current = field.value ?? ""
+                                                        const newValue =
+                                                            current.substring(0, idx) + val + current.substring(idx + 1)
+
+                                                        field.onChange(newValue)
+
+                                                        // tự động focus sang input kế
+                                                        if (val && idx < 5) {
+                                                            const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
+                                                            next?.focus()
+                                                        }
+                                                    }}
+                                                    className="h-12 flex-1 text-center text-lg"
+                                                    maxLength={1}
+                                                />
+                                            ))}
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    ) : ''}
 
                     <div className="flex justify-between items-center">
                         <Switch className="data-[state=unchecked]:bg-gray-400" />
@@ -138,13 +159,9 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                             className="w-full text-lg rounded-none h-14"
                             variant={'secondary'}
                             hasEffect
-                            disabled={loginMutation.isPending}
+                            disabled={submitOtpMutation.isPending || sendOtpMutation.isPending}
                         >
-                            {loginMutation.isPending ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                t("login")
-                            )}
+                            {(submitOtpMutation.isPending || sendOtpMutation.isPending) ? seePassword ? <Loader2 className="animate-spin" /> : t('login') : t('getOtp')}
                         </Button>
                     </div>
                 </form>

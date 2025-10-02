@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook"
 import { stripHtmlRegex } from "@/hooks/simplifyHtml"
 import { Switch } from "@/components/ui/switch"
+import DeleteDialog from "./delete-dialog"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -467,7 +468,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
                     </Link>
 
                     {/* Delete */}
-                    {/* <DeleteDialog product={row.original} /> */}
+                    <DeleteDialog product={row.original} />
 
                     {/* View */}
                     <Link href={`/product${categoryHref}`} target="_blank" rel="noopener noreferrer">

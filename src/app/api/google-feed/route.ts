@@ -46,8 +46,8 @@ export async function GET() {
   <g:id>${escapeXml(p.id_provider)}</g:id>
   <g:title><![CDATA[${escapeCDATA(p.name.trim())}]]></g:title>
   <g:description><![CDATA[${escapeCDATA(cleanDescription(p.description))}]]></g:description>
-  <g:link>${escapeXml(`https://prestige-home.de/product${categoryHref}`)}</g:link>
-  <g:image_link>${escapeXml(cleanImageLink(p.static_files[0]?.url))}</g:image_link>
+<g:link>${escapeXml(encodeURI(`https://prestige-home.de/product${categoryHref}`))}</g:link>
+<g:image_link>${escapeXml(encodeURI(cleanImageLink(p.static_files[0]?.url)))}</g:image_link>
   <g:availability>${p.stock > 0 ? "in stock" : "out of stock"}</g:availability>
   <g:price>${p.final_price.toFixed(2)} EUR</g:price>
   <g:gtin>${escapeXml(p.ean)}</g:gtin>

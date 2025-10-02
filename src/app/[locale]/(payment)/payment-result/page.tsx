@@ -14,6 +14,10 @@ const OrderPlacedWrapper = () => {
     useEffect(() => {
         if (status === "failed" && counter === 4) {
             router.replace("/cart")
+            localStorage.removeItem("checkoutId")
+            localStorage.removeItem("paymentId")
+            localStorage.removeItem("userIdGuest")
+            localStorage.removeItem("access_token")
         }
         const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
         return () => clearTimeout(timer)

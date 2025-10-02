@@ -191,7 +191,7 @@
     "sale": "Sale",
     "download": "Download",
     "general": "General",
-    "invalidCredentials": "Wrong email or password",
+    "invalidCredentials": "Wrong OTP, please try again",
     "continueAsGuest": "Continue as Guest",
     "orderFail": "Place order fail",
     "otpRequired": "Please enter all 6 OTP digits",
@@ -241,6 +241,6 @@
     "removeItemCartSuccess": "Item removed from cart successfully",
     "removeItemCartFail": "Failed to remove item from cart",
     "removeItemWishlistSuccess": "Item removed from wishlist successfully",
-    "removeItemWishlistFail": "Failed to remove item from wishlist"
-  
+    "removeItemWishlistFail": "Failed to remove item from wishlist",
+    "getOtp": "Get OTP"
 }

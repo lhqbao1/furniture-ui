@@ -15,6 +15,7 @@ import { Loader2, Trash2 } from 'lucide-react'
 import { useDeleteProduct } from '@/features/products/hook'
 import { ProductItem } from '@/types/products'
 import { toast } from 'sonner'
+import { useRemoveFormEbay } from '@/features/ebay/hook'
 
 interface DeleteDialogProps {
     product: ProductItem
@@ -22,13 +23,26 @@ interface DeleteDialogProps {
 
 const DeleteDialog = ({ product }: DeleteDialogProps) => {
     const deleteProduct = useDeleteProduct()
+    const removeFromEbayMutation = useRemoveFormEbay()
     const [open, setOpen] = useState(false)
 
     const handleDelete = () => {
         deleteProduct.mutate(product.id ?? "", {
             onSuccess(data, variables, context) {
                 toast.success("Delete product successfully")
-                setOpen(false)
+                if (product.ebay) {
+                    removeFromEbayMutation.mutate(product.sku, {
+                        onSuccess(data, variables, context) {
+                            toast.success("Remove from Ebay successful")
+                            setOpen(false)
+                        },
+                        onError(error, variables, context) {
+                            toast.error("Remove from Ebay fail")
+                        },
+                    })
+                } else {
+                    setOpen(false)
+                }
             },
             onError(error, variables, context) {
                 toast.error("Failed to delete product")

@@ -28,7 +28,7 @@ import { User } from '@/types/user'
 import { getUserById } from '@/features/users/api'
 import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
 import { getCartItems } from '@/features/cart/api'
-import { useCheckMailExist, useLogin, useLoginOtp, useSignUp } from '@/features/auth/hook'
+import { useCheckMailExist, useLogin, useLoginOtp, useSignUp, useSignUpGuess } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
 import BankDialog from '@/components/layout/checkout/bank-dialog'
@@ -132,9 +132,6 @@ export default function CreateCheckoutpage() {
         enabled: !!userId,
     })
 
-    console.log(invoiceAddress)
-    console.log('userid', userId)
-
     const { cart: localCart } = useCartLocal();
     const { data: cartItems, isLoading: isLoadingCart } = useQuery({
         queryKey: ["cart-items", userId],
@@ -149,7 +146,7 @@ export default function CreateCheckoutpage() {
     })
 
     const createCheckOutMutation = useCreateCheckOut()
-    const createUserAccountMutation = useSignUp()
+    const createUserAccountMutation = useSignUpGuess()
     const createInvoiceAddressMutation = useCreateInvoiceAddress()
     const editInvoiceAddressMutation = useUpdateInvoiceAddress()
     const createShippingAddressMutation = useCreateAddress()
@@ -264,23 +261,18 @@ export default function CreateCheckoutpage() {
                         last_name: data.last_name,
                         email: data.email,
                         phone_number: data.phone_number,
-                        password: data.password ? data.password : 'Guest@12345',
                     })
                     userId = newUser.id
 
-                    // Sau khi tạo account thành công → gọi login
-                    const loginRes = await loginMutation.mutateAsync({
-                        username: data.email,
-                        password: data.password ? data.password : 'Guest@12345',
-                    })
+
 
                     // Lưu token + userId vào localStorage
-                    localStorage.setItem("access_token", loginRes.access_token)
-                    localStorage.setItem("userId", loginRes.id)
+                    localStorage.setItem("access_token", newUser.access_token)
+                    localStorage.setItem("userId", newUser.id)
 
                     // Sync local cart
                     syncLocalCartMutation.mutate()
-                    userId = loginRes.id
+                    userId = newUser.id
                 }
 
                 // Nếu chưa có invoice address thì tạo mới
