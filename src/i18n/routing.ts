@@ -11,4 +11,4 @@ export const routing = defineRouting({
 
 export const locales = ['de','en'] as const
 export const defaultLocale = 'de'
-export const localePrefix = 'as-needed' // hoặc 'always'
+export const localePrefix = 'as-needed'
