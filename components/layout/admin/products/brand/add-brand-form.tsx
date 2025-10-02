@@ -87,8 +87,6 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                 },
             });
         }
-
-
     }
 
     return (

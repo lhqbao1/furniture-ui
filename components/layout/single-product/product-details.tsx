@@ -277,17 +277,26 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         : ''}
                                     <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
                                     <div className='flex flex-row justify-start gap-4 items-center'>
-                                        {/* <div className='rounded-xl text-xs py-1 uppercase px-2 text-white' style={{ backgroundColor: `red` }}>
-                                            {productDetails.tag}
-                                        </div> */}
-
                                         <div className='flex gap-1 items-center'>
                                             <ListStars rating={0} />
                                         </div>
                                     </div>
-                                    <div className='flex gap-2'>
+                                    {/* <div className='flex gap-2'>
                                         <p className='text-primary lg:text-3xl text-xl font-semibold'>{productDetails.final_price ? <>€{productDetails.final_price.toFixed(2)}</> : ''}</p>
                                         <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>{productDetails.price ? <>€{productDetails.price.toFixed(2)}</> : ''}</p>
+                                    </div> */}
+                                    <div className='space-y-2'>
+                                        <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
+                                            <div className='text-4xl'>{Math.floor(productDetails.final_price ? productDetails.final_price : productDetails.price)}</div>
+                                            <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
+                                                .{((productDetails.final_price ? productDetails.final_price : productDetails.price) % 1).toFixed(2).split(".")[1]}
+                                            </div>
+                                            <div className="text-base font-semibold text-black">€</div>
+                                        </div>
+
+                                        <p className='text-base mb-1'>
+                                            Vorher: €{(productDetails.price ? productDetails.price : productDetails.final_price).toFixed(2)}
+                                        </p>
                                     </div>
 
                                     <div className='space-y-2'>
@@ -367,7 +376,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         </div>
                                     </div> */}
 
-                                    <div className='flex lg:flex-row flex-col items-start gap-6 lg:items-end'>
+                                    <div className='flex  flex-col items-start gap-4'>
                                         <div className='lg:basis-1/3 basis-2/5'>
                                             <FormField
                                                 control={form.control}
@@ -383,33 +392,24 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                 )}
                                             />
                                         </div>
-                                        <Button
-                                            className="rounded-md pr-10 font-bold text-start justify-start lg:text-lg text-base lg:basis-2/5 w-3/5 relative lg:min-h-[40px] lg:h-fit !h-[40px]"
-                                            type="submit"
-                                        >
-                                            {t('addToCart')}
+
+                                        <div className='flex gap-1 lg:basis-2/5 basis-3/5 relative'>
+                                            <Button
+                                                className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
+                                                type="submit"
+                                            >
+                                                {t('addToCart')}
+                                            </Button>
+
                                             <div
                                                 onClick={(e) => {
-                                                    e.preventDefault()
-                                                    e.stopPropagation()
                                                     handleAddProductToWishlist()
                                                 }}
-                                                className="absolute bg-white rounded-md aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary right-0"
+                                                className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white border-secondary border  hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
                                             >
                                                 <Heart />
                                             </div>
-                                            {/* <div
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    e.stopPropagation()
-                                                    handleAddProductToCart()
-                                                }}
-                                                className="absolute bg-white rounded-md aspect-square h-full text-gray-500 font-bold flex items-center justify-center border border-primary left-0"
-                                            >
-                                                <Plus />
-                                            </div> */}
-                                        </Button>
-
+                                        </div>
                                     </div>
 
                                     {/* Voucher */}
