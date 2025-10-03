@@ -233,7 +233,16 @@ const ProductAdditionalInputs = () => {
                                 Product Length
                             </FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                <Input
+                                    placeholder=""
+                                    {...field}
+                                    value={field.value ?? ''}
+                                    onChange={(e) =>
+                                        field.onChange(
+                                            e.target.value === "" ? null : e.target.valueAsNumber
+                                        )
+                                    }
+                                    type='number'
                                 />
                             </FormControl>
                             <FormMessage />
@@ -251,7 +260,16 @@ const ProductAdditionalInputs = () => {
                                 Product Width
                             </FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                <Input
+                                    placeholder=""
+                                    {...field}
+                                    value={field.value ?? ''}
+                                    onChange={(e) =>
+                                        field.onChange(
+                                            e.target.value === "" ? null : e.target.valueAsNumber
+                                        )
+                                    }
+                                    type='number'
                                 />
                             </FormControl>
                             <FormMessage />
@@ -269,7 +287,16 @@ const ProductAdditionalInputs = () => {
                                 Product Height
                             </FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                <Input
+                                    placeholder=""
+                                    {...field}
+                                    value={field.value ?? ''}
+                                    onChange={(e) =>
+                                        field.onChange(
+                                            e.target.value === "" ? null : e.target.valueAsNumber
+                                        )
+                                    }
+                                    type='number'
                                 />
                             </FormControl>
                             <FormMessage />
@@ -287,7 +314,16 @@ const ProductAdditionalInputs = () => {
                                 Product Net. Weight
                             </FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                <Input
+                                    placeholder=""
+                                    {...field}
+                                    value={field.value ?? ''}
+                                    onChange={(e) =>
+                                        field.onChange(
+                                            e.target.value === "" ? null : e.target.valueAsNumber
+                                        )
+                                    }
+                                    type='number'
                                 />
                             </FormControl>
                             <FormMessage />
