@@ -180,7 +180,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
                     <div className="xl:col-span-7 col-span-12 flex justify-between">
                         <div className="space-y-3">
                             <div className="flex flex-col gap-3 justify-between">
-                                <Link href={`/${locale}/shop-all`} className="flex gap-2 items-center">
+                                <Link href={`/shop-all`} className="flex gap-2 items-center">
                                     <ArrowLeft size={20} />
                                     <span className="text-sm">{t('continueShopping')}</span>
                                 </Link>

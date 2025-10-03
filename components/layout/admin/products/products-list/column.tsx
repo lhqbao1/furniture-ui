@@ -318,14 +318,14 @@ function ActionsCell({ product }: { product: ProductItem }) {
 
     return (
         <div className="flex gap-2">
-            <Link href={`/${locale}/admin/products/${product.id}/edit`}>
+            <Link href={`/admin/products/${product.id}/edit`}>
                 <Button variant="ghost" size="icon">
                     <Pencil className="w-4 h-4 text-primary" />
                 </Button>
             </Link>
             <DeleteDialog product={product} />
             <Link
-                href={`/${locale}/product${categoryHref}`}
+                href={`/product${categoryHref}`}
                 target="_blank"
                 rel="noopener noreferrer"
             >
@@ -333,7 +333,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
                     <Eye className="w-4 h-4 text-secondary" />
                 </Button>
             </Link>
-            <Link href={`/${locale}/admin/products/${product.id}/clone`}>
+            <Link href={`/admin/products/${product.id}/clone`}>
                 <Button variant="ghost" size="icon">
                     <CopyCheck className="w-4 h-4 text-secondary" />
                 </Button>

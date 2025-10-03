@@ -115,7 +115,7 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                             ? `/${level2.name}/${product.id}`
                             : `/${product.id}`
                 return (
-                    <Link href={`/${locale}/product/${categoryHref}`} passHref key={product.id}>
+                    <Link href={`/product/${categoryHref}`} passHref key={product.id}>
                         <div
                             className='bg-white p-4 relative group'
                             style={{

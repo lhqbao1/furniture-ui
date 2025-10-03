@@ -88,7 +88,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
         <div className="home-banner-top__content sticky top-0 overflow-hidden z-50 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 
     lg:flex lg:items-center lg:justify-end lg:px-4 lg:py-3 lg:gap-6">
             <div className={`flex gap-4 items-center`}>
-                <Link href={`/${locale}`} className='relative w-10 h-10'>
+                <Link href={`/`} className='relative w-10 h-10'>
                     <Image
                         src="/new-logo.svg"
                         alt=""
@@ -118,7 +118,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                     <CartDrawer openCart={openCart} setOpenCart={setOpenCart} cartNumber={displayedCart.length} />
                 </div>
                 <div className="hidden lg:block relative">
-                    <Link href={`/${locale}/cart`} className={`cursor-pointer relative`}>
+                    <Link href={`/cart`} className={`cursor-pointer relative`}>
                         <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
                         {displayedCart && displayedCart.length > 0 ?
                             <span className="absolute -top-1.5 -right-1 flex size-3">
@@ -168,7 +168,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                                     <DropdownMenuItem onClick={onLogout}>
                                         {t("logout")}
                                     </DropdownMenuItem>
-                                    <Link href={`/${locale}/wishlist`}>
+                                    <Link href={`/wishlist`}>
                                         <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
                                     </Link>
                                 </DropdownMenuContent>

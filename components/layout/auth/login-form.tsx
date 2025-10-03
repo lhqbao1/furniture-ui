@@ -201,7 +201,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
             {/* Forgot password */}
             <div className="flex justify-end mt-2">
-                <Link href={`/${locale}/forgot-password`} className="text-sm text-secondary hover:underline">
+                <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
                     {t('forgotPassword')}?
                 </Link>
             </div>
@@ -209,7 +209,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             {/* Sign up link */}
             <div className="text-sm text-center mt-6 space-x-1">
                 <span>{t('noAccount')}</span>
-                <Link href={`/${locale}/sign-up`} className="text-sm text-secondary hover:underline">
+                <Link href={`/sign-up`} className="text-sm text-secondary hover:underline">
                     {t('createAccount')}
                 </Link>
             </div>

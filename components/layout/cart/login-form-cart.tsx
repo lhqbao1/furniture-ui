@@ -183,7 +183,7 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
 
             {/* Forgot password */}
             <div className="flex justify-end mt-2 lg:mt-4">
-                <Link href={`/${locale}/forgot-password`} className="text-sm text-secondary hover:underline">
+                <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
 
                     {t("forgotPassword")}?
                 </Link>
@@ -192,7 +192,7 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
             {/* Sign up link */}
             <div className="text-sm text-center mt-6 space-x-1">
                 <span>{t("noAccount")}</span>
-                <Link href={`/${locale}/sign-up`} className="font-medium text-secondary hover:underline">
+                <Link href={`/sign-up`} className="font-medium text-secondary hover:underline">
 
                     {t("createAccount")}
                 </Link>

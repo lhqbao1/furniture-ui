@@ -1,15 +1,12 @@
 'use client'
 import React from "react";
 import Image from "next/image";
-// ❌ bỏ import Link từ "next/link"
-// ✅ dùng Link của next-intl navigation để auto handle locale
 import { Link } from "@/src/i18n/navigation"
 import { useTranslations, useLocale } from "next-intl";
 import { Input } from "../ui/input";
 
 const Footer = () => {
     const t = useTranslations()
-    const locale = useLocale() // 👈 lấy locale hiện tại
 
     return (
         <footer className="bg-white shadow-2xl mt-10 lg:mt-20 text-black w-full grid lg:grid-cols-6 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:py-10 px-8 py-8 rounded-tl-2lg rounded-tr-2xl">
@@ -42,7 +39,7 @@ const Footer = () => {
                 <p className="leading-relaxed font-semibold text-sm lg:w-1/2 w-full">
                     Die Abmeldung des Newsletters ist jederzeit über den Abmeldelink in jeder Mail oder als Anfrage in unserem Kontaktformular möglich.{" "}
                     {/* ✅ thêm locale */}
-                    <Link href={`/${locale}/privacy-policy`} className="underline text-gray-600 hover:text-gray-800">
+                    <Link href={`/privacy-policy`} className="underline text-gray-600 hover:text-gray-800">
                         Datenschutz
                     </Link>
                 </p>
@@ -53,10 +50,10 @@ const Footer = () => {
                 <h3 className="font-semibold mb-3">{t('pages')}</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     {/* ✅ thêm locale */}
-                    <li><Link href={`/${locale}/about-us`}>{t('aboutUs')}</Link></li>
-                    <li><Link href={`/${locale}/contact`}>{t('contact')}</Link></li>
-                    <li><Link href={`/${locale}/faq`}>FAQ</Link></li>
-                    <li><Link href={`/${locale}/impressum`}>{t('imprint')}</Link></li>
+                    <li><Link href={`/about-us`}>{t('aboutUs')}</Link></li>
+                    <li><Link href={`/contact`}>{t('contact')}</Link></li>
+                    <li><Link href={`/faq`}>FAQ</Link></li>
+                    <li><Link href={`/impressum`}>{t('imprint')}</Link></li>
                 </ul>
             </div>
 
@@ -65,9 +62,9 @@ const Footer = () => {
                 <h3 className="font-semibold mb-3">{t('termPolicy')}</h3>
                 <ul className="space-y-2 text-black-700 text-sm">
                     {/* ✅ thêm locale */}
-                    <li><Link href={`/${locale}/agb`}>{t('termCondition')}</Link></li>
-                    <li><Link href={`/${locale}/privacy-policy`}>{t('privacyPolicy')}</Link></li>
-                    <li><Link href={`/${locale}/cancellation`}>Widerruf</Link></li>
+                    <li><Link href={`/agb`}>{t('termCondition')}</Link></li>
+                    <li><Link href={`/privacy-policy`}>{t('privacyPolicy')}</Link></li>
+                    <li><Link href={`/cancellation`}>Widerruf</Link></li>
                     <li>
                         <Link
                             href="#"
