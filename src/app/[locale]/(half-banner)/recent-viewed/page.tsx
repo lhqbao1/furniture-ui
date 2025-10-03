@@ -7,12 +7,14 @@ import { CustomPagination } from '@/components/shared/custom-pagination'
 import { useGetViewedProduct } from '@/features/viewed/hook'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 export default function ViewProductPage() {
     const [page, setPage] = useState(1)
     const { data: products, isLoading, isError } = useGetViewedProduct()
     const t = useTranslations()
+    const locale = useLocale()
+
     if (!products || isLoading) return <ProductGridSkeleton length={12} />
 
 
@@ -24,7 +26,7 @@ export default function ViewProductPage() {
                 {isLoading || isError || !products || products.items.length === 0 ?
                     <div className='flex justify-center flex-col items-center lg:mt-10 gap-2'>
                         <div className='text-xl'>No Product Found</div>
-                        <Link href={'/shop-all'}>
+                        <Link href={`/${locale}/shop-all`}>
                             <Button>Continue shop</Button>
                         </Link>
                     </div>

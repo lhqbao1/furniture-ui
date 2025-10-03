@@ -6,10 +6,12 @@ import { useRouter } from "@/src/i18n/navigation"
 import { ProductInput } from "@/lib/schema/product"
 import { toast } from "sonner"
 import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
+import { useLocale } from "next-intl"
 
 const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = React.use(params) // unwrap Promise
     const router = useRouter()
+    const locale = useLocale()
     const createProductMutation = useAddProduct()
 
     const { data, isLoading, isError } = useGetProductById(id)
@@ -20,7 +22,7 @@ const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         createProductMutation.mutate(values, {
             onSuccess: () => {
                 toast.success("Product added successfully!")
-                router.push("/admin/products/list")
+                router.push("/admin/products/list", { locale })
             },
             onError: (error) => {
                 toast.error(`Failed to add product ${error}`)

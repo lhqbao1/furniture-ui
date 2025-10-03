@@ -11,7 +11,7 @@ import { useLogin, useLoginOtp, useSendOtp } from "@/features/auth/hook"
 import { toast } from "sonner"
 import { useState } from "react"
 import { Link, useRouter } from "@/src/i18n/navigation"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { Switch } from "../ui/switch"
 import { useQueryClient } from "@tanstack/react-query"
@@ -25,6 +25,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
     const router = useRouter()
     const t = useTranslations()
     const queryClient = useQueryClient()
+    const locale = useLocale()
 
     const formSchema = z.object({
         username: z
@@ -170,7 +171,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
             {/* Forgot password */}
             <div className="flex justify-end mt-2 mb-5">
                 <Link
-                    href="/forgot-password"
+                    href={`/${locale}/forgot-password`}
                     className="text-black/70 hover:underline"
                 >
                     {t("forgotPassword")}?
@@ -185,7 +186,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                 hasEffect
                 disabled={loginMutation.isPending}
                 onClick={() => {
-                    router.push('/sign-up')
+                    router.push('/sign-up', { locale })
                 }}
             >
                 {loginMutation.isPending ? (

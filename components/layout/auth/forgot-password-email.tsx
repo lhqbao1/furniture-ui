@@ -16,7 +16,8 @@ import { Input } from "@/components/ui/input"
 import { useForgotPassword } from '@/features/auth/hook'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
+import { useRouter } from '@/src/i18n/navigation'
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -24,6 +25,8 @@ const formSchema = z.object({
 
 const ForgotPasswordEmail = () => {
     const router = useRouter()
+    const t = useTranslations()
+    const locale = useLocale()
     const forgotPasswordMutation = useForgotPassword()
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -39,7 +42,7 @@ const ForgotPasswordEmail = () => {
             onSuccess: (data) => {
                 console.log("Forgot password request successful:", data)
                 toast.success("Successful, You will receive password reset instructions.")
-                router.push('/reset-password')
+                router.push('/reset-password', { locale })
             },
             onError: (error) => {
                 console.error("Forgot password request failed:", error)
@@ -58,7 +61,7 @@ const ForgotPasswordEmail = () => {
                         name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Your email</FormLabel>
+                                <FormLabel>{t('email')}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="example@gmail.com" {...field} />
                                 </FormControl>

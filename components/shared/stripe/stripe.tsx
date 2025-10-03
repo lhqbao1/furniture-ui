@@ -16,7 +16,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import Image from "next/image";
 import { paymentOptions } from "@/data/data";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -42,12 +42,13 @@ function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpe
     const selectedMethod = watch("payment_method");
     const t = useTranslations();
     const router = useRouter();
+    const locale = useLocale()
 
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
 
     const handlePaymentSuccess = (paymentIntentId: string) => {
         // Redirect sang trang kết quả và gửi PaymentIntent.id vào query
-        router.push(`http://prestige-home.de/payment-result?payment_intent=${paymentIntentId}`);
+        router.push(`http://prestige-home.de/payment-result?payment_intent=${paymentIntentId}`, { locale });
     };
 
     // Reset clientSecret & PaymentRequest khi đổi phương thức
@@ -136,12 +137,12 @@ function CheckoutForm({ clientSecret, setClientSecret, total, openDialog, setOpe
                     if (error) {
                         // Nếu có lỗi ngay lập tức (VD: không đủ thông tin, không support Klarna)
                         toast.error(error.message || t("klarnaNotAllow"));
-                        router.push("/check-out");
+                        router.push("/check-out", { locale });
                     }
                 } catch (err) {
                     console.error(err);
                     toast.error(t("klarnaNotAllow"));
-                    router.push("https://www.prestige-home.de/check-out");
+                    router.push("https://www.prestige-home.de/check-out", { locale });
                 }
             };
             confirmKlarna();

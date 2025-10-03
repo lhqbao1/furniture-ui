@@ -12,12 +12,8 @@ import { toast } from "sonner"
 import Image from "next/image"
 import { useState } from "react"
 import { Link, useRouter } from "@/src/i18n/navigation"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
-import { OtpInput } from "./otp-input"
-
-
-
 interface LoginFormProps {
     isAdmin?: boolean
 }
@@ -26,6 +22,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     // const [userId, setUserId] = useAtom(userIdAtom)
     const [seePassword, setSeePassword] = useState(false)
     const router = useRouter()
+    const locale = useLocale()
     const t = useTranslations()
 
     const formSchema = z.object({
@@ -69,7 +66,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     // Giả sử backend trả về token
                     const token = data.access_token
                     localStorage.setItem("admin_access_token", token)
-                    router.push("/admin/orders/list")
+                    router.push("/admin/orders/list", { locale })
                     localStorage.setItem("userId", data.id)
 
                     // Có thể lưu userId nếu cần
@@ -91,7 +88,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     const token = data.access_token
 
                     localStorage.setItem("access_token", token)
-                    router.push("/")
+                    router.push("/", { locale })
                     localStorage.setItem("userId", data.id)
 
                     syncLocalCartMutation.mutate()
@@ -204,7 +201,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
             {/* Forgot password */}
             <div className="flex justify-end mt-2">
-                <Link href="/forgot-password" className="text-sm text-secondary hover:underline">
+                <Link href={`/${locale}/forgot-password`} className="text-sm text-secondary hover:underline">
                     {t('forgotPassword')}?
                 </Link>
             </div>
@@ -212,7 +209,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             {/* Sign up link */}
             <div className="text-sm text-center mt-6 space-x-1">
                 <span>{t('noAccount')}</span>
-                <Link href="/sign-up" className="text-secondary font-medium hover:underline">
+                <Link href={`/${locale}/sign-up`} className="text-sm text-secondary hover:underline">
                     {t('createAccount')}
                 </Link>
             </div>

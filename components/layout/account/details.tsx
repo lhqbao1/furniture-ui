@@ -16,7 +16,7 @@ import AddressForm from './address-form'
 import AddressList from './address-list'
 import { useGetAddressByUserId, useGetInvoiceAddressByUserId } from '@/features/address/hook'
 import InvoiceAddress from './invoice-address'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BoxIcon, Heart, HomeIcon, LockKeyholeIcon, LucideEye, Mails, PenBoxIcon, PlusSquare, User2 } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -32,6 +32,7 @@ interface AccountDetailsProps {
 
 const AccountDetails = ({ user }: AccountDetailsProps) => {
     const t = useTranslations()
+    const locale = useLocale()
 
     const [openAddressDialog, setOpenAddressDialog] = useState(false)
     const [openUserDialog, setOpenUserDialog] = useState(false)
@@ -152,7 +153,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             <div className='col-span-2 lg:col-span-1 w-full lg:space-y-8 space-y-4'>
                 {/*Password */}
                 <div>
-                    <Link href={'/forgot-password'}>
+                    <Link href={`/${locale}/forgot-password`}>
                         <Card className="shadow-sm rounded-none border-none relative">
                             <div className='bg-black w-0.5 h-full absolute left-0 top-0'></div>
                             <CardHeader className="flex flex-row items-center justify-between">
@@ -168,7 +169,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
 
                 {/*Order History */}
                 <div>
-                    <Link href={'/my-order'} className="">
+                    <Link href={`/${locale}/my-order`} className="">
                         <Card className="shadow-sm rounded-none border-none relative">
                             <div className='bg-black w-0.5 h-full absolute left-0 top-0'></div>
                             <CardHeader className="flex flex-row items-center justify-between">
@@ -184,7 +185,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
 
                 {/*Wishlist */}
                 <div>
-                    <Link href={'/wishlist'} className="">
+                    <Link href={`/${locale}/wishlist`} className="">
                         <Card className="shadow-sm rounded-none border-none relative">
                             <div className='bg-black w-0.5 h-full absolute left-0 top-0'></div>
                             <CardHeader className="flex flex-row items-center justify-between">

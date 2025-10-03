@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { PolicyVersion } from '@/types/policy'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { useRouter } from '@/src/i18n/navigation'
 import { formatDate } from '@/lib/date-formated'
@@ -32,6 +32,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
     const [openAccordion, setOpenAccordion] = useState<string>("")
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
     const router = useRouter()
+    const locale = useLocale()
     const [currentVersion, setCurrentVersion] = useState(versionId)
     const pathname = usePathname()
     const { scrollTo, registerRef, setContainer } = useSmoothScrollToRef<HTMLDivElement>()
@@ -101,23 +102,23 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                             setTimeout(() => {
                                                 switch (true) {
                                                     case item.name.toLowerCase().includes("agb"):
-                                                        router.push("/agb")
+                                                        router.push("/agb", { locale })
                                                         break
 
                                                     case item.name.toLowerCase().includes("impressum"):
-                                                        router.push("/impressum")
+                                                        router.push("/impressum", { locale })
                                                         break
 
                                                     case item.name.toLowerCase().includes("widerruf"):
-                                                        router.push("/cancellation")
+                                                        router.push("/cancellation", { locale })
                                                         break
 
                                                     case item.name.toLowerCase().includes("datenschutzer"):
-                                                        router.push("/privacy-policy")
+                                                        router.push("/privacy-policy", { locale })
                                                         break
 
                                                     default:
-                                                        router.push("/agb")
+                                                        router.push("/agb", { locale })
                                                 }
                                             }, 150)
                                         }

@@ -6,10 +6,10 @@ import { useAddToCart } from '@/features/cart/hook'
 import { ProductItem } from '@/types/products'
 import { toast } from 'sonner'
 import { useAddToWishList } from '@/features/wishlist/hook'
-import { useRouter } from 'next/navigation'
 import { HandleApiError } from '@/lib/api-helper'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCartLocal } from '@/hooks/cart'
+import { useRouter } from '@/src/i18n/navigation'
 
 interface IconListProps {
     currentProduct?: ProductItem
@@ -22,6 +22,7 @@ const IconList = ({ currentProduct }: IconListProps) => {
     const addToWishlistMutation = useAddToWishList()
     const { addToCartLocal } = useCartLocal()
     const router = useRouter()
+    const locale = useLocale()
 
     const handleAddToCart = () => {
         if (!currentProduct) return
@@ -56,7 +57,7 @@ const IconList = ({ currentProduct }: IconListProps) => {
                 onError(error, variables, context) {
                     const { status, message } = HandleApiError(error, t);
                     toast.error(message)
-                    if (status === 401) router.push('/login')
+                    if (status === 401) router.push('/login', { locale })
                 },
             })
         }
@@ -71,7 +72,7 @@ const IconList = ({ currentProduct }: IconListProps) => {
             onError(error, variables, context) {
                 const { status, message } = HandleApiError(error, t);
                 toast.error(message)
-                if (status === 401) router.push('/login')
+                if (status === 401) router.push('/login', { locale })
             },
         })
     }

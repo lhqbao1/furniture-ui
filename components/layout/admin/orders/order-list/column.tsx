@@ -7,9 +7,28 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { CheckOut } from "@/types/checkout"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Eye } from "lucide-react"
-import Link from "next/link"
 import ViewFileDialog from "./view-file"
 import { listChanel, paymentOptions } from "@/data/data"
+import { useRouter } from "@/src/i18n/navigation"
+import { useLocale } from "next-intl"
+
+const ActionCell = ({ id }: { id: string }) => {
+    const router = useRouter()
+    const locale = useLocale()
+
+    return (
+        <div className="flex justify-center">
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push(`/admin/orders/${id}`, { locale })}
+            >
+                <Eye className="w-4 h-4" stroke="#F7941D" />
+            </Button>
+        </div>
+    )
+}
+
 
 
 export const orderColumns: ColumnDef<CheckOut>[] = [
@@ -180,17 +199,18 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
     {
         id: "actions",
         header: "ACTION",
-        cell: ({ row }) => {
-            return (
-                <div className="flex justify-center">
-                    <Link href={`/admin/orders/${row.original.id}`}>
-                        <Button variant="ghost" size="icon">
-                            <Eye className="w-4 h-4" stroke="#F7941D" />
-                        </Button>
-                    </Link>
-                </div>
+        cell: ({ row }) => <ActionCell id={row.original.id} />,
+        //     {
+        //     return (
+        //         <div className="flex justify-center">
+        //             <Link href={`/admin/orders/${row.original.id}`}>
+        //                 <Button variant="ghost" size="icon">
+        //                     <Eye className="w-4 h-4" stroke="#F7941D" />
+        //                 </Button>
+        //             </Link>
+        //         </div>
 
-            )
-        }
+        //     )
+        // }
     },
 ]

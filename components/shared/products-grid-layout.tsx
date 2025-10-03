@@ -6,7 +6,7 @@ import gsap from 'gsap'
 import { ProductItem } from '@/types/products'
 import { useMediaQuery } from 'react-responsive'
 import { useAddViewedProduct } from '@/features/viewed/hook'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/src/i18n/navigation'
 import { Heart, ShoppingBasket, Star } from 'lucide-react'
 import { Button } from '../ui/button'
@@ -31,6 +31,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
     const addProductToViewMutation = useAddViewedProduct()
     const t = useTranslations()
     const router = useRouter()
+    const locale = useLocale()
 
     const addToCartMutation = useAddToCart()
     const addToWishlistMutation = useAddToWishList()
@@ -103,7 +104,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                         return
                     }
                     toast.error(message)
-                    if (status === 401) router.push('/login')
+                    if (status === 401) router.push('/login', { locale })
                 },
             })
         }
@@ -124,7 +125,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                     return
                 }
                 toast.error(message)
-                if (status === 401) router.push('/login')
+                if (status === 401) router.push('/login', { locale })
             },
         })
     }
@@ -166,7 +167,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         : "1px solid #e0e0e0",
                             }}
                         >
-                            <Link href={`/product${categoryHref}`} passHref>
+                            <Link href={`/${locale}/product${categoryHref}`} passHref>
                                 <div
                                     className="bg-white p-0 group cursor-pointer z-0 pt-4 lg:px-4 px-2"
                                 >

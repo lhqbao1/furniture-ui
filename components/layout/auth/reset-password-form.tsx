@@ -16,9 +16,9 @@ import { Input } from "@/components/ui/input"
 import { useForgotPassword, useResetPassword } from '@/features/auth/hook'
 import { toast } from 'sonner'
 import { Eye, EyeOff, Key, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { OtpInput } from './otp-input'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { useRouter } from '@/src/i18n/navigation'
 
 
 
@@ -27,6 +27,7 @@ const ResetPasswordForm = () => {
     const [showPass, setShowPass] = useState(false)
     const resetPasswordMutation = useResetPassword()
     const t = useTranslations()
+    const locale = useLocale()
 
     const formSchema = z.object({
         email: z.string().email("Invalid email address"),
@@ -64,7 +65,7 @@ const ResetPasswordForm = () => {
         resetPasswordMutation.mutate({ email: values.email, code: values.code, new_password: values.password }, {
             onSuccess: (data) => {
                 toast.success("Successful, Please login with your new password.")
-                router.push('/login')
+                router.push('/login', { locale })
             },
             onError: (error) => {
                 toast.error("Failed to reset password. Please check your inputs or try again later.")

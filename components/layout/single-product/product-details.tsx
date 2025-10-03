@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Eye, Heart, Truck } from 'lucide-react'
 import Image from 'next/image'
-import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 import { ProductDetailsTab } from '@/components/layout/single-product/product-tab'
 import ListStars from '@/components/shared/list-stars'
@@ -29,7 +28,7 @@ import { getProductById } from '@/features/products/api'
 import { VariantOptionResponse } from '@/types/variant'
 import { ProductItem } from '@/types/products'
 import { useAddToWishList } from '@/features/wishlist/hook'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { HandleApiError } from '@/lib/api-helper'
 import { cn } from '@/lib/utils'
 import { useCartLocal } from '@/hooks/cart'
@@ -39,6 +38,7 @@ import { getProductGroupDetail } from '@/features/product-group/api'
 import ProductImageDialog from './main-image-dialog'
 import { CartItemLocal } from '@/lib/utils/cart'
 import { CartItem } from '@/types/cart'
+import { useRouter } from '@/src/i18n/navigation'
 
 interface ProductDetailsProps {
     productDetailsData: ProductItem
@@ -51,6 +51,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
     const t = useTranslations()
     const { addToCartLocal, cart } = useCartLocal()
     const router = useRouter()
+    const locale = useLocale()
 
     // Form init
     const form = useForm<z.infer<typeof cartFormSchema>>({
@@ -153,7 +154,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                         return
                     }
                     toast.error(message)
-                    if (status === 401) router.push('/login')
+                    if (status === 401) router.push('/login', { locale })
                 },
             })
         }
@@ -173,7 +174,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
 
     const moveToAdmin = (productId: string) => {
         if (adminId) {
-            router.push(`/admin/products/${productId}/edit`)
+            router.push(`/admin/products/${productId}/edit`, { locale })
         }
     }
 

@@ -10,8 +10,7 @@ import { Mail, Key, Loader2, Eye, EyeOff } from "lucide-react"
 import { useLogin, useLoginOtp, useSendOtp } from "@/features/auth/hook"
 import { toast } from "sonner"
 import { useState } from "react"
-// import { Link, usePathname, useRouter } from "@/src/i18n/navigation"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { useCartLocal } from "@/hooks/cart"
 import { Link, useRouter } from "@/src/i18n/navigation"
@@ -24,7 +23,9 @@ interface CartLoginFormProps {
 export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps) {
     const [seePassword, setSeePassword] = useState(false)
     const router = useRouter()
+    const locale = useLocale()
     const t = useTranslations()
+
     const { cart: localCart } = useCartLocal();
 
     const formSchema = z.object({
@@ -80,7 +81,7 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                         syncLocalCartMutation.mutate()
 
                         toast.success(t("loginSuccess"))
-                        router.push('/check-out')
+                        router.push('/check-out', { locale })
                         // gọi callback onSuccess nếu được truyền
                         if (onSuccess) onSuccess()
                     },
@@ -182,10 +183,8 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
 
             {/* Forgot password */}
             <div className="flex justify-end mt-2 lg:mt-4">
-                <Link
-                    href="/forgot-password"
-                    className="text-sm text-secondary hover:underline"
-                >
+                <Link href={`/${locale}/forgot-password`} className="text-sm text-secondary hover:underline">
+
                     {t("forgotPassword")}?
                 </Link>
             </div>
@@ -193,10 +192,8 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
             {/* Sign up link */}
             <div className="text-sm text-center mt-6 space-x-1">
                 <span>{t("noAccount")}</span>
-                <Link
-                    href="/sign-up"
-                    className="text-secondary font-medium hover:underline"
-                >
+                <Link href={`/${locale}/sign-up`} className="font-medium text-secondary hover:underline">
+
                     {t("createAccount")}
                 </Link>
             </div>

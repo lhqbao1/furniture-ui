@@ -118,17 +118,18 @@ import {
     CommandGroup,
 } from "@/components/ui/command"
 import { Search, X } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useGetProductsSelect } from "@/features/product-group/hook"
 import { ProductItem } from "@/types/products"
 import Image from "next/image"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
+import { useRouter } from "@/src/i18n/navigation"
 
 export default function MobileProductSearch() {
     const [open, setOpen] = React.useState(false)
     const [query, setQuery] = React.useState("")
     const [debouncedQuery, setDebouncedQuery] = React.useState("")
     const router = useRouter()
+    const locale = useLocale()
     const t = useTranslations()
 
     // debounce query
@@ -176,7 +177,7 @@ export default function MobileProductSearch() {
                                             key={product.id}
                                             value={product.name}
                                             onSelect={() => {
-                                                router.push(`/product/${product.id}`)
+                                                router.push(`/product/${product.id}`, { locale })
                                                 setQuery("")
                                                 setOpen(false)
                                             }}

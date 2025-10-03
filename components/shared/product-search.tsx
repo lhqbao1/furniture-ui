@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { useGetProductsSelect } from "@/features/product-group/hook"
 import { ProductItem } from "@/types/products"
 import Image from "next/image"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import {
     Command,
     CommandList,
@@ -29,6 +29,7 @@ export default function ProductSearch({ height, isAdmin = false }: { height?: bo
     const inputRef = React.useRef<HTMLInputElement>(null)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
     const { addToCartLocal } = useCartLocal()
+    const locale = useLocale()
 
     const handleAddToCartLocal = (productDetails: ProductItem) => {
         addToCartLocal({
@@ -174,7 +175,7 @@ export default function ProductSearch({ height, isAdmin = false }: { height?: bo
                                                         </div>
                                                     ) : (
                                                         <Link
-                                                            href={`/product${categoryHref}`}
+                                                            href={`/${locale}/product${categoryHref}`}
                                                             passHref
                                                             className="flex justify-between items-center w-full cursor-pointer"
                                                             onClick={() => {
