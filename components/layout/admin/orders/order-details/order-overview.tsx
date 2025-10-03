@@ -18,7 +18,7 @@ const OrderDetailOverView = ({ created_at, updated_at, status, order }: OrderDet
             </div>
             <div className='flex gap-1 text-sm font-bold'>
                 <div>Ext order:</div>
-                <div>ID21-13452-00796</div>
+                <div>{order.marketplace_order_id ? order.marketplace_order_id : ""}</div>
             </div>
             <div className='flex gap-1 text-sm'>
                 <div>Created:</div>
