@@ -47,14 +47,14 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     const submitOtpMutation = useLoginOtp()
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        if (!seePassword) {
+        if (!seePassword && !isAdmin) {
             sendOtpMutation.mutate(values.username, {
                 onSuccess: (data) => {
                     toast.success(t('sendedEmail'))
                     setSeePassword(true)
                 },
                 onError(error, variables, context) {
-                    toast.error(t("invalidCredentials"))
+                    toast.error(t("invalidEmail"))
                 },
             })
         } else if (isAdmin && !seePassword) {
@@ -64,7 +64,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     setSeePassword(true)
                 },
                 onError() {
-                    toast.error(t("invalidCredentials"))
+                    toast.error(t("invalidEmail"))
                 },
 
             })

@@ -56,7 +56,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                     setSeePassword(true)
                 },
                 onError(error, variables, context) {
-                    toast.error(t("invalidCredentials"))
+                    toast.error(t("invalidEmail"))
                 },
             })
         } else {

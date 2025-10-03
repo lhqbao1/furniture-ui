@@ -65,7 +65,7 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                     setSeePassword(true)
                 },
                 onError(error, variables, context) {
-                    toast.error(t("invalidCredentials"))
+                    toast.error(t("invalidEmail"))
                 },
             })
         } else {
