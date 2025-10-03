@@ -25,10 +25,11 @@ const OrderDetails = () => {
         <div className='space-y-12 pb-20'>
             <div className='flex gap-14 items-center'>
                 <OrderDetailOverView
-                    orderId={order?.id}
+                    order={order}
                     created_at={formatDateTime(order.created_at)}
                     updated_at={formatDateTime(order.updated_at)}
                     status={order.status}
+
                 />
                 <OrderDetailUser user={order.user} shippingAddress={order.shipping_address} invoiceAddress={order.invoice_address} />
             </div>
@@ -43,7 +44,16 @@ const OrderDetails = () => {
                 totalItems={order.cart.items.length}
                 totalPages={Math.ceil(order.cart.items.length / pageSize)}
             />
-            <OrderInformation language={order.user.language ?? ''} sub_total={order.total_amount_item} shipping_amount={order.total_shipping} discount_amount={order.voucher_amount + order.coupon_amount} tax={order.total_vat} total_amount={order.total_amount} />
+            <OrderInformation
+                language={order.user.language ?? ''}
+                sub_total={order.total_amount_item}
+                shipping_amount={order.total_shipping}
+                discount_amount={order.voucher_amount + order.coupon_amount}
+                tax={order.total_vat}
+                total_amount={order.total_amount}
+                payment_method={order.payment_method}
+                entry_date={order.created_at}
+            />
             {order.status !== "Pending" ?
                 <div className='flex gap-12'>
                     <DocumentTable order={order} />

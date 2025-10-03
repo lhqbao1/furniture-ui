@@ -3,7 +3,7 @@ import { api, apiPublic } from "@/lib/axios";
 import { LoginResponse, User } from "@/types/user";
 import qs from 'qs'
 export type LoginInput = { username: string; code: string }
-export type SignUpInput = { email: string; phone_number: string, first_name: string, last_name: string }
+export type SignUpInput = { email: string; phone_number: string, first_name: string, last_name: string, gender?: string }
 
 export async function login(input: LoginInput) {
     const { data } = await apiPublic.post(

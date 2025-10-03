@@ -8,6 +8,7 @@ export type User = {
     avatar_url: string
     date_of_birth: string 
     language: string
+    gender: string
     is_notified: boolean
     created_at: string 
     updated_at: string
@@ -23,8 +24,9 @@ export type User = {
     last_name: string
     is_active: boolean
     avatar_url: string
-    date_of_birth: string // ISO date string, có thể dùng Date nếu muốn parse
+    date_of_birth: string
     language: string
+    gender: string
     is_notified: boolean
     created_at: string // ISO date string
     updated_at: string // ISO date string

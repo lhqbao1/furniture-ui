@@ -9,16 +9,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { useSignUp } from "@/features/auth/hook"
+import { useCheckMailExist, useSignUp } from "@/features/auth/hook"
 import { toast } from "sonner"
 import { Eye, EyeOff, Key, Loader2 } from "lucide-react"
 import { useRouter } from "@/src/i18n/navigation"
 import { useTranslations } from "next-intl"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 
 export default function SignUpForm() {
   const t = useTranslations()
   const signUp = useSignUp()
+  const checkMailMutation = useCheckMailExist()
   const router = useRouter()
 
   const formSchema = z.object({
@@ -33,7 +35,8 @@ export default function SignUpForm() {
       .min(6, { message: t('phone_number_short') })
       .refine((val) => /^\+?[0-9]+$/.test(val), {
         message: t('phone_number_invalid'),
-      })
+      }),
+    gender: z.string().min(1, { message: t('gender_required') })
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,25 +46,35 @@ export default function SignUpForm() {
       first_name: "",
       last_name: "",
       phone_number: "",
+      gender: ""
     },
     mode: "onSubmit",
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    signUp.mutate({
-      email: values.email,
-      phone_number: values.phone_number,
-      first_name: values.first_name,
-      last_name: values.last_name
-    }, {
-      onSuccess: (data) => {
-        form.reset()
-        toast.success("Sign up successful! Please log in.")
-        router.push("/login")
+  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log(values)
+    checkMailMutation.mutate(values.email, {
+      onSuccess(data, variables, context) {
+        signUp.mutate({
+          email: values.email,
+          phone_number: values.phone_number,
+          first_name: values.first_name,
+          last_name: values.last_name,
+          gender: values.gender
+        }, {
+          onSuccess: (data) => {
+            form.reset()
+            toast.success(t('signUpSuccess'))
+            router.push("/login")
+          },
+          onError: (error) => {
+            toast.error(t('signUpFail'))
+          }
+        })
       },
-      onError: (error) => {
-        toast.error("Failed to sign up. Please try again.")
-      }
+      onError(error, variables, context) {
+        toast.error(t('useDifferentEmail'))
+      },
     })
   }
 
@@ -82,7 +95,76 @@ export default function SignUpForm() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form
+          onSubmit={form.handleSubmit(
+            (values) => {
+              handleSubmit(values)
+            },
+            (errors) => {
+              console.log(errors)
+              toast.error("Please check the form for errors")
+            }
+          )} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2 col-span-1">
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  {/* <FormLabel>{t("gender")}</FormLabel> */}
+                  <FormControl>
+                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                      <FormItem className="flex gap-1 items-center">
+                        <FormControl>
+                          <RadioGroupItem value="male" />
+                        </FormControl>
+                        <FormLabel className="ml-2">{t("male")}</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex gap-1 items-center">
+                        <FormControl>
+                          <RadioGroupItem value="female" />
+                        </FormControl>
+                        <FormLabel className="ml-2">{t("female")}</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex gap-1 items-center">
+                        <FormControl>
+                          <RadioGroupItem value="other" />
+                        </FormControl>
+                        <FormLabel className="ml-2">{t("otherGender")}</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="first_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="">{t('first_name')}</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="last_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('last_name')}</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"
@@ -113,32 +195,7 @@ export default function SignUpForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="first_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="">{t('first_name')}</FormLabel>
-                <FormControl>
-                  <Input placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="last_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('last_name')}</FormLabel>
-                <FormControl>
-                  <Input placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
             <Button type="submit" className="bg-primary/90 hover:bg-primary lg:px-12 px-4 py-6 text-lg" hasEffect>
               {signUp.isPending ? (
