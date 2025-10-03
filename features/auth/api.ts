@@ -32,20 +32,6 @@ export async function login(input: LoginInput) {
     return res.json()
   }
 
-  export async function loginAdmin(input: LoginInput) {
-    const { data } = await apiPublic.post(
-      "/login-admin",
-      qs.stringify(input),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        withCredentials: true,
-      }
-    )
-    return data as LoginResponse
-  }
-
 export async function getMe() {
   const token = localStorage.getItem("access_token")
   if (!token) throw new Error("No token")
@@ -124,6 +110,14 @@ export async function sendOtp(email: string) {
   const { data } = await apiPublic.post(
     "/login-symlink",
     { email },
+  )
+  return data
+}
+
+export async function loginAdmin(email: string) {
+  const { data } = await apiPublic.post(
+    "/login-admin",
+    {email},
   )
   return data
 }

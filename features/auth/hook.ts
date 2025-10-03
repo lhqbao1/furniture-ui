@@ -39,16 +39,6 @@ export function useLogin() {
 //   })
 // }
 
-export function useLoginAdmin() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (input: LoginInput) => loginAdmin(input),
-    onSuccess: (res) => {
-      qc.invalidateQueries({ queryKey: ["me"] })
-    },
-  })
-}
-
 export function useLogout() {
   const qc = useQueryClient()
   return useMutation({
@@ -96,6 +86,12 @@ export function useCheckMailExist() {
 export function useSendOtp() {
   return useMutation({
     mutationFn: (email: string) => sendOtp(email),
+  })
+}
+
+export function useSendOtpAdmin() {
+  return useMutation({
+    mutationFn: (email: string) => loginAdmin(email),
   })
 }
 
