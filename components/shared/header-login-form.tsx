@@ -171,7 +171,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
             {/* Forgot password */}
             <div className="flex justify-end mt-2 mb-5">
                 <Link
-                    href={`/${locale}/forgot-password`}
+                    href={`/forgot-password`}
                     className="text-black/70 hover:underline"
                 >
                     {t("forgotPassword")}?

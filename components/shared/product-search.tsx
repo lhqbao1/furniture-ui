@@ -175,7 +175,7 @@ export default function ProductSearch({ height, isAdmin = false }: { height?: bo
                                                         </div>
                                                     ) : (
                                                         <Link
-                                                            href={`/${locale}/product${categoryHref}`}
+                                                            href={`/product${categoryHref}`}
                                                             passHref
                                                             className="flex justify-between items-center w-full cursor-pointer"
                                                             onClick={() => {

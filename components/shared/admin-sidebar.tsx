@@ -72,13 +72,13 @@ export function AdminSideBar() {
     ];
 
     // prepend locale vào url
-    const withLocale = (url: string) => `/${locale}${url}`
+    const withLocale = (url: string) => `${url}`
 
     return (
         <Sidebar className="app-sidebar custom-scroll">
             <SidebarContent>
                 <SidebarGroup>
-                    <Link href={`/${locale}/admin`}>
+                    <Link href={`/admin`}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
                             <Image
                                 src="/new-logo.svg"

@@ -167,7 +167,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         : "1px solid #e0e0e0",
                             }}
                         >
-                            <Link href={`/${locale}/product${categoryHref}`} passHref>
+                            <Link href={`/product${categoryHref}`} passHref>
                                 <div
                                     className="bg-white p-0 group cursor-pointer z-0 pt-4 lg:px-4 px-2"
                                 >

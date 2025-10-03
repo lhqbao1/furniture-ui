@@ -153,7 +153,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             <div className='col-span-2 lg:col-span-1 w-full lg:space-y-8 space-y-4'>
                 {/*Password */}
                 <div>
-                    <Link href={`/${locale}/forgot-password`}>
+                    <Link href={`/forgot-password`}>
                         <Card className="shadow-sm rounded-none border-none relative">
                             <div className='bg-black w-0.5 h-full absolute left-0 top-0'></div>
                             <CardHeader className="flex flex-row items-center justify-between">
@@ -169,7 +169,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
 
                 {/*Order History */}
                 <div>
-                    <Link href={`/${locale}/my-order`} className="">
+                    <Link href={`/my-order`} className="">
                         <Card className="shadow-sm rounded-none border-none relative">
                             <div className='bg-black w-0.5 h-full absolute left-0 top-0'></div>
                             <CardHeader className="flex flex-row items-center justify-between">
@@ -185,7 +185,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
 
                 {/*Wishlist */}
                 <div>
-                    <Link href={`/${locale}/wishlist`} className="">
+                    <Link href={`/wishlist`} className="">
                         <Card className="shadow-sm rounded-none border-none relative">
                             <div className='bg-black w-0.5 h-full absolute left-0 top-0'></div>
                             <CardHeader className="flex flex-row items-center justify-between">

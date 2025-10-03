@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Mail, Loader2 } from "lucide-react"
-import { useLogin, useLoginAdmin, useLoginOtp, useSendOtp } from "@/features/auth/hook"
+import { useLogin, useLoginOtp, useSendOtp, useSendOtpAdmin } from "@/features/auth/hook"
 import { toast } from "sonner"
 import Image from "next/image"
 import { useState } from "react"
@@ -41,7 +41,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     })
 
     const loginMutation = useLogin()
-    const loginAdminMutation = useLoginAdmin()
+    const loginAdminMutation = useSendOtpAdmin()
     const syncLocalCartMutation = useSyncLocalCart();
     const sendOtpMutation = useSendOtp()
     const submitOtpMutation = useLoginOtp()
@@ -57,28 +57,18 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     toast.error(t("invalidCredentials"))
                 },
             })
-        } else if (isAdmin) {
-            loginAdminMutation.mutate({
-                username: values.username,
-                code: values.code ?? ''
-            }, {
-                onSuccess: (data) => {
-                    // Giả sử backend trả về token
-                    const token = data.access_token
-                    localStorage.setItem("admin_access_token", token)
-                    router.push("/admin/orders/list", { locale })
-                    localStorage.setItem("userId", data.id)
-
-                    // Có thể lưu userId nếu cần
-                    // setUserId(data.id)
-                    toast.success(t('loginSuccess'))
-
+        } else if (isAdmin && !seePassword) {
+            loginAdminMutation.mutate(values.username, {
+                onSuccess: () => {
+                    toast.success(t('sendedEmail'))
+                    setSeePassword(true)
                 },
-                onError(error, variables, context) {
-                    toast.error(error.message)
+                onError() {
+                    toast.error(t("invalidCredentials"))
                 },
+
             })
-        } else if (seePassword) {
+        } else if (seePassword && !isAdmin) {
             submitOtpMutation.mutate({
                 email: values.username,
                 code: values.code ?? ''
@@ -99,6 +89,28 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                 },
                 onError(error, variables, context) {
                     toast.error(t("invalidCredentials"))
+                },
+            })
+        }
+        else if (seePassword && isAdmin) {
+            submitOtpMutation.mutate({
+                email: values.username,
+                code: values.code ?? ''
+            }, {
+                onSuccess: (data) => {
+                    // Giả sử backend trả về token
+                    const token = data.access_token
+                    localStorage.setItem("admin_access_token", token)
+                    router.push("/admin/orders/list", { locale })
+                    localStorage.setItem("userId", data.id)
+
+                    // Có thể lưu userId nếu cần
+                    // setUserId(data.id)
+                    toast.success(t('loginSuccess'))
+
+                },
+                onError(error, variables, context) {
+                    toast.error(error.message)
                 },
             })
         }
@@ -201,7 +213,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
             {/* Forgot password */}
             <div className="flex justify-end mt-2">
-                <Link href={`/${locale}/forgot-password`} className="text-sm text-secondary hover:underline">
+                <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
                     {t('forgotPassword')}?
                 </Link>
             </div>
@@ -209,7 +221,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             {/* Sign up link */}
             <div className="text-sm text-center mt-6 space-x-1">
                 <span>{t('noAccount')}</span>
-                <Link href={`/${locale}/sign-up`} className="text-sm text-secondary hover:underline">
+                <Link href={`/sign-up`} className="text-sm text-secondary hover:underline">
                     {t('createAccount')}
                 </Link>
             </div>

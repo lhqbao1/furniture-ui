@@ -26,7 +26,7 @@ export default function ViewProductPage() {
                 {isLoading || isError || !products || products.items.length === 0 ?
                     <div className='flex justify-center flex-col items-center lg:mt-10 gap-2'>
                         <div className='text-xl'>No Product Found</div>
-                        <Link href={`/${locale}/shop-all`}>
+                        <Link href={`/shop-all`}>
                             <Button>Continue shop</Button>
                         </Link>
                     </div>
