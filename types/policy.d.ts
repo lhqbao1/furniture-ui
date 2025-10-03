@@ -19,6 +19,7 @@ export interface PolicyResponse {
     id: string
     legal_policy_id: string
     label: string
+    tt: number
     content: string
     created_at: string
     updated_at: string

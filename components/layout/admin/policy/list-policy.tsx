@@ -30,22 +30,43 @@ interface ListPolicyAdminProps {
 }
 
 // Helper: Convert children policies -> HTML 
-function buildHtmlFromPolicies(children: { label: string; content: string }[]): string { return children.map((cl) => `<h2>${cl.label || ""}</h2>${cl.content || "<p></p>"}`).join("") }
+function buildHtmlFromPolicies(children: { label: string; content: string; tt: number }[]): string {
+    return children.map((cl) =>
+        `<h2>${cl.label || ""}</h2>${cl.content || "<p></p>"}`
+    ).join("")
+}
 
-// Helper: Parse HTML -> children policies 
 function parseEditorContent(html: string) {
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, "text/html")
     const h2s = Array.from(doc.querySelectorAll("h2"))
-    const results: { label: string; content: string }[] = []
+
+    const results: { label: string; content: string; tt: number }[] = []
+
     h2s.forEach((h2) => {
-        const label = h2.textContent || ""
+        const label = h2.textContent?.trim() || ""
         let content = ""
         let sibling = h2.nextSibling
-        while (sibling && sibling.nodeName.toLowerCase() !== "h2") { if ((sibling as HTMLElement).outerHTML) { content += (sibling as HTMLElement).outerHTML } else { content += sibling.textContent || "" } sibling = sibling.nextSibling } results.push({ label, content })
+
+        while (sibling && sibling.nodeName.toLowerCase() !== "h2") {
+            if ((sibling as HTMLElement).outerHTML) {
+                content += (sibling as HTMLElement).outerHTML
+            } else {
+                content += sibling.textContent || ""
+            }
+            sibling = sibling.nextSibling
+        }
+
+        // Regex: tìm số đầu tiên trong label
+        const match = label.match(/\d+/)
+        const tt = match ? parseInt(match[0], 10) : 0  // convert string -> number
+
+        results.push({ label, content, tt })
     })
+
     return results
 }
+
 
 const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmin = false }: ListPolicyAdminProps) => {
     const t = useTranslations()
@@ -70,24 +91,25 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
 
     const contentRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
-    const [policies, setPolicies] = useState<Record<string, Record<string, { label: string; content: string }>>>({})
+    const [policies, setPolicies] = useState<Record<string, Record<string, { label: string; content: string, tt: number }>>>({})
 
     useEffect(() => {
         if (currentPolicy) {
-            const html = buildHtmlFromPolicies(currentPolicy.child_legal_policies.map((cl) => ({ label: cl.label, content: cl.content, })))
+            const html = buildHtmlFromPolicies(currentPolicy.child_legal_policies.map((cl) => ({ label: cl.label, content: cl.content, tt: cl.tt })))
             setEditorValue(html)
         }
     }, [currentPolicy])
 
     useEffect(() => {
         if (filteredPolicies.length > 0) {
-            const initial: Record<string, Record<string, { label: string; content: string }>> = {}
+            const initial: Record<string, Record<string, { label: string; content: string, tt: number }>> = {}
             filteredPolicies.forEach(lp => {
-                const children: Record<string, { label: string; content: string }> = {}
+                const children: Record<string, { label: string; content: string, tt: number }> = {}
                 lp.child_legal_policies.forEach((cl: ChildLegalPolicy) => {
                     children[cl.id] = {
                         label: cl.label || "",
-                        content: cl.content || ""
+                        content: cl.content || "",
+                        tt: cl.tt || 0
                     }
                 })
                 initial[lp.id] = children
@@ -163,6 +185,7 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                     return {
                         label: parsed?.label ?? cl.label,
                         content: parsed?.content ?? cl.content,
+                        tt: parsed?.tt ?? cl.tt   // giữ số thứ tự
                     }
                 })
 
@@ -266,30 +289,6 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
-
-                {/* {currentPolicy?.child_legal_policies.map((cl, clIndex) => {
-                    const refKey = `${currentPolicy.id}-${clIndex}`
-                    return (
-                        <div
-                            key={cl.id}
-                            ref={(el) => {
-                                contentRefs.current[refKey] = el
-                            }}
-                        >
-                            <Input
-                                type="text"
-                                value={policies[currentPolicy.id]?.[cl.id]?.label || ""}
-                                onChange={(e) => handleLabelChange(currentPolicy.id, cl.id, e.target.value)}
-                                className="w-full text-xl text-secondary font-bold border rounded px-2 py-1 mb-2"
-                            />
-
-                            <RichEditor
-                                value={policies[currentPolicy.id]?.[cl.id]?.content || ""}
-                                onChangeValue={(val) => handleContentChange(currentPolicy.id, cl.id, val)}
-                            />
-                        </div>
-                    )
-                })} */}
                 <div className="col-span-12"> <RichEditor value={editorValue} onChangeValue={(val) => setEditorValue(val)} /> </div>
             </div>
         </div>
@@ -297,222 +296,3 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
 }
 
 export default ListPolicyAdmin
-// "use client"
-
-// import React, { useState, useEffect } from "react"
-// import { useQuery } from "@tanstack/react-query"
-// import { getPolicyItemsByVersion } from "@/features/policy/api"
-// import { Loader2 } from "lucide-react"
-// import { Button } from "@/components/ui/button"
-// import { PolicyVersion } from "@/types/policy"
-// import { useTranslations } from "next-intl"
-// import {
-//     Dialog,
-//     DialogContent,
-//     DialogFooter,
-//     DialogHeader,
-//     DialogTitle,
-// } from "@/components/ui/dialog"
-// import { Input } from "@/components/ui/input"
-// import {
-//     useCreateChildLegalPolicy,
-//     useCreateLegalPolicy,
-//     useCreateVersion,
-// } from "@/features/policy/hook"
-// import { toast } from "sonner"
-// import RichEditor from "@/components/shared/tiptap/tiptap-editor"
-
-// interface ListPolicyAdminProps {
-//     versionId: string
-//     versionData: PolicyVersion[]
-//     policyId?: string
-//     versionName?: string
-//     isAdmin?: boolean
-// }
-
-// // Helper: Convert children policies -> HTML
-// function buildHtmlFromPolicies(
-//     children: { label: string; content: string }[]
-// ): string {
-//     return children
-//         .map(
-//             (cl) => `< h2 > ${cl.label || ""}</ > ${cl.content || "<p></p>"} `
-//         )
-//         .join("")
-// }
-
-// // Helper: Parse HTML -> children policies
-// function parseEditorContent(html: string) {
-//     const parser = new DOMParser()
-//     const doc = parser.parseFromString(html, "text/html")
-
-//     const h2s = Array.from(doc.querySelectorAll("h2"))
-//     const results: { label: string; content: string }[] = []
-
-//     h2s.forEach((h2) => {
-//         const label = h2.textContent || ""
-//         let content = ""
-//         let sibling = h2.nextSibling
-
-//         while (sibling && sibling.nodeName.toLowerCase() !== "h2") {
-//             if ((sibling as HTMLElement).outerHTML) {
-//                 content += (sibling as HTMLElement).outerHTML
-//             } else {
-//                 content += sibling.textContent || ""
-//             }
-//             sibling = sibling.nextSibling
-//         }
-
-//         results.push({ label, content })
-//     })
-
-//     return results
-// }
-
-// const ListPolicyAdmin = ({ versionId, isAdmin = false }: ListPolicyAdminProps) => {
-//     const t = useTranslations()
-//     const [openDialog, setOpenDialog] = useState(false)
-//     const [versionNameInput, setVersionNameInput] = useState("")
-//     const [editorValue, setEditorValue] = useState("")
-
-//     const { data: policy, isLoading } = useQuery({
-//         queryKey: ["policy-items", versionId],
-//         queryFn: () => getPolicyItemsByVersion(versionId),
-//         enabled: !!versionId,
-//     })
-
-//     const createVersionMutation = useCreateVersion()
-//     const createLegalPolicyMutation = useCreateLegalPolicy()
-//     const createChildLegalPolicyMutation = useCreateChildLegalPolicy()
-//     const [policies, setPolicies] = useState<Record<string, Record<string, { label: string; content: string }>>>({})
-
-//     const filteredPolicies = policy?.legal_policies ?? []
-//     const currentPolicy = filteredPolicies[0]
-
-//     useEffect(() => {
-//         if (currentPolicy) {
-//             const html = buildHtmlFromPolicies(
-//                 currentPolicy.child_legal_policies.map((cl) => ({
-//                     label: cl.label,
-//                     content: cl.content,
-//                 }))
-//             )
-//             setEditorValue(html)
-//         }
-//     }, [currentPolicy])
-
-//     const handleSaveClick = () => {
-//         setOpenDialog(true)
-//         console.log(editorValue)
-//     }
-
-//     // const handleSubmitVersion = async () => {
-//     //     if (!versionNameInput || !currentPolicy) return
-//     //     try {
-//     //         const versionRes = await createVersionMutation.mutateAsync(versionNameInput)
-
-//     //         // tạo legal policy mới
-//     //         const legalPolicyRes = await createLegalPolicyMutation.mutateAsync({
-//     //             name: currentPolicy.name,
-//     //             version_id: versionRes.id,
-//     //         })
-
-//     //         // parse content từ editor
-//     //         const childInputs = parseEditorContent(editorValue)
-
-//     //         await createChildLegalPolicyMutation.mutateAsync({
-//     //             input: childInputs,
-//     //             legal_policy_id: legalPolicyRes.id,
-//     //         })
-
-//     //         setOpenDialog(false)
-//     //         setVersionNameInput("")
-//     //         toast.success("Create new policy version successful")
-//     //     } catch (err) {
-//     //         console.error("Lỗi khi tạo version:", err)
-//     //     }
-//     // }
-
-//     const handleSubmitVersion = async () => {
-//         if (!versionNameInput) return
-
-//         try {
-//             const versionRes = await createVersionMutation.mutateAsync(versionNameInput)
-
-//             // Sau khi tạo version thành công → tạo lần lượt các legal policy
-//             for (const lp of filteredPolicies) {
-//                 try {
-//                     const legalPolicyRes = await createLegalPolicyMutation.mutateAsync({
-//                         name: lp.name,
-//                         version_id: versionRes.id, // lấy id từ version vừa tạo
-//                     })
-
-//                     // sau khi tạo legal policy xong → tạo child legal policies
-//                     const childInputs = lp.child_legal_policies.map(cl => ({
-//                         label: policies[lp.id]?.[cl.id]?.label || cl.label,
-//                         content: policies[lp.id]?.[cl.id]?.content || cl.content,
-//                     }))
-
-//                     await createChildLegalPolicyMutation.mutateAsync({
-//                         input: childInputs,
-//                         legal_policy_id: legalPolicyRes.id,
-//                     })
-
-//                 } catch (err) {
-//                     console.error("Lỗi khi tạo legal policy hoặc child:", err)
-//                 }
-//             }
-
-//             setOpenDialog(false)
-//             setVersionNameInput('')
-//             toast.success("Create new policy version successful")
-
-//         } catch (err) {
-//             console.error("Lỗi khi tạo version:", err)
-//         }
-//     }
-
-//     if (isLoading) return <Loader2 className="animate-spin" />
-//     if (!versionId) return <></>
-
-//     return (
-//         <div className="grid grid-cols-12 pt-3 lg:h-[calc(100vh-100px)] h-fit pb-4">
-//             <div className="space-x-2 col-span-12 mb-12">
-//                 <Button className="text-xl" onClick={handleSaveClick}>
-//                     Save
-//                 </Button>
-//                 <Button className="text-xl" variant={"outline"}>
-//                     Cancel
-//                 </Button>
-//             </div>
-
-//             {/* Dialog */}
-//             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-//                 <DialogContent className="sm:max-w-[500px]">
-//                     <DialogHeader>
-//                         <DialogTitle>{t("Enter version name")}</DialogTitle>
-//                     </DialogHeader>
-//                     <Input
-//                         placeholder="Version name"
-//                         value={versionNameInput}
-//                         onChange={(e) => setVersionNameInput(e.target.value)}
-//                     />
-//                     <DialogFooter>
-//                         <Button onClick={handleSubmitVersion}>Save</Button>
-//                     </DialogFooter>
-//                 </DialogContent>
-//             </Dialog>
-
-//             <div className="col-span-12">
-//                 <RichEditor
-//                     value={editorValue}
-//                     onChangeValue={(val) => setEditorValue(val)}
-//                 />
-//             </div>
-//         </div>
-//     )
-// }
-
-// export default ListPolicyAdmin
-
-

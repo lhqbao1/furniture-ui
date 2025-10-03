@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { getPolicyVersion } from '@/features/policy/api'
 import { useGetPolicyVersion } from '@/features/policy/hook'
+import { formatDate } from '@/lib/date-formated'
 import React from 'react'
 
 interface PolicyListVersionProps {
@@ -19,7 +20,7 @@ const PolicyListVersion = ({ setCurrentVersion, currentVersion }: PolicyListVers
             {listPolicyVersion.map((item, index) => {
                 return (
                     <Button variant={'outline'} key={index} className={`p-4 border-2 rounded-xl text-xl ${currentVersion === item.id ? 'border-primary' : ''}`} onClick={() => setCurrentVersion(item.id)}>
-                        {item.name}
+                        {formatDate(item.created_at)}
                     </Button>
                 )
             })}
