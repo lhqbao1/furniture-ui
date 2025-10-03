@@ -204,27 +204,40 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                         type="submit"
                         className="w-full bg-secondary/95 hover:bg-secondary"
                         hasEffect
-                        disabled={submitOtpMutation.isPending || sendOtpMutation.isPending}
+                        disabled={submitOtpMutation.isPending || sendOtpMutation.isPending || loginAdminMutation.isPending}
                     >
-                        {(submitOtpMutation.isPending || sendOtpMutation.isPending) ? seePassword ? <Loader2 className="animate-spin" /> : t('login') : t('getOtp')}
+                        {
+                            sendOtpMutation.isPending || loginAdminMutation.isPending
+                                ? <Loader2 className="animate-spin" />
+                                : seePassword
+                                    ? (submitOtpMutation.isPending
+                                        ? <Loader2 className="animate-spin" />
+                                        : t('login')
+                                    )
+                                    : t('getOtp')
+                        }
                     </Button>
                 </form>
             </Form>
 
             {/* Forgot password */}
-            <div className="flex justify-end mt-2">
+            {/* <div className="flex justify-end mt-2">
                 <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
                     {t('forgotPassword')}?
                 </Link>
-            </div>
+            </div> */}
 
             {/* Sign up link */}
-            <div className="text-sm text-center mt-6 space-x-1">
-                <span>{t('noAccount')}</span>
-                <Link href={`/sign-up`} className="text-sm text-secondary hover:underline">
-                    {t('createAccount')}
-                </Link>
-            </div>
+            {
+                !isAdmin && (
+                    <div className="text-sm text-center mt-6 space-x-1">
+                        <span>{t('noAccount')}</span>
+                        <Link href={`/sign-up`} className="text-sm text-secondary hover:underline">
+                            {t('createAccount')}
+                        </Link>
+                    </div>
+                )
+            }
         </div>
     )
 }

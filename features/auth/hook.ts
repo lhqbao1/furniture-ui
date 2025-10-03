@@ -91,7 +91,7 @@ export function useSendOtp() {
 
 export function useSendOtpAdmin() {
   return useMutation({
-    mutationFn: (email: string) => loginAdmin(email),
+    mutationFn: (username: string) => loginAdmin(username),
   })
 }
 

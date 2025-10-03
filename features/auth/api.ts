@@ -114,12 +114,17 @@ export async function sendOtp(email: string) {
   return data
 }
 
-export async function loginAdmin(email: string) {
+export async function loginAdmin(username: string) {
   const { data } = await apiPublic.post(
     "/login-admin",
-    {email},
-  )
-  return data
+    qs.stringify({ username }),
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+  return data;
 }
 
 export async function resetPassword(email: string, code: string, new_password: string) {
