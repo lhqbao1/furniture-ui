@@ -4,6 +4,7 @@ import { PolicyResponse, PolicyVersion } from "@/types/policy"
 export interface ChildLegalInput {
     label: string
     content: string
+    tt?: number
 }
 
 export async function getPolicyVersion() {

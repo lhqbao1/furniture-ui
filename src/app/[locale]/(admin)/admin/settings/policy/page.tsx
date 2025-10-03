@@ -1,7 +1,6 @@
 'use client'
 import ListPolicyAdmin from '@/components/layout/admin/policy/list-policy'
 import PolicyListVersion from '@/components/layout/admin/policy/list-version'
-import { Button } from '@/components/ui/button'
 import { useGetPolicyVersion } from '@/features/policy/hook'
 import React, { useState } from 'react'
 
