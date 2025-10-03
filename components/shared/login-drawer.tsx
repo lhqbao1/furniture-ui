@@ -8,9 +8,8 @@ import {
     DrawerDescription,
 } from "@/components/ui/drawer"
 import { User, X } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import HeaderLoginForm from "./header-login-form"
-import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import CartLoginForm from "../layout/cart/login-form-cart"
 import { useRouter } from "@/src/i18n/navigation"
@@ -26,6 +25,7 @@ export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false, setUs
     const t = useTranslations()
     const queryClient = useQueryClient();
     const router = useRouter()
+    const locale = useLocale()
     return (
         <Drawer open={openLogin} onOpenChange={setOpenLogin} direction="left">
             {isCheckOut ? '' :
@@ -60,11 +60,11 @@ export function LoginDrawer({ openLogin, setOpenLogin, isCheckOut = false, setUs
                                 setUserId(uid) // cập nhật state
                                 queryClient.refetchQueries({ queryKey: ["me"] })
                                 queryClient.refetchQueries({ queryKey: ["cart-items"] })
-                                router.push('/check-out')
+                                router.push('/check-out', { locale })
                             }}
                             onError={() => {
                                 setOpenLogin(false)
-                                router.push('/check-out')
+                                router.push('/check-out', { locale })
                             }}
                         />) :
                         (<HeaderLoginForm

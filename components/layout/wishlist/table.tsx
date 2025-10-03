@@ -12,9 +12,8 @@ import { useAddWishlistItemToCart, useAddWishlistToCart, useRemoveWishlistItem, 
 import { ArrowLeft, Trash } from "lucide-react"
 import { Checkbox } from "@radix-ui/react-checkbox"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import { useTranslations } from "next-intl"
-import Link from "next/link"
+import { useLocale, useTranslations } from "next-intl"
+import { Link, useRouter } from "@/src/i18n/navigation"
 
 interface WishlistTableProps {
     wishlist?: WishListResponse
@@ -30,6 +29,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
     const [localStatuses, setLocalStatuses] = useState<Record<string, boolean>>({})
     const [barStyle, setBarStyle] = React.useState<React.CSSProperties>({})
     const t = useTranslations()
+    const locale = useLocale()
 
     const router = useRouter()
     const updateWishlistItemQuantityMutation = useUpdateWishlistItemQuantity()
@@ -97,7 +97,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
         addWishlistToCartMutation.mutate({ wishlistId: wishlistId }, {
             onSuccess: () => {
                 toast.success(t("addToCartSuccess"))
-                router.push('/cart')
+                router.push('/cart', { locale })
             },
             onError: () => toast.error(t("addToCartFail")),
         })
@@ -180,7 +180,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
                     <div className="xl:col-span-7 col-span-12 flex justify-between">
                         <div className="space-y-3">
                             <div className="flex flex-col gap-3 justify-between">
-                                <Link href={'/shop-all'} className="flex gap-2 items-center">
+                                <Link href={`/${locale}/shop-all`} className="flex gap-2 items-center">
                                     <ArrowLeft size={20} />
                                     <span className="text-sm">{t('continueShopping')}</span>
                                 </Link>

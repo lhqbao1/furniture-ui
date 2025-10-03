@@ -18,6 +18,7 @@ import { useRouter } from '@/src/i18n/navigation'
 
 const OrderPlaced = () => {
     const router = useRouter()
+    const locale = useLocale()
     const params = useSearchParams()
     const paymentIntentId = params?.get('payment_intent') // Lấy param paymentIntent.id nếu có
 
@@ -30,7 +31,6 @@ const OrderPlaced = () => {
     const uploadStaticFileMutation = useUploadStaticFile()
     const sendMailMutation = useSendMail()
     const t = useTranslations()
-    const locale = useLocale()
 
     // Lấy userId từ localStorage
     useEffect(() => {
@@ -105,7 +105,7 @@ const OrderPlaced = () => {
     // Redirect về home sau 5s
     useEffect(() => {
         if (counter <= 0) {
-            router.push('/')
+            router.push('/', { locale })
             return
         }
         const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)

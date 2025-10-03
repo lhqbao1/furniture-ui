@@ -18,7 +18,6 @@ import {
     SelectItem,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
 import {
     Dialog,
     DialogContent,
@@ -27,6 +26,8 @@ import {
 } from "@/components/ui/dialog"
 import FilterForm from "./toolbar/filter"
 import ImportDialog from "./toolbar/import"
+import { useRouter } from "@/src/i18n/navigation"
+import { useLocale } from "next-intl"
 
 interface TableToolbarProps {
     searchQuery?: string
@@ -50,6 +51,7 @@ export default function TableToolbar({
     addButtonModalContent
 }: TableToolbarProps) {
     const router = useRouter()
+    const locale = useLocale()
     const [openAddModal, setOpenAddModal] = useState(false)
     const [inputValue, setInputValue] = useState(searchQuery ?? "")
     const [isImporting, setIsImporting] = useState(false)
@@ -157,7 +159,7 @@ export default function TableToolbar({
                         className="bg-primary hover:bg-primary font-semibold"
                         onClick={() => {
                             if (addButtonUrl) {
-                                router.push(addButtonUrl)
+                                router.push(addButtonUrl, { locale })
                             } else if (isAddButtonModal) {
                                 setOpenAddModal(true)
                             }

@@ -17,7 +17,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 import { usePathname } from "next/navigation"
 import { Button } from "../ui/button"
 import { CategoryResponse } from "@/types/categories"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useRouter } from "@/src/i18n/navigation"
 import { useAtom } from "jotai"
 import { currentCategoryIdAtom, currentCategoryNameAtom } from "@/store/category"
@@ -38,6 +38,7 @@ type AppSidebarProps = {
 export default function AppSidebar({ categories, defaultOpen = true }: AppSidebarProps) {
     const { open: sidebarOpen, setOpen, openMobile, setOpenMobile } = useSidebar()  // true = expanded, false = collapsed
     const t = useTranslations()
+    const locale = useLocale() // 👈 thêm locale
     const [currentCategoryId, setCurrentCategoryId] = useAtom(currentCategoryIdAtom)
     const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
 
@@ -101,7 +102,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-3">
                             {items.map((item) => {
-                                const isActive = pathname === item.url
+                                const isActive = pathname.startsWith(item.url) // ✅ cho phép match /category/slug/... 
                                 const isOpen = openItem === item.id
                                 // Nếu có children → dùng Collapsible
                                 if (item.children) {
@@ -136,12 +137,12 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                                         className="flex flex-col gap-1.5 mt-1 overflow-hidden [data-state=closed]:hidden [data-state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
                                                     >
                                                         {item.children.map((child) => {
-                                                            const isChildActive = pathname === child.url
+                                                            const isChildActive = pathname === child.url || pathname === `/${locale}${child.url}` // 👈 check kèm locale
                                                             return (
                                                                 <Button
                                                                     key={child.id}
                                                                     onClick={() => {
-                                                                        router.push(child.url)
+                                                                        router.push(child.url, { locale }) // 👈 thêm locale
                                                                         if (isPhone) setOpenMobile(false)
                                                                         if (item.url && item.url.includes("category")) {
                                                                             setCurrentCategoryId(child.id)
@@ -175,7 +176,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                         <SidebarMenuButton asChild>
                                             <Button
                                                 onClick={() => {
-                                                    router.push(item.url)
+                                                    router.push(item.url, { locale }) // 👈 thêm locale
                                                 }}
                                                 className={`relative flex flex-row items-center justify-start rounded-none gap-3 px-4 py-6 transition-colors ${isActive
                                                     ? "bg-secondary/20 text-[#4D4D4D] hover:text-black hover:bg-secondary/20"

@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { useCheckMailExist, useSignUp } from "@/features/auth/hook"
 import { toast } from "sonner"
-import { Eye, EyeOff, Key, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useRouter } from "@/src/i18n/navigation"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 
@@ -22,6 +22,7 @@ export default function SignUpForm() {
   const signUp = useSignUp()
   const checkMailMutation = useCheckMailExist()
   const router = useRouter()
+  const locale = useLocale()
 
   const formSchema = z.object({
     email: z
@@ -65,7 +66,7 @@ export default function SignUpForm() {
           onSuccess: (data) => {
             form.reset()
             toast.success(t('signUpSuccess'))
-            router.push("/login")
+            router.push("/login", { locale })
           },
           onError: (error) => {
             toast.error(t('signUpFail'))

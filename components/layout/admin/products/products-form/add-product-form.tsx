@@ -14,7 +14,6 @@ import { ProductItem, StaticFile } from '@/types/products'
 import { toast } from 'sonner'
 import { CategoryResponse } from '@/types/categories'
 import { useAddProduct, useEditProduct } from '@/features/products/hook'
-import { useRouter } from 'next/navigation'
 import {
     Accordion,
     AccordionContent,
@@ -26,6 +25,8 @@ import ProductDetailInputs from './fisrt-group'
 import ProductAdditionalInputs from './product-additional-group'
 import ProductLogisticsGroup from './product-logistics-group'
 import ProductSEOGroup from './product-seo-group'
+import { useRouter } from '@/src/i18n/navigation'
+import { useLocale } from 'next-intl'
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -36,6 +37,7 @@ interface AddProductFormProps {
 
 const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormProps) => {
     const router = useRouter()
+    const locale = useLocale()
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
     const [isLoadingSEO, setIsLoadingSEO] = useState(false)
@@ -91,7 +93,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                 onSuccess: () => {
                     toast.success("Product add successfully")
                     form.reset()
-                    router.push("/admin/products/list")
+                    router.push("/admin/products/list", { locale })
                 },
                 onError: (error) => {
                     toast.error(
@@ -110,7 +112,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                 {
                     onSuccess: () => {
                         toast.success("Product updated successfully")
-                        router.push("/admin/products/list")
+                        router.push("/admin/products/list", { locale })
                         router.refresh()
                     },
                     onError: () => {

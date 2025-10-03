@@ -16,6 +16,7 @@ import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook"
 import { stripHtmlRegex } from "@/hooks/simplifyHtml"
 import { Switch } from "@/components/ui/switch"
 import DeleteDialog from "./delete-dialog"
+import { useLocale } from "next-intl"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -296,6 +297,52 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
 
 }
 
+function ActionsCell({ product }: { product: ProductItem }) {
+    const locale = useLocale();
+
+    const categories = product.categories || [];
+    const formatName = (name: string) =>
+        name.trim().toLowerCase().replace(/\s+/g, "-");
+
+    const level1 = categories.find((c) => c.level === 1);
+    const level2 = categories.find((c) => c.level === 2);
+
+    const categoryHref =
+        level1 && level2
+            ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
+            : level1
+                ? `/${formatName(level1.name)}/${product.id}`
+                : level2
+                    ? `/${formatName(level2.name)}/${product.id}`
+                    : `/${product.id}`;
+
+    return (
+        <div className="flex gap-2">
+            <Link href={`/${locale}/admin/products/${product.id}/edit`}>
+                <Button variant="ghost" size="icon">
+                    <Pencil className="w-4 h-4 text-primary" />
+                </Button>
+            </Link>
+            <DeleteDialog product={product} />
+            <Link
+                href={`/${locale}/product${categoryHref}`}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <Button variant="ghost" size="icon">
+                    <Eye className="w-4 h-4 text-secondary" />
+                </Button>
+            </Link>
+            <Link href={`/${locale}/admin/products/${product.id}/clone`}>
+                <Button variant="ghost" size="icon">
+                    <CopyCheck className="w-4 h-4 text-secondary" />
+                </Button>
+            </Link>
+        </div>
+    );
+}
+
+
 export const productColumns: ColumnDef<ProductItem>[] = [
     {
         id: "select",
@@ -441,50 +488,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         id: "actions",
         header: "ACTION",
-        cell: ({ row }) => {
-            // Lấy đường dẫn category
-            const product = row.original
-            const categories = product.categories || []
-            const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
-
-            const level1 = categories.find(c => c.level === 1)
-            const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
-
-            const categoryHref = level1 && level2
-                ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
-                : level1
-                    ? `/${formatName(level1.name)}/${product.id}`
-                    : level2
-                        ? `/${formatName(level2.name)}/${product.id}`
-                        : `/${product.id}`
-
-            return (
-                <div className="flex gap-2">
-                    {/* Edit */}
-                    <Link href={`/admin/products/${row.original.id}/edit`}>
-                        <Button variant="ghost" size="icon">
-                            <Pencil className="w-4 h-4 text-primary" />
-                        </Button>
-                    </Link>
-
-                    {/* Delete */}
-                    <DeleteDialog product={row.original} />
-
-                    {/* View */}
-                    <Link href={`/product${categoryHref}`} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon">
-                            <Eye className="w-4 h-4 text-secondary" />
-                        </Button>
-                    </Link>
-
-                    <Link href={`/admin/products/${row.original.id}/clone`}>
-                        <Button variant="ghost" size="icon">
-                            <CopyCheck className="w-4 h-4 text-secondary" />
-                        </Button>
-                    </Link>
-                </div>
-            )
-        }
+        cell: ({ row }) => <ActionsCell product={row.original} />
     },
     {
         id: 'sync',

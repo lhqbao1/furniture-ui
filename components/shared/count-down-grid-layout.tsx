@@ -1,12 +1,11 @@
 'use client'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
-import ListReviewButton from './list-review-buttons'
 import gsap from 'gsap'
 import { useMediaQuery } from 'react-responsive'
 import { ProductItem } from '@/types/products'
-import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
+import { Link } from '@/src/i18n/navigation'
 
 interface CountDownGridLayoutProps {
     products: ProductItem[]
@@ -22,6 +21,7 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
     const cardRefs = useRef<HTMLDivElement[]>([])
     const isMobile = useMediaQuery({ maxWidth: 650 })
     const t = useTranslations()
+    const locale = useLocale()
 
     // state riêng cho countdown & progress
     const [productTimes, setProductTimes] = useState<ProductTime[]>(() =>
@@ -115,7 +115,7 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                             ? `/${level2.name}/${product.id}`
                             : `/${product.id}`
                 return (
-                    <Link href={`/product/${categoryHref}`} passHref key={product.id}>
+                    <Link href={`/${locale}/product/${categoryHref}`} passHref key={product.id}>
                         <div
                             className='bg-white p-4 relative group'
                             style={{

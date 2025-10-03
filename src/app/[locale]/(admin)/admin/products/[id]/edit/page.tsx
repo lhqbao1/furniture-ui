@@ -6,10 +6,12 @@ import { useRouter } from "@/src/i18n/navigation"
 import { ProductInput } from "@/lib/schema/product"
 import { toast } from "sonner"
 import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
+import { useLocale } from "next-intl"
 
 const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = React.use(params) // unwrap Promise
     const router = useRouter()
+    const locale = useLocale()
     const editProduct = useEditProduct()
 
     const { data, isLoading, isError } = useGetProductById(id)
@@ -22,7 +24,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             {
                 onSuccess: () => {
                     toast.success("Product updated successfully")
-                    router.push("/admin/products/list")
+                    router.push("/admin/products/list", { locale })
                 },
                 onError: () => {
                     toast.error("Failed to update product")

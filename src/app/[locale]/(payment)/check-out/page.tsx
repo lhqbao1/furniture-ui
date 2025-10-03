@@ -13,10 +13,8 @@ import { useCreateCheckOut } from '@/features/checkout/hook'
 import { useCreatePayment } from '@/features/payment/hook'
 import { useAtom } from 'jotai'
 import { checkOutIdAtom, paymentIdAtom } from '@/store/payment'
-import { useRouter } from 'next/navigation'
 import { Checkbox } from '@/components/ui/checkbox'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import z from 'zod'
 // import CheckOutInvoiceAddress from '@/components/layout/checkout/invoice-address'
 import { useCartLocal } from '@/hooks/cart'
@@ -35,6 +33,7 @@ import dynamic from 'next/dynamic'
 import { SectionSkeleton } from '@/components/layout/checkout/section-skeleton'
 import StripeLayout from '@/components/shared/stripe/stripe'
 import { Loader2 } from 'lucide-react'
+import { Link, useRouter } from '@/src/i18n/navigation'
 const CartTable = dynamic(() => import('@/components/layout/cart/cart-table'), { ssr: false })
 const CartLocalTable = dynamic(() => import('@/components/layout/cart/cart-local-table'), { ssr: false })
 
@@ -75,7 +74,6 @@ export interface CartItem {
 export default function CheckOutPage() {
     const [userId, setUserId] = useState<string>("")
     const [userIdLogin, setUserIdLogin] = useState<string>("")
-
     const [paymentId, setPaymentId] = useAtom(paymentIdAtom)
     const [checkout, setCheckOut] = useAtom(checkOutIdAtom)
     const [otpEmail, setOtpEmail] = useState<string>("")
@@ -86,6 +84,7 @@ export default function CheckOutPage() {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [total, setTotal] = useState<number>(0);
     const [openCardDialog, setOpenCardDialog] = useState(false)
+    const locale = useLocale()
 
     useEffect(() => {
         const hasReloaded = sessionStorage.getItem("checkout_reloaded")
@@ -417,7 +416,7 @@ export default function CheckOutPage() {
                     toast.success("Place payment successful")
                     setPaymentId(payment.payment_id)
                     if (data.payment_method === "paypal") {
-                        router.push(payment.approve_url)
+                        router.push(payment.approve_url, { locale })
                     } else {
                         if (data.payment_method === "card") {
                             setOpenCardDialog(true)
@@ -650,7 +649,7 @@ export default function CheckOutPage() {
                                             <span className='space-x-2'>
                                                 {t('byPlacing')}
                                                 <span className='pl-2'>
-                                                    <Link href="/agb" className="text-secondary underline">
+                                                    <Link href={`/${locale}/agb`} className="text-secondary underline">
                                                         {t('termCondition')}
                                                     </Link>
                                                 </span>

@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useCartLocal } from '@/hooks/cart'
 import { useRouter } from '@/src/i18n/navigation'
 import { getCartItems } from '@/features/cart/api'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { LoginDrawer } from '@/components/shared/login-drawer'
 import CartLocalTable from '@/components/layout/cart/cart-local-table'
 
@@ -19,6 +19,9 @@ const CartPage = () => {
     );
     const [isLoginOpen, setIsLoginOpen] = useState(false)
     const t = useTranslations()
+    const router = useRouter()
+    const locale = useLocale()
+    const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
 
     useEffect(() => {
         const handleStorageChange = () => {
@@ -47,8 +50,7 @@ const CartPage = () => {
     const displayedCart = userId ? cart?.items ?? [] : localCart;
     const { updateStatus } = useCartLocal()
 
-    const router = useRouter()
-    const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
+
 
 
 
@@ -69,7 +71,7 @@ const CartPage = () => {
                 toast.error(t('chooseAtLeastCart'))
             } else {
                 // Navigate checkout
-                router.push('/check-out')
+                router.push('/check-out', { locale })
             }
         } else {
             if (displayedCart.length === 0) {

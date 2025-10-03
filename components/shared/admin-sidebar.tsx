@@ -12,13 +12,16 @@ import {
     SidebarProvider,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
-import { usePathname, useRouter } from "next/navigation"
 import { Button } from "../ui/button"
 import Link from "next/link"
+import { useLocale } from "next-intl"
+import { usePathname, useRouter } from "@/src/i18n/navigation"
 
 export function AdminSideBar() {
     const router = useRouter()
     const pathname = usePathname()
+    const locale = useLocale() // 👈 lấy locale hiện tại
+
 
     const items = [
         {
@@ -68,11 +71,14 @@ export function AdminSideBar() {
         },
     ];
 
+    // prepend locale vào url
+    const withLocale = (url: string) => `/${locale}${url}`
+
     return (
         <Sidebar className="app-sidebar custom-scroll">
             <SidebarContent>
                 <SidebarGroup>
-                    <Link href={'/admin'}>
+                    <Link href={`/${locale}/admin`}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
                             <Image
                                 src="/new-logo.svg"
@@ -91,8 +97,7 @@ export function AdminSideBar() {
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-3">
                             {items.map((item) => {
-                                const isActive = pathname === item.url
-
+                                const isActive = pathname === withLocale(item.url)
                                 if (item.children) {
                                     return (
                                         <SidebarMenuItem key={item.title} className="flex flex-col">
@@ -114,11 +119,12 @@ export function AdminSideBar() {
                                             {/* Luôn render children thay vì Collapsible */}
                                             <div className="flex flex-col gap-3 mt-3">
                                                 {item.children.map((child) => {
-                                                    const isChildActive = pathname === child.url
+                                                    const childUrl = withLocale(child.url)
+                                                    const isChildActive = pathname === withLocale(child.url)
                                                     return (
                                                         <Button
                                                             key={child.title}
-                                                            onClick={() => router.push(child.url)}
+                                                            onClick={() => router.push(childUrl, { locale })}
                                                             variant="ghost"
                                                             className={`relative flex flex-row items-center justify-start pl-12 gap-3 rounded-md py-1 text-base transition-colors ${isChildActive
                                                                 ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
@@ -139,7 +145,7 @@ export function AdminSideBar() {
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton asChild>
                                             <Button
-                                                onClick={() => router.push(item.url)}
+                                                onClick={() => router.push(item.url, { locale })}
                                                 className={`relative flex flex-row items-center justify-start gap-3 px-4 py-6 transition-colors ${isActive
                                                     ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                     : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
