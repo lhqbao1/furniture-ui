@@ -65,7 +65,7 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                     setSeePassword(true)
                 },
                 onError(error, variables, context) {
-                    toast.error(t("invalidCredentials"))
+                    toast.error(t("invalidEmail"))
                 },
             })
         } else {
@@ -166,7 +166,16 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                             hasEffect
                             disabled={submitOtpMutation.isPending || sendOtpMutation.isPending}
                         >
-                            {(submitOtpMutation.isPending || sendOtpMutation.isPending) ? seePassword ? <Loader2 className="animate-spin" /> : t('login') : t('getOtp')}
+                            {
+                                sendOtpMutation.isPending
+                                    ? <Loader2 className="animate-spin" />
+                                    : seePassword
+                                        ? (submitOtpMutation.isPending
+                                            ? <Loader2 className="animate-spin" />
+                                            : t('login')
+                                        )
+                                        : t('getOtp')
+                            }
                         </Button>
                         <Button
                             type="button"
@@ -182,12 +191,12 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
             </Form>
 
             {/* Forgot password */}
-            <div className="flex justify-end mt-2 lg:mt-4">
+            {/* <div className="flex justify-end mt-2 lg:mt-4">
                 <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
 
                     {t("forgotPassword")}?
                 </Link>
-            </div>
+            </div> */}
 
             {/* Sign up link */}
             <div className="text-sm text-center mt-6 space-x-1">

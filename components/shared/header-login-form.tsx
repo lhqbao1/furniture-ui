@@ -56,7 +56,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                     setSeePassword(true)
                 },
                 onError(error, variables, context) {
-                    toast.error(t("invalidCredentials"))
+                    toast.error(t("invalidEmail"))
                 },
             })
         } else {
@@ -162,21 +162,30 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                             hasEffect
                             disabled={submitOtpMutation.isPending || sendOtpMutation.isPending}
                         >
-                            {(submitOtpMutation.isPending || sendOtpMutation.isPending) ? seePassword ? <Loader2 className="animate-spin" /> : t('login') : t('getOtp')}
+                            {
+                                sendOtpMutation.isPending
+                                    ? <Loader2 className="animate-spin" />
+                                    : seePassword
+                                        ? (submitOtpMutation.isPending
+                                            ? <Loader2 className="animate-spin" />
+                                            : t('login')
+                                        )
+                                        : t('getOtp')
+                            }
                         </Button>
                     </div>
                 </form>
             </Form>
 
             {/* Forgot password */}
-            <div className="flex justify-end mt-2 mb-5">
+            {/* <div className="flex justify-end mt-2 mb-5">
                 <Link
                     href={`/forgot-password`}
                     className="text-black/70 hover:underline"
                 >
                     {t("forgotPassword")}?
                 </Link>
-            </div>
+            </div> */}
 
             {/* Sign up link */}
             <Button
