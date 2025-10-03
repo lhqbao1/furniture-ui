@@ -25,27 +25,6 @@ export default function CheckOutUserInformation({ isLogin, userId }: CheckOutUse
     const form = useFormContext()
     const t = useTranslations()
 
-    // // Query user info nếu có userId
-    // const { data: user, isLoading } = useQuery({
-    //     queryKey: ["user", userId],
-    //     queryFn: () => getUserById(userId!),
-    //     enabled: !!userId,
-    //     retry: false,
-    // })
-
-    // // Khi có user thì patch giá trị vào form
-    // useEffect(() => {
-    //     if (user) {
-    //         form.reset({
-    //             ...form.getValues(),
-    //             first_name: user.first_name || '',
-    //             last_name: user.last_name || '',
-    //             email: user.email || '',
-    //             phone_number: user.phone_number || '',
-    //         })
-    //     }
-    // }, [user, form])
-
     return (
         <div className="space-y-4">
             <div className="flex justify-between bg-secondary/10 p-2">

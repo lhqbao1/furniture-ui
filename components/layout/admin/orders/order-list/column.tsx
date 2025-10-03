@@ -126,7 +126,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         cell: ({ row }) => {
             const method = row.original.payment_method;
             const option = paymentOptions.find((opt) => opt.id === method);
-            const logo = option?.logo || "/paypal.svg"; // default Paypal
+            const logo = option?.logo || "/ebay.png"; // default Paypal
 
             return (
                 <div className="h-12 relative">

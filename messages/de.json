@@ -198,7 +198,7 @@
   "otpError": "Falscher OTP, bitte erneut versuchen",
   "sendedEmail": "Wir haben den OTP an Ihre E-Mail gesendet, bitte verifizieren Sie, um fortzufahren.",
   "ifNotEnterOtp": "Wenn Sie den OTP nicht eingeben, können Sie diese E-Mail nicht für Einkäufe verwenden.",
-  "useDifferentEmail": "Aus Sicherheitsgründen verwenden Sie bitte eine andere E-Mail-Adresse.",
+  "useDifferentEmail": "E-Mail existiert bereits, bitte verwenden Sie eine andere.",
   "verifyOTP": "OTP verifizieren",
   "gender": "Anrede",
   "male": "Herr",
@@ -206,7 +206,7 @@
   "addressSupplement": "Adresszusatz",
   "gender_required": "Geschlecht ist erforderlich",
   "loginToContinue": "Zum Fortfahren anmelden",
-  "otherGender": "Andere",
+  "otherGender": "ohne Angabe",
   "userInformation": "Benutzerinformationen",
   "delivery": "Lieferung",
   "updating": "Aktualisierung",
@@ -242,5 +242,7 @@
   "removeItemCartFail": "Artikel konnte nicht aus dem Warenkorb entfernt werden",
   "removeItemWishlistSuccess": "Artikel wurde erfolgreich von der Wunschliste entfernt",
   "removeItemWishlistFail": "Artikel konnte nicht von der Wunschliste entfernt werden",
-  "getOtp": "OTP anfordern"
+  "getOtp": "OTP anfordern",
+  "signUpSuccess": "Registrierung erfolgreich!",
+"signUpFail": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
 }

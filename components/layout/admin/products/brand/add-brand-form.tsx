@@ -91,14 +91,15 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(
-                (values) => {
-                    handleSubmit(values)
-                },
-                (errors) => {
-                    toast.error("Please check the form for errors")
-                }
-            )}
+            <form
+                onSubmit={form.handleSubmit(
+                    (values) => {
+                        handleSubmit(values)
+                    },
+                    (errors) => {
+                        toast.error("Please check the form for errors")
+                    }
+                )}
                 className="space-y-6"
             >
                 <FormField

@@ -1,19 +1,20 @@
+import { CheckOut } from '@/types/checkout'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
 interface OrderDetailOverViewProps {
-    orderId: string,
     created_at: string,
     updated_at: string,
     status: string,
+    order: CheckOut
 }
 
-const OrderDetailOverView = ({ orderId, created_at, updated_at, status }: OrderDetailOverViewProps) => {
+const OrderDetailOverView = ({ created_at, updated_at, status, order }: OrderDetailOverViewProps) => {
     return (
         <div className='space-y-1'>
             <div className='flex gap-1 text-sm font-bold'>
                 <div>Order ID:</div>
-                <div>#DE-{orderId.substring(0, 7)}</div>
+                <div>{order.checkout_code}</div>
             </div>
             <div className='flex gap-1 text-sm font-bold'>
                 <div>Ext order:</div>
@@ -38,7 +39,7 @@ const OrderDetailOverView = ({ orderId, created_at, updated_at, status }: OrderD
                 <div className='flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold cursor-pointer'>
                     <div className='flex gap-1'>
                         <div>Chanel:</div>
-                        <div translate='no'>Prestige Home</div>
+                        <div translate='no' className='capitalize'>{order.from_marketplace}</div>
                     </div>
                     <ArrowRight size={16} />
                 </div>

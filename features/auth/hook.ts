@@ -64,7 +64,7 @@ export function useSignUp() {
   return useMutation({
     mutationFn: (input: SignUpInput) => signUp(input),
     onSuccess(data, variables, context) {
-      localStorage.setItem("userId", data.id)
+      // localStorage.setItem("userId", data.id)
     },
   })
 }

@@ -20,9 +20,49 @@ export async function GET() {
   try {
     const products = await getProductsFeed();
 
+    const allowedSkus = [
+      "1202182-198842",
+      "1202181-198841",
+      "1202251-198952",
+      "1199282-195553",
+      "1205737-202880",
+      "1199308-195579",
+      "1199177-195443",
+      "1199855-196375",
+      "1199860-196380",
+      "1199154-195420",
+      "1199784-196301",
+      "1199731-196247",
+      "1199732-196248",
+      "1199730-196246",
+      "1199315-195586",
+      "1199843-196363",
+      "1199562-196022",
+      "1199283-195554",
+      "1199321-195592",
+      "1206514-204306",
+      "1206518-204310",
+      "1206520-204312",
+      "1206517-204309",
+      "1206521-204314",
+      "1199154-195419",
+      "1082858-72099",
+      "1152638-142245",
+      "1152700-142350",
+      "1067359-54144",
+      "1152640-142247",
+      "1152641-142248",
+      "1152639-142246"
+    ];
+
     const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
     const itemsXml = products
-    .filter(p => p.final_price > 0 && p.is_active) // lọc cả giá và active
+    .filter(
+      (p) =>
+        p.final_price > 0 &&
+        p.is_active &&
+        allowedSkus.includes(p.sku) // lọc theo sku
+    )
     .map((p) => {
         const categories = p.categories || [];
         const level1 = categories.find(c => c.level === 1)

@@ -199,7 +199,7 @@
     "otpError": "Incorrect OTP, please try again",
     "sendedEmail": "We have sent the OTP to your email, please verify to continue.",
     "ifNotEnterOtp": "If you do not enter the OTP, you will not be able to use this email to make purchases.",
-    "useDifferentEmail": "For security reasons, please use a different email.",
+    "useDifferentEmail": "Email already exists, please use a different one.",
     "verifyOTP": "Verify OTP",
     "gender": "Gender",
     "male": "Male",
@@ -242,5 +242,7 @@
     "removeItemCartFail": "Failed to remove item from cart",
     "removeItemWishlistSuccess": "Item removed from wishlist successfully",
     "removeItemWishlistFail": "Failed to remove item from wishlist",
-    "getOtp": "Get OTP"
+    "getOtp": "Get OTP",
+    "signUpSuccess": "Sign up successful!",
+    "signUpFail": "Sign up fail. Please try again"
 }
