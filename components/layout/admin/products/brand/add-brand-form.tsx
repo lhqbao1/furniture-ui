@@ -64,7 +64,7 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                     onClose?.()
                 },
                 onError(error, variables, context) {
-                    toast.success("Create brand fail")
+                    toast.error("Create brand fail")
                 },
             });
         } else {
@@ -83,7 +83,7 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                     onClose?.()
                 },
                 onError(error, variables, context) {
-                    toast.success("Create brand fail")
+                    toast.error("Create brand fail")
                 },
             });
         }

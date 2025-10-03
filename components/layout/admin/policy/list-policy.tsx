@@ -122,48 +122,6 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
         setOpenDialog(true)
     }
 
-    // const handleSubmitVersion = async () => {
-    //     if (!versionNameInput) return
-    //     // parse content từ editor 
-    //     const childInputs = parseEditorContent(editorValue)
-
-    //     console.log(childInputs)
-    //     try {
-    //         const versionRes = await createVersionMutation.mutateAsync(versionNameInput)
-
-    //         // Sau khi tạo version thành công → tạo lần lượt các legal policy
-    //         for (const lp of filteredPolicies) {
-    //             try {
-    //                 const legalPolicyRes = await createLegalPolicyMutation.mutateAsync({
-    //                     name: lp.name,
-    //                     version_id: versionRes.id, // lấy id từ version vừa tạo
-    //                 })
-
-    //                 // sau khi tạo legal policy xong → tạo child legal policies
-    //                 const childInputs = lp.child_legal_policies.map(cl => ({
-    //                     label: policies[lp.id]?.[cl.id]?.label || cl.label,
-    //                     content: policies[lp.id]?.[cl.id]?.content || cl.content,
-    //                 }))
-
-    //                 await createChildLegalPolicyMutation.mutateAsync({
-    //                     input: childInputs,
-    //                     legal_policy_id: legalPolicyRes.id,
-    //                 })
-
-    //             } catch (err) {
-    //                 console.error("Lỗi khi tạo legal policy hoặc child:", err)
-    //             }
-    //         }
-
-    //         setOpenDialog(false)
-    //         setVersionNameInput('')
-    //         toast.success("Create new policy version successful")
-
-    //     } catch (err) {
-    //         console.error("Lỗi khi tạo version:", err)
-    //     }
-    // }
-
     const handleSubmitVersion = async () => {
         if (!versionNameInput) return
 

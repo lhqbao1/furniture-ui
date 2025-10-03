@@ -62,6 +62,14 @@ export function AdminSideBar() {
             ],
         },
         {
+            title: "Supplier",
+            url: "/admin/supplier",
+            icon: ChevronRight,
+            children: [
+                { title: "Supplier List", url: "/admin/supplier/list", icon: CornerDownRight },
+            ],
+        },
+        {
             title: "AMM",
             url: "/admin/amm",
             icon: ChevronRight,

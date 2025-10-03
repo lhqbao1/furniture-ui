@@ -1,0 +1,27 @@
+import { SupplierInput } from "@/types/supplier"
+import { z } from "zod"
+
+export const supplierSchema = z.object({
+    salutation: z.string().min(1, "Salutation is required"),
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+    vat_id: z.string().min(1, "VAT id is required"),
+    email: z.string().email("Invalid email"),
+    email_order: z.string().email("Invalid order email"),
+    email_billing: z.string().email("Invalid billing email"),
+    phone_number: z.string().min(5, "Invalid phone number"),
+  })
+
+  
+
+export const defaultSupplier: SupplierInput = {
+    salutation: "",
+    first_name: "",
+    last_name: "",
+    vat_id: "",
+    email: "",
+    email_order: "",
+    email_billing: "",
+    phone_number: "",
+  }
+
