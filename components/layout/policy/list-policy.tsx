@@ -126,36 +126,39 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                 >
                                     <div className='pr-6 cursor-pointer font-bold'>{item.name}</div>
                                 </AccordionTrigger>
-                                <AccordionContent className="flex flex-col gap-1.5 text-balance">
-                                    {item.child_legal_policies.map((child, policyItemIndex) => (
-                                        <div
-                                            key={child.id}
-                                            className={cn(
-                                                'cursor-pointer hover:underline lg:pl-6 pl-2 relative',
-                                                currentPolicy?.id === item.id && currentPolicyItem === policyItemIndex
-                                                    ? 'bg-secondary/20 hover:bg-secondary-20 px-2 py-1 font-semibold'
-                                                    : ''
-                                            )}
-                                            onClick={() => {
-                                                setCurrentPolicyItem(policyItemIndex)
-                                                // delay 1 tick để đảm bảo DOM ổn định rồi mới scroll
-                                                setTimeout(() => {
-                                                    scrollTo(`${item.id}-${policyItemIndex}`, -80)
-                                                }, 200)
-                                            }}
-                                        >
-                                            {child.label}
+                                {item.name === "Impressum" ? '' : (
+
+                                    <AccordionContent className="flex flex-col gap-1.5 text-balance">
+                                        {item.child_legal_policies.map((child, policyItemIndex) => (
                                             <div
+                                                key={child.id}
                                                 className={cn(
-                                                    'absolute w-1 h-full bg-secondary right-0 top-0',
+                                                    'cursor-pointer hover:underline lg:pl-6 pl-2 relative',
                                                     currentPolicy?.id === item.id && currentPolicyItem === policyItemIndex
-                                                        ? 'block'
-                                                        : 'hidden'
+                                                        ? 'bg-secondary/20 hover:bg-secondary-20 px-2 py-1 font-semibold'
+                                                        : ''
                                                 )}
-                                            />
-                                        </div>
-                                    ))}
-                                </AccordionContent>
+                                                onClick={() => {
+                                                    setCurrentPolicyItem(policyItemIndex)
+                                                    // delay 1 tick để đảm bảo DOM ổn định rồi mới scroll
+                                                    setTimeout(() => {
+                                                        scrollTo(`${item.id}-${policyItemIndex}`, -80)
+                                                    }, 200)
+                                                }}
+                                            >
+                                                {child.label}
+                                                <div
+                                                    className={cn(
+                                                        'absolute w-1 h-full bg-secondary right-0 top-0',
+                                                        currentPolicy?.id === item.id && currentPolicyItem === policyItemIndex
+                                                            ? 'block'
+                                                            : 'hidden'
+                                                    )}
+                                                />
+                                            </div>
+                                        ))}
+                                    </AccordionContent>
+                                )}
                             </AccordionItem>
                         ))}
                     </Accordion>
