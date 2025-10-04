@@ -32,7 +32,7 @@ interface ListPolicyAdminProps {
 // Helper: Convert children policies -> HTML 
 function buildHtmlFromPolicies(children: { label: string; content: string; tt: number }[]): string {
     return children.map((cl) =>
-        `<h2>${cl.label || ""}</h2>${cl.content || "<p></p>"}`
+        `<h2>${cl.label || ""}</h2>${cl.content || "<p></p> || <strong></strong>"}`
     ).join("")
 }
 
@@ -74,7 +74,8 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
     const [openDialog, setOpenDialog] = useState(false)
     const [versionNameInput, setVersionNameInput] = useState("")
-    const [editorValue, setEditorValue] = useState("")
+    // const [editorValue, setEditorValue] = useState("")
+    const [editorValues, setEditorValues] = useState<Record<string, string>>({})
 
     const { data: policy, isLoading } = useQuery({
         queryKey: ["policy-items", versionId],
@@ -93,12 +94,30 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
 
     const [policies, setPolicies] = useState<Record<string, Record<string, { label: string; content: string, tt: number }>>>({})
 
+    // useEffect(() => {
+    //     if (currentPolicy) {
+    //         const html = buildHtmlFromPolicies(currentPolicy.child_legal_policies.map((cl) => ({ label: cl.label, content: cl.content, tt: cl.tt })))
+    //         setEditorValue(html)
+    //     }
+    // }, [currentPolicy])
     useEffect(() => {
         if (currentPolicy) {
-            const html = buildHtmlFromPolicies(currentPolicy.child_legal_policies.map((cl) => ({ label: cl.label, content: cl.content, tt: cl.tt })))
-            setEditorValue(html)
+            if (!editorValues[currentPolicy.id]) {
+                const html = buildHtmlFromPolicies(
+                    currentPolicy.child_legal_policies.map(cl => ({
+                        label: cl.label,
+                        content: cl.content,
+                        tt: cl.tt,
+                    }))
+                )
+                setEditorValues(prev => ({
+                    ...prev,
+                    [currentPolicy.id]: html,
+                }))
+            }
         }
     }, [currentPolicy])
+
 
     useEffect(() => {
         if (filteredPolicies.length > 0) {
@@ -122,44 +141,93 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
         setOpenDialog(true)
     }
 
-    const handleSubmitVersion = async () => {
-        if (!versionNameInput) return
+    // const handleSubmitVersion = async () => {
+    //     if (!versionNameInput) return
 
-        // parse content từ editor
-        const parsedChildren = parseEditorContent(editorValue)
+    //     // parse content từ editor
+    //     // const parsedChildren = parseEditorContent(editorValue)
+    //     console.log(filteredPolicies)
+
+    //     // try {
+    //     //     const versionRes = await createVersionMutation.mutateAsync(versionNameInput)
+
+    //     //     for (const lp of filteredPolicies) {
+    //     //         const legalPolicyRes = await createLegalPolicyMutation.mutateAsync({
+    //     //             name: lp.name,
+    //     //             version_id: versionRes.id,
+    //     //         })
+
+    //     //         // so sánh parsedChildren với lp.child_legal_policies
+    //     //         const childInputs = lp.child_legal_policies.map((cl, idx) => {
+    //     //             const parsed = parsedChildren[idx]
+    //     //             return {
+    //     //                 label: parsed?.label ?? cl.label,
+    //     //                 content: parsed?.content ?? cl.content,
+    //     //                 tt: parsed?.tt ?? cl.tt   // giữ số thứ tự
+    //     //             }
+    //     //         })
+
+    //     //         await createChildLegalPolicyMutation.mutateAsync({
+    //     //             input: childInputs,
+    //     //             legal_policy_id: legalPolicyRes.id,
+    //     //         })
+    //     //     }
+
+    //     //     setOpenDialog(false)
+    //     //     setVersionNameInput('')
+    //     //     toast.success("Create new policy version successful")
+    //     // } catch (err) {
+    //     //     console.error("Lỗi khi tạo version:", err)
+    //     // }
+    // }
+    const handleSubmitVersion = async () => {
+        if (!versionNameInput) return;
+
+        console.log(filteredPolicies)
 
         try {
-            const versionRes = await createVersionMutation.mutateAsync(versionNameInput)
+            // 1. Tạo version trước
+            const versionRes = await createVersionMutation.mutateAsync(versionNameInput);
 
+            // 2. Lặp qua từng policy
             for (const lp of filteredPolicies) {
                 const legalPolicyRes = await createLegalPolicyMutation.mutateAsync({
                     name: lp.name,
                     version_id: versionRes.id,
-                })
+                });
 
-                // so sánh parsedChildren với lp.child_legal_policies
+                // 3. Parse content theo editor riêng từng policy
+                const editorContent = editorValues[lp.id] || "";
+                const parsedChildren = parseEditorContent(editorContent);
+                console.log(parseEditorContent(editorContent))
+
+                // 4. Merge parsed content với child gốc (để giữ tt, fallback)
                 const childInputs = lp.child_legal_policies.map((cl, idx) => {
-                    const parsed = parsedChildren[idx]
+                    const parsed = parsedChildren[idx];
                     return {
                         label: parsed?.label ?? cl.label,
                         content: parsed?.content ?? cl.content,
-                        tt: parsed?.tt ?? cl.tt   // giữ số thứ tự
-                    }
-                })
+                        tt: parsed?.tt ?? cl.tt, // giữ số thứ tự
+                    };
+                });
 
+                // 5. Gửi API tạo child policies
                 await createChildLegalPolicyMutation.mutateAsync({
                     input: childInputs,
                     legal_policy_id: legalPolicyRes.id,
-                })
+                });
             }
 
-            setOpenDialog(false)
-            setVersionNameInput('')
-            toast.success("Create new policy version successful")
+            // 6. Reset state + toast
+            setOpenDialog(false);
+            setVersionNameInput("");
+            toast.success("Create new policy version successful");
         } catch (err) {
-            console.error("Lỗi khi tạo version:", err)
+            console.error("Lỗi khi tạo version:", err);
+            toast.error("Failed to create new policy version");
         }
-    }
+    };
+
 
 
     if (isLoading) return <div className=''><Loader2 className='animate-spin' /></div>
@@ -214,7 +282,7 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                             }}
                         >
                             <div className='pr-6 px-2 py-3 cursor-pointer font-bold'>{item.name}</div>
-                            <AccordionContent className="flex flex-col gap-1.5 text-balance">
+                            {/* <AccordionContent className="flex flex-col gap-1.5 text-balance">
                                 {item.child_legal_policies.map((child, policyItemIndex) => (
                                     <div
                                         key={child.id}
@@ -236,7 +304,7 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                                         {policies[item.id]?.[child.id]?.label || child.label}
                                     </div>
                                 ))}
-                            </AccordionContent>
+                            </AccordionContent> */}
                         </AccordionItem>
                     ))}
                 </Accordion>
@@ -247,7 +315,18 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
-                <div className="col-span-12"> <RichEditor value={editorValue} onChangeValue={(val) => setEditorValue(val)} /> </div>
+                <div className='col-span-12'>
+                    <RichEditor
+                        value={editorValues[currentPolicy?.id] || ""}
+                        onChangeValue={(val) =>
+                            setEditorValues(prev => ({
+                                ...prev,
+                                [currentPolicy.id]: val,
+                            }))
+                        }
+                    />
+                </div>
+                {/* <div className="col-span-12"> <RichEditor value={editorValue} onChangeValue={(val) => setEditorValue(val)} /> </div> */}
             </div>
         </div>
     )
