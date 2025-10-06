@@ -31,7 +31,7 @@ const ViewFileDialog = ({ checkoutId, invoiceId, type = 'invoice' }: ViewFileDia
                     <File className="w-4 h-4 text-secondary" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="w-fit h-[calc(100%-3rem)] px-0">
+            <DialogContent className="w-fit h-[calc(100%-3rem)] overflow-y-scroll px-0">
                 <DialogHeader>
                     <DialogTitle></DialogTitle>
                 </DialogHeader>

@@ -43,7 +43,7 @@ export default function ProductImageDialog({
                             alt={productDetails.name}
                             width={600}
                             height={600}
-                            className="object-cover h-full w-full"
+                            className="object-contain h-full w-full"
                             priority
                             unoptimized
                         />
