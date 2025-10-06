@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { CopyCheck, Eye, Loader2, Pencil } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ProductItem } from "@/types/products"
-import Link from "next/link"
 import { useState } from "react"
 import { useEditProduct } from "@/features/products/hook"
 import { Input } from "@/components/ui/input"
@@ -17,6 +16,10 @@ import { stripHtmlRegex } from "@/hooks/simplifyHtml"
 import { Switch } from "@/components/ui/switch"
 import DeleteDialog from "./delete-dialog"
 import { useLocale } from "next-intl"
+import { Link, useRouter } from "@/src/i18n/navigation"
+import { useQueryClient } from "@tanstack/react-query"
+import { getProductById } from "@/features/products/api"
+import { String } from "lodash"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -235,7 +238,8 @@ function SyncToEbay({ product }: { product: ProductItem }) {
                 title: JSON.stringify(product.name),
                 imageUrls: product.static_files?.map(file => file.url) ?? [],
                 ean: product.ean ? [product.ean] : [],
-            }
+            },
+            carrier: product.carrier
         }, {
             onSuccess(data, variables, context) {
                 toast.success("Sync to Ebay successful")
@@ -299,6 +303,9 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
 
 function ActionsCell({ product }: { product: ProductItem }) {
     const locale = useLocale();
+    const router = useRouter();
+    const queryClient = useQueryClient();
+
 
     const categories = product.categories || [];
     const formatName = (name: string) =>
@@ -306,6 +313,19 @@ function ActionsCell({ product }: { product: ProductItem }) {
 
     const level1 = categories.find((c) => c.level === 1);
     const level2 = categories.find((c) => c.level === 2);
+
+    const handleClick = async (id: string) => {
+        try {
+            await queryClient.prefetchQuery({
+                queryKey: ["product", id],
+                queryFn: () => getProductById(id),
+            });
+            router.push(`/admin/products/${id}/edit`, { locale });
+        } catch (err) {
+            console.error("Prefetch failed:", err);
+            router.push(`/admin/products/${id}/edit`, { locale });
+        }
+    }
 
     const categoryHref =
         level1 && level2
@@ -318,11 +338,11 @@ function ActionsCell({ product }: { product: ProductItem }) {
 
     return (
         <div className="flex gap-2">
-            <Link href={`/admin/products/${product.id}/edit`}>
-                <Button variant="ghost" size="icon">
-                    <Pencil className="w-4 h-4 text-primary" />
-                </Button>
-            </Link>
+            {/* <Link href={`/admin/products/${product.id}/edit`}> */}
+            <Button variant="ghost" size="icon" onClick={() => handleClick(product.id)}>
+                <Pencil className="w-4 h-4 text-primary" />
+            </Button>
+            {/* </Link> */}
             <DeleteDialog product={product} />
             <Link
                 href={`/product${categoryHref}`}

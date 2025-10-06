@@ -1,4 +1,3 @@
-// app/[locale]/products/[...slug]/page.tsx
 import { getProductById } from '@/features/products/api'
 import type { Metadata } from 'next'
 import { StaticFile } from '@/types/products'

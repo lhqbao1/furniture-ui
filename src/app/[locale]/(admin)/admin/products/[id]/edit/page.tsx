@@ -9,7 +9,7 @@ import ProductForm from "@/components/layout/admin/products/products-form/add-pr
 import { useLocale } from "next-intl"
 
 const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const { id } = React.use(params) // unwrap Promise
+    const { id } = React.use(params)
     const router = useRouter()
     const locale = useLocale()
     const editProduct = useEditProduct()
