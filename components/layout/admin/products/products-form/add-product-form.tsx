@@ -81,7 +81,6 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
             cost: values.cost || values.cost === 0 ? values.cost : undefined,
-            sku: values.sku?.trim() || undefined,
             final_price: values.final_price ?? values.price ?? undefined,
             price: values.price ?? values.final_price ?? undefined,
             stock: values.stock ?? 1

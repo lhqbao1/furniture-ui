@@ -290,7 +290,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
                                             <div className='text-4xl'>{Math.floor(productDetails.final_price ? productDetails.final_price : productDetails.price)}</div>
                                             <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                                                ,{((productDetails.final_price ? productDetails.final_price : productDetails.price) % 1).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).split(".")[1]}
+                                                ,{((productDetails.final_price ? productDetails.final_price : productDetails.price) % 1).toFixed(2).split(".")[1]}
                                             </div>
                                             <div className="text-base font-semibold text-black">€</div>
                                         </div>

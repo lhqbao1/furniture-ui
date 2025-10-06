@@ -13,37 +13,37 @@ import { FormLabelWithAsterisk } from "@/components/shared/form-label-with-aster
 
 export function ProductPricingFields() {
     const form = useFormContext()
-    const price = form.watch("price") || 0
-    const discountPercent = form.watch("discount_percent") || 0
-    const discountAmount = form.watch("discount_amount") || 0
-    const finalPrice = form.watch("final_price") || 0
+    // const price = form.watch("price") || 0
+    // const discountPercent = form.watch("discount_percent") || 0
+    // const discountAmount = form.watch("discount_amount") || 0
+    // const finalPrice = form.watch("final_price") || 0
 
     const [activeField, setActiveField] = useState<"percent" | "amount" | "final" | null>("percent")
 
-    useEffect(() => {
-        if (!price) {
-            form.setValue("discount_percent", 0)
-            form.setValue("discount_amount", 0)
-            return
-        }
+    // useEffect(() => {
+    //     if (!price) {
+    //         form.setValue("discount_percent", 0)
+    //         form.setValue("discount_amount", 0)
+    //         return
+    //     }
 
-        if (activeField === "percent") {
-            const amount = (price * discountPercent) / 100
-            const final = Math.max(price - amount, 0)
-            form.setValue("discount_amount", parseFloat(amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-            form.setValue("final_price", parseFloat(final.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-        } else if (activeField === "amount") {
-            const percent = price > 0 ? (discountAmount / price) * 100 : 0
-            const final = Math.max(price - discountAmount, 0)
-            form.setValue("discount_percent", parseFloat(percent.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-            form.setValue("final_price", parseFloat(final.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-        } else if (activeField === "final") {
-            const amount = Math.max(price - finalPrice, 0)
-            const percent = price > 0 ? (amount / price) * 100 : 0
-            form.setValue("discount_amount", parseFloat(amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-            form.setValue("discount_percent", parseFloat(percent.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-        }
-    }, [price, discountPercent, discountAmount, finalPrice, activeField])
+    //     if (activeField === "percent") {
+    //         const amount = (price * discountPercent) / 100
+    //         const final = Math.max(price - amount, 0)
+    //         form.setValue("discount_amount", parseFloat(amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+    //         form.setValue("final_price", parseFloat(final.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+    //     } else if (activeField === "amount") {
+    //         const percent = price > 0 ? (discountAmount / price) * 100 : 0
+    //         const final = Math.max(price - discountAmount, 0)
+    //         form.setValue("discount_percent", parseFloat(percent.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+    //         form.setValue("final_price", parseFloat(final.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+    //     } else if (activeField === "final") {
+    //         const amount = Math.max(price - finalPrice, 0)
+    //         const percent = price > 0 ? (amount / price) * 100 : 0
+    //         form.setValue("discount_amount", parseFloat(amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+    //         form.setValue("discount_percent", parseFloat(percent.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+    //     }
+    // }, [price, discountPercent, discountAmount, finalPrice, activeField])
 
     return (
         <div className="grid grid-cols-12 gap-6">
@@ -64,7 +64,6 @@ export function ProductPricingFields() {
                                         min={0}
                                         className="pl-7"
                                         step="0.01"
-                                        inputMode="decimal"
                                         value={field.value ?? ""}
                                         onChange={(e) =>
                                             field.onChange(
@@ -127,23 +126,15 @@ export function ProductPricingFields() {
                                     <Input
                                         {...field}
                                         type="number"
-                                        step="0.01"
-                                        inputMode="decimal"
-                                        value={field.value ?? ""}
-                                        onFocus={() => setActiveField(null)}
-                                        onChange={(e) => {
-                                            const val = e.target.valueAsNumber
-                                            const parsed = isNaN(val) ? 0 : val
-                                            field.onChange(parsed)
-                                            form.setValue("price", parsed, { shouldValidate: true })
-                                        }}
-                                        onBlur={(e) => {
-                                            const val = parseFloat(e.target.value)
-                                            if (!isNaN(val)) {
-                                                form.setValue("price", parseFloat(val.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-                                            }
-                                        }}
+                                        min={0}
                                         className="pl-7"
+                                        step="0.01"
+                                        value={field.value ?? ""}
+                                        onChange={(e) =>
+                                            field.onChange(
+                                                e.target.value === "" ? null : e.target.valueAsNumber
+                                            )
+                                        }
                                     />
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>
@@ -167,26 +158,15 @@ export function ProductPricingFields() {
                                     <Input
                                         {...field}
                                         type="number"
-                                        step="0.01"
-                                        inputMode="decimal"
-                                        value={field.value ?? ""}
-                                        onFocus={() => setActiveField("final")}
-                                        onChange={(e) => {
-                                            let val = e.target.valueAsNumber
-                                            if (isNaN(val)) val = 0
-                                            const p = form.getValues("price") || 0
-                                            // if (val > p) val = p
-                                            if (val < 0) val = 0
-                                            field.onChange(val)
-                                            form.setValue("final_price", val, { shouldValidate: true })
-                                        }}
-                                        onBlur={(e) => {
-                                            const val = parseFloat(e.target.value)
-                                            if (!isNaN(val)) {
-                                                form.setValue("final_price", parseFloat(val.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
-                                            }
-                                        }}
+                                        min={0}
                                         className="pl-7"
+                                        step="0.01"
+                                        value={field.value ?? ""}
+                                        onChange={(e) =>
+                                            field.onChange(
+                                                e.target.value === "" ? null : e.target.valueAsNumber
+                                            )
+                                        }
                                     />
                                     <span className="absolute left-3 text-gray-500">€</span>
                                 </div>

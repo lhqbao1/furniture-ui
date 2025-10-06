@@ -9,6 +9,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarProvider,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import { Button } from "../ui/button"
@@ -16,65 +17,33 @@ import Link from "next/link"
 import { useLocale } from "next-intl"
 import { usePathname, useRouter } from "@/src/i18n/navigation"
 
-export function AdminSideBar() {
+export function DSPAdminSidebar() {
     const router = useRouter()
     const pathname = usePathname()
-    const locale = useLocale()
+    const locale = useLocale() // 👈 lấy locale hiện tại
 
 
     const items = [
         {
             title: "Products",
-            url: "/admin/products",
+            url: "/dsp/admin/products",
             icon: ChevronRight,
             children: [
-                { title: "Add Product", url: "/admin/products/add", icon: CornerDownRight },
-                { title: "Product List", url: "/admin/products/list", icon: CornerDownRight },
-                { title: "Product Group", url: "/admin/products/group", icon: CornerDownRight },
-                { title: "Category List", url: "/admin/products/categories", icon: CornerDownRight },
-                { title: "Brand List", url: "/admin/products/brand", icon: CornerDownRight },
-                { title: "Product Bundle", url: "/admin/products/bundle", icon: CornerDownRight },
+                { title: "Add Product", url: "/dsp/admin/products/add", icon: CornerDownRight },
+                { title: "Product List", url: "/dsp/admin/products/list", icon: CornerDownRight },
+                { title: "Product Group", url: "/dsp/admin/products/group", icon: CornerDownRight },
+                { title: "Category List", url: "/dsp/admin/products/categories", icon: CornerDownRight },
+                { title: "Brand List", url: "/dsp/admin/products/brand", icon: CornerDownRight },
+                { title: "Product Bundle", url: "/dsp/admin/products/bundle", icon: CornerDownRight },
             ],
         },
         {
             title: "Orders",
-            url: "/admin/orders",
+            url: "/dsp/admin/orders",
             icon: ChevronRight,
             children: [
-                { title: "Order List", url: "/admin/orders/list", icon: CornerDownRight },
-                { title: "Create Order", url: "/admin/orders/add", icon: CornerDownRight },
-            ],
-        },
-        {
-            title: "CRM",
-            url: "/admin/crm",
-            icon: ChevronRight,
-            children: [
-                { title: "Customer List", url: "/admin/crm/customers/list", icon: CornerDownRight },
-            ],
-        },
-        {
-            title: "Settings",
-            url: "/admin/settings",
-            icon: ChevronRight,
-            children: [
-                { title: "Policy", url: "/admin/settings/policy", icon: CornerDownRight },
-            ],
-        },
-        {
-            title: "Supplier",
-            url: "/admin/supplier",
-            icon: ChevronRight,
-            children: [
-                { title: "Supplier List", url: "/admin/supplier/list", icon: CornerDownRight },
-            ],
-        },
-        {
-            title: "AMM",
-            url: "/admin/amm",
-            icon: ChevronRight,
-            children: [
-                { title: "We Avis", url: "/admin/amm/we-avis", icon: CornerDownRight },
+                { title: "Order List", url: "/dsp/admin/orders/list", icon: CornerDownRight },
+                { title: "Create Order", url: "/dsp/admin/orders/add", icon: CornerDownRight },
             ],
         },
     ];
@@ -86,7 +55,7 @@ export function AdminSideBar() {
         <Sidebar className="app-sidebar custom-scroll">
             <SidebarContent>
                 <SidebarGroup>
-                    <Link href={`/admin`}>
+                    <Link href={`/dsp/admin`}>
                         <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
                             <Image
                                 src="/new-logo.svg"

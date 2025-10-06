@@ -126,10 +126,12 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                             <FormControl>
                                 <Input
                                     type="number"
-                                    min={0}
+                                    inputMode="decimal"
                                     value={field.value ?? ""}
                                     onChange={(e) =>
-                                        field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
+                                        field.onChange(
+                                            e.target.value === "" ? null : e.target.valueAsNumber
+                                        )
                                     }
                                 />
                             </FormControl>

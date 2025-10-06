@@ -19,7 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCreateSupplier, useEditSupplier } from "@/features/supplier/hook";
 
 type AddOrEditSupplierFormProps = {
-    onSuccess?: (brand: SupplierResponse) => void
+    onSuccess?: (supplier: SupplierResponse) => void
     submitText?: string
     onClose?: () => void
     supplierValues?: SupplierResponse

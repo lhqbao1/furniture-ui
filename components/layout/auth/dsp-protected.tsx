@@ -5,15 +5,15 @@ interface ProtectedProps {
     children: ReactNode
 }
 
-export default function Protected({ children }: ProtectedProps) {
+export default function DSPProtected({ children }: ProtectedProps) {
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
 
     useEffect(() => {
         // check admin token trong localStorage
-        const adminToken = localStorage.getItem("admin_access_token")
+        const adminToken = localStorage.getItem("dsp_access_token")
         if (!adminToken) {
             // không có token → redirect login
-            window.location.href = "/admin-login"
+            window.location.href = "/dsp/login"
         } else {
             setIsAdmin(true)
         }
@@ -21,7 +21,7 @@ export default function Protected({ children }: ProtectedProps) {
 
     if (isAdmin === null) {
         // chưa kiểm tra xong
-        return <div className="p-6">Loading admin...</div>
+        return <div className="p-6">Loading ...</div>
     }
 
     return <>{children}</>

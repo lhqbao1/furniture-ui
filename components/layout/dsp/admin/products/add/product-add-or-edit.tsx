@@ -23,24 +23,24 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { useRouter } from '@/src/i18n/navigation'
 import { useLocale } from 'next-intl'
-import ProductDetailInputs from '../products-form/fisrt-group'
-import ProductAdditionalInputs from '../products-form/product-additional-group'
-import ProductLogisticsGroup from '../products-form/product-logistics-group'
-import ProductSEOGroup from '../products-form/product-seo-group'
-import SelectBundleComponent from './select-bundle'
+import ProductDetailInputs from '@/components/layout/admin/products/products-form/fisrt-group'
+import ProductAdditionalInputs from '@/components/layout/admin/products/products-form/product-additional-group'
+import ProductLogisticsGroup from '@/components/layout/admin/products/products-form/product-logistics-group'
+import ProductSEOGroup from '@/components/layout/admin/products/products-form/product-seo-group'
+import { useAddProductDSP } from '@/features/dsp/products/hook'
 
-interface AddProductFormProps {
+interface AddProductFormDSPProps {
     productValues?: Partial<ProductItem>
     onSubmit: (values: ProductInput) => Promise<void> | void
     isPending?: boolean
     productValuesClone?: Partial<ProductItem>
 }
 
-const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormProps) => {
+const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormDSPProps) => {
     const router = useRouter()
     const locale = useLocale()
     const editProductMutation = useEditProduct()
-    const addProductMutation = useAddProduct()
+    const addProductMutation = useAddProductDSP()
     const [isLoadingSEO, setIsLoadingSEO] = useState(false)
 
     const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
@@ -93,7 +93,7 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
                 onSuccess: () => {
                     toast.success("Product add successfully")
                     form.reset()
-                    router.push("/admin/products/list", { locale })
+                    router.push("/dsp/admin/products/list", { locale })
                 },
                 onError: (error) => {
                     toast.error(
@@ -112,7 +112,7 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
                 {
                     onSuccess: () => {
                         toast.success("Product updated successfully")
-                        router.push("/admin/products/list", { locale })
+                        router.push("/dsp/admin/products/list", { locale })
                         router.refresh()
                     },
                     onError: () => {
@@ -174,17 +174,6 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
                                         </Card>
                                     </AccordionContent>
                                 </AccordionItem>
-                                <AccordionItem value="component">
-                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Bundle</AccordionTrigger>
-                                    <AccordionContent className="mt-2">
-                                        <Card>
-                                            <CardContent>
-                                                <SelectBundleComponent />
-                                                {/* <ProductDetailInputs isEdit={productValues ? true : false} productId={productValues ? productValues.id_provider : null} /> */}
-                                            </CardContent>
-                                        </Card>
-                                    </AccordionContent>
-                                </AccordionItem>
                                 <AccordionItem value="additional">
                                     <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Additional Details</AccordionTrigger>
                                     <AccordionContent className="mt-2">
@@ -221,6 +210,8 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
                         <div className='col-span-3 flex flex-col items-end gap-4 relative'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end top-24 fixed'>
+                                <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.back()}
+                                >Back</Button>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>Discard</Button>
                                 <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (
@@ -242,4 +233,4 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
     )
 }
 
-export default ProductBundleForm
+export default ProductFormDSP

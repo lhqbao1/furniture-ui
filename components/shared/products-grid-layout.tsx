@@ -187,7 +187,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                             <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
                                                 <div className='text-4xl'>{Math.floor(product.final_price ? product.final_price : product.price)}</div>
                                                 <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                                                    ,{((product.final_price ? product.final_price : product.price) % 1).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).split(".")[1]}
+                                                    ,{((product.final_price ? product.final_price : product.price) % 1).toFixed(2).split(".")[1]}
                                                 </div>
                                                 <div className="text-base font-semibold text-black">€</div>
                                             </div>

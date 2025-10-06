@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { SupplierResponse } from "@/types/supplier";
 import DeleteDialog from "./delete-dialog";
+import AddOrEditSupplierForm from "./add-or-edit-form";
 
 
 
@@ -24,9 +25,9 @@ const EditSupplierCell = ({ supplier }: { supplier: SupplierResponse }) => {
             </DialogTrigger>
             <DialogContent className="w-1/3">
                 <DialogHeader>
-                    <DialogTitle>Edit Brand</DialogTitle>
+                    <DialogTitle>Edit Supplier</DialogTitle>
                 </DialogHeader>
-                {/* <AddOrEditBrandForm brandValues={brand} onClose={() => setOpen(false)} /> */}
+                <AddOrEditSupplierForm supplierValues={supplier} onClose={() => setOpen(false)} />
             </DialogContent>
         </Dialog>
     )

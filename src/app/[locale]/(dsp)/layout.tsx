@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
 import "../../globals.css"
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AdminSideBar } from "@/components/shared/admin-sidebar";
-import Protected from "@/components/layout/auth/protected";
+import DSPProtected from "@/components/layout/auth/dsp-protected";
+import { DSPAdminSidebar } from "@/components/shared/dsp-sidebar";
 
-export default function AdminLayout({
+export default function DSPAdminLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <Protected>
+        <DSPProtected>
             <SidebarProvider defaultOpen={true}>
-                <AdminSideBar />
+                <DSPAdminSidebar />
                 <div className="container-padding pt-8 w-full overflow-x-scroll">
                     {children}
                 </div>
             </SidebarProvider>
-        </Protected>
+        </DSPProtected>
     );
 }

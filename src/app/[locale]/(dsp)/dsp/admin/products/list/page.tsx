@@ -4,21 +4,20 @@ import { productColumns } from '@/components/layout/admin/products/products-list
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import TableToolbar from '@/components/layout/admin/products/products-list/toolbar'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
-import { useGetAllProducts } from '@/features/products/hook'
+import { useGetAllProductsDSP } from '@/features/dsp/products/hook'
 import { searchProductQueryStringAtom } from '@/store/product'
 import { useAtom } from 'jotai'
 import React, { useState } from 'react'
 
 
-const ProductList = () => {
+const ProductListDSP = () => {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(50)
     const [searchQuery, setSearchQuery] = useAtom<string>(searchProductQueryStringAtom)
 
-    const { data, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize, all_products: true, search: searchQuery })
+    const { data, isLoading, isError } = useGetAllProductsDSP({ page, page_size: pageSize, all_products: true, search: searchQuery })
 
     if (isError) return <div>No data</div>
-    // if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
 
     return (
         <div className='space-y-12'>
@@ -29,9 +28,8 @@ const ProductList = () => {
                 pageSize={pageSize}
                 setPageSize={setPageSize} // đảm bảo type đúng
                 addButtonText='Add Product'
-                addButtonUrl='/admin/products/add'
+                addButtonUrl='/dsp/admin/products/add'
                 setSearchQuery={setSearchQuery}
-                exportData={data?.items}
             />
             {isLoading ? <ProductTableSkeleton /> :
                 <ProductTable
@@ -49,4 +47,4 @@ const ProductList = () => {
     )
 }
 
-export default ProductList
+export default ProductListDSP

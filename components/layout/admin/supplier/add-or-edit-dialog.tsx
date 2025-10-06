@@ -28,7 +28,7 @@ const AddSupplierDialog = () => {
                 </DialogTrigger>
                 <DialogContent className="w-[600px]">
                     <DialogHeader>
-                        <DialogTitle>Add Brand</DialogTitle>
+                        <DialogTitle>Add Supplier</DialogTitle>
                     </DialogHeader>
                     <AddOrEditSupplierForm onClose={handleClose} />
                 </DialogContent>
