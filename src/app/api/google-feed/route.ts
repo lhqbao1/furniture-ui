@@ -60,8 +60,8 @@ export async function GET() {
     .filter(
       (p) =>
         p.final_price > 0 &&
-        p.is_active &&
-        allowedSkus.includes(p.sku) // lọc theo sku
+        p.is_active 
+        && allowedSkus.includes(p.sku) // lọc theo sku
     )
     .map((p) => {
         const categories = p.categories || [];
@@ -100,6 +100,7 @@ export async function GET() {
     <g:service>Standard</g:service>
     <g:price>5.95 EUR</g:price>
   </g:shipping>
+  <g:shipping_label>${p.carrier === 'dpd' ? "DPD": "AMM"}</g:shipping_label>
 </item>`;
       })
       .join("\n");
