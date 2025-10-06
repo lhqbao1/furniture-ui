@@ -1,11 +1,7 @@
 'use client'
 import CustomBreadCrumb from '@/components/shared/breadcrumb'
 import ProductsGridLayout from '@/components/shared/products-grid-layout'
-import { SlidersHorizontal } from 'lucide-react'
-import { useParams, usePathname } from 'next/navigation'
 import React, { useState } from 'react'
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
-import FilterSection from '@/components/layout/single-product/filter-section'
 import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
 import { CustomPagination } from '@/components/shared/custom-pagination'
 import { useAtom } from 'jotai'

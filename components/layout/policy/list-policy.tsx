@@ -127,7 +127,6 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                                     <div className='pr-6 cursor-pointer font-bold'>{item.name}</div>
                                 </AccordionTrigger>
                                 {item.name === "Impressum" ? '' : (
-
                                     <AccordionContent className="flex flex-col gap-1.5 text-balance">
                                         {item.child_legal_policies.map((child, policyItemIndex) => (
                                             <div
