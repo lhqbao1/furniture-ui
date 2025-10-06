@@ -97,6 +97,13 @@ export type StaticFile = {
     meta_keywords: string
     ebay_offer_id: string
 
+    weee_nr: string,
+    eek: string,
+    gpsr_info: string
+    technical_description: string
+    return_cost: number
+
+
     delivery_cost: number
     weight: number
     length: number
