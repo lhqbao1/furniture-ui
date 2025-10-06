@@ -21,7 +21,7 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
   {
     accessorKey: "price",
     header: () => <div className="text-right">Unit price</div>,
-    cell: ({ row }) => <div className="text-right">€{row.original.final_price.toFixed(2)}</div>,
+    cell: ({ row }) => <div className="text-right">€{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>,
   },
   {
     accessorKey: "qty",
@@ -40,7 +40,7 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
     id: "amount",
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
-      return <div className="text-right">€{row.original.final_price.toFixed(2)}</div>
+      return <div className="text-right">€{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
     },
   },
 ]

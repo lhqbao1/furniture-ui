@@ -120,7 +120,7 @@ export const GetWishlistColumns = ({
             accessorKey: "item_price",
             size: 100,
             header: () => <div className="text-right">{t('price')}</div>,
-            cell: ({ row }) => <div className="font-semibold text-right">€{row.original.item_price.toFixed(2)}</div>,
+            cell: ({ row }) => <div className="font-semibold text-right">€{row.original.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>,
         },
         {
             accessorKey: "total",
@@ -128,7 +128,7 @@ export const GetWishlistColumns = ({
             cell: ({ row }) => {
                 const item = row.original
                 const quantity = localQuantities[item.id] ?? item.quantity
-                return <div className="font-semibold text-primary text-right">€{(item.item_price * quantity).toFixed(2)}</div>
+                return <div className="font-semibold text-primary text-right">€{(item.item_price * quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             },
         },
         {

@@ -54,7 +54,7 @@ export default function CartItemSelector({ field }: CartItemSelectorProps) {
                                 />
                                 <button onClick={() => updateItem(item.id, item.quantity + 1)} className="px-2 py-1 border rounded text-sm">➕</button>
                             </div>
-                            <div className="text-sm">€{total.toFixed(2)}</div>
+                            <div className="text-sm">€{total.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                         </div>
 
                         <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700 text-xl col-span-2">🗑️</button>

@@ -5,6 +5,8 @@ import { ProductTable } from '@/components/layout/admin/products/products-list/p
 import TableToolbar from '@/components/layout/admin/products/products-list/toolbar'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetAllProducts } from '@/features/products/hook'
+import { searchProductQueryStringAtom } from '@/store/product'
+import { useAtom } from 'jotai'
 import { Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
@@ -12,7 +14,7 @@ import React, { useState } from 'react'
 const ProductList = () => {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(50)
-    const [searchQuery, setSearchQuery] = useState<string>('')
+    const [searchQuery, setSearchQuery] = useAtom<string>(searchProductQueryStringAtom)
 
     const { data, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize, all_products: true, search: searchQuery })
 

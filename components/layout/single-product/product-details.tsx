@@ -283,20 +283,20 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         </div>
                                     </div>
                                     {/* <div className='flex gap-2'>
-                                        <p className='text-primary lg:text-3xl text-xl font-semibold'>{productDetails.final_price ? <>€{productDetails.final_price.toFixed(2)}</> : ''}</p>
-                                        <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>{productDetails.price ? <>€{productDetails.price.toFixed(2)}</> : ''}</p>
+                                        <p className='text-primary lg:text-3xl text-xl font-semibold'>{productDetails.final_price ? <>€{productDetails.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</> : ''}</p>
+                                        <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>{productDetails.price ? <>€{productDetails.price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</> : ''}</p>
                                     </div> */}
                                     <div className='space-y-2'>
                                         <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
                                             <div className='text-4xl'>{Math.floor(productDetails.final_price ? productDetails.final_price : productDetails.price)}</div>
                                             <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                                                .{((productDetails.final_price ? productDetails.final_price : productDetails.price) % 1).toFixed(2).split(".")[1]}
+                                                ,{((productDetails.final_price ? productDetails.final_price : productDetails.price) % 1).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).split(".")[1]}
                                             </div>
                                             <div className="text-base font-semibold text-black">€</div>
                                         </div>
 
                                         <p className='text-base mb-1'>
-                                            Vorher: €{(productDetails.price ? productDetails.price : productDetails.final_price).toFixed(2)}
+                                            Vorher: €{(productDetails.price ? productDetails.price : productDetails.final_price).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
                                     </div>
 

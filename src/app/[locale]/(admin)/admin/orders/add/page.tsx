@@ -469,7 +469,7 @@ export default function CreateCheckoutpage() {
                                                         (total, item) => total + (item.item_price ?? 0) * (item.quantity ?? 1),
                                                         0
                                                     )) ?? 0
-                                        ).toFixed(2)}
+                                        ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </span>
                                 </div>
                                 <div className='grid grid-cols-5'>
@@ -498,7 +498,7 @@ export default function CreateCheckoutpage() {
                                                 shippingCost -
                                                 (couponAmount ?? 0) -
                                                 (voucherAmount ?? 0)
-                                            ).toFixed(2)
+                                            ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                         }
 
                                     </span>
@@ -515,13 +515,13 @@ export default function CreateCheckoutpage() {
                         </div>
                     </div>
                 </div>
+
                 <OtpDialog
                     open={openOtpDialog}
                     onOpenChange={setOpenOTPDialog}
                     email={otpEmail}
                     onSuccess={handleOtpSuccess}
                 />
-
 
                 <BankDialog
                     open={openBankDialog}

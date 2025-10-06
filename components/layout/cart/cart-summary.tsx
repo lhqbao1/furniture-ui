@@ -36,7 +36,7 @@ const CartSummary = ({ total = 0, onApplyCoupon, onCheckout, cart }: CartSummary
                 <div className="xl:py-7 py-3 border-t border-b space-y-4">
                     <div className="flex justify-between text-base font-semibold items-center">
                         <span>{t('total')}</span>
-                        <span className="text-primary text-xl font-bold">€{total.toFixed(2)}</span>
+                        <span className="text-primary text-xl font-bold">€{total.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     <Button
                         className="w-full bg-primary py-5 cursor-pointer"

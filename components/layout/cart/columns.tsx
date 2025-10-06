@@ -82,9 +82,8 @@ export const GetCartColumns = ({
 
                             {/* Hàng 2 */}
                             <div className="flex justify-end items-center text-sm gap-6">
-                                {/* <span>€{item.item_price.toFixed(2)}</span> */}
                                 <span className="font-semibold">
-                                    €{(item.item_price * quantity).toFixed(2)}
+                                    €{(item.item_price * quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <Button
@@ -162,7 +161,7 @@ export const GetCartColumns = ({
             header: () => <div className="text-right">{t("price")}</div>,
             cell: ({ row }) => (
                 <div className="font-semibold text-right">
-                    €{row.original.item_price.toFixed(2)}
+                    €{row.original.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
             ),
         },
@@ -204,7 +203,7 @@ export const GetCartColumns = ({
                 const quantity = localQuantities[item.id] ?? item.quantity
                 return (
                     <div className="font-semibold text-right">
-                        €{(item.item_price * quantity).toFixed(2)}
+                        €{(item.item_price * quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                 )
             },

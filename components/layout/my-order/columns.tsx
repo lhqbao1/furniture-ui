@@ -26,7 +26,7 @@ export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
             accessorKey: "product_price",
             header: () => <div className="text-right">{t("total")}</div>,
             cell: ({ row }) => (
-                <div className="text-right">€{(row.original.item_price * row.original.quantity).toFixed(2)}</div>
+                <div className="text-right">€{(row.original.item_price * row.original.quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             ),
         },
     ]

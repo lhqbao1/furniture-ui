@@ -11,7 +11,7 @@ const ProductLogisticsGroup = () => {
         { id: "amm", logo: "/amm.jpeg" },
         { id: "dpd", logo: "/dpd.jpeg" },
     ]
-    const deliveryTimes = ["1-3", "3-5", "5-8", "5-14", "8-14", "14-20"]
+    const deliveryTimes = ["1-3", "3-5", "5-8", "8-14", "14-20"]
 
     return (
         <div className='space-y-6'>
@@ -70,7 +70,7 @@ const ProductLogisticsGroup = () => {
                                     <SelectContent>
                                         {deliveryTimes.map((t) => (
                                             <SelectItem key={t} value={t}>
-                                                {t}
+                                                {t} business days
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

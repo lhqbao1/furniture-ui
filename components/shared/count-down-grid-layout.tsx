@@ -168,7 +168,7 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                                                     product.final_price +
                                                     ((100 - barWidth) / 100) *
                                                     (product.price - product.final_price)
-                                                ).toFixed(2)}
+                                                ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
 
                                             </p>
                                             <div className='absolute left-1/2 -bottom-3 w-0 h-0 border-l-16 border-l-transparent border-r-16 border-r-transparent border-t-16 border-t-primary -translate-x-1/2'></div>
@@ -186,8 +186,8 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                                             product.final_price +
                                             ((100 - barWidth) / 100) *
                                             (product.price - product.final_price)
-                                        ).toFixed(2)} */}
-                                        €{product.price.toFixed(2)}
+                                        ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
+                                        €{product.price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </p>
                                 </div>
                             </div>

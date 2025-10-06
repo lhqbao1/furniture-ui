@@ -21,12 +21,13 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Card, CardContent } from '@/components/ui/card'
-import ProductDetailInputs from './fisrt-group'
-import ProductAdditionalInputs from './product-additional-group'
-import ProductLogisticsGroup from './product-logistics-group'
-import ProductSEOGroup from './product-seo-group'
 import { useRouter } from '@/src/i18n/navigation'
 import { useLocale } from 'next-intl'
+import ProductDetailInputs from '../products-form/fisrt-group'
+import ProductAdditionalInputs from '../products-form/product-additional-group'
+import ProductLogisticsGroup from '../products-form/product-logistics-group'
+import ProductSEOGroup from '../products-form/product-seo-group'
+import SelectBundleComponent from './select-bundle'
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -35,7 +36,7 @@ interface AddProductFormProps {
     productValuesClone?: Partial<ProductItem>
 }
 
-const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormProps) => {
+const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormProps) => {
     const router = useRouter()
     const locale = useLocale()
     const editProductMutation = useEditProduct()
@@ -174,6 +175,17 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                         </Card>
                                     </AccordionContent>
                                 </AccordionItem>
+                                <AccordionItem value="component">
+                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Bundle</AccordionTrigger>
+                                    <AccordionContent className="mt-2">
+                                        <Card>
+                                            <CardContent>
+                                                <SelectBundleComponent />
+                                                {/* <ProductDetailInputs isEdit={productValues ? true : false} productId={productValues ? productValues.id_provider : null} /> */}
+                                            </CardContent>
+                                        </Card>
+                                    </AccordionContent>
+                                </AccordionItem>
                                 <AccordionItem value="additional">
                                     <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Additional Details</AccordionTrigger>
                                     <AccordionContent className="mt-2">
@@ -210,8 +222,6 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                         <div className='col-span-3 flex flex-col items-end gap-4 relative'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end top-24 fixed'>
-                                <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.back()}
-                                >Back</Button>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>Discard</Button>
                                 <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (
@@ -233,4 +243,4 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
     )
 }
 
-export default ProductForm
+export default ProductBundleForm

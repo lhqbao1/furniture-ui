@@ -41,7 +41,7 @@ export const paymentColumns: ColumnDef<Payment>[] = [
     {
         accessorKey: "amount",
         header: () => <div className="text-right font-bold">Amount</div>,
-        cell: ({ row }) => <div className="text-right">€{row.original.amount.toFixed(2)}</div>,
+        cell: ({ row }) => <div className="text-right">€{row.original.amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>,
     },
     {
         accessorKey: "received_on",

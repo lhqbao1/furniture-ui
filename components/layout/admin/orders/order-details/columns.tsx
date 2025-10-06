@@ -42,7 +42,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
         cell: ({ row }) => {
             const netPrice = row.original.price_whithout_tax / row.original.quantity
             return (
-                <div className="text-right">€{netPrice.toFixed(2)}</div>
+                <div className="text-right">€{netPrice.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             )
         }
     },
@@ -53,7 +53,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-right">€{row.original.item_price.toFixed(2)}</div>
+                <div className="text-right">€{row.original.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             )
         }
     },
@@ -65,7 +65,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
             const discount = final_price
                 ? ((final_price - cost) / final_price) * 100
                 : 0;
-            return <div className="text-right">{discount_percent?.toFixed(2)}%</div>;
+            return <div className="text-right">{discount_percent?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</div>;
         },
     },
     {
@@ -75,7 +75,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-right">€{row.original.final_price.toFixed(2)}</div>
+                <div className="text-right">€{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             )
         }
     },
@@ -86,7 +86,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-right">€{row.original.price_whithout_tax.toFixed(2)}</div>
+                <div className="text-right">€{row.original.price_whithout_tax.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             )
         }
     },
@@ -97,7 +97,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-right">€{row.original.final_price.toFixed(2)}</div>
+                <div className="text-right">€{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             )
         }
     },

@@ -190,7 +190,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex gap-1 items-center justify-end">
-                    <div className={`${row.original.total_amount < 0 ? 'text-red-500' : 'text-[#4D4D4D]'}`}>€{row.original.total_amount.toFixed(2)}</div>
+                    <div className={`${row.original.total_amount < 0 ? 'text-red-500' : 'text-[#4D4D4D]'}`}>€{row.original.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     {row.original.status === "Pending" ? "" : <ViewFileDialog checkoutId={row.original.id} type="invoice" />}
                 </div>
             )

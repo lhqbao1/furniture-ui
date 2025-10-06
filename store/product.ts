@@ -44,3 +44,5 @@ export const productFiltersAtom = atom<ProductFilters>({
   channels: [],
   myFilter: "",
 })
+
+export const searchProductQueryStringAtom = atom<string>('')

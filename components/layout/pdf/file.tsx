@@ -113,10 +113,10 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                 <Text>{item.products.name}</Text>
                                 <Text style={{ marginTop: 5, textAlign: 'left' }}>{item.products.id_provider}</Text>
                             </Text>
-                            <Text style={{ flex: 1, paddingRight: 15, textAlign: 'right' }}>€{item.item_price.toFixed(2)}</Text>
+                            <Text style={{ flex: 1, paddingRight: 15, textAlign: 'right' }}>€{item.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                             <Text style={styles.tableColQuantity}>{item.quantity}</Text>
                             <Text style={styles.tableCol}>19%</Text>
-                            <Text style={styles.tableCol}>€{item.final_price.toFixed(2)}</Text>
+                            <Text style={styles.tableCol}>€{item.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
                     ))}
                 </View>
@@ -127,35 +127,35 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                         <View style={styles.flexEndTotal}>
                             <Text style={styles.gapY10}>Gesamt Netto</Text>
                             <Text style={styles.minWidth}>
-                                €{((invoice?.total_amount_item ?? 0) - (invoice?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toFixed(2)}
+                                €{((invoice?.total_amount_item ?? 0) - (invoice?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </Text>
                         </View>
 
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <Text style={styles.gapY10}>zzgl. MwSt</Text>
-                            <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>€{invoice?.total_vat.toFixed(2)}</Text>
+                            <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>€{invoice?.total_vat.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
 
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <Text style={styles.gapY10}>Versandkosten</Text>
-                            <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', textAlign: 'right' }}>€{invoice?.total_shipping.toFixed(2)}</Text>
+                            <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', textAlign: 'right' }}>€{invoice?.total_shipping.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
 
                         <View style={styles.flexEndTotalBg}>
                             <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Rechnungsbetrag</Text>
-                            <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
+                            <Text style={styles.minWidth}>€{invoice?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
 
                         <View style={styles.flexEndTotal}>
                             <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Zahlbetrag</Text>
-                            <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
+                            <Text style={styles.minWidth}>€{invoice?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
 
                         <View style={styles.flexEndTotal}>
                             <Text style={styles.gapY10}>Zahlung vom {invoice?.created_at
                                 ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
                                 : ""}:</Text>
-                            <Text style={styles.minWidth}>€{invoice?.total_amount.toFixed(2)}</Text>
+                            <Text style={styles.minWidth}>€{invoice?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
 
                         <View style={styles.flexEndTotal}>
