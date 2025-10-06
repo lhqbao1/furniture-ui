@@ -121,19 +121,19 @@ const OrderInformation = ({
                 <div className='grid grid-cols-2'>
                     <div className='text-end col-span-1'>Sub total</div>
                     <div className='text-end'>
-                        €{sub_total?.toFixed(2)}
+                        €{sub_total?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                 </div>
                 <div className='grid grid-cols-2'>
                     <div className='text-end'>Shipping</div>
                     <div className='text-end'>
-                        €{shipping_amount?.toFixed(2)}
+                        €{shipping_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                 </div>
                 <div className='grid grid-cols-2'>
                     <div className='text-end'>Discount</div>
                     <div className='text-end'>
-                        €{discount_amount?.toFixed(2)}
+                        €{discount_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                 </div>
                 <div className='grid grid-cols-2'>
@@ -143,7 +143,7 @@ const OrderInformation = ({
                     </div>
                 </div>
                 <div className='text-end text-2xl text-primary font-bold'>
-                    <div className=''>Total €{total_amount?.toFixed(2)}</div>
+                    <div className=''>Total €{total_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div>
             </div>
         </div>

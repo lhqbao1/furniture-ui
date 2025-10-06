@@ -88,7 +88,7 @@ export function FileTable<TData, TValue>({
                                 <TableCell className="text-start"></TableCell>
                                 <TableCell className="text-center pr-6"></TableCell>
                                 <TableCell className="text-right"></TableCell>
-                                <TableCell className="text-end">€{coupon ? coupon?.toFixed(2) : DEFAULT_SALE.toFixed(2)}</TableCell>
+                                <TableCell className="text-end">€{coupon ? coupon?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : DEFAULT_SALE.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell className="text-start">{table.getRowModel().rows?.length + 2}</TableCell>
@@ -96,7 +96,7 @@ export function FileTable<TData, TValue>({
                                 <TableCell className="text-start"></TableCell>
                                 <TableCell className="text-center pr-6"></TableCell>
                                 <TableCell className="text-right"></TableCell>
-                                <TableCell className="text-end">€{voucher ? voucher.toFixed(2) : DEFAULT_SALE.toFixed(2)}</TableCell>
+                                <TableCell className="text-end">€{voucher ? voucher.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : DEFAULT_SALE.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                             </TableRow>
                         </>
                     ) : (

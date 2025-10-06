@@ -76,7 +76,7 @@ export function MyOrderDataTable<TData, TValue>({
                                     colSpan={columns.length}
                                     className="border-t pt-2 text-right font-semibold"
                                 >
-                                    <div className="text-primary text-lg">{t('total')}: {(orderData.total_amount).toFixed(2)}</div>
+                                    <div className="text-primary text-lg">{t('total')}: {(orderData.total_amount).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                 </TableCell>
                             </TableRow>
                         </>

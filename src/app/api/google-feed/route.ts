@@ -65,16 +65,7 @@ export async function GET() {
     )
     .map((p) => {
         const categories = p.categories || [];
-        const level1 = categories.find(c => c.level === 1)
-                    const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
-
-                    const categoryHref = level1 && level2
-                        ? `/${formatName(level1.name)}/${formatName(level2.name)}/${p.id}`
-                        : level1
-                            ? `/${formatName(level1.name)}/${p.id}`
-                            : level2
-                                ? `/${formatName(level2.name)}/${p.id}`
-                                : `/${p.id}`
+       
 
         const colors = p.options
           .filter((opt) => opt.variant_name?.toLowerCase() === "color")
@@ -86,7 +77,7 @@ export async function GET() {
   <g:id>${escapeXml(p.id_provider)}</g:id>
   <g:title><![CDATA[${escapeCDATA(p.name.trim())}]]></g:title>
   <g:description><![CDATA[${escapeCDATA(cleanDescription(p.description))}]]></g:description>
-<g:link>${escapeXml(encodeURI(`https://prestige-home.de/product${categoryHref}`))}</g:link>
+<g:link>${escapeXml(encodeURI(`https://prestige-home.de/product${p.categories && p.categories.length > 0 ? `/${p.categories[0].slug}` : ''}/${p.id}`))}</g:link>
 <g:image_link>${escapeXml(encodeURI(cleanImageLink(p.static_files[0]?.url)))}</g:image_link>
   <g:availability>${p.stock > 0 ? "in_stock" : "out_of_stock"}</g:availability>
   <g:price>${p.final_price.toFixed(2)} EUR</g:price>
@@ -98,7 +89,7 @@ export async function GET() {
   <g:shipping>
     <g:country>DE</g:country>
     <g:service>Standard</g:service>
-    <g:price>5.95 EUR</g:price>
+    <g:price>${p.carrier === "dpd" ? "5.95 EUR" : "35.95 EUR"}</g:price>
   </g:shipping>
   <g:shipping_label>${p.carrier === 'dpd' ? "DPD": "AMM"}</g:shipping_label>
 </item>`;

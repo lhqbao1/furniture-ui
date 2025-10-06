@@ -30,18 +30,18 @@ export function ProductPricingFields() {
         if (activeField === "percent") {
             const amount = (price * discountPercent) / 100
             const final = Math.max(price - amount, 0)
-            form.setValue("discount_amount", parseFloat(amount.toFixed(2)))
-            form.setValue("final_price", parseFloat(final.toFixed(2)))
+            form.setValue("discount_amount", parseFloat(amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+            form.setValue("final_price", parseFloat(final.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
         } else if (activeField === "amount") {
             const percent = price > 0 ? (discountAmount / price) * 100 : 0
             const final = Math.max(price - discountAmount, 0)
-            form.setValue("discount_percent", parseFloat(percent.toFixed(2)))
-            form.setValue("final_price", parseFloat(final.toFixed(2)))
+            form.setValue("discount_percent", parseFloat(percent.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+            form.setValue("final_price", parseFloat(final.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
         } else if (activeField === "final") {
             const amount = Math.max(price - finalPrice, 0)
             const percent = price > 0 ? (amount / price) * 100 : 0
-            form.setValue("discount_amount", parseFloat(amount.toFixed(2)))
-            form.setValue("discount_percent", parseFloat(percent.toFixed(2)))
+            form.setValue("discount_amount", parseFloat(amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
+            form.setValue("discount_percent", parseFloat(percent.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
         }
     }, [price, discountPercent, discountAmount, finalPrice, activeField])
 
@@ -140,7 +140,7 @@ export function ProductPricingFields() {
                                         onBlur={(e) => {
                                             const val = parseFloat(e.target.value)
                                             if (!isNaN(val)) {
-                                                form.setValue("price", parseFloat(val.toFixed(2)))
+                                                form.setValue("price", parseFloat(val.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
                                             }
                                         }}
                                         className="pl-7"
@@ -183,7 +183,7 @@ export function ProductPricingFields() {
                                         onBlur={(e) => {
                                             const val = parseFloat(e.target.value)
                                             if (!isNaN(val)) {
-                                                form.setValue("final_price", parseFloat(val.toFixed(2)))
+                                                form.setValue("final_price", parseFloat(val.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })))
                                             }
                                         }}
                                         className="pl-7"

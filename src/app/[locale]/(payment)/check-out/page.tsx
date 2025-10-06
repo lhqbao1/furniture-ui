@@ -587,12 +587,12 @@ export default function CheckOutPage() {
                                                         (total, item) => total + (item.item_price ?? 0) * (item.quantity ?? 1),
                                                         0
                                                     )) ?? 0
-                                        ).toFixed(2)}
+                                        ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </span>
                                 </div>
                                 <div className='grid grid-cols-5'>
                                     <span className='col-span-3 text-right'>{hasOtherCarrier ? t('shippingSpedition') : t('shipping')}</span>
-                                    <span className='text-right col-span-2'>€{shippingCost}</span>
+                                    <span className='text-right col-span-2'>€{shippingCost.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className='grid grid-cols-5'>
                                     <span className='col-span-3 text-right'>{t('discount')}</span>
@@ -616,7 +616,7 @@ export default function CheckOutPage() {
                                                 shippingCost -
                                                 (couponAmount ?? 0) -
                                                 (voucherAmount ?? 0)
-                                            ).toFixed(2)
+                                            ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                         }
 
                                     </span>

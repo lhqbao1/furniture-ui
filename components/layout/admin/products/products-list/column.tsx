@@ -19,7 +19,6 @@ import { useLocale } from "next-intl"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { getProductById } from "@/features/products/api"
-import { String } from "lodash"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)

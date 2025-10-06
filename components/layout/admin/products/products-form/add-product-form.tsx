@@ -210,6 +210,8 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                         <div className='col-span-3 flex flex-col items-end gap-4 relative'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end top-24 fixed'>
+                                <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.back()}
+                                >Back</Button>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>Discard</Button>
                                 <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (

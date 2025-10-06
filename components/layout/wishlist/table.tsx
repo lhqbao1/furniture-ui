@@ -200,7 +200,7 @@ const WishlistTable = ({ wishlist, isLoadingWishlist, isCheckout = false, localQ
                     <div className="xl:col-span-5 col-span-12 flex gap-6 xl:justify-end justify-center">
                         <div className="text-right text-xl">
                             <p className="font-semibold">
-                                {t('total')} ({wishlist?.items.length} {t('items')}) <span className="font-bold">€{total.toFixed(2)}</span>
+                                {t('total')} ({wishlist?.items.length} {t('items')}) <span className="font-bold">€{total.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </p>
                         </div>
                         <Button className="bg-primary/90 hover:bg-primary cursor-pointer text-white rounded-full px-10 py-2 relative" onClick={() => handleAddWishlistToCart(wishlist?.id ?? '')}>

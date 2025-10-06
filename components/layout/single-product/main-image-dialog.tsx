@@ -9,6 +9,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { ProductItem } from "@/types/products"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface ProductImageDialogProps {
     productDetails: ProductItem
@@ -33,7 +34,7 @@ export default function ProductImageDialog({
                 <DialogTitle className="hidden"></DialogTitle>
                 <div className="grid grid-cols-12 gap-6 h-full">
                     {/* Cột 8: main image (không scroll, chỉ theo ảnh) */}
-                    <div className="col-span-12 lg:col-span-8 flex items-center justify-center lg:max-h-[85vh] max-h-[40vh]">
+                    <div className="col-span-12 lg:col-span-8 flex items-center justify-center lg:max-h-[85vh] max-h-[40vh] relative">
                         <Image
                             src={
                                 productDetails.static_files.length > 0
@@ -47,6 +48,17 @@ export default function ProductImageDialog({
                             priority
                             unoptimized
                         />
+
+                        <div className="absolute right-0 top-1/2 rounded-full border border-secondary p-2 cursor-pointer hover:bg-secondary hover:text-white"
+                            onClick={() => setMainImageIndex(mainImageIndex < productDetails.static_files.length - 1 ? mainImageIndex + 1 : 0)}
+                        >
+                            <ChevronRight />
+                        </div>
+                        <div className="absolute left-0 top-1/2 rounded-full border border-secondary p-2 cursor-pointer hover:bg-secondary hover:text-white"
+                            onClick={() => setMainImageIndex(mainImageIndex === 0 ? productDetails.static_files.length - 1 : mainImageIndex - 1)}
+                        >
+                            <ChevronLeft />
+                        </div>
                     </div>
 
                     {/* Cột 4: thumbnails + name (scroll riêng) */}

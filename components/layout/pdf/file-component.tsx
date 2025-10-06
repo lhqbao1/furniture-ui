@@ -64,31 +64,28 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                     <div>Total net amount</div>
                     <div>
                         €{
-                            ((invoice?.total_amount_item ?? 0)
-                                - (invoice?.total_vat ?? 0)
-                                - (invoice?.voucher_amount ?? 0)
-                                - (invoice?.coupon_amount ?? 0)).toFixed(2)
+                            (invoice?.total_amount_item)?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                         }
                     </div>
                 </div>
                 <div className="flex gap-3 justify-end">
-                    <div>Total VAT </div>
-                    <div>€{invoice?.total_vat.toFixed(2)}</div>
+                    <div>Total VAT</div>
+                    <div>€{invoice?.total_vat.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Shipping cost</div>
-                    <div>€{invoice?.total_shipping.toFixed(2)}</div>
+                    <div>€{invoice?.total_shipping.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div><div className="flex gap-3 justify-end bg-secondary/20 p-2 rounded-sm">
                     <div className="font-bold">Invoice amount</div>
-                    <div>€{invoice?.total_amount.toFixed(2)}</div>
+                    <div>€{invoice?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div className="font-bold">Amount Due</div>
-                    <div>€{invoice?.total_amount.toFixed(2)}</div>
+                    <div>€{invoice?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Payment {invoice?.created_at
                         ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
                         : ""}
                     </div>
-                    <div>€{invoice?.total_amount.toFixed(2)}</div>
+                    <div>€{invoice?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div><div className="flex gap-3 justify-end">
                     <div>Open Amount</div>
                     <div>€00.00</div>
