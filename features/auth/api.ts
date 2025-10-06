@@ -127,6 +127,38 @@ export async function loginAdmin(username: string) {
   return data;
 }
 
+export async function sendOtpDSP(email: string) {
+  const { data } = await apiPublic.post(
+    "/supplier/login",
+    { email },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    }
+  );
+  return data;
+}
+
+export async function loginOtpDSP(email: string, code: string) {
+  const body = new URLSearchParams()
+  body.append('email', email)
+  body.append('code', code)
+
+  const { data } = await apiPublic.post(
+    '/supplier/check-otp',
+    body,
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    }
+  )
+
+  return data as { access_token: string, token_type: string,id: string,  email: string }
+}
+
 export async function resetPassword(email: string, code: string, new_password: string) {
   const { data } = await apiPublic.post(
     "/reset-password",

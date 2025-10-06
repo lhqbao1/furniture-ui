@@ -55,6 +55,7 @@
     "dompurify": "^3.2.6",
     "drawer": "^0.0.2",
     "embla-carousel-react": "^8.6.0",
+    "file-saver": "^2.0.5",
     "googleapis": "^159.0.0",
     "gsap": "^3.13.0",
     "isomorphic-dompurify": "^2.26.0",
@@ -86,11 +87,13 @@
     "uuid": "^12.0.0",
     "vaul": "^1.1.2",
     "world-countries": "^5.1.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/file-saver": "^2.0.7",
     "@types/jsdom": "^21.1.7",
     "@types/lodash": "^4.17.20",
     "@types/node": "^20",

@@ -59,7 +59,7 @@ export async function getProductsFeed() {
 
 export async function getProductById(id: string) {
   const {data} = await apiPublic.get(
-      `/products/${id}`,
+      `/products/details/${id}`,
   )
   return data as ProductItem 
 }

@@ -173,10 +173,13 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
             <div className="text-center w-full">CARRIER</div>
         ),
         cell: ({ row }) => {
+            const shippingCost = row.original.total_shipping
             return (
                 <div className="w-full flex justify-center">
                     <div className="h-20 w-20 relative">
-                        <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />
+                        {shippingCost === 5.95 ?
+                            <Image src={'/dpd.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />
+                            : <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />}
                     </div>
                 </div>
             )

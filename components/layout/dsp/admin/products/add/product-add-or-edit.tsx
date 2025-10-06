@@ -21,25 +21,26 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Card, CardContent } from '@/components/ui/card'
-import ProductDetailInputs from './fisrt-group'
-import ProductAdditionalInputs from './product-additional-group'
-import ProductLogisticsGroup from './product-logistics-group'
-import ProductSEOGroup from './product-seo-group'
 import { useRouter } from '@/src/i18n/navigation'
 import { useLocale } from 'next-intl'
+import ProductDetailInputs from '@/components/layout/admin/products/products-form/fisrt-group'
+import ProductAdditionalInputs from '@/components/layout/admin/products/products-form/product-additional-group'
+import ProductLogisticsGroup from '@/components/layout/admin/products/products-form/product-logistics-group'
+import ProductSEOGroup from '@/components/layout/admin/products/products-form/product-seo-group'
+import { useAddProductDSP } from '@/features/dsp/products/hook'
 
-interface AddProductFormProps {
+interface AddProductFormDSPProps {
     productValues?: Partial<ProductItem>
     onSubmit: (values: ProductInput) => Promise<void> | void
     isPending?: boolean
     productValuesClone?: Partial<ProductItem>
 }
 
-const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormProps) => {
+const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone }: AddProductFormDSPProps) => {
     const router = useRouter()
     const locale = useLocale()
     const editProductMutation = useEditProduct()
-    const addProductMutation = useAddProduct()
+    const addProductMutation = useAddProductDSP()
     const [isLoadingSEO, setIsLoadingSEO] = useState(false)
 
     const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
@@ -92,7 +93,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                 onSuccess: () => {
                     toast.success("Product add successfully")
                     form.reset()
-                    router.push("/admin/products/list", { locale })
+                    router.push("/dsp/admin/products/list", { locale })
                 },
                 onError: (error) => {
                     toast.error(
@@ -111,7 +112,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                 {
                     onSuccess: () => {
                         toast.success("Product updated successfully")
-                        router.push("/admin/products/list", { locale })
+                        router.push("/dsp/admin/products/list", { locale })
                         router.refresh()
                     },
                     onError: () => {
@@ -232,4 +233,4 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
     )
 }
 
-export default ProductForm
+export default ProductFormDSP

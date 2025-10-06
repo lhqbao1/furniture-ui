@@ -28,6 +28,8 @@ import FilterForm from "./toolbar/filter"
 import ImportDialog from "./toolbar/import"
 import { useRouter } from "@/src/i18n/navigation"
 import { useLocale } from "next-intl"
+import { ProductItem } from "@/types/products"
+import ExportExcelButton from "./toolbar/export-button"
 
 interface TableToolbarProps {
     searchQuery?: string
@@ -38,6 +40,7 @@ interface TableToolbarProps {
     isAddButtonModal?: boolean
     addButtonUrl?: string
     addButtonModalContent?: React.ReactNode
+    exportData?: ProductItem[]
 }
 
 export default function TableToolbar({
@@ -48,7 +51,8 @@ export default function TableToolbar({
     addButtonText,
     isAddButtonModal,
     addButtonUrl,
-    addButtonModalContent
+    addButtonModalContent,
+    exportData
 }: TableToolbarProps) {
     const router = useRouter()
     const locale = useLocale()
@@ -86,7 +90,8 @@ export default function TableToolbar({
                 </DropdownMenu>
 
                 <div className="flex gap-2 text-sm font-medium">
-                    <Button variant="ghost" className="">Export</Button>
+                    {/* <Button variant="ghost" className="">Export</Button> */}
+                    <ExportExcelButton data={exportData ?? []} />
                     <ImportDialog setIsImporting={setIsImporting} />
                 </div>
             </div>

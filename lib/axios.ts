@@ -68,7 +68,7 @@ apiAdmin.interceptors.response.use(
       localStorage.removeItem("admin_access_token")
 
       // 👉 Redirect về admin login
-      // window.location.href = "/admin-login"
+      window.location.href = "/admin-login"
     }
     return Promise.reject(error)
   }
@@ -105,6 +105,37 @@ apiFlexible.interceptors.response.use(
 
       // 👉 Trường hợp flexible thì redirect về login chung
       // window.location.href = "/login"
+    }
+    return Promise.reject(error)
+  }
+)
+
+
+// 3. DSP API - attach dsp_access_token
+export const apiDSP = axios.create({
+  baseURL,
+  withCredentials: true,
+})
+
+apiDSP.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("dsp_access_token")
+    if (token) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${token}`
+    }
+  }
+  return config
+})
+
+apiAdmin.interceptors.response.use(
+  (res) => res,
+  async (error: AxiosError) => {
+    if (error.response?.status === 401 && typeof window !== "undefined") {
+      localStorage.removeItem("dsp_access_token")
+
+      // 👉 Redirect về admin login
+      window.location.href = "/dsp/login"
     }
     return Promise.reject(error)
   }

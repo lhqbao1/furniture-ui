@@ -6,7 +6,7 @@ const StaticFileSchema = z.object({
   url: z.string(),
 })
 
-export const addProductSchema = z.object({
+export const addProductDSPSchema = z.object({
   name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
@@ -24,7 +24,7 @@ export const addProductSchema = z.object({
   unit: z.string().optional().nullable(),
   amount_unit: z.string().optional().nullable(),
   incoterm: z.string().optional().nullable(),
-  sku: z.string().min(1, "Product SKU is required"),
+  sku: z.string().optional().nullable(),
   packaging_amount: z.string().optional().nullable(),
   ean: z.string().optional().nullable(),
   carrier: z.string().optional().nullable(),
@@ -66,7 +66,7 @@ export const addProductSchema = z.object({
 })
 
 
-export type ProductInput = z.infer<typeof addProductSchema>
+export type ProductInput = z.infer<typeof addProductDSPSchema>
 
 export const defaultValues = {
   name: "",
