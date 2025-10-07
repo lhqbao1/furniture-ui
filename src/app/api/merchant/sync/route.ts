@@ -1,10 +1,9 @@
-// /app/api/merchant/sync/route.js
 import { GoogleAuth } from 'google-auth-library';
 import axios, { AxiosError } from 'axios';
 import { getProductsFeed } from '@/features/products/api';
 import { NextRequest } from 'next/server';
 
-export async function POST(request: NextRequest) {
+ async function syncProducts() {
     const auth = new GoogleAuth({
         keyFile: 'path/to/service-account.json',
         scopes: ['https://www.googleapis.com/auth/content'],
@@ -59,3 +58,11 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: err.response?.data || err.message }, { status: 500 });
   }
 }
+
+export async function POST() {
+    return await syncProducts();
+  }
+  
+  export async function GET() {
+    return await syncProducts(); // Cho phép Vercel cron gọi GET
+  }

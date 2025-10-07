@@ -1,0 +1,13 @@
+name: Sync Merchant Products
+
+on:
+  schedule:
+    - cron: "00 13 * * *" # 18:25 giờ Việt Nam (UTC+7)
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Merchant Sync API
+        run: |
+          curl -X POST https://www.prestige-home.de/api/merchant/sync

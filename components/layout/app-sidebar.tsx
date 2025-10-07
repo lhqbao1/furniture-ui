@@ -102,7 +102,7 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-3">
                             {items.map((item) => {
-                                const isActive = pathname.startsWith(item.url) // ✅ cho phép match /category/slug/... 
+                                const isActive = pathname?.startsWith(item.url) // ✅ cho phép match /category/slug/... 
                                 const isOpen = openItem === item.id
                                 // Nếu có children → dùng Collapsible
                                 if (item.children) {

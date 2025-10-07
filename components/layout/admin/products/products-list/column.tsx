@@ -257,9 +257,12 @@ function SyncToEbay({ product }: { product: ProductItem }) {
 
     return (
         <div className="flex justify-start gap-2">
-            <Button onClick={() => handleSyncToEbay()} variant={'outline'} disabled={syncToEbayMutation.isPending || removeFromEbayMutation.isPending}>
-                {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Sync'}
-            </Button>
+            {product.stock === 0
+
+                ? '' : <Button onClick={() => handleSyncToEbay()} variant={'outline'} disabled={syncToEbayMutation.isPending || removeFromEbayMutation.isPending}>
+                    {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Sync'}
+                </Button>}
+
             {product.ebay ?
                 <Button onClick={() => handleRemoveFromEbay()} variant={'outline'} className="text-red-600 border-red-600" disabled={removeFromEbayMutation.isPending || syncToEbayMutation.isPending}>
                     {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Remove'}
@@ -517,7 +520,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         header: "EBAY",
         cell: ({ row }) => {
             const product = row.original
-            if (!product.is_active) return null // ❌ không render nếu inactive
+            // if (!product.is_active) return null // ❌ không render nếu inactive
             return <SyncToEbay product={product} />
         }
     }

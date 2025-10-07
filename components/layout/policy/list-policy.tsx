@@ -55,10 +55,10 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
         const matchedItem = filteredPolicies.find((item) => {
             const name = item.name.toLowerCase()
             return (
-                (path.includes("agb") && name.includes("agb")) ||
-                (path.includes("impressum") && name.includes("impressum")) ||
-                (path.includes("cancellation") && name.includes("widerruf")) ||
-                (path.includes("privacy-policy") && name.includes("datenschutzer"))
+                (path?.includes("agb") && name.includes("agb")) ||
+                (path?.includes("impressum") && name.includes("impressum")) ||
+                (path?.includes("cancellation") && name.includes("widerruf")) ||
+                (path?.includes("privacy-policy") && name.includes("datenschutzer"))
             )
         })
 
