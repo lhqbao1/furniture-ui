@@ -89,12 +89,15 @@ function EditableStockCell({ product }: { product: ProductItem }) {
     const syncToEbayMutation = useSyncToEbay()
 
     const handleEditProductStock = () => {
+        console.log('hehe')
         EditProductMutation.mutate({
             input: {
                 ...product,
                 stock: value,
-                category_ids: product.categories.map((c) => c.id), // map ra id array
-                brand_id: product.brand.id
+                ...(product.categories?.length
+                    ? { category_ids: product.categories.map(c => c.id) }
+                    : {}),
+                ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
             },
             id: product.id,
         }, {
@@ -132,7 +135,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
                     }}
                     autoFocus
                     disabled={EditProductMutation.isPending}
-                    className={cn(EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
+                    className={cn('w-20', EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
                 />
             ) : (
                 <div
@@ -174,7 +177,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
     }
 
     return (
-        <div className="">
+        <div className="text-right flex justify-end">
             {editing ? (
                 <Input
                     type="number"
@@ -197,14 +200,14 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                     }}
                     autoFocus
                     disabled={EditProductMutation.isPending}
-                    className={cn(EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
+                    className={cn('w-28', EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
                 />
             ) : (
                 <div
                     className="cursor-pointer"
                     onClick={() => setEditing(true)}
                 >
-                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : 'Updating ...'}
+                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : <div className="text-right">Updating</div>}
                 </div>
             )}
         </div>
