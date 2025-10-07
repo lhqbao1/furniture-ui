@@ -1,7 +1,6 @@
 import { GoogleAuth } from 'google-auth-library';
 import axios, { AxiosError } from 'axios';
 import { getProductsFeed } from '@/features/products/api';
-import { NextRequest } from 'next/server';
 
  async function syncProducts() {
     const auth = new GoogleAuth({
