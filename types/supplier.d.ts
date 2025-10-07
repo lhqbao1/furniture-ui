@@ -1,7 +1,6 @@
 export interface SupplierInput {
     salutation: string
-    first_name: string
-    last_name: string
+    business_name: string
     vat_id: string
     email: string
     email_order: string
@@ -11,8 +10,7 @@ export interface SupplierInput {
 
 export interface SupplierResponse {
     salutation: string
-  first_name: string
-  last_name: string
+    business_name
   vat_id: string
   email: string
   email_order: string

@@ -113,30 +113,15 @@ export default function AddOrEditSupplierForm({ onSuccess, submitText, onClose, 
                     )}
                 />
 
-                {/* First name */}
+                {/* Business name */}
                 <FormField
                     control={form.control}
-                    name="first_name"
+                    name="business_name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>First Name</FormLabel>
+                            <FormLabel>Business Name</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter first name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {/* Last name */}
-                <FormField
-                    control={form.control}
-                    name="last_name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Last Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter last name" {...field} />
+                                <Input placeholder="Enter business name" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

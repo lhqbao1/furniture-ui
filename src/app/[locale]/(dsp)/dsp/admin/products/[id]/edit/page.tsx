@@ -22,7 +22,7 @@ const EditProductDSPPage = ({ params }: { params: Promise<{ id: string }> }) => 
     const editProductDSPMutation = useEditProductDSP()
 
     const { data, isLoading, isError } = useGetProductByIdDSP(id)
-    if (isError) return <div>No data</div>
+    if (isError) return <div>Error</div>
     if (isLoading || !data) return <ProductFormSkeleton />
 
     const handleEdit = (values: ProductInput) => {
