@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CreateProductDSP, deleteProductDSP, getAllProductsDSP, getProductByIdDSP } from "./api"
+import { CreateProductDSP, deleteProductDSP, editProductDSP, getAllProductsDSP, getProductByIdDSP } from "./api"
 import { ProductInput } from "@/lib/schema/product"
 
 interface UseGetAllProductsParams {
@@ -43,5 +43,15 @@ export function useGetProductByIdDSP(product_id: string) {
     queryFn: () => getProductByIdDSP(product_id),
     enabled: !!product_id,
     retry: false,
+  })
+}
+
+export function useEditProductDSP() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ product_id, input }: { product_id: string; input: ProductInput }) => editProductDSP(input, product_id),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["dsp-products"] })
+    },
   })
 }

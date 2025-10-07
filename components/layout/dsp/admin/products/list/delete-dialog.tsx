@@ -12,37 +12,37 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button'
 import { Loader2, Trash2 } from 'lucide-react'
-import { useDeleteProduct } from '@/features/products/hook'
 import { ProductItem } from '@/types/products'
 import { toast } from 'sonner'
 import { useRemoveFormEbay } from '@/features/ebay/hook'
+import { useDeleteProductDSP } from '@/features/dsp/products/hook'
 
 interface DeleteDialogProps {
     product: ProductItem
 }
 
-const DeleteDialog = ({ product }: DeleteDialogProps) => {
-    const deleteProduct = useDeleteProduct()
-    const removeFromEbayMutation = useRemoveFormEbay()
+const DeleteDialogDSP = ({ product }: DeleteDialogProps) => {
+    const deleteProductDSPMutation = useDeleteProductDSP()
+    // const removeFromEbayMutation = useRemoveFormEbay()
     const [open, setOpen] = useState(false)
 
     const handleDelete = () => {
-        deleteProduct.mutate(product.id ?? "", {
+        deleteProductDSPMutation.mutate(product.id ?? "", {
             onSuccess(data, variables, context) {
                 toast.success("Delete product successfully")
-                if (product.ebay) {
-                    removeFromEbayMutation.mutate(product.sku, {
-                        onSuccess(data, variables, context) {
-                            toast.success("Remove from Ebay successful")
-                            setOpen(false)
-                        },
-                        onError(error, variables, context) {
-                            toast.error("Remove from Ebay fail")
-                        },
-                    })
-                } else {
-                    setOpen(false)
-                }
+                // if (product.ebay) {
+                //     removeFromEbayMutation.mutate(product.sku, {
+                //         onSuccess(data, variables, context) {
+                //             toast.success("Remove from Ebay successful")
+                //             setOpen(false)
+                //         },
+                //         onError(error, variables, context) {
+                //             toast.error("Remove from Ebay fail")
+                //         },
+                //     })
+                // } else {
+                //     setOpen(false)
+                // }
             },
             onError(error, variables, context) {
                 toast.error("Failed to delete product")
@@ -69,13 +69,13 @@ const DeleteDialog = ({ product }: DeleteDialogProps) => {
                         <Button
                             type="button"
                             className='bg-gray-400 text-white hover:bg-gray-500'
-                            disabled={deleteProduct.isPending}
+                            disabled={deleteProductDSPMutation.isPending}
                         >
                             Cancel
                         </Button>
                     </DialogClose>
-                    <Button type="button" onClick={handleDelete} hasEffect variant="secondary" disabled={deleteProduct.isPending}>
-                        {deleteProduct.isPending ? (
+                    <Button type="button" onClick={handleDelete} hasEffect variant="secondary" disabled={deleteProductDSPMutation.isPending}>
+                        {deleteProductDSPMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                             "Delete"
@@ -87,4 +87,4 @@ const DeleteDialog = ({ product }: DeleteDialogProps) => {
     )
 }
 
-export default DeleteDialog
+export default DeleteDialogDSP

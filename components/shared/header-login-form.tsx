@@ -15,7 +15,6 @@ import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { Switch } from "../ui/switch"
 import { useQueryClient } from "@tanstack/react-query"
-
 interface HeaderLoginFormProps {
     onSuccess?: () => void
 }
