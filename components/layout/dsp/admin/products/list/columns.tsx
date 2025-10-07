@@ -18,7 +18,9 @@ import { useLocale } from "next-intl"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { getProductById } from "@/features/products/api"
-import DeleteDialog from "@/components/layout/admin/products/products-list/delete-dialog"
+import DeleteDialog from "./delete-dialog"
+import { getProductByIdDSP } from "@/features/dsp/products/api"
+import DeleteDialogDSP from "./delete-dialog"
 
 function EditableNameCell({ product }: { product: ProductItem }) {
     const [value, setValue] = useState(product.name)
@@ -204,7 +206,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                     className="cursor-pointer"
                     onClick={() => setEditing(true)}
                 >
-                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : 'Updating ...'}
+                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : <div className="text-right">Updating</div>}
                 </div>
             )}
         </div>
@@ -316,24 +318,15 @@ function ActionsCell({ product }: { product: ProductItem }) {
     const handleClick = async (id: string) => {
         try {
             await queryClient.prefetchQuery({
-                queryKey: ["product", id],
-                queryFn: () => getProductById(id),
+                queryKey: ["dsp-product", id],
+                queryFn: () => getProductByIdDSP(id),
             });
-            router.push(`/admin/products/${id}/edit`, { locale });
+            router.push(`/dsp/admin/products/${id}/edit`, { locale });
         } catch (err) {
             console.error("Prefetch failed:", err);
-            router.push(`/admin/products/${id}/edit`, { locale });
+            // router.push(`/dsp/admin/products/${id}/edit`, { locale });
         }
     }
-
-    const categoryHref =
-        level1 && level2
-            ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
-            : level1
-                ? `/${formatName(level1.name)}/${product.id}`
-                : level2
-                    ? `/${formatName(level2.name)}/${product.id}`
-                    : `/${product.id}`;
 
     return (
         <div className="flex gap-2">
@@ -342,27 +335,27 @@ function ActionsCell({ product }: { product: ProductItem }) {
                 <Pencil className="w-4 h-4 text-primary" />
             </Button>
             {/* </Link> */}
-            <DeleteDialog product={product} />
-            <Link
-                href={`/product${categoryHref}`}
+            <DeleteDialogDSP product={product} />
+            {/* <Link
+                href={`/product/${product.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
             >
                 <Button variant="ghost" size="icon">
                     <Eye className="w-4 h-4 text-secondary" />
                 </Button>
-            </Link>
-            <Link href={`/admin/products/${product.id}/clone`}>
+            </Link> */}
+            {/* <Link href={`/admin/products/${product.id}/clone`}>
                 <Button variant="ghost" size="icon">
                     <CopyCheck className="w-4 h-4 text-secondary" />
                 </Button>
-            </Link>
+            </Link> */}
         </div>
     );
 }
 
 
-export const productColumns: ColumnDef<ProductItem>[] = [
+export const productColumnsDSP: ColumnDef<ProductItem>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -435,24 +428,24 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         accessorKey: "is_active",
         header: "STATUS",
         cell: ({ row }) => (
-            // <span
-            //     className={`px-2 py-1 rounded-md text-xs ${row.original.is_active ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-            //         }`}
-            // >
-            //     {row.original.is_active ? "active" : "inactive"}
-            // </span>
-            <ToogleProductStatus product={row.original} />
+            <span
+                className={`px-2 py-1 rounded-md text-xs ${row.original.is_active ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                    }`}
+            >
+                {row.original.is_active ? "active" : "inactive"}
+            </span>
+            // <ToogleProductStatus product={row.original} />
         ),
     },
     {
         accessorKey: "cost",
         header: () => <div className="text-right">COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : 'Updating ...'}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : 'Updating'}</div>,
     },
     {
         accessorKey: "shipping_cost",
         header: () => <div className="text-right">DELIVERY COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : 'Updating ...'}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : 'Updating'}</div>,
     },
     {
         accessorKey: "final_price",
@@ -465,7 +458,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         cell: ({ row }) => {
             const { final_price, cost, tax } = row.original
             const taxRate = parseFloat(tax) / 100
-            if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating ...</div>
+            if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating</div>
 
             const margin = ((1 / (1 + taxRate)) - (cost / final_price)) * 100
             return <div className="text-right">{margin.toFixed(1)}%</div>
@@ -497,7 +490,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
                         />
                     ) : (
                         <div>
-                            Updating ...
+                            Updating
                         </div>
                     )}
                 </div>
@@ -506,16 +499,16 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     },
     {
         id: "actions",
-        header: "ACTION",
+        header: () => <div className="text-start">ACTION</div>,
         cell: ({ row }) => <ActionsCell product={row.original} />
     },
-    {
-        id: 'sync',
-        header: "EBAY",
-        cell: ({ row }) => {
-            return (
-                <SyncToEbay product={row.original} />
-            )
-        }
-    }
+    // {
+    //     id: 'sync',
+    //     header: "EBAY",
+    //     cell: ({ row }) => {
+    //         return (
+    //             <SyncToEbay product={row.original} />
+    //         )
+    //     }
+    // }
 ]

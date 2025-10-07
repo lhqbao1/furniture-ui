@@ -3,6 +3,7 @@
 import { productColumns } from '@/components/layout/admin/products/products-list/column'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import TableToolbar from '@/components/layout/admin/products/products-list/toolbar'
+import { productColumnsDSP } from '@/components/layout/dsp/admin/products/list/columns'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetAllProductsDSP } from '@/features/dsp/products/hook'
 import { searchProductQueryStringAtom } from '@/store/product'
@@ -34,7 +35,7 @@ const ProductListDSP = () => {
             {isLoading ? <ProductTableSkeleton /> :
                 <ProductTable
                     data={data ? data.items : []}
-                    columns={productColumns}
+                    columns={productColumnsDSP}
                     page={page}
                     pageSize={pageSize}
                     setPage={setPage}

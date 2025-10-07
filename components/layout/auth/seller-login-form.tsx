@@ -15,11 +15,7 @@ import { Link, useRouter } from "@/src/i18n/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 
-interface LoginFormProps {
-    isAdmin?: boolean
-}
-
-export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
+export default function SellerLoginForm() {
     // const [userId, setUserId] = useAtom(userIdAtom)
     const [seePassword, setSeePassword] = useState(false)
     const router = useRouter()
@@ -41,26 +37,11 @@ export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
         },
     })
 
-    const loginMutation = useLogin()
-    const loginAdminMutation = useSendOtpAdmin()
-    const syncLocalCartMutation = useSyncLocalCart();
-    const sendOtpMutation = useSendOtp()
-    const submitOtpMutation = useLoginOtp()
     const sendOtpDSPMutation = useSendOtpDSP()
     const submitOtpDSPMutation = useLoginDSPOtp()
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        if (!seePassword && !isAdmin) {
-            sendOtpMutation.mutate(values.username, {
-                onSuccess: (data) => {
-                    toast.success(t('sendedEmail'))
-                    setSeePassword(true)
-                },
-                onError(error, variables, context) {
-                    toast.error(t("invalidEmail"))
-                },
-            })
-        } else if (isAdmin && !seePassword) {
+        if (!seePassword) {
             sendOtpDSPMutation.mutate(values.username, {
                 onSuccess: () => {
                     toast.success(t('sendedEmail'))
@@ -71,31 +52,7 @@ export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
                 },
 
             })
-        } else if (seePassword && !isAdmin) {
-            submitOtpMutation.mutate({
-                email: values.username,
-                code: values.code ?? ''
-            }, {
-                onSuccess: (data) => {
-                    // Giả sử backend trả về token
-                    const token = data.access_token
-
-                    localStorage.setItem("access_token", token)
-                    router.push("/", { locale })
-                    localStorage.setItem("userId", data.id)
-
-                    syncLocalCartMutation.mutate()
-
-                    // Có thể lưu userId nếu cần
-                    // setUserId(data.id)
-                    toast.success(t('loginSuccess'))
-                },
-                onError(error, variables, context) {
-                    toast.error(t("invalidCredentials"))
-                },
-            })
-        }
-        else if (seePassword && isAdmin) {
+        } else if (seePassword) {
             submitOtpDSPMutation.mutate({
                 email: values.username,
                 code: values.code ?? ''
@@ -117,6 +74,34 @@ export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
                 },
             })
         }
+    }
+
+    const handleAutoSubmitOtp = (code: string) => {
+        if (code.length !== 6) return
+
+        submitOtpDSPMutation.mutate(
+            {
+                email: form.getValues("username"),
+                code,
+            },
+            {
+                onSuccess: (data) => {
+                    // Giả sử backend trả về token
+                    const token = data.access_token
+                    localStorage.setItem("dsp_access_token", token)
+                    router.push("/dsp/admin", { locale })
+                    localStorage.setItem("userId", data.id)
+
+                    // Có thể lưu userId nếu cần
+                    // setUserId(data.id)
+                    toast.success(t('loginSuccess'))
+
+                },
+                onError(error, variables, context) {
+                    toast.error(error.message)
+                },
+            }
+        )
     }
 
     return (
@@ -190,6 +175,10 @@ export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
                                                             const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
                                                             next?.focus()
                                                         }
+
+                                                        if (idx === 5) {
+                                                            handleAutoSubmitOtp(newValue)
+                                                        }
                                                     }}
                                                     className="h-12 flex-1 text-center text-lg"
                                                     maxLength={1}
@@ -207,13 +196,13 @@ export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
                         type="submit"
                         className="w-full bg-secondary/95 hover:bg-secondary"
                         hasEffect
-                        disabled={submitOtpMutation.isPending || sendOtpMutation.isPending || loginAdminMutation.isPending}
+                        disabled={submitOtpDSPMutation.isPending || sendOtpDSPMutation.isPending}
                     >
                         {
-                            sendOtpMutation.isPending || loginAdminMutation.isPending
+                            sendOtpDSPMutation.isPending || submitOtpDSPMutation.isPending
                                 ? <Loader2 className="animate-spin" />
                                 : seePassword
-                                    ? (submitOtpMutation.isPending
+                                    ? (submitOtpDSPMutation.isPending
                                         ? <Loader2 className="animate-spin" />
                                         : t('login')
                                     )
@@ -222,25 +211,6 @@ export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
                     </Button>
                 </form>
             </Form>
-
-            {/* Forgot password */}
-            {/* <div className="flex justify-end mt-2">
-                <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
-                    {t('forgotPassword')}?
-                </Link>
-            </div> */}
-
-            {/* Sign up link */}
-            {
-                !isAdmin && (
-                    <div className="text-sm text-center mt-6 space-x-1">
-                        <span>{t('noAccount')}</span>
-                        <Link href={`/sign-up`} className="text-sm text-secondary hover:underline">
-                            {t('createAccount')}
-                        </Link>
-                    </div>
-                )
-            }
         </div>
     )
 }

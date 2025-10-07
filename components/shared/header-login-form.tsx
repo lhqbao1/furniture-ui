@@ -15,7 +15,6 @@ import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { Switch } from "../ui/switch"
 import { useQueryClient } from "@tanstack/react-query"
-
 interface HeaderLoginFormProps {
     onSuccess?: () => void
 }
@@ -85,6 +84,35 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
         }
     }
 
+    const handleAutoSubmitOtp = (code: string) => {
+        if (code.length !== 6) return
+
+        submitOtpMutation.mutate(
+            {
+                email: form.getValues("username"),
+                code,
+            },
+            {
+                onSuccess(data, variables, context) {
+                    const token = data.access_token
+                    localStorage.setItem("access_token", token)
+                    localStorage.setItem("userId", data.id)
+                    queryClient.refetchQueries({ queryKey: ["me"], exact: true })
+                    queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true })
+                    syncLocalCartMutation.mutate()
+
+                    toast.success(t("loginSuccess"))
+
+                    // gọi callback onSuccess nếu được truyền
+                    if (onSuccess) onSuccess()
+                },
+                onError(error) {
+                    toast.error(t("invalidCredentials"))
+                },
+            }
+        )
+    }
+
     return (
         <div className="bg-white rounded-2xl w-full">
             <Form {...form}>
@@ -136,6 +164,10 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                                                             const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
                                                             next?.focus()
                                                         }
+
+                                                        if (idx === 5) {
+                                                            handleAutoSubmitOtp(newValue)
+                                                        }
                                                     }}
                                                     className="h-12 flex-1 text-center text-lg"
                                                     maxLength={1}
@@ -177,21 +209,11 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                 </form>
             </Form>
 
-            {/* Forgot password */}
-            {/* <div className="flex justify-end mt-2 mb-5">
-                <Link
-                    href={`/forgot-password`}
-                    className="text-black/70 hover:underline"
-                >
-                    {t("forgotPassword")}?
-                </Link>
-            </div> */}
-
             {/* Sign up link */}
             <Button
                 type="button"
                 variant={'outline'}
-                className="w-full text-lg rounded-none h-14 text-black/50"
+                className="w-full text-lg rounded-none h-14 text-black/50 mt-4"
                 hasEffect
                 disabled={loginMutation.isPending}
                 onClick={() => {
