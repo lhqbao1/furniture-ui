@@ -89,12 +89,15 @@ function EditableStockCell({ product }: { product: ProductItem }) {
     const syncToEbayMutation = useSyncToEbay()
 
     const handleEditProductStock = () => {
+        console.log('hehe')
         EditProductMutation.mutate({
             input: {
                 ...product,
                 stock: value,
-                category_ids: product.categories.map((c) => c.id), // map ra id array
-                brand_id: product.brand.id
+                ...(product.categories?.length
+                    ? { category_ids: product.categories.map(c => c.id) }
+                    : {}),
+                ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
             },
             id: product.id,
         }, {
