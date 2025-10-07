@@ -3,8 +3,7 @@ import { z } from "zod"
 
 export const supplierSchema = z.object({
     salutation: z.string().min(1, "Salutation is required"),
-    first_name: z.string().min(1, "First name is required"),
-    last_name: z.string().min(1, "Last name is required"),
+    business_name: z.string().min(1, "Business name is required"),
     vat_id: z.string().min(1, "VAT id is required"),
     email: z.string().email("Invalid email"),
     email_order: z.string().email("Invalid order email"),
@@ -16,8 +15,7 @@ export const supplierSchema = z.object({
 
 export const defaultSupplier: SupplierInput = {
     salutation: "",
-    first_name: "",
-    last_name: "",
+    business_name: "",
     vat_id: "",
     email: "",
     email_order: "",

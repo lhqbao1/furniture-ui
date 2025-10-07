@@ -67,9 +67,9 @@ export const supplierColumns: ColumnDef<SupplierResponse>[] = [
         },
     },
     {
-        accessorKey: "name",
+        accessorKey: "business_name",
         header: "NAME",
-        cell: ({ row }) => <div>{row.original.first_name} {row.original.last_name}</div>
+        cell: ({ row }) => <div>{row.original.business_name}</div>
     },
     {
         accessorKey: "vat_id",

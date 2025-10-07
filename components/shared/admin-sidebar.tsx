@@ -51,6 +51,7 @@ export function AdminSideBar() {
             icon: ChevronRight,
             children: [
                 { title: "Customer List", url: "/admin/crm/customers/list", icon: CornerDownRight },
+                { title: "Supplier List", url: "/admin/crm/supplier/list", icon: CornerDownRight },
             ],
         },
         {
@@ -59,14 +60,6 @@ export function AdminSideBar() {
             icon: ChevronRight,
             children: [
                 { title: "Policy", url: "/admin/settings/policy", icon: CornerDownRight },
-            ],
-        },
-        {
-            title: "Supplier",
-            url: "/admin/supplier",
-            icon: ChevronRight,
-            children: [
-                { title: "Supplier List", url: "/admin/supplier/list", icon: CornerDownRight },
             ],
         },
         {
