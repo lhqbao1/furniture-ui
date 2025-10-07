@@ -210,21 +210,11 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                 </form>
             </Form>
 
-            {/* Forgot password */}
-            {/* <div className="flex justify-end mt-2 mb-5">
-                <Link
-                    href={`/forgot-password`}
-                    className="text-black/70 hover:underline"
-                >
-                    {t("forgotPassword")}?
-                </Link>
-            </div> */}
-
             {/* Sign up link */}
             <Button
                 type="button"
                 variant={'outline'}
-                className="w-full text-lg rounded-none h-14 text-black/50"
+                className="w-full text-lg rounded-none h-14 text-black/50 mt-4"
                 hasEffect
                 disabled={loginMutation.isPending}
                 onClick={() => {
