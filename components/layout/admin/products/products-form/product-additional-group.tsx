@@ -24,10 +24,20 @@ const ProductAdditionalInputs = () => {
         { id: "m2" },
     ]
 
-    const countryOptions = countries.map((c) => ({
+    const priorityCountries = ["Vietnam", "Germany", "China"];
+
+    const sortedCountries = [...countries].sort((a, b) => {
+        const aPriority = priorityCountries.includes(a.name.common);
+        const bPriority = priorityCountries.includes(b.name.common);
+        if (aPriority && !bPriority) return -1;
+        if (!aPriority && bPriority) return 1;
+        return a.name.common.localeCompare(b.name.common);
+    });
+
+    const countryOptions = sortedCountries.map((c) => ({
         value: c.name.common,
         label: c.name.common,
-    }))
+    }));
 
     return (
         <div className='space-y-6'>
