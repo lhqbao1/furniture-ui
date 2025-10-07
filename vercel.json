@@ -3,7 +3,7 @@
     "crons": [
       {
         "path": "/api/merchant-sync",
-        "schedule": "25 11 * * *"
+        "schedule": "40 11 * * *"
       }
     ]
   }
