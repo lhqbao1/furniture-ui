@@ -56,6 +56,7 @@
     "drawer": "^0.0.2",
     "embla-carousel-react": "^8.6.0",
     "file-saver": "^2.0.5",
+    "google-auth-library": "^10.4.0",
     "googleapis": "^159.0.0",
     "gsap": "^3.13.0",
     "isomorphic-dompurify": "^2.26.0",
