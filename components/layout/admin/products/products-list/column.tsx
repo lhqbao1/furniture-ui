@@ -135,7 +135,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
                     }}
                     autoFocus
                     disabled={EditProductMutation.isPending}
-                    className={cn(EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
+                    className={cn('w-20', EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
                 />
             ) : (
                 <div
@@ -177,7 +177,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
     }
 
     return (
-        <div className="">
+        <div className="text-right flex justify-end">
             {editing ? (
                 <Input
                     type="number"
@@ -200,14 +200,14 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                     }}
                     autoFocus
                     disabled={EditProductMutation.isPending}
-                    className={cn(EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
+                    className={cn('w-28', EditProductMutation.isPending ? "cursor-wait" : "cursor-text")}
                 />
             ) : (
                 <div
                     className="cursor-pointer"
                     onClick={() => setEditing(true)}
                 >
-                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : 'Updating ...'}
+                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : <div className="text-right">Updating</div>}
                 </div>
             )}
         </div>
