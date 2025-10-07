@@ -16,7 +16,7 @@ const OrderDetails = () => {
     const params = useParams<{ id: string }>()  // type-safe
     const checkoutId = params?.id
     const { data: order, isLoading, isError } = useGetCheckOutByCheckOutId(checkoutId)
-
+    // const {data: invoice, isLoading: isLoadingInvoice, isError: isErrorInvoice} = useGetOrde
     if (isLoading) return <div>Loading...</div>
     if (isError) return <div>Error loading order</div>
     if (!order) return <div>Error loading order</div>
