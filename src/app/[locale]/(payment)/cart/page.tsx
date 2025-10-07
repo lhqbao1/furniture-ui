@@ -12,6 +12,13 @@ import { useLocale, useTranslations } from 'next-intl'
 import { LoginDrawer } from '@/components/shared/login-drawer'
 import CartLocalTable from '@/components/layout/cart/cart-local-table'
 
+export const metadata = {
+    robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+    },
+}
 
 const CartPage = () => {
     const [userId, setUserId] = React.useState<string | null>(

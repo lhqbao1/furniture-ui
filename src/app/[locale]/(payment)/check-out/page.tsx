@@ -71,6 +71,14 @@ export interface CartItem {
     imageUrl: string
 }
 
+export const metadata = {
+    robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+    },
+}
+
 export default function CheckOutPage() {
     const [userId, setUserId] = useState<string>("")
     const [userIdLogin, setUserIdLogin] = useState<string>("")

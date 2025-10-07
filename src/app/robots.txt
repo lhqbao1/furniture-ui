@@ -8,6 +8,9 @@ User-agent: *
 Disallow: /wp-admin/
 Disallow: /wp-content/
 Disallow: /product-category/
+Disallow: /cart
+Disallow: /check-out
+Disallow: /payment-result
 Allow: /
 
 Sitemap: https://prestige-home.de/sitemap.xml
