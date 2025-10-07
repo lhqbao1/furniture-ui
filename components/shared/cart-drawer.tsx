@@ -6,7 +6,7 @@ import {
     DrawerClose,
     DrawerDescription,
 } from "@/components/ui/drawer"
-import CartPage from "@/src/app/[locale]/(payment)/cart/page"
+import CartPage from "@/src/app/[locale]/(payment)/cart/page-client"
 import { ShoppingCart, X } from "lucide-react"
 import { useTranslations } from "next-intl"
 
