@@ -1,0 +1,8 @@
+{
+    "functions": {
+      "api/merchant/sync/route.ts": {
+        "schedule": "25 11 * * *"
+      }
+    }
+  }
+  
