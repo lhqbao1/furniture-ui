@@ -516,9 +516,9 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         id: 'sync',
         header: "EBAY",
         cell: ({ row }) => {
-            return (
-                <SyncToEbay product={row.original} />
-            )
+            const product = row.original
+            if (!product.is_active) return null // ❌ không render nếu inactive
+            return <SyncToEbay product={product} />
         }
     }
 ]
