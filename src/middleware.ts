@@ -18,12 +18,18 @@ export default function middleware(req: NextRequest) {
     // không phải ID UUID (Next.js mới)
     !/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/.test(pathname);
 
-  const hasWpParams =
-    searchParams.has("add_to_wishlist") ||
-    searchParams.has("_wpnonce") ||
-    searchParams.has("product-page") ||
-    searchParams.has("orderby") ||
-    searchParams.has("wc-api");
+    const hasWpParams = [
+      "add_to_wishlist",
+      "_wpnonce",
+      "remove_item",
+      "add-to-cart",
+      "wc-api",
+      "product-page",
+      "orderby",
+      "coupon_code",
+      "apply_coupon",
+      "order"
+    ].some((param) => searchParams.has(param));
 
   const isOtherOldWpPaths =
     pathname.startsWith("/shop/") 

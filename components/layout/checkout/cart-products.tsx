@@ -1,8 +1,8 @@
 'use client'
 
-import { CartItem } from "@/src/app/[locale]/(payment)/check-out/page"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { CartItem } from "@/src/app/[locale]/(payment)/check-out/page-client"
 import Image from "next/image"
 
 type CartItemSelectorProps = {
