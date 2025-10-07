@@ -1,8 +1,10 @@
 {
-    "functions": {
-      "api/merchant-sync.func.ts": {
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "crons": [
+      {
+        "path": "/api/merchant-sync",
         "schedule": "25 11 * * *"
       }
-    }
+    ]
   }
   
