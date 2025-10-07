@@ -11,6 +11,15 @@ Disallow: /product-category/
 Disallow: /cart
 Disallow: /check-out
 Disallow: /payment-result
+Disallow: /*add_to_cart
+Disallow: /*remove_item
+Disallow: /*_wpnonce
+Disallow: /*?add-to-cart
+Disallow: /*?add_to_wishlist
+
 Allow: /
+Allow: /product/
+Allow: /category/
+
 
 Sitemap: https://prestige-home.de/sitemap.xml

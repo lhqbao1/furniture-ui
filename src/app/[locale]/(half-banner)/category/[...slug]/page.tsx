@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         const category = await getCategoryBySlug(lastSlug)
         return {
             title: category?.meta_title || "Prestige Home",
+            robots: { index: true, follow: true },
             description:
                 category?.meta_description ||
                 "Category",
@@ -28,9 +29,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         }
     } catch {
         return {
-            title: "Not found",
-            description: "This page is not available",
-        }
+            title: 'Not found',
+            description: 'This page is not available',
+            robots: { index: false, follow: false },
+        };
     }
 }
 

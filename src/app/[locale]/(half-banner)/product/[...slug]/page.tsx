@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         return {
             title: product?.meta_title || product?.name,
             description: product?.meta_description || product?.description?.slice(0, 150),
+            robots: { index: true, follow: true },
             openGraph: {
                 title: product?.meta_title || product?.name,
                 description: product?.meta_description || product?.description?.slice(0, 150),
@@ -26,7 +27,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             },
         }
     } catch {
-        return { title: 'Not found', description: 'This page is not available' }
+        return {
+            title: 'Not found',
+            description: 'This page is not available',
+            robots: { index: false, follow: false },
+        };
     }
 }
 
