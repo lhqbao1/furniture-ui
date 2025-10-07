@@ -67,7 +67,7 @@ export function DSPAdminSidebar() {
                                 className="w-auto h-[80px] group-data-[collapsible=icon]:h-[50px] group-data-[collapsible=icon]:mb-6"
                             />
                             <div className="text-[29px] flex gap-1">
-                                <span className="text-secondary font-semibold">Dropshipping Portal</span>
+                                <span className="text-secondary font-semibold text-center">Dropshipping Portal</span>
                             </div>
                         </div>
                     </Link>

@@ -409,7 +409,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         accessorKey: "name",
         header: "NAME",
         // cell: ({ row }) => <EditableNameCell product={row.original} />,
-        cell: ({ row }) => <div className="w-60 text-wrap">{row.original.name}</div>
+        cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>
     },
     {
         accessorKey: "category",
@@ -450,12 +450,12 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "cost",
         header: () => <div className="text-right">COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : 'Updating ...'}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : <div className="text-right">Updating</div>}</div>,
     },
     {
         accessorKey: "shipping_cost",
         header: () => <div className="text-right">DELIVERY COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : 'Updating ...'}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : <div className="text-right">Updating</div>}</div>,
     },
     {
         accessorKey: "final_price",
@@ -468,7 +468,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         cell: ({ row }) => {
             const { final_price, cost, tax } = row.original
             const taxRate = parseFloat(tax) / 100
-            if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating ...</div>
+            if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating</div>
 
             const margin = ((1 / (1 + taxRate)) - (cost / final_price)) * 100
             return <div className="text-right">{margin.toFixed(1)}%</div>
@@ -500,7 +500,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
                         />
                     ) : (
                         <div>
-                            Updating ...
+                            Updating
                         </div>
                     )}
                 </div>
