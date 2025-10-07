@@ -4,6 +4,35 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
+  
+   // ✅ Redirect các URL cũ của WordPress
+   async redirects() {
+    return [
+      // Redirect /product/... → /products/...
+      {
+        source: '/product/:slug*',
+        destination: '/products/:slug*',
+        permanent: true,
+      },
+      // Redirect nếu có add_to_wishlist hoặc _wpnonce trong query
+      {
+        source: '/product/:slug*',
+        has: [
+          { type: 'query', key: 'add_to_wishlist' },
+          { type: 'query', key: '_wpnonce' },
+        ],
+        destination: '/products/:slug*',
+        permanent: true,
+      },
+      // Optional: redirect /product-category/... → /categories/...
+      {
+        source: '/product-category/:slug*',
+        destination: '/categories/:slug*',
+        permanent: true,
+      },
+    ];
+  },
+
   images: {
     remotePatterns: [
       {

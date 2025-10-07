@@ -35,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: "https://www.prestige-home.de/uber-uns",
+      url: "https://www.prestige-home.de/about-us",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
@@ -65,13 +65,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       },
       {
-        url: "https://www.prestige-home.de/widderuf",
+        url: "https://www.prestige-home.de/cancellation",
         lastModified: new Date(),
         changeFrequency: "monthly",
         priority: 0.8,
       },
       {
-        url: "https://www.prestige-home.de/datenschutzerklarung",
+        url: "https://www.prestige-home.de/privacy-policy",
         lastModified: new Date(),
         changeFrequency: "monthly",
         priority: 0.8,
@@ -92,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL động cho product
   let products: ProductItem[] = []
   try {
-    const res = await apiPublic.get("/products/all")
+    const res = await apiPublic.get("/products/all-product")
     products = res.data
   } catch (e) {
     products = []
@@ -101,7 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const productUrls: MetadataRoute.Sitemap = products.map((p: ProductItem) => ({
     url: `https://www.prestige-home.de/product/${p.id}`,
     lastModified: new Date(p.updated_at || new Date()),
-    changeFrequency: "weekly",
+    changeFrequency: "daily",
     priority: 0.6,
   }))
 

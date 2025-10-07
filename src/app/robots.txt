@@ -4,4 +4,11 @@ Disallow:
 User-agent: Googlebot-Image
 Disallow:
 
+User-agent: *
+Disallow: /wp-admin/
+Disallow: /wp-content/
+Disallow: /product-category/
+Disallow: /product/
+Allow: /
+
 Sitemap: https://prestige-home.de/sitemap.xml

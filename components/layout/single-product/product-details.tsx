@@ -404,7 +404,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                     <FormItem>
                                                         <FormLabel>{t('quantity')}</FormLabel>
                                                         <FormControl>
-                                                            <FormNumberInput {...field} min={1} max={productDetails.stock} stepper={1} placeholder="1" />
+                                                            <FormNumberInput {...field} min={productDetails.stock === 0 ? 0 : 1} max={productDetails.stock} stepper={1} placeholder={productDetails.stock === 0 ? '0' : '1'} />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -416,8 +416,9 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                             <Button
                                                 className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
                                                 type="submit"
+                                                disabled={productDetails.stock > 0 ? false : true}
                                             >
-                                                {t('addToCart')}
+                                                {productDetails.stock > 0 ? t('addToCart') : t('outStock')}
                                             </Button>
 
                                             <div
