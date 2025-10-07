@@ -257,8 +257,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
 
     return (
         <div className="flex justify-start gap-2">
-            {product.stock === 0
-
+            {product.is_active === false
                 ? '' : <Button onClick={() => handleSyncToEbay()} variant={'outline'} disabled={syncToEbayMutation.isPending || removeFromEbayMutation.isPending}>
                     {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Sync'}
                 </Button>}
