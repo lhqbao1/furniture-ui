@@ -429,7 +429,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         accessorKey: "stock",
         header: "STOCK",
         // cell: ({ row }) => <EditableStockCell product={row.original} />,
-        cell: ({ row }) => <div className="text-center">{row.original.stock} pcs.</div>
+        cell: ({ row }) => <EditableStockCell product={row.original} />
     },
     {
         accessorKey: "is_active",

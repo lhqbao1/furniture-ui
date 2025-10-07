@@ -85,6 +85,35 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
         }
     }
 
+    const handleAutoSubmitOtp = (code: string) => {
+        if (code.length !== 6) return
+
+        submitOtpMutation.mutate(
+            {
+                email: form.getValues("username"),
+                code,
+            },
+            {
+                onSuccess(data, variables, context) {
+                    const token = data.access_token
+                    localStorage.setItem("access_token", token)
+                    localStorage.setItem("userId", data.id)
+                    queryClient.refetchQueries({ queryKey: ["me"], exact: true })
+                    queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true })
+                    syncLocalCartMutation.mutate()
+
+                    toast.success(t("loginSuccess"))
+
+                    // gọi callback onSuccess nếu được truyền
+                    if (onSuccess) onSuccess()
+                },
+                onError(error) {
+                    toast.error(t("invalidCredentials"))
+                },
+            }
+        )
+    }
+
     return (
         <div className="bg-white rounded-2xl w-full">
             <Form {...form}>
@@ -135,6 +164,10 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                                                         if (val && idx < 5) {
                                                             const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
                                                             next?.focus()
+                                                        }
+
+                                                        if (idx === 5) {
+                                                            handleAutoSubmitOtp(newValue)
                                                         }
                                                     }}
                                                     className="h-12 flex-1 text-center text-lg"
