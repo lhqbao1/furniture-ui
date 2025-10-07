@@ -116,6 +116,52 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
         }
     }
 
+    const handleAutoSubmitOtp = (code: string) => {
+        if (code.length !== 6) return
+
+        if (!isAdmin) {
+            submitOtpMutation.mutate(
+                {
+                    email: form.getValues("username"),
+                    code,
+                },
+                {
+                    onSuccess: (data) => {
+                        const token = data.access_token
+                        localStorage.setItem("access_token", token)
+                        localStorage.setItem("userId", data.id)
+                        router.push("/", { locale })
+                        syncLocalCartMutation.mutate()
+                        toast.success(t("loginSuccess"))
+                    },
+                    onError() {
+                        toast.error(t("invalidCredentials"))
+                    },
+                }
+            )
+        } else {
+            submitOtpMutation.mutate(
+                {
+                    email: form.getValues("username"),
+                    code,
+                },
+                {
+                    onSuccess: (data) => {
+                        const token = data.access_token
+                        localStorage.setItem("admin_access_token", token)
+                        localStorage.setItem("userId", data.id)
+                        router.push("/admin/orders/list", { locale })
+                        toast.success(t("loginSuccess"))
+                    },
+                    onError(error) {
+                        toast.error(error.message)
+                    },
+                }
+            )
+        }
+    }
+
+
     return (
         <div className="p-6 bg-white rounded-2xl lg:w-3/4 w-full">
             <div className="flex flex-col items-center mb-12 gap-3">
@@ -187,6 +233,10 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                                                             const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
                                                             next?.focus()
                                                         }
+
+                                                        if (idx === 5) {
+                                                            handleAutoSubmitOtp(newValue)
+                                                        }
                                                     }}
                                                     className="h-12 flex-1 text-center text-lg"
                                                     maxLength={1}
@@ -219,13 +269,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     </Button>
                 </form>
             </Form>
-
-            {/* Forgot password */}
-            {/* <div className="flex justify-end mt-2">
-                <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
-                    {t('forgotPassword')}?
-                </Link>
-            </div> */}
 
             {/* Sign up link */}
             {

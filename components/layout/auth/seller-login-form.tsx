@@ -130,8 +130,8 @@ export default function SellerLoginForm({ isAdmin = false }: LoginFormProps) {
                     alt=""
                 />
                 <h1 className="text-3xl font-semibold text-secondary text-center space-x-2 lg:block flex flex-col">
-                    <span>{t('welcomeTo')}</span>
-                    <span className="text-primary" translate="no">Prestige Home</span>
+                    {/* <span>{t('welcomeTo')}</span> */}
+                    <span className="text-primary" translate="no"><span className="text-secondary">Prestige Home</span> Dropshipping Portal</span>
                 </h1>
             </div>
 

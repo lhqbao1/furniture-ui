@@ -34,6 +34,13 @@ export async function getAllProductsDSP(params?: GetAllProductsParams) {
   return data as ProductResponse
 }
 
+export async function getProductByIdDSP(product_id: string) {
+  const {data} = await apiDSP.get(
+      `/products/supplier/detail/${product_id}`,
+  )
+  return data as ProductItem 
+}
+
 export async function CreateProductDSP(input: ProductInput) {
   const { data } = await apiDSP.post(
     "/products/supplier",
@@ -41,10 +48,28 @@ export async function CreateProductDSP(input: ProductInput) {
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
       },
-      withCredentials: true,
     }
   )
   return data as ProductItem
   }
+
+  export async function deleteProductDSP(product_id: string){
+    const {data} = await apiDSP.delete(
+      `/products/supplier/${product_id}`
+    )
+    return data
+  }
+
+  export async function editProductDSP(input: ProductInput, product_id: string) {
+    const { data } = await apiDSP.put(
+      `/products/supplier/${product_id}`,
+      input,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    return data as ProductItem
+    }

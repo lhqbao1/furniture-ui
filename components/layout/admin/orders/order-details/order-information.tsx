@@ -55,27 +55,6 @@ const OrderInformation = ({
                         {language ?? 'None'}
                     </div>
                 </div>
-
-                {/* <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-4">Warehouse:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {warehouse ?? 'Norma NF / DE'}
-                    </div>
-                </div> */}
-
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-4">Order referrer:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {referrer ?? '2.08 | eBay Germany'}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-4">Owner:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {owner?.first_name ?? 'Unknown selection ID 339'}
-                    </div>
-                </div>
             </div>
 
             <div className="space-y-3 col-span-1">
@@ -92,29 +71,6 @@ const OrderInformation = ({
                         {shipping_profile ?? 'Standard DPD'}
                     </div>
                 </div>
-
-                {/* <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-4">Package numbers:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {package_number ?? '21-13452-00796'}
-                    </div>
-                </div> */}
-
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-4">Entry date:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {entry_date
-                            ? formatDateTime(entry_date)
-                            : '18.08.2025 22:56:24'}
-                    </div>
-                </div>
-
-                {/* <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-4">Client:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {client ?? '43350 | NORMAShopware'}
-                    </div>
-                </div> */}
             </div>
 
             <div className='space-y-3 col-span-1'>

@@ -302,17 +302,35 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
 
                                     <div className='space-y-2'>
                                         <div>{t('includeVatAndShipping')}</div>
-                                        {productDetails.stock > 0 ?
-                                            <div
-                                                className={cn(`border py-1.5 px-2.5 rounded-md w-fit`,
-                                                    productDetails.stock <= 10 && 'text-red-500 border-red-500',
-                                                    productDetails.stock > 10 && productDetails.stock < 50 ? 'text-primary border-primary' : '',
-                                                    productDetails.stock > 50 && 'text-secondary border-secondary'
-                                                )}
-                                            >
-                                                {t('inStock')}: {productDetails.stock}
-                                            </div>
-                                            : <div>{t('outStock')}</div>}
+                                        <div className='grid grid-cols-3 w-1/3 gap-1'>
+                                            <span
+                                                className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                    ? "bg-red-500"
+                                                    : productDetails.stock <= 20
+                                                        ? "bg-primary"
+                                                        : "bg-secondary"
+                                                    }`}
+                                            ></span>
+
+                                            <span
+                                                className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                    ? "bg-red-500"
+                                                    : productDetails.stock <= 20
+                                                        ? "bg-primary"
+                                                        : "bg-secondary"
+                                                    }`}
+                                            ></span>
+
+                                            <span
+                                                className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                    ? "bg-red-500"
+                                                    : productDetails.stock <= 20
+                                                        ? "bg-primary"
+                                                        : "bg-secondary"
+                                                    }`}
+                                            ></span>
+                                        </div>
+
                                         <div className='flex flex-row gap-4 items-start border px-2.5 py-1.5 rounded-md w-fit border-black/40'>
                                             <Truck size={30} />
                                             <div>
@@ -377,8 +395,8 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         </div>
                                     </div> */}
 
-                                    <div className='flex  flex-col items-start gap-4'>
-                                        <div className='lg:basis-1/3 basis-2/5'>
+                                    <div className='flex  flex-row items-end gap-4'>
+                                        <div className='lg:basis-1/4 basis-2/5'>
                                             <FormField
                                                 control={form.control}
                                                 name="quantity"
