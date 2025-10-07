@@ -33,6 +33,7 @@ export default function middleware(req: NextRequest) {
 
   const isOtherOldWpPaths =
     pathname.startsWith("/shop/") 
+    pathname.startsWith("/product-category/") 
     // pathname.startsWith("/cart") ||
     // pathname.startsWith("/checkout") ||
     // pathname.startsWith("/my-account");
