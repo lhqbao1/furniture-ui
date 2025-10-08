@@ -39,6 +39,7 @@ import ProductImageDialog from './main-image-dialog'
 import { CartItemLocal } from '@/lib/utils/cart'
 import { CartItem } from '@/types/cart'
 import { useRouter } from '@/src/i18n/navigation'
+import Script from 'next/script'
 
 interface ProductDetailsProps {
     productDetailsData: ProductItem
@@ -193,167 +194,190 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
     })
 
     return (
-        <div className='py-3 lg:pt-3 space-y-4'>
-            <CustomBreadCrumb
-                isProductPage
-                currentPage={
-                    productDetails?.categories[0]?.children?.length
-                        ? productDetails.categories[0].children[0].name
-                        : productDetails?.categories[0]?.name
-                }
+        <>
+            <Script
+                id="product-schema"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "Product",
+                        name: productDetails.name,
+                        image: productDetails.static_files?.map(f => f.url),
+                        description: productDetails.description,
+                        sku: productDetails.sku,
+                        brand: { "@type": "Brand", name: "Prestige Home" },
+                        offers: {
+                            "@type": "Offer",
+                            priceCurrency: "EUR",
+                            price: productDetails.price,
+                            availability: "https://schema.org/InStock",
+                            url: `https://www.prestige-home.de/product/${productDetails.id}`,
+                        },
+                    }),
+                }}
             />
-            {!isLoadingProduct && productDetails ?
-                <FormProvider {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(
-                            (values) => handleSubmit(values),
-                            (e) => console.error("Please check the form for errors", e)
-                        )}
-                        className='space-y-8 lg:px-30'
-                    >
-                        <div className='flex flex-col gap-8'>
-                            {/*Product details */}
-                            <div className='grid grid-cols-12 xl:gap-16 gap-8'>
-                                {/*Product details images */}
-                                <div className='xl:col-span-6 col-span-12 flex flex-col gap-6 h-fit'>
-                                    {/* Main image */}
-                                    <ProductImageDialog productDetails={productDetails}>
-                                        <div
-                                            className='flex justify-center overflow-hidden main-image'
-                                            onMouseMove={handleZoomImage}
-                                            onMouseEnter={() => setIsHover(true)}
-                                            onMouseLeave={() => setIsHover(false)}
-                                            {...handlers}
-                                        >
-                                            <Image
-                                                src={productDetails.static_files.length > 0 ? productDetails.static_files[mainImageIndex].url : '/2.png'}
-                                                width={500}
-                                                height={300}
-                                                alt={`${productDetails.name}`}
-                                                className='transition-transform duration-300 lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer'
-                                                style={{
-                                                    transformOrigin: `${position.x}% ${position.y}%`,
-                                                    transform: isHover ? "scale(1.5)" : "scale(1)",
-                                                }}
-                                                priority
-                                            />
-                                        </div>
-                                    </ProductImageDialog>
-
-                                    {/* Sub images */}
-                                    <div className='flex flex-row px-12 w-full'>
-                                        <Carousel opts={{ loop: true, align: 'start' }}>
-                                            <CarouselContent className='w-full flex'>
-                                                {productDetails.static_files.map((item, index) => (
-                                                    <CarouselItem key={index} className={`lg:basis-1/4 basis-1/3`}>
-                                                        <div
-                                                            className="cursor-pointer"
-                                                            onClick={() => setMainImageIndex(index)}
-                                                        >
-                                                            <Image
-                                                                src={item.url}
-                                                                width={100}
-                                                                height={100}
-                                                                alt=''
-                                                                className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] object-fill`}
-                                                                priority={index < 2}
-                                                                loading={index < 2 ? 'eager' : 'lazy'}
-                                                            />
-                                                        </div>
-                                                    </CarouselItem>
-                                                ))}
-                                            </CarouselContent>
-                                            <CarouselPrevious className='text-primary border-primary' />
-                                            <CarouselNext className='text-primary border-primary' />
-                                        </Carousel>
-                                    </div>
-                                </div>
-
+            <div className='py-3 lg:pt-3 space-y-4'>
+                <CustomBreadCrumb
+                    isProductPage
+                    currentPage={
+                        productDetails?.categories[0]?.children?.length
+                            ? productDetails.categories[0].children[0].name
+                            : productDetails?.categories[0]?.name
+                    }
+                />
+                {!isLoadingProduct && productDetails ?
+                    <FormProvider {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(
+                                (values) => handleSubmit(values),
+                                (e) => console.error("Please check the form for errors", e)
+                            )}
+                            className='space-y-8 lg:px-30'
+                        >
+                            <div className='flex flex-col gap-8'>
                                 {/*Product details */}
-                                <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
-                                    {adminId ?
-                                        <div className='cursor-pointer text-primary' onClick={() => moveToAdmin(productDetails.id)}>
-                                            <Eye />
-                                        </div>
-                                        : ''}
-                                    <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
-                                    <div className='flex flex-row justify-start gap-4 items-center'>
-                                        <div className='flex gap-1 items-center'>
-                                            <ListStars rating={0} />
+                                <div className='grid grid-cols-12 xl:gap-16 gap-8'>
+                                    {/*Product details images */}
+                                    <div className='xl:col-span-6 col-span-12 flex flex-col gap-6 h-fit'>
+                                        {/* Main image */}
+                                        <ProductImageDialog productDetails={productDetails}>
+                                            <div
+                                                className='flex justify-center overflow-hidden main-image'
+                                                onMouseMove={handleZoomImage}
+                                                onMouseEnter={() => setIsHover(true)}
+                                                onMouseLeave={() => setIsHover(false)}
+                                                {...handlers}
+                                            >
+                                                <Image
+                                                    src={productDetails.static_files.length > 0 ? productDetails.static_files[mainImageIndex].url : '/2.png'}
+                                                    width={500}
+                                                    height={300}
+                                                    alt={`${productDetails.name}`}
+                                                    className='transition-transform duration-300 lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer'
+                                                    style={{
+                                                        transformOrigin: `${position.x}% ${position.y}%`,
+                                                        transform: isHover ? "scale(1.5)" : "scale(1)",
+                                                    }}
+                                                    priority
+                                                />
+                                            </div>
+                                        </ProductImageDialog>
+
+                                        {/* Sub images */}
+                                        <div className='flex flex-row px-12 w-full'>
+                                            <Carousel opts={{ loop: true, align: 'start' }}>
+                                                <CarouselContent className='w-full flex'>
+                                                    {productDetails.static_files.map((item, index) => (
+                                                        <CarouselItem key={index} className={`lg:basis-1/4 basis-1/3`}>
+                                                            <div
+                                                                className="cursor-pointer"
+                                                                onClick={() => setMainImageIndex(index)}
+                                                            >
+                                                                <Image
+                                                                    src={item.url}
+                                                                    width={100}
+                                                                    height={100}
+                                                                    alt=''
+                                                                    className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] object-fill`}
+                                                                    priority={index < 2}
+                                                                    loading={index < 2 ? 'eager' : 'lazy'}
+                                                                />
+                                                            </div>
+                                                        </CarouselItem>
+                                                    ))}
+                                                </CarouselContent>
+                                                <CarouselPrevious className='text-primary border-primary' />
+                                                <CarouselNext className='text-primary border-primary' />
+                                            </Carousel>
                                         </div>
                                     </div>
-                                    {/* <div className='flex gap-2'>
+
+                                    {/*Product details */}
+                                    <div className='xl:col-span-6 col-span-12 flex flex-col gap-6'>
+                                        {adminId ?
+                                            <div className='cursor-pointer text-primary' onClick={() => moveToAdmin(productDetails.id)}>
+                                                <Eye />
+                                            </div>
+                                            : ''}
+                                        <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
+                                        <div className='flex flex-row justify-start gap-4 items-center'>
+                                            <div className='flex gap-1 items-center'>
+                                                <ListStars rating={0} />
+                                            </div>
+                                        </div>
+                                        {/* <div className='flex gap-2'>
                                         <p className='text-primary lg:text-3xl text-xl font-semibold'>{productDetails.final_price ? <>€{productDetails.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</> : ''}</p>
                                         <p className='text-gray-300 line-through lg:text-3xl text-xl font-semibold'>{productDetails.price ? <>€{productDetails.price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</> : ''}</p>
                                     </div> */}
-                                    <div className='space-y-2'>
-                                        <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
-                                            <div className='text-4xl'>{Math.floor(productDetails.final_price ? productDetails.final_price : productDetails.price)}</div>
-                                            <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                                                ,{((productDetails.final_price ? productDetails.final_price : productDetails.price) % 1).toFixed(2).split(".")[1]}
+                                        <div className='space-y-2'>
+                                            <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
+                                                <div className='text-4xl'>{Math.floor(productDetails.final_price ? productDetails.final_price : productDetails.price)}</div>
+                                                <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
+                                                    ,{((productDetails.final_price ? productDetails.final_price : productDetails.price) % 1).toFixed(2).split(".")[1]}
+                                                </div>
+                                                <div className="text-base font-semibold text-black">€</div>
                                             </div>
-                                            <div className="text-base font-semibold text-black">€</div>
+
+                                            <p className='text-base mb-1'>
+                                                Vorher: €{(productDetails.price ? productDetails.price : productDetails.final_price).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </p>
                                         </div>
 
-                                        <p className='text-base mb-1'>
-                                            Vorher: €{(productDetails.price ? productDetails.price : productDetails.final_price).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </p>
-                                    </div>
+                                        <div className='space-y-2'>
+                                            <div>{t('includeVatAndShipping')}</div>
+                                            <div className='flex gap-2 items-center '>
+                                                <div>{t('inStock')}:</div>
+                                                <div className='grid grid-cols-3 w-1/3 gap-1'>
+                                                    <span
+                                                        className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                            ? "bg-red-500"
+                                                            : productDetails.stock <= 20
+                                                                ? "bg-primary"
+                                                                : "bg-secondary"
+                                                            }`}
+                                                    ></span>
 
-                                    <div className='space-y-2'>
-                                        <div>{t('includeVatAndShipping')}</div>
-                                        <div className='flex gap-2 items-center '>
-                                            <div>{t('inStock')}:</div>
-                                            <div className='grid grid-cols-3 w-1/3 gap-1'>
-                                                <span
-                                                    className={`w-full h-2 rounded-xs ${productDetails.stock < 10
-                                                        ? "bg-red-500"
-                                                        : productDetails.stock <= 20
-                                                            ? "bg-primary"
-                                                            : "bg-secondary"
-                                                        }`}
-                                                ></span>
+                                                    <span
+                                                        className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                            ? "bg-gray-300"
+                                                            : productDetails.stock <= 20
+                                                                ? "bg-primary"
+                                                                : "bg-secondary"
+                                                            }`}
+                                                    ></span>
 
-                                                <span
-                                                    className={`w-full h-2 rounded-xs ${productDetails.stock < 10
-                                                        ? "bg-gray-300"
-                                                        : productDetails.stock <= 20
-                                                            ? "bg-primary"
-                                                            : "bg-secondary"
-                                                        }`}
-                                                ></span>
+                                                    <span
+                                                        className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                            ? "bg-gray-300"
+                                                            : productDetails.stock <= 20
+                                                                ? "bg-gray-400"
+                                                                : "bg-secondary"
+                                                            }`}
+                                                    ></span>
+                                                </div>
+                                            </div>
 
-                                                <span
-                                                    className={`w-full h-2 rounded-xs ${productDetails.stock < 10
-                                                        ? "bg-gray-300"
-                                                        : productDetails.stock <= 20
-                                                            ? "bg-gray-400"
-                                                            : "bg-secondary"
-                                                        }`}
-                                                ></span>
+
+                                            <div className='flex flex-row gap-4 items-start border px-2.5 py-1.5 rounded-md w-fit border-black/40'>
+                                                <Truck size={30} />
+                                                <div>
+                                                    <p className='font-bold'>{t('delivery')}</p>
+                                                    <p className='font-light'>{productDetails.delivery_time ? t('deliveryTime', { days: productDetails.delivery_time }) : t('updating')}</p>
+                                                </div>
                                             </div>
                                         </div>
 
-
-                                        <div className='flex flex-row gap-4 items-start border px-2.5 py-1.5 rounded-md w-fit border-black/40'>
-                                            <Truck size={30} />
-                                            <div>
-                                                <p className='font-bold'>{t('delivery')}</p>
-                                                <p className='font-light'>{productDetails.delivery_time ? t('deliveryTime', { days: productDetails.delivery_time }) : t('updating')}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {parentProduct && parentProduct?.variants?.length > 0 &&
-                                        <ListVariant
-                                            variant={parentProduct.variants}
-                                            currentProduct={productDetails}
-                                            parentProduct={parentProduct}
-                                        />
-                                    }
+                                        {parentProduct && parentProduct?.variants?.length > 0 &&
+                                            <ListVariant
+                                                variant={parentProduct.variants}
+                                                currentProduct={productDetails}
+                                                parentProduct={parentProduct}
+                                            />
+                                        }
 
 
-                                    {/* <div className='grid grid-cols-2 gap-2'>
+                                        {/* <div className='grid grid-cols-2 gap-2'>
                                         <div className='flex flex-row gap-1 items-center'>
                                             <Image
                                                 src={'/1.svg'}
@@ -399,45 +423,45 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         </div>
                                     </div> */}
 
-                                    <div className='flex  flex-row items-end gap-4'>
-                                        <div className='lg:basis-1/4 basis-2/5'>
-                                            <FormField
-                                                control={form.control}
-                                                name="quantity"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>{t('quantity')}</FormLabel>
-                                                        <FormControl>
-                                                            <FormNumberInput {...field} min={productDetails.stock === 0 ? 0 : 1} max={productDetails.stock} stepper={1} placeholder={productDetails.stock === 0 ? '0' : '1'} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                        <div className='flex  flex-row items-end gap-4'>
+                                            <div className='lg:basis-1/4 basis-2/5'>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="quantity"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>{t('quantity')}</FormLabel>
+                                                            <FormControl>
+                                                                <FormNumberInput {...field} min={productDetails.stock === 0 ? 0 : 1} max={productDetails.stock} stepper={1} placeholder={productDetails.stock === 0 ? '0' : '1'} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
 
-                                        <div className='flex gap-1 lg:basis-2/5 basis-3/5 relative'>
-                                            <Button
-                                                className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
-                                                type="submit"
-                                                disabled={productDetails.stock > 0 ? false : true}
-                                            >
-                                                {productDetails.stock > 0 ? t('addToCart') : t('outStock')}
-                                            </Button>
+                                            <div className='flex gap-1 lg:basis-2/5 basis-3/5 relative'>
+                                                <Button
+                                                    className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
+                                                    type="submit"
+                                                    disabled={productDetails.stock > 0 ? false : true}
+                                                >
+                                                    {productDetails.stock > 0 ? t('addToCart') : t('outStock')}
+                                                </Button>
 
-                                            <div
-                                                onClick={(e) => {
-                                                    handleAddProductToWishlist()
-                                                }}
-                                                className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white border-secondary border  hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
-                                            >
-                                                <Heart />
+                                                <div
+                                                    onClick={(e) => {
+                                                        handleAddProductToWishlist()
+                                                    }}
+                                                    className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white border-secondary border  hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
+                                                >
+                                                    <Heart />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Voucher */}
-                                    {/* <div className='flex lg:flex-row flex-col justify-center gap-2 mt-6'>
+                                        {/* Voucher */}
+                                        {/* <div className='flex lg:flex-row flex-col justify-center gap-2 mt-6'>
                                         {vouchers.map((item, index) => (
                                             <ProductVoucher
                                                 item={item}
@@ -447,18 +471,19 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                             />
                                         ))}
                                     </div> */}
+                                    </div>
+                                </div>
+
+                                {/*Product tabs */}
+                                <div className='lg:mt-12 mt-8'>
+                                    <ProductDetailsTab product={productDetails} />
                                 </div>
                             </div>
-
-                            {/*Product tabs */}
-                            <div className='lg:mt-12 mt-8'>
-                                <ProductDetailsTab product={productDetails} />
-                            </div>
-                        </div>
-                    </form>
-                </FormProvider>
-                : <ProductDetailsSkeleton />}
-        </div>
+                        </form>
+                    </FormProvider>
+                    : <ProductDetailsSkeleton />}
+            </div>
+        </>
     )
 }
 

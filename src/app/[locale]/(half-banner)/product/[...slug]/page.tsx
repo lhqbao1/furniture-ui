@@ -5,25 +5,30 @@ import { getProductGroupDetail } from '@/features/product-group/api'
 import ProductDetails from '@/components/layout/single-product/product-details'
 
 interface PageProps {
-    params: Promise<{ slug: string[] }>
+    params: Promise<{ slug: string[]; locale: string }>
 }
 
 // 🕒 ISR: tái tạo lại mỗi 1 giờ (3600s)
 export const revalidate = 3600
 
-// 🏗️ Tạo trước các trang sản phẩm khi build
+// 🏗️ Pre-render sản phẩm (SSG + ISR)
 export async function generateStaticParams() {
     const products = await getProductsFeed()
-    return products.map((p) => ({
-        slug: [p.id], // hoặc [p.slug] nếu bạn dùng slug thật
-    }))
+    const locales = ['de', 'en']
+
+    // Tạo path cho mỗi locale
+    return products.flatMap((p) =>
+        locales.map((locale) => ({
+            locale,
+            slug: [p.id], // Nếu có slug riêng, đổi thành [p.slug]
+        }))
+    )
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { slug } = await params;
+    const { slug, locale } = await params;
     const slugArray = Array.isArray(slug) ? slug : [slug]
     const lastSlug = slugArray[slugArray.length - 1]
-
 
     try {
         const product = await getProductById(lastSlug)
@@ -34,9 +39,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             openGraph: {
                 title: product?.meta_title || product?.name,
                 description: product?.meta_description || product?.description?.slice(0, 150),
+                url: `https://www.prestige-home.de/${locale}/product/${product.id}`,
                 images: product?.static_files?.map((img: StaticFile) => ({ url: img.url })) ?? [],
             },
-            alternates: { canonical: product?.id || `https://www.prestige-home.de/product/${product.id}` },
+            alternates: {
+                canonical: `https://www.prestige-home.de/${locale}/product/${product.id}`,
+                languages: {
+                    de: `https://www.prestige-home.de/de/product/${product.id}`,
+                    en: `https://www.prestige-home.de/en/product/${product.id}`,
+                    'x-default': `https://www.prestige-home.de/en/product/${product.id}`,
+                },
+            },
         }
     } catch {
         return {
