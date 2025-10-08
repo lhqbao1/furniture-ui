@@ -28,7 +28,7 @@ export default function ProductSearch({
 }: {
     height?: boolean
     isAdmin?: boolean
-    setListProducts: React.Dispatch<React.SetStateAction<ProductManual[]>>
+    setListProducts?: React.Dispatch<React.SetStateAction<ProductManual[]>>
 }) {
     const t = useTranslations()
     const [query, setQuery] = React.useState("")
@@ -173,7 +173,7 @@ export default function ProductSearch({
                                                                     final_price: product.final_price ?? 0,
                                                                 }
 
-                                                                setListProducts(prev => [...prev, newProduct])
+                                                                setListProducts?.(prev => [...prev, newProduct])
                                                                 setQuery("")
                                                                 handleAddToCartLocal(product)
                                                                 setOpen(false)
