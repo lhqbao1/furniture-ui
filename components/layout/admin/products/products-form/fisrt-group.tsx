@@ -19,9 +19,10 @@ const RichEditor = dynamic(() => import("@/components/shared/tiptap/tiptap-edito
 interface ProductDetailInputsProps {
     isEdit?: boolean
     productId?: string | null
+    isDSP?: boolean
 }
 
-const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) => {
+const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetailInputsProps) => {
     const form = useFormContext()
 
     return (
@@ -48,22 +49,25 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                 {productId ? <div>ID: {productId}</div> : ''}
 
                 {/*Product Active */}
-                <FormField
-                    control={form.control}
-                    name="is_active"
-                    render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
-                            <FormLabel className="!mt-0 text-[#666666]">Active</FormLabel>
-                            <FormControl>
-                                <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
-                                />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
+                {isDSP ? '' :
+                    <FormField
+                        control={form.control}
+                        name="is_active"
+                        render={({ field }) => (
+                            <FormItem className="flex items-center space-x-2">
+                                <FormLabel className="!mt-0 text-[#666666]">Active</FormLabel>
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
+                                    />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                }
+
             </div>
 
             <div className='flex gap-6'>
@@ -85,10 +89,12 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                             <FormControl>
                                 <Input
                                     type="text"
-                                    value={field.value ?? ""} // null -> ""
-                                    onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                    {...field}
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
                                 />
                             </FormControl>
+                            <FormMessage></FormMessage>
                         </FormItem>
                     )}
                 />
@@ -110,6 +116,7 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                                     onChange={(e) => field.onChange(e.target.value)}
                                 />
                             </FormControl>
+                            <FormMessage></FormMessage>
                         </FormItem>
                     )}
                 />
@@ -187,12 +194,6 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                                 value={field.value || ""}
                                 onChangeValue={field.onChange}
                             />
-                            {/* <RichTextEditor
-                                value={field.value || ""}
-                                onChange={field.onChange}
-                                content={description}
-                                setContent={setDescription}
-                            /> */}
                         </FormControl>
                         <FormMessage />
                     </FormItem>

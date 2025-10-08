@@ -29,6 +29,9 @@ import ProductSearch from '@/components/shared/product-search'
 import { CheckOutUserInformation } from '@/components/layout/checkout/admin-user-information'
 import CheckOutShippingAddress from '@/components/layout/checkout/shipping-address'
 import CartLocalTable from '@/components/layout/cart/cart-local-table'
+import DownloadInvoiceButton from '@/components/layout/pdf/download-invoice-button'
+import { AdminManualCreateOrder } from '@/components/layout/admin/orders/order-create/manual-create-order'
+import { ProductManual } from '@/components/layout/pdf/manual-invoice'
 
 export interface CartItem {
     id: number
@@ -46,11 +49,22 @@ export default function CreateCheckoutpage() {
     const [openBankDialog, setOpenBankDialog] = useState(false)
     const [localQuantities, setLocalQuantities] = useState<Record<string, number>>({})
     const [openOtpDialog, setOpenOTPDialog] = useState(false)
+    const [listProducts, setListProducts] = useState<ProductManual[]>([])
     const t = useTranslations()
+
 
     const { updateStatus } = useCartLocal()
 
     const CreateOrderSchema = z.object({
+        user_code: z.string().min(1, { message: "User code is required" }),
+        created_at: z.string().min(1, { message: "Created date is required" }),
+        shipping_cost: z.number().min(1, { message: "Shipping cost is required" }),
+        total_amount: z.number().min(1, { message: "Shipping cost is required" }),
+        total_vat: z.number().min(1, { message: "Shipping cost is required" }),
+        invoice_code: z.string().min(1, { message: "Shipping cost is required" }),
+        net_amount: z.number().min(1, { message: "Shipping cost is required" }),
+
+
         shipping_address_id: z.string().optional(),
         invoice_address_id: z.string().optional(),
         cart_id: z.string().optional(),
@@ -154,6 +168,8 @@ export default function CreateCheckoutpage() {
     const form = useForm<CreateOrderFormValues>({
         resolver: zodResolver(CreateOrderSchema),
         defaultValues: {
+            user_code: "",
+
             shipping_address_id: "",
             invoice_address_id: "",
             cart_id: "",
@@ -224,6 +240,8 @@ export default function CreateCheckoutpage() {
 
     const couponAmount = form.watch('coupon_amount')
     const voucherAmount = form.watch('voucher_amount')
+    const formValues = form.watch()
+
 
     //Assign cart_id into form values
     useEffect(() => {
@@ -236,139 +254,143 @@ export default function CreateCheckoutpage() {
     }, [cartItems, invoiceAddress, form])
 
 
-    const handleSubmit = useCallback(
-        async (data: CreateOrderFormValues) => {
-            try {
-                // Nếu password hoặc confirmPassword rỗng thì gán Guest@12345
-                if (!data.password) data.password = "Guest@12345";
-                if (!data.confirmPassword) data.confirmPassword = "Guest@12345";
-                let userId = user?.id;
-                let invoiceAddressId = invoiceAddress?.id;
-                const invoiceAddressCountry = invoiceAddress?.country;
-                let shippingAddressId = addresses?.find(a => a.is_default)?.id
+    // const handleSubmit = useCallback(
+    //     async (data: CreateOrderFormValues) => {
+    //         try {
+    //             // Nếu password hoặc confirmPassword rỗng thì gán Guest@12345
+    //             if (!data.password) data.password = "Guest@12345";
+    //             if (!data.confirmPassword) data.confirmPassword = "Guest@12345";
+    //             let userId = user?.id;
+    //             let invoiceAddressId = invoiceAddress?.id;
+    //             const invoiceAddressCountry = invoiceAddress?.country;
+    //             let shippingAddressId = addresses?.find(a => a.is_default)?.id
 
-                // Nếu chưa có user thì tạo mới
-                if (!userId) {
-                    const newUser = await createUserAccountMutation.mutateAsync({
-                        first_name: data.first_name,
-                        last_name: data.last_name,
-                        email: data.email,
-                        phone_number: data.phone_number,
-                    })
-                    userId = newUser.id
+    //             // Nếu chưa có user thì tạo mới
+    //             if (!userId) {
+    //                 const newUser = await createUserAccountMutation.mutateAsync({
+    //                     first_name: data.first_name,
+    //                     last_name: data.last_name,
+    //                     email: data.email,
+    //                     phone_number: data.phone_number,
+    //                 })
+    //                 userId = newUser.id
 
 
 
-                    // Lưu token + userId vào localStorage
-                    localStorage.setItem("access_token", newUser.access_token)
-                    localStorage.setItem("userId", newUser.id)
+    //                 // Lưu token + userId vào localStorage
+    //                 localStorage.setItem("access_token", newUser.access_token)
+    //                 localStorage.setItem("userId", newUser.id)
 
-                    // Sync local cart
-                    syncLocalCartMutation.mutate()
-                    userId = newUser.id
-                }
+    //                 // Sync local cart
+    //                 syncLocalCartMutation.mutate()
+    //                 userId = newUser.id
+    //             }
 
-                // Nếu chưa có invoice address thì tạo mới
-                if (!invoiceAddressCountry || invoiceAddressCountry === "" || !invoiceAddressId) {
-                    const newInvoice = await createInvoiceAddressMutation.mutateAsync({
-                        user_id: userId ?? '',
-                        recipient_name: data.first_name + data.last_name,
-                        postal_code: data.invoice_postal_code,
-                        phone_number: data.phone_number,
-                        address_line: data.invoice_address_line,
-                        city: data.invoice_city,
-                        country: data.invoice_city,
-                        name_address: "Invoice",
-                        state: data.invoice_city
-                    })
-                    invoiceAddressId = newInvoice.id
-                } else {
-                    if (data.invoice_address_line !== invoiceAddress?.address_line ||
-                        data.invoice_postal_code !== invoiceAddress?.postal_code ||
-                        data.invoice_city !== invoiceAddress?.city ||
-                        data.phone_number !== invoiceAddress?.phone_number) {
-                        const newInvoice = await editInvoiceAddressMutation.mutateAsync({
-                            addressId: invoiceAddressId,
-                            address: {
-                                user_id: userId ?? '',
-                                recipient_name: data.first_name + data.last_name,
-                                postal_code: data.invoice_postal_code,
-                                phone_number: data.phone_number,
-                                address_line: data.invoice_address_line,
-                                city: data.invoice_city,
-                                country: data.invoice_city,
-                                name_address: "Invoice",
-                                state: data.invoice_city
-                            }
-                        })
-                        invoiceAddressId = newInvoice.id
-                    }
-                }
+    //             // Nếu chưa có invoice address thì tạo mới
+    //             if (!invoiceAddressCountry || invoiceAddressCountry === "" || !invoiceAddressId) {
+    //                 const newInvoice = await createInvoiceAddressMutation.mutateAsync({
+    //                     user_id: userId ?? '',
+    //                     recipient_name: data.first_name + data.last_name,
+    //                     postal_code: data.invoice_postal_code,
+    //                     phone_number: data.phone_number,
+    //                     address_line: data.invoice_address_line,
+    //                     city: data.invoice_city,
+    //                     country: data.invoice_city,
+    //                     name_address: "Invoice",
+    //                     state: data.invoice_city
+    //                 })
+    //                 invoiceAddressId = newInvoice.id
+    //             } else {
+    //                 if (data.invoice_address_line !== invoiceAddress?.address_line ||
+    //                     data.invoice_postal_code !== invoiceAddress?.postal_code ||
+    //                     data.invoice_city !== invoiceAddress?.city ||
+    //                     data.phone_number !== invoiceAddress?.phone_number) {
+    //                     const newInvoice = await editInvoiceAddressMutation.mutateAsync({
+    //                         addressId: invoiceAddressId,
+    //                         address: {
+    //                             user_id: userId ?? '',
+    //                             recipient_name: data.first_name + data.last_name,
+    //                             postal_code: data.invoice_postal_code,
+    //                             phone_number: data.phone_number,
+    //                             address_line: data.invoice_address_line,
+    //                             city: data.invoice_city,
+    //                             country: data.invoice_city,
+    //                             name_address: "Invoice",
+    //                             state: data.invoice_city
+    //                         }
+    //                     })
+    //                     invoiceAddressId = newInvoice.id
+    //                 }
+    //             }
 
-                // Nếu chưa có shipping address thì tạo mới
-                if (!shippingAddressId) {
-                    const newShipping = await createShippingAddressMutation.mutateAsync({
-                        user_id: userId ?? '',
-                        recipient_name: data.first_name + data.last_name,
-                        postal_code: data.invoice_postal_code,
-                        phone_number: data.phone_number,
-                        address_line: data.invoice_address_line,
-                        city: data.shipping_city,
-                        country: data.shipping_city,
-                        name_address: "Rechnung",
-                        is_default: true,
-                        state: data.shipping_city
-                    })
-                    shippingAddressId = newShipping.id
-                } else {
-                    if (data.shipping_address_line !== addresses?.find(a => a.is_default)?.address_line ||
-                        data.shipping_postal_code !== addresses?.find(a => a.is_default)?.postal_code ||
-                        data.shipping_city !== addresses?.find(a => a.is_default)?.city ||
-                        data.phone_number !== addresses?.find(a => a.is_default)?.phone_number) {
-                        const newShipping = await createShippingAddressMutation.mutateAsync({
-                            user_id: userId ?? '',
-                            recipient_name: data.first_name + data.last_name,
-                            postal_code: data.shipping_postal_code,
-                            phone_number: data.phone_number,
-                            address_line: data.shipping_address_line,
-                            city: data.shipping_city,
-                            country: data.shipping_city,
-                            name_address: "Rechnung",
-                            is_default: true,
-                            state: data.shipping_city
-                        })
-                        shippingAddressId = newShipping.id
-                    }
-                }
+    //             // Nếu chưa có shipping address thì tạo mới
+    //             if (!shippingAddressId) {
+    //                 const newShipping = await createShippingAddressMutation.mutateAsync({
+    //                     user_id: userId ?? '',
+    //                     recipient_name: data.first_name + data.last_name,
+    //                     postal_code: data.invoice_postal_code,
+    //                     phone_number: data.phone_number,
+    //                     address_line: data.invoice_address_line,
+    //                     city: data.shipping_city,
+    //                     country: data.shipping_city,
+    //                     name_address: "Rechnung",
+    //                     is_default: true,
+    //                     state: data.shipping_city
+    //                 })
+    //                 shippingAddressId = newShipping.id
+    //             } else {
+    //                 if (data.shipping_address_line !== addresses?.find(a => a.is_default)?.address_line ||
+    //                     data.shipping_postal_code !== addresses?.find(a => a.is_default)?.postal_code ||
+    //                     data.shipping_city !== addresses?.find(a => a.is_default)?.city ||
+    //                     data.phone_number !== addresses?.find(a => a.is_default)?.phone_number) {
+    //                     const newShipping = await createShippingAddressMutation.mutateAsync({
+    //                         user_id: userId ?? '',
+    //                         recipient_name: data.first_name + data.last_name,
+    //                         postal_code: data.shipping_postal_code,
+    //                         phone_number: data.phone_number,
+    //                         address_line: data.shipping_address_line,
+    //                         city: data.shipping_city,
+    //                         country: data.shipping_city,
+    //                         name_address: "Rechnung",
+    //                         is_default: true,
+    //                         state: data.shipping_city
+    //                     })
+    //                     shippingAddressId = newShipping.id
+    //                 }
+    //             }
 
-                // Đợi cartItems
-                if (!cartItems?.id) {
-                    const latestCart = await getCartItems()
-                    if (!latestCart?.id) {
-                        toast.error("Cart not found")
-                        return
-                    }
-                    data.cart_id = latestCart.id
-                } else {
-                    data.cart_id = cartItems.id
-                }
+    //             // Đợi cartItems
+    //             if (!cartItems?.id) {
+    //                 const latestCart = await getCartItems()
+    //                 if (!latestCart?.id) {
+    //                     toast.error("Cart not found")
+    //                     return
+    //                 }
+    //                 data.cart_id = latestCart.id
+    //             } else {
+    //                 data.cart_id = cartItems.id
+    //             }
 
-                // Tạo checkout
-                await createCheckOutMutation.mutateAsync({
-                    ...data,
-                    // user_id: userId,
-                    invoice_address_id: invoiceAddressId,
-                    shipping_address_id: shippingAddressId,
+    //             // Tạo checkout
+    //             await createCheckOutMutation.mutateAsync({
+    //                 ...data,
+    //                 // user_id: userId,
+    //                 invoice_address_id: invoiceAddressId,
+    //                 shipping_address_id: shippingAddressId,
 
-                })
-                toast.success("Place order successful")
-            } catch (error) {
-                toast.error(t('orderFail'))
-                console.error(error)
-            }
-        },
-        [user, invoiceAddress, addresses]
-    )
+    //             })
+    //             toast.success("Place order successful")
+    //         } catch (error) {
+    //             toast.error(t('orderFail'))
+    //             console.error(error)
+    //         }
+    //     },
+    //     [user, invoiceAddress, addresses]
+    // )
+
+    const handleSubmit = (data: CreateOrderFormValues) => {
+        console.log(data)
+    }
 
     const normalizedItems = normalizeCartItems(cartItems && cartItems.items.length > 0 ? cartItems.items : localCart, cartItems && cartItems.items.length > 0 ? true : false)
     const shippingCost = calculateShipping(normalizedItems)
@@ -394,6 +416,7 @@ export default function CreateCheckoutpage() {
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12'>
                     {/* User information and address */}
                     <div className='col-span-1 space-y-4 lg:space-y-12'>
+                        <AdminManualCreateOrder />
                         <CheckOutUserInformation setUserId={setUserId} isAdmin />
                         <CheckOutShippingAddress isAdmin />
                         <CheckOutInvoiceAddress isAdmin />
@@ -401,7 +424,7 @@ export default function CreateCheckoutpage() {
 
                     {/* Table cart and total */}
                     <div className='col-span-1 space-y-4 lg:space-y-4'>
-                        <ProductSearch isAdmin />
+                        <ProductSearch isAdmin setListProducts={setListProducts} />
                         {
                             cartItems ? (<CartTable
                                 isLoadingCart={isLoadingCart}
@@ -513,6 +536,24 @@ export default function CreateCheckoutpage() {
                         <div className='flex lg:justify-end justify-center'>
                             <Button type="submit" className='text-lg lg:w-1/3 w-1/2 py-6'>{t('continue')}</Button>
                         </div>
+
+                        <DownloadInvoiceButton
+                            data={{
+                                first_name: formValues.first_name,
+                                last_name: formValues.last_name,
+                                user_code: formValues.user_code,
+                                created_at: formValues.created_at,
+                                shipping_address_city: formValues.shipping_city,
+                                shipping_address_line: formValues.shipping_address_line,
+                                shipping_address_postal: formValues.shipping_postal_code,
+                                shipping_cost: formValues.shipping_cost,
+                                total_amount: formValues.total_amount,
+                                total_vat: formValues.total_vat,
+                                invoice_code: formValues.invoice_code,
+                                net_amount: formValues.net_amount,
+                                products: listProducts
+                            }}
+                        />
                     </div>
                 </div>
 

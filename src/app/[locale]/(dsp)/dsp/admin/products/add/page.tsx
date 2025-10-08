@@ -1,13 +1,13 @@
 'use client'
 import ProductFormDSP from '@/components/layout/dsp/admin/products/add/product-add-or-edit'
 import { useAddProductDSP } from '@/features/dsp/products/hook'
-import { ProductInput } from '@/lib/schema/product'
+import { ProductInputDSP } from '@/lib/schema/dsp/product'
 import React from 'react'
 import { toast } from 'sonner'
 
 const ProductAddDsp = () => {
     const addProduct = useAddProductDSP()
-    const handleAddProduct = async (values: ProductInput) => {
+    const handleAddProduct = async (values: ProductInputDSP) => {
         addProduct.mutate(values, {
             onSuccess: () => {
                 toast.success("Product added successfully!")

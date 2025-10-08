@@ -22,7 +22,7 @@ type NormalizedCartItem = {
 export function calculateShipping(cartItems: NormalizedCartItem[]): number {
     if (cartItems.length === 0) return 0
     const hasOtherCarrier = cartItems.some(item => item.carrier !== "amm")
-    return hasOtherCarrier ? 35.95 : 5.95
+    return hasOtherCarrier ? 5.95 : 35.95
   }
 
   export function checkShippingType(cartItems: NormalizedCartItem[]): boolean {

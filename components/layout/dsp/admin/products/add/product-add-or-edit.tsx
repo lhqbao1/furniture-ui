@@ -8,7 +8,6 @@ import {
     Form,
 } from "@/components/ui/form"
 import "react-quill-new/dist/quill.snow.css"
-import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/product'
 import { Loader2 } from 'lucide-react'
 import { ProductItem, StaticFile } from '@/types/products'
 import { toast } from 'sonner'
@@ -28,10 +27,11 @@ import ProductAdditionalInputs from '@/components/layout/admin/products/products
 import ProductLogisticsGroup from '@/components/layout/admin/products/products-form/product-logistics-group'
 import ProductSEOGroup from '@/components/layout/admin/products/products-form/product-seo-group'
 import { useAddProductDSP } from '@/features/dsp/products/hook'
+import { addProductDSPSchema, defaultValuesDSP, ProductInputDSP } from '@/lib/schema/dsp/product'
 
 interface AddProductFormDSPProps {
     productValues?: Partial<ProductItem>
-    onSubmit: (values: ProductInput) => Promise<void> | void
+    onSubmit: (values: ProductInputDSP) => Promise<void> | void
     isPending?: boolean
     productValuesClone?: Partial<ProductItem>
 }
@@ -44,10 +44,10 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
     const [isLoadingSEO, setIsLoadingSEO] = useState(false)
 
     const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
-        if (!productValues) return defaultValues
+        if (!productValues) return defaultValuesDSP
 
         return {
-            ...defaultValues,
+            ...defaultValuesDSP,
             ...productValues,
             category_ids:
                 productValues.categories?.map((c: CategoryResponse | number) =>
@@ -59,8 +59,8 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
 
     const initialValues = normalizeProductValues(productValuesClone || productValues)
 
-    const form = useForm<z.infer<typeof addProductSchema>>({
-        resolver: zodResolver(addProductSchema),
+    const form = useForm<z.infer<typeof addProductDSPSchema>>({
+        resolver: zodResolver(addProductDSPSchema),
         defaultValues: initialValues,
         mode: "onBlur",
     })
@@ -73,7 +73,7 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
         }
     }, [productValuesClone, productValues, form])
 
-    const handleSubmit = async (values: ProductInput) => {
+    const handleSubmit = async (values: ProductInputDSP) => {
         const payload = {
             ...values,
             weight: values.weight || values.weight === 0 ? values.weight : undefined,
@@ -81,7 +81,6 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
             width: values.width || values.width === 0 ? values.width : undefined,
             height: values.height || values.height === 0 ? values.height : undefined,
             length: values.length || values.length === 0 ? values.length : undefined,
-            cost: values.cost || values.cost === 0 ? values.cost : undefined,
             final_price: values.final_price ?? values.price ?? undefined,
             price: values.price ?? values.final_price ?? undefined,
             stock: values.stock ?? 1
@@ -158,7 +157,7 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
                 )}>
                     <div className='grid-cols-12 grid gap-24 w-full'>
                         <div className='col-span-9 flex flex-col gap-4'>
-                            {!defaultValues ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
+                            {!defaultValuesDSP ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
                                 : ''}
 
                             <Accordion
@@ -171,7 +170,7 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
-                                                <ProductDetailInputs isEdit={productValues ? true : false} productId={productValues ? productValues.id_provider : null} />
+                                                <ProductDetailInputs isEdit={productValues ? true : false} productId={productValues ? productValues.id_provider : null} isDSP />
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>
@@ -215,7 +214,7 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
                                 <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.back()}
                                 >Back</Button>
                                 <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>Discard</Button>
-                                <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
+                                <Button className={`cursor-pointer text-lg px-8 ${defaultValuesDSP ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (
                                         <Loader2 className="animate-spin" />
                                     ) : productValues ? (
@@ -231,7 +230,6 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
                 </form>
             </Form>
         </div>
-
     )
 }
 

@@ -74,6 +74,7 @@ export const defaultValues = {
   tax: "19%",
   category: "",
   ebay: false,
+  sku: "",
   // delivery_cost: 0,
   collection: null as string | null,
   // ean: "",

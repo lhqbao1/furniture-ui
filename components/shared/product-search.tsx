@@ -19,8 +19,17 @@ import { createPortal } from "react-dom"
 import { Link } from "@/src/i18n/navigation"
 import { useCartLocal } from "@/hooks/cart"
 import { toast } from "sonner"
+import { ProductManual } from "../layout/pdf/manual-invoice"
 
-export default function ProductSearch({ height, isAdmin = false }: { height?: boolean, isAdmin?: boolean }) {
+export default function ProductSearch({
+    height,
+    isAdmin = false,
+    setListProducts,
+}: {
+    height?: boolean
+    isAdmin?: boolean
+    setListProducts: React.Dispatch<React.SetStateAction<ProductManual[]>>
+}) {
     const t = useTranslations()
     const [query, setQuery] = React.useState("")
     const [debouncedQuery, setDebouncedQuery] = React.useState("")
@@ -150,9 +159,23 @@ export default function ProductSearch({ height, isAdmin = false }: { height?: bo
                                                     {isAdmin ? (
                                                         <div
                                                             className="flex justify-between items-center w-full cursor-pointer"
+                                                            // onClick={() => {
+                                                            //     handleAddToCartLocal(product)
+                                                            //     setQuery("")
+                                                            //     setOpen(false)
+                                                            // }}
                                                             onClick={() => {
-                                                                handleAddToCartLocal(product)
+                                                                const newProduct: ProductManual = {
+                                                                    name: product.name,
+                                                                    id_provider: product.id_provider ?? "",
+                                                                    price: product.final_price ?? 0,
+                                                                    quantity: 1,
+                                                                    final_price: product.final_price ?? 0,
+                                                                }
+
+                                                                setListProducts(prev => [...prev, newProduct])
                                                                 setQuery("")
+                                                                handleAddToCartLocal(product)
                                                                 setOpen(false)
                                                             }}
                                                         >
