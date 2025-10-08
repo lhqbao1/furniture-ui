@@ -126,6 +126,7 @@ export function AdminSideBar() {
                                                         <Button
                                                             key={child.title}
                                                             onClick={() => router.push(childUrl, { locale })}
+                                                            onMouseEnter={() => router.prefetch(childUrl)} // 👈 prefetch trước
                                                             variant="ghost"
                                                             className={`relative flex flex-row items-center justify-start pl-12 gap-3 rounded-md py-1 text-base transition-colors ${isChildActive
                                                                 ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
