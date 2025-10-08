@@ -100,8 +100,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     <Text style={styles.title}>Rechnung</Text>
                     <View style={styles.tableHeader}>
                         <Text style={{ width: 50, textAlign: 'center', fontFamily: 'FigtreeBold' }}>Pos.</Text>
-                        <Text style={{ width: 150, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Menge</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Bezeichnung</Text>
+                        <Text style={{ width: 150, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Bezeichnung</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Menge</Text>
                         <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>MwSt.</Text>
                         <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>E-Preis</Text>
                         <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>G-Preis</Text>
@@ -113,9 +113,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                 <Text>{item.products.name}</Text>
                                 <Text style={{ marginTop: 5, textAlign: 'left' }}>{item.products.id_provider}</Text>
                             </Text>
-                            <Text style={{ flex: 1, paddingRight: 15, textAlign: 'right' }}>€{item.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                             <Text style={styles.tableColQuantity}>{item.quantity}</Text>
                             <Text style={styles.tableCol}>19%</Text>
+                            <Text style={{ flex: 1, paddingRight: 15, textAlign: 'right' }}>€{item.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                             <Text style={styles.tableCol}>€{item.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
                     ))}

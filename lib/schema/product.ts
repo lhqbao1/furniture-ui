@@ -6,6 +6,13 @@ const StaticFileSchema = z.object({
   url: z.string(),
 })
 
+export const packageSchema = z.object({
+  weight: z.number().nonnegative().optional().nullable(),
+  length: z.number().nonnegative().optional().nullable(),
+  width: z.number().nonnegative().optional().nullable(),
+  height: z.number().nonnegative().optional().nullable(),
+})
+
 export const addProductSchema = z.object({
   name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
@@ -18,14 +25,15 @@ export const addProductSchema = z.object({
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
   stock: z.number().nonnegative().optional().nullable(),
-  // sku: z.string().min(1, "You must provide product sku"),
+  delivery_multiple: z.boolean().optional().nullable(),
+  
   materials: z.string().optional().nullable(),
   color: z.string().optional().nullable(),
   unit: z.string().optional().nullable(),
   amount_unit: z.string().optional().nullable(),
   incoterm: z.string().optional().nullable(),
   sku: z.string().min(1, "Product SKU is required"),
-  packaging_amount: z.string().optional().nullable(),
+  number_of_packages: z.number().optional().nullable(),
   ean: z.string().optional().nullable(),
   carrier: z.string().optional().nullable(),
   delivery_time:z.string().optional().nullable(),
@@ -57,11 +65,7 @@ export const addProductSchema = z.object({
   meta_keywords: z.string().optional().nullable(),
 
   pallet_unit: z.number().optional().nullable(),
-  product_height: z.number().optional().nullable(),
-  product_length: z.number().optional().nullable(),
-  product_width: z.number().optional().nullable(),
-  product_net_weight: z.number().optional().nullable(),
-
+  packages: z.array(packageSchema).optional(),
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 })
 

@@ -25,10 +25,10 @@ const TrendingProducts = () => {
                 <>
                     <ProductsGridLayout
                         data={isPhone ?
-                            products.filter(item => item.stock > 0)
+                            products.filter(item => item.is_active === true)
                                 .slice(0, 6)
                             :
-                            products.filter(item => item.stock > 0)
+                            products.filter(item => item.is_active === true)
                                 .slice(0, 8)}
                     />
                 </>

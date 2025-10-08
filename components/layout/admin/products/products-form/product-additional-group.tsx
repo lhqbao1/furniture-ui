@@ -236,7 +236,7 @@ const ProductAdditionalInputs = () => {
                 {/* Product length */}
                 <FormField
                     control={form.control}
-                    name="product_length"
+                    name="length"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
                             <FormLabel className='text-black font-semibold text-sm'>
@@ -263,7 +263,7 @@ const ProductAdditionalInputs = () => {
                 {/* Product width */}
                 <FormField
                     control={form.control}
-                    name="product_width"
+                    name="width"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
                             <FormLabel className='text-black font-semibold text-sm'>
@@ -290,7 +290,7 @@ const ProductAdditionalInputs = () => {
                 {/* Product height */}
                 <FormField
                     control={form.control}
-                    name="product_height"
+                    name="height"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
                             <FormLabel className='text-black font-semibold text-sm'>
@@ -317,7 +317,7 @@ const ProductAdditionalInputs = () => {
                 {/* Product net weight */}
                 <FormField
                     control={form.control}
-                    name="product_net_weight"
+                    name="weight"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
                             <FormLabel className='text-black font-semibold text-sm'>

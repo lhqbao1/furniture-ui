@@ -142,28 +142,28 @@ export const InvoicePDFManual = (
                     <View style={styles.flexColBlock}>
                         <Text style={{ fontFamily: "Figtree", fontSize: 12, fontWeight: 'bold' }}>
                             {/* {data.first_name} {data.last_name} */}
-                            Ralf Gerwien
+                            Christina Knöss
                         </Text>
                         <Text>
                             {/* {data.shipping_address_line} */}
-                            Auenblickstr. 13A
+                            Kurt-Schumacherstr 11
                         </Text>
                         <Text>
                             {/* {data.shipping_address_postal} - {data.shipping_address_city} */}
-                            04159 Leipzig
+                            35096 Weimar
                         </Text>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'column', marginRight: 50 }}>
                         {/* <Text>Invoice ID: {invoice?.id}</Text> */}
-                        <Text>IBelegnummer: 081025-0001
+                        <Text>IBelegnummer: 071025-0002
                             {/* {data.invoice_code} */}
                         </Text>
                         <Text>
-                            Datum: Oct 8,2025
+                            Datum: Oct 7,2025
                             {/* {data.created_at} */}
                         </Text>
                         {/* <Text>Customer ID: {checkout?.user.id}</Text> */}
-                        <Text>Kunden-Nr: 7410122
+                        <Text>Kunden-Nr: 7410113
                             {/* {data.user_code} */}
                         </Text>
                     </View>
@@ -174,11 +174,11 @@ export const InvoicePDFManual = (
                     <Text style={styles.title}>Rechnung</Text>
                     <View style={styles.tableHeader}>
                         <Text style={{ width: 50, textAlign: 'center', fontFamily: 'FigtreeBold' }}>Pos.</Text>
-                        <Text style={{ width: 150, textAlign: 'left', fontFamily: 'FigtreeBold' }}>Menge</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Bezeichnung</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>MwSt.</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>E-Preis</Text>
-                        <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>G-Preis</Text>
+                        <Text style={{ width: 150, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>Bezeichnung</Text>
+                        <Text style={{ width: 50, textAlign: 'center', fontFamily: 'FigtreeBold' }}>Menge</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, textAlign: 'center', fontFamily: 'FigtreeBold' }}>MwSt.</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, textAlign: 'center', fontFamily: 'FigtreeBold' }}>E-Preis</Text>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, textAlign: 'center', fontFamily: 'FigtreeBold' }}>G-Preis</Text>
                     </View>
                     {/* {data?.products?.map((item, index) => (
                         <View style={styles.tableRow} key={index}>
@@ -195,22 +195,22 @@ export const InvoicePDFManual = (
                     ))} */}
                     <View style={styles.tableRow}>
                         <Text style={{ width: 50, textAlign: 'center' }}>1</Text>
-                        <Text style={{ width: 100, textAlign: 'left' }}>
-                            <Text>9er–Set Massivholz–Klickfliese aus Akazienholz, ca. 30 x 30 cm – Braun</Text>
-                            <Text style={{ marginTop: 5, textAlign: 'left' }}>#1000068</Text>
+                        <Text style={{ width: 150, textAlign: 'left', paddingHorizontal: 5 }}>
+                            <Text>XXL–Komfort–Sonnenliege inkl. Kissen gepolstert aus Aluminium, ca. 203 x 67,5 x 48 cm – Anthrazit</Text>
+                            <Text style={{ marginTop: 5, textAlign: 'left' }}>#10000114</Text>
                         </Text>
-                        <Text style={{ textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', flex: 1 }}>
-                            €19,00
-                            {/* {item.price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
-                        </Text>
-                        <Text style={styles.tableColQuantity}>
-                            3
+                        <Text style={{ width: 50, textAlign: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                            1
                             {/* {item.quantity} */}
                         </Text>
-                        <Text style={{ textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', flex: 1 }}>
+                        <Text style={{ flex: 1, paddingHorizontal: 5, textAlign: 'center' }}>
                             19%</Text>
-                        <Text style={{ textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', flex: 1 }}>
-                            €57,00
+                        <Text style={{ textAlign: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'center', flex: 1 }}>
+                            €40,00
+                            {/* {item.price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
+                        </Text>
+                        <Text style={{ textAlign: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'center', flex: 1 }}>
+                            €40,00
                             {/* {item.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
                         </Text>
                     </View>
@@ -222,7 +222,7 @@ export const InvoicePDFManual = (
                         <View style={styles.flexEndTotal}>
                             <Text style={styles.gapY10}>Gesamt Netto</Text>
                             <Text style={styles.minWidth}>
-                                €57,00
+                                €32,40
                                 {/* {data.net_amount ? data?.net_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0} */}
                                 {/* €{((data?.total_amount_item ?? 0) - (data?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
                             </Text>
@@ -232,7 +232,7 @@ export const InvoicePDFManual = (
                             <Text style={styles.gapY10}>zzgl. MwSt</Text>
                             <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                 {/* €{data.total_vat.toFixed(2)} */}
-                                €57,00
+                                €07,60
                                 {/* {data.total_vat ? data?.total_vat.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0} */}
                             </Text>
                         </View>
@@ -240,14 +240,14 @@ export const InvoicePDFManual = (
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <Text style={styles.gapY10}>Versandkosten</Text>
                             <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', textAlign: 'right' }}>
-                                €€5,95
+                                €00,00
                                 {/* {data.shipping_cost ? data?.shipping_cost.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0} */}
                             </Text>
                         </View>
 
                         <View style={styles.flexEndTotalBg}>
                             <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Rechnungsbetrag</Text>
-                            <Text style={styles.minWidth}>€57,00
+                            <Text style={styles.minWidth}>€40,00
                                 {/* {data.total_amount ? data?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0} */}
                             </Text>
                         </View>
@@ -255,20 +255,20 @@ export const InvoicePDFManual = (
                         <View style={styles.flexEndTotal}>
                             <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Zahlbetrag</Text>
                             <Text style={styles.minWidth}>
-                                €57,00
+                                €40,00
                                 {/* €{data.total_amount ? data?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0} */}
                             </Text>
                         </View>
 
                         <View style={styles.flexEndTotal}>
-                            <Text style={styles.gapY10}>Zahlung vom Oct 8, 2025
+                            <Text style={styles.gapY10}>Zahlung vom Oct 7,2025
                                 {/* {data.created_at} */}
                                 {/* {invoice?.created_at
                                     ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
                                     : ""} */}
                                 :</Text>
                             <Text style={styles.minWidth}>
-                                €57,00
+                                €40,00
                                 {/* €{data.total_amount ? data?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0} */}
                             </Text>
                         </View>
