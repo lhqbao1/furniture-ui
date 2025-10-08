@@ -31,7 +31,7 @@ export default function DownloadInvoiceButton({ data, fileName = "invoice.pdf" }
             fileName="invoice.pdf"
         >
             {({ loading }) => (
-                <Button type="button">
+                <Button type="button" className="py-6" variant={'secondary'}>
                     {loading ? <Loader2 className="animate-spin" /> : "⬇️ Download PDF"}
                 </Button>
             )}

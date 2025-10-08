@@ -533,27 +533,26 @@ export default function CreateCheckoutpage() {
                             <div className='font-bold text-base'>{t('selectPayment')}</div>
                             <PaymentMethodSelector />
                         </div>
-                        <div className='flex lg:justify-end justify-center'>
+                        <div className='flex lg:justify-end justify-center gap-2'>
+                            <DownloadInvoiceButton
+                                data={{
+                                    first_name: formValues.first_name,
+                                    last_name: formValues.last_name,
+                                    user_code: formValues.user_code,
+                                    created_at: formValues.created_at,
+                                    shipping_address_city: formValues.shipping_city,
+                                    shipping_address_line: formValues.shipping_address_line,
+                                    shipping_address_postal: formValues.shipping_postal_code,
+                                    shipping_cost: formValues.shipping_cost,
+                                    total_amount: formValues.total_amount,
+                                    total_vat: formValues.total_vat,
+                                    invoice_code: formValues.invoice_code,
+                                    net_amount: formValues.net_amount,
+                                    products: listProducts
+                                }}
+                            />
                             <Button type="submit" className='text-lg lg:w-1/3 w-1/2 py-6'>{t('continue')}</Button>
                         </div>
-
-                        <DownloadInvoiceButton
-                            data={{
-                                first_name: formValues.first_name,
-                                last_name: formValues.last_name,
-                                user_code: formValues.user_code,
-                                created_at: formValues.created_at,
-                                shipping_address_city: formValues.shipping_city,
-                                shipping_address_line: formValues.shipping_address_line,
-                                shipping_address_postal: formValues.shipping_postal_code,
-                                shipping_cost: formValues.shipping_cost,
-                                total_amount: formValues.total_amount,
-                                total_vat: formValues.total_vat,
-                                invoice_code: formValues.invoice_code,
-                                net_amount: formValues.net_amount,
-                                products: listProducts
-                            }}
-                        />
                     </div>
                 </div>
 
