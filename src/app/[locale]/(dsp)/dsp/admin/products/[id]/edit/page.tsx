@@ -15,6 +15,7 @@ const ProductFormDSP = dynamic(
         loading: () => <ProductFormSkeleton />
     }
 );
+
 const EditProductDSPPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = React.use(params)
     const router = useRouter()

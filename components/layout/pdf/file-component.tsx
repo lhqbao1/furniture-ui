@@ -37,8 +37,8 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
             <div className="flex justify-between gap-8 w-full">
                 <div className="flex flex-col gap-1">
                     <span>{checkout?.user.first_name} {checkout?.user.last_name}</span>
-                    <span>{checkout?.shipping_address.city}</span>
                     <span>{checkout?.shipping_address.address_line}</span>
+                    <span>{checkout?.shipping_address.postal_code} - {checkout?.shipping_address.city}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                     <span>Invoice ID: {invoice?.invoice_code}</span>

@@ -106,9 +106,11 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
                 },
             })
         } else if (productValues) {
+            const updatePayload = { ...payload, is_active: false }
+
             // 🟡 Edit
             editProductMutation.mutate(
-                { id: productValues.id ?? "", input: payload },
+                { id: productValues.id ?? "", input: updatePayload },
                 {
                     onSuccess: () => {
                         toast.success("Product updated successfully")

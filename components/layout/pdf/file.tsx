@@ -79,8 +79,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 <View style={styles.header}>
                     <View style={styles.flexColBlock}>
                         <Text style={{ fontFamily: "Figtree", fontSize: 12, fontWeight: 'bold' }}>{checkout?.user.first_name} {checkout?.user.last_name}</Text>
-                        <Text>{checkout?.shipping_address.city}</Text>
                         <Text>{checkout?.shipping_address.address_line}</Text>
+                        <Text>{checkout?.shipping_address.postal_code} - {checkout?.shipping_address.city}</Text>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'column', marginRight: 50 }}>
                         {/* <Text>Invoice ID: {invoice?.id}</Text> */}

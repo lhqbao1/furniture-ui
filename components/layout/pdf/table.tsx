@@ -84,14 +84,6 @@ export function FileTable<TData, TValue>({
                             {/* Thêm hàng thủ công */}
                             <TableRow>
                                 <TableCell className="text-start">{table.getRowModel().rows?.length + 1}</TableCell>
-                                <TableCell className="text-start">Coupon</TableCell>
-                                <TableCell className="text-start"></TableCell>
-                                <TableCell className="text-center pr-6"></TableCell>
-                                <TableCell className="text-right"></TableCell>
-                                <TableCell className="text-end">€{coupon ? coupon?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : DEFAULT_SALE.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell className="text-start">{table.getRowModel().rows?.length + 2}</TableCell>
                                 <TableCell className="text-start">Voucher</TableCell>
                                 <TableCell className="text-start"></TableCell>
                                 <TableCell className="text-center pr-6"></TableCell>
