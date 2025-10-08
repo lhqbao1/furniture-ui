@@ -27,7 +27,7 @@ export default function DownloadInvoiceButton({ data, fileName = "invoice.pdf" }
         //     )}
         // </PDFDownloadLink>
         <PDFDownloadLink
-            document={<InvoicePDFManual data={data} />}
+            document={<InvoicePDFManual />}
             fileName="invoice.pdf"
         >
             {({ loading }) => (
