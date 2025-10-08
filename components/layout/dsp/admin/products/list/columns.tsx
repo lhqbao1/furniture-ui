@@ -206,7 +206,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                     className="cursor-pointer"
                     onClick={() => setEditing(true)}
                 >
-                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : <div className="text-right">Updating</div>}
+                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : <div className="text-right">updating</div>}
                 </div>
             )}
         </div>
@@ -440,12 +440,12 @@ export const productColumnsDSP: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "cost",
         header: () => <div className="text-right">COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : 'Updating'}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : 'updating'}</div>,
     },
     {
         accessorKey: "shipping_cost",
         header: () => <div className="text-right">DELIVERY COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : 'Updating'}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : 'updating'}</div>,
     },
     {
         accessorKey: "final_price",
@@ -458,7 +458,7 @@ export const productColumnsDSP: ColumnDef<ProductItem>[] = [
         cell: ({ row }) => {
             const { final_price, cost, tax } = row.original
             const taxRate = parseFloat(tax) / 100
-            if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating</div>
+            if (!final_price || !cost || final_price <= 0) return <div className="text-right">updating</div>
 
             const margin = ((1 / (1 + taxRate)) - (cost / final_price)) * 100
             return <div className="text-right">{margin.toFixed(1)}%</div>
@@ -490,7 +490,7 @@ export const productColumnsDSP: ColumnDef<ProductItem>[] = [
                         />
                     ) : (
                         <div>
-                            Updating
+                            updating
                         </div>
                     )}
                 </div>

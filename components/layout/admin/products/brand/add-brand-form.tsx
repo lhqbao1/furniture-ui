@@ -168,7 +168,7 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                             editBrand.isPending ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Updating...
+                                    updating
                                 </>
                             ) : (
                                 submitText ?? "Update Brand"
@@ -176,7 +176,7 @@ export default function AddOrEditBrandForm({ onSuccess, submitText, onClose, bra
                         ) : createBrand.isPending ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Creating...
+                                creating
                             </>
                         ) : (
                             submitText ?? "Create Brand"

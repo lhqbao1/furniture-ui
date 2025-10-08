@@ -55,6 +55,7 @@ export function ProductTable<TData, TValue>({
         pageCount: Math.ceil(totalItems / pageSize),
         state: {
             pagination: { pageIndex: page - 1, pageSize },
+            sorting
         },
         manualPagination: true,
         getCoreRowModel: getCoreRowModel(),

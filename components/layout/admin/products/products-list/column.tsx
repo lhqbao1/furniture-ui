@@ -207,7 +207,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                     className="cursor-pointer"
                     onClick={() => setEditing(true)}
                 >
-                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : <div className="text-right">Updating</div>}
+                    {product.final_price ? <div className="text-right">€{(product.final_price)?.toFixed(2)}</div> : <div className="text-right">updating</div>}
                 </div>
             )}
         </div>
@@ -409,9 +409,25 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     },
     {
         accessorKey: "name",
-        header: "NAME",
+        header: ({ column }) => (
+            <Button
+                variant={'ghost'}
+                className="font-semibold flex items-center justify-center gap-1 w-fit"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                <div>NAME</div>
+                <div className="mb-0.5">
+                    {{
+                        asc: "↑",
+                        desc: "↓",
+                    }[column.getIsSorted() as string] ?? "↕"}
+                </div>
+            </Button>
+        ),
         // cell: ({ row }) => <EditableNameCell product={row.original} />,
-        cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>
+        cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>,
+        enableSorting: true
+
     },
     {
         accessorKey: "category",
@@ -452,12 +468,12 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     {
         accessorKey: "cost",
         header: () => <div className="text-right">COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : <div className="text-right">Updating</div>}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : <div className="text-right">updating</div>}</div>,
     },
     {
         accessorKey: "shipping_cost",
         header: () => <div className="text-right">DELIVERY COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : <div className="text-right">Updating</div>}</div>,
+        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : <div className="text-right">updating</div>}</div>,
     },
     {
         accessorKey: "final_price",
@@ -470,7 +486,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         cell: ({ row }) => {
             const { final_price, cost, tax } = row.original
             const taxRate = parseFloat(tax) / 100
-            if (!final_price || !cost || final_price <= 0) return <div className="text-right">Updating</div>
+            if (!final_price || !cost || final_price <= 0) return <div className="text-right">updating</div>
 
             const margin = ((1 / (1 + taxRate)) - (cost / final_price)) * 100
             return <div className="text-right">{margin.toFixed(1)}%</div>
@@ -502,7 +518,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
                         />
                     ) : (
                         <div>
-                            Updating
+                            updating
                         </div>
                     )}
                 </div>
