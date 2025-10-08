@@ -1,18 +1,37 @@
 'use client'
 import ProductFormSkeleton from "@/components/layout/admin/products/products-form/product-form-skeleton"
 import { useEditProduct, useGetProductById } from "@/features/products/hook"
-import React from "react"
+import React, { useEffect } from "react"
 import { useRouter } from "@/src/i18n/navigation"
 import { ProductInput } from "@/lib/schema/product"
 import { toast } from "sonner"
-import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
+// import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
 import { useLocale } from "next-intl"
+import dynamic from "next/dynamic"
+const ProductForm = dynamic(() => import('@/components/layout/admin/products/products-form/add-product-form'), {
+    ssr: false,
+    loading: () => <div>Loading form...</div>,
+})
+
 
 const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = React.use(params)
     const router = useRouter()
     const locale = useLocale()
     const editProduct = useEditProduct()
+
+    useEffect(() => {
+        // Prefetch form khi rảnh
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                import('@/components/layout/admin/products/products-form/add-product-form')
+            })
+        } else {
+            setTimeout(() => {
+                import('@/components/layout/admin/products/products-form/add-product-form')
+            }, 2000)
+        }
+    }, [])
 
     const { data, isLoading, isError } = useGetProductById(id)
     if (isError) return <div>No data</div>
@@ -32,6 +51,8 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             }
         )
     }
+
+
 
     return (
         <div className="p-6">

@@ -324,10 +324,12 @@ function ActionsCell({ product }: { product: ProductItem }) {
                 queryKey: ["product", id],
                 queryFn: () => getProductById(id),
             });
+            router.prefetch(`/admin/products/${id}/edit`)
             router.push(`/admin/products/${id}/edit`, { locale });
+
         } catch (err) {
             console.error("Prefetch failed:", err);
-            router.push(`/admin/products/${id}/edit`, { locale });
+            // router.push(`/admin/products/${id}/edit`, { locale });
         }
     }
 
@@ -357,7 +359,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
                     <Eye className="w-4 h-4 text-secondary" />
                 </Button>
             </Link>
-            <Link href={`/admin/products/${product.id}/clone`}>
+            <Link href={`/admin/products/${product.id}/clone`} prefetch={true}>
                 <Button variant="ghost" size="icon">
                     <CopyCheck className="w-4 h-4 text-secondary" />
                 </Button>
@@ -428,6 +430,15 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>,
         enableSorting: true
 
+    },
+    {
+        accessorKey: "owner",
+        header: "OWNER",
+        cell: ({ row }) => {
+            return (
+                <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
+            )
+        }
     },
     {
         accessorKey: "category",
