@@ -3,6 +3,7 @@
 import { PDFDownloadLink, Document, Page, Text } from "@react-pdf/renderer"
 import { CheckOutManual, DataManual, InvoiceManual, InvoicePDFManual } from "./manual-invoice"
 import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
 
 interface DownloadInvoiceButtonProps {
     data: DataManual
@@ -27,11 +28,11 @@ export default function DownloadInvoiceButton({ data, fileName = "invoice.pdf" }
         // </PDFDownloadLink>
         <PDFDownloadLink
             document={<InvoicePDFManual data={data} />}
-            fileName="test.pdf"
+            fileName="invoice.pdf"
         >
             {({ loading }) => (
                 <Button type="button">
-                    {loading ? "Đang tạo..." : "⬇️ Tải test PDF"}
+                    {loading ? <Loader2 className="animate-spin" /> : "⬇️ Download PDF"}
                 </Button>
             )}
         </PDFDownloadLink>
