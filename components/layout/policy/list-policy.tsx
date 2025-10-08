@@ -181,7 +181,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
                         >
                             <div className='text-xl text-secondary font-bold'>{cl.label ?? ''}</div>
                             {typeof cl?.content === 'string' && cl.content.trim() !== '' ? (
-                                <div dangerouslySetInnerHTML={{ __html: cl.content }} />
+                                <div dangerouslySetInnerHTML={{ __html: cl.content }} className='[&_a]:text-secondary [&_a]:underline' />
                             ) : (
                                 <p className="text-gray-500 italic">Updated...</p>
                             )}
