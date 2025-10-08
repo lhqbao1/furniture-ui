@@ -19,9 +19,10 @@ const RichEditor = dynamic(() => import("@/components/shared/tiptap/tiptap-edito
 interface ProductDetailInputsProps {
     isEdit?: boolean
     productId?: string | null
+    isDSP?: boolean
 }
 
-const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) => {
+const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetailInputsProps) => {
     const form = useFormContext()
 
     return (
@@ -48,22 +49,25 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                 {productId ? <div>ID: {productId}</div> : ''}
 
                 {/*Product Active */}
-                <FormField
-                    control={form.control}
-                    name="is_active"
-                    render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
-                            <FormLabel className="!mt-0 text-[#666666]">Active</FormLabel>
-                            <FormControl>
-                                <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
-                                />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
+                {isDSP ? '' :
+                    <FormField
+                        control={form.control}
+                        name="is_active"
+                        render={({ field }) => (
+                            <FormItem className="flex items-center space-x-2">
+                                <FormLabel className="!mt-0 text-[#666666]">Active</FormLabel>
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
+                                    />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                }
+
             </div>
 
             <div className='flex gap-6'>
@@ -85,10 +89,12 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                             <FormControl>
                                 <Input
                                     type="text"
-                                    value={field.value ?? ""} // null -> ""
-                                    onChange={(e) => field.onChange(e.target.value === "" ? null : e.target.value)}
+                                    {...field}
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
                                 />
                             </FormControl>
+                            <FormMessage></FormMessage>
                         </FormItem>
                     )}
                 />
@@ -110,6 +116,7 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                                     onChange={(e) => field.onChange(e.target.value)}
                                 />
                             </FormControl>
+                            <FormMessage></FormMessage>
                         </FormItem>
                     )}
                 />
@@ -142,6 +149,76 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
 
             {/*Product price fields */}
             <ProductPricingFields />
+
+            <div className='grid grid-cols-12 gap-6'>
+                <div className="col-span-3">
+                    <FormField
+                        control={form.control}
+                        name="delivery_cost"
+                        render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                                <FormLabel className='text-[#666666] text-sm'>
+                                    Delivery cost
+                                </FormLabel>
+                                <FormControl>
+                                    <div className="relative flex items-center w-full">
+                                        <Input
+                                            {...field}
+                                            type="number"
+                                            // min={0}
+                                            className="pl-7"
+                                            step="0.01"            // hoặc "any" để cho phép mọi số thập phân
+                                            inputMode="decimal"    // hint cho bàn phím mobile
+                                            value={field.value ?? ""} // tránh uncontrolled / NaN
+                                            onChange={(e) =>
+                                                field.onChange(
+                                                    e.target.value === "" ? null : e.target.valueAsNumber
+                                                )
+                                            }
+                                        />
+                                        <span className="absolute left-3 text-gray-500">€</span>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+                <div className="col-span-3">
+                    <FormField
+                        control={form.control}
+                        name="delivery_multiple"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-[#666666] text-sm'>Delivery Type</FormLabel>
+                                <FormControl>
+                                    <RadioGroup
+                                        onValueChange={(value) => field.onChange(value === "true")}
+                                        value={field.value ? "true" : "false"}
+                                        className="flex flex-col gap-4"
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="true" id="multiple" />
+                                            <FormLabel htmlFor="multiple" className="font-normal">
+                                                Multiple time
+                                            </FormLabel>
+                                        </div>
+
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="false" id="single" />
+                                            <FormLabel htmlFor="single" className="font-normal">
+                                                Single time
+                                            </FormLabel>
+                                        </div>
+                                    </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+            </div>
 
             {/*Product VAT */}
             <FormField
@@ -187,12 +264,6 @@ const ProductDetailInputs = ({ isEdit, productId }: ProductDetailInputsProps) =>
                                 value={field.value || ""}
                                 onChangeValue={field.onChange}
                             />
-                            {/* <RichTextEditor
-                                value={field.value || ""}
-                                onChange={field.onChange}
-                                content={description}
-                                setContent={setDescription}
-                            /> */}
                         </FormControl>
                         <FormMessage />
                     </FormItem>

@@ -70,6 +70,26 @@ export type StaticFile = {
     options: VariantOption[]
   }
 
+  export type ProductPackage = {
+    weight: number
+    length: number
+    width: number
+    height: number
+  }
+
+  export type Owner = {
+    salutation: string;
+  business_name: string;
+  vat_id: string;
+  email: string;
+  email_order: string;
+  email_billing: string;
+  phone_number: string;
+  id: string;
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+  }
+
     export type ProductItem = {
     name: string
     description: string
@@ -121,6 +141,13 @@ export type StaticFile = {
     options: VariantOptionResponse[]
     categories: CategoryResponse[]
     brand: BrandResponse
+
+    delivery_multiple: boolean
+    materials: string
+    color: string
+    number_of_packages: number
+    packages: ProductPackage[]
+    owner: Owner
   }
   
   export type ProductResponse = {

@@ -18,15 +18,14 @@ export const addProductDSPSchema = z.object({
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
   stock: z.number().nonnegative().optional().nullable(),
-  // sku: z.string().min(1, "You must provide product sku"),
   materials: z.string().optional().nullable(),
   color: z.string().optional().nullable(),
   unit: z.string().optional().nullable(),
   amount_unit: z.string().optional().nullable(),
   incoterm: z.string().optional().nullable(),
-  sku: z.string().optional().nullable(),
+  sku: z.string().min(1, {message: "Sku is required"}),
   packaging_amount: z.string().optional().nullable(),
-  ean: z.string().optional().nullable(),
+  ean: z.string().min(1, {message: "EAN is required"}),
   carrier: z.string().optional().nullable(),
   delivery_time:z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),
@@ -66,14 +65,16 @@ export const addProductDSPSchema = z.object({
 })
 
 
-export type ProductInput = z.infer<typeof addProductDSPSchema>
+export type ProductInputDSP = z.infer<typeof addProductDSPSchema>
 
-export const defaultValues = {
+export const defaultValuesDSP = {
   name: "",
   description: "",
   tax: "19%",
   category: "",
   ebay: false,
+  ean: "",
+  sku: "",
   // delivery_cost: 0,
   collection: null as string | null,
   // ean: "",

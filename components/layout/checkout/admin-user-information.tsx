@@ -62,7 +62,8 @@ export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: 
                         </FormItem>
                     )}
                 />
-                <FormField
+
+                {/* <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => {
@@ -138,6 +139,20 @@ export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: 
                             </FormItem>
                         )
                     }}
+                /> */}
+
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
                 />
 
 

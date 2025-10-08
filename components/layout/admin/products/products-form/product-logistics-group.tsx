@@ -2,16 +2,62 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image from 'next/image'
-import React from 'react'
-import { useFormContext } from 'react-hook-form'
+import React, { useEffect } from 'react'
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 const ProductLogisticsGroup = () => {
     const form = useFormContext()
+    const control = form.control;
+
     const carriers = [
         { id: "amm", logo: "/amm.jpeg" },
         { id: "dpd", logo: "/dpd.jpeg" },
     ]
     const deliveryTimes = ["1-3", "3-5", "5-8", "8-14", "14-20"]
+
+    // Lấy giá trị number_of_packages từ form
+    const numberOfPackages = useWatch({
+        control,
+        name: "number_of_packages",
+    })
+
+    // Tạo field array cho packages
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "packages",
+    })
+
+    useEffect(() => {
+        // Nếu chưa nhập hoặc nhập < 1 → clear toàn bộ packages
+        if (!numberOfPackages || numberOfPackages < 1) {
+            form.setValue("packages", []);
+            return;
+        }
+
+        // Nếu ít hơn thì thêm
+        if (fields.length < numberOfPackages) {
+            const diff = numberOfPackages - fields.length;
+            for (let i = 0; i < diff; i++) {
+                append({
+                    length: null,
+                    height: null,
+                    width: null,
+                    weight: null,
+                });
+            }
+        }
+
+        // Nếu nhiều hơn thì xóa bớt
+        if (fields.length > numberOfPackages) {
+            const diff = fields.length - numberOfPackages;
+            for (let i = 0; i < diff; i++) {
+                remove(fields.length - 1 - i);
+            }
+        }
+    }, [numberOfPackages, fields.length]);
+
+
+
 
     return (
         <div className='space-y-6'>
@@ -84,20 +130,39 @@ const ProductLogisticsGroup = () => {
                 {/* Product packaging number */}
                 <FormField
                     control={form.control}
-                    name="packaging_amount"
+                    name="number_of_packages"
                     render={({ field }) => (
                         <FormItem className='flex flex-col col-span-1'>
                             <FormLabel className='text-black font-semibold text-sm'>
                                 Number of packages
                             </FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} className='col-span-4' />
+                                {/* <Input
+                                    placeholder=""
+                                    {...field}
+                                    value={field.value ?? ""}
+                                    onChange={(e) =>
+                                        field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
+                                    }
+                                    className='col-span-4'
+                                /> */}
+                                <Input
+                                    type="number"
+                                    inputMode="decimal"
+                                    value={field.value ?? ""}
+                                    onChange={(e) =>
+                                        field.onChange(
+                                            e.target.value === "" ? null : e.target.valueAsNumber
+                                        )
+                                    }
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
             </div>
+
             <div className='flex gap-6'>
                 {/* Tariff Number */}
                 <FormField
@@ -167,124 +232,61 @@ const ProductLogisticsGroup = () => {
                     )}
                 />
             </div>
-            <div className='flex gap-6'>
-                {/* Packaging input */}
-                <div className='flex flex-col w-full'>
+
+            {/* --- DYNAMIC PACKAGES --- */}
+            {numberOfPackages > 0 && (
+                <div>
                     <div className='col-span-2 text-sm text-black font-semibold'>Packaging (cm)</div>
-                    <div className='flex flex-row gap-1 col-span-4'>
-                        <FormField
-                            control={form.control}
-                            name='length'
-                            render={({ field }) => (
-                                <FormItem className='flex flex-col-reverse items-center'>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            placeholder=""
-                                            min={0}
-                                            step="0.01"
-                                            inputMode="decimal"
-                                            {...field}
-                                            value={field.value ?? ""} // null hoặc undefined => ""
-                                            onChange={(e) =>
-                                                field.onChange(
-                                                    e.target.value === "" ? null : e.target.valueAsNumber
-                                                )
-                                            }
+
+                    <div className='flex flex-col gap-4 mt-2'>
+                        {fields.map((pkg, index) => (
+                            <div
+                                key={pkg.id}
+                                className='flex flex-col w-full border p-3 rounded-2xl shadow-sm'
+                            >
+                                <div className='font-semibold text-sm mb-2 text-gray-700'>
+                                    Package #{index + 1}
+                                </div>
+
+                                <div className='flex flex-row gap-3 w-full'>
+                                    {["length", "height", "width", "weight"].map((key) => (
+                                        <FormField
+                                            key={key}
+                                            control={control}
+                                            name={`packages.${index}.${key}`}
+                                            render={({ field }) => (
+                                                <FormItem className='flex flex-col-reverse items-center flex-1'>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            placeholder=""
+                                                            min={0}
+                                                            step="0.01"
+                                                            inputMode="decimal"
+                                                            {...field}
+                                                            value={field.value ?? ""}
+                                                            onChange={(e) =>
+                                                                field.onChange(
+                                                                    e.target.value === ""
+                                                                        ? null
+                                                                        : e.target.valueAsNumber
+                                                                )
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className='text-black font-semibold text-sm capitalize'>
+                                                        {key}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )}
                                         />
-                                    </FormControl>
-                                    <FormLabel className='text-black font-semibold text-sm'>
-                                        Length
-                                    </FormLabel>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='height'
-                            render={({ field }) => (
-                                <FormItem className='flex flex-col-reverse items-center'>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            placeholder=""
-                                            min={0}
-                                            step="0.01"
-                                            inputMode="decimal"
-                                            {...field}
-                                            value={field.value ?? ""} // null hoặc undefined => ""
-                                            onChange={(e) =>
-                                                field.onChange(
-                                                    e.target.value === "" ? null : e.target.valueAsNumber
-                                                )
-                                            } />
-                                    </FormControl>
-                                    <FormLabel className='text-black font-semibold text-sm'>
-                                        Height
-                                    </FormLabel>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='width'
-                            render={({ field }) => (
-                                <FormItem className='flex flex-col-reverse items-center'>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            placeholder=""
-                                            min={0}
-                                            step="0.01"
-                                            inputMode="decimal"
-                                            {...field}
-                                            value={field.value ?? ""} // null hoặc undefined => ""
-                                            onChange={(e) =>
-                                                field.onChange(
-                                                    e.target.value === "" ? null : e.target.valueAsNumber
-                                                )
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormLabel className='text-black font-semibold text-sm'>
-                                        Width
-                                    </FormLabel>
-                                </FormItem>
-                            )}
-                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
-
-                {/* Weight input */}
-                <FormField
-                    control={form.control}
-                    name="weight"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col w-full justify-end">
-                            <FormLabel className="text-black font-semibold text-sm col-span-2">
-                                Weight (kg)
-                            </FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="number"
-                                    placeholder="Weight"
-                                    min={0}
-                                    step="0.01"
-                                    inputMode="decimal"
-                                    value={field.value ?? ""}
-                                    onChange={(e) =>
-                                        field.onChange(
-                                            e.target.value === "" ? null : e.target.valueAsNumber
-                                        )
-                                    }
-                                    className="col-span-4"
-                                />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-            </div>
+            )}
         </div>
     )
 }
