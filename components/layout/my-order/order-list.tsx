@@ -26,13 +26,15 @@ const OrderList = () => {
 
     return (
         <div className='lg:w-1/2 mx-auto space-y-6'>
-            {order?.map((item, index) => {
-                return (
-                    <div key={index}>
-                        <MyOrderDataTable columns={columns} data={item.cart.items} orderData={item} />
-                    </div>
-                )
-            })}
+            {order
+                ?.filter(item => item.status !== "Pending")
+                ?.map((item, index) => {
+                    return (
+                        <div key={index}>
+                            <MyOrderDataTable columns={columns} data={item.cart.items} orderData={item} />
+                        </div>
+                    )
+                })}
         </div>
     )
 }

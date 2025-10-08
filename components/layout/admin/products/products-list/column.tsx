@@ -432,6 +432,15 @@ export const productColumns: ColumnDef<ProductItem>[] = [
 
     },
     {
+        accessorKey: "owner",
+        header: "OWNER",
+        cell: ({ row }) => {
+            return (
+                <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
+            )
+        }
+    },
+    {
         accessorKey: "category",
         header: "CATEGORY",
         cell: ({ row }) => {
