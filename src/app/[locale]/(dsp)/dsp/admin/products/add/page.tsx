@@ -1,5 +1,4 @@
 'use client'
-import ProductForm from '@/components/layout/admin/products/products-form/add-product-form'
 import ProductFormDSP from '@/components/layout/dsp/admin/products/add/product-add-or-edit'
 import { useAddProductDSP } from '@/features/dsp/products/hook'
 import { ProductInput } from '@/lib/schema/product'
