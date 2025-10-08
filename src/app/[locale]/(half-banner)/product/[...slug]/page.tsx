@@ -1,4 +1,4 @@
-import { getProductById } from '@/features/products/api'
+import { getAllProducts, getProductById, getProductsFeed } from '@/features/products/api'
 import type { Metadata } from 'next'
 import { StaticFile } from '@/types/products'
 import { getProductGroupDetail } from '@/features/product-group/api'
@@ -6,6 +6,17 @@ import ProductDetails from '@/components/layout/single-product/product-details'
 
 interface PageProps {
     params: Promise<{ slug: string[] }>
+}
+
+// 🕒 ISR: tái tạo lại mỗi 1 giờ (3600s)
+export const revalidate = 3600
+
+// 🏗️ Tạo trước các trang sản phẩm khi build
+export async function generateStaticParams() {
+    const products = await getProductsFeed()
+    return products.map((p) => ({
+        slug: [p.id], // hoặc [p.slug] nếu bạn dùng slug thật
+    }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -25,6 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
                 description: product?.meta_description || product?.description?.slice(0, 150),
                 images: product?.static_files?.map((img: StaticFile) => ({ url: img.url })) ?? [],
             },
+            alternates: { canonical: product?.id || `https://www.prestige-home.de/product/${product.id}` },
         }
     } catch {
         return {

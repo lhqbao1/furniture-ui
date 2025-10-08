@@ -68,7 +68,7 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
         header: "EXTERNAL ID",
         cell: ({ row }) => {
             return (
-                <div>21-13452-00796</div>
+                <div>{row.original.marketplace_order_id}</div>
             )
         }
     },
