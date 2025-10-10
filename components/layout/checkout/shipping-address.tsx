@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
+import { City, State } from "country-state-city"
 
 interface CheckOutShippingAddressProps {
     isAdmin?: boolean
@@ -36,9 +37,14 @@ export default function CheckOutShippingAddress({ isAdmin = false }: CheckOutShi
         })
     }, [])
 
-    const countryOptions = countries.map((c) => ({
-        value: c.value,
-        label: c.label,
+    // Lấy tất cả bang của Đức
+    const states = State.getStatesOfCountry("DE")
+    // Lấy tất cả thành phố từ tất cả bang
+    const allCities = states.flatMap((state) => City.getCitiesOfState("DE", state.isoCode))
+    // Danh sách tên thành phố
+    const cityOptions = allCities.map((city) => ({
+        value: city.name,
+        label: city.name,
     }))
 
     return (
@@ -133,24 +139,26 @@ export default function CheckOutShippingAddress({ isAdmin = false }: CheckOutShi
                                                 <CommandEmpty>{t('noCity')}</CommandEmpty>
                                                 <CommandList className="h-[400px]">
                                                     <CommandGroup>
-                                                        {countryOptions.map((c) => (
-                                                            <CommandItem
-                                                                key={c.value}
-                                                                value={c.value}
-                                                                onSelect={() => {
-                                                                    field.onChange(c.value)
-                                                                    setOpen(false)
-                                                                }}
-                                                            >
-                                                                <Check
-                                                                    className={cn(
-                                                                        "mr-2 h-4 w-4",
-                                                                        field.value === c.value ? "opacity-100" : "opacity-0"
-                                                                    )}
-                                                                />
-                                                                {c.label}
-                                                            </CommandItem>
-                                                        ))}
+                                                        <CommandGroup>
+                                                            {cityOptions.map((c, index) => (
+                                                                <CommandItem
+                                                                    key={index}
+                                                                    value={c.value}
+                                                                    onSelect={() => {
+                                                                        field.onChange(c.value)
+                                                                        setOpen(false) // đóng popover sau khi chọn
+                                                                    }}
+                                                                >
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "mr-2 h-4 w-4",
+                                                                            field.value === c.value ? "opacity-100" : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                    {c.label}
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
                                                     </CommandGroup>
                                                 </CommandList>
                                             </Command>

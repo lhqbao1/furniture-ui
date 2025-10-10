@@ -2,15 +2,17 @@
 import { orderColumns } from '@/components/layout/admin/orders/order-list/column'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import ProductStatistic from '@/components/layout/admin/products/products-list/statistic'
+import DownloadInvoiceButton from '@/components/layout/pdf/download-invoice-button'
 import ProductStatisticSkeleton from '@/components/shared/statistic-skeleton'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
-import { useGetCheckOut, useGetCheckOutStatistic } from '@/features/checkout/hook'
+import { getCheckOutMain } from '@/features/checkout/api'
+import { useGetCheckOut, useGetCheckOutMain, useGetCheckOutStatistic } from '@/features/checkout/hook'
 import React, { useState } from 'react'
 
 const OrderList = () => {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(50)
-    const { data, isLoading, isError } = useGetCheckOut({ page, page_size: pageSize })
+    const { data, isLoading, isError } = useGetCheckOutMain({ page, page_size: pageSize })
     const { data: statistic, isLoading: isLoadingStatistic, isError: isErrorStatistic } = useGetCheckOutStatistic()
 
     const mergedStatistic = [

@@ -14,13 +14,16 @@ export type CartItem = {
   updated_at: string
 }
   
-  export type CartResponse = {
+  export type CartResponseItem = {
     user_id: string
+    supplier_id: string
     id: string
     items: CartItem[]
     created_at: string
     updated_at: string
   }
+
+  export type CartResponse = CartResponseItem[]
   
   export type CartFormValue = {
     product_id: string
@@ -29,3 +32,8 @@ export type CartItem = {
     is_active: boolean
   }
   
+
+  export type SupplierCartInput = {
+    cart_id: string
+    supplier_id: string
+  }

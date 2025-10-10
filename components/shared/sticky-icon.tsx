@@ -15,7 +15,7 @@ export default function StickyIcon() {
         queryKey: ["cart-items"],
         queryFn: async () => {
             const data = await getCartItems()
-            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            // data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             return data
         },
     })
@@ -85,7 +85,7 @@ export default function StickyIcon() {
                     className="w-24 h-24 select-none pointer-events-auto "
                     unoptimized
                 />
-                <p className="absolute bottom-3 text-lg text-white font-bold left-7 text-center flex flex-col leading-3">{isLoadingCart || isErrorCart ? 0 : cart?.items.length} <br /> <span className="text-sm font-semibold mt-1">{t('items')}</span></p>
+                <p className="absolute bottom-3 text-lg text-white font-bold left-7 text-center flex flex-col leading-3">{isLoadingCart || isErrorCart ? 0 : cart?.length} <br /> <span className="text-sm font-semibold mt-1">{t('items')}</span></p>
             </div>
         </div>
     )

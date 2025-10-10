@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import "../../globals.css"
 import { SidebarProvider } from "@/components/ui/sidebar";
 import DSPProtected from "@/components/layout/auth/dsp-protected";

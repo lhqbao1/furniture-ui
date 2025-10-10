@@ -10,7 +10,7 @@ import { Mail, Loader2 } from "lucide-react"
 import { useLogin, useLoginOtp, useSendOtp, useSendOtpAdmin } from "@/features/auth/hook"
 import { toast } from "sonner"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
@@ -24,6 +24,8 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     const router = useRouter()
     const locale = useLocale()
     const t = useTranslations()
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+
 
     const formSchema = z.object({
         username: z
@@ -211,42 +213,75 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                         <FormField
                             control={form.control}
                             name="code"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormControl>
-                                        <div className="flex gap-2 justify-center mb-4 w-full">
-                                            {Array.from({ length: 6 }).map((_, idx) => (
-                                                <Input
-                                                    key={idx}
-                                                    id={`otp-${idx}`}
-                                                    value={field.value?.[idx] ?? ""}
-                                                    onChange={(e) => {
-                                                        const val = e.target.value.replace(/\D/g, "").slice(-1) // chỉ số 1 ký tự
-                                                        const current = field.value ?? ""
-                                                        const newValue =
-                                                            current.substring(0, idx) + val + current.substring(idx + 1)
+                            render={({ field }) => {
+                                return (
+                                    <FormItem>
+                                        <FormControl>
+                                            <div className="flex gap-2 justify-center mb-4 w-full">
+                                                {Array.from({ length: 6 }).map((_, idx) => (
+                                                    <Input
+                                                        key={idx}
+                                                        id={`otp-${idx}`}
+                                                        value={field.value?.[idx] ?? ""}
+                                                        // ref={(el) => (inputRefs.current[idx] = el)}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value.replace(/\D/g, "").slice(-1) // chỉ số 1 ký tự
+                                                            const current = field.value ?? ""
+                                                            const newValue =
+                                                                current.substring(0, idx) + val + current.substring(idx + 1)
 
-                                                        field.onChange(newValue)
+                                                            field.onChange(newValue)
 
-                                                        // tự động focus sang input kế
-                                                        if (val && idx < 5) {
-                                                            const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
-                                                            next?.focus()
-                                                        }
+                                                            // tự động focus sang input kế
+                                                            if (val && idx < 5) {
+                                                                const next = document.getElementById(`otp-${idx + 1}`) as HTMLInputElement
+                                                                next?.focus()
+                                                            }
 
-                                                        if (idx === 5) {
-                                                            handleAutoSubmitOtp(newValue)
-                                                        }
-                                                    }}
-                                                    className="h-12 flex-1 text-center text-lg"
-                                                    maxLength={1}
-                                                />
-                                            ))}
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                                                            if (idx === 5) {
+                                                                handleAutoSubmitOtp(newValue)
+                                                            }
+                                                        }}
+                                                        onPaste={(e) => {
+                                                            e.preventDefault()
+                                                            const pasted = e.clipboardData.getData("text").replace(/\D/g, "")
+                                                            if (!pasted) return
+
+                                                            const newValue = field.value ?? ""
+                                                            const arr = newValue.split("")
+
+                                                            // điền lần lượt vào các ô
+                                                            for (let i = 0; i < 6; i++) {
+                                                                arr[i] = pasted[i] ?? arr[i] ?? ""
+                                                            }
+
+                                                            const finalValue = arr.join("").slice(0, 6)
+                                                            field.onChange(finalValue)
+
+                                                            // focus ô cuối cùng có ký tự
+                                                            const nextIndex = Math.min(pasted.length, 6) - 1
+                                                            inputRefs.current[nextIndex]?.focus()
+
+                                                            if (finalValue.length === 6) {
+                                                                handleAutoSubmitOtp(finalValue)
+                                                            }
+                                                        }}
+                                                        className="h-12 flex-1 text-center text-lg"
+                                                        maxLength={1}
+                                                        inputMode="numeric"              // ✅ hiển thị bàn phím số trên mobile
+                                                        pattern="[0-9]*"                 // ✅ chỉ chấp nhận số
+                                                        type="text"                      // tránh lỗi autofill của Safari
+                                                        autoComplete="one-time-code"     // ✅ hỗ trợ autofill OTP (iOS, Android)
+                                                    />
+                                                ))}
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )
+                            }
+
+                            }
                         />
                     ) : ''}
 

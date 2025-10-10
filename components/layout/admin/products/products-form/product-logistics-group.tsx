@@ -5,7 +5,11 @@ import Image from 'next/image'
 import React, { useEffect } from 'react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
-const ProductLogisticsGroup = () => {
+interface ProductLogisticsGroupProps {
+    isDSP?: boolean
+}
+
+const ProductLogisticsGroup = ({ isDSP = false }: ProductLogisticsGroupProps) => {
     const form = useFormContext()
     const control = form.control;
 
@@ -13,6 +17,17 @@ const ProductLogisticsGroup = () => {
         { id: "amm", logo: "/amm.jpeg" },
         { id: "dpd", logo: "/dpd.jpeg" },
     ]
+
+    const DSPcarriers = [
+        { id: "amm", logo: "/amm.jpeg" },
+        { id: "dpd", logo: "/dpd.jpeg" },
+        { id: "dhl", logo: "/dhl.png" },
+        { id: "hermes", logo: "/hermes.png" },
+        { id: "gls", logo: "/gls.png" },
+        { id: "ups", logo: "/ups.png" },
+    ]
+
+
     const deliveryTimes = ["1-3", "3-5", "5-8", "8-14", "14-20"]
 
     // Lấy giá trị number_of_packages từ form
@@ -56,9 +71,6 @@ const ProductLogisticsGroup = () => {
         }
     }, [numberOfPackages, fields.length]);
 
-
-
-
     return (
         <div className='space-y-6'>
             <div className='grid grid-cols-3 gap-6'>
@@ -77,7 +89,7 @@ const ProductLogisticsGroup = () => {
                                         <SelectValue placeholder="Select carrier" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {carriers.map((c) => (
+                                        {(isDSP ? DSPcarriers : carriers).map((c) => (
                                             <SelectItem key={c.id} value={c.id}>
                                                 <div className="flex items-center gap-2">
                                                     <Image
@@ -87,7 +99,9 @@ const ProductLogisticsGroup = () => {
                                                         height={20}
                                                         className="object-contain"
                                                     />
-                                                    <span className="uppercase">{c.id}</span>
+                                                    <span className="uppercase">
+                                                        {c.id === "amm" ? "Spedition" : c.id}
+                                                    </span>
                                                 </div>
                                             </SelectItem>
                                         ))}

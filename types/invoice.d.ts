@@ -1,7 +1,8 @@
 import { Address } from "./address"
 import { CartResponse } from "./cart"
+import { CheckOutMain } from "./checkout"
 
-interface InvoiceResponse {
+export interface InvoiceResponse {
     checkout_id: string
     coupon_amount: number
     voucher_amount: number
@@ -12,9 +13,7 @@ interface InvoiceResponse {
     id: string
     invoice_code: string
     user_code: string
-    cart: CartResponse
-    shipping_address: Address
-    invoice_address: Address
+    main_checkout: CheckOutMain
     created_at: Date
     updated_at: Date
-}
+  }

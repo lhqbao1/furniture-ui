@@ -15,9 +15,9 @@ export async function createPayment(paymentInput: PaymentFormValues) {
     return data
   }
 
-  export async function capturePayment(paymentId: string) {
+  export async function capturePayment(paypal_order_id: string) {
     const {data} = await api.post(
-        `/payments/${paymentId}/capture`,
+        `/payments/${paypal_order_id}/capture`,
         {
             headers: {
               "Content-Type": "application/json",

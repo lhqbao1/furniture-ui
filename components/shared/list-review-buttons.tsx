@@ -38,8 +38,8 @@ const IconList = ({ currentProduct }: IconListProps) => {
                     img_url: currentProduct.static_files[0].url,
                     product_name: currentProduct.name,
                     stock: currentProduct.stock,
-                    carrier: currentProduct.carrier ? currentProduct.carrier : 'amm'
-
+                    carrier: currentProduct.carrier ? currentProduct.carrier : 'amm',
+                    delivery_time: currentProduct.delivery_time ? currentProduct.delivery_time : ''
                 }
             }, {
                 onSuccess(data, variables, context) {

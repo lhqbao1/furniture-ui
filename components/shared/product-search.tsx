@@ -51,7 +51,8 @@ export default function ProductSearch({
                 img_url: productDetails.static_files[0].url,
                 product_name: productDetails.name,
                 stock: productDetails.stock,
-                carrier: productDetails.carrier ? productDetails.carrier : 'amm'
+                carrier: productDetails.carrier ? productDetails.carrier : 'amm',
+                delivery_time: productDetails.delivery_time ? productDetails.delivery_time : ''
             }
         }, {
             onSuccess(data, variables, context) {

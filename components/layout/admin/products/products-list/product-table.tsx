@@ -27,7 +27,7 @@ interface DataTableProps<TData, TValue> {
     addButtonUrl?: string
     isAddButtonModal?: boolean
     addButtonModalContent?: React.ReactNode
-
+    hasPagination?: boolean
 }
 
 export function ProductTable<TData, TValue>({
@@ -43,7 +43,8 @@ export function ProductTable<TData, TValue>({
     addButtonText,
     addButtonUrl,
     isAddButtonModal = false,
-    addButtonModalContent
+    addButtonModalContent,
+    hasPagination = true
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([
         { id: "updated_at", desc: true }, // mặc định sort theo updated_at giảm dần
@@ -99,11 +100,11 @@ export function ProductTable<TData, TValue>({
                 </Table>
             </div>
 
-            <CustomPagination
+            {hasPagination ? (<CustomPagination
                 page={page}
                 totalPages={totalPages}
                 onPageChange={(newPage) => setPage(newPage)}
-            />
+            />) : ''}
         </div>
     )
 }

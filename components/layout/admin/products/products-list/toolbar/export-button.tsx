@@ -7,6 +7,7 @@ import { ProductItem } from '@/types/products'
 
 export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
     const handleExport = () => {
+
         const exportData =
             data
                 .filter(p => p.is_active === true)
@@ -44,6 +45,8 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
                     materials: '',
                     color: ''
                 }))
+
+        console.log(exportData)
 
         // 1️⃣ Tạo worksheet từ dữ liệu JSON
         const worksheet = XLSX.utils.json_to_sheet(exportData)

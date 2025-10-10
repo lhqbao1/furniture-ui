@@ -5,14 +5,6 @@ import { useEffect, useState } from "react"
 import OrderPlaced from "./container"
 import { Loader2 } from "lucide-react"
 
-// export const metadata = {
-//     robots: {
-//         index: false,
-//         follow: false,
-//         nocache: true,
-//     },
-// }
-
 const OrderPlacedWrapper = () => {
     const router = useRouter()
     const params = useSearchParams()

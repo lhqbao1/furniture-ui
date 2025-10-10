@@ -19,9 +19,10 @@ import { useRemoveFormEbay } from '@/features/ebay/hook'
 
 interface DeleteDialogProps {
     product: ProductItem
+    isEbay?: boolean
 }
 
-const DeleteDialog = ({ product }: DeleteDialogProps) => {
+const DeleteDialog = ({ product, isEbay }: DeleteDialogProps) => {
     const deleteProduct = useDeleteProduct()
     const removeFromEbayMutation = useRemoveFormEbay()
     const [open, setOpen] = useState(false)
@@ -53,8 +54,19 @@ const DeleteDialog = ({ product }: DeleteDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <Trash2 className='size-4 text-red-500' />
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        if (isEbay) {
+                            toast.error("You need to remove this product from eBay first")
+                            return // ❌ Không mở dialog
+                        }
+                        setOpen(true) // ✅ Mở dialog nếu không phải eBay
+                    }}
+                >
+                    <Trash2 className="size-4 text-red-500" />
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
