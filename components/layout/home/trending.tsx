@@ -2,6 +2,7 @@
 
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
+import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useGetProductByTag } from "@/features/products/hook";
 import { useIsPhone } from "@/hooks/use-is-phone";
 import { useTranslations } from "next-intl";
@@ -10,14 +11,15 @@ import React from "react";
 const TrendingProducts = () => {
     const t = useTranslations()
     const isPhone = useIsPhone()
-    const { data: products, isLoading, isError } = useGetProductByTag('Trending');
+    // const { data: products, isLoading, isError } = useGetProductByTag('Trending');
+    const { data: products, isLoading, isError } = useGetProductsSelect();
 
     return (
         <div className="section-padding">
-            <h2 className="section-header">{t('trending')}</h2>
+            {/* <h2 className="section-header">{t('trending')}</h2>
             <p className="text-primary text-lg text-center">
                 {t('mostWanted')}
-            </p>
+            </p> */}
 
             {isLoading || isError || !products ? (
                 <ProductGridSkeleton />
@@ -29,7 +31,7 @@ const TrendingProducts = () => {
                                 .slice(0, 6)
                             :
                             products.filter(item => item.is_active === true)
-                                .slice(0, 8)}
+                        }
                     />
                 </>
             )}

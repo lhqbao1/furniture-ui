@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useGetAllCustomers } from "@/features/users/hook"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface CheckOutUserInformationProps {
     userId?: string
@@ -35,6 +36,39 @@ export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: 
                 <h2 className="text-lg text-black font-semibold ">{isAdmin ? "User Information" : t('userInformation')}</h2>
             </div>
             <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                    <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                            <FormItem>
+                                {/* <FormLabel>{t("gender")}</FormLabel> */}
+                                <FormControl>
+                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                                        <FormItem className="flex gap-1 items-center">
+                                            <FormControl>
+                                                <RadioGroupItem value="male" />
+                                            </FormControl>
+                                            <FormLabel className="ml-2">{t("male")}</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex gap-1 items-center">
+                                            <FormControl>
+                                                <RadioGroupItem value="female" />
+                                            </FormControl>
+                                            <FormLabel className="ml-2">{t("female")}</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex gap-1 items-center">
+                                            <FormControl>
+                                                <RadioGroupItem value="other" />
+                                            </FormControl>
+                                            <FormLabel className="ml-2">{t("otherGender")}</FormLabel>
+                                        </FormItem>
+                                    </RadioGroup>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                </div>
                 <FormField
                     control={form.control}
                     name="first_name"
@@ -168,31 +202,6 @@ export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: 
                                     placeholder="+49"
                                     {...field}
                                 />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel>{isAdmin ? "Gender" : t("gender")}</FormLabel>
-                            <FormControl>
-                                <Select
-                                    value={field.value}
-                                    onValueChange={field.onChange}
-                                >
-                                    <SelectTrigger className="w-full border" placeholderColor>
-                                        <SelectValue placeholder={isAdmin ? "Gender" : t("gender")} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="male">{isAdmin ? "Male" : t("male")}</SelectItem>
-                                        <SelectItem value="female">{isAdmin ? "Female" : t("female")}</SelectItem>
-                                        <SelectItem value="other">{isAdmin ? 'Other' : t("otherGender")}</SelectItem>
-                                    </SelectContent>
-                                </Select>
                             </FormControl>
                             <FormMessage />
                         </FormItem>

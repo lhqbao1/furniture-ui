@@ -28,6 +28,7 @@ export type CartTableItem = {
     item_price: number
     stock: number
     id_provider?: string
+    delivery_time?: string
 }
 
 interface CartLocalTableProps {

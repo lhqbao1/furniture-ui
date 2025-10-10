@@ -19,14 +19,22 @@ type NormalizedCartItem = {
     }))
   }
 
-export function calculateShipping(cartItems: NormalizedCartItem[]): number {
+  export function calculateShipping(cartItems: NormalizedCartItem[]): number {
     if (cartItems.length === 0) return 0
-    const hasOtherCarrier = cartItems.some(item => item.carrier !== "amm")
-    return hasOtherCarrier ? 5.95 : 35.95
+  
+    // ✅ Kiểm tra nếu có ít nhất 1 item có carrier là "amm"
+    const hasAmmCarrier = cartItems.some(item => item.carrier === "amm")
+  
+    // ✅ Nếu có AMM thì 5.95, ngược lại 35.95
+    return hasAmmCarrier ? 35.95 : 5.95
   }
-
+  
   export function checkShippingType(cartItems: NormalizedCartItem[]): boolean {
     if (cartItems.length === 0) return false
-    const hasOtherCarrier = cartItems.some(item => item.carrier !== "amm")
-    return hasOtherCarrier
+  
+    // ✅ Trả về true nếu có carrier là "amm"
+    const hasAmmCarrier = cartItems.some(item => item.carrier === "amm")
+  
+    return hasAmmCarrier
   }
+  

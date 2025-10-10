@@ -131,7 +131,8 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                     product_name: productDetails.name,
                     stock: productDetails.stock,
                     carrier: productDetails.carrier ? productDetails.carrier : 'amm',
-                    id_provider: productDetails.id_provider ? productDetails.id_provider : ''
+                    id_provider: productDetails.id_provider ? productDetails.id_provider : '',
+                    delivery_time: productDetails.delivery_time ? productDetails.delivery_time : ''
                 }
             }, {
                 onSuccess(data, variables, context) {

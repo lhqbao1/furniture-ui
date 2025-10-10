@@ -1,16 +1,17 @@
 "use client"
 
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useMemo } from "react"
 import { debounce } from "lodash"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CartItem, CartResponse } from "@/types/cart"
 import { useDeleteCartItem, useUpdateCartItemQuantity, useUpdateCartItemStatus } from "@/features/cart/hook"
 import CartTableSkeleton from "./table-skeleton"
 import { toast } from "sonner"
-import { ColumnDef, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, flexRender } from "@tanstack/react-table"
+import { getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, flexRender } from "@tanstack/react-table"
 import { GetCartColumns } from "./columns"
 import { useTranslations } from "next-intl"
 import { useIsPhone } from "@/hooks/use-is-phone"
+import { useMe } from "@/features/auth/hook"
 
 interface CartTableProps {
     cart?: CartResponse
@@ -61,6 +62,7 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
         )
     }
 
+
     const handleUpdateCartItemQuantity = (item: CartItem, newQuantity: number) => {
         if (newQuantity <= 0) {
             deleteCartItemMutation.mutate(item.id, {
@@ -91,12 +93,14 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
         onUpdateQuantity: handleUpdateCartItemQuantity,
         onDeleteItem: handleDeleteItem,
         onToggleSelect: handleToggleSelect,
-        isCheckout: isCheckout,
+        isCheckout,
         localStatuses,
     })
 
+    const flattenedItems = useMemo(() => cart?.flatMap(cartItem => cartItem.items), [cart])
+
     const table = useReactTable({
-        data: cart?.items ?? [],
+        data: flattenedItems ?? [],
         columns,
         state: { rowSelection },
         onRowSelectionChange: setRowSelection,
@@ -110,7 +114,9 @@ const CartTable = ({ cart, isLoadingCart, isCheckout = false, localQuantities, s
         <div className="col-span-12 md:col-span-8 flex-1">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold mb-6">{t('shoppingCart')}</h2>
-                <p className="text-xl font-bold mb-6">({cart?.items.length ? cart.items.length : 0} {t('items')})</p>
+                <p className="text-xl font-bold mb-6">
+                    ({cart ? cart.reduce((acc, group) => acc + group.items.length, 0) : 0} {t('items')})
+                </p>
             </div>
 
             <Table className="overflow-x-hidden">

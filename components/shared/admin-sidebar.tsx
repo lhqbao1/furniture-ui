@@ -6,9 +6,11 @@ import {
     SidebarContent,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import { Button } from "../ui/button"

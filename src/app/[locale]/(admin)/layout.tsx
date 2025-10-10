@@ -1,6 +1,5 @@
-import type { Metadata } from "next";
 import "../../globals.css"
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSideBar } from "@/components/shared/admin-sidebar";
 import Protected from "@/components/layout/auth/protected";
 
@@ -14,6 +13,7 @@ export default function AdminLayout({
             <SidebarProvider defaultOpen={true}>
                 <AdminSideBar />
                 <div className="container-padding pt-8 w-full overflow-x-scroll">
+                    <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} />
                     {children}
                 </div>
             </SidebarProvider>

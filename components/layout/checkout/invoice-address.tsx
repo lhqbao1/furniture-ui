@@ -29,7 +29,7 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
     const form = useFormContext()
     const t = useTranslations()
     const [open, setOpen] = useState(false)
-    const [isSameShipping, setIsSameShipping] = useState(false)
+    const [isSameShipping, setIsSameShipping] = useState(true)
 
     // Watch shipping fields
     const shippingAddressLine = useWatch({ name: "shipping_address_line", control: form.control })
@@ -97,102 +97,107 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
                     />
                 </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name="invoice_address_line"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel>{isAdmin ? "Address line" : t("streetAndHouse")}</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} disabled={isSameShipping} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+            {isSameShipping === true ? '' :
+                (
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="invoice_address_line"
+                            render={({ field }) => (
+                                <FormItem className="col-span-2">
+                                    <FormLabel>{isAdmin ? "Address line" : t("streetAndHouse")}</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="" {...field} disabled={isSameShipping} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="invoice_address_additional"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel>{isAdmin ? "Additional Address" : t("addressSupplement")}</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} disabled={isSameShipping} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                        <FormField
+                            control={form.control}
+                            name="invoice_address_additional"
+                            render={({ field }) => (
+                                <FormItem className="col-span-2">
+                                    <FormLabel>{isAdmin ? "Additional Address" : t("addressSupplement")}</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="" {...field} disabled={isSameShipping} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="invoice_postal_code"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{isAdmin ? "Postal Code" : t("postalCode")}</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} disabled={isSameShipping} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                        <FormField
+                            control={form.control}
+                            name="invoice_postal_code"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{isAdmin ? "Postal Code" : t("postalCode")}</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="" {...field} disabled={isSameShipping} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="invoice_city"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">{isAdmin ? "City" : t("city")}</FormLabel>
-                            <FormControl>
-                                <Popover open={open} onOpenChange={setOpen}>
-                                    <PopoverTrigger asChild disabled={isSameShipping}>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
-                                        >
-                                            {field.value || (isAdmin ? "Select City" : t('selectCity'))}
-                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-full p-0">
-                                        <Command>
-                                            <CommandInput placeholder="" />
-                                            <CommandEmpty>{t("noCity")}</CommandEmpty>
-                                            <CommandList className="h-[400px]">
-                                                <CommandGroup>
-                                                    {cityOptions.map((c, index) => (
-                                                        <CommandItem
-                                                            key={index}
-                                                            value={c.value}
-                                                            onSelect={() => {
-                                                                field.onChange(c.value)
-                                                                setOpen(false) // đóng popover sau khi chọn
-                                                            }}
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    field.value === c.value ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            {c.label}
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
+                        <FormField
+                            control={form.control}
+                            name="invoice_city"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-[#666666] text-sm">{isAdmin ? "City" : t("city")}</FormLabel>
+                                    <FormControl>
+                                        <Popover open={open} onOpenChange={setOpen}>
+                                            <PopoverTrigger asChild disabled={isSameShipping}>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                                                >
+                                                    {field.value || (isAdmin ? "Select City" : t('selectCity'))}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-full p-0">
+                                                <Command>
+                                                    <CommandInput placeholder="" />
+                                                    <CommandEmpty>{t("noCity")}</CommandEmpty>
+                                                    <CommandList className="h-[400px]">
+                                                        <CommandGroup>
+                                                            {cityOptions.map((c, index) => (
+                                                                <CommandItem
+                                                                    key={index}
+                                                                    value={c.value}
+                                                                    onSelect={() => {
+                                                                        field.onChange(c.value)
+                                                                        setOpen(false) // đóng popover sau khi chọn
+                                                                    }}
+                                                                >
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "mr-2 h-4 w-4",
+                                                                            field.value === c.value ? "opacity-100" : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                    {c.label}
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                )
+            }
+
         </div>
     )
 }

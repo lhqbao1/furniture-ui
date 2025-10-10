@@ -10,7 +10,7 @@ import {
 import "react-quill-new/dist/quill.snow.css"
 import { addProductSchema, defaultValues, ProductInput } from '@/lib/schema/product'
 import { Loader2 } from 'lucide-react'
-import { ProductItem, StaticFile } from '@/types/products'
+import { ProductItem } from '@/types/products'
 import { toast } from 'sonner'
 import { CategoryResponse } from '@/types/categories'
 import { useAddProduct, useEditProduct } from '@/features/products/hook'
@@ -208,10 +208,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
 
                         <div className='col-span-3 flex flex-col items-end gap-4 relative'>
                             {/*Form Button */}
-                            <div className='flex gap-2 justify-end top-24 fixed'>
-                                <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.back()}
-                                >Back</Button>
-                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>Discard</Button>
+                            <div className='grid grid-cols-2 gap-2 justify-end top-24 fixed'>
                                 <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (
                                         <Loader2 className="animate-spin" />
@@ -221,14 +218,22 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                         "Add"
                                     )}
                                 </Button>
-
+                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>
+                                    Discard
+                                </Button>
+                                <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.back()}>
+                                    Back
+                                </Button>
+                                {productValues ?
+                                    <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.push(`/product${productValues?.categories && productValues.categories.length > 0 ? `/${productValues.categories[0].slug}` : ''}/${productValues?.id}`)}
+                                    >View</Button> : ''
+                                }
                             </div>
                         </div>
                     </div>
                 </form>
             </Form>
         </div>
-
     )
 }
 

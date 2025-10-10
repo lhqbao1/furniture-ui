@@ -4,13 +4,29 @@ import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { CheckOut } from "@/types/checkout"
+import { CheckOut, CheckOutMain } from "@/types/checkout"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Eye } from "lucide-react"
+import { Eye, File } from "lucide-react"
 import ViewFileDialog from "./view-file"
 import { listChanel, paymentOptions } from "@/data/data"
 import { useRouter } from "@/src/i18n/navigation"
 import { useLocale } from "next-intl"
+import { Product } from "@/types/products"
+import { CartItem, CartResponseItem } from "@/types/cart"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogTrigger,
+    DialogFooter,
+    DialogClose
+} from '@/components/ui/dialog'
+import { use, useState } from "react"
+import { ProductTable } from "../../products/products-list/product-table"
+import { cartSupplierColumn, GetCartColumns } from "@/components/layout/cart/columns"
+import CartTable from "@/components/layout/cart/cart-table"
 
 const ActionCell = ({ id }: { id: string }) => {
     const router = useRouter()
@@ -29,9 +45,56 @@ const ActionCell = ({ id }: { id: string }) => {
     )
 }
 
+const ActionCellChild = ({ items, checkoutId, isSupplier = false }: { items: CartItem[], checkoutId: string, isSupplier?: boolean }) => {
+    const router = useRouter()
+    const locale = useLocale()
+    const [open, setOpen] = useState(false)
+    const [openPackage, setOpenPackge] = useState(false)
+
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(1)
+
+    return (
+        <div className="flex justify-center items-center gap-2">
+            {/* Eye Icon → mở dialog */}
+            {isSupplier ? '' : (
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <Eye className="w-4 h-4" stroke="#F7941D" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className='lg:w-[800px]'>
+                        <ProductTable
+                            data={items}
+                            columns={cartSupplierColumn}
+                            page={page}
+                            pageSize={pageSize}
+                            setPage={setPage}
+                            setPageSize={setPageSize}
+                            hasPagination={false}
+                            totalItems={items.length}
+                            totalPages={1}
+                        />
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="secondary">Close</Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            <ViewFileDialog
+                checkoutId={checkoutId}
+                type="package"
+            />
+        </div>
+    )
+}
 
 
-export const orderColumns: ColumnDef<CheckOut>[] = [
+export const orderColumns: ColumnDef<CheckOutMain>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -117,78 +180,78 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
             )
         }
     },
-    {
-        accessorKey: "customer",
-        header: () => (
-            <div className="text-center w-full">CUSTOMER</div>
-        ),
-        cell: ({ row }) => {
-            const user = row.original.user
-            const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
-            return (
-                <div className="flex gap-2 items-center justify-center">
-                    <Avatar>
-                        <AvatarImage src={`${user.avatar_url}`} alt={user.first_name} />
-                        <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                        <div className="text-[#4D4D4D] font-semibold">{user.first_name} {user.last_name}</div>
-                        <div className="text-xs text-[#4D4D4D]">{user.phone_number}</div>
-                    </div>
-                </div>
-            )
-        }
-    },
-    {
-        accessorKey: "payment",
-        header: () => <div className="text-center w-full">PAYMENT</div>,
-        cell: ({ row }) => {
-            const method = row.original.payment_method;
-            const option = paymentOptions.find((opt) => opt.id === method);
-            const logo = option?.logo || "/ebay.png"; // default Paypal
+    // {
+    //     accessorKey: "customer",
+    //     header: () => (
+    //         <div className="text-center w-full">CUSTOMER</div>
+    //     ),
+    //     cell: ({ row }) => {
+    //         const user = row.original.user
+    //         const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
+    //         return (
+    //             <div className="flex gap-2 items-center justify-center">
+    //                 <Avatar>
+    //                     <AvatarImage src={`${user.avatar_url}`} alt={user.first_name} />
+    //                     <AvatarFallback>{initials}</AvatarFallback>
+    //                 </Avatar>
+    //                 <div className="flex flex-col">
+    //                     <div className="text-[#4D4D4D] font-semibold">{user.first_name} {user.last_name}</div>
+    //                     <div className="text-xs text-[#4D4D4D]">{user.phone_number}</div>
+    //                 </div>
+    //             </div>
+    //         )
+    //     }
+    // },
+    // {
+    //     accessorKey: "payment",
+    //     header: () => <div className="text-center w-full">PAYMENT</div>,
+    //     cell: ({ row }) => {
+    //         const method = row.original.payment_method;
+    //         const option = paymentOptions.find((opt) => opt.id === method);
+    //         const logo = option?.logo || "/ebay.png"; // default Paypal
 
-            return (
-                <div className="h-12 relative">
-                    <Image
-                        src={logo}
-                        alt={option?.label || "PayPal"}
-                        fill
-                        className="object-contain p-2"
-                        unoptimized
-                    />
-                </div>
-            );
-        },
-    },
+    //         return (
+    //             <div className="h-12 relative">
+    //                 <Image
+    //                     src={logo}
+    //                     alt={option?.label || "PayPal"}
+    //                     fill
+    //                     className="object-contain p-2"
+    //                     unoptimized
+    //                 />
+    //             </div>
+    //         );
+    //     },
+    // },
     {
         accessorKey: "status",
         header: () => (
             <div className="text-center w-full">STATUS</div>
         ),
-        cell: ({ row }) => <div className="text-center">{row.original.status}</div>,
+        cell: ({ row }) => <div className="text-center lowercase">{row.original.status}</div>,
     },
-    {
-        accessorKey: "shipping",
-        header: () => (
-            <div className="text-center w-full">CARRIER</div>
-        ),
-        cell: ({ row }) => {
-            const shippingCost = row.original.total_shipping
-            return (
-                <div className="w-full flex justify-center">
-                    <div className="h-20 w-20 relative">
-                        {shippingCost === 5.95 ?
-                            <Image src={'/dpd.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />
-                            : <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />}
-                    </div>
-                </div>
-            )
-        }
-    },
+    // {
+    //     accessorKey: "shipping",
+    //     header: () => (
+    //         <div className="text-center w-full">CARRIER</div>
+    //     ),
+    //     cell: ({ row }) => {
+    //         const shippingCost = row.original.total_shipping
+    //         return (
+    //             <div className="w-full flex justify-center">
+    //                 <div className="h-20 w-20 relative">
+    //                     {shippingCost === 5.95 ?
+    //                         <Image src={'/dpd.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />
+    //                         : <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />}
+    //                 </div>
+    //             </div>
+    //         )
+    //     }
+    // },
     {
         accessorKey: "value",
         header: () => (
-            <div className="text-center w-full">INVOICE</div>
+            <div className="text-end w-full">INVOICE</div>
         ),
         cell: ({ row }) => {
             return (
@@ -201,19 +264,173 @@ export const orderColumns: ColumnDef<CheckOut>[] = [
     },
     {
         id: "actions",
-        header: "ACTION",
+        header: () => (
+            <div className="text-center w-full">ACTIONS</div>
+        ),
         cell: ({ row }) => <ActionCell id={row.original.id} />,
-        //     {
-        //     return (
-        //         <div className="flex justify-center">
-        //             <Link href={`/admin/orders/${row.original.id}`}>
-        //                 <Button variant="ghost" size="icon">
-        //                     <Eye className="w-4 h-4" stroke="#F7941D" />
-        //                 </Button>
-        //             </Link>
-        //         </div>
+    },
+]
 
-        //     )
-        // }
+export const orderChildColumns: ColumnDef<CheckOut>[] = [
+    {
+        accessorKey: "id",
+        header: "ORDER ID",
+        cell: ({ row }) => {
+            return (
+                <div>#{row.original.checkout_code}</div>
+            )
+        }
+    },
+    {
+        accessorKey: "owner",
+        header: "OWNER",
+        cell: ({ row }) => {
+            return (
+                <div>{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
+            )
+        }
+    },
+
+    {
+        accessorKey: "channel",
+        header: () => (
+            <div className="text-center w-full">CHANNEL</div>
+        ),
+        cell: ({ row }) => {
+            const currentChanel = row.original.from_marketplace
+            const channelLogo = listChanel.find(ch => ch.name === currentChanel)?.icon || 'new-logo.svg'
+            return (
+                <div className="h-12 relative">
+                    <Image src={`/${channelLogo}`} alt="icon" fill className="object-contain p-2" unoptimized />
+                </div>
+                // <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
+            )
+        },
+    },
+    {
+        accessorKey: "created_at",
+        header: () => (
+            <div className="text-center w-full">DATE CREATED</div>
+        ),
+        cell: ({ row }) => {
+            const isoString = row.original.created_at
+            const date = new Date(isoString)
+
+            const time = date.toLocaleString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false, // bỏ AM/PM nếu muốn
+            })
+
+            const day = date.toLocaleString("en-US", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            })
+
+            return (
+                <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
+                    <span>{time}</span>
+                    <span>{day}</span>
+                </div>
+            )
+        }
+    },
+
+    {
+        accessorKey: "status",
+        header: () => (
+            <div className="text-center w-full">STATUS</div>
+        ),
+        cell: ({ row }) => <div className="text-center lowercase">{row.original.status}</div>,
+    },
+    {
+        id: "actions",
+        header: () => (
+            <div className="text-center w-full">ACTIONS</div>
+        ),
+        cell: ({ row }) => <ActionCellChild checkoutId={row.original.id} items={row.original.cart.items} />,
+    },
+]
+
+export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
+    {
+        accessorKey: "id",
+        header: "ORDER ID",
+        cell: ({ row }) => {
+            return (
+                <div>#{row.original.checkout_code}</div>
+            )
+        }
+    },
+    {
+        accessorKey: "owner",
+        header: "OWNER",
+        cell: ({ row }) => {
+            return (
+                <div>{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
+            )
+        }
+    },
+
+    {
+        accessorKey: "channel",
+        header: () => (
+            <div className="text-center w-full">CHANNEL</div>
+        ),
+        cell: ({ row }) => {
+            const currentChanel = row.original.from_marketplace
+            const channelLogo = listChanel.find(ch => ch.name === currentChanel)?.icon || 'new-logo.svg'
+            return (
+                <div className="h-12 relative">
+                    <Image src={`/${channelLogo}`} alt="icon" fill className="object-contain p-2" unoptimized />
+                </div>
+                // <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
+            )
+        },
+    },
+    {
+        accessorKey: "created_at",
+        header: () => (
+            <div className="text-center w-full">DATE CREATED</div>
+        ),
+        cell: ({ row }) => {
+            const isoString = row.original.created_at
+            const date = new Date(isoString)
+
+            const time = date.toLocaleString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false, // bỏ AM/PM nếu muốn
+            })
+
+            const day = date.toLocaleString("en-US", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            })
+
+            return (
+                <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
+                    <span>{time}</span>
+                    <span>{day}</span>
+                </div>
+            )
+        }
+    },
+
+    {
+        accessorKey: "status",
+        header: () => (
+            <div className="text-center w-full">STATUS</div>
+        ),
+        cell: ({ row }) => <div className="text-center lowercase">{row.original.status}</div>,
+    },
+    {
+        id: "actions",
+        header: () => (
+            <div className="text-center w-full">ACTIONS</div>
+        ),
+        cell: ({ row }) => <ActionCellChild checkoutId={row.original.id} items={row.original.cart.items} isSupplier />,
     },
 ]

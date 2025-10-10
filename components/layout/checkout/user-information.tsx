@@ -1,6 +1,6 @@
 "use client"
 
-import { useFormContext, Controller, useWatch } from "react-hook-form"
+import { useFormContext } from "react-hook-form"
 import {
     FormField,
     FormItem,
@@ -10,11 +10,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useTranslations } from "next-intl"
-import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useGetAllCustomers } from "@/features/users/hook"
-import { useQuery } from "@tanstack/react-query"
-import { getUserById } from "@/features/users/api"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 
 interface CheckOutUserInformationProps {
@@ -31,6 +28,39 @@ export default function CheckOutUserInformation({ isLogin, userId }: CheckOutUse
                 <h2 className="text-lg text-black font-semibold ">{t('userInformation')}</h2>
             </div>
             <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                    <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                            <FormItem>
+                                {/* <FormLabel>{t("gender")}</FormLabel> */}
+                                <FormControl>
+                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                                        <FormItem className="flex gap-1 items-center">
+                                            <FormControl>
+                                                <RadioGroupItem value="male" />
+                                            </FormControl>
+                                            <FormLabel className="ml-2">{t("male")}</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex gap-1 items-center">
+                                            <FormControl>
+                                                <RadioGroupItem value="female" />
+                                            </FormControl>
+                                            <FormLabel className="ml-2">{t("female")}</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex gap-1 items-center">
+                                            <FormControl>
+                                                <RadioGroupItem value="other" />
+                                            </FormControl>
+                                            <FormLabel className="ml-2">{t("otherGender")}</FormLabel>
+                                        </FormItem>
+                                    </RadioGroup>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                </div>
                 <FormField
                     control={form.control}
                     name="first_name"
@@ -90,31 +120,6 @@ export default function CheckOutUserInformation({ isLogin, userId }: CheckOutUse
                                     {...field}
                                     disabled={isLogin}
                                 />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel>{t("gender")}</FormLabel>
-                            <FormControl>
-                                <Select
-                                    value={field.value}
-                                    onValueChange={field.onChange}
-                                >
-                                    <SelectTrigger className="w-full border" placeholderColor disabled={isLogin}>
-                                        <SelectValue placeholder={t("gender")} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="male">{t("male")}</SelectItem>
-                                        <SelectItem value="female">{t("female")}</SelectItem>
-                                        <SelectItem value="other">{t("otherGender")}</SelectItem>
-                                    </SelectContent>
-                                </Select>
                             </FormControl>
                             <FormMessage />
                         </FormItem>

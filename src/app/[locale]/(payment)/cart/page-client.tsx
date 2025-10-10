@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import CartSummary from '@/components/layout/cart/cart-summary'
 import CartTable from '@/components/layout/cart/cart-table'
@@ -11,6 +11,8 @@ import { getCartItems } from '@/features/cart/api'
 import { useLocale, useTranslations } from 'next-intl'
 import { LoginDrawer } from '@/components/shared/login-drawer'
 import CartLocalTable from '@/components/layout/cart/cart-local-table'
+import { CartItem, CartResponse, CartResponseItem } from '@/types/cart'
+import { CartItemLocal } from '@/lib/utils/cart'
 
 const CartPageClient = () => {
     const [userId, setUserId] = React.useState<string | null>(
@@ -37,31 +39,46 @@ const CartPageClient = () => {
     const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
         queryKey: ["cart-items", userId],
         queryFn: async () => {
-            const data = await getCartItems()
-            // Sort theo created_at giảm dần (mới nhất lên trước)
-            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            const data = await getCartItems() // CartResponseItem[]
+            // Có thể sort theo thời gian tạo của từng giỏ hàng nếu cần
+            data.sort(
+                (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            )
             return data
         },
         retry: false,
-        enabled: !!userId
+        enabled: !!userId,
     })
 
-    const displayedCart = userId ? cart?.items ?? [] : localCart;
+    // Nếu có user thì hiển thị cart trên server, không thì localCart
+    const displayedCart = useMemo(() => userId ? cart ?? [] : localCart, [cart, localCart, userId])
+
     const { updateStatus } = useCartLocal()
 
+    let total = 0;
 
-
-
-
-    //Calculate total amount 
-    const total =
-        displayedCart
-            ?.filter(item => item.is_active)
+    if (userId && cart) {
+        // 🛒 Trường hợp user đăng nhập → cart là CartResponse
+        total = cart
+            .flatMap(group => group.items) // flatten tất cả items trong từng supplier
+            .filter(item => item.is_active)
             .reduce((acc, item) => {
-                const key = 'id' in item ? item.id : item.product_id;
-                const quantity = localQuantities[key ?? ''] ?? item.quantity;
+                const key = item.id;
+                const quantity = localQuantities[key ?? ""] ?? item.quantity;
                 return acc + quantity * item.item_price;
-            }, 0) ?? 0;
+            }, 0);
+    } else {
+        // 🧺 Trường hợp guest → localCart là CartItem[]
+        total =
+            localCart
+                ?.filter(item => item.is_active)
+                .reduce((acc, item) => {
+                    const key = 'id' in item ? item.id : (item as CartItemLocal).product_id;
+                    const quantity = localQuantities[key ?? ''] ?? item.quantity;
+                    return acc + quantity * item.item_price;
+                }, 0) ?? 0;
+    }
+
 
     // Proceed checkout
     const proceedToCart = () => {
@@ -90,7 +107,7 @@ const CartPageClient = () => {
                     {
                         userId ? (<CartTable
                             isLoadingCart={isLoadingCart}
-                            cart={cart}
+                            cart={cart ?? []}
                             localQuantities={localQuantities}
                             setLocalQuantities={setLocalQuantities}
                             isCheckout={false}

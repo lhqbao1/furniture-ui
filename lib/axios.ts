@@ -128,7 +128,7 @@ apiDSP.interceptors.request.use((config) => {
   return config
 })
 
-apiAdmin.interceptors.response.use(
+apiDSP.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {

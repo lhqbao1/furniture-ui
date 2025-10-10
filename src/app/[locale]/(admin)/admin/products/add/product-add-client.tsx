@@ -1,14 +1,12 @@
 'use client'
+import ProductForm from '@/components/layout/admin/products/products-form/add-product-form'
 // import ProductForm from '@/components/layout/admin/products/products-form/add-product-form'
 import { useAddProduct } from '@/features/products/hook'
 import { ProductInput } from '@/lib/schema/product'
 import dynamic from 'next/dynamic'
 import React, { useEffect } from 'react'
 import { toast } from 'sonner'
-const ProductForm = dynamic(() => import('@/components/layout/admin/products/products-form/add-product-form'), {
-    ssr: false,
-    loading: () => <div>Loading form...</div>,
-})
+
 
 
 const ProductAddClient = () => {

@@ -45,6 +45,7 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                                     <div>
                                         <p className="font-semibold text-wrap line-clamp-3">{item.product_name}</p>
                                         <p>#{item.id_provider}</p>
+                                        <span>In {item.delivery_time} {t('business_days')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -118,12 +119,21 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
             ),
         },
         {
+            accessorKey: "delivery_time",
+            header: () => <div className="">{t('estimated_delivery')}</div>,
+            cell: ({ row }) => (
+                <div>
+                    In {row.original.delivery_time} {t('business_days')}
+                </div>
+            ),
+        },
+        {
             accessorKey: "quantity",
             header: () => <div className="text-center">{t('quantity')}</div>,
             cell: ({ row }) => {
                 const item = row.original
                 return (
-                    <div className="flex items-center gap-2">
+                    <div className="flex justify-center items-center gap-2">
                         <Button
                             type="button"
                             variant="outline"

@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Textarea } from '@/components/ui/textarea'
-import { useCreateAddress, useCreateInvoiceAddress, useGetAddressByUserId, useGetInvoiceAddressByUserId, useUpdateInvoiceAddress } from '@/features/address/hook'
+import { useCreateAddress, useCreateInvoiceAddress, useUpdateInvoiceAddress } from '@/features/address/hook'
 import { toast } from 'sonner'
 import { useSyncLocalCart } from '@/features/cart/hook'
 import { useCreateCheckOut } from '@/features/checkout/hook'
@@ -15,7 +15,6 @@ import { useAtom } from 'jotai'
 import { checkOutIdAtom, paymentIdAtom } from '@/store/payment'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useLocale, useTranslations } from 'next-intl'
-import z from 'zod'
 // import CheckOutInvoiceAddress from '@/components/layout/checkout/invoice-address'
 import { useCartLocal } from '@/hooks/cart'
 import { useQuery } from '@tanstack/react-query'
@@ -24,7 +23,7 @@ import { getUserById } from '@/features/users/api'
 import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
 import { getCartItems } from '@/features/cart/api'
 // import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
-import { useCheckMailExist, useLogin, useLoginOtp, useSignUp, useSignUpGuess } from '@/features/auth/hook'
+import { useCheckMailExist, useSignUpGuess } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
 // import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
@@ -34,6 +33,8 @@ import { SectionSkeleton } from '@/components/layout/checkout/section-skeleton'
 import StripeLayout from '@/components/shared/stripe/stripe'
 import { Loader2 } from 'lucide-react'
 import { Link, useRouter } from '@/src/i18n/navigation'
+import { checkoutDefaultValues, CreateOrderFormValues, CreateOrderSchema } from '@/lib/schema/checkout'
+import { mapToSupplierCarts } from '@/hooks/map-cart-to-supplier'
 const CartTable = dynamic(() => import('@/components/layout/cart/cart-table'), { ssr: false })
 const CartLocalTable = dynamic(() => import('@/components/layout/cart/cart-local-table'), { ssr: false })
 
@@ -92,6 +93,8 @@ export default function CheckOutPageClient() {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [total, setTotal] = useState<number>(0);
     const [openCardDialog, setOpenCardDialog] = useState(false)
+    const schema = CreateOrderSchema(t)
+
     const locale = useLocale()
 
     useEffect(() => {
@@ -107,41 +110,6 @@ export default function CheckOutPageClient() {
     const router = useRouter()
     const { updateStatus } = useCartLocal()
 
-    const CreateOrderSchema = z.object({
-        shipping_address_id: z.string().optional(),
-        invoice_address_id: z.string().optional(),
-        cart_id: z.string().optional(),
-        payment_method: z.string().min(1, "You need to choose payment method"),
-        note: z.string().optional().nullable(),
-        coupon_amount: z.number().optional().nullable(),
-        voucher_amount: z.number().optional().nullable(),
-        terms: z.boolean().refine(val => val === true),
-
-        first_name: z.string().min(1, { message: t('first_name_required') }),
-        last_name: z.string().min(1, { message: t('last_name_required') }),
-        invoice_address_line: z.string().min(1, { message: t('last_name_required') }),
-        invoice_postal_code: z.string().min(1, { message: t('last_name_required') }),
-        invoice_city: z.string().min(1, { message: t('last_name_required') }),
-        invoice_address_additional: z.string().optional(),
-        shipping_address_additional: z.string().optional(),
-        gender: z.string().optional().nullable(),
-        email: z
-            .string()
-            .min(1, t('emailRequired'))
-            .email(t('invalidEmail')),
-        phone_number: z
-            .string()
-            .min(6, { message: t('phone_number_short') })
-            .refine((val) => /^\+?[0-9]+$/.test(val), {
-                message: t('phone_number_invalid'),
-            }),
-
-        shipping_address_line: z.string().min(1, { message: t('last_name_required') }),
-        shipping_postal_code: z.string().min(1, { message: t('last_name_required') }),
-        shipping_city: z.string().min(1, { message: t('last_name_required') }),
-    });
-
-    type CreateOrderFormValues = z.infer<typeof CreateOrderSchema>
 
     // SSR-safe: chỉ đọc localStorage sau khi client mounted
     useEffect(() => {
@@ -177,8 +145,10 @@ export default function CheckOutPageClient() {
         queryKey: ["cart-items", userIdLogin ? userIdLogin : userId],
         queryFn: async () => {
             const data = await getCartItems()
-            // Sort theo created_at giảm dần (mới nhất lên trước)
-            // data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            // Có thể sort theo thời gian tạo của từng giỏ hàng nếu cần
+            data.sort(
+                (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            )
             return data
         },
         enabled: !!(userIdLogin ? userIdLogin : userId),
@@ -194,40 +164,26 @@ export default function CheckOutPageClient() {
     const checkMailExistMutation = useCheckMailExist();
     const editInvoiceAddressMutation = useUpdateInvoiceAddress()
 
+    const hasServerCart = Array.isArray(cartItems) && cartItems.length > 0;
+
+    const normalizedItems = normalizeCartItems(
+        hasServerCart
+            ? cartItems.flatMap((group) => group.items)
+            : localCart,
+        hasServerCart
+    );
+
+    const shippingCost = calculateShipping(normalizedItems)
+    const hasOtherCarrier = checkShippingType(normalizedItems)
+
 
     const handleOtpSuccess = (verifiedUserId: string) => {
         setUserId(verifiedUserId)
     }
 
     const form = useForm<CreateOrderFormValues>({
-        resolver: zodResolver(CreateOrderSchema),
-        defaultValues: {
-            shipping_address_id: "",
-            invoice_address_id: "",
-            cart_id: "",
-            payment_method: "paypal",
-            note: "",
-            coupon_amount: 0,
-            voucher_amount: 0,
-            terms: false,
-
-            first_name: "",
-            last_name: "",
-            email: "",
-            phone_number: "",
-            gender: "",
-
-            invoice_address_line: "",
-            invoice_postal_code: "",
-            invoice_city: "",
-            invoice_address_additional: "",
-
-
-            shipping_address_line: "",
-            shipping_postal_code: "",
-            shipping_city: "",
-            shipping_address_additional: "",
-        },
+        resolver: zodResolver(schema),
+        defaultValues: checkoutDefaultValues
     })
 
     useEffect(() => {
@@ -260,21 +216,21 @@ export default function CheckOutPageClient() {
 
         if (Object.keys(defaults).length > 0) {
             form.reset({
-                ...form.getValues(), // giữ nguyên các field khác
-                ...defaults,         // override field có data
+                ...form.getValues(),
+                ...defaults,
             })
         }
     }, [user, invoiceAddress, addresses, form])
-
 
     const couponAmount = form.watch('coupon_amount')
     const voucherAmount = form.watch('voucher_amount')
 
     //Assign cart_id into form values
     useEffect(() => {
-        if (cartItems?.id) {
-            form.setValue("cart_id", cartItems.id)
+        if (cartItems && cartItems?.length > 0) {
+            console.log(cartItems)
         }
+
         if (invoiceAddress?.id) {
             form.setValue("invoice_address_id", invoiceAddress.id)
         }
@@ -391,25 +347,14 @@ export default function CheckOutPageClient() {
                     }
                 }
 
-                // Đợi cartItems
-                if (!cartItems?.id) {
-                    const latestCart = await getCartItems()
-                    if (!latestCart?.id) {
-                        toast.error("Cart not found")
-                        return
-                    }
-                    data.cart_id = latestCart.id
-                } else {
-                    data.cart_id = cartItems.id
-                }
-
                 // Tạo checkout
                 const checkout = await createCheckOutMutation.mutateAsync({
                     ...data,
-                    // user_id: userId,
                     invoice_address_id: invoiceAddressId,
                     shipping_address_id: shippingAddressId,
-                    total_shipping: calculateShipping(normalizeCartItems(cartItems && cartItems.items.length > 0 ? cartItems.items : localCart, cartItems && cartItems.items.length > 0 ? true : false)),
+                    supplier_carts: mapToSupplierCarts(cartItems ?? []),
+                    note: data.note,
+                    total_shipping: shippingCost
                 })
                 toast.success("Place order successful")
                 setCheckOut(checkout.id)
@@ -422,7 +367,7 @@ export default function CheckOutPageClient() {
                     })
 
                     toast.success("Place payment successful")
-                    setPaymentId(payment.payment_id)
+                    setPaymentId(payment.payment_order_id)
                     if (data.payment_method === "paypal") {
                         router.push(payment.approve_url, { locale })
                     } else {
@@ -440,8 +385,8 @@ export default function CheckOutPageClient() {
                 }
             } catch (error) {
                 toast.error(t('orderFail'))
-                localStorage.removeItem("userIdGuest")
-                localStorage.removeItem("access_token")
+                // localStorage.removeItem("userIdGuest")
+                // localStorage.removeItem("access_token")
                 form.reset()
                 console.error(error)
             }
@@ -449,9 +394,7 @@ export default function CheckOutPageClient() {
         [user, invoiceAddress, addresses]
     )
 
-    const normalizedItems = normalizeCartItems(cartItems && cartItems.items.length > 0 ? cartItems.items : localCart, cartItems && cartItems.items.length > 0 ? true : false)
-    const shippingCost = calculateShipping(normalizedItems)
-    const hasOtherCarrier = checkShippingType(normalizedItems)
+
 
     return (
         <FormProvider {...form}>
@@ -470,7 +413,7 @@ export default function CheckOutPageClient() {
                 <h2 className='section-header'>{t('order')}</h2>
 
                 {/* Main container */}
-                <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:px-52 md:px-14 px-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-12 lg:px-52 md:px-14 px-4'>
 
                     {/* Shipping Address */}
                     {/* <div className='col-span-1 space-y-4 lg:space-y-12'>
@@ -516,16 +459,16 @@ export default function CheckOutPageClient() {
                     {/* Order summary 
 
                     */}
-                    <div className='col-span-1 space-y-4 lg:space-y-4'>
+                    <div className='col-span-2 space-y-4 lg:space-y-4'>
                         {
                             cartItems ? (<CartTable
                                 isLoadingCart={isLoadingCart}
                                 cart={
                                     cartItems
-                                        ? {
-                                            ...cartItems,
-                                            items: cartItems.items.filter((item) => item.is_active)
-                                        }
+                                        ? cartItems.map((group) => ({
+                                            ...group,
+                                            items: group.items.filter((item) => item.is_active),
+                                        }))
                                         : undefined
                                 }
                                 localQuantities={localQuantities}
@@ -585,17 +528,21 @@ export default function CheckOutPageClient() {
                                     <span className='col-span-3 text-right'>{t('subTotalInclude')}</span>
                                     <span className='text-right col-span-2'>
                                         €{(
-                                            (cartItems?.items && cartItems.items.length > 0
-                                                ? cartItems.items
+                                            cartItems && Array.isArray(cartItems) && cartItems.length > 0
+                                                ? cartItems
+                                                    .flatMap((group) => group.items) // gom tất cả items trong từng supplier cart
                                                     .filter((item) => item.is_active)
-                                                    .reduce((total, item) => total + item.final_price, 0)
+                                                    .reduce((total, item) => total + (item.final_price ?? 0), 0)
                                                 : localCart
                                                     ?.filter((item) => item.is_active)
                                                     .reduce(
                                                         (total, item) => total + (item.item_price ?? 0) * (item.quantity ?? 1),
                                                         0
-                                                    )) ?? 0
-                                        ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    ) ?? 0
+                                        ).toLocaleString("de-DE", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })}
                                     </span>
                                 </div>
                                 <div className='grid grid-cols-5'>
@@ -611,22 +558,29 @@ export default function CheckOutPageClient() {
                                     <span className='text-right col-span-2'>
                                         €{
                                             (
-                                                (cartItems?.items && cartItems.items.length > 0
-                                                    ? cartItems.items
-                                                        .filter((item) => item.is_active === true)
-                                                        .reduce((total, item) => total + item.final_price, 0)
-                                                    : localCart
-                                                        ?.filter((item) => item.is_active === true)
-                                                        .reduce(
-                                                            (total, item) => total + (item.item_price ?? 0) * (item.quantity ?? 1),
-                                                            0
-                                                        ) ?? 0) +
-                                                shippingCost -
-                                                (couponAmount ?? 0) -
-                                                (voucherAmount ?? 0)
-                                            ).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                                (
+                                                    (Array.isArray(cartItems) && cartItems.length > 0
+                                                        ? cartItems
+                                                            .flatMap((group) => group.items) // gộp tất cả CartItem từ các supplier
+                                                            .filter((item) => item.is_active)
+                                                            .reduce((total, item) => total + (item.final_price ?? 0), 0)
+                                                        : localCart
+                                                            ?.filter((item) => item.is_active)
+                                                            .reduce(
+                                                                (total, item) =>
+                                                                    total + (item.item_price ?? 0) * (item.quantity ?? 1),
+                                                                0
+                                                            ) ?? 0
+                                                    ) +
+                                                    (shippingCost ?? 0) -
+                                                    (couponAmount ?? 0) -
+                                                    (voucherAmount ?? 0)
+                                                ).toLocaleString("de-DE", {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                })
+                                            )
                                         }
-
                                     </span>
                                 </div>
                             </div>

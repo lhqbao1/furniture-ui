@@ -80,7 +80,8 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                     product_name: currentProduct.name,
                     stock: currentProduct.stock,
                     carrier: currentProduct.carrier ? currentProduct.carrier : 'amm',
-                    id_provider: currentProduct.id_provider ? currentProduct.id_provider : ''
+                    id_provider: currentProduct.id_provider ? currentProduct.id_provider : '',
+                    delivery_time: currentProduct.delivery_time ? currentProduct.delivery_time : ''
                 }
             }, {
                 onSuccess(data, variables, context) {

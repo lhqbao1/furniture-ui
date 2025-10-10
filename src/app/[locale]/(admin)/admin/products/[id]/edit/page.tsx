@@ -5,13 +5,8 @@ import React, { useEffect } from "react"
 import { useRouter } from "@/src/i18n/navigation"
 import { ProductInput } from "@/lib/schema/product"
 import { toast } from "sonner"
-// import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
+import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
 import { useLocale } from "next-intl"
-import dynamic from "next/dynamic"
-const ProductForm = dynamic(() => import('@/components/layout/admin/products/products-form/add-product-form'), {
-    ssr: false,
-    loading: () => <div>Loading form...</div>,
-})
 
 
 const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {

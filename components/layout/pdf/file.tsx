@@ -106,7 +106,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                         <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>E-Preis</Text>
                         <Text style={{ flex: 1, paddingHorizontal: 5, fontFamily: 'FigtreeBold' }}>G-Preis</Text>
                     </View>
-                    {invoice?.cart.items?.map((item, index) => (
+                    {/* {invoice?.cart.items?.map((item, index) => (
                         <View style={styles.tableRow} key={index}>
                             <Text style={{ width: 50, textAlign: 'center' }}>{index + 1}</Text>
                             <Text style={{ width: 100, textAlign: 'left' }}>
@@ -118,7 +118,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                             <Text style={{ flex: 1, paddingRight: 15, textAlign: 'right' }}>€{item.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                             <Text style={styles.tableCol}>€{item.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
                         </View>
-                    ))}
+                    ))} */}
                 </View>
 
                 {/* Summary */}

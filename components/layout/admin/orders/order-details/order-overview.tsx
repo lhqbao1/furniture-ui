@@ -1,4 +1,4 @@
-import { CheckOut } from '@/types/checkout'
+import { CheckOut, CheckOutMain } from '@/types/checkout'
 import { ArrowRight } from 'lucide-react'
 import React from 'react'
 
@@ -6,7 +6,7 @@ interface OrderDetailOverViewProps {
     created_at: string,
     updated_at: string,
     status: string,
-    order: CheckOut
+    order: CheckOutMain
 }
 
 const OrderDetailOverView = ({ created_at, updated_at, status, order }: OrderDetailOverViewProps) => {

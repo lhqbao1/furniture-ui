@@ -349,7 +349,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
                 <Pencil className="w-4 h-4 text-primary" />
             </Button>
             {/* </Link> */}
-            <DeleteDialog product={product} />
+            <DeleteDialog product={product} isEbay={product.ebay} />
             <Link
                 href={`/product${categoryHref}`}
                 target="_blank"
@@ -414,7 +414,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         header: ({ column }) => (
             <Button
                 variant={'ghost'}
-                className="font-semibold flex items-center justify-center gap-1 w-fit"
+                className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 <div>NAME</div>

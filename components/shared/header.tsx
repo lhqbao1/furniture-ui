@@ -48,12 +48,13 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
         queryKey: ["cart-items", userId],
         queryFn: async () => {
             const data = await getCartItems()
-            data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            // data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             return data
         },
         enabled: !!userId,
         retry: false,
     })
+
 
     const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useQuery({
         queryKey: ["me", userId],
@@ -81,8 +82,9 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
         // queryClient.removeQueries({ queryKey: ["cart-items"], exact: true });
     }
 
-    const displayedCart = userId ? cart?.items ?? [] : localCart;
-
+    const displayedCart = userId
+        ? cart?.reduce((count, group) => count + group.items.length, 0) ?? 0
+        : localCart.length
 
     return (
         <div className="home-banner-top__content sticky top-0 overflow-hidden z-50 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 
@@ -115,12 +117,12 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
                 {/*Shopping cart */}
                 <div className="lg:hidden">
-                    <CartDrawer openCart={openCart} setOpenCart={setOpenCart} cartNumber={displayedCart.length} />
+                    <CartDrawer openCart={openCart} setOpenCart={setOpenCart} cartNumber={displayedCart} />
                 </div>
                 <div className="hidden lg:block relative">
                     <Link href={`/cart`} className={`cursor-pointer relative`}>
                         <ShoppingCart stroke={`#4D4D4D`} size={30} className='hover:scale-110 transition-all duration-300' />
-                        {displayedCart && displayedCart.length > 0 ?
+                        {displayedCart && displayedCart > 0 ?
                             <span className="absolute -top-1.5 -right-1 flex size-3">
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
                                 <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>

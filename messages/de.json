@@ -244,5 +244,17 @@
   "removeItemWishlistFail": "Artikel konnte nicht von der Wunschliste entfernt werden",
   "getOtp": "OTP anfordern",
   "signUpSuccess": "Registrierung erfolgreich!",
-"signUpFail": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+"signUpFail": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+"city_required": "Stadt ist ein Pflichtfeld",
+"postal_required": "Postleitzahl ist ein Pflichtfeld",
+"address_required": "Adresszeile ist ein Pflichtfeld",
+"choose_payment_method": "Sie müssen mindestens eine Zahlungsmethode auswählen",
+"must_accept_terms": "Sie müssen die Allgemeinen Geschäftsbedingungen akzeptieren",
+"estimated_delivery": "Voraussichtliche Lieferzeit",
+"business_days": "Werktagen",
+"NotFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Entschuldigung, wir konnten die gesuchte Seite nicht finden.",
+    "backHome": "Zur Startseite"
+  }
 }
