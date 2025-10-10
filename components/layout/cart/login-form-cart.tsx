@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Mail, Key, Loader2, Eye, EyeOff } from "lucide-react"
 import { useLogin, useLoginOtp, useSendOtp } from "@/features/auth/hook"
 import { toast } from "sonner"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { useCartLocal } from "@/hooks/cart"
@@ -25,6 +25,8 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
     const router = useRouter()
     const locale = useLocale()
     const t = useTranslations()
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+
 
     const { cart: localCart } = useCartLocal();
 
@@ -180,6 +182,34 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                                                     }}
                                                     className="h-12 flex-1 text-center text-lg"
                                                     maxLength={1}
+                                                    onPaste={(e) => {
+                                                        e.preventDefault()
+                                                        const pasted = e.clipboardData.getData("text").replace(/\D/g, "")
+                                                        if (!pasted) return
+
+                                                        const newValue = field.value ?? ""
+                                                        const arr = newValue.split("")
+
+                                                        // điền lần lượt vào các ô
+                                                        for (let i = 0; i < 6; i++) {
+                                                            arr[i] = pasted[i] ?? arr[i] ?? ""
+                                                        }
+
+                                                        const finalValue = arr.join("").slice(0, 6)
+                                                        field.onChange(finalValue)
+
+                                                        // focus ô cuối cùng có ký tự
+                                                        const nextIndex = Math.min(pasted.length, 6) - 1
+                                                        inputRefs.current[nextIndex]?.focus()
+
+                                                        if (finalValue.length === 6) {
+                                                            handleAutoSubmitOtp(finalValue)
+                                                        }
+                                                    }}
+                                                    inputMode="numeric"              // ✅ hiển thị bàn phím số trên mobile
+                                                    pattern="[0-9]*"                 // ✅ chỉ chấp nhận số
+                                                    type="text"                      // tránh lỗi autofill của Safari
+                                                    autoComplete="one-time-code"     // ✅ hỗ trợ autofill OTP (iOS, Android)
                                                 />
                                             ))}
                                         </div>

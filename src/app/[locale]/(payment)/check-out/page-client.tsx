@@ -160,7 +160,7 @@ export default function CheckOutPageClient() {
     const createUserAccountMutation = useSignUpGuess()
     const createInvoiceAddressMutation = useCreateInvoiceAddress()
     const createShippingAddressMutation = useCreateAddress()
-    const syncLocalCartMutation = useSyncLocalCart();
+    const syncLocalCartMutation = useSyncLocalCart(true);
     const checkMailExistMutation = useCheckMailExist();
     const editInvoiceAddressMutation = useUpdateInvoiceAddress()
 
@@ -178,7 +178,7 @@ export default function CheckOutPageClient() {
 
 
     const handleOtpSuccess = (verifiedUserId: string) => {
-        setUserId(verifiedUserId)
+        setUserIdLogin(verifiedUserId)
     }
 
     const form = useForm<CreateOrderFormValues>({
