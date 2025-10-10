@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -36,6 +36,16 @@ export function OtpDialog({ open, onOpenChange, email, onSuccess }: OtpDialogPro
         }
     }
 
+
+    // ✅ Cho phép dán (paste) toàn bộ mã OTP 1 lần
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault()
+        const pasteData = e.clipboardData.getData("Text").trim()
+        if (!/^\d{6}$/.test(pasteData)) return
+        const newOtp = pasteData.split("").slice(0, 6)
+        setOtpValues(newOtp)
+    }
+
     const handleSubmit = () => {
         const code = otpValues.join("")
         if (code.length !== 6) {
@@ -62,6 +72,15 @@ export function OtpDialog({ open, onOpenChange, email, onSuccess }: OtpDialogPro
         )
     }
 
+    // ✅ Tự động submit khi nhập đủ 6 số
+    useEffect(() => {
+        const code = otpValues.join("")
+        if (code.length === 6) {
+            handleSubmit()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [otpValues])
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[400px] gap-2">
@@ -81,6 +100,7 @@ export function OtpDialog({ open, onOpenChange, email, onSuccess }: OtpDialogPro
                             id={`otp-${idx}`}
                             value={val}
                             onChange={(e) => handleChange(idx, e.target.value)}
+                            onPaste={handlePaste}
                             className="w-10 text-center text-lg"
                             maxLength={1}
                         />

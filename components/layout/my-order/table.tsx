@@ -39,10 +39,13 @@ export function MyOrderDataTable<TData, TValue>({
 
     return (
         <div className="overflow-hidden rounded-md border">
-            <Table>
+            <Table className="table-fixed w-full">
                 <TableHeader>
                     <TableRow>
-                        <TableHead colSpan={columns.length} className="bg-secondary/15 px-2">
+                        <TableHead
+                            colSpan={columns.length}
+                            className="bg-secondary/15 px-2"
+                        >
                             <div className="flex justify-between w-full">
                                 <div className="text-base text-[#666666] font-semibold">{t('orderId')}: #{orderData.checkout_code}</div>
                                 <div className="flex gap-3">
@@ -63,7 +66,10 @@ export function MyOrderDataTable<TData, TValue>({
                                     data-state={row.getIsSelected() && "selected"}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell
+                                            key={cell.id}
+                                            className={cell.column.getSize() ? `!w-[${cell.column.getSize()}px]` : ""}
+                                        >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}

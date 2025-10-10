@@ -10,24 +10,31 @@ export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
     return [
         {
             accessorKey: "product_name",
-            header: t("product"), // ví dụ: "Product"
+            header: t("product"),
+            meta: { width: "300px" },
             cell: ({ row }) => (
-                <div>{row.original.products.name}</div>
+                <div className="line-clamp-2 text-wrap">{row.original.products.name}</div>
             ),
         },
         {
             accessorKey: "quantity",
-            header: () => <div>{t("quantity")}</div>,
-            cell: ({ row }) => (
-                <div>{row.original.quantity}</div>
-            ),
+            header: t("quantity"),
+            meta: { width: "100px" },
+            cell: ({ row }) => <div className="text-center">{row.original.quantity}</div>,
         },
         {
             accessorKey: "product_price",
-            header: () => <div className="text-right">{t("total")}</div>,
+            header: t("total"),
+            meta: { width: "150px" },
             cell: ({ row }) => (
-                <div className="text-right">€{(row.original.item_price * row.original.quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                <div className="text-right">
+                    €{(row.original.item_price * row.original.quantity).toLocaleString("de-DE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    })}
+                </div>
             ),
         },
     ]
 }
+

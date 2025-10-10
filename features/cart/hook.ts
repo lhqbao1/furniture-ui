@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addToCart, deleteCartItem, getCartById, getCartItems, quickAddToCart, updateCartItemQuantity, updateCartItemStatus } from "./api";
 import {  CartItemLocal, getCart, saveCart } from "@/lib/utils/cart";
 import { toast } from "sonner";
+import { CartResponseItem } from "@/types/cart";
 
 
 export function useGetCartItems() {
@@ -76,27 +77,50 @@ export function useUpdateCartItemStatus(){
     })
 }
 
-export function useSyncLocalCart() {
-    const qc = useQueryClient();
-  
-    return useMutation({
-      mutationFn: async () => {
-        const localCart: CartItemLocal[] = getCart();
-        if (!localCart.length) return;
-  
-        for (const item of localCart) {
-          const res =  await addToCart(item.product_id, item.quantity);
+export function useSyncLocalCart(isCheckOut = false) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const localCart: CartItemLocal[] = getCart();
+      if (localCart.length === 0) return;
+
+      // 1️⃣ Thêm tất cả item từ local cart lên server
+      const localProductIds = localCart.map((item) => item.product_id);
+
+      for (const item of localCart) {
+        await addToCart(item.product_id, item.quantity);
+      }
+
+      // 2️⃣ Nếu là checkout => xóa item cũ trên server
+      if (isCheckOut) {
+        const serverCart: CartResponseItem[] = await getCartItems();
+
+        // Server trả về danh sách theo supplier => flatten tất cả items
+        const allServerItems = serverCart.flatMap((cart) => cart.items);
+
+        // Xác định item nào cần xóa
+        const itemsToRemove = allServerItems.filter(
+          (i) => !localProductIds.includes(i.products.id)
+        );
+
+        for (const item of itemsToRemove) {
+          await deleteCartItem(item.id);
         }
-  
-        saveCart([]); // clear local cart sau khi sync
-        return true;
-      },
-      onSuccess: () => {
-        qc.refetchQueries({ queryKey: ["cart-items"] });
-      },
-      onError: (err) => {
-        console.error("Error syncing cart:", err);
-        toast.error("Die Produktmenge im Warenkorb überschreitet den Lagerbestand");
-      },
-    });
-  }
+      }
+
+      // 3️⃣ Dọn local cart sau khi sync
+      saveCart([]);
+      return true;
+    },
+
+    onSuccess: () => {
+      qc.refetchQueries({ queryKey: ["cart-items"] });
+    },
+
+    onError: (err: unknown) => {
+      console.error("Error syncing cart:", err);
+      toast.error("Die Produktmenge im Warenkorb überschreitet den Lagerbestand");
+    },
+  });
+}
