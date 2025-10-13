@@ -5,7 +5,6 @@ import FlashSale from "@/components/layout/home/flash-sale";
 import PreOrder from "@/components/layout/home/pre-order";
 import RecentViewed from "@/components/layout/home/recent-viewed";
 import TrendingProducts from "@/components/layout/home/trending";
-import Voucher from "@/components/layout/home/voucher";
 import { getCartItems } from "@/features/cart/api";
 import { getAllProducts, getProductByTag } from "@/features/products/api";
 import getQueryClient from "@/lib/get-query-client";

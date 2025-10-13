@@ -28,8 +28,6 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
         retry: false
     })
 
-    console.log(checkout)
-    console.log(invoice)
 
     const flattenedCartItems = useMemo(() => {
         if (!invoice?.main_checkout?.checkouts) return []
@@ -86,7 +84,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                         </div>
                         <div className="flex justify-between">
                             <span className="font-medium">Kunden-Nr:</span>
-                            <span>{checkout?.checkouts[0].user.last_name} {checkout?.checkouts[0].user.first_name}</span>
+                            <span>{checkout?.checkouts[0].user.user_code}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-medium">Bearbeiter:</span>
@@ -127,24 +125,34 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 </div>
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Summe (netto)</div>
-                    <div className="w-[100px] text-right">{((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+                    <div className="w-[100px] text-right">
+                        {((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                    </div>
                 </div>
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">MwSt.</div>
-                    <div className="w-[100px] text-right">{((invoice?.total_amount_item ?? 0) - ((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0))).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+                    <div className="w-[100px] text-right">
+                        {((invoice?.total_amount_item ?? 0) - ((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0))).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                    </div>
                 </div>
 
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Rechnungsbetrag (brutto)</div>
-                    <div className="w-[100px] text-right">{((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+                    <div className="w-[100px] text-right">
+                        {((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                    </div>
                 </div>
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Wertgutschein (brutto)</div>
-                    <div className="w-[100px] text-right">{(invoice?.coupon_amount ?? 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+                    <div className="w-[100px] text-right">
+                        {(invoice?.coupon_amount ?? 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                    </div>
                 </div>
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Zahlbetrag</div>
-                    <div className="w-[100px] text-right">{((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+                    <div className="w-[100px] text-right">
+                        {((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                    </div>
                 </div>
             </div>
 

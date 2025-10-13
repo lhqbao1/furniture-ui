@@ -4,7 +4,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useAtom } from "jotai";
 import { checkOutIdAtom } from "@/store/payment";
 import { invoiceIdAtom } from "@/store/invoice";
-import { getCheckOutByCheckOutId } from "@/features/checkout/api";
+import { getCheckOutByCheckOutId, getMainCheckOutByMainCheckOutId } from "@/features/checkout/api";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { InvoicePDF } from "@/components/layout/pdf/file";
 
@@ -14,7 +14,7 @@ export default function InvoicePage() {
 
     const { data: checkout } = useQuery({
         queryKey: ["checkout-id", checkoutId],
-        queryFn: () => getCheckOutByCheckOutId(checkoutId as string),
+        queryFn: () => getMainCheckOutByMainCheckOutId(checkoutId as string),
         enabled: !!checkoutId,
     });
 

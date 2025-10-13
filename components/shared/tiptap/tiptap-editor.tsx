@@ -25,7 +25,7 @@ import { TextStyleKit } from '@tiptap/extension-text-style'
 import type { Editor } from '@tiptap/react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import Link from "@tiptap/extension-link"
 import LinkControls from "./link-button"
@@ -53,7 +53,9 @@ const extensions = [
     }),
 ]
 
-export function MenuBar({ editor }: { editor: Editor }) {
+export function MenuBar({ editor, showHtml, setShowHtml }: {
+    editor: Editor, showHtml: boolean, setShowHtml: React.Dispatch<React.SetStateAction<boolean>>
+}) {
     const editorState = useEditorState({
         editor,
         selector: ctx => ({
@@ -129,11 +131,21 @@ export function MenuBar({ editor }: { editor: Editor }) {
             {iconButton(() => editor.chain().focus().undo().run(), Undo2, false, !editorState.canUndo, "Undo")}
             {iconButton(() => editor.chain().focus().redo().run(), Redo2, false, !editorState.canRedo, "Redo")}
             <LinkControls editor={editor} />
+            <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowHtml(!showHtml)}
+            >
+                {showHtml ? 'Back to Editor' : 'View HTML'}
+            </Button>
         </div>
     )
 }
 
 export default function RichEditor({ value, onChangeValue }: { value: string; onChangeValue: (val: string) => void }) {
+    const [showHtml, setShowHtml] = useState(false)
+
     const editor = useEditor({
         extensions,
         content: value || "<p></p>",
@@ -155,14 +167,35 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
 
     return (
         <div>
-            {editor && <MenuBar editor={editor} />}
-            <EditorContent
-                editor={editor}
-                className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
+            <div className="flex justify-between items-center">
+                <p className="text-sm text-gray-500">
+                    {showHtml ? 'HTML View' : 'Rich Text View'}
+                </p>
+            </div>
+            {editor && <MenuBar editor={editor} showHtml={showHtml} setShowHtml={setShowHtml} />}
+            {showHtml && editor ? (
+                <textarea
+                    className="w-full h-64 border rounded-md p-2 font-mono text-sm bg-gray-50"
+                    value={editor.getHTML()}
+                    onChange={(e) => {
+                        const newValue = e.target.value
+                        // ✅ Check editor trước khi gọi command
+                        if (editor) {
+                            editor.commands.setContent(newValue, { emitUpdate: false })
+                            onChangeValue(newValue)
+                        }
+                    }}
+                />
+            ) : (
+                <EditorContent
+                    editor={editor}
+                    className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
                 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-secondary [&_h2]:mt-6 [&_h2]:mb-3 [&_li]:list-disc [&_li]:pl-4
                 [&_li]:ml-12 [&_a]:text-secondary [&_a]:underline
                 "
-            />
+                />
+            )}
+
         </div>
     )
 }
