@@ -110,6 +110,20 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-4 py-2">
                         <FormField
                             control={form.control}
+                            name="code"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Category ID</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
                             name="name"
                             render={({ field }) => (
                                 <FormItem>

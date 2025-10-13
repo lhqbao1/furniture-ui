@@ -39,7 +39,9 @@ export interface CategoryInput {
   meta_keywords?: string;
   level: number;
   parent_id?: string; // optional
+  code?: string
 }
+
 
 export interface CategoryByIdResponse {
     in_category: ProductItem[]
