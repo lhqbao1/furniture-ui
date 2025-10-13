@@ -44,7 +44,7 @@ const OrderDetails = () => {
 
     return (
         <div className='space-y-12 pb-20'>
-            <div className='flex gap-14 items-center'>
+            <div className='grid grid-cols-4 gap-12'>
                 <OrderDetailOverView
                     order={order}
                     created_at={formatDate(order.created_at)}
