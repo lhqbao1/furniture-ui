@@ -38,7 +38,6 @@ export default function VariantDrawer({
 
     // reset khi editingVariant thay đổi
     useEffect(() => {
-        console.log("editingVariant changed:", editingVariant)
         if (editingVariant) {
             form.reset(editingVariant)
         }

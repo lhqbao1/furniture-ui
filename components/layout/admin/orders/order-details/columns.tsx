@@ -3,13 +3,13 @@ import { ColumnDef } from "@tanstack/react-table";
 
 export const orderDetailColumn: ColumnDef<CartItem>[] = [
     {
-        accessorKey: "quantity",
+        accessorKey: "pos",
         header: () => (
-            <div className="text-center w-full">Quantity</div>
+            <div className="text-center w-full">POS.</div>
         ),
         cell: ({ row }) => {
             return (
-                <div className="text-center">{row.original.quantity}</div>
+                <div className="text-center">{row.index + 1}</div>
             )
         }
     },
@@ -27,7 +27,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     {
         accessorKey: "ean",
         header: () => (
-            <div className="text-center w-full">EAN Number</div>
+            <div className="text-center w-full">EAN</div>
         ),
         cell: ({ row }) => {
             return (
@@ -37,7 +37,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     },
     {
         accessorKey: "product_name",
-        header: "Name",
+        header: "NAME",
         cell: ({ row }) => {
             return (
                 <div>{row.original.products.name}</div>
@@ -61,7 +61,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     {
         accessorKey: "tax",
         header: () => (
-            <div className="text-center w-full">Tax</div>
+            <div className="text-center w-full">TAX</div>
         ),
         cell: ({ row }) => {
             return (
@@ -72,11 +72,22 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     {
         accessorKey: "invoice_amount",
         header: () => (
-            <div className="text-right w-full">Unit Price</div>
+            <div className="text-right w-full">UNIT PRICE</div>
         ),
         cell: ({ row }) => {
             return (
                 <div className="text-right">€{row.original.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            )
+        }
+    },
+    {
+        accessorKey: "quantity",
+        header: () => (
+            <div className="text-center w-full">QUANTITY</div>
+        ),
+        cell: ({ row }) => {
+            return (
+                <div className="text-center">{row.original.quantity}</div>
             )
         }
     },
@@ -116,7 +127,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     {
         accessorKey: "total_invoice_amount",
         header: () => (
-            <div className="text-right w-full">Total amount</div>
+            <div className="text-right w-full">TOTAL AMOUNT</div>
         ),
         cell: ({ row }) => {
             return (
@@ -127,7 +138,7 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     {
         accessorKey: "ware_house",
         header: () => (
-            <div className="text-center w-full">Ware House</div>
+            <div className="text-center w-full">WAREHOUSE</div>
         ),
         cell: ({ row }) => {
             return (

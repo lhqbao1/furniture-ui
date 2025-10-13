@@ -23,7 +23,6 @@ export function useCreateVersion() {
   return useMutation({
     mutationFn: (name: string) => createVersion(name),
     onSuccess: (data) => {
-      console.log("Tạo version thành công:", data)
       qc.invalidateQueries({queryKey: ['policy-version']})
       // chỗ này bạn có thể refetch list version, hoặc show toast
     },
@@ -38,7 +37,6 @@ export function useCreateLegalPolicy() {
   return useMutation({
     mutationFn: ({name, version_id} : {name: string, version_id: string}) => createLegalPolicy(name,version_id),
     onSuccess: (data) => {
-      console.log("Tạo legal policy thành công:", data)
       qc.invalidateQueries({queryKey: ['policy-items']})
       // chỗ này bạn có thể refetch list version, hoặc show toast
     },
@@ -53,7 +51,6 @@ export function useCreateChildLegalPolicy() {
   return useMutation({
     mutationFn: ({input, legal_policy_id} : {input: ChildLegalInput[], legal_policy_id: string}) => createChildLegalPolicy(input,legal_policy_id),
     onSuccess: (data) => {
-      console.log("Tạo child legal policy thành công:", data)
       qc.invalidateQueries({queryKey: ['policy-items']})
       // chỗ này bạn có thể refetch list version, hoặc show toast
     },

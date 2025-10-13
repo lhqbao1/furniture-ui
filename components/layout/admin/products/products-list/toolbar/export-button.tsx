@@ -42,11 +42,9 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
                     weee_nr: p.weee_nr,
                     eek: p.eek,
                     SEO_keywords: p.meta_keywords,
-                    materials: '',
-                    color: ''
+                    materials: p.materials ? p.materials : '',
+                    color: p.color ? p.color : ''
                 }))
-
-        console.log(exportData)
 
         // 1️⃣ Tạo worksheet từ dữ liệu JSON
         const worksheet = XLSX.utils.json_to_sheet(exportData)

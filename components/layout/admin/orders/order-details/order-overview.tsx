@@ -11,7 +11,7 @@ interface OrderDetailOverViewProps {
 
 const OrderDetailOverView = ({ created_at, updated_at, status, order }: OrderDetailOverViewProps) => {
     return (
-        <div className='space-y-1'>
+        <div className='space-y-1 col-span-1'>
             <div className='flex gap-1 text-sm font-bold'>
                 <div>Order ID:</div>
                 <div>{order.checkout_code}</div>

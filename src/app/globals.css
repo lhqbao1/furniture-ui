@@ -167,10 +167,6 @@
     p {
       @apply min-h-6
     }
-
-    li {
-      @apply list-disc pl-4 ml-12
-    }
 }
 
 @layer components {
@@ -332,4 +328,16 @@ input[type=number] {
   font-family: inherit !important;
   color: inherit !important;
   background: transparent !important;
+}
+
+.ProseMirror li {
+  list-style-type: disc;
+  padding-left: 16px;
+  margin-left: 48px;
+}
+
+.product-descriptions li {
+  list-style-type: disc;
+  padding-left: 16px;
+  margin-left: 48px;
 }

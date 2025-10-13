@@ -184,7 +184,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             <Form {...form}>
                 <form className="space-y-6" onSubmit={form.handleSubmit(
                     (values) => {
-                        console.log("✅ Valid submit", values)
                         handleSubmit(values)
                     },
                     (errors) => {
