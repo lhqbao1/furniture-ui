@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button"
 import Link from "@tiptap/extension-link"
 import LinkControls from "./link-button"
 import HardBreak from "@tiptap/extension-hard-break"
+import { FixedFont } from "./fixed-font"
 
 
 
@@ -130,6 +131,7 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
     const extensions = [
         TextStyleKit,
         StarterKit,
+        FixedFont,
         Link.configure({
             openOnClick: false,
             autolink: false,
@@ -148,6 +150,25 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
                 ]
             },
         }),
+        // {
+        //     name: 'cleanPaste',
+        //     addProseMirrorPlugins() {
+        //         return [
+        //             new this.editor.view.Plugin({
+        //                 props: {
+        //                     handlePaste(view, event) {
+        //                         event.preventDefault()
+        //                         const text = event.clipboardData?.getData('text/plain') || ''
+        //                         view.dispatch(
+        //                             view.state.tr.insertText(text)
+        //                         )
+        //                         return true
+        //                     },
+        //                 },
+        //             }),
+        //         ]
+        //     },
+        // },
     ]
 
     const editor = useEditor({
@@ -194,7 +215,8 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
                 <EditorContent
                     editor={editor}
                     className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
-               [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline
+               [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline font-libre
+               [&_*]:font-libre [&_*]:text-inherit [&_*]:bg-transparent
                 "
                 />
             )}

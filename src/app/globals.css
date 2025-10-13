@@ -318,3 +318,18 @@ input[type=number] {
   min-height: 200px;
   padding: 4px;
 }
+
+/* Giữ font cố định cho toàn bộ editor */
+.ProseMirror {
+  font-family: var(--font-libre, 'Libre Baskerville', serif) !important;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: hsl(var(--foreground));
+}
+
+/* Xóa font dính khi copy/paste */
+.ProseMirror * {
+  font-family: inherit !important;
+  color: inherit !important;
+  background: transparent !important;
+}
