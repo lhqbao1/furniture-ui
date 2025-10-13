@@ -225,7 +225,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     Back
                                 </Button>
                                 {productValues ?
-                                    <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.push(`/product${productValues?.categories && productValues.categories.length > 0 ? `/${productValues.categories[0].slug}` : ''}/${productValues?.id}`)}
+                                    <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.push(`/product${productValues?.categories && productValues.categories.length > 0 ? `/${productValues.categories[0].slug}` : ''}/${productValues?.url_key}`)}
                                     >View</Button> : ''
                                 }
                             </div>
