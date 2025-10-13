@@ -108,12 +108,12 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                 const level1 = categories.find(c => c.level === 1)
                 const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
                 const categoryHref = level1 && level2
-                    ? `/${level1.name}/${level2.name}/${product.id}`
+                    ? `/${level1.name}/${level2.name}/${product.url_key}`
                     : level1
-                        ? `/${level1.name}/${product.id}`
+                        ? `/${level1.name}/${product.url_key}`
                         : level2
-                            ? `/${level2.name}/${product.id}`
-                            : `/${product.id}`
+                            ? `/${level2.name}/${product.url_key}`
+                            : `/${product.url_key}`
                 return (
                     <Link href={`/product/${categoryHref}`} passHref key={product.id}>
                         <div

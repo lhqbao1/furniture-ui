@@ -1,4 +1,4 @@
-import { getAllProducts, getProductById, getProductsFeed } from '@/features/products/api'
+import { getAllProducts, getProductById, getProductBySlug, getProductsFeed } from '@/features/products/api'
 import type { Metadata } from 'next'
 import { StaticFile } from '@/types/products'
 import { getProductGroupDetail } from '@/features/product-group/api'
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const lastSlug = slugArray[slugArray.length - 1]
 
     try {
-        const product = await getProductById(lastSlug)
+        const product = await getProductBySlug(lastSlug)
         return {
             title: product?.meta_title || product?.name,
             description: product?.meta_description || product?.description?.slice(0, 150),
@@ -39,15 +39,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             openGraph: {
                 title: product?.meta_title || product?.name,
                 description: product?.meta_description || product?.description?.slice(0, 150),
-                url: `https://www.prestige-home.de/${locale}/product/${product.id}`,
+                url: `https://www.prestige-home.de/${locale}/product/${product.url_key}`,
                 images: product?.static_files?.map((img: StaticFile) => ({ url: img.url })) ?? [],
             },
             alternates: {
-                canonical: `https://www.prestige-home.de/${locale}/product/${product.id}`,
+                canonical: `https://www.prestige-home.de/${locale}/product/${product.url_key}`,
                 languages: {
-                    de: `https://www.prestige-home.de/de/product/${product.id}`,
-                    en: `https://www.prestige-home.de/en/product/${product.id}`,
-                    'x-default': `https://www.prestige-home.de/en/product/${product.id}`,
+                    de: `https://www.prestige-home.de/de/product/${product.url_key}`,
+                    en: `https://www.prestige-home.de/en/product/${product.url_key}`,
+                    'x-default': `https://www.prestige-home.de/de/product/${product.url_key}`,
                 },
             },
         }
@@ -65,7 +65,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
     const slugArray = Array.isArray(resolvedParams.slug) ? resolvedParams.slug : [resolvedParams.slug]
     const lastSlug = slugArray[slugArray.length - 1]
 
-    const product = await getProductById(lastSlug)
+    const product = await getProductBySlug(lastSlug)
     let parentProduct = null
     if (product?.parent_id) {
         parentProduct = await getProductGroupDetail(product.parent_id)

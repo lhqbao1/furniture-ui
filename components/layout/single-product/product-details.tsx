@@ -213,7 +213,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                             priceCurrency: "EUR",
                             price: productDetails.price,
                             availability: "https://schema.org/InStock",
-                            url: `https://www.prestige-home.de/product/${productDetails.id}`,
+                            url: `https://www.prestige-home.de/product/${productDetails.url_key}`,
                         },
                     }),
                 }}
