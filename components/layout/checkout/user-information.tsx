@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useTranslations } from "next-intl"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 
@@ -68,7 +67,7 @@ export default function CheckOutUserInformation({ isLogin, userId }: CheckOutUse
                         <FormItem>
                             <FormLabel>{t('firstName')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter first name" {...field} disabled={isLogin} />
+                                <Input placeholder="" {...field} disabled={isLogin} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -82,7 +81,7 @@ export default function CheckOutUserInformation({ isLogin, userId }: CheckOutUse
                         <FormItem>
                             <FormLabel>{t('lastName')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter last name" {...field} disabled={isLogin} />
+                                <Input placeholder="" {...field} disabled={isLogin} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -116,7 +115,7 @@ export default function CheckOutUserInformation({ isLogin, userId }: CheckOutUse
                             <FormControl>
                                 <Input
                                     type="number"
-                                    placeholder="+49"
+                                    placeholder=""
                                     {...field}
                                     disabled={isLogin}
                                 />
