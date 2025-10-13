@@ -21,6 +21,7 @@ const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
             totalItems={data.length ?? 0}
             totalPages={1}
             hasBackground
+            hasExpanded
         />
     )
 }

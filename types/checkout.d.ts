@@ -53,6 +53,7 @@ export interface CheckOutMain {
     voucher_amount: number
     from_marketplace: string
     marketplace_order_id: string
+    payment_method: string
     checkouts: CheckOut[]
     created_at: Date
     updated_at: Date

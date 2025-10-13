@@ -11,7 +11,9 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CustomPagination } from "@/components/shared/custom-pagination"
 import React from "react"
-import TableToolbar from "./toolbar"
+import { CheckOut } from "@/types/checkout"
+import { CartItem } from "@/types/cart"
+import { getDeliveryOrderColumns } from "@/components/layout/cart/columns"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -28,6 +30,8 @@ interface DataTableProps<TData, TValue> {
     isAddButtonModal?: boolean
     addButtonModalContent?: React.ReactNode
     hasPagination?: boolean
+    hasExpanded?: boolean
+    is_delivery_multiple?: boolean
 }
 
 export function ProductTable<TData, TValue>({
@@ -44,25 +48,33 @@ export function ProductTable<TData, TValue>({
     addButtonUrl,
     isAddButtonModal = false,
     addButtonModalContent,
-    hasPagination = true
+    hasPagination = true,
+    hasExpanded = false,
+    is_delivery_multiple = false
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([
         { id: "updated_at", desc: true }, // mặc định sort theo updated_at giảm dần
     ])
+    const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null)
+
 
     const table = useReactTable({
         data,
-        columns,
+        columns: columns,
         pageCount: Math.ceil(totalItems / pageSize),
         state: {
             pagination: { pageIndex: page - 1, pageSize },
-            sorting
+            sorting,
         },
         manualPagination: true,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onSortingChange: setSorting,
         manualSorting: true,
+        meta: {
+            expandedRowId,
+            setExpandedRowId,
+        },
     })
 
     return (
@@ -84,18 +96,72 @@ export function ProductTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows.map((row, index) => (
-                            <TableRow
-                                key={row.id}
-                                className={hasBackground && index % 2 === 1 ? "bg-secondary/5" : ""}
-                            >
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
+                        {!hasExpanded ?
+                            table.getRowModel().rows.map((row, index) => (
+                                <TableRow
+                                    key={row.id}
+                                    className={hasBackground && index % 2 === 1 ? "bg-secondary/5" : ""}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, {
+                                                ...cell.getContext(),
+                                                expandedRowId,
+                                                setExpandedRowId,
+                                                currentRowId: row.id,
+                                            })}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                            :
+                            table.getRowModel().rows.map((row) => (
+                                <React.Fragment key={row.id}>
+                                    <TableRow>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, {
+                                                    ...cell.getContext(),
+                                                    expandedRowId,
+                                                    setExpandedRowId,
+                                                    currentRowId: row.id,
+                                                })}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+
+                                    {/* Hàng expand */}
+                                    {expandedRowId === row.id &&
+                                        (
+                                            <TableRow>
+                                                <TableCell colSpan={columns.length} className="bg-muted/10">
+                                                    <div
+                                                        className={`
+                                                    overflow-hidden transition-all duration-1000 ease-in-out 
+                                                    ${expandedRowId === row.id ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}
+                                                    `}
+                                                    >
+                                                        <div className="p-4 text-sm">
+                                                            <ProductTable<CartItem, unknown>
+                                                                data={(row.original as CheckOut).cart.items}
+                                                                columns={getDeliveryOrderColumns({ is_multiple_delivery: is_delivery_multiple })}
+                                                                page={1}
+                                                                pageSize={5}
+                                                                setPage={() => { }}
+                                                                setPageSize={() => { }}
+                                                                hasPagination={false}
+                                                                totalItems={(row.original as CheckOut).cart.items.length}
+                                                                totalPages={1}
+                                                            />
+
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    }
+                                </React.Fragment>
+                            ))}
                     </TableBody>
                 </Table>
             </div>

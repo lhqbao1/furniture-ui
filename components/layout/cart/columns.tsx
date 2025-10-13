@@ -294,3 +294,88 @@ export const cartSupplierColumn: ColumnDef<CartItem>[] = [
     },
 
 ]
+
+interface DeliveryOrderColumnProps {
+    is_multiple_delivery?: boolean
+
+}
+
+export const getDeliveryOrderColumns = (
+    { is_multiple_delivery = false }: DeliveryOrderColumnProps = {}
+): ColumnDef<CartItem>[] => [
+        {
+            accessorKey: "id",
+            header: "ID",
+            cell: ({ row }) => {
+                return (
+                    <div>#{row.original.products.id_provider}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "name",
+            header: () => <div className="text-center">NAME</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{row.original.products.name}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "sku",
+            header: () => <div className="text-center">SKU</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{row.original.products.sku}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "ean",
+            header: () => <div className="text-center">EAN</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{row.original.products.ean}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "delivery_cost",
+            header: () => <div className="text-center">DELIVERY COST</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{is_multiple_delivery ? (row.original.products.delivery_cost * row.original.quantity) : (row.original.products.delivery_cost)}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "quantity",
+            header: () => <div className="text-center">QUANTITY</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{row.original.quantity}</div>
+                )
+            }
+        },
+
+        {
+            accessorKey: "unit_price",
+            header: () => (
+                <div className="text-right w-full">UNIT PRICE</div>
+            ),
+            cell: ({ row }) => <div className="text-right">€{row.original.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>,
+        },
+
+        {
+            accessorKey: "price",
+            header: () => (
+                <div className="text-right w-full">PRICE</div>
+            ),
+            cell: ({ row }) => {
+                return (
+                    <div className="text-right">€{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                )
+            },
+        },
+
+    ]

@@ -7,9 +7,11 @@ import OrderDetailOverView from '@/components/layout/admin/orders/order-details/
 import OrderDetailUser from '@/components/layout/admin/orders/order-details/order-user'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import { useGetCheckOutByCheckOutId, useGetMainCheckOutByMainCheckOutId } from '@/features/checkout/hook'
+import { getInvoiceByCheckOut } from '@/features/invoice/api'
 import { formatDate, formatDateTime } from '@/lib/date-formated'
 import { CartItem } from '@/types/cart'
-import { CheckOutMain, CheckOutMainResponse } from '@/types/checkout'
+import { CheckOutMain } from '@/types/checkout'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import React, { useState } from 'react'
 
@@ -29,12 +31,16 @@ const OrderDetails = () => {
     const checkoutId = params?.id
     // const { data: order, isLoading, isError } = useGetCheckOutByCheckOutId(checkoutId)
     const { data: order, isLoading, isError } = useGetMainCheckOutByMainCheckOutId(checkoutId)
+    const { data: invoice, isLoading: isLoadingInvoice, isError: isErrorInvoice } = useQuery({
+        queryKey: ["invoice-checkout", checkoutId],
+        queryFn: () => getInvoiceByCheckOut(checkoutId as string),
+        enabled: !!checkoutId,
+        retry: false
+    })
 
     if (isLoading) return <div>Loading...</div>
     if (isError) return <div>Error loading order</div>
     if (!order) return <div>Error loading order</div>
-
-    console.log(order)
 
     return (
         <div className='space-y-12 pb-20'>
@@ -66,7 +72,7 @@ const OrderDetails = () => {
                 discount_amount={order.voucher_amount + order.coupon_amount}
                 tax={order.total_vat}
                 total_amount={order.total_amount}
-                payment_method={order.checkouts[0].payment_method}
+                payment_method={order.payment_method}
                 entry_date={order.created_at}
             />
             <OrderDeliveryOrder
@@ -74,9 +80,8 @@ const OrderDetails = () => {
             />
             {order.status !== "Pending" ?
                 <div className='flex gap-12'>
-                    {/* <DocumentTable order={order} /> */}
-                    <DocumentTable />
-
+                    <DocumentTable order={order} invoiceCode={invoice?.invoice_code} />
+                    {/* <DocumentTable /> */}
                 </div>
                 : ''}
         </div>
