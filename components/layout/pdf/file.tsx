@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 });
 
 interface InvoicePDFProps {
-    checkout: CheckOut;
+    checkout: CheckOut
     invoice: InvoiceResponse;
 }
 
