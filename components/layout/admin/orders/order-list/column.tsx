@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckOut, CheckOutMain } from "@/types/checkout"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Eye, File } from "lucide-react"
+import { ChevronDown, ChevronRight, Eye, File } from "lucide-react"
 import ViewFileDialog from "./view-file"
 import { listChanel, paymentOptions } from "@/data/data"
 import { useRouter } from "@/src/i18n/navigation"
@@ -45,20 +45,28 @@ const ActionCell = ({ id }: { id: string }) => {
     )
 }
 
-const ActionCellChild = ({ items, checkoutId, isSupplier = false }: { items: CartItem[], checkoutId: string, isSupplier?: boolean }) => {
-    const router = useRouter()
-    const locale = useLocale()
-    const [open, setOpen] = useState(false)
-    const [openPackage, setOpenPackge] = useState(false)
-
-    const [page, setPage] = useState(1)
-    const [pageSize, setPageSize] = useState(1)
+const ActionCellChild = ({
+    items,
+    checkoutId,
+    isSupplier = false,
+    expandedRowId,
+    setExpandedRowId,
+    currentRowId,
+}: {
+    items: CartItem[]
+    checkoutId: string
+    isSupplier?: boolean
+    expandedRowId?: string | null
+    setExpandedRowId?: (id: string | null) => void
+    currentRowId?: string
+}) => {
+    const isExpanded = expandedRowId === currentRowId
 
     return (
         <div className="flex justify-center items-center gap-2">
-            {/* Eye Icon → mở dialog */}
-            {isSupplier ? '' : (
-                <Dialog open={open} onOpenChange={setOpen}>
+            {/* Eye Icon */}
+            {!isSupplier && (
+                <Dialog>
                     <DialogTrigger asChild>
                         <Button variant="ghost" size="icon">
                             <Eye className="w-4 h-4" stroke="#F7941D" />
@@ -68,10 +76,10 @@ const ActionCellChild = ({ items, checkoutId, isSupplier = false }: { items: Car
                         <ProductTable
                             data={items}
                             columns={cartSupplierColumn}
-                            page={page}
-                            pageSize={pageSize}
-                            setPage={setPage}
-                            setPageSize={setPageSize}
+                            page={1}
+                            pageSize={1}
+                            setPage={() => { }}
+                            setPageSize={() => { }}
                             hasPagination={false}
                             totalItems={items.length}
                             totalPages={1}
@@ -85,14 +93,26 @@ const ActionCellChild = ({ items, checkoutId, isSupplier = false }: { items: Car
                 </Dialog>
             )}
 
-            <ViewFileDialog
-                checkoutId={checkoutId}
-                type="package"
-            />
+            <ViewFileDialog checkoutId={checkoutId} type="package" />
+
+            {/* Expand button */}
+            <Button
+                variant={'ghost'}
+                type="button"
+                onClick={() =>
+                    setExpandedRowId?.(isExpanded ? null : currentRowId ?? null)
+                }
+                className="p-1"
+            >
+                {isExpanded ? (
+                    <ChevronDown className="size-4 text-gray-600" />
+                ) : (
+                    <ChevronRight className="size-4 text-gray-600" />
+                )}
+            </Button>
         </div>
     )
 }
-
 
 export const orderColumns: ColumnDef<CheckOutMain>[] = [
     {
@@ -360,7 +380,15 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
         header: () => (
             <div className="text-center w-full">ACTIONS</div>
         ),
-        cell: ({ row }) => <ActionCellChild checkoutId={row.original.id} items={row.original.cart.items} />,
+        cell: ({ row, table }) => (
+            <ActionCellChild
+                checkoutId={row.original.id}
+                items={row.original.cart.items}
+                expandedRowId={table.options.meta?.expandedRowId || null}
+                setExpandedRowId={table.options.meta?.setExpandedRowId || (() => { })}
+                currentRowId={row.id}
+            />
+        ),
     },
 ]
 
