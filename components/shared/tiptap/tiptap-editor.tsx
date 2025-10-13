@@ -32,28 +32,7 @@ import LinkControls from "./link-button"
 import HardBreak from "@tiptap/extension-hard-break"
 
 
-// const extensions = [
-//     TextStyleKit,
-//     StarterKit,
-//     Link.configure({
-//         openOnClick: false,
-//         autolink: false,
-//         defaultProtocol: "https",
-//     }).extend({
-//         renderHTML({ HTMLAttributes }) {
-//             return [
-//                 "a",
-//                 {
-//                     ...HTMLAttributes,
-//                     class: "underline text-secondary cursor-pointer",
-//                     onclick: "event.preventDefault()",
-//                     "data-link": HTMLAttributes.href,
-//                 },
-//                 0,
-//             ]
-//         },
-//     }),
-// ]
+
 
 export function MenuBar({ editor, showHtml, setShowHtml }: {
     editor: Editor, showHtml: boolean, setShowHtml: React.Dispatch<React.SetStateAction<boolean>>
@@ -150,18 +129,7 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
 
     const extensions = [
         TextStyleKit,
-        StarterKit.configure({
-            // ❌ tắt behavior mặc định của Enter
-            paragraph: false,
-            hardBreak: false,
-        }),
-        HardBreak.extend({
-            addKeyboardShortcuts() {
-                return {
-                    Enter: () => this.editor.commands.setHardBreak(),
-                }
-            },
-        }),
+        StarterKit,
         Link.configure({
             openOnClick: false,
             autolink: false,
