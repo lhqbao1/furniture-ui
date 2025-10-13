@@ -169,6 +169,9 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
                                                 {t("greeting")}, {user.last_name}
                                             </DropdownMenuLabel>
                                             <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => router.push("/my-order", { locale })}>
+                                                {t("myOrder")}
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => router.push("/account", { locale })}>
                                                 {t("accountInformation")}
                                             </DropdownMenuItem>

@@ -13,8 +13,8 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
     const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
 
     return (
-        <div className='flex gap-8 justify-between flex-1'>
-            <div className='pt-2 pb-6 px-3 rounded-sm border space-y-2.5'>
+        <>
+            <div className='col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5'>
                 <h4 className='font-bold'>Customer</h4>
                 <div className='flex items-start gap-2.5'>
                     <Avatar>
@@ -28,7 +28,7 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
                     </div>
                 </div>
             </div>
-            <div className='py-2 px-3 rounded-sm border space-y-2.5 flex-1'>
+            <div className='col-span-1 py-2 px-3 rounded-sm border space-y-2.5 flex-1'>
                 <h4 className='font-bold'>Invoice address</h4>
                 <div className='space-y-2.5'>
                     <div className='text-sm'>
@@ -38,7 +38,7 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
                     </div>
                 </div>
             </div>
-            <div className='py-2 px-3 rounded-sm border space-y-2.5 flex-1'>
+            <div className='col-span-1 py-2 px-3 rounded-sm border space-y-2.5 flex-1'>
                 <h4 className='font-bold'>Shipping address</h4>
                 <div className='space-y-2.5'>
                     <div className='text-sm'>
@@ -53,7 +53,7 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

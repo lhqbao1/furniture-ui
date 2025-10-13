@@ -183,8 +183,6 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
     const handleSubmitVersion = async () => {
         if (!versionNameInput) return;
 
-        console.log(filteredPolicies)
-
         try {
             // 1. Tạo version trước
             const versionRes = await createVersionMutation.mutateAsync(versionNameInput);
@@ -199,7 +197,6 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                 // 3. Parse content theo editor riêng từng policy
                 const editorContent = editorValues[lp.id] || "";
                 const parsedChildren = parseEditorContent(editorContent);
-                console.log(parseEditorContent(editorContent))
 
                 // 4. Merge parsed content với child gốc (để giữ tt, fallback)
                 const childInputs = lp.child_legal_policies.map((cl, idx) => {

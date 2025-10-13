@@ -57,6 +57,11 @@ export const brandColumns: ColumnDef<BrandResponse>[] = [
         enableHiding: false,
     },
     {
+        accessorKey: "id",
+        header: "ID",
+        cell: ({ row }) => <div>{row.original.code}</div>
+    },
+    {
         accessorKey: "img_url",
         header: "IMAGE",
         cell: ({ row }) => {

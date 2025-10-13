@@ -105,9 +105,6 @@ const CategoryAdd = () => {
             products: selectedRows.map(product => product.id),
         };
 
-        console.log('data', data)
-        console.log('selectedCategory', selectedCategory)
-
         if (data.products.length <= 0) {
             toast.error("You need to choose at least one product")
         } else {

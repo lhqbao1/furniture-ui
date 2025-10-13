@@ -9,7 +9,12 @@ export const supplierSchema = z.object({
     email_order: z.string().email("Invalid order email"),
     email_billing: z.string().email("Invalid billing email"),
     phone_number: z.string().min(5, "Invalid phone number"),
-  })
+    delivery_multiple: z
+    .boolean()
+    .refine((val) => val === true || val === false, {
+      message: "Delivery Type is required",
+    }),
+    })
 
   
 
@@ -21,5 +26,6 @@ export const defaultSupplier: SupplierInput = {
     email_order: "",
     email_billing: "",
     phone_number: "",
+    delivery_multiple: false
   }
 

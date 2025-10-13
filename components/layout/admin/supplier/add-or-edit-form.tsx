@@ -203,6 +203,42 @@ export default function AddOrEditSupplierForm({ onSuccess, submitText, onClose, 
                     )}
                 />
 
+                {/* Delivery Cost Type */}
+                <FormField
+                    control={form.control}
+                    name="delivery_multiple"
+                    render={({ field }) => (
+                        <FormItem className="mt-4">
+                            <FormLabel>Delivery Cost Type</FormLabel>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={(value) => field.onChange(value === "true")}
+                                    value={field.value ? "true" : "false"}
+                                    className="flex gap-4 mt-2"
+                                >
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl>
+                                            <RadioGroupItem value="false" id="one_time" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="one_time" className="font-normal">
+                                            One time
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-2">
+                                        <FormControl>
+                                            <RadioGroupItem value="true" id="multiple_time" />
+                                        </FormControl>
+                                        <FormLabel htmlFor="multiple_time" className="font-normal">
+                                            Multiple time
+                                        </FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <div className="flex items-center justify-end">
                     <Button
                         type="submit"

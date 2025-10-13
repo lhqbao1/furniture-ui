@@ -6,6 +6,7 @@ export interface SupplierInput {
     email_order: string
     email_billing: string
     phone_number: string
+    delivery_multiple: boolean
 }
 
 export interface SupplierResponse {

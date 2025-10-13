@@ -9,12 +9,12 @@ const Footer = () => {
     const t = useTranslations()
 
     return (
-        <footer className="bg-white shadow-2xl mt-10 lg:mt-20 text-black w-full grid lg:grid-cols-6 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:py-10 px-8 py-8 rounded-tl-2lg rounded-tr-2xl">
+        <footer className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-20 text-black w-full grid lg:grid-cols-6 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:py-10 px-8 py-8 rounded-tl-2lg rounded-tr-2xl">
             {/* Cột 1: Newsletter */}
             <div className="col-span-6 lg:col-span-3 space-y-3 mb-6 lg:mb-0">
-                <h3 className="font-semibold">
+                <h4 className="font-semibold">
                     Jetzt Newsletter abonnieren – und mehr entdecken.
-                </h3>
+                </h4>
 
                 <ul className="list-disc space-y-2 text-black-700 text-sm pl-3">
                     <li>Spare bis zu 70 % bei exklusiven Sales & Design-Angeboten</li>
@@ -22,7 +22,7 @@ const Footer = () => {
                     <li>Erhalte persönliche Einladungen zu Aktionen & Events</li>
                 </ul>
 
-                <h3 className="font-semibold lg:mt-2 mt-1">Inspiration direkt ins Postfach.</h3>
+                <h4 className="font-semibold lg:mt-2 mt-1">Inspiration direkt ins Postfach.</h4>
 
                 <div className="flex items-center gap-2">
                     <Input
@@ -47,7 +47,7 @@ const Footer = () => {
 
             {/* Cột 2: Các trang */}
             <div className="lg:col-span-1 col-span-6">
-                <h3 className="font-semibold mb-3">{t('pages')}</h3>
+                <h4 className="font-semibold mb-3">{t('pages')}</h4>
                 <ul className="space-y-2 text-black-700 text-sm">
                     {/* ✅ thêm locale */}
                     <li><Link href={`/about-us`}>{t('aboutUs')}</Link></li>
@@ -59,7 +59,7 @@ const Footer = () => {
 
             {/* Cột 3: Term & Policy */}
             <div className="lg:col-span-1 col-span-6">
-                <h3 className="font-semibold mb-3">{t('termPolicy')}</h3>
+                <h4 className="font-semibold mb-3">{t('termPolicy')}</h4>
                 <ul className="space-y-2 text-black-700 text-sm">
                     {/* ✅ thêm locale */}
                     <li><Link href={`/agb`}>{t('termCondition')}</Link></li>
@@ -83,7 +83,7 @@ const Footer = () => {
 
             {/* Cột 4: Social (ngoài, không thêm locale) */}
             <div className="lg:col-span-1 col-span-6 flex lg:items-start lg:justify-start lg:flex-col flex-row justify-center">
-                <h3 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h3>
+                <h4 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h4>
                 <div className="flex gap-1 mt-2 lg:mt-0">
                     <Link href="https://www.facebook.com/profile.php?id=61578621160298" target="_blank">
                         <Image src="/fb.png" width={50} height={50} alt="fb" className="w-12 h-12 object-fill" unoptimized />

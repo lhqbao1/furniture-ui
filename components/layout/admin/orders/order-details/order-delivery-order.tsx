@@ -22,6 +22,8 @@ const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
             totalPages={1}
             hasBackground
             hasExpanded
+            hasPagination={false}
+            hasCount={false}
         />
     )
 }

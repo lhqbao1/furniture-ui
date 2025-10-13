@@ -32,6 +32,8 @@ interface DataTableProps<TData, TValue> {
     hasPagination?: boolean
     hasExpanded?: boolean
     is_delivery_multiple?: boolean
+    hasCount?: boolean
+    hasHeaderBackGround?: boolean
 }
 
 export function ProductTable<TData, TValue>({
@@ -50,7 +52,9 @@ export function ProductTable<TData, TValue>({
     addButtonModalContent,
     hasPagination = true,
     hasExpanded = false,
-    is_delivery_multiple = false
+    is_delivery_multiple = false,
+    hasCount = true,
+    hasHeaderBackGround = false
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([
         { id: "updated_at", desc: true }, // mặc định sort theo updated_at giảm dần
@@ -79,14 +83,15 @@ export function ProductTable<TData, TValue>({
 
     return (
         <div className="flex flex-col gap-4">
-            <p>{totalItems} items found</p>
+            {hasCount ? <p>{totalItems} items found</p> : ''}
+
             <div className="rounded-md border w-full overflow-x-scroll">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id} className={`${hasHeaderBackGround ? 'bg-secondary/5' : ''}`}>
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(header.column.columnDef.header, header.getContext())}
@@ -152,6 +157,7 @@ export function ProductTable<TData, TValue>({
                                                                 hasPagination={false}
                                                                 totalItems={(row.original as CheckOut).cart.items.length}
                                                                 totalPages={1}
+                                                                hasCount={false}
                                                             />
 
                                                         </div>

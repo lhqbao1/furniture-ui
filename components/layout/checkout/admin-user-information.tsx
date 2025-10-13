@@ -44,7 +44,11 @@ export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: 
                             <FormItem>
                                 {/* <FormLabel>{t("gender")}</FormLabel> */}
                                 <FormControl>
-                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                                    <RadioGroup
+                                        onValueChange={(val) => field.onChange(val)}
+                                        value={field.value ?? ""}
+                                        className="flex gap-4"
+                                    >
                                         <FormItem className="flex gap-1 items-center">
                                             <FormControl>
                                                 <RadioGroupItem value="male" />

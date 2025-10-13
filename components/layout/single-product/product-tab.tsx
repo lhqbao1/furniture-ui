@@ -108,7 +108,7 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
   const t = useTranslations()
 
   const sections = [
-    { value: "description", label: t('description'), content: <div dangerouslySetInnerHTML={{ __html: product?.description ?? "" }} /> },
+    { value: "description", label: t('description'), content: <div className='product-descriptions' dangerouslySetInnerHTML={{ __html: product?.description ?? "" }} /> },
     { value: "shipping", label: t('shipping'), content: <div></div> },
     { value: "review", label: t('review'), content: <ProductReviewTab /> },
     { value: "q&a", label: "Q&A", content: <QASection /> },

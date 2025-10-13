@@ -68,7 +68,7 @@ const OrderPlaced = () => {
     // Luồng xử lý khi có user
     useEffect(() => {
         const process = async () => {
-            if (!checkout || !invoice || !user) return console.log('hehe')
+            if (!checkout || !invoice || !user) return
 
             try {
                 const doc = <InvoicePDF checkout={checkout} invoice={invoice} />

@@ -57,13 +57,15 @@ const OrderDetails = () => {
             <ProductTable
                 data={extractCartItemsFromMain(order)}
                 columns={orderDetailColumn}
-                hasBackground
                 page={page}
                 setPage={setPage}
                 pageSize={pageSize}
                 setPageSize={setPageSize}
                 totalItems={extractCartItemsFromMain(order).length}
                 totalPages={Math.ceil(extractCartItemsFromMain(order).length / pageSize)}
+                hasPagination={false}
+                hasCount={false}
+                hasHeaderBackGround
             />
             <OrderInformation
                 language={order.checkouts[0].user.language ?? ''}

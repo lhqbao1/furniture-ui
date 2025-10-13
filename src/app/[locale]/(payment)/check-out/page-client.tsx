@@ -144,16 +144,24 @@ export default function CheckOutPageClient() {
     const { data: cartItems, isLoading: isLoadingCart } = useQuery({
         queryKey: ["cart-items", userIdLogin ? userIdLogin : userId],
         queryFn: async () => {
-            const data = await getCartItems()
-            // Có thể sort theo thời gian tạo của từng giỏ hàng nếu cần
-            data.sort(
-                (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            )
-            return data
+            const response = await getCartItems() // CartResponse
+
+            const sorted = [...response].sort((a, b) => {
+                const latestA = Math.max(
+                    ...a.items.map(item => new Date(item.created_at).getTime())
+                )
+                const latestB = Math.max(
+                    ...b.items.map(item => new Date(item.created_at).getTime())
+                )
+                return latestB - latestA
+            })
+
+            return sorted // ✅ vẫn trả về CartResponse, không đổi type
         },
         enabled: !!(userIdLogin ? userIdLogin : userId),
         retry: false
     })
+
 
     const createCheckOutMutation = useCreateCheckOut()
     const createPaymentMutation = useCreatePayment()
@@ -227,10 +235,6 @@ export default function CheckOutPageClient() {
 
     //Assign cart_id into form values
     useEffect(() => {
-        if (cartItems && cartItems?.length > 0) {
-            console.log(cartItems)
-        }
-
         if (invoiceAddress?.id) {
             form.setValue("invoice_address_id", invoiceAddress.id)
         }
@@ -313,7 +317,6 @@ export default function CheckOutPageClient() {
 
                 // Nếu chưa có shipping address thì tạo mới
                 if (!shippingAddressId) {
-                    console.log('none')
                     const newShipping = await createShippingAddressMutation.mutateAsync({
                         user_id: userId ?? '',
                         recipient_name: data.first_name + data.last_name,
@@ -328,7 +331,6 @@ export default function CheckOutPageClient() {
                     })
                     shippingAddressId = newShipping.id
                 } else {
-                    console.log('yes')
                     if (data.shipping_address_line !== addresses?.find(a => a.is_default)?.address_line ||
                         data.shipping_postal_code !== addresses?.find(a => a.is_default)?.postal_code ||
                         data.shipping_city !== addresses?.find(a => a.is_default)?.city ||
@@ -454,7 +456,6 @@ export default function CheckOutPageClient() {
                         <CheckOutUserInformation isLogin={userIdLogin ? true : false} />
                         <CheckOutShippingAddress key={`shipping-${userId}`} />
                         <CheckOutInvoiceAddress key={`invoice-${userId}`} />
-                        {/* {userId ? '' : <CheckOutPassword isCreatePassword={isCreatePassword} setIsCreatePassword={setIsCreatePassword} />} */}
                     </div>
 
                     {/* Table cart and total */}

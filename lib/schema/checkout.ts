@@ -69,3 +69,31 @@ export const  checkoutDefaultValues = {
     shipping_city: "",
     shipping_address_additional: "",
 }
+
+export const  adminCheckoutDefaultValues = {
+  shipping_address_id: "",
+  invoice_address_id: "",
+  cart_id: "",
+  payment_method: "paypal",
+  note: "",
+  coupon_amount: 0,
+  voucher_amount: 0,
+  terms: true,
+
+  first_name: "",
+  last_name: "",
+  email: "",
+  phone_number: "",
+  gender: "",
+
+  invoice_address_line: "",
+  invoice_postal_code: "",
+  invoice_city: "",
+  invoice_address_additional: "",
+
+
+  shipping_address_line: "",
+  shipping_postal_code: "",
+  shipping_city: "",
+  shipping_address_additional: "",
+}

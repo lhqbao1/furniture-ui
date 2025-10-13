@@ -143,7 +143,6 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(
                     (values) => {
-                        console.log("✅ Valid submit", values)
                         handleSubmit(values)
                     },
                     (errors) => {

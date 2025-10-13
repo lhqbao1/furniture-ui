@@ -39,16 +39,25 @@ const CartPageClient = () => {
     const { data: cart, isLoading: isLoadingCart, isError: isErrorCart } = useQuery({
         queryKey: ["cart-items", userId],
         queryFn: async () => {
-            const data = await getCartItems() // CartResponseItem[]
-            // Có thể sort theo thời gian tạo của từng giỏ hàng nếu cần
-            data.sort(
-                (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            )
-            return data
+            const response = await getCartItems() // CartResponse
+
+            // 🧩 Lấy thời gian mới nhất trong từng CartResponseItem (flatten tạm)
+            const sorted = [...response].sort((a, b) => {
+                const latestA = Math.max(
+                    ...a.items.map(item => new Date(item.created_at).getTime())
+                )
+                const latestB = Math.max(
+                    ...b.items.map(item => new Date(item.created_at).getTime())
+                )
+                return latestB - latestA
+            })
+
+            return sorted // ✅ vẫn trả về CartResponse, không đổi type
         },
         retry: false,
         enabled: !!userId,
     })
+
 
     // Nếu có user thì hiển thị cart trên server, không thì localCart
     const displayedCart = useMemo(() => userId ? cart ?? [] : localCart, [cart, localCart, userId])
@@ -60,7 +69,7 @@ const CartPageClient = () => {
     if (userId && cart) {
         // 🛒 Trường hợp user đăng nhập → cart là CartResponse
         total = cart
-            .flatMap(group => group.items) // flatten tất cả items trong từng supplier
+            .flatMap(group => group.items)
             .filter(item => item.is_active)
             .reduce((acc, item) => {
                 const key = item.id;

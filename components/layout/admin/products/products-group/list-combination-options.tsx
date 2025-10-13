@@ -53,8 +53,6 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
     const [queryParams, setQueryParams] = useState('')
     const [localCombinations, setLocalCombinations] = useState(combinations)
 
-    console.log(combinations)
-
     const [selectedAction, setSelectedAction] = useState<Record<number, string>>(filteredProduct);
     const [listSelect, setListSelect] = useState<ProductItem[]>([])
     const [openIdx, setOpenIdx] = useState<number | null>(null)

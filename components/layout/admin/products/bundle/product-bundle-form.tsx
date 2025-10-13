@@ -146,7 +146,6 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(
                     (values) => {
-                        console.log("✅ Valid submit", values)
                         handleSubmit(values)
                     },
                     (errors) => {
