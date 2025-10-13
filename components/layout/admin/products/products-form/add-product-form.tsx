@@ -86,57 +86,59 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             stock: values.stock ?? 1
         }
 
-        if (productValuesClone) {
-            // 🟢 Clone thì vẫn gọi add
-            addProductMutation.mutate(payload, {
-                onSuccess: () => {
-                    toast.success("Product add successfully")
-                    form.reset()
-                    router.push("/admin/products/list", { locale })
-                },
-                onError: (error) => {
-                    toast.error(
-                        <div className="flex flex-col gap-2">
-                            <div>Failed to add product</div>
-                            <div>Please check duplication for SKU or EAN</div>
-                        </div>
-                    )
-                    console.log(error)
-                },
-            })
-        } else if (productValues) {
-            // 🟡 Edit
-            editProductMutation.mutate(
-                { id: productValues.id ?? "", input: payload },
-                {
-                    onSuccess: () => {
-                        toast.success("Product updated successfully")
-                        router.push("/admin/products/list", { locale })
-                        router.refresh()
-                    },
-                    onError: () => {
-                        toast.error("Failed to update product")
-                    },
-                }
-            )
-        } else {
-            // 🔵 Add mới
-            addProductMutation.mutate(payload, {
-                onSuccess: () => {
-                    toast.success("Product add successfully")
-                    form.reset()
-                },
-                onError: (error) => {
-                    toast.error(
-                        <div className="flex flex-col gap-2">
-                            <div>Failed to add product</div>
-                            <div>Please check duplication for SKU or EAN</div>
-                        </div>
-                    )
-                    console.log(error)
-                },
-            })
-        }
+        console.log(values.description)
+
+        // if (productValuesClone) {
+        //     // 🟢 Clone thì vẫn gọi add
+        //     addProductMutation.mutate(payload, {
+        //         onSuccess: () => {
+        //             toast.success("Product add successfully")
+        //             form.reset()
+        //             router.push("/admin/products/list", { locale })
+        //         },
+        //         onError: (error) => {
+        //             toast.error(
+        //                 <div className="flex flex-col gap-2">
+        //                     <div>Failed to add product</div>
+        //                     <div>Please check duplication for SKU or EAN</div>
+        //                 </div>
+        //             )
+        //             console.log(error)
+        //         },
+        //     })
+        // } else if (productValues) {
+        //     // 🟡 Edit
+        //     editProductMutation.mutate(
+        //         { id: productValues.id ?? "", input: payload },
+        //         {
+        //             onSuccess: () => {
+        //                 toast.success("Product updated successfully")
+        //                 router.push("/admin/products/list", { locale })
+        //                 router.refresh()
+        //             },
+        //             onError: () => {
+        //                 toast.error("Failed to update product")
+        //             },
+        //         }
+        //     )
+        // } else {
+        //     // 🔵 Add mới
+        //     addProductMutation.mutate(payload, {
+        //         onSuccess: () => {
+        //             toast.success("Product add successfully")
+        //             form.reset()
+        //         },
+        //         onError: (error) => {
+        //             toast.error(
+        //                 <div className="flex flex-col gap-2">
+        //                     <div>Failed to add product</div>
+        //                     <div>Please check duplication for SKU or EAN</div>
+        //                 </div>
+        //             )
+        //             console.log(error)
+        //         },
+        //     })
+        // }
 
     }
 
@@ -225,7 +227,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     Back
                                 </Button>
                                 {productValues ?
-                                    <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.push(`/product${productValues?.categories && productValues.categories.length > 0 ? `/${productValues.categories[0].slug}` : ''}/${productValues?.id}`)}
+                                    <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.push(`/product${productValues?.categories && productValues.categories.length > 0 ? `/${productValues.categories[0].slug}` : ''}/${productValues?.url_key}`)}
                                     >View</Button> : ''
                                 }
                             </div>

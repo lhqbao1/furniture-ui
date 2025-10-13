@@ -144,7 +144,7 @@ export function ProductTable<TData, TValue>({
                                                         <div className="p-4 text-sm">
                                                             <ProductTable<CartItem, unknown>
                                                                 data={(row.original as CheckOut).cart.items}
-                                                                columns={getDeliveryOrderColumns({ is_multiple_delivery: is_delivery_multiple })}
+                                                                columns={getDeliveryOrderColumns({ is_multiple_delivery: (row.original as CheckOut).supplier ? (row.original as CheckOut).supplier.delivery_multiple : false })}
                                                                 page={1}
                                                                 pageSize={5}
                                                                 setPage={() => { }}

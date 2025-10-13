@@ -10,7 +10,8 @@ export interface SupplierInput {
 
 export interface SupplierResponse {
     salutation: string
-    business_name
+    business_name: string
+    delivery_multiple: boolean
   vat_id: string
   email: string
   email_order: string

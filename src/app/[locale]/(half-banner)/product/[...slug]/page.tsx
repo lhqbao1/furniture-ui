@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { slug, locale } = await params;
     const slugArray = Array.isArray(slug) ? slug : [slug]
     const lastSlug = slugArray[slugArray.length - 1]
-
+    console.log(lastSlug)
     try {
         const product = await getProductBySlug(lastSlug)
         return {
@@ -64,6 +64,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
     const resolvedParams = await params;
     const slugArray = Array.isArray(resolvedParams.slug) ? resolvedParams.slug : [resolvedParams.slug]
     const lastSlug = slugArray[slugArray.length - 1]
+    console.log(lastSlug)
 
     const product = await getProductBySlug(lastSlug)
     let parentProduct = null
