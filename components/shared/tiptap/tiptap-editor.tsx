@@ -29,29 +29,31 @@ import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import Link from "@tiptap/extension-link"
 import LinkControls from "./link-button"
+import HardBreak from "@tiptap/extension-hard-break"
 
-const extensions = [
-    TextStyleKit,
-    StarterKit,
-    Link.configure({
-        openOnClick: false,
-        autolink: false,
-        defaultProtocol: "https",
-    }).extend({
-        renderHTML({ HTMLAttributes }) {
-            return [
-                "a",
-                {
-                    ...HTMLAttributes,
-                    class: "underline text-secondary cursor-pointer",
-                    onclick: "event.preventDefault()",
-                    "data-link": HTMLAttributes.href,
-                },
-                0,
-            ]
-        },
-    }),
-]
+
+// const extensions = [
+//     TextStyleKit,
+//     StarterKit,
+//     Link.configure({
+//         openOnClick: false,
+//         autolink: false,
+//         defaultProtocol: "https",
+//     }).extend({
+//         renderHTML({ HTMLAttributes }) {
+//             return [
+//                 "a",
+//                 {
+//                     ...HTMLAttributes,
+//                     class: "underline text-secondary cursor-pointer",
+//                     onclick: "event.preventDefault()",
+//                     "data-link": HTMLAttributes.href,
+//                 },
+//                 0,
+//             ]
+//         },
+//     }),
+// ]
 
 export function MenuBar({ editor, showHtml, setShowHtml }: {
     editor: Editor, showHtml: boolean, setShowHtml: React.Dispatch<React.SetStateAction<boolean>>
@@ -146,8 +148,42 @@ export function MenuBar({ editor, showHtml, setShowHtml }: {
 export default function RichEditor({ value, onChangeValue }: { value: string; onChangeValue: (val: string) => void }) {
     const [showHtml, setShowHtml] = useState(false)
 
+    const extensions = [
+        TextStyleKit,
+        StarterKit.configure({
+            // ❌ tắt behavior mặc định của Enter
+            paragraph: false,
+            hardBreak: false,
+        }),
+        HardBreak.extend({
+            addKeyboardShortcuts() {
+                return {
+                    Enter: () => this.editor.commands.setHardBreak(),
+                }
+            },
+        }),
+        Link.configure({
+            openOnClick: false,
+            autolink: false,
+            defaultProtocol: "https",
+        }).extend({
+            renderHTML({ HTMLAttributes }) {
+                return [
+                    "a",
+                    {
+                        ...HTMLAttributes,
+                        class: "underline text-secondary cursor-pointer",
+                        onclick: "event.preventDefault()",
+                        "data-link": HTMLAttributes.href,
+                    },
+                    0,
+                ]
+            },
+        }),
+    ]
+
     const editor = useEditor({
-        extensions,
+        extensions: extensions,
         content: value || "<p></p>",
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
@@ -190,8 +226,7 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
                 <EditorContent
                     editor={editor}
                     className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
-                [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-secondary [&_h2]:mt-6 [&_h2]:mb-3 [&_li]:list-disc [&_li]:pl-4
-                [&_li]:ml-12 [&_a]:text-secondary [&_a]:underline
+               [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline
                 "
                 />
             )}
