@@ -193,7 +193,6 @@ export default function CheckOutPageClient() {
             defaults.first_name = user.first_name ?? ""
             defaults.last_name = user.last_name ?? ""
             defaults.email = user.email ?? ""
-            defaults.phone_number = user.phone_number ?? ""
         }
 
         if (invoiceAddress) {
@@ -211,6 +210,7 @@ export default function CheckOutPageClient() {
                 defaults.shipping_postal_code = shippingAddress.postal_code ?? ""
                 defaults.shipping_city = shippingAddress.city ?? ""
                 defaults.shipping_address_id = shippingAddress.id
+                defaults.phone_number = shippingAddress.phone_number ?? ""
             }
         }
 
@@ -313,6 +313,7 @@ export default function CheckOutPageClient() {
 
                 // Nếu chưa có shipping address thì tạo mới
                 if (!shippingAddressId) {
+                    console.log('none')
                     const newShipping = await createShippingAddressMutation.mutateAsync({
                         user_id: userId ?? '',
                         recipient_name: data.first_name + data.last_name,
@@ -327,10 +328,12 @@ export default function CheckOutPageClient() {
                     })
                     shippingAddressId = newShipping.id
                 } else {
+                    console.log('yes')
                     if (data.shipping_address_line !== addresses?.find(a => a.is_default)?.address_line ||
                         data.shipping_postal_code !== addresses?.find(a => a.is_default)?.postal_code ||
                         data.shipping_city !== addresses?.find(a => a.is_default)?.city ||
                         data.phone_number !== addresses?.find(a => a.is_default)?.phone_number) {
+
                         const newShipping = await createShippingAddressMutation.mutateAsync({
                             user_id: userId ?? '',
                             recipient_name: data.first_name + data.last_name,
@@ -347,7 +350,7 @@ export default function CheckOutPageClient() {
                     }
                 }
 
-                // Tạo checkout
+                // // Tạo checkout
                 const checkout = await createCheckOutMutation.mutateAsync({
                     ...data,
                     invoice_address_id: invoiceAddressId,

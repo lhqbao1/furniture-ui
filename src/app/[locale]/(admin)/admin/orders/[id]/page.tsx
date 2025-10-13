@@ -34,6 +34,8 @@ const OrderDetails = () => {
     if (isError) return <div>Error loading order</div>
     if (!order) return <div>Error loading order</div>
 
+    console.log(order)
+
     return (
         <div className='space-y-12 pb-20'>
             <div className='flex gap-14 items-center'>

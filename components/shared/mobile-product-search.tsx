@@ -177,7 +177,7 @@ export default function MobileProductSearch() {
                                             key={product.id}
                                             value={product.name}
                                             onSelect={() => {
-                                                router.push(`/product/${product.id}`, { locale })
+                                                router.push(`/product/${product.url_key}`, { locale })
                                                 setQuery("")
                                                 setOpen(false)
                                             }}

@@ -143,12 +143,12 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                     const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
 
                     const categoryHref = level1 && level2
-                        ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
+                        ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.url_key}`
                         : level1
-                            ? `/${formatName(level1.name)}/${product.id}`
+                            ? `/${formatName(level1.name)}/${product.url_key}`
                             : level2
-                                ? `/${formatName(level2.name)}/${product.id}`
-                                : `/${product.id}`
+                                ? `/${formatName(level2.name)}/${product.url_key}`
+                                : `/${product.url_key}`
 
                     return (
                         <div key={product.id}

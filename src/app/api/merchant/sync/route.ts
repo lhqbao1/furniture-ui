@@ -21,7 +21,7 @@ import { getProductsFeed } from '@/features/products/api';
     offerId: p.id,
     title: p.name,
     description: p.description,
-    link: `http://prestige-home.de/product/${p.id}`,
+    link: `http://prestige-home.de/product/${p.url_key}`,
     imageLink: p.static_files[0].url,
     price: {
       value: p.price.toString(),

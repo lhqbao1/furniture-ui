@@ -178,7 +178,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                                 unoptimized
                                                             />
                                                             <div className="text-base">{listProducts?.find((p) => p.id === selectedAction[idx])?.name}</div>
-                                                            <Link href={`/product/${listProducts?.find((p) => p.id === selectedAction[idx])?.id}`}>
+                                                            <Link href={`/product/${listProducts?.find((p) => p.id === selectedAction[idx])?.url_key}`}>
                                                                 <Eye className="text-secondary cursor-pointer" size={20} />
                                                             </Link>
                                                         </div>
