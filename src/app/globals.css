@@ -129,7 +129,7 @@
     h4,
     h5,
     h6 {
-      @apply font-semibold text-secondary tracking-tight;
+      @apply font-semibold text-black tracking-tight;
     }
   
     h1 {
