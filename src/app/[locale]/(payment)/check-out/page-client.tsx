@@ -356,7 +356,7 @@ export default function CheckOutPageClient() {
                     note: data.note,
                     total_shipping: shippingCost
                 })
-                toast.success("Place order successful")
+                toast.success(t('orderSuccess'))
                 setCheckOut(checkout.id)
 
                 if (data.payment_method !== "bank") {
@@ -366,7 +366,6 @@ export default function CheckOutPageClient() {
                         pay_channel: data.payment_method,
                     })
 
-                    toast.success("Place payment successful")
                     setPaymentId(payment.payment_order_id)
                     if (data.payment_method === "paypal") {
                         router.push(payment.approve_url, { locale })

@@ -256,5 +256,6 @@
     "title": "Seite nicht gefunden",
     "description": "Entschuldigung, wir konnten die gesuchte Seite nicht finden.",
     "backHome": "Zur Startseite"
-  }
+  },
+  "orderSuccess": "Bestellung erfolgreich"
 }

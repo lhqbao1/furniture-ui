@@ -194,6 +194,7 @@
     "invalidCredentials": "Wrong OTP, please try again",
     "continueAsGuest": "Continue as Guest",
     "orderFail": "Place order fail",
+    "orderSuccess": "Place order success",
     "otpRequired": "Please enter all 6 OTP digits",
     "otpDone": "OTP verification successful",
     "otpError": "Incorrect OTP, please try again",
