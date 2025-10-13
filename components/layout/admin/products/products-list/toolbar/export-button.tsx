@@ -27,7 +27,7 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
                     amount_unit: p.amount_unit,
                     delivery_time: p.delivery_time,
                     carrier_id: p.carrier,
-                    net_purchase_cost: '',
+                    net_purchase_cost: p.cost ? p.cost : '',
                     delivery_cost: p.delivery_cost,
                     return_cost: p.return_cost,
                     original_price: p.price,
