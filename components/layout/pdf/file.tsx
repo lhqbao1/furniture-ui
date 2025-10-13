@@ -475,18 +475,19 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 </View>
 
                 {/* Footer */}
-                <View style={styles.footer}>
-                    <View>
-                        <Text style={styles.boldWithGap}>Prestige Home GmbH</Text>
-                        <Text style={styles.gapY5}>Greifswalder Straße 226, 10405 Berlin.</Text>
-                        <Text style={styles.gapY5}>Email: info@prestige-home.de</Text>
-                    </View>
+                {/* <View style={{ marginTop: 50, display: 'flex', justifyContent: 'space-between', flexDirection: "row", fontSize: 9, position: "absolute"}}>
+                    
+                </View> */}
+                <View style={{ position: 'absolute', bottom: 0, left: 48, zIndex: 20 }}>
+                    <Text style={styles.boldWithGap}>Prestige Home GmbH</Text>
+                    <Text style={styles.gapY5}>Greifswalder Straße 226, 10405 Berlin.</Text>
+                    <Text style={styles.gapY5}>Email: info@prestige-home.de</Text>
+                </View>
 
-                    <View>
-                        <Text style={styles.boldWithGap}>Geschäftsführer</Text>
-                        <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
-                        <Text style={styles.gapY5}>USt-ID: DE454714336</Text>
-                    </View>
+                <View style={{ position: 'absolute', bottom: 0, right: 48, zIndex: 20 }}>
+                    <Text style={styles.boldWithGap}>Geschäftsführer</Text>
+                    <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
+                    <Text style={styles.gapY5}>USt-ID: DE454714336</Text>
                 </View>
             </Page>
         </Document >
