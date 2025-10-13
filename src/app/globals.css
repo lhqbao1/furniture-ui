@@ -317,7 +317,7 @@ input[type=number] {
 
 /* Giữ font cố định cho toàn bộ editor */
 .ProseMirror {
-  font-family: var(--font-libre, 'Libre Baskerville', serif) !important;
+  font-family: var(--font-sans) !important;
   font-size: 1rem;
   line-height: 1.6;
   color: hsl(var(--foreground));

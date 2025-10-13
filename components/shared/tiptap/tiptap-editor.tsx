@@ -215,8 +215,8 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
                 <EditorContent
                     editor={editor}
                     className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
-               [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline font-libre
-               [&_*]:font-libre [&_*]:text-inherit [&_*]:bg-transparent
+               [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline font-sans
+               [&_*]:font-sans [&_*]:text-inherit [&_*]:bg-transparent
                 "
                 />
             )}
