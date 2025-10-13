@@ -136,6 +136,18 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
         }
     },
     {
+        accessorKey: "customer",
+        header: "CUSTOMER",
+        cell: ({ row }) => {
+            return (
+                <div>
+                    <div>{row.original.checkouts[0].user.first_name} {row.original.checkouts[0].user.last_name}</div>
+                    <div>{row.original.checkouts[0].user.email}</div>
+                </div>
+            )
+        }
+    },
+    {
         accessorKey: "channel",
         header: () => (
             <div className="text-center w-full">CHANNEL</div>
@@ -251,7 +263,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     {
         accessorKey: "value",
         header: () => (
-            <div className="text-end w-full">INVOICE</div>
+            <div className="text-center w-full">INVOICE</div>
         ),
         cell: ({ row }) => {
             return (
@@ -283,14 +295,13 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     },
     {
         accessorKey: "owner",
-        header: "OWNER",
+        header: "SUPPLIER",
         cell: ({ row }) => {
             return (
                 <div>{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
             )
         }
     },
-
     {
         accessorKey: "channel",
         header: () => (
@@ -363,16 +374,27 @@ export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
             )
         }
     },
+    // {
+    //     accessorKey: "owner",
+    //     header: "SUPPLIER",
+    //     cell: ({ row }) => {
+    //         return (
+    //             <div>{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
+    //         )
+    //     }
+    // },
     {
-        accessorKey: "owner",
-        header: "OWNER",
+        accessorKey: "customer",
+        header: "CUSTOMER",
         cell: ({ row }) => {
             return (
-                <div>{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
+                <div>
+                    <div>{row.original.user.first_name} {row.original.user.last_name}</div>
+                    <div>{row.original.user.email}</div>
+                </div>
             )
         }
     },
-
     {
         accessorKey: "channel",
         header: () => (

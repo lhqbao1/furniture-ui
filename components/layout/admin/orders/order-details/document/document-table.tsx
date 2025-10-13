@@ -9,18 +9,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { CheckOut } from '@/types/checkout'
+import { CheckOut, CheckOutMain } from '@/types/checkout'
 import { formatDateTime } from '@/lib/date-formated'
 
 interface DocumentTableProps {
-    order?: CheckOut
+    order?: CheckOutMain
+    invoiceCode?: string
 }
 
-const DocumentTable = ({ order }: DocumentTableProps) => {
+const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
     const data = useMemo<DocumentRow[]>(() => [
         {
             document: "Invoice",
-            code: order?.checkout_code ?? '',
+            code: invoiceCode ?? '',
             dateSent: formatDateTime(order?.created_at ? new Date(order.created_at) : new Date()),
             viewType: 'invoice',
             checkOutId: order?.id

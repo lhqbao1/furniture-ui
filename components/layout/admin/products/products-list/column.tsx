@@ -335,12 +335,12 @@ function ActionsCell({ product }: { product: ProductItem }) {
 
     const categoryHref =
         level1 && level2
-            ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.id}`
+            ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.url_key}`
             : level1
-                ? `/${formatName(level1.name)}/${product.id}`
+                ? `/${formatName(level1.name)}/${product.url_key}`
                 : level2
-                    ? `/${formatName(level2.name)}/${product.id}`
-                    : `/${product.id}`;
+                    ? `/${formatName(level2.name)}/${product.url_key}`
+                    : `/${product.url_key}`;
 
     return (
         <div className="flex gap-2">
@@ -433,7 +433,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     },
     {
         accessorKey: "owner",
-        header: "OWNER",
+        header: "SUPPLIER",
         cell: ({ row }) => {
             return (
                 <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>

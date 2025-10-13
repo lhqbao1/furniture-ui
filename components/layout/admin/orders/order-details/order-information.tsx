@@ -44,7 +44,7 @@ const OrderInformation = ({
             <div className="space-y-3 col-span-1">
                 <div className="grid grid-cols-10 items-center gap-2">
                     <div className="text-right col-span-4">Payment Method:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
+                    <div className="rounded-sm border px-2 py-1 w-full col-span-6 capitalize">
                         {payment_method ?? 'eBay Payment'}
                     </div>
                 </div>

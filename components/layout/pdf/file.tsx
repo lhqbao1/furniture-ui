@@ -22,7 +22,7 @@ Font.register({
 
 const styles = StyleSheet.create({
     page: {
-        padding: 30,
+        padding: 48,
         fontSize: 11,
         fontFamily: "Figtree",
         fontWeight: "bold",
@@ -119,7 +119,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                         {/* Header */}
                         <View
                             style={{
-                                backgroundColor: '#e0e0e0',
+                                backgroundColor: '#ededed',
                                 paddingVertical: 4,
                                 paddingHorizontal: 8,
                             }}
@@ -213,8 +213,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                             backgroundColor: '#D2D2D2',
                         }}
                     >
-                        <Text style={{ width: '6%' }}>Pos.</Text>
-                        <Text style={{ width: '10%' }}>Menge</Text>
+                        <Text style={{ width: '6%', textAlign: 'center' }}>Pos.</Text>
+                        <Text style={{ width: '10%', textAlign: 'center' }}>Menge</Text>
                         <Text style={{ width: '16%' }}>Art.-Nr.</Text>
                         <Text style={{ width: '36%' }}>Bezeichnung</Text>
                         <Text style={{ width: '10%', textAlign: 'right' }}>MwSt.</Text>
@@ -234,8 +234,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                     padding: 4,
                                 }}
                             >
-                                <Text style={{ width: '6%' }}>{index + 1}</Text>
-                                <Text style={{ width: '10%' }}>{item.quantity}</Text>
+                                <Text style={{ width: '6%', textAlign: 'center' }}>{index + 1}</Text>
+                                <Text style={{ width: '10%', textAlign: 'center' }}>{item.quantity}</Text>
                                 <Text style={{ width: '16%' }}>{item.products.ean}</Text>
                                 <View style={{ width: '36%' }}>
                                     <Text>{item.products.name}</Text>
@@ -252,69 +252,6 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 </View>
 
                 {/* Summary */}
-                {/* <View style={styles.flexEnd}>
-                            <View style={styles.flexColBlock}>
-                                <View style={styles.flexEndTotal}>
-                                    <Text style={styles.gapY10}>Gesamt Netto</Text>
-                                    <Text style={styles.minWidth}>
-                                        €32,40
-                                        {data.net_amount ? data?.net_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
-                                        €{((data?.total_amount_item ?? 0) - (data?.total_vat ?? 0) - (invoice?.voucher_amount ?? 0) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </Text>
-                                </View>
-        
-                                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                    <Text style={styles.gapY10}>zzgl. MwSt</Text>
-                                    <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                        €{data.total_vat.toFixed(2)}
-                                        €07,60
-                                        {data.total_vat ? data?.total_vat.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
-                                    </Text>
-                                </View>
-        
-                                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                    <Text style={styles.gapY10}>Versandkosten</Text>
-                                    <Text style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', textAlign: 'right' }}>
-                                        €00,00
-                                        {data.shipping_cost ? data?.shipping_cost.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
-                                    </Text>
-                                </View>
-        
-                                <View style={styles.flexEndTotalBg}>
-                                    <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Rechnungsbetrag</Text>
-                                    <Text style={styles.minWidth}>€40,00
-                                        {data.total_amount ? data?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
-                                    </Text>
-                                </View>
-        
-                                <View style={styles.flexEndTotal}>
-                                    <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Zahlbetrag</Text>
-                                    <Text style={styles.minWidth}>
-                                        €40,00
-                                        €{data.total_amount ? data?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
-                                    </Text>
-                                </View>
-        
-                                <View style={styles.flexEndTotal}>
-                                    <Text style={styles.gapY10}>Zahlung vom Oct 7,2025
-                                        {data.created_at}
-                                        {invoice?.created_at
-                                            ? new Date(invoice.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-                                            : ""}
-                                        :</Text>
-                                    <Text style={styles.minWidth}>
-                                        €40,00
-                                        €{data.total_amount ? data?.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 0}
-                                    </Text>
-                                </View>
-        
-                                <View style={styles.flexEndTotal}>
-                                    <Text style={{ marginBottom: 5, marginRight: 20, fontFamily: "FigtreeBold" }}>Offener Betrag:</Text>
-                                    <Text style={styles.minWidth}>€00.00</Text>
-                                </View>
-        
-                            </View>
-                        </View> */}
                 <View style={{ fontSize: 10, width: '100%', marginTop: 10 }}>
                     {/* Net and VAT */}
                     <View
@@ -322,12 +259,11 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                             display: 'flex',
                             flexDirection: 'row',
                             justifyContent: 'flex-end',
-                            backgroundColor: '#D2D2D2',
                             paddingVertical: 3,
                             paddingHorizontal: 6,
                         }}
                     >
-                        <Text style={{ width: '60%' }}>Warenwert (brutto)</Text>
+                        <Text style={{ width: '60%', textAlign: 'right' }}>Warenwert (brutto)</Text>
                         <Text style={{ width: '20%', textAlign: 'right' }}>{invoice.total_amount_item.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
                     </View>
 
@@ -340,7 +276,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                             paddingHorizontal: 6,
                         }}
                     >
-                        <Text style={{ width: '60%' }}>Versandkosten (brutto)</Text>
+                        <Text style={{ width: '60%', textAlign: 'right' }}>Versandkosten (brutto)</Text>
                         <Text style={{ width: '20%', textAlign: 'right' }}>{invoice?.total_shipping.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
                     </View>
 
@@ -350,20 +286,18 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                             display: 'flex',
                             flexDirection: 'row',
                             justifyContent: 'flex-end',
-                            backgroundColor: '#D2D2D2',
                             paddingVertical: 4,
                             paddingHorizontal: 6,
                             fontWeight: 'bold',
-                            marginTop: 10
                         }}
                     >
-                        <Text style={{ width: '60%' }}>Summe (netto)</Text>
+                        <Text style={{ width: '60%', textAlign: 'right' }}>Summe (netto)</Text>
                         <Text style={{ width: '20%', textAlign: 'right' }}>
                             {((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                         </Text>
                     </View>
 
-                    <View style={{ marginTop: 8 }}>
+                    <View>
                         <View
                             style={{
                                 display: 'flex',
@@ -373,7 +307,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                 paddingHorizontal: 6,
                             }}
                         >
-                            <Text style={{ width: '60%', fontWeight: 'bold' }}>MwSt.</Text>
+                            <Text style={{ width: '60%', textAlign: 'right', fontWeight: 'bold' }}>MwSt.</Text>
                             <Text style={{ width: '20%', textAlign: 'right', fontWeight: 'bold' }}>
                                 {((invoice?.total_amount_item ?? 0) - ((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0))).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                             </Text>
@@ -388,7 +322,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                 paddingHorizontal: 6,
                             }}
                         >
-                            <Text style={{ width: '60%', fontWeight: 'bold' }}>Rechnungsbetrag (brutto)</Text>
+                            <Text style={{ width: '60%', textAlign: 'right', fontWeight: 'bold' }}>Rechnungsbetrag (brutto)</Text>
                             <Text style={{ width: '20%', textAlign: 'right', fontWeight: 'bold' }}>
                                 {((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                             </Text>
@@ -403,7 +337,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                 paddingHorizontal: 6,
                             }}
                         >
-                            <Text style={{ width: '60%', fontWeight: 'bold' }}>Wertgutschein (brutto)</Text>
+                            <Text style={{ width: '60%', textAlign: 'right', fontWeight: 'bold' }}>Wertgutschein (brutto)</Text>
                             <Text style={{ width: '20%', textAlign: 'right', fontWeight: 'bold' }}>
                                 {(invoice?.coupon_amount ?? 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                             </Text>
@@ -414,11 +348,12 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                 display: 'flex',
                                 flexDirection: 'row',
                                 justifyContent: 'flex-end',
+                                backgroundColor: '#ededed',
                                 paddingVertical: 3,
                                 paddingHorizontal: 6,
                             }}
                         >
-                            <Text style={{ width: '60%', fontWeight: 'bold' }}>Zahlbetrag</Text>
+                            <Text style={{ width: '60%', textAlign: 'right', fontWeight: 'bold' }}>Zahlbetrag</Text>
                             <Text style={{ width: '20%', textAlign: 'right', fontWeight: 'bold' }}>
                                 {((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                             </Text>
@@ -430,13 +365,13 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 {/* <View style={{ marginTop: 50, display: 'flex', justifyContent: 'space-between', flexDirection: "row", fontSize: 9, position: "absolute"}}>
                     
                 </View> */}
-                <View style={{ position: 'absolute', bottom: 0, left: 48, zIndex: 20 }}>
+                <View style={{ position: 'absolute', bottom: 10, left: 48, zIndex: 20 }}>
                     <Text style={styles.boldWithGap}>Prestige Home GmbH</Text>
                     <Text style={styles.gapY5}>Greifswalder Straße 226, 10405 Berlin.</Text>
                     <Text style={styles.gapY5}>Email: info@prestige-home.de</Text>
                 </View>
 
-                <View style={{ position: 'absolute', bottom: 0, right: 48, zIndex: 20 }}>
+                <View style={{ position: 'absolute', bottom: 10, right: 48, zIndex: 20 }}>
                     <Text style={styles.boldWithGap}>Geschäftsführer</Text>
                     <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
                     <Text style={styles.gapY5}>USt-ID: DE454714336</Text>

@@ -9,7 +9,8 @@ import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { InvoicePDF } from "@/components/layout/pdf/file";
 
 export default function InvoicePage() {
-    const [checkoutId] = useAtom(checkOutIdAtom);
+    const checkoutId = '0d5bd6b9-a2d6-45e3-aafe-8e85ff9ec3a5'
+    // const [checkoutId] = useAtom(checkOutIdAtom);
     const [invoiceId] = useAtom(invoiceIdAtom);
 
     const { data: checkout } = useQuery({
