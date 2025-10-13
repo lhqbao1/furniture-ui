@@ -34,9 +34,10 @@ const OrderPlaced = () => {
 
     // Lấy userId từ localStorage
     useEffect(() => {
-        const id = localStorage.getItem('userIdGuest')
-        if (id) setUserId(id)
-    }, [])
+        const id = localStorage.getItem('userIdGuest') || localStorage.getItem('userId');
+        if (id) setUserId(id);
+    }, []);
+
 
     const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
         queryKey: ["checkout-id", checkoutId, paymentId],
@@ -67,7 +68,7 @@ const OrderPlaced = () => {
     // Luồng xử lý khi có user
     useEffect(() => {
         const process = async () => {
-            if (!checkout || !invoice || !user) return
+            if (!checkout || !invoice || !user) return console.log('hehe')
 
             try {
                 const doc = <InvoicePDF checkout={checkout} invoice={invoice} />
@@ -103,14 +104,14 @@ const OrderPlaced = () => {
 
 
     // Redirect về home sau 5s
-    // useEffect(() => {
-    //     if (counter <= 0) {
-    //         router.push('/', { locale })
-    //         return
-    //     }
-    //     const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
-    //     return () => clearTimeout(timer)
-    // }, [counter, router])
+    useEffect(() => {
+        if (counter <= 0) {
+            router.push('/', { locale })
+            return
+        }
+        const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
+        return () => clearTimeout(timer)
+    }, [counter, router])
 
     return (
         <div className='w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10'>

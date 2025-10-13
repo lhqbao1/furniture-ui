@@ -199,7 +199,7 @@ export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: 
                             <FormControl>
                                 <Input
                                     type="number"
-                                    placeholder="+49"
+                                    placeholder=""
                                     {...field}
                                 />
                             </FormControl>
