@@ -6,7 +6,7 @@ import { useSendMail } from '@/features/mail/hook'
 import { useGetUserById } from '@/features/users/hook'
 import { useAtom } from 'jotai'
 import { checkOutIdAtom, paymentIdAtom } from '@/store/payment'
-import { getCheckOutByCheckOutId } from '@/features/checkout/api'
+import { getCheckOutByCheckOutId, getMainCheckOutByMainCheckOutId } from '@/features/checkout/api'
 import { getInvoiceByCheckOut } from '@/features/invoice/api'
 import { useQuery } from '@tanstack/react-query'
 import { InvoicePDF } from '@/components/layout/pdf/file'
@@ -50,7 +50,7 @@ const OrderPlaced = () => {
             }
 
             // 2. Sau đó fetch checkout
-            return getCheckOutByCheckOutId(checkoutId)
+            return getMainCheckOutByMainCheckOutId(checkoutId)
         },
         enabled: !!checkoutId,
         retry: false
