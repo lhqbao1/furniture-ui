@@ -14,6 +14,8 @@ export interface syncToEbayInput {
     price: number
     tax?: string | null
     carrier?: string
+    min_stock?: number
+    max_stock?: number
 }
 export async function syncToEbay(input: syncToEbayInput) {
   const { data } = await apiAdmin.post(

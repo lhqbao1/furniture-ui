@@ -193,9 +193,6 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
     return (
         <div>
             <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-500">
-                    {showHtml ? 'HTML View' : 'Rich Text View'}
-                </p>
             </div>
             {editor && <MenuBar editor={editor} showHtml={showHtml} setShowHtml={setShowHtml} />}
             {showHtml && editor ? (

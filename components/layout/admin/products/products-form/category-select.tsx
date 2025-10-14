@@ -72,7 +72,7 @@ export function MultiSelectField({
                 return (
                     <FormItem className="flex flex-col w-full">
                         {label &&
-                            <FormLabel className='text-[#666666] text-sm text-start'>
+                            <FormLabel className='text-black font-semibold text-sm text-start'>
                                 Categories
                             </FormLabel>}
 

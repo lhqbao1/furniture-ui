@@ -10,6 +10,8 @@ import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import dynamic from "next/dynamic"
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 // import RichEditor dynamically to avoid SSR issues
 const RichEditor = dynamic(() => import("@/components/shared/tiptap/tiptap-editor"), {
@@ -25,6 +27,42 @@ interface ProductDetailInputsProps {
 const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetailInputsProps) => {
     const form = useFormContext()
 
+    const handleDownloadImages = async () => {
+        const files = form.getValues('static_files') as { url: string }[];
+
+        if (!files || files.length === 0) {
+            toast.error("Product does not have any image")
+            return;
+        }
+
+        for (const [index, file] of files.entries()) {
+            try {
+                const response = await fetch(file.url);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                // --- Đoán định dạng ảnh ---
+                const match = file.url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
+                const ext = match ? match[1].toLowerCase() : "jpg";
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `image_${index + 1}.${ext}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error("Lỗi tải ảnh:", file.url, error);
+            }
+        }
+
+        toast.success("Download images successful")
+    };
+
+
+
     return (
         <div className='space-y-6'>
             {/*Product Name */}
@@ -33,7 +71,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                 name="name"
                 render={({ field }) => (
                     <FormItem className='flex flex-col'>
-                        <FormLabel className='text-[#666666] text-sm'>
+                        <FormLabel className='text-black font-semibold text-sm'>
                             Product Name
                         </FormLabel>
                         <FormControl>
@@ -55,7 +93,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                         name="is_active"
                         render={({ field }) => (
                             <FormItem className="flex items-center space-x-2">
-                                <FormLabel className="!mt-0 text-[#666666]">Active</FormLabel>
+                                <FormLabel className="!mt-0 text-black font-semibold">Active</FormLabel>
                                 <FormControl>
                                     <Switch
                                         checked={field.value}
@@ -83,7 +121,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                     name='sku'
                     render={({ field }) => (
                         <FormItem className="flex flex-col w-full">
-                            <FormLabel className='text-[#666666] text-sm'>
+                            <FormLabel className='text-black font-semibold text-sm'>
                                 SKU
                             </FormLabel>
                             <FormControl>
@@ -105,7 +143,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                     name='ean'
                     render={({ field }) => (
                         <FormItem className="flex flex-col w-full">
-                            <FormLabel className='text-[#666666] text-sm'>
+                            <FormLabel className='text-black font-semibold text-sm'>
                                 EAN
                             </FormLabel>
                             <FormControl>
@@ -127,7 +165,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                     name="stock"
                     render={({ field }) => (
                         <FormItem className="flex flex-col w-full">
-                            <FormLabel className='text-[#666666] text-sm'>
+                            <FormLabel className='text-black font-semibold text-sm'>
                                 Stock
                             </FormLabel>
                             <FormControl>
@@ -159,7 +197,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                         name="delivery_multiple"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className='text-[#666666] text-sm'>Delivery Type</FormLabel>
+                                <FormLabel className='text-black font-semibold text-sm'>Delivery Type</FormLabel>
                                 <FormControl>
                                     <RadioGroup
                                         onValueChange={(value) => field.onChange(value === "true")}
@@ -194,7 +232,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                 name='tax'
                 render={({ field }) => (
                     <div className='flex gap-4 flex-col'>
-                        <FormLabel className='text-[#666666] text-sm'>
+                        <FormLabel className='text-black font-semibold text-sm'>
                             VAT
                         </FormLabel>
                         <RadioGroup
@@ -226,7 +264,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                 name="description"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel className='text-[#666666] text-sm'>Description</FormLabel>
+                        <FormLabel className='text-black font-semibold text-sm'>Description</FormLabel>
                         <FormControl>
                             <RichEditor
                                 value={field.value || ""}
@@ -239,8 +277,16 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
             />
 
             {/*Product Images */}
-            <div className='flex flex-col gap-2'>
-                <p className='text-[#666666] text-sm'>Image</p>
+            <div className='flex flex-col gap-4'>
+                <div className='flex gap-3 items-center'>
+                    <p className='text-black font-semibold text-sm'>Image</p>
+                    {/* <Button
+                        onClick={handleDownloadImages}
+                        variant={'secondary'}
+                        className='w-fit'>
+                        Get Images
+                    </Button> */}
+                </div>
                 <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' isAddProduct />
             </div>
         </div>

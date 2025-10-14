@@ -13,6 +13,37 @@ export const packageSchema = z.object({
   height: z.number().nonnegative().optional().nullable(),
 })
 
+export const marketPlaceSchema = z.object({
+  marketplace: z.string().optional(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  final_price: z.number().nonnegative().optional().nullable(),
+  min_stock: z.number().nonnegative().optional().nullable(),
+  max_stock: z.number().nonnegative().optional().nullable(),
+  sku: z.string().optional(),
+}).refine(
+  (data) => {
+    if (data.marketplace) {
+      return (
+        data.name &&
+        data.description &&
+        data.final_price !== null &&
+        data.final_price !== undefined &&
+        data.min_stock !== null &&
+        data.min_stock !== undefined &&
+        data.max_stock !== null &&
+        data.max_stock !== undefined
+      );
+    }
+    return true;
+  },
+  {
+    message: "If marketplace is provided, all other fields must also be filled in.",
+    path: ["marketplace"],
+  }
+);
+
+
 export const addProductSchema = z.object({
   name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
@@ -66,7 +97,7 @@ export const addProductSchema = z.object({
 
   pallet_unit: z.number().optional().nullable(),
   packages: z.array(packageSchema).optional(),
-  // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
+  marketplace_products: z.array(marketPlaceSchema).optional(),
 })
 
 
