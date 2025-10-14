@@ -29,9 +29,9 @@ export async function GET() {
       : ""
 
       // Tính toán shipping dựa vào carrier
-  let shipping = "DE:::Standard:35.95 EUR" // default
+  let shipping = "DE:::35.95 EUR" // default
   if (p.carrier?.toLowerCase() === "dpd") {
-    shipping = "DE:::Standard:5.95 EUR"
+    shipping = "DE:::5.95 EUR"
   }
 
     return [
