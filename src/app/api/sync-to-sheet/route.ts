@@ -38,7 +38,7 @@ export async function GET() {
       p.final_price ?? 0,
       p.ean ? "yes" : "no",
       p.ean ?? "",
-      p.brand?.company_name ?? "Prestige Home",
+      p.brand?.company_name ?? "Prestige Home GmbH",
     ]
   })
 
