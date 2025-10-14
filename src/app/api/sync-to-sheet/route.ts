@@ -29,7 +29,7 @@ export async function GET() {
       : ""
 
     return [
-      p.id ?? "",
+      p.id_provider ?? "",
       p.name ?? "",
       p.description ?? "",
       p.stock > 0 ? "in_stock" : "out_of_stock",
