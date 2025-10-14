@@ -27,6 +27,7 @@ import { use, useState } from "react"
 import { ProductTable } from "../../products/products-list/product-table"
 import { cartSupplierColumn, GetCartColumns } from "@/components/layout/cart/columns"
 import CartTable from "@/components/layout/cart/cart-table"
+import ViewFileChildDialog from "@/components/layout/packaging-dialog/packaging-dialog-chil"
 
 const ActionCell = ({ id }: { id: string }) => {
     const router = useRouter()
@@ -93,7 +94,7 @@ const ActionCellChild = ({
                 </Dialog>
             )}
 
-            <ViewFileDialog checkoutId={checkoutId} type="package" />
+            <ViewFileChildDialog checkoutId={checkoutId} data={items} />
 
             {/* Expand button */}
             <Button
@@ -402,15 +403,6 @@ export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
             )
         }
     },
-    // {
-    //     accessorKey: "owner",
-    //     header: "SUPPLIER",
-    //     cell: ({ row }) => {
-    //         return (
-    //             <div>{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
-    //         )
-    //     }
-    // },
     {
         accessorKey: "customer",
         header: "CUSTOMER",

@@ -19,19 +19,29 @@ export async function GET() {
 
     const products = await getProductsFeed() // bạn sẽ viết hàm này
 
-    // 3️⃣ Chuyển sang dạng mảng dữ liệu
-    const values = products.map(p => [
-      p.id,
-      p.name,
-      p.description,
+   const values = products.map(p => {
+    const productUrl = p.url_key
+      ? `https://www.prestige-home.de/de/product/${p.url_key}`
+      : ""
+
+    const imageUrl = Array.isArray(p.static_files) && p.static_files.length > 0
+      ? p.static_files[0].url
+      : ""
+
+    return [
+      p.id_provider ?? "",
+      p.name ?? "",
+      p.description ?? "",
       p.stock > 0 ? "in_stock" : "out_of_stock",
-    `https://www.prestige-home.de/de/product/${p.url_key}`,
-    `${p.static_files[0].url}`,
-      p.final_price,
-      p.ean ? 'yes' : 'no',
-      p.ean,
-      p.brand ? p.brand.company_name : 'Prestige Home'
-    ])
+      productUrl,
+      imageUrl,
+      p.final_price ?? 0,
+      p.ean ? "yes" : "no",
+      p.ean ?? "",
+      p.brand?.company_name ?? "Prestige Home",
+    ]
+  })
+
 
     // 4️⃣ Ghi vào Google Sheet (ví dụ từ A2)
     await sheets.spreadsheets.values.update({
@@ -41,7 +51,7 @@ export async function GET() {
       requestBody: { values },
     })
 
-    return NextResponse.json({ success: true, count: values.length })
+    return NextResponse.json({ success: true, count: values.length, data: values  })
   } catch (error) {
     console.error("Sync error:", error)
     const message =

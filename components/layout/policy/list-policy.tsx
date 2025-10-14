@@ -191,7 +191,7 @@ const ListPolicy = ({ versionId, versionData, policyId, versionName, isAdmin = f
 
                 <div className='lg:mt-12 mt-6'>
                     {currentPolicy.name.toLowerCase().includes("widerruf") && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/widderuf.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
-                    {currentPolicy.name.toLowerCase().includes("agb") && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/ABG2.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
+                    {currentPolicy.name.toLowerCase().includes("agb") && <div className='flex justify-center col-span-12'> <Button variant={'outline'} className='border border-black rounded-sm'> <a href="/file/AGB.pdf" download className="cursor-pointer flex gap-1 items-center"> {t('download')} <Image src={'/pdf.png'} width={15} height={15} alt='' unoptimized /> </a> </Button> </div>}
                 </div>
 
                 {/* Version section */}

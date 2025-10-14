@@ -28,7 +28,6 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
         retry: false
     })
 
-
     const flattenedCartItems = useMemo(() => {
         if (!invoice?.main_checkout?.checkouts) return []
 
