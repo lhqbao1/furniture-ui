@@ -154,14 +154,13 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                         <div className='col-span-9 flex flex-col gap-4'>
                             {!defaultValues ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
                                 : ''}
-
                             <Accordion
                                 type="multiple"
                                 className="w-full space-y-8"
                                 defaultValue={["details"]}
                             >
                                 <AccordionItem value="details">
-                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Details</AccordionTrigger>
+                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Details</AccordionTrigger>
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
@@ -171,7 +170,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="additional">
-                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Additional Details</AccordionTrigger>
+                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Additional Details</AccordionTrigger>
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
@@ -181,7 +180,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="logistic">
-                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Logistic</AccordionTrigger>
+                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Logistic</AccordionTrigger>
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
@@ -191,7 +190,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="seo">
-                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product SEO</AccordionTrigger>
+                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>SEO</AccordionTrigger>
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>

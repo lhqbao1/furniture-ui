@@ -90,6 +90,20 @@ export type StaticFile = {
   updated_at: string; // ISO date string
   }
 
+  export type MarketplaceProduct = {
+    marketplace: string
+    marketplace_offer_id: string
+    name: string
+    description: string
+    final_price: number
+    min_stock: number
+    max_stock: number
+    is_active: boolean
+    sku: string
+    line_item_id: string
+    current_stock: number
+  }
+
     export type ProductItem = {
     name: string
     description: string
@@ -148,6 +162,8 @@ export type StaticFile = {
     number_of_packages: number
     packages: ProductPackage[]
     owner: Owner
+
+    marketplace_products: MarketplaceProduct[]
   }
   
   export type ProductResponse = {

@@ -16,7 +16,7 @@ export function ProductPricingFields() {
                     name="cost"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
-                            <FormLabel className='text-[#666666] text-sm'>
+                            <FormLabel className='text-black font-semibold text-sm'>
                                 Cost
                             </FormLabel>
                             <FormControl>
@@ -49,7 +49,7 @@ export function ProductPricingFields() {
                     name="delivery_cost"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
-                            <FormLabel className='text-[#666666] text-sm'>
+                            <FormLabel className='text-black font-semibold text-sm'>
                                 Delivery cost
                             </FormLabel>
                             <FormControl>
@@ -84,7 +84,7 @@ export function ProductPricingFields() {
                     name="price"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
-                            <FormLabel className="text-[#666666] text-sm">Original Price</FormLabel>
+                            <FormLabel className="text-black font-semibold text-sm">Original Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
                                     <Input
@@ -116,7 +116,7 @@ export function ProductPricingFields() {
                     name="final_price"
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
-                            <FormLabel className="text-[#666666] text-sm">Sale Price</FormLabel>
+                            <FormLabel className="text-black font-semibold text-sm">Sale Price</FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center">
                                     <Input

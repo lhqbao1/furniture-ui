@@ -275,22 +275,26 @@ function SyncToEbay({ product }: { product: ProductItem }) {
 function ToogleProductStatus({ product }: { product: ProductItem }) {
     const editProductMutation = useEditProduct()
     const handleToogleStatus = () => {
-        editProductMutation.mutate({
-            input: {
-                ...product,
-                is_active: !product.is_active,
-                category_ids: product.categories.map((c) => c.id), // map ra id array
-                // brand_id: product.brand.id
-            },
-            id: product.id,
-        }, {
-            onSuccess(data, variables, context) {
-                toast.success("Update product status successful")
-            },
-            onError(error, variables, context) {
-                toast.error("Update product status fail")
-            },
-        })
+        if (product.marketplace_products?.length > 0) {
+            toast.error("This product is currently on marketplace")
+        } else {
+            editProductMutation.mutate({
+                input: {
+                    ...product,
+                    is_active: !product.is_active,
+                    category_ids: product.categories.map((c) => c.id), // map ra id array
+                    // brand_id: product.brand.id
+                },
+                id: product.id,
+            }, {
+                onSuccess(data, variables, context) {
+                    toast.success("Update product status successful")
+                },
+                onError(error, variables, context) {
+                    toast.error("Update product status fail")
+                },
+            })
+        }
     }
 
     return (
@@ -441,7 +445,9 @@ export const productColumns: ColumnDef<ProductItem>[] = [
     },
     {
         accessorKey: "category",
-        header: "CATEGORY",
+        header: ({ column }) => (
+            <div className="text-center">CATEGORY</div>
+        ),
         cell: ({ row }) => {
             return (
                 <div className="flex flex-col gap-1 items-center">
@@ -540,13 +546,4 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         header: "ACTION",
         cell: ({ row }) => <ActionsCell product={row.original} />
     },
-    {
-        id: 'sync',
-        header: "EBAY",
-        cell: ({ row }) => {
-            const product = row.original
-            // if (!product.is_active) return null // ❌ không render nếu inactive
-            return <SyncToEbay product={product} />
-        }
-    }
 ]
