@@ -128,15 +128,21 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
 
     return (
         <div className="flex justify-start gap-2">
-            {product.marketplace_products.length === 0
-                ? '' :
-                <Button
-                    onClick={() => handleSync()}
-                    variant={'outline'}
-                    disabled={syncToEbayMutation.isPending || removeFromEbayMutation.isPending}
-                >
-                    {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Sync'}
-                </Button>}
+            {(!product.marketplace_products.length ||
+                !product.marketplace_products.some(m => m.marketplace === marketplace)) && (
+                    <Button
+                        onClick={() => handleSync()}
+                        variant="outline"
+                        disabled={syncToEbayMutation.isPending || removeFromEbayMutation.isPending}
+                    >
+                        {syncToEbayMutation.isPending ? (
+                            <Loader2 className="animate-spin" />
+                        ) : (
+                            "Sync"
+                        )}
+                    </Button>
+                )}
+
 
             {product.marketplace_products.find(i => i.marketplace === 'ebay') ?
                 <Button onClick={() => handleRemoveFromEbay()} variant={'outline'} className="text-red-600 border-red-600" disabled={removeFromEbayMutation.isPending || syncToEbayMutation.isPending}>

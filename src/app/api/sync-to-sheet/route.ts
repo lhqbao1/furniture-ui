@@ -28,6 +28,12 @@ export async function GET() {
       ? p.static_files[0].url
       : ""
 
+      // Tính toán shipping dựa vào carrier
+  let shipping = "DE:::Standard:35.95 EUR" // default
+  if (p.carrier?.toLowerCase() === "dpd") {
+    shipping = "DE:::Standard:5.95 EUR"
+  }
+
     return [
       p.id_provider ?? "",
       p.name ?? "",
@@ -39,6 +45,7 @@ export async function GET() {
       p.ean ? "yes" : "no",
       p.ean ?? "",
       p.brand?.company_name ?? "Prestige Home GmbH",
+      shipping
     ]
   })
 
