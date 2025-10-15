@@ -277,7 +277,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                         }}
                     >
                         <Text style={{ width: '60%', textAlign: 'right' }}>Versandkosten (brutto)</Text>
-                        <Text style={{ width: '20%', textAlign: 'right' }}>{invoice?.total_shipping.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</Text>
+                        <Text style={{ width: '20%', textAlign: 'right' }}>
+                            {((invoice?.total_shipping ?? 0) + (invoice?.voucher_amount ?? 0))?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                        </Text>
                     </View>
 
                     {/* Invoice total */}
@@ -355,7 +357,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                         >
                             <Text style={{ width: '60%', textAlign: 'right', fontWeight: 'bold' }}>Zahlbetrag</Text>
                             <Text style={{ width: '20%', textAlign: 'right', fontWeight: 'bold' }}>
-                                {((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                                {((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) + (invoice?.voucher_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                             </Text>
                         </View>
                     </View>

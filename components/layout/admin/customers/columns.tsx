@@ -42,23 +42,6 @@ export const customerColumns: ColumnDef<Customer>[] = [
         }
     },
     {
-        accessorKey: "avatar",
-        header: () => (
-            <div className="text-center w-full">AVATAR</div>
-        ),
-        cell: ({ row }) => {
-            const initials = `${row.original.first_name?.[0] ?? ""}${row.original.last_name?.[0] ?? ""}`.toUpperCase()
-            return (
-                <div className="flex justify-center">
-                    <Avatar>
-                        <AvatarImage src={`${row.original.avatar_url}`} alt={row.original.first_name} />
-                        <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
-                </div>
-            )
-        }
-    },
-    {
         accessorKey: "name",
         header: "NAME",
         cell: ({ row }) => {

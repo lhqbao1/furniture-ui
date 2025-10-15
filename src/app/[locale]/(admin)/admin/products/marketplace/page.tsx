@@ -29,7 +29,7 @@ const ProductMarketplace = () => {
         })
     }, [data?.items])
 
-    if (isError || !data) return <div>No data</div>
+    if (isError || !data) return <ProductTableSkeleton />
     // if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
     const columns = productMarketplaceColumns(data?.items)
 

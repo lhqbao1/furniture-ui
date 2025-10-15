@@ -238,7 +238,9 @@ function SyncToEbay({ product }: { product: ProductItem }) {
             product: {
                 description: stripHtmlRegex(product.description),
                 title: JSON.stringify(product.name),
-                imageUrls: product.static_files?.map(file => file.url) ?? [],
+                imageUrls: product.static_files
+                    ?.map((file) => file.url.replace(/\s+/g, "%20")) // Đổi khoảng trắng thành %20
+                    ?? [],
                 ean: product.ean ? [product.ean] : [],
             },
             carrier: product.carrier

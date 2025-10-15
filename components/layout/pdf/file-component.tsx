@@ -120,7 +120,9 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 </div>
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Versandkosten (brutto)</div>
-                    <div className="w-[100px] text-right">{invoice?.total_shipping.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+                    <div className="w-[100px] text-right">
+                        {((invoice?.total_shipping ?? 0) + (invoice?.voucher_amount ?? 0))?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                    </div>
                 </div>
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Summe (netto)</div>
@@ -138,7 +140,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Rechnungsbetrag (brutto)</div>
                     <div className="w-[100px] text-right">
-                        {((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                        {((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0) + (invoice?.voucher_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                     </div>
                 </div>
                 <div className="flex gap-0 justify-end">
@@ -150,7 +152,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">Zahlbetrag</div>
                     <div className="w-[100px] text-right">
-                        {((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) - (invoice?.coupon_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                        {((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) + (invoice?.voucher_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                     </div>
                 </div>
             </div>

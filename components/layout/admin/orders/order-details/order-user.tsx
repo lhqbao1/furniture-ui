@@ -17,10 +17,6 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
             <div className='col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5'>
                 <h4 className='font-bold'>Customer</h4>
                 <div className='flex items-start gap-2.5'>
-                    <Avatar>
-                        <AvatarImage src={`${user.avatar_url}`} alt={user.first_name} />
-                        <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
                     <div className='text-sm'>
                         <div>{user.first_name} {user.last_name}</div>
                         <div>{user.email}</div>

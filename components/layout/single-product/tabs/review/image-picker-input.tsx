@@ -131,12 +131,12 @@ function ImagePickerInput<T extends FieldValues>({
                 onSuccess(data: StaticFileResponse) {
                     const uploadedUrls = data.results.map((r) => r.url)
 
-                    // 🔍 Kiểm tra URL có chứa khoảng trắng
-                    const invalidUrl = uploadedUrls.find((url) => /\s/.test(url))
-                    if (invalidUrl) {
-                        toast.error(`Image name must not contain whitespace (${invalidUrl})`)
-                        return // ❌ Dừng hàm ngay tại đây
-                    }
+                    // // 🔍 Kiểm tra URL có chứa khoảng trắng
+                    // const invalidUrl = uploadedUrls.find((url) => /\s/.test(url))
+                    // if (invalidUrl) {
+                    //     toast.error(`Image name must not contain whitespace (${invalidUrl})`)
+                    //     return // ❌ Dừng hàm ngay tại đây
+                    // }
 
                     // ✅ Tiếp tục xử lý bình thường
                     if (isSingle) {
