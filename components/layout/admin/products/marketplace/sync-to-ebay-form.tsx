@@ -101,7 +101,7 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
             max_stock: values.max_stock ?? 0,
             current_stock: values.current_stock ?? 0,
             line_item_id: values.line_item_id ?? "",
-            is_active: values.is_active ?? true,
+            is_active: values.is_active ?? false,
             marketplace_offer_id: values.marketplace_offer_id ?? "",
             name: values.name ?? "",
             description: values.description ?? '',
@@ -127,52 +127,50 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
             updatedMarketplaceProducts.push(normalizedValues)
         }
 
-        // updateProductMutation.mutate(
-        //     {
-        //         input: {
-        //             ...product,
-        //             category_ids: product.categories.map((c) => c.id),
-        //             marketplace_products: updatedMarketplaceProducts,
-        //         },
-        //         id: product.id,
-        //     },
-        //     {
-        //         onSuccess(data) {
-        //             if (isUpdating && currentMarketplace === 'ebay') {
-        //                 const ebayData = product.marketplace_products?.find(
-        //                     (m) => m.marketplace === "ebay"
-        //                 )
-        //                 const payload: syncToEbayInput = {
-        //                     price: ebayData?.final_price ?? product.final_price,
-        //                     sku: ebayData?.sku ?? product.sku,
-        //                     stock: product.stock,
-        //                     tax: product.tax ? product.tax : null,
-        //                     product: {
-        //                         description: stripHtmlRegex(ebayData?.description ?? product.description),
-        //                         title: JSON.stringify(ebayData?.name ?? product.name),
-        //                         imageUrls: product.static_files?.map((file) => file.url) ?? [],
-        //                         ean: product.ean ? [product.ean] : [],
-        //                     },
-        //                     carrier: product.carrier,
-        //                     ...(ebayData?.min_stock !== undefined && { min_stock: ebayData.min_stock }),
-        //                     ...(ebayData?.max_stock !== undefined && { max_stock: ebayData.max_stock }),
-        //                 }
-        //                 syncToEbayMutation.mutate(payload)
-        //             }
-        //             toast.success(
-        //                 isUpdating
-        //                     ? "Marketplace data updated successfully"
-        //                     : "Marketplace data created successfully"
-        //             )
-        //             setOpen(false)
-        //         },
-        //         onError() {
-        //             toast.error("Failed to update marketplace data")
-        //         },
-        //     }
-        // )
-        console.log(isUpdating)
-        console.log(currentMarketplace)
+        updateProductMutation.mutate(
+            {
+                input: {
+                    ...product,
+                    category_ids: product.categories.map((c) => c.id),
+                    marketplace_products: updatedMarketplaceProducts,
+                },
+                id: product.id,
+            },
+            {
+                onSuccess(data) {
+                    if (isUpdating && currentMarketplace === 'ebay') {
+                        const ebayData = product.marketplace_products?.find(
+                            (m) => m.marketplace === "ebay"
+                        )
+                        const payload: syncToEbayInput = {
+                            price: ebayData?.final_price ?? product.final_price,
+                            sku: ebayData?.sku ?? product.sku,
+                            stock: product.stock,
+                            tax: product.tax ? product.tax : null,
+                            product: {
+                                description: stripHtmlRegex(ebayData?.description ?? product.description),
+                                title: ebayData?.name ?? product.name,
+                                imageUrls: product.static_files?.map((file) => file.url) ?? [],
+                                ean: product.ean ? [product.ean] : [],
+                            },
+                            carrier: product.carrier,
+                            ...(ebayData?.min_stock !== undefined && { min_stock: ebayData.min_stock }),
+                            ...(ebayData?.max_stock !== undefined && { max_stock: ebayData.max_stock }),
+                        }
+                        syncToEbayMutation.mutate(payload)
+                    }
+                    toast.success(
+                        isUpdating
+                            ? "Marketplace data updated successfully"
+                            : "Marketplace data created successfully"
+                    )
+                    setOpen(false)
+                },
+                onError() {
+                    toast.error("Failed to update marketplace data")
+                },
+            }
+        )
     }
 
 
