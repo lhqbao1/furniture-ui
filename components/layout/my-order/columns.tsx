@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { useTranslations } from "next-intl"
 import { CartItem } from "@/types/cart"
+import { CheckOutMain } from "@/types/checkout"
 
 export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
     const t = useTranslations()
@@ -37,4 +38,5 @@ export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
         },
     ]
 }
+
 

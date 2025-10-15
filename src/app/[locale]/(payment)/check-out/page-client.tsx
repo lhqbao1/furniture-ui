@@ -156,12 +156,11 @@ export default function CheckOutPageClient() {
                 return latestB - latestA
             })
 
-            return sorted // ✅ vẫn trả về CartResponse, không đổi type
+            return sorted
         },
         enabled: !!(userIdLogin ? userIdLogin : userId),
         retry: false
     })
-
 
     const createCheckOutMutation = useCreateCheckOut()
     const createPaymentMutation = useCreatePayment()
@@ -363,6 +362,7 @@ export default function CheckOutPageClient() {
                 })
                 toast.success(t('orderSuccess'))
                 setCheckOut(checkout.id)
+
 
                 if (data.payment_method !== "bank") {
                     // Tạo payment

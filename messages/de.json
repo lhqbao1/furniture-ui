@@ -55,6 +55,7 @@
   "stock": "Lager",
   "left": "verbleibend",
   "actions": "Aktionen",
+  "feedback": "Rückmeldung",
   "addToCart": "In den Warenkorb",
   "selectAll": "Alle auswählen",
   "selectRow": "Reihe auswählen",
@@ -118,7 +119,7 @@
   "all": "Alle",
   "picOrVid": "Bilder/Video",
   "comments": "Kommentare",
-  "orderId": "Bestellnummer",
+  "orderId": "Bestell-ID",
   "myOrder": "Meine Bestellung",
   "contactForm": "Kontaktformular",
   "back": "Zurück",
@@ -257,5 +258,8 @@
     "description": "Entschuldigung, wir konnten die gesuchte Seite nicht finden.",
     "backHome": "Zur Startseite"
   },
-  "orderSuccess": "Bestellung erfolgreich"
+  "orderSuccess": "Bestellung erfolgreich",
+  "feedback_title": "Feedback geben",
+  "feedback_desc": "Möchten Sie ein Feedback zu dieser Bestellung geben?",
+  "send": "Senden"
 }

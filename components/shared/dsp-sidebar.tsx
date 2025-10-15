@@ -31,10 +31,10 @@ export function DSPAdminSidebar() {
             children: [
                 { title: "Add Product", url: "/dsp/admin/products/add", icon: CornerDownRight },
                 { title: "Product List", url: "/dsp/admin/products/list", icon: CornerDownRight },
-                { title: "Product Group", url: "/dsp/admin/products/group", icon: CornerDownRight },
-                { title: "Category List", url: "/dsp/admin/products/categories", icon: CornerDownRight },
-                { title: "Brand List", url: "/dsp/admin/products/brand", icon: CornerDownRight },
-                { title: "Product Bundle", url: "/dsp/admin/products/bundle", icon: CornerDownRight },
+                // { title: "Product Group", url: "/dsp/admin/products/group", icon: CornerDownRight },
+                // { title: "Category List", url: "/dsp/admin/products/categories", icon: CornerDownRight },
+                // { title: "Brand List", url: "/dsp/admin/products/brand", icon: CornerDownRight },
+                // { title: "Product Bundle", url: "/dsp/admin/products/bundle", icon: CornerDownRight },
             ],
         },
         {
@@ -43,7 +43,7 @@ export function DSPAdminSidebar() {
             icon: ChevronRight,
             children: [
                 { title: "Order List", url: "/dsp/admin/orders/list", icon: CornerDownRight },
-                { title: "Create Order", url: "/dsp/admin/orders/add", icon: CornerDownRight },
+                // { title: "Create Order", url: "/dsp/admin/orders/add", icon: CornerDownRight },
             ],
         },
     ];
