@@ -137,11 +137,11 @@
     }
   
     h2 {
-      @apply text-3xl md:text-4xl leading-snug mb-3;
+      @apply text-2xl md:text-3xl leading-snug mb-3;
     }
   
     h3 {
-      @apply text-2xl md:text-3xl leading-snug mb-2.5;
+      @apply text-2xl md:text-2xl leading-snug mb-2.5;
     }
   
     h4 {

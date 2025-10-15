@@ -76,6 +76,7 @@ const OrderDetails = () => {
                 total_amount={order.total_amount}
                 payment_method={order.payment_method}
                 entry_date={order.created_at}
+                is_Ebay={order.marketplace_order_id ? true : false}
             />
             <OrderDeliveryOrder
                 data={order.checkouts}

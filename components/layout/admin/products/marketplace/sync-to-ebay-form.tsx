@@ -151,7 +151,9 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                             product: {
                                 description: stripHtmlRegex(ebayData?.description ?? product.description),
                                 title: ebayData?.name ?? product.name,
-                                imageUrls: product.static_files?.map((file) => file.url) ?? [],
+                                imageUrls: product.static_files
+                                    ?.map((file) => file.url.replace(/\s+/g, "%20")) // Đổi khoảng trắng thành %20
+                                    ?? [],
                                 ean: product.ean ? [product.ean] : [],
                             },
                             carrier: product.carrier,

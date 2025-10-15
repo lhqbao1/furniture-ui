@@ -222,7 +222,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                 </Button>
                                 {productValues && (
                                     <a
-                                        href={`/product${productValues?.categories?.length ? `/${productValues.categories[0].slug}` : ''}/${productValues?.url_key}`}
+                                        href={`/${locale}/product${productValues?.categories?.length ? `/${productValues.categories[0].slug}` : ''}/${productValues?.url_key}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >

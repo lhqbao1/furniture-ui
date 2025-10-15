@@ -19,6 +19,7 @@ interface OrderInformationProps {
     discount_amount?: number
     tax?: number
     total_amount?: number
+    is_Ebay?: boolean
 }
 
 const OrderInformation = ({
@@ -37,7 +38,8 @@ const OrderInformation = ({
     shipping_amount,
     discount_amount,
     tax,
-    total_amount
+    total_amount,
+    is_Ebay = false
 }: OrderInformationProps) => {
     return (
         <div className="grid grid-cols-2 gap-10">
@@ -81,13 +83,13 @@ const OrderInformation = ({
                 <div className='grid grid-cols-3'>
                     <div className='text-end col-span-2'>Shipping</div>
                     <div className='text-end'>
-                        €{shipping_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        €{((shipping_amount ?? 0) + (discount_amount ?? 0))?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                 </div>
                 <div className='grid grid-cols-3'>
                     <div className='text-end col-span-2'>Discount</div>
                     <div className='text-end'>
-                        €{discount_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        €{is_Ebay ? '00,00' : discount_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                 </div>
                 <div className='grid grid-cols-3'>

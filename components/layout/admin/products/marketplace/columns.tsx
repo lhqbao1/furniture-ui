@@ -95,7 +95,9 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
                 product: {
                     description: stripHtmlRegex(product.description),
                     title: product.name,
-                    imageUrls: product.static_files?.map((file) => file.url) ?? [],
+                    imageUrls: product.static_files
+                        ?.map((file) => file.url.replace(/\s+/g, "%20")) // Đổi khoảng trắng thành %20
+                        ?? [],
                     ean: product.ean ? [product.ean] : [],
                 },
                 carrier: product.carrier,
