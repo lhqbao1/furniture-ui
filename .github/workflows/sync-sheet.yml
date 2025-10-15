@@ -12,5 +12,4 @@ jobs:
     steps:
       - name: Call Next.js API
         run: |
-          curl -X POST "https://www.prestige-home.de/api/sync-to-sheet" \
-          -H "Content-Type: application/json"
+          curl -X POST "https://www.prestige-home.de/api/sync-to-sheet"

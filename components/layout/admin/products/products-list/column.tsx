@@ -338,11 +338,11 @@ function ActionsCell({ product }: { product: ProductItem }) {
 
     const categoryHref =
         level1 && level2
-            ? `/${formatName(level1.name)}/${formatName(level2.name)}/${product.url_key}`
+            ? `/${formatName(level1.slug)}/${formatName(level2.slug)}/${product.url_key}`
             : level1
-                ? `/${formatName(level1.name)}/${product.url_key}`
+                ? `/${formatName(level1.slug)}/${product.url_key}`
                 : level2
-                    ? `/${formatName(level2.name)}/${product.url_key}`
+                    ? `/${formatName(level2.slug)}/${product.url_key}`
                     : `/${product.url_key}`;
 
     return (

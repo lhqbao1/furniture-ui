@@ -20,6 +20,10 @@ export const marketPlaceSchema = z.object({
   final_price: z.number().nonnegative().optional().nullable(),
   min_stock: z.number().nonnegative().optional().nullable(),
   max_stock: z.number().nonnegative().optional().nullable(),
+  current_stock: z.number().nonnegative().optional().nullable(),
+  line_item_id: z.string().optional().nullable(),
+  marketplace_offer_id: z.string().optional().nullable(),
+  is_active: z.boolean().optional().nullable(),
   sku: z.string().optional(),
 }).refine(
   (data) => {

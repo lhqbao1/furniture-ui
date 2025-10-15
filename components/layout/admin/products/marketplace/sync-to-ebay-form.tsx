@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { marketPlaceSchema } from "@/lib/schema/product"
-import { ProductItem } from "@/types/products"
+import { MarketplaceProduct, ProductItem } from "@/types/products"
 import { useEditProduct } from "@/features/products/hook"
 import {
     Select,
@@ -32,36 +32,45 @@ interface SyncToEbayFormProps {
     product: ProductItem
     open: boolean
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    isUpdating?: boolean
+    currentMarketplace?: string
 }
 
 type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>
 
-const SyncToEbayForm = ({ product, open, setOpen }: SyncToEbayFormProps) => {
+const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMarketplace }: SyncToEbayFormProps) => {
     const updateProductMutation = useEditProduct()
 
     // Danh sách marketplace khả dụng
     const ALL_MARKETPLACES = ["ebay", "amazon", "kaufland"]
 
-    // Lấy danh sách marketplace đã có
-    const existingMarketplaces =
-        product.marketplace_products?.map((m) => m.marketplace) ?? []
-
-    // Lọc các marketplace chưa có
-    const availableMarketplaces = ALL_MARKETPLACES.filter(
-        (m) => !existingMarketplaces.includes(m)
+    const existingMarketplaces = useMemo(
+        () => product.marketplace_products?.map((m) => m.marketplace) ?? [],
+        [product.marketplace_products]
     )
+
+    const availableMarketplaces = useMemo(
+        () => ALL_MARKETPLACES.filter((m) => !existingMarketplaces.includes(m)),
+        [existingMarketplaces]
+    )
+
+    const marketplacesToRender = useMemo(
+        () => (isUpdating ? ALL_MARKETPLACES : availableMarketplaces),
+        [isUpdating, availableMarketplaces]
+    )
+
 
 
 
     const form = useForm<MarketPlaceFormValues>({
         resolver: zodResolver(marketPlaceSchema),
         defaultValues: {
-            marketplace: "",
-            name: product.name,
-            description: product.description,
-            final_price: product.final_price,
-            min_stock: undefined,
-            max_stock: undefined,
+            marketplace: currentMarketplace ?? '',
+            name: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.name : product.name,
+            description: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.description : product.description,
+            final_price: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.final_price : product.final_price,
+            min_stock: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.min_stock : undefined,
+            max_stock: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.max_stock : undefined,
             sku: product.sku,
         },
     })
@@ -69,6 +78,7 @@ const SyncToEbayForm = ({ product, open, setOpen }: SyncToEbayFormProps) => {
     const marketplace = form.watch("marketplace")
 
     useEffect(() => {
+        if (isUpdating) return
         if (marketplace === "ebay") {
             form.setValue("min_stock", 0)
             form.setValue("max_stock", 10)
@@ -80,10 +90,39 @@ const SyncToEbayForm = ({ product, open, setOpen }: SyncToEbayFormProps) => {
     }, [marketplace, form])
 
     const onSubmit = (values: MarketPlaceFormValues) => {
-        const updatedMarketplaceProducts = [
-            ...(product.marketplace_products || []),
-            values,
-        ]
+        const normalizedValues: MarketplaceProduct = {
+            ...values,
+            marketplace: values.marketplace ?? '',
+            final_price: values.final_price ?? 0,
+            min_stock: values.min_stock ?? 0,
+            max_stock: values.max_stock ?? 0,
+            current_stock: values.current_stock ?? 0,
+            line_item_id: values.line_item_id ?? "",
+            is_active: values.is_active ?? true,
+            marketplace_offer_id: values.marketplace_offer_id ?? "",
+            name: values.name ?? "",
+            description: values.description ?? '',
+            sku: values.sku ?? ''
+        }
+
+        const updatedMarketplaceProducts = [...(product.marketplace_products || [])]
+
+        if (isUpdating) {
+            const index = updatedMarketplaceProducts.findIndex(
+                (m) => m.marketplace === values.marketplace
+            )
+
+            if (index !== -1) {
+                updatedMarketplaceProducts[index] = {
+                    ...updatedMarketplaceProducts[index],
+                    ...normalizedValues,
+                }
+            } else {
+                updatedMarketplaceProducts.push(normalizedValues)
+            }
+        } else {
+            updatedMarketplaceProducts.push(normalizedValues)
+        }
 
         updateProductMutation.mutate(
             {
@@ -96,15 +135,20 @@ const SyncToEbayForm = ({ product, open, setOpen }: SyncToEbayFormProps) => {
             },
             {
                 onSuccess() {
-                    toast.success("Create product marketplace data successful")
+                    toast.success(
+                        isUpdating
+                            ? "Marketplace data updated successfully"
+                            : "Marketplace data created successfully"
+                    )
                     setOpen(false)
                 },
                 onError() {
-                    toast.error("Create product marketplace data fail")
+                    toast.error("Failed to update marketplace data")
                 },
             }
         )
     }
+
 
     return (
         <div className="mx-auto space-y-6">
@@ -117,36 +161,37 @@ const SyncToEbayForm = ({ product, open, setOpen }: SyncToEbayFormProps) => {
                     <FormField
                         control={form.control}
                         name="marketplace"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Marketplace</FormLabel>
-                                <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value || ""}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger className="border">
-                                            <SelectValue placeholder="Select a marketplace" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {availableMarketplaces.length > 0 ? (
-                                            availableMarketplaces.map((m) => (
-                                                <SelectItem key={m} value={m}>
-                                                    {m.toUpperCase()}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <div className="px-3 py-2 text-sm text-muted-foreground">
-                                                All marketplaces added
-                                            </div>
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                        render={({ field }) => {
+
+                            return (
+                                <FormItem>
+                                    <FormLabel>Marketplace</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                                        <FormControl>
+                                            <SelectTrigger className="border">
+                                                <SelectValue placeholder="Select a marketplace" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {marketplacesToRender.length > 0 ? (
+                                                marketplacesToRender.map((m) => (
+                                                    <SelectItem key={m} value={m}>
+                                                        {m.toUpperCase()}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                                    All marketplaces added
+                                                </div>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )
+                        }}
                     />
+
 
                     {/* Name */}
                     <FormField
