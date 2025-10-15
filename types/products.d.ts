@@ -102,6 +102,7 @@ export type StaticFile = {
     sku: string
     line_item_id: string
     current_stock: number
+    brand: string
   }
 
     export type ProductItem = {

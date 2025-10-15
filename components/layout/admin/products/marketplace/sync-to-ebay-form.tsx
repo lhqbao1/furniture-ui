@@ -101,11 +101,12 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
             max_stock: values.max_stock ?? 0,
             current_stock: values.current_stock ?? 0,
             line_item_id: values.line_item_id ?? "",
-            is_active: values.is_active ?? true,
+            is_active: values.is_active ?? false,
             marketplace_offer_id: values.marketplace_offer_id ?? "",
             name: values.name ?? "",
             description: values.description ?? '',
-            sku: values.sku ?? ''
+            sku: values.sku ?? '',
+            brand: product.brand ? product.brand.name : ''
         }
 
         const updatedMarketplaceProducts = [...(product.marketplace_products || [])]
@@ -127,52 +128,58 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
             updatedMarketplaceProducts.push(normalizedValues)
         }
 
-        // updateProductMutation.mutate(
-        //     {
-        //         input: {
-        //             ...product,
-        //             category_ids: product.categories.map((c) => c.id),
-        //             marketplace_products: updatedMarketplaceProducts,
-        //         },
-        //         id: product.id,
-        //     },
-        //     {
-        //         onSuccess(data) {
-        //             if (isUpdating && currentMarketplace === 'ebay') {
-        //                 const ebayData = product.marketplace_products?.find(
-        //                     (m) => m.marketplace === "ebay"
-        //                 )
-        //                 const payload: syncToEbayInput = {
-        //                     price: ebayData?.final_price ?? product.final_price,
-        //                     sku: ebayData?.sku ?? product.sku,
-        //                     stock: product.stock,
-        //                     tax: product.tax ? product.tax : null,
-        //                     product: {
-        //                         description: stripHtmlRegex(ebayData?.description ?? product.description),
-        //                         title: JSON.stringify(ebayData?.name ?? product.name),
-        //                         imageUrls: product.static_files?.map((file) => file.url) ?? [],
-        //                         ean: product.ean ? [product.ean] : [],
-        //                     },
-        //                     carrier: product.carrier,
-        //                     ...(ebayData?.min_stock !== undefined && { min_stock: ebayData.min_stock }),
-        //                     ...(ebayData?.max_stock !== undefined && { max_stock: ebayData.max_stock }),
-        //                 }
-        //                 syncToEbayMutation.mutate(payload)
-        //             }
-        //             toast.success(
-        //                 isUpdating
-        //                     ? "Marketplace data updated successfully"
-        //                     : "Marketplace data created successfully"
-        //             )
-        //             setOpen(false)
-        //         },
-        //         onError() {
-        //             toast.error("Failed to update marketplace data")
-        //         },
-        //     }
-        // )
-        console.log(isUpdating)
-        console.log(currentMarketplace)
+        updateProductMutation.mutate(
+            {
+                input: {
+                    ...product,
+                    category_ids: product.categories.map((c) => c.id),
+                    marketplace_products: updatedMarketplaceProducts,
+                },
+                id: product.id,
+            },
+            {
+                onSuccess(data) {
+                    if (isUpdating && currentMarketplace === 'ebay') {
+                        const ebayData = data.marketplace_products?.find(
+                            (m) => m.marketplace === "ebay"
+                        )
+                        const payload: syncToEbayInput = {
+                            price: ebayData?.final_price ?? product.final_price,
+                            sku: ebayData?.sku ?? product.sku,
+                            stock: product.stock,
+                            tax: product.tax ? product.tax : null,
+                            product: {
+                                description: stripHtmlRegex(ebayData?.description ?? product.description),
+                                title: ebayData?.name ?? product.name,
+                                imageUrls: product.static_files?.map((file) => file.url) ?? [],
+                                ean: product.ean ? [product.ean] : [],
+                            },
+                            carrier: product.carrier,
+                            brand: product.brand ? product.brand.name : '',
+                            ...(ebayData?.min_stock !== undefined && { min_stock: ebayData.min_stock }),
+                            ...(ebayData?.max_stock !== undefined && { max_stock: ebayData.max_stock }),
+                        }
+                        syncToEbayMutation.mutate(payload, {
+                            onSuccess(data, variables, context) {
+                                setOpen(false)
+                                toast.success("Update data to ebay successfully")
+                            },
+                            onError(error, variables, context) {
+                                toast.error("Update data to ebay fail")
+                            },
+                        })
+                    }
+                    toast.success(
+                        isUpdating
+                            ? "Marketplace data updated successfully"
+                            : "Marketplace data created successfully"
+                    )
+                },
+                onError() {
+                    toast.error("Failed to update marketplace data")
+                },
+            }
+        )
     }
 
 
@@ -184,39 +191,41 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                     className="space-y-6"
                 >
                     {/* Marketplace */}
-                    <FormField
-                        control={form.control}
-                        name="marketplace"
-                        render={({ field }) => {
+                    {isUpdating ? "" :
+                        <FormField
+                            control={form.control}
+                            name="marketplace"
+                            render={({ field }) => {
 
-                            return (
-                                <FormItem>
-                                    <FormLabel>Marketplace</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value || ""}>
-                                        <FormControl>
-                                            <SelectTrigger className="border">
-                                                <SelectValue placeholder="Select a marketplace" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {marketplacesToRender.length > 0 ? (
-                                                marketplacesToRender.map((m) => (
-                                                    <SelectItem key={m} value={m}>
-                                                        {m.toUpperCase()}
-                                                    </SelectItem>
-                                                ))
-                                            ) : (
-                                                <div className="px-3 py-2 text-sm text-muted-foreground">
-                                                    All marketplaces added
-                                                </div>
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
+                                return (
+                                    <FormItem>
+                                        <FormLabel>Marketplace</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                                            <FormControl>
+                                                <SelectTrigger className="border">
+                                                    <SelectValue placeholder="Select a marketplace" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {marketplacesToRender.length > 0 ? (
+                                                    marketplacesToRender.map((m) => (
+                                                        <SelectItem key={m} value={m}>
+                                                            {m.toUpperCase()}
+                                                        </SelectItem>
+                                                    ))
+                                                ) : (
+                                                    <div className="px-3 py-2 text-sm text-muted-foreground">
+                                                        All marketplaces added
+                                                    </div>
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )
+                            }}
+                        />
+                    }
 
 
                     {/* Name */}
@@ -333,31 +342,31 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                         />
                     </div>
 
-                    {/* SKU */}
-                    <FormField
-                        control={form.control}
-                        name="sku"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>SKU</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        placeholder="Enter SKU"
-                                        value={field.value ?? ""}
-                                        onChange={(e) => field.onChange(e.target.value || null)} // nếu rỗng -> null
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
 
                     {/* Submit */}
                     <div className="flex justify-end">
-                        <Button type="submit" className="px-6 py-2 text-lg" disabled={updateProductMutation.isPending}>
-                            {updateProductMutation.isPending ? <Loader2 className="animate-spin" /> : "Add"}
+                        <Button
+                            type="submit"
+                            className="px-6 py-2 text-lg"
+                            disabled={
+                                isUpdating
+                                    ? syncToEbayMutation.isPending
+                                    : updateProductMutation.isPending
+                            }
+                        >
+                            {isUpdating ? (
+                                syncToEbayMutation.isPending ? (
+                                    <Loader2 className="animate-spin" />
+                                ) : (
+                                    "Update"
+                                )
+                            ) : updateProductMutation.isPending ? (
+                                <Loader2 className="animate-spin" />
+                            ) : (
+                                "Add"
+                            )}
                         </Button>
+
                     </div>
                 </form>
             </Form>

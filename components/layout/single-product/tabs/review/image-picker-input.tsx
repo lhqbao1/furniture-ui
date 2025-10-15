@@ -28,6 +28,7 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { StaticFileResponse } from "@/types/products"
 import { useTranslations } from "next-intl"
+import { toast } from "sonner"
 
 // ================== TYPES ==================
 export type ImageItem = { id: string; url: string }
@@ -130,6 +131,14 @@ function ImagePickerInput<T extends FieldValues>({
                 onSuccess(data: StaticFileResponse) {
                     const uploadedUrls = data.results.map((r) => r.url)
 
+                    // 🔍 Kiểm tra URL có chứa khoảng trắng
+                    const invalidUrl = uploadedUrls.find((url) => /\s/.test(url))
+                    if (invalidUrl) {
+                        toast.error(`Image name must not contain whitespace (${invalidUrl})`)
+                        return // ❌ Dừng hàm ngay tại đây
+                    }
+
+                    // ✅ Tiếp tục xử lý bình thường
                     if (isSingle) {
                         form.setValue(fieldName, uploadedUrls[0] as PathValue<T, Path<T>>, {
                             shouldValidate: true,
@@ -146,6 +155,7 @@ function ImagePickerInput<T extends FieldValues>({
                     }
                 },
             })
+
         },
         [uploadImage, isSingle, items, form, fieldName]
     )
