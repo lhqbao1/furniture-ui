@@ -64,6 +64,7 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
 function SyncToMarketplace({ product, marketplace }: { product: ProductItem, marketplace: string }) {
     const syncToEbayMutation = useSyncToEbay()
     const removeFromEbayMutation = useRemoveFormEbay()
+    const [openUpdateMarketplaceDialog, setOpenUpdateMarketplaceDialog] = useState<boolean>(false)
 
     const handleRemoveFromEbay = () => {
         if (marketplace === 'ebay') {
@@ -128,8 +129,20 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
 
     return (
         <div className="flex justify-start gap-2">
-            {(!product.marketplace_products.length ||
-                !product.marketplace_products.some(m => m.marketplace === marketplace)) && (
+            {product.marketplace_products.length > 0 ? (
+                product.marketplace_products.some(m => m.marketplace === marketplace) ? (
+                    <Dialog open={openUpdateMarketplaceDialog} onOpenChange={setOpenUpdateMarketplaceDialog}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">Update</Button>
+                        </DialogTrigger>
+                        <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
+                            <DialogHeader>
+                                <DialogTitle>Update Marketplace</DialogTitle>
+                            </DialogHeader>
+                            <SyncToEbayForm product={product} open={openUpdateMarketplaceDialog} setOpen={setOpenUpdateMarketplaceDialog} isUpdating currentMarketplace={marketplace} />
+                        </DialogContent>
+                    </Dialog>
+                ) : (
                     <Button
                         onClick={() => handleSync()}
                         variant="outline"
@@ -141,7 +154,21 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
                             "Sync"
                         )}
                     </Button>
-                )}
+                )
+            ) : (
+                <Button
+                    onClick={() => handleSync()}
+                    variant="outline"
+                    disabled={syncToEbayMutation.isPending || removeFromEbayMutation.isPending}
+                >
+                    {syncToEbayMutation.isPending ? (
+                        <Loader2 className="animate-spin" />
+                    ) : (
+                        "Sync"
+                    )}
+                </Button>
+            )}
+
 
 
             {product.marketplace_products.find(i => i.marketplace === 'ebay') ?
