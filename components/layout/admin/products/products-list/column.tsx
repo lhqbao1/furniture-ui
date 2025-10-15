@@ -234,6 +234,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
             sku: product.sku,
             stock: product.stock,
             tax: product.tax ? product.tax : null,
+            brand: product.brand ? product.brand.name : '',
             product: {
                 description: stripHtmlRegex(product.description),
                 title: JSON.stringify(product.name),
@@ -241,6 +242,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
                 ean: product.ean ? [product.ean] : [],
             },
             carrier: product.carrier
+
         }, {
             onSuccess(data, variables, context) {
                 toast.success("Sync to Ebay successful")

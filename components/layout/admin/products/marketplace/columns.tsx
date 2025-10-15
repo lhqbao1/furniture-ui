@@ -99,6 +99,7 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
                     ean: product.ean ? [product.ean] : [],
                 },
                 carrier: product.carrier,
+                brand: product.brand ? product.brand.name : ''
             }
 
             // ✅ Chỉ thêm min_stock nếu có giá trị thật

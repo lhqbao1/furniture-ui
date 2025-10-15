@@ -23,6 +23,7 @@ export const marketPlaceSchema = z.object({
   current_stock: z.number().nonnegative().optional().nullable(),
   line_item_id: z.string().optional().nullable(),
   marketplace_offer_id: z.string().optional().nullable(),
+  brand: z.string().optional().nullable(),
   is_active: z.boolean().optional().nullable(),
   sku: z.string().optional().nullable(),
 }).refine(
