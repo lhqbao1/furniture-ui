@@ -24,7 +24,7 @@ export const marketPlaceSchema = z.object({
   line_item_id: z.string().optional().nullable(),
   marketplace_offer_id: z.string().optional().nullable(),
   is_active: z.boolean().optional().nullable(),
-  sku: z.string().optional(),
+  sku: z.string().optional().nullable(),
 }).refine(
   (data) => {
     if (data.marketplace) {

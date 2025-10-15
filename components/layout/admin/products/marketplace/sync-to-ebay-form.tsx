@@ -27,6 +27,9 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
+import { useSyncToEbay } from "@/features/ebay/hook"
+import { syncToEbayInput } from "@/features/ebay/api"
+import { stripHtmlRegex } from "@/hooks/simplifyHtml"
 
 interface SyncToEbayFormProps {
     product: ProductItem
@@ -40,7 +43,7 @@ type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>
 
 const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMarketplace }: SyncToEbayFormProps) => {
     const updateProductMutation = useEditProduct()
-
+    const syncToEbayMutation = useSyncToEbay()
     // Danh sách marketplace khả dụng
     const ALL_MARKETPLACES = ["ebay", "amazon", "kaufland"]
 
@@ -124,29 +127,52 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
             updatedMarketplaceProducts.push(normalizedValues)
         }
 
-        updateProductMutation.mutate(
-            {
-                input: {
-                    ...product,
-                    category_ids: product.categories.map((c) => c.id),
-                    marketplace_products: updatedMarketplaceProducts,
-                },
-                id: product.id,
-            },
-            {
-                onSuccess() {
-                    toast.success(
-                        isUpdating
-                            ? "Marketplace data updated successfully"
-                            : "Marketplace data created successfully"
-                    )
-                    setOpen(false)
-                },
-                onError() {
-                    toast.error("Failed to update marketplace data")
-                },
-            }
-        )
+        // updateProductMutation.mutate(
+        //     {
+        //         input: {
+        //             ...product,
+        //             category_ids: product.categories.map((c) => c.id),
+        //             marketplace_products: updatedMarketplaceProducts,
+        //         },
+        //         id: product.id,
+        //     },
+        //     {
+        //         onSuccess(data) {
+        //             if (isUpdating && currentMarketplace === 'ebay') {
+        //                 const ebayData = product.marketplace_products?.find(
+        //                     (m) => m.marketplace === "ebay"
+        //                 )
+        //                 const payload: syncToEbayInput = {
+        //                     price: ebayData?.final_price ?? product.final_price,
+        //                     sku: ebayData?.sku ?? product.sku,
+        //                     stock: product.stock,
+        //                     tax: product.tax ? product.tax : null,
+        //                     product: {
+        //                         description: stripHtmlRegex(ebayData?.description ?? product.description),
+        //                         title: JSON.stringify(ebayData?.name ?? product.name),
+        //                         imageUrls: product.static_files?.map((file) => file.url) ?? [],
+        //                         ean: product.ean ? [product.ean] : [],
+        //                     },
+        //                     carrier: product.carrier,
+        //                     ...(ebayData?.min_stock !== undefined && { min_stock: ebayData.min_stock }),
+        //                     ...(ebayData?.max_stock !== undefined && { max_stock: ebayData.max_stock }),
+        //                 }
+        //                 syncToEbayMutation.mutate(payload)
+        //             }
+        //             toast.success(
+        //                 isUpdating
+        //                     ? "Marketplace data updated successfully"
+        //                     : "Marketplace data created successfully"
+        //             )
+        //             setOpen(false)
+        //         },
+        //         onError() {
+        //             toast.error("Failed to update marketplace data")
+        //         },
+        //     }
+        // )
+        console.log(isUpdating)
+        console.log(currentMarketplace)
     }
 
 
@@ -315,12 +341,17 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                             <FormItem>
                                 <FormLabel>SKU</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Enter SKU" {...field} />
+                                    <Input
+                                        placeholder="Enter SKU"
+                                        value={field.value ?? ""}
+                                        onChange={(e) => field.onChange(e.target.value || null)} // nếu rỗng -> null
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
+
 
                     {/* Submit */}
                     <div className="flex justify-end">
