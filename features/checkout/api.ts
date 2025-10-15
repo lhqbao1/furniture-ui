@@ -89,6 +89,13 @@ export async function getCheckOutByUserId(user_id: string) {
   return data as CheckOut[]
 }
 
+export async function getCheckOutMainByUserId(user_id: string) {
+  const {data} = await api.get(
+      `/checkout/main-checkout/user/${user_id}`,
+  )
+  return data as CheckOutMain[]
+}
+
 export async function getCheckOutStatistics() {
   const {data} = await apiAdmin.get(
       '/checkout/statistics',

@@ -28,6 +28,8 @@ import { useUploadContactForm } from "@/features/contact/hook"
 import { ContactFormInput } from "@/features/contact/api"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { useAtom } from "jotai"
+import { contactOrderIdAtom } from "@/store/checkout"
 
 const formSchema = z.object({
     email: z.string().email("Ungültige E-Mail-Adresse"),
@@ -36,8 +38,6 @@ const formSchema = z.object({
     message: z.string().min(1, "Bitte geben Sie eine Nachricht ein"),
     file_url: z.string().optional(),
 })
-
-
 
 const SUBJECT_OPTIONS_DE = [
     "Frage zu einem Produkt",
@@ -54,6 +54,8 @@ const SUBJECT_OPTIONS_DE = [
 
 export default function ContactPage() {
     const t = useTranslations()
+    const [contactOrderId, setContactOrderId] = useAtom(contactOrderIdAtom)
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -74,7 +76,10 @@ export default function ContactPage() {
             })
         ) as unknown as ContactFormInput;
 
-        uploadContactFormMutation.mutate(cleanedValues, {
+        uploadContactFormMutation.mutate({
+            ...cleanedValues,
+            order_id: contactOrderId
+        }, {
             onSuccess() {
                 toast.success("Ihre Nachricht wurde erfolgreich gesendet.");
                 form.reset();
@@ -132,21 +137,6 @@ export default function ContactPage() {
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Related Order ID */}
-                    <FormField
-                        control={form.control}
-                        name="order_id"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="lg:text-base font-semibold text-sm">{t('relatedToOrder')}</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="" {...field} />
-                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}

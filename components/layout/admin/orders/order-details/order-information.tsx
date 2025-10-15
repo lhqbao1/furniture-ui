@@ -72,7 +72,6 @@ const OrderInformation = ({
                 </div>
             </div>
 
-
             <div className='space-y-3 col-span-1'>
                 <div className='grid grid-cols-3'>
                     <div className='text-end col-span-2'>Sub total</div>

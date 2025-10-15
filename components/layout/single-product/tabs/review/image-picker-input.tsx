@@ -124,19 +124,27 @@ function ImagePickerInput<T extends FieldValues>({
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
             if (!acceptedFiles?.length) return
+
+            // 🔍 Check tổng số ảnh (hiện có + mới)
+            const totalImages = items.length + acceptedFiles.length
+            if (totalImages > 10) {
+                toast.error(`You can upload a maximum of 10 images per product.`)
+                return
+            }
+
             const formData = new FormData()
             acceptedFiles.forEach((file) => formData.append("files", file))
+
 
             uploadImage.mutate(formData, {
                 onSuccess(data: StaticFileResponse) {
                     const uploadedUrls = data.results.map((r) => r.url)
-
-                    // // 🔍 Kiểm tra URL có chứa khoảng trắng
-                    // const invalidUrl = uploadedUrls.find((url) => /\s/.test(url))
-                    // if (invalidUrl) {
-                    //     toast.error(`Image name must not contain whitespace (${invalidUrl})`)
-                    //     return // ❌ Dừng hàm ngay tại đây
-                    // }
+                    console.log(uploadedUrls)
+                    // 🔍 Kiểm tra URL có chứa khoảng trắng
+                    if (uploadedUrls.length > 10) {
+                        toast.error(`At least 10 images per product`)
+                        return
+                    }
 
                     // ✅ Tiếp tục xử lý bình thường
                     if (isSingle) {

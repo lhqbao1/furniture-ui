@@ -33,6 +33,7 @@ export function useCreateCheckOut(){
         onSuccess: () => {
             qc.refetchQueries({ queryKey: ["checkout"] })
             qc.refetchQueries({ queryKey: ["checkout-statistic"] })
+            qc.refetchQueries({ queryKey: ["cart-items"] })
         },
     })
 }

@@ -18,17 +18,25 @@ import {
 import { CheckOut } from "@/types/checkout"
 import { formatDateTime } from "@/lib/date-formated"
 import { useTranslations } from "next-intl"
+import { useCallback } from "react"
 
 interface MyOrderDataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
     orderData: CheckOut
+    pos?: number
 }
+
+type DeliveryRange = {
+    start: number;
+    end: number;
+};
 
 export function MyOrderDataTable<TData, TValue>({
     columns,
     data,
-    orderData
+    orderData,
+    pos
 }: MyOrderDataTableProps<TData, TValue>) {
     const table = useReactTable({
         data,
@@ -36,6 +44,30 @@ export function MyOrderDataTable<TData, TValue>({
         getCoreRowModel: getCoreRowModel(),
     })
     const t = useTranslations()
+
+    const parseRange = useCallback((str: string): DeliveryRange => {
+        const [start, end] = str.split("-").map(Number)
+        if (isNaN(start) || isNaN(end)) {
+            throw new Error(`Invalid delivery_time format: "${str}"`)
+        }
+        return { start, end }
+    }, [])
+
+    const compareRanges = useCallback((a: DeliveryRange, b: DeliveryRange): number => {
+        if (a.start !== b.start) return a.start - b.start
+        return a.end - b.end
+    }, [])
+
+    const getMaxDeliveryTime = useCallback((data: CheckOut): string | null => {
+        const ranges = data.cart.items
+            .map(item => parseRange(item.products.delivery_time))
+            .sort(compareRanges)
+
+        if (ranges.length === 0) return null
+
+        const max = ranges[ranges.length - 1]
+        return `${max.start}-${max.end}`
+    }, [parseRange, compareRanges])
 
     return (
         <div className="overflow-hidden rounded-md border">
@@ -47,11 +79,13 @@ export function MyOrderDataTable<TData, TValue>({
                             className="bg-secondary/15 px-2"
                         >
                             <div className="flex justify-between w-full">
-                                <div className="text-base text-[#666666] font-semibold">{t('orderId')}: #{orderData.checkout_code}</div>
+                                <div className="text-md font-semibold">Lieferung: {pos}</div>
                                 <div className="flex gap-3">
-                                    <p className="text-sm text-[#666666]">{formatDateTime(orderData.created_at)}</p>
-                                    <p>{orderData.status}</p>
+                                    <p className="text-md">
+                                        Voraussichtliches Lieferdatum: {getMaxDeliveryTime(orderData)} {t('business_days')}
+                                    </p>
                                 </div>
+                                <p>{orderData.status}</p>
                             </div>
                         </TableHead>
                     </TableRow>
@@ -75,16 +109,6 @@ export function MyOrderDataTable<TData, TValue>({
                                     ))}
                                 </TableRow>
                             ))}
-
-                            {/* Hàng custom hiển thị total */}
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="border-t pt-2 text-right font-semibold"
-                                >
-                                    <div className="text-primary text-lg">{t('total')}: {(orderData.total_amount).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                </TableCell>
-                            </TableRow>
                         </>
                     ) : (
                         <TableRow>
