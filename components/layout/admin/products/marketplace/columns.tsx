@@ -124,13 +124,12 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
         } else {
             console.log(marketplace)
         }
-
     }
 
     return (
         <div className="flex justify-start gap-2">
             {product.marketplace_products.length > 0 ? (
-                product.marketplace_products.some(m => m.marketplace === marketplace) ? (
+                product.marketplace_products.find(m => m.marketplace === marketplace)?.is_active === true ? (
                     <Dialog open={openUpdateMarketplaceDialog} onOpenChange={setOpenUpdateMarketplaceDialog}>
                         <DialogTrigger asChild>
                             <Button variant="outline">Update</Button>
@@ -171,7 +170,7 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
 
 
 
-            {product.marketplace_products.find(i => i.marketplace === 'ebay') ?
+            {product.marketplace_products.find(i => i.marketplace === 'ebay') && product.marketplace_products.find(i => i.marketplace === 'ebay')?.is_active === true ?
                 <Button onClick={() => handleRemoveFromEbay()} variant={'outline'} className="text-red-600 border-red-600" disabled={removeFromEbayMutation.isPending || syncToEbayMutation.isPending}>
                     {syncToEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Remove'}
                 </Button>
@@ -180,6 +179,32 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
             }
         </div>
     )
+}
+
+function RemoveFromMarketplace({ product, marketplace }: { product: ProductItem, marketplace: string }) {
+    const removeFromEbayMutation = useRemoveFormEbay()
+
+    const handleRemoveFromEbay = () => {
+        if (marketplace === 'ebay') {
+            removeFromEbayMutation.mutate(product.sku, {
+                onSuccess(data, variables, context) {
+                    toast.success("Remove from Ebay successful")
+                },
+                onError(error, variables, context) {
+                    toast.error("Remove from Ebay fail")
+                },
+            })
+        } else {
+            console.log(marketplace)
+        }
+    }
+
+    return (
+        <Button onClick={() => handleRemoveFromEbay()} variant={'outline'} className="text-red-600 border-red-600" disabled={removeFromEbayMutation.isPending}>
+            {removeFromEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Remove'}
+        </Button>
+    )
+
 }
 
 function AddProductMarketplace({ product }: { product: ProductItem }) {
@@ -195,7 +220,7 @@ function AddProductMarketplace({ product }: { product: ProductItem }) {
                     <DialogHeader>
                         <DialogTitle>Add Marketplace</DialogTitle>
                     </DialogHeader>
-                    <SyncToEbayForm product={product} open={openAddMarketplaceDialog} setOpen={setOpenAddMarketplaceDialog} />
+                    <SyncToEbayForm product={product} open={openAddMarketplaceDialog} setOpen={setOpenAddMarketplaceDialog} isUpdating={false} />
                 </DialogContent>
             </Dialog>
             {/* <Button variant={'outline'} className="text-red-500 border border-red-500">Remove</Button> */}
@@ -340,13 +365,22 @@ export const productMarketplaceColumns = (
                         className={`flex justify-center text-center text-sm font-medium 
                             }`}
                     >
-                        {hasMarketplace && product.is_active ? (
-                            <SyncToMarketplace product={product} marketplace={marketplace} />
+                        {hasMarketplace ? (
+                            product.is_active ? (
+                                // ✅ Có marketplace + active → hiển thị nút Sync
+                                <SyncToMarketplace product={product} marketplace={marketplace} />
+                            ) : (
+                                // ✅ Có marketplace + inactive → hiển thị nút Remove
+                                <RemoveFromMarketplace product={product} marketplace={marketplace} />
+                            )
                         ) : !product.is_active ? (
+                            // ❌ Không có marketplace + inactive
                             <div className="text-center">Product is inactive</div>
                         ) : (
+                            // ❌ Không có marketplace + active
                             <div className="text-center">No {marketplace} data</div>
                         )}
+
 
                     </div>
                 )
