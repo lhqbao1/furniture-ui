@@ -307,7 +307,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
 export const orderChildColumns: ColumnDef<CheckOut>[] = [
     {
         accessorKey: "id",
-        header: "ORDER ID",
+        header: "DELIVERY ORDER ID",
         cell: ({ row }) => {
             return (
                 <div>#{row.original.checkout_code}</div>

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { User } from "@/types/user"
-import { getAllCustomers, getUserById, updateUser } from "./api"
+import { deleteCustomer, getAllCustomers, getUserById, updateUser } from "./api"
 
 export function useGetUserById(userId: string) {
   return useQuery<User>({
@@ -27,4 +27,14 @@ export function useGetAllCustomers(){
        queryFn: () => getAllCustomers(),
        retry: false,
      })
+}
+
+export function useDeleteCustomer(){
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (user_id: string) => deleteCustomer(user_id),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["customers"] })
+    },
+  })
 }

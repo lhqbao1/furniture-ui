@@ -1,12 +1,33 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Eye } from "lucide-react"
-import Link from "next/link"
 import { Customer } from "@/types/user"
+import { useDeleteCustomer } from "@/features/users/hook"
+import { Button } from "@/components/ui/button"
+import { Trash } from "lucide-react"
+import { toast } from "sonner"
+import DeleteDialog from "./delete-dialog"
+
+function ActionCell({ user }: { user: Customer }) {
+    const deleteCustomerMutation = useDeleteCustomer()
+
+    const handleDeleteCustomer = () => {
+        deleteCustomerMutation.mutate(user.id, {
+            onSuccess(data, variables, context) {
+                toast.success("Delete customer successfully")
+            },
+            onError(error, variables, context) {
+                toast.error("Delete customer fail")
+            },
+        })
+    }
+    return (
+        <div className="flex gap-1.5 justify-center">
+            <DeleteDialog user={user} />
+        </div>
+    )
+}
 
 
 export const customerColumns: ColumnDef<Customer>[] = [
@@ -85,20 +106,13 @@ export const customerColumns: ColumnDef<Customer>[] = [
             )
         }
     },
-    // {
-    //     id: "actions",
-    //     header: "ACTION",
-    //     cell: ({ row }) => {
-    //         return (
-    //             <div className="flex justify-center">
-    //                 <Link href={`/admin/orders/${row.original.id}`}>
-    //                     <Button variant="ghost" size="icon">
-    //                         <Eye className="w-4 h-4" stroke="#F7941D" />
-    //                     </Button>
-    //                 </Link>
-    //             </div>
-
-    //         )
-    //     }
-    // },
+    {
+        id: "actions",
+        header: ({ }) => <div className="text-center">ACTION</div>,
+        cell: ({ row }) => {
+            return (
+                <ActionCell user={row.original} />
+            )
+        }
+    },
 ]

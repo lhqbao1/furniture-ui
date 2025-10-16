@@ -196,16 +196,6 @@ const ProductFormDSP = ({ productValues, onSubmit, isPending, productValuesClone
                                         </Card>
                                     </AccordionContent>
                                 </AccordionItem>
-                                <AccordionItem value="seo">
-                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product SEO</AccordionTrigger>
-                                    <AccordionContent className="mt-2">
-                                        <Card>
-                                            <CardContent>
-                                                <ProductSEOGroup setIsLoadingSEO={setIsLoadingSEO} />
-                                            </CardContent>
-                                        </Card>
-                                    </AccordionContent>
-                                </AccordionItem>
                             </Accordion>
                         </div>
 

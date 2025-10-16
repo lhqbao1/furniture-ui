@@ -3,9 +3,12 @@
 import { useFormContext, UseFormReturn } from "react-hook-form"
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useEffect, useState } from "react"
 
-export function ProductPricingFields() {
+interface ProductPricingFieldsProps {
+    isDsp?: boolean
+}
+
+export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
     const form = useFormContext()
 
     return (
@@ -17,7 +20,7 @@ export function ProductPricingFields() {
                     render={({ field }) => (
                         <FormItem className='flex flex-col'>
                             <FormLabel className='text-black font-semibold text-sm'>
-                                Cost
+                                {isDsp ? "Purchase Price" : 'Cost'}
                             </FormLabel>
                             <FormControl>
                                 <div className="relative flex items-center w-full">
@@ -77,69 +80,72 @@ export function ProductPricingFields() {
                 />
             </div>
 
-            {/* Price */}
-            <div className="col-span-3">
-                <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                        <FormItem className='flex flex-col'>
-                            <FormLabel className="text-black font-semibold text-sm">Original Price</FormLabel>
-                            <FormControl>
-                                <div className="relative flex items-center">
-                                    <Input
-                                        {...field}
-                                        type="number"
-                                        min={0}
-                                        className="pl-7"
-                                        step="0.01"
-                                        value={field.value ?? ""}
-                                        onChange={(e) =>
-                                            field.onChange(
-                                                e.target.value === "" ? null : e.target.valueAsNumber
-                                            )
-                                        }
-                                    />
-                                    <span className="absolute left-3 text-gray-500">€</span>
-                                </div>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
+            {isDsp ? '' : <>
+                {/* Price */}
+                <div className="col-span-3">
+                    <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                                <FormLabel className="text-black font-semibold text-sm">UVP</FormLabel>
+                                <FormControl>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                            {...field}
+                                            type="number"
+                                            min={0}
+                                            className="pl-7"
+                                            step="0.01"
+                                            value={field.value ?? ""}
+                                            onChange={(e) =>
+                                                field.onChange(
+                                                    e.target.value === "" ? null : e.target.valueAsNumber
+                                                )
+                                            }
+                                        />
+                                        <span className="absolute left-3 text-gray-500">€</span>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
 
-            {/* Final Price */}
-            <div className="col-span-3">
-                <FormField
-                    control={form.control}
-                    name="final_price"
-                    render={({ field }) => (
-                        <FormItem className='flex flex-col'>
-                            <FormLabel className="text-black font-semibold text-sm">Sale Price</FormLabel>
-                            <FormControl>
-                                <div className="relative flex items-center">
-                                    <Input
-                                        {...field}
-                                        type="number"
-                                        min={0}
-                                        className="pl-7"
-                                        step="0.01"
-                                        value={field.value ?? ""}
-                                        onChange={(e) =>
-                                            field.onChange(
-                                                e.target.value === "" ? null : e.target.valueAsNumber
-                                            )
-                                        }
-                                    />
-                                    <span className="absolute left-3 text-gray-500">€</span>
-                                </div>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-        </div>
+                {/* Final Price */}
+                <div className="col-span-3">
+                    <FormField
+                        control={form.control}
+                        name="final_price"
+                        render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                                <FormLabel className="text-black font-semibold text-sm">Sale Price</FormLabel>
+                                <FormControl>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                            {...field}
+                                            type="number"
+                                            min={0}
+                                            className="pl-7"
+                                            step="0.01"
+                                            value={field.value ?? ""}
+                                            onChange={(e) =>
+                                                field.onChange(
+                                                    e.target.value === "" ? null : e.target.valueAsNumber
+                                                )
+                                            }
+                                        />
+                                        <span className="absolute left-3 text-gray-500">€</span>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+            </>}
+
+        </div >
     )
 }

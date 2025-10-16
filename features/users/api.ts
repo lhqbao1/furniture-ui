@@ -18,3 +18,10 @@ export async function getAllCustomers() {
     )
     return data as Customer[]
 }
+
+export async function deleteCustomer(user_id: string){
+  const {data} = await apiAdmin.delete(
+    `/user/${user_id}`
+  )
+  return data
+}

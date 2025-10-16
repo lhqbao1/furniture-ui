@@ -3,11 +3,15 @@
 import { productColumns } from '@/components/layout/admin/products/products-list/column'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import TableToolbar from '@/components/layout/admin/products/products-list/toolbar'
+import AdminBackButton from '@/components/shared/admin-back-button'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
+import { Button } from '@/components/ui/button'
 import { useGetProductsSelect } from '@/features/product-group/hook'
 import { useGetAllProducts } from '@/features/products/hook'
+import { useRouter } from '@/src/i18n/navigation'
 import { searchProductQueryStringAtom } from '@/store/product'
 import { useAtom } from 'jotai'
+import { ArrowLeft } from 'lucide-react'
 import React, { useState } from 'react'
 
 
@@ -19,16 +23,17 @@ const ProductList = () => {
     const { data, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize, all_products: true, search: searchQuery })
     const { data: exportData, isLoading: isLoadingProductExport, isError: isErrorProductExport } = useGetProductsSelect()
     if (isError) return <div>No data</div>
-    // if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
 
     return (
         <div className='space-y-12'>
+            <AdminBackButton />
+
             {/* <ProductStatistic statistic={statisticDemo} /> */}
             <div className='text-3xl text-secondary font-bold text-center'>Product List</div>
             <TableToolbar
                 searchQuery={searchQuery}
                 pageSize={pageSize}
-                setPageSize={setPageSize} // đảm bảo type đúng
+                setPageSize={setPageSize}
                 addButtonText='Add Product'
                 addButtonUrl='/admin/products/add'
                 setSearchQuery={setSearchQuery}

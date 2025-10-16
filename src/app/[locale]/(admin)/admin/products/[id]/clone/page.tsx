@@ -7,6 +7,7 @@ import { ProductInput } from "@/lib/schema/product"
 import { toast } from "sonner"
 import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
 import { useLocale } from "next-intl"
+import AdminBackButton from "@/components/shared/admin-back-button"
 
 const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = React.use(params) // unwrap Promise
@@ -31,9 +32,12 @@ const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     return (
-        <div className="p-6">
-            <h1 className="text-xl font-bold mb-4">Clone Product</h1>
-            <ProductForm productValuesClone={data} onSubmit={handleCreate} isPending={createProductMutation.isPending} />
+        <div>
+            <AdminBackButton />
+            <div className="p-6">
+                <h1 className="text-xl font-bold mb-4">Clone Product</h1>
+                <ProductForm productValuesClone={data} onSubmit={handleCreate} isPending={createProductMutation.isPending} />
+            </div>
         </div>
     )
 }

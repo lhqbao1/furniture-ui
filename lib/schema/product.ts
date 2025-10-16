@@ -83,9 +83,6 @@ export const addProductSchema = z.object({
   width: z.number().optional().nullable(),
   height: z.number().optional().nullable(),
 
-  // length: z.number().min(1, "You must provide product length").nonnegative(),
-  // width: z.number().min(1, "You must provide product width").nonnegative(),
-  // height: z.number().min(1, "You must provide product height").nonnegative(),
   is_active: z.boolean(),
   tag: z.string().optional().nullable(),
   static_files: z.array(StaticFileSchema),

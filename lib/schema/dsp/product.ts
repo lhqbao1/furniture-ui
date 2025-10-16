@@ -6,6 +6,13 @@ const StaticFileSchema = z.object({
   url: z.string(),
 })
 
+export const packageSchema = z.object({
+  weight: z.number().nonnegative().optional().nullable(),
+  length: z.number().nonnegative().optional().nullable(),
+  width: z.number().nonnegative().optional().nullable(),
+  height: z.number().nonnegative().optional().nullable(),
+})
+
 export const addProductDSPSchema = z.object({
   name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
@@ -17,7 +24,9 @@ export const addProductDSPSchema = z.object({
   final_price: z.number().optional().nullable(),
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
-  stock: z.number().nonnegative().optional().nullable(),
+  stock: z
+  .number("Stock is required")
+  .min(0, { message: "Stock must be at least 0" }),
   materials: z.string().optional().nullable(),
   color: z.string().optional().nullable(),
   unit: z.string().optional().nullable(),
@@ -30,7 +39,7 @@ export const addProductDSPSchema = z.object({
   delivery_time:z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),
   tariff_number: z.string().optional().nullable(),
-  brand_id: z.string().optional().nullable(),
+  brand_id: z.string().min(1, "Brand is required"),
   ebay: z.boolean().optional().nullable(),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
   weight: z.number().optional().nullable(),
@@ -38,12 +47,11 @@ export const addProductDSPSchema = z.object({
   width: z.number().optional().nullable(),
   height: z.number().optional().nullable(),
 
-  // length: z.number().min(1, "You must provide product length").nonnegative(),
-  // width: z.number().min(1, "You must provide product width").nonnegative(),
-  // height: z.number().min(1, "You must provide product height").nonnegative(),
   is_active: z.boolean(),
   tag: z.string().optional().nullable(),
-  static_files: z.array(StaticFileSchema),
+  static_files: z
+  .array(StaticFileSchema)
+  .min(1, { message: "Image is required" }),
   category_ids: z.array(z.string()).optional().nullable(),
 
   weee_nr: z.string().optional().nullable(),
@@ -56,11 +64,7 @@ export const addProductDSPSchema = z.object({
   meta_keywords: z.string().optional().nullable(),
 
   pallet_unit: z.number().optional().nullable(),
-  product_height: z.number().optional().nullable(),
-  product_length: z.number().optional().nullable(),
-  product_width: z.number().optional().nullable(),
-  product_net_weight: z.number().optional().nullable(),
-
+  packages: z.array(packageSchema).optional(),
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 })
 

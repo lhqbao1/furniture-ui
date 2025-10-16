@@ -29,8 +29,8 @@ import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import Link from "@tiptap/extension-link"
 import LinkControls from "./link-button"
-import HardBreak from "@tiptap/extension-hard-break"
 import { FixedFont } from "./fixed-font"
+import { KeepHtmlPaste } from "./keep-html-style"
 
 
 
@@ -132,6 +132,7 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
         TextStyleKit,
         StarterKit,
         FixedFont,
+        KeepHtmlPaste,
         Link.configure({
             openOnClick: false,
             autolink: false,

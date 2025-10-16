@@ -3,6 +3,7 @@ import AddBrandDialog from '@/components/layout/admin/products/brand/add-brand-d
 import AddBrandForm from '@/components/layout/admin/products/brand/add-brand-form'
 import { brandColumns } from '@/components/layout/admin/products/brand/columns'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
+import AdminBackButton from '@/components/shared/admin-back-button'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { Button } from '@/components/ui/button'
 import { useGetBrands } from '@/features/brand/hook'
@@ -17,33 +18,30 @@ const BrandListPage = () => {
     if (isError) return <div>No data</div>
 
     return (
-        <div className='space-y-12'>
-            <div className='section-header'>Product Brands</div>
-            <div>
-                <div className='flex justify-end'>
-                    <AddBrandDialog />
+        <div className='space-y-6'>
+            <AdminBackButton />
+            <div className='space-y-12'>
+                <div className='section-header'>Product Brands</div>
+                <div>
+                    <div className='flex justify-end'>
+                        <AddBrandDialog />
+                    </div>
+                    {isLoading || !data ? <ProductTableSkeleton /> :
+                        <ProductTable
+                            data={data ? data : []}
+                            columns={brandColumns}
+                            page={page}
+                            pageSize={pageSize}
+                            setPage={setPage}
+                            setPageSize={setPageSize}
+                            totalItems={data.length}
+                            totalPages={data.length / pageSize}
+                            addButtonText='Add Brand'
+                            isAddButtonModal
+                            addButtonModalContent={<AddBrandForm />}
+                        />
+                    }
                 </div>
-                {/* <TableToolbar
-                pageSize={pageSize}
-                setPageSize={setPageSize} // đảm bảo type đúng
-                addButtonText='Add Brand'
-                addButtonUrl='/admin/products/add'
-            /> */}
-                {isLoading || !data ? <ProductTableSkeleton /> :
-                    <ProductTable
-                        data={data ? data : []}
-                        columns={brandColumns}
-                        page={page}
-                        pageSize={pageSize}
-                        setPage={setPage}
-                        setPageSize={setPageSize}
-                        totalItems={data.length}
-                        totalPages={data.length / pageSize}
-                        addButtonText='Add Brand'
-                        isAddButtonModal
-                        addButtonModalContent={<AddBrandForm />}
-                    />
-                }
             </div>
         </div>
     )
