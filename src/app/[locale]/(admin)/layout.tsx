@@ -13,7 +13,7 @@ export default function AdminLayout({
         <Protected>
             <SidebarProvider defaultOpen={true}>
                 <AdminSideBar />
-                <div className="container-padding pt-8 w-full overflow-x-scroll">
+                <div className="container-padding pt-8 w-full">
                     <div>
                         <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} />
                     </div>

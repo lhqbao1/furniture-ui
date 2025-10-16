@@ -74,9 +74,9 @@ export default function TableToolbar({
     }, [debouncedValue, searchQuery, setSearchQuery])
 
     return (
-        <div className="flex items-center justify-between gap-4 p-2 w-full">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
             {/* Left group */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap lg:flex-nowrap ">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="flex items-center gap-1">
@@ -97,7 +97,7 @@ export default function TableToolbar({
             </div>
 
             {/* Search (auto, no button) */}
-            <div className="flex items-center w-full flex-1">
+            <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap">
                 <Input
                     placeholder="Search"
                     value={inputValue}
@@ -106,22 +106,24 @@ export default function TableToolbar({
             </div>
 
             {/* Right group */}
-            <div className="flex items-center gap-4">
-                <Select
-                    value={String(pageSize)}
-                    onValueChange={(value) => setPageSize(Number(value))}
-                >
-                    <SelectTrigger className="border text-black cursor-pointer">
-                        <SelectValue placeholder="Select size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="1">1 rows</SelectItem>
-                        <SelectItem value="5">5 rows</SelectItem>
-                        <SelectItem value="10">10 rows</SelectItem>
-                        <SelectItem value="20">20 rows</SelectItem>
-                        <SelectItem value="50">50 rows</SelectItem>
-                    </SelectContent>
-                </Select>
+            <div className="flex items-center gap-4 flex-wrap lg:flex-nowrap justify-center lg:justify-start">
+                <div>
+                    <Select
+                        value={String(pageSize)}
+                        onValueChange={(value) => setPageSize(Number(value))}
+                    >
+                        <SelectTrigger className="border text-black cursor-pointer">
+                            <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="1">1 rows</SelectItem>
+                            <SelectItem value="5">5 rows</SelectItem>
+                            <SelectItem value="10">10 rows</SelectItem>
+                            <SelectItem value="20">20 rows</SelectItem>
+                            <SelectItem value="50">50 rows</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
