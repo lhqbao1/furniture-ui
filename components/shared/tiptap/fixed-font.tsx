@@ -13,7 +13,7 @@ export const FixedFont = Extension.create({
                         parseHTML: element => element.getAttribute('style'),
                         renderHTML: attributes => {
                             // Giữ nguyên các style khác, chỉ đảm bảo font-family đúng
-                            const style = attributes.style ? `${attributes.style}; font-family: 'Libre', serif;` : "font-family: 'Libre', serif;"
+                            const style = attributes.style ? `${attributes.style}; font-family: 'Figtree', sans-serif;` : "font-family: 'Figtree', sans-serif;"
                             return { style }
                         },
                     },

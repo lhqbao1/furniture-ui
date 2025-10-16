@@ -7,6 +7,7 @@ import { ProductInput } from "@/lib/schema/product"
 import { toast } from "sonner"
 import ProductForm from "@/components/layout/admin/products/products-form/add-product-form"
 import { useLocale } from "next-intl"
+import AdminBackButton from "@/components/shared/admin-back-button"
 
 
 const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -48,9 +49,12 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     return (
-        <div className="p-6">
-            <h1 className="text-xl font-bold mb-4">Edit Product</h1>
-            <ProductForm productValues={data} onSubmit={handleEdit} isPending={editProduct.isPending} />
+        <div>
+            <AdminBackButton />
+            <div className="p-6">
+                <h1 className="text-xl font-bold mb-4">Edit Product</h1>
+                <ProductForm productValues={data} onSubmit={handleEdit} isPending={editProduct.isPending} />
+            </div>
         </div>
     )
 }

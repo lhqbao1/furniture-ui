@@ -220,7 +220,6 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
                         <div className='col-span-3 flex flex-col items-end gap-4 relative'>
                             {/*Form Button */}
                             <div className='flex gap-2 justify-end top-24 fixed'>
-                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>Discard</Button>
                                 <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>
                                     {addProductMutation.isPending || editProductMutation.isPending ? (
                                         <Loader2 className="animate-spin" />
@@ -230,7 +229,9 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
                                         "Add"
                                     )}
                                 </Button>
-
+                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect onClick={() => router.push('/admin/products/list')}>
+                                    Discard
+                                </Button>
                             </div>
                         </div>
                     </div>

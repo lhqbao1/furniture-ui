@@ -214,11 +214,8 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                         "Add"
                                     )}
                                 </Button>
-                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect>
+                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect onClick={() => router.push('/admin/products/list')}>
                                     Discard
-                                </Button>
-                                <Button variant={'outline'} className='cursor-pointer text-black text-lg px-8' type="button" hasEffect onClick={() => router.back()}>
-                                    Back
                                 </Button>
                                 {productValues && (
                                     <a

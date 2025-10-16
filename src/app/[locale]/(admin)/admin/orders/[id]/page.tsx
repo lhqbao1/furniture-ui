@@ -6,6 +6,7 @@ import OrderInformation from '@/components/layout/admin/orders/order-details/ord
 import OrderDetailOverView from '@/components/layout/admin/orders/order-details/order-overview'
 import OrderDetailUser from '@/components/layout/admin/orders/order-details/order-user'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
+import AdminBackButton from '@/components/shared/admin-back-button'
 import { useGetCheckOutByCheckOutId, useGetMainCheckOutByMainCheckOutId } from '@/features/checkout/hook'
 import { getInvoiceByCheckOut } from '@/features/invoice/api'
 import { formatDate, formatDateTime } from '@/lib/date-formated'
@@ -44,6 +45,7 @@ const OrderDetails = () => {
 
     return (
         <div className='space-y-12 pb-20'>
+            <AdminBackButton />
             <div className='grid grid-cols-4 gap-12'>
                 <OrderDetailOverView
                     order={order}

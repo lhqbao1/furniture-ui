@@ -180,13 +180,14 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                                     }
                                 />
                             </FormControl>
+                            <FormMessage></FormMessage>
                         </FormItem>
                     )}
                 />
             </div>
 
             {/*Product price fields */}
-            <ProductPricingFields />
+            <ProductPricingFields isDsp={isDSP} />
 
             <div className='grid grid-cols-12 gap-6'>
 
@@ -280,12 +281,6 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
             <div className='flex flex-col gap-4'>
                 <div className='flex gap-3 items-center'>
                     <p className='text-black font-semibold text-sm'>Image</p>
-                    {/* <Button
-                        onClick={handleDownloadImages}
-                        variant={'secondary'}
-                        className='w-fit'>
-                        Get Images
-                    </Button> */}
                 </div>
                 <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' isAddProduct />
             </div>

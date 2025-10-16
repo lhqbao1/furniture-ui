@@ -261,5 +261,13 @@
   "orderSuccess": "Bestellung erfolgreich",
   "feedback_title": "Feedback geben",
   "feedback_desc": "Möchten Sie ein Feedback zu dieser Bestellung geben?",
-  "send": "Senden"
+  "send": "Senden",
+  "properties": "Eigenschaften",
+  "dimensions_weight": "Maße & Gewichte",
+  "width": "Breite",
+  "height": "Höhe",
+  "length": "Länge",
+  "product_details": "Produktdetails",
+  "materials": "Materialien",
+  "color": "Farbe"
 }

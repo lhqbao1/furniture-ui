@@ -1,6 +1,7 @@
 'use client'
 import ProductBundleForm from '@/components/layout/admin/products/bundle/product-bundle-form'
 import ProductForm from '@/components/layout/admin/products/products-form/add-product-form'
+import AdminBackButton from '@/components/shared/admin-back-button'
 import { useAddProduct } from '@/features/products/hook'
 import { ProductInput } from '@/lib/schema/product'
 import React from 'react'
@@ -19,13 +20,12 @@ const ProductBundle = () => {
         })
     }
     return (
-        <div className='grid grid-cols-12 gap-6'>
-            <div className='col-span-12 flex flex-col gap-6'>
-                <ProductBundleForm
-                    onSubmit={handleAddProduct}
-                    isPending={addProduct.isPending}
-                />
-            </div>
+        <div className='space-y-6'>
+            <AdminBackButton />
+            <ProductBundleForm
+                onSubmit={handleAddProduct}
+                isPending={addProduct.isPending}
+            />
         </div>
     )
 }

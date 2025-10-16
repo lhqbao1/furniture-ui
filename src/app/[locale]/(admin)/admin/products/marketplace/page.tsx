@@ -4,6 +4,7 @@ import { productMarketplaceColumns } from '@/components/layout/admin/products/ma
 import { productColumns } from '@/components/layout/admin/products/products-list/column'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import TableToolbar from '@/components/layout/admin/products/products-list/toolbar'
+import AdminBackButton from '@/components/shared/admin-back-button'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetProductsSelect } from '@/features/product-group/hook'
 import { useGetAllProducts } from '@/features/products/hook'
@@ -34,30 +35,33 @@ const ProductMarketplace = () => {
     const columns = productMarketplaceColumns(data?.items)
 
     return (
-        <div className='space-y-12 pb-12'>
-            {/* <ProductStatistic statistic={statisticDemo} /> */}
-            <div className='text-3xl text-secondary font-bold text-center'>Product Marketplace</div>
-            <TableToolbar
-                searchQuery={searchQuery}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-                addButtonText='Add Product'
-                addButtonUrl='/admin/products/add'
-                setSearchQuery={setSearchQuery}
-                exportData={exportData}
-            />
-            {isLoading ? <ProductTableSkeleton /> :
-                <ProductTable
-                    data={sortedData}
-                    columns={columns}
-                    page={page}
+        <div className='space-y-6'>
+            <AdminBackButton />
+            <div className='space-y-12 pb-12'>
+                {/* <ProductStatistic statistic={statisticDemo} /> */}
+                <div className='text-3xl text-secondary font-bold text-center'>Product Marketplace</div>
+                <TableToolbar
+                    searchQuery={searchQuery}
                     pageSize={pageSize}
-                    setPage={setPage}
                     setPageSize={setPageSize}
-                    totalItems={data?.pagination.total_items ?? 0}
-                    totalPages={data?.pagination.total_pages ?? 0}
+                    addButtonText='Add Product'
+                    addButtonUrl='/admin/products/add'
+                    setSearchQuery={setSearchQuery}
+                    exportData={exportData}
                 />
-            }
+                {isLoading ? <ProductTableSkeleton /> :
+                    <ProductTable
+                        data={sortedData}
+                        columns={columns}
+                        page={page}
+                        pageSize={pageSize}
+                        setPage={setPage}
+                        setPageSize={setPageSize}
+                        totalItems={data?.pagination.total_items ?? 0}
+                        totalPages={data?.pagination.total_pages ?? 0}
+                    />
+                }
+            </div>
         </div>
     )
 }

@@ -1,5 +1,6 @@
 'use client'
 import ProductForm from '@/components/layout/admin/products/products-form/add-product-form'
+import AdminBackButton from '@/components/shared/admin-back-button'
 // import ProductForm from '@/components/layout/admin/products/products-form/add-product-form'
 import { useAddProduct } from '@/features/products/hook'
 import { ProductInput } from '@/lib/schema/product'
@@ -36,10 +37,13 @@ const ProductAddClient = () => {
     }, [])
 
     return (
-        <ProductForm
-            onSubmit={handleAddProduct}
-            isPending={addProduct.isPending}
-        />
+        <div className='space-y-6'>
+            <AdminBackButton />
+            <ProductForm
+                onSubmit={handleAddProduct}
+                isPending={addProduct.isPending}
+            />
+        </div>
     )
 }
 

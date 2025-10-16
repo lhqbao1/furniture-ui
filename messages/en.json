@@ -254,12 +254,20 @@
     "estimated_delivery": "Estimated Delivery Time",
     "feedback": "Feedback",
     "business_days": "business days",
-      "NotFound": {
-        "title": "Page Not Found",
-        "description": "Sorry, we couldn’t find the page you’re looking for.",
-        "backHome": "Back to Home"
-      },
-      "feedback_title": "Give Feedback",
-        "feedback_desc": "Do you want to give feedback about this order?",
-        "send": "Send"
+    "NotFound": {
+      "title": "Page Not Found",
+      "description": "Sorry, we couldn’t find the page you’re looking for.",
+      "backHome": "Back to Home"
+    },
+    "feedback_title": "Give Feedback",
+    "feedback_desc": "Do you want to give feedback about this order?",
+    "send": "Send",
+    "properties": "Properties",
+    "dimensions_weight": "Dimensions & Weight",
+    "width": "Width",
+    "height": "Height",
+    "length": "Length",
+    "product_details": "Product Details",
+    "materials": "Materials",
+    "color": "Color"
 }
