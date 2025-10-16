@@ -69,5 +69,5 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
     if (product?.parent_id) {
         parentProduct = await getProductGroupDetail(product.parent_id)
     }
-    return <ProductDetails parentProductData={parentProduct} productDetailsData={product} productId={lastSlug} />
+    return <ProductDetails parentProductData={parentProduct} productDetailsData={product} productId={product.id} />
 }
