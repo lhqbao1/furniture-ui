@@ -1,12 +1,15 @@
 'use client'
 
 import { CartFormValues } from '@/lib/schema/cart'
+import { useRouter } from '@/src/i18n/navigation'
 import { ProductGroupDetailResponse } from '@/types/product-group'
 import { ProductItem } from '@/types/products'
 import { VariantOptionsResponse } from '@/types/variant'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { toast } from 'sonner'
 
 interface ListVariantProps {
     variant: VariantOptionsResponse[]
@@ -14,35 +17,67 @@ interface ListVariantProps {
     parentProduct: ProductGroupDetailResponse
 }
 
-const ListVariant = ({ variant, currentProduct }: ListVariantProps) => {
+const ListVariant = ({ variant, currentProduct, parentProduct }: ListVariantProps) => {
     const { control, setValue } = useFormContext<CartFormValues>()
     const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+    const router = useRouter()
+    const t = useTranslations()
 
-    // Khi vào trang, auto chọn các option trong currentProduct
     useEffect(() => {
-        if (currentProduct?.options) {
-            const ids = currentProduct.options.map((o) => o.id)
-            setSelectedOptions(ids)
-            setValue('option_id', ids)
-        }
-    }, [currentProduct, setValue])
+        if (!currentProduct?.options?.length) return;
 
-    // Khi user chọn option (1 option/variant)
+        const ids = currentProduct.options.map((o) => o.id);
+
+        // ✅ Cập nhật state trước
+        setSelectedOptions(ids);
+
+        // ✅ Đảm bảo chỉ setValue sau khi render xong (next tick)
+        // hoặc trong effect riêng biệt
+        const timer = setTimeout(() => {
+            setValue('option_id', ids, { shouldValidate: false });
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, [currentProduct, setValue]);
+
+
     const handleSelect = (variantId: string, optionId: string) => {
+        console.log(selectedOptions)
+        console.log(currentProduct.options)
+
+        if (!parentProduct) return
+
+        // Cập nhật state selectedOptions
         setSelectedOptions((prev) => {
-            // Xóa option cũ cùng variant
             const otherOptions = prev.filter((id) => {
                 const isSameVariant = variant.some((g) =>
-                    g.options.some((o) => o.id === id && g.variant.id == variantId)
+                    g.options.some((o) => o.id === id && g.variant.id === variantId)
                 )
                 return !isSameVariant
             })
-
-            const newSelected = [...otherOptions, optionId]
-            setValue('option_id', newSelected)
-            return newSelected
+            return [...otherOptions, optionId]
         })
+
+        // 🔍 Tìm product khớp trong parentProduct.products
+        const matchedProduct = parentProduct.products.find((product) =>
+            product.options?.some((opt) => opt.id === optionId)
+        )
+
+        // 👉 Nếu tìm thấy thì chuyển hướng
+        if (matchedProduct?.url_key) {
+            router.push(`/product/${matchedProduct.url_key}`)
+        } else {
+            toast.error(t('noOption')
+            )
+            return
+        }
     }
+
+    // ✅ Khi selectedOptions thay đổi thì update form
+    useEffect(() => {
+        setValue('option_id', selectedOptions, { shouldValidate: false })
+    }, [selectedOptions, setValue])
+
 
     return (
         <Controller

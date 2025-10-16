@@ -78,6 +78,8 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
         initialData: parentProductData
     })
 
+    console.log(parentProduct)
+
     // Khi có productDetails mới → sync form
     useEffect(() => {
         if (productDetails?.id) {

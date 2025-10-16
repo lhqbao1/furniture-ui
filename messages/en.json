@@ -267,7 +267,9 @@
     "width": "Width",
     "height": "Height",
     "length": "Length",
+    "weight": "Weight",
     "product_details": "Product Details",
     "materials": "Materials",
-    "color": "Color"
+    "color": "Color",
+    "noOption": "Sorry, this option is not available for any product."
 }
