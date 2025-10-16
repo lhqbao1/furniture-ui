@@ -1,6 +1,6 @@
 'use client'
 import { useGetProductsSelect } from '@/features/product-group/hook'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
@@ -10,6 +10,7 @@ import { ProductItem } from '@/types/products';
 import Link from 'next/link';
 import { Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useGetAllProducts } from '@/features/products/hook';
 
 type SelectedProduct = {
     product: ProductItem;
@@ -18,11 +19,12 @@ type SelectedProduct = {
 
 const SelectBundleComponent = () => {
     const form = useFormContext()
+    const { setValue } = form
     const [listProducts, setListProducts] = useState<SelectedProduct[]>([])
     const [queryParams, setQueryParams] = useState('')
     const [open, setOpen] = useState(false)
 
-    const { data: products, isLoading, isError } = useGetProductsSelect(queryParams)
+    const { data: products, isLoading, isError } = useGetAllProducts({ search: queryParams, all_products: true })
 
     const handleSelectProduct = (product: ProductItem) => {
         setListProducts((prev) => {
@@ -40,7 +42,17 @@ const SelectBundleComponent = () => {
     }
 
     const filteredProducts =
-        products?.filter((p: ProductItem) => !listProducts.some((lp) => lp.product.id === p.id)) ?? []
+        products?.items?.filter((p: ProductItem) => !listProducts.some((lp) => lp.product.id === p.id)) ?? []
+
+
+    // ✅ Mỗi khi listProducts thay đổi → cập nhật vào form
+    useEffect(() => {
+        const bundles = listProducts.map((item) => ({
+            product_id: item.product.id,
+            quantity: item.amount,
+        }))
+        setValue("bundles", bundles)
+    }, [listProducts, setValue])
 
     return (
         <div className='space-y-6'>

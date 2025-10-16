@@ -37,7 +37,15 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
                 ...product,
                 is_active: !product.is_active,
                 category_ids: product.categories.map((c) => c.id), // map ra id array
-                // brand_id: product.brand.id
+                // 🔹 Thêm bundles
+                ...(product.bundles?.length
+                    ? {
+                        bundles: product.bundles.map(item => ({
+                            product_id: item.bundle_item.id,
+                            quantity: item.quantity,
+                        })),
+                    }
+                    : { bundles: [] }),
             },
             id: product.id,
         }, {

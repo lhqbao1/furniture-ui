@@ -33,7 +33,16 @@ function EditableNameCell({ product }: { product: ProductItem }) {
                 ...product,
                 name: value,
                 category_ids: product.categories.map((c) => c.id),
-                brand_id: product.brand.id
+                brand_id: product.brand.id,
+                // 🔹 Thêm bundles
+                ...(product.bundles?.length
+                    ? {
+                        bundles: product.bundles.map(item => ({
+                            product_id: item.bundle_item.id,
+                            quantity: item.quantity,
+                        })),
+                    }
+                    : { bundles: [] }),
             },
             id: product.id,
         }, {
@@ -96,7 +105,16 @@ function EditableStockCell({ product }: { product: ProductItem }) {
                 ...product,
                 stock: value,
                 category_ids: product.categories.map((c) => c.id), // map ra id array
-                brand_id: product.brand.id
+                brand_id: product.brand.id,
+                // 🔹 Thêm bundles
+                ...(product.bundles?.length
+                    ? {
+                        bundles: product.bundles.map(item => ({
+                            product_id: item.bundle_item.id,
+                            quantity: item.quantity,
+                        })),
+                    }
+                    : { bundles: [] }),
             },
             id: product.id,
         }, {
@@ -162,6 +180,15 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                     ? { category_ids: product.categories.map((c) => c.id) }
                     : {}),
                 ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+                // 🔹 Thêm bundles
+                ...(product.bundles?.length
+                    ? {
+                        bundles: product.bundles.map(item => ({
+                            product_id: item.bundle_item.id,
+                            quantity: item.quantity,
+                        })),
+                    }
+                    : { bundles: [] }),
             },
             id: product.id,
         }, {
@@ -281,6 +308,15 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
                 ...product,
                 is_active: !product.is_active,
                 category_ids: product.categories.map((c) => c.id), // map ra id array
+                // 🔹 Thêm bundles
+                ...(product.bundles?.length
+                    ? {
+                        bundles: product.bundles.map(item => ({
+                            product_id: item.bundle_item.id,
+                            quantity: item.quantity,
+                        })),
+                    }
+                    : { bundles: [] }),
                 // brand_id: product.brand.id
             },
             id: product.id,
