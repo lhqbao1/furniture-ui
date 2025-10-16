@@ -8,6 +8,9 @@ import { getInvoiceByCheckOut } from "@/features/invoice/api"
 import { FileTable } from "./table"
 import { formatDate } from "@/lib/date-formated"
 import { useMemo } from "react"
+import { PDFDownloadLink } from "@react-pdf/renderer"
+import { InvoicePDF } from "./file"
+import { Button } from "@/components/ui/button"
 
 interface InvoiceTableProps {
     checkoutId: string
@@ -59,10 +62,26 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                     <span>
                         {checkout?.checkouts?.[0]?.user?.first_name} {checkout?.checkouts?.[0]?.user?.last_name}
                     </span>
-                    <span>{checkout?.checkouts?.[0]?.invoice_address?.address_line}</span>
                     <span>
-                        {checkout?.checkouts?.[0]?.invoice_address?.postal_code} - {checkout?.checkouts?.[0]?.invoice_address?.city}
+                        {(checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
+                            ? checkout?.checkouts?.[0]?.invoice_address?.address_line
+                            : checkout?.checkouts?.[0]?.shipping_address?.address_line)}
                     </span>
+
+                    <span>
+                        {(
+                            checkout?.checkouts?.[0]?.invoice_address?.postal_code?.trim()
+                                ? checkout?.checkouts?.[0]?.invoice_address?.postal_code
+                                : checkout?.checkouts?.[0]?.shipping_address?.postal_code
+                        )} - {
+                            (
+                                checkout?.checkouts?.[0]?.invoice_address?.city?.trim()
+                                    ? checkout?.checkouts?.[0]?.invoice_address?.city
+                                    : checkout?.checkouts?.[0]?.shipping_address?.city
+                            )
+                        }
+                    </span>
+
                 </div>
 
                 <div className="w-[320px] border border-gray-400 text-[13px]">
@@ -205,6 +224,20 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div>Thuy Duong Nguyen</div>
                 <div>Tax code: DE454714336</div>
             </div>
+            {checkout && invoice && (
+                <div className="absolute bottom-0 right-1/2 translate-x-1/2 transform z-20">
+                    <Button variant={'outline'}>
+                        <PDFDownloadLink
+                            document={<InvoicePDF checkout={checkout} invoice={invoice} />}
+                            fileName="invoice.pdf"
+                        >
+                            {({ loading }) => (loading ? "Generating PDF..." : <div className="cursor-pointer">Download Invoice PDF</div>)}
+                        </PDFDownloadLink>
+                    </Button>
+                </div>
+            )}
+
+
         </div>
     )
 }

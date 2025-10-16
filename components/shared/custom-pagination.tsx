@@ -1,3 +1,4 @@
+'use client'
 import {
     Pagination,
     PaginationContent,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/pagination"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface CustomPaginationProps {
     page: number
@@ -19,6 +20,14 @@ interface CustomPaginationProps {
 
 export function CustomPagination({ page, totalPages, onPageChange }: CustomPaginationProps) {
     const [goPage, setGoPage] = useState("")
+
+    // 🔹 Reset về trang 1 khi totalPages thay đổi
+    useEffect(() => {
+        if (page !== 1) {
+            onPageChange(1)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [totalPages])
 
     const getPageNumbers = () => {
         const delta = 2

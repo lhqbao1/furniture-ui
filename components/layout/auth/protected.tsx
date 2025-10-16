@@ -1,5 +1,6 @@
 "use client"
 import { ReactNode, useEffect, useState } from "react"
+import { BounceLoader, BeatLoader, FadeLoader } from "react-spinners"
 
 interface ProtectedProps {
     children: ReactNode
@@ -20,8 +21,35 @@ export default function Protected({ children }: ProtectedProps) {
     }, [])
 
     if (isAdmin === null) {
-        // chưa kiểm tra xong
-        return <div className="p-6">Loading admin...</div>
+        // màn hình loading với spinner và backdrop mờ
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+                {/* overlay mờ + blur */}
+                <div className="absolute inset-0 bg-gray-100 backdrop-blur-sm" />
+
+                {/* card spinner */}
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className="relative z-10 flex flex-col items-center gap-4"
+                >
+                    {/* spinner */}
+                    <FadeLoader color="#00B159" />
+
+                    {/* text */}
+                    <div className="text-center">
+                        <p className="text-sm font-medium text-black">
+                            Loading admin...
+                        </p>
+                        <p className="mt-1 text-xs text-black">
+                            Checking access — please wait
+                        </p>
+                    </div>
+                    <BeatLoader color="#00B159" size={20} />
+
+                </div>
+            </div>
+        )
     }
 
     return <>{children}</>

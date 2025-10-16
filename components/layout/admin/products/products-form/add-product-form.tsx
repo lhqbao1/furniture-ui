@@ -139,7 +139,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
     }
 
     return (
-        <div className='pb-20 px-30'>
+        <div className='lg:pb-20 lg:px-30 pb-12'>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(
                     (values) => {
@@ -150,8 +150,8 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                         console.log(errors)
                     }
                 )}>
-                    <div className='grid-cols-12 grid gap-24 w-full'>
-                        <div className='col-span-9 flex flex-col gap-4'>
+                    <div className='lg:grid-cols-12 lg:grid flex flex-col-reverse lg:gap-24 w-full'>
+                        <div className='lg:col-span-9 flex flex-col gap-4'>
                             {!defaultValues ? <h3 className='text-xl text-[#666666]'>Add New Product</h3>
                                 : ''}
                             <Accordion
@@ -202,7 +202,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                             </Accordion>
                         </div>
 
-                        <div className='col-span-3 flex flex-col items-end gap-4 relative'>
+                        <div className='lg:col-span-3  flex flex-col items-end gap-4 relative'>
                             {/*Form Button */}
                             <div className='grid grid-cols-2 gap-2 justify-end top-24 fixed'>
                                 <Button className={`cursor-pointer text-lg px-8 ${defaultValues ? 'bg-secondary' : ''}`} type="submit" hasEffect disabled={isLoadingSEO}>

@@ -80,6 +80,9 @@ export function AdminSideBar() {
 
     return (
         <Sidebar className="app-sidebar custom-scroll">
+            <SidebarHeader className="items-end flex lg:hidden">
+                <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isClose />
+            </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <Link href={`/admin`}>

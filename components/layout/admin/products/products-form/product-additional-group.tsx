@@ -5,13 +5,14 @@ import GpsrInput from './form-input/gpsr'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { tags } from '@/data/data'
+import { COLORS, tags } from '@/data/data'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import countries from "world-countries"
+import { ColorSelect } from './form-input/color-seclect'
 
 const ProductAdditionalInputs = () => {
     const form = useFormContext()
@@ -63,21 +64,67 @@ const ProductAdditionalInputs = () => {
                 />
 
                 {/* Product color */}
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="color"
-                    render={({ field }) => (
-                        <FormItem className='flex flex-col col-span-1'>
-                            <FormLabel className='text-black font-semibold text-sm'>
-                                Color
-                            </FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value)} className='col-span-4' />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    render={({ field }) => {
+                        const selectedColors = field.value ? field.value.split(", ") : []
+
+                        return (
+                            <FormItem className="flex flex-col col-span-1">
+                                <FormLabel className="text-black font-semibold text-sm">Color</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                className="w-full justify-between"
+                                            >
+                                                {selectedColors.length > 0
+                                                    ? selectedColors.join(", ")
+                                                    : "Select colors..."}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="p-0 w-[300px]">
+                                        <Command>
+                                            <CommandInput placeholder="Search color..." />
+                                            <CommandGroup className='overflow-y-scroll h-[400px]'>
+                                                {COLORS.map((color) => {
+                                                    const isSelected = selectedColors.includes(color.label)
+                                                    return (
+                                                        <CommandItem
+                                                            key={color.value}
+                                                            value={color.label}
+                                                            onSelect={() => {
+                                                                const newSelected = isSelected
+                                                                    ? selectedColors.filter((c: string) => c !== color.label)
+                                                                    : [...selectedColors, color.label]
+                                                                field.onChange(newSelected.join(", "))
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4",
+                                                                    isSelected ? "opacity-100" : "opacity-0"
+                                                                )}
+                                                            />
+                                                            {color.label} ({color.value})
+                                                        </CommandItem>
+                                                    )
+                                                })}
+                                            </CommandGroup>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                            </FormItem>
+                        )
+                    }}
+                /> */}
+                <ColorSelect />
             </div>
 
             {/* Manufacture Country */}
@@ -337,37 +384,6 @@ const ProductAdditionalInputs = () => {
                                 />
                             </FormControl>
                             <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
-
-            {/*Tag choose */}
-            <div className="w-full">
-                <FormField
-                    control={form.control}
-                    name="tag"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="font-bold text-base">Tag</FormLabel>
-                            <div className="flex flex-row gap-2 flex-wrap">
-                                {tags.map((item, idx) => {
-                                    const isSelected = field.value === item.name
-                                    return (
-                                        <div
-                                            key={idx}
-                                            style={{ background: item.color }}
-                                            onClick={() =>
-                                                field.onChange(isSelected ? "" : item.name) // toggle
-                                            }
-                                            className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${isSelected ? `ring-2 ring-primary ring-offset-2` : ""
-                                                }`}
-                                        >
-                                            {item.name}
-                                        </div>
-                                    )
-                                })}
-                            </div>
                         </FormItem>
                     )}
                 />

@@ -40,6 +40,7 @@ import { CartItemLocal } from '@/lib/utils/cart'
 import { CartItem } from '@/types/cart'
 import { useRouter } from '@/src/i18n/navigation'
 import Script from 'next/script'
+import { ProductImageCarousel } from './sub-images-carousel'
 
 interface ProductDetailsProps {
     productDetailsData: ProductItem
@@ -268,32 +269,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         </ProductImageDialog>
 
                                         {/* Sub images */}
-                                        <div className='flex flex-row px-12 w-full'>
-                                            <Carousel opts={{ loop: true, align: 'start' }}>
-                                                <CarouselContent className='w-full flex'>
-                                                    {productDetails.static_files.map((item, index) => (
-                                                        <CarouselItem key={index} className={`lg:basis-1/4 basis-1/3`}>
-                                                            <div
-                                                                className="cursor-pointer"
-                                                                onClick={() => setMainImageIndex(index)}
-                                                            >
-                                                                <Image
-                                                                    src={item.url}
-                                                                    width={100}
-                                                                    height={100}
-                                                                    alt=''
-                                                                    className={` ${mainImageIndex === index && 'border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover'} lg:h-[80px] h-[60px] object-fill`}
-                                                                    priority={index < 2}
-                                                                    loading={index < 2 ? 'eager' : 'lazy'}
-                                                                />
-                                                            </div>
-                                                        </CarouselItem>
-                                                    ))}
-                                                </CarouselContent>
-                                                <CarouselPrevious className='text-primary border-primary' />
-                                                <CarouselNext className='text-primary border-primary' />
-                                            </Carousel>
-                                        </div>
+                                        <ProductImageCarousel productDetails={productDetails} />
                                     </div>
 
                                     {/*Product details */}
