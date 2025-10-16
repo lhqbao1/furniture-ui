@@ -58,8 +58,6 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
         })
     }
 
-
-
     const pathname = usePathname()
     const router = useRouter()
 
@@ -93,11 +91,9 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
         <Sidebar className="app-sidebar custom-scroll" collapsible="offcanvas"
         >
             <SidebarContent>
-                {isPhone &&
-                    <SidebarHeader className="items-end">
-                        <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isMobile={isPhone ? true : false} isClose />
-                    </SidebarHeader>
-                }
+                <SidebarHeader className="items-end block lg:hidden">
+                    <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} isMobile={isPhone ? true : false} isClose />
+                </SidebarHeader>
                 <SidebarGroup className="h-full relative">
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-3">

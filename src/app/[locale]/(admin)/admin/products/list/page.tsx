@@ -27,7 +27,6 @@ const ProductList = () => {
     return (
         <div className='space-y-12'>
             <AdminBackButton />
-
             {/* <ProductStatistic statistic={statisticDemo} /> */}
             <div className='text-3xl text-secondary font-bold text-center'>Product List</div>
             <TableToolbar

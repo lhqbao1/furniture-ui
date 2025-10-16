@@ -42,9 +42,6 @@ const ListVariant = ({ variant, currentProduct, parentProduct }: ListVariantProp
 
 
     const handleSelect = (variantId: string, optionId: string) => {
-        console.log(selectedOptions)
-        console.log(currentProduct.options)
-
         if (!parentProduct) return
 
         // Cập nhật state selectedOptions

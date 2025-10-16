@@ -113,7 +113,6 @@ const ProductLogisticsGroup = ({ isDSP = false }: ProductLogisticsGroupProps) =>
                     )}
                 />
 
-                {/* Delivery time field */}
                 <FormField
                     control={form.control}
                     name="delivery_time"
@@ -123,11 +122,20 @@ const ProductLogisticsGroup = ({ isDSP = false }: ProductLogisticsGroupProps) =>
                                 Delivery time
                             </FormLabel>
                             <FormControl>
-                                <Select value={field.value ?? ""} onValueChange={field.onChange}>
-                                    <SelectTrigger placeholderColor className='border col-span-4 font-light'>
+                                <Select
+                                    value={field.value ?? ""}
+                                    onValueChange={(val) => {
+                                        if (val === "Deselect") field.onChange(null)
+                                        else field.onChange(val)
+                                    }}
+                                >
+                                    <SelectTrigger className='border col-span-4 font-light'>
                                         <SelectValue placeholder="Select delivery time" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="Deselect" className="text-gray-400 italic">
+                                            — Deselect —
+                                        </SelectItem>
                                         {deliveryTimes.map((t) => (
                                             <SelectItem key={t} value={t}>
                                                 {t} business days
@@ -140,6 +148,7 @@ const ProductLogisticsGroup = ({ isDSP = false }: ProductLogisticsGroupProps) =>
                         </FormItem>
                     )}
                 />
+
 
                 {/* Product packaging number */}
                 <FormField

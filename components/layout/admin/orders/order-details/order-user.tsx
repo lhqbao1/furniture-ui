@@ -15,7 +15,7 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
     return (
         <>
             <div className='col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5'>
-                <h4 className='font-bold'>Customer</h4>
+                <h5 className='font-bold'>Customer</h5>
                 <div className='flex items-start gap-2.5'>
                     <div className='text-sm'>
                         <div>{user.first_name} {user.last_name}</div>
@@ -25,7 +25,7 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
                 </div>
             </div>
             <div className='col-span-1 py-2 px-3 rounded-sm border space-y-2.5 flex-1'>
-                <h4 className='font-bold'>Invoice address</h4>
+                <h5 className='font-bold'>Invoice address</h5>
                 <div className='space-y-2.5'>
                     <div className='text-sm'>
                         <div>{invoiceAddress.address_line}</div>
@@ -35,7 +35,7 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
                 </div>
             </div>
             <div className='col-span-1 py-2 px-3 rounded-sm border space-y-2.5 flex-1'>
-                <h4 className='font-bold'>Shipping address</h4>
+                <h5 className='font-bold'>Shipping address</h5>
                 <div className='space-y-2.5'>
                     <div className='text-sm'>
                         <div>{shippingAddress.recipient_name}</div>

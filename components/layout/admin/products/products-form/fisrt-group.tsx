@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import dynamic from "next/dynamic"
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { tags } from '@/data/data'
 
 // import RichEditor dynamically to avoid SSR issues
 const RichEditor = dynamic(() => import("@/components/shared/tiptap/tiptap-editor"), {
@@ -283,6 +284,37 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                     <p className='text-black font-semibold text-sm'>Image</p>
                 </div>
                 <ImagePickerInput form={form} fieldName="static_files" description='prefer 2k - 2500 x 1875px - Ratio 4:3' isAddProduct />
+            </div>
+
+            {/*Tag choose */}
+            <div className="w-full">
+                <FormField
+                    control={form.control}
+                    name="tag"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="font-bold text-base">Tag</FormLabel>
+                            <div className="flex flex-row gap-2 flex-wrap">
+                                {tags.map((item, idx) => {
+                                    const isSelected = field.value === item.name
+                                    return (
+                                        <div
+                                            key={idx}
+                                            style={{ background: item.color }}
+                                            onClick={() =>
+                                                field.onChange(isSelected ? "" : item.name) // toggle
+                                            }
+                                            className={`rounded-xl text-xs py-1 px-2 text-white cursor-pointer uppercase ${isSelected ? `ring-2 ring-primary ring-offset-2` : ""
+                                                }`}
+                                        >
+                                            {item.name}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </FormItem>
+                    )}
+                />
             </div>
         </div>
     )
