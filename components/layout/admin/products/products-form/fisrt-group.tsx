@@ -174,7 +174,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                                 <Input
                                     type="number"
                                     inputMode="decimal"
-                                    disabled={bundles.length > 0}
+                                    disabled={bundles && bundles.length > 0}
                                     value={field.value ?? ""}
                                     onChange={(e) =>
                                         field.onChange(
