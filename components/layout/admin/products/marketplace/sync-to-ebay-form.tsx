@@ -134,6 +134,14 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                     ...product,
                     category_ids: product.categories.map((c) => c.id),
                     marketplace_products: updatedMarketplaceProducts,
+                    ...(product.bundles?.length
+                        ? {
+                            bundles: product.bundles.map(item => ({
+                                product_id: item.bundle_item.id,
+                                quantity: item.quantity,
+                            })),
+                        }
+                        : { bundles: [] }),
                 },
                 id: product.id,
             },
