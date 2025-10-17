@@ -271,5 +271,10 @@
     "product_details": "Product Details",
     "materials": "Materials",
     "color": "Color",
-    "noOption": "Sorry, this option is not available for any product."
+    "noOption": "Sorry, this option is not available for any product.",
+    "msg": {
+    "min": "Message must be at least 10 characters",
+    "max": "Message must be at most 1000 characters"
+    },
+    "clear": "Clear"
 }

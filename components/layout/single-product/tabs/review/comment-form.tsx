@@ -19,19 +19,24 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import ImagePickerInput from "./image-picker-input";
+import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 
-const Schema = z.object({
-    message: z
-        .string()
-        .trim()
-        .min(10, "Nội dung tối thiểu 10 ký tự")
-        .max(1000, "Nội dung tối đa 1000 ký tự"),
-    image: z.array(z.string()).optional()
-});
 
-export type FormValues = z.infer<typeof Schema>;
 
 export default function CommentForm() {
+    const t = useTranslations()
+    const Schema = z.object({
+        message: z
+            .string()
+            .trim()
+            .min(10, t('msg.min'))
+            .max(1000, t('msg.max')),
+        image: z.array(z.string()).optional()
+    });
+
+    type FormValues = z.infer<typeof Schema>;
+
     const form = useForm<FormValues>({
         resolver: zodResolver(Schema),
         mode: "onChange",
@@ -68,11 +73,11 @@ export default function CommentForm() {
                     name="message"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Message</FormLabel>
                             <FormControl>
                                 <Textarea
                                     rows={4}
-                                    placeholder="Write something..."
+                                    placeholder=""
+                                    className="h-40"
                                     {...field}
                                 />
                             </FormControl>
@@ -81,7 +86,7 @@ export default function CommentForm() {
                     )}
                 />
 
-                <ImagePickerInput form={form} fieldName="image" />
+                {/* <ImagePickerInput form={form} fieldName="image" /> */}
                 {/* Buttons nằm cạnh nhau, phải */}
                 <div className="flex items-center justify-center gap-2">
                     <Button
@@ -91,10 +96,10 @@ export default function CommentForm() {
                         disabled={isSubmitting}
                         className="flex-1 text-lg font-semibold"
                     >
-                        Clear
+                        {t('clear')}
                     </Button>
                     <Button type="submit" disabled={isSubmitting || !isValid} className="flex-1 text-lg font-bold" variant={'default'} hasEffect>
-                        {isSubmitting ? "Submitting..." : "Submit"}
+                        {isSubmitting ? <Loader2 className="animate-spin" /> : t('submit')}
                     </Button>
                 </div>
             </form>
