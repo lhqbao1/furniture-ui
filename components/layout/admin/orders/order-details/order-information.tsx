@@ -85,7 +85,7 @@ const OrderInformation = ({
                     </div>
                 </div>
                 <div className='grid grid-cols-3'>
-                    <div className='text-end col-span-2'>VAT Tax</div>
+                    <div className='text-end col-span-2'>VAT</div>
                     <div className='text-end'>
                         €{tax}
                     </div>

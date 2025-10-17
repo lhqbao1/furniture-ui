@@ -6,6 +6,7 @@ import ProductCategory from "@/components/layout/category/category-page"
 interface PageProps {
     params: Promise<{ slug: string[] }>
 }
+export const revalidate = 3600
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
@@ -47,4 +48,3 @@ export default async function Page({ params }: PageProps) {
     return <ProductCategory category={category} categorySlugs={slugArray} />
 }
 
-export const revalidate = 3600

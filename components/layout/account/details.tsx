@@ -151,22 +151,6 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
             </div>
 
             <div className='col-span-2 lg:col-span-1 w-full lg:space-y-8 space-y-4'>
-                {/*Password */}
-                <div>
-                    <Link href={`/forgot-password`}>
-                        <Card className="shadow-sm rounded-none border-none relative">
-                            <div className='bg-black w-0.5 h-full absolute left-0 top-0'></div>
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <LockKeyholeIcon className="w-7 h-7" strokeWidth={1} stroke='black' />
-                                    <CardTitle className='text-2xl font-light'>{t('changePassword')}</CardTitle>
-                                </div>
-                                <PenBoxIcon className="w-7 h-7 cursor-pointer" strokeWidth={1} />
-                            </CardHeader>
-                        </Card>
-                    </Link>
-                </div>
-
                 {/*Order History */}
                 <div>
                     <Link href={`/my-order`} className="">

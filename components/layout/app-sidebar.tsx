@@ -115,7 +115,9 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                                             className={`flex w-full flex-row items-center justify-between gap-3 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black hover:[&>svg]:stroke-black ${isActive
                                                                 ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                                                 : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
-                                                                }`}
+                                                                }
+                                                                focus:bg-secondary/20 active:bg-secondary/20 focus:text-black active:text-black
+                                                                `}
                                                             variant={"ghost"}
                                                         >
                                                             <span className="lg:text-lg text-lg">{item.title}</span>
@@ -177,8 +179,12 @@ export default function AppSidebar({ categories, defaultOpen = true }: AppSideba
                                                 className={`relative flex flex-row items-center justify-start rounded-none gap-3 px-4 py-6 transition-colors ${isActive
                                                     ? "bg-secondary/20 text-[#4D4D4D] hover:text-black hover:bg-secondary/20"
                                                     : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
-                                                    }`}
+                                                    }
+                                                        focus:bg-secondary/20 active:bg-secondary/20 focus:text-black active:text-black
+
+                                                    `}
                                                 variant={"ghost"}
+                                                hasEffect
                                             >
                                                 <span className="lg:text-lg text-lg">{item.title}</span>
                                                 {isActive && (

@@ -276,5 +276,6 @@
     "min": "Message must be at least 10 characters",
     "max": "Message must be at most 1000 characters"
     },
-    "clear": "Clear"
+    "clear": "Clear",
+    "saleProducts": "Sale Products"
 }
