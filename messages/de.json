@@ -271,5 +271,10 @@
   "product_details": "Produktdetails",
   "materials": "Materialien",
   "color": "Farbe",
-  "noOption": "Entschuldigung, diese Option ist für kein Produkt verfügbar."
+  "noOption": "Entschuldigung, diese Option ist für kein Produkt verfügbar.",
+  "msg": {
+    "min": "Die Nachricht muss mindestens 10 Zeichen lang sein",
+    "max": "Die Nachricht darf höchstens 1000 Zeichen lang sein"
+  },
+  "clear": "Löschen"
 }

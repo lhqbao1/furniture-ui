@@ -31,8 +31,10 @@ import Link from "@tiptap/extension-link"
 import LinkControls from "./link-button"
 import { FixedFont } from "./fixed-font"
 import { KeepHtmlPaste } from "./keep-html-style"
-
-
+import TableRow from "@tiptap/extension-table-row"
+import TableCell from "@tiptap/extension-table-cell"
+import TableHeader from "@tiptap/extension-table-header"
+import { Table } from "@tiptap/extension-table"
 
 
 export function MenuBar({ editor, showHtml, setShowHtml }: {
@@ -151,25 +153,13 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
                 ]
             },
         }),
-        // {
-        //     name: 'cleanPaste',
-        //     addProseMirrorPlugins() {
-        //         return [
-        //             new this.editor.view.Plugin({
-        //                 props: {
-        //                     handlePaste(view, event) {
-        //                         event.preventDefault()
-        //                         const text = event.clipboardData?.getData('text/plain') || ''
-        //                         view.dispatch(
-        //                             view.state.tr.insertText(text)
-        //                         )
-        //                         return true
-        //                     },
-        //                 },
-        //             }),
-        //         ]
-        //     },
-        // },
+        // 👇 Thêm các extension bảng
+        Table.configure({
+            resizable: true,
+        }),
+        TableRow,
+        TableHeader,
+        TableCell,
     ]
 
     const editor = useEditor({
