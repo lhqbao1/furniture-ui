@@ -79,8 +79,6 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
         initialData: parentProductData
     })
 
-    console.log(parentProduct)
-
     // Khi có productDetails mới → sync form
     useEffect(() => {
         if (productDetails?.id) {
@@ -229,6 +227,9 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                             ? productDetails.categories[0].children[0].name
                             : productDetails?.categories[0]?.name
                     }
+                    currentPageLink={productDetails?.categories[0]?.children?.length
+                        ? `category/${productDetails.categories[0].children[0].slug}`
+                        : `category/${productDetails?.categories[0]?.slug}`}
                 />
                 {!isLoadingProduct && productDetails ?
                     <FormProvider {...form}>
