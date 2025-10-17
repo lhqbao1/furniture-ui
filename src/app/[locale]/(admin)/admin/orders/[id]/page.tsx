@@ -7,7 +7,7 @@ import OrderDetailOverView from '@/components/layout/admin/orders/order-details/
 import OrderDetailUser from '@/components/layout/admin/orders/order-details/order-user'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import AdminBackButton from '@/components/shared/admin-back-button'
-import { useGetCheckOutByCheckOutId, useGetMainCheckOutByMainCheckOutId } from '@/features/checkout/hook'
+import { useGetMainCheckOutByMainCheckOutId } from '@/features/checkout/hook'
 import { getInvoiceByCheckOut } from '@/features/invoice/api'
 import { formatDate, formatDateTime } from '@/lib/date-formated'
 import { CartItem } from '@/types/cart'

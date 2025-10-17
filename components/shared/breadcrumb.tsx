@@ -8,6 +8,7 @@ import {
     BreadcrumbSeparator,
     BreadcrumbPage,
 } from "@/components/ui/breadcrumb"
+import { Link } from "@/src/i18n/navigation"
 import { Home } from "lucide-react"
 import { useParams, usePathname } from "next/navigation"
 import React from "react"
@@ -16,9 +17,10 @@ interface CustomBreadCrumbProps {
     currentPage?: string
     parentPage?: string
     isProductPage?: boolean
+    currentPageLink?: string
 }
 
-export default function CustomBreadCrumb({ currentPage, isProductPage, parentPage }: CustomBreadCrumbProps) {
+export default function CustomBreadCrumb({ currentPage, isProductPage, parentPage, currentPageLink }: CustomBreadCrumbProps) {
     const params = useParams()
     const { slug } = params
 
@@ -54,7 +56,7 @@ export default function CustomBreadCrumb({ currentPage, isProductPage, parentPag
                         <BreadcrumbSeparator className="text-primary" />
                         <BreadcrumbItem>
                             <BreadcrumbPage className="capitalize text-gray-500 font-bold text-lg">
-                                {currentPage}
+                                <Link href={currentPageLink ? `/${currentPageLink}` : '/'}>{currentPage}</Link>
                             </BreadcrumbPage>
                         </BreadcrumbItem>
                     </>

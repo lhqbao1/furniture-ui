@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { ProductItem } from '@/types/products';
 import Link from 'next/link';
-import { Eye } from 'lucide-react';
+import { Eye, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useGetAllProducts } from '@/features/products/hook';
 
@@ -47,9 +47,11 @@ const SelectBundleComponent = ({ currentProduct }: SelectBundleComponentProps) =
 
     const filteredProducts = useMemo(() => {
         if (!products?.items) return []
-        return products.items.filter((p: ProductItem) =>
-            !listProducts.some((lp) => lp.product.id === p.id)
-        )
+        return products.items
+            .filter(p => p.id !== currentProduct?.id)
+            .filter((p: ProductItem) =>
+                !listProducts.some((lp) => lp.product.id === p.id)
+            )
     }, [products?.items, listProducts])
 
     const maxParentStock = useMemo(() => {
@@ -64,6 +66,13 @@ const SelectBundleComponent = ({ currentProduct }: SelectBundleComponentProps) =
         // Lấy giá trị nhỏ nhất làm giới hạn chung
         return Math.min(...possibleCounts)
     }, [listProducts])
+
+    const handleRemoveBundleItem = (product: ProductItem) => {
+        setListProducts((prev) =>
+            prev.filter((p) => p.product.id !== product.id)
+        )
+    }
+
 
     // ✅ Khởi tạo listProducts từ currentProduct.bundles (nếu có)
     useEffect(() => {
@@ -169,36 +178,41 @@ const SelectBundleComponent = ({ currentProduct }: SelectBundleComponentProps) =
                         </div>
                         <div className="flex flex-col gap-4">
                             {listProducts.map(({ product, amount }) => (
-                                <div key={product.id} className='grid grid-cols-4 gap-3'>
-                                    <div
-                                        className="flex col-span-3 items-center gap-3 border rounded-md p-2 hover:bg-accent/40 transition"
-                                    >
-                                        <Image
-                                            src={product.static_files?.[0]?.url ?? "/product-placeholder.png"}
-                                            width={50}
-                                            height={50}
-                                            alt=""
-                                            className="rounded-sm !h-[40px] object-cover"
-                                            unoptimized
-                                        />
-                                        <div className="flex flex-col flex-1">
-                                            <span className="font-medium">{product.name}</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                #{product.id_provider}
-                                            </span>
+                                <div className='flex gap-3 items-center justify-between' key={product.id}>
+                                    <div key={product.id} className='grid grid-cols-4 gap-3 flex-1'>
+                                        <div
+                                            className="flex col-span-3 items-center gap-3 border rounded-md p-2 hover:bg-accent/40 transition"
+                                        >
+                                            <Image
+                                                src={product.static_files?.[0]?.url ?? "/product-placeholder.png"}
+                                                width={50}
+                                                height={50}
+                                                alt=""
+                                                className="rounded-sm !h-[40px] object-cover"
+                                                unoptimized
+                                            />
+                                            <div className="flex flex-col flex-1">
+                                                <span className="font-medium">{product.name}</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    #{product.id_provider}
+                                                </span>
+                                            </div>
+                                            <Link href={`/product/${product.id}`} target="_blank">
+                                                <Eye className="text-secondary cursor-pointer" size={18} />
+                                            </Link>
                                         </div>
-                                        <Link href={`/product/${product.id}`} target="_blank">
-                                            <Eye className="text-secondary cursor-pointer" size={18} />
-                                        </Link>
-                                    </div>
 
-                                    <Input
-                                        type='number'
-                                        min={1}
-                                        value={amount}
-                                        onChange={(e) => handleAmountChange(product.id, Number(e.target.value))}
-                                        className='h-full'
-                                    />
+                                        <Input
+                                            type='number'
+                                            min={1}
+                                            value={amount}
+                                            onChange={(e) => handleAmountChange(product.id, Number(e.target.value))}
+                                            className='h-full'
+                                        />
+                                    </div>
+                                    <Button variant={'ghost'} onClick={() => handleRemoveBundleItem(product)}>
+                                        <X className='text-red-400' />
+                                    </Button>
                                 </div>
                             ))}
                         </div>

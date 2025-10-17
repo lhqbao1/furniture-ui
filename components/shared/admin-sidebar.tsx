@@ -35,7 +35,6 @@ export function AdminSideBar() {
                 { title: "Product Group", url: "/admin/products/group", icon: CornerDownRight },
                 { title: "Category List", url: "/admin/products/categories", icon: CornerDownRight },
                 { title: "Brand List", url: "/admin/products/brand", icon: CornerDownRight },
-                { title: "Product Bundle", url: "/admin/products/bundle", icon: CornerDownRight },
                 { title: "Marketplace", url: "/admin/products/marketplace", icon: CornerDownRight },
             ],
         },
