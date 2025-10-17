@@ -186,7 +186,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
-                                                <SelectBundleComponent />
+                                                <SelectBundleComponent currentProduct={productValues} />
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>

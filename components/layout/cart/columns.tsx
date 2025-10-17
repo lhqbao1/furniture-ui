@@ -357,25 +357,4 @@ export const getDeliveryOrderColumns = (
                 )
             }
         },
-
-        {
-            accessorKey: "unit_price",
-            header: () => (
-                <div className="text-right w-full">UNIT PRICE</div>
-            ),
-            cell: ({ row }) => <div className="text-right">€{row.original.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>,
-        },
-
-        {
-            accessorKey: "price",
-            header: () => (
-                <div className="text-right w-full">PRICE</div>
-            ),
-            cell: ({ row }) => {
-                return (
-                    <div className="text-right">€{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                )
-            },
-        },
-
     ]

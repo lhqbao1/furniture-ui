@@ -449,6 +449,15 @@ export const productColumns: ColumnDef<ProductItem>[] = [
         },
     },
     {
+        accessorKey: "id",
+        header: ({ }) => <div className="text-center">ID</div>,
+        cell: ({ row }) => {
+            return (
+                <div className="text-center">{row.original.id_provider}</div>
+            )
+        }
+    },
+    {
         accessorKey: "name",
         header: ({ column }) => (
             <Button

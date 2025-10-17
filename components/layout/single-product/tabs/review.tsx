@@ -158,12 +158,12 @@ const ProductReviewTab = () => {
             </div> */}
 
             {/* RIGHT: Videos + Write Review */}
-            {/* <div className={`${isMobile ? 'col-span-1' : 'md:col-span-5 col-span-12'} flex flex-col gap-6`}>
-                <div className="w-full aspect-video">
+            <div className={`${isMobile ? 'col-span-1' : 'md:col-span-5 col-span-12'} flex flex-col gap-6`}>
+                {/* <div className="w-full aspect-video">
                     <YouTube className="w-full h-full rounded-lg" iframeClassName="rounded-lg" videoId={videos[0]} opts={mainVideoOpts} />
-                </div>
+                </div> */}
 
-                <div className='flex justify-center pb-4 border-b border-gray-300'>
+                {/* <div className='flex justify-center pb-4 border-b border-gray-300'>
                     <Carousel opts={{ align: "start", loop: true }} className='w-full md:w-3/4'>
                         <CarouselContent>
                             {videos.slice(1).map((id, idx) => (
@@ -177,10 +177,10 @@ const ProductReviewTab = () => {
                         <CarouselPrevious className='text-primary border-primary' />
                         <CarouselNext className='text-primary border-primary' />
                     </Carousel>
-                </div>
+                </div> */}
 
                 <GiveCommentSection />
-            </div> */}
+            </div>
         </div>
     )
 }
