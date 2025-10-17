@@ -316,10 +316,10 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     },
     {
         accessorKey: "owner",
-        header: "SUPPLIER",
+        header: ({ }) => <div className="text-center">SUPPLIER</div>,
         cell: ({ row }) => {
             return (
-                <div>{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
+                <div className="text-center">{row.original?.supplier?.business_name ? row.original?.supplier?.business_name : "Prestige Home"}</div>
             )
         }
     },
@@ -368,13 +368,28 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
             )
         }
     },
-
+    {
+        accessorKey: "tracking_number",
+        header: ({ }) => <div className="text-center">TRACKING NUMBER</div>,
+        cell: ({ row }) => {
+            return (
+                <div className="text-center">{row.original?.shipment ? row.original?.shipment?.tracking_number : ""}</div>
+            )
+        }
+    },
+    {
+        accessorKey: "carrier",
+        header: () => (
+            <div className="text-center w-full">CARRIER</div>
+        ),
+        cell: ({ row }) => <div className="text-center uppercase">{row.original.shipment ? row.original.shipment.shipping_carrier : row.original.carrier}</div>,
+    },
     {
         accessorKey: "status",
         header: () => (
             <div className="text-center w-full">STATUS</div>
         ),
-        cell: ({ row }) => <div className="text-center lowercase">{row.original.status}</div>,
+        cell: ({ row }) => <div className="text-center lowercase">{row.original.shipment ? row.original.shipment.status : "pending"}</div>,
     },
     {
         id: "actions",

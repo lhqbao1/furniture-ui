@@ -18,22 +18,33 @@ interface DocumentTableProps {
 }
 
 const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
-    const data = useMemo<DocumentRow[]>(() => [
-        {
-            document: "Invoice",
-            code: invoiceCode ?? '',
-            dateSent: formatDateTime(order?.created_at ? new Date(order.created_at) : new Date()),
-            viewType: 'invoice',
-            checkOutId: order?.id
-        },
-        {
-            document: "Package Slip",
-            code: "AR-12365489",
-            dateSent: formatDateTime(order?.created_at ? new Date(order.created_at) : new Date()),
-            viewType: 'package',
-            checkOutId: order?.id
-        },
-    ], [order])
+    const data = useMemo<DocumentRow[]>(() => {
+        if (!order) return []
+
+        const baseData: DocumentRow[] = [
+            {
+                document: "Invoice",
+                code: invoiceCode ?? '',
+                dateSent: formatDateTime(order.created_at ? new Date(order.created_at) : new Date()),
+                viewType: 'invoice',
+                checkOutId: order.id
+            }
+        ]
+
+        // ✅ Chỉ thêm Package Slip khi có <= 1 checkout
+        if ((order.checkouts?.length ?? 0) <= 1) {
+            baseData.push({
+                document: "Package Slip",
+                code: order.checkout_code ?? "",
+                dateSent: formatDateTime(order.created_at ? new Date(order.created_at) : new Date()),
+                viewType: 'package',
+                checkOutId: order.id
+            })
+        }
+
+        return baseData
+    }, [order, invoiceCode])
+
 
     const table = useReactTable({
         data,

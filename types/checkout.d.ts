@@ -9,6 +9,19 @@ interface CheckOutResponse {
     pagination: Pagination
 }
 
+export interface CheckOutShipment {
+    checkout_id: string
+    checkout_marketplace_id: string
+    status: string
+    id: string
+    ship_code: string
+    created_at: string
+    updated_at: string
+    tracking_number: string
+    shipper_date: string
+    shipping_carrier: string
+}
+
 interface CartResponseCheckOut {
     user_id: string
     supplier_id: string
@@ -36,6 +49,8 @@ interface CheckOut {
     marketplace_order_id: string
     total_amount: number
     supplier: SupplierResponse
+    carrier: string
+    shipment: CheckOutShipment
     created_at: Date
     updated_at: Date
 }

@@ -10,6 +10,7 @@ interface OrderDeliveryOrderProps {
 const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(100)
+
     return (
         <ProductTable
             data={data ? data : []}

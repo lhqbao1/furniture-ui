@@ -63,13 +63,6 @@ const OrderInformation = ({
                         {order_type ?? 'Sales order'}
                     </div>
                 </div>
-
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-2">Shipping profile:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {shipping_profile ?? 'Standard DPD'}
-                    </div>
-                </div>
             </div>
 
             <div className='space-y-3 col-span-1'>
