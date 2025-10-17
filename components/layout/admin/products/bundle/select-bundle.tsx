@@ -1,6 +1,6 @@
 'use client'
 import { useGetProductsSelect } from '@/features/product-group/hook'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
@@ -10,19 +10,25 @@ import { ProductItem } from '@/types/products';
 import Link from 'next/link';
 import { Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useGetAllProducts } from '@/features/products/hook';
 
 type SelectedProduct = {
     product: ProductItem;
     amount: number;
 };
 
-const SelectBundleComponent = () => {
+interface SelectBundleComponentProps {
+    currentProduct?: Partial<ProductItem>
+}
+
+const SelectBundleComponent = ({ currentProduct }: SelectBundleComponentProps) => {
     const form = useFormContext()
+    const { setValue } = form
     const [listProducts, setListProducts] = useState<SelectedProduct[]>([])
     const [queryParams, setQueryParams] = useState('')
     const [open, setOpen] = useState(false)
 
-    const { data: products, isLoading, isError } = useGetProductsSelect(queryParams)
+    const { data: products, isLoading, isError } = useGetAllProducts({ search: queryParams, all_products: true, page_size: 100 })
 
     const handleSelectProduct = (product: ProductItem) => {
         setListProducts((prev) => {
@@ -39,8 +45,53 @@ const SelectBundleComponent = () => {
         )
     }
 
-    const filteredProducts =
-        products?.filter((p: ProductItem) => !listProducts.some((lp) => lp.product.id === p.id)) ?? []
+    const filteredProducts = useMemo(() => {
+        if (!products?.items) return []
+        return products.items.filter((p: ProductItem) =>
+            !listProducts.some((lp) => lp.product.id === p.id)
+        )
+    }, [products?.items, listProducts])
+
+    const maxParentStock = useMemo(() => {
+        if (listProducts.length === 0) return 0
+
+        // Tính số lượng tối đa có thể tạo cho từng bundle item
+        const possibleCounts = listProducts.map(({ product, amount }) => {
+            if (!product.stock || amount <= 0) return 0
+            return Math.floor(product.stock / amount)
+        })
+
+        // Lấy giá trị nhỏ nhất làm giới hạn chung
+        return Math.min(...possibleCounts)
+    }, [listProducts])
+
+    // ✅ Khởi tạo listProducts từ currentProduct.bundles (nếu có)
+    useEffect(() => {
+        if (currentProduct?.bundles?.length) {
+            const initialBundles: SelectedProduct[] = currentProduct.bundles.map((b) => ({
+                product: b.bundle_item,
+                amount: b.quantity,
+            }))
+            setListProducts(initialBundles)
+        }
+    }, [currentProduct])
+
+
+    // ✅ Cập nhật vào form mỗi khi listProducts thay đổi
+    useEffect(() => {
+        const bundles = listProducts.map((item) => ({
+            product_id: item.product.id,
+            quantity: item.amount,
+        }))
+        setValue("bundles", bundles)
+    }, [listProducts, setValue])
+
+    useEffect(() => {
+        if (maxParentStock > 0) {
+            setValue("stock", maxParentStock)
+        }
+    }, [maxParentStock, setValue])
+
 
     return (
         <div className='space-y-6'>
@@ -53,26 +104,6 @@ const SelectBundleComponent = () => {
                             className="flex-1 justify-between py-1 h-12"
                         >
                             Select Products
-                            <div className="flex gap-4">
-                                {/* {selectedAction[idx]
-                                    ?
-                                    <div className="flex gap-2 items-center overflow-x-scroll">
-                                        <Image
-                                            src={listProducts?.find((p) => p.id === selectedAction[idx])?.static_files[0].url ?? '/1.png'}
-                                            width={40}
-                                            height={40}
-                                            alt=""
-                                            className="h-10 rounded-sm"
-                                            unoptimized
-                                        />
-                                        <div className="text-base">{listProducts?.find((p) => p.id === selectedAction[idx])?.name}</div>
-                                        <Link href={`/product/${listProducts?.find((p) => p.id === selectedAction[idx])?.id}`}>
-                                            <Eye className="text-secondary cursor-pointer" size={20} />
-                                        </Link>
-                                    </div>
-                                    : "Select product"} */}
-                            </div>
-                            {/* <ChevronRight /> */}
                         </Button>
                     </PopoverTrigger>
 
@@ -104,7 +135,7 @@ const SelectBundleComponent = () => {
                                                     src={
                                                         product.static_files.length > 0
                                                             ? product.static_files[0].url
-                                                            : "/1.png"
+                                                            : "/product-placeholder.png"
                                                     }
                                                     height={25}
                                                     width={25}
@@ -143,7 +174,7 @@ const SelectBundleComponent = () => {
                                         className="flex col-span-3 items-center gap-3 border rounded-md p-2 hover:bg-accent/40 transition"
                                     >
                                         <Image
-                                            src={product.static_files?.[0]?.url ?? "/1.png"}
+                                            src={product.static_files?.[0]?.url ?? "/product-placeholder.png"}
                                             width={50}
                                             height={50}
                                             alt=""

@@ -48,6 +48,11 @@ export const marketPlaceSchema = z.object({
   }
 );
 
+const bundleSchema = z.object({
+  product_id: z.string().min(1, { message: "Bundle product ID is required" }),
+  quantity: z.number().min(1, { message: "Quantity must be at least 1" }),
+})
+
 
 export const addProductSchema = z.object({
   name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
@@ -100,6 +105,9 @@ export const addProductSchema = z.object({
   pallet_unit: z.number().optional().nullable(),
   packages: z.array(packageSchema).optional(),
   marketplace_products: z.array(marketPlaceSchema).optional(),
+
+  bundles: z.array(bundleSchema).optional().nullable(),
+  is_bundle: z.boolean().optional().nullable(),
 })
 
 
@@ -111,6 +119,7 @@ export const defaultValues = {
   tax: "19%",
   category: "",
   ebay: false,
+  is_bundle: false,
   sku: "",
   // delivery_cost: 0,
   collection: null as string | null,

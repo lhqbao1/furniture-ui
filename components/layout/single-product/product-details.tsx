@@ -269,7 +269,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                         </ProductImageDialog>
 
                                         {/* Sub images */}
-                                        <ProductImageCarousel productDetails={productDetails} />
+                                        <ProductImageCarousel productDetails={productDetails} mainImageIndex={mainImageIndex} setMainImageIndex={setMainImageIndex} />
                                     </div>
 
                                     {/*Product details */}
@@ -309,31 +309,38 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                 <div>{t('inStock')}:</div>
                                                 <div className='grid grid-cols-3 w-1/3 gap-1'>
                                                     <span
-                                                        className={`w-full h-2 rounded-xs ${productDetails.stock < 10
-                                                            ? "bg-red-500"
-                                                            : productDetails.stock <= 20
-                                                                ? "bg-primary"
-                                                                : "bg-secondary"
+                                                        className={`w-full h-2 rounded-xs ${productDetails.stock === 0
+                                                            ? "bg-gray-300"
+                                                            : productDetails.stock < 10
+                                                                ? "bg-red-500"
+                                                                : productDetails.stock <= 20
+                                                                    ? "bg-primary"
+                                                                    : "bg-secondary"
                                                             }`}
-                                                    ></span>
+                                                    />
 
                                                     <span
-                                                        className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                        className={`w-full h-2 rounded-xs ${productDetails.stock === 0
                                                             ? "bg-gray-300"
-                                                            : productDetails.stock <= 20
-                                                                ? "bg-primary"
-                                                                : "bg-secondary"
+                                                            : productDetails.stock < 10
+                                                                ? "bg-gray-300"
+                                                                : productDetails.stock <= 20
+                                                                    ? "bg-primary"
+                                                                    : "bg-secondary"
                                                             }`}
-                                                    ></span>
+                                                    />
 
                                                     <span
-                                                        className={`w-full h-2 rounded-xs ${productDetails.stock < 10
+                                                        className={`w-full h-2 rounded-xs ${productDetails.stock === 0
                                                             ? "bg-gray-300"
-                                                            : productDetails.stock <= 20
-                                                                ? "bg-gray-400"
-                                                                : "bg-secondary"
+                                                            : productDetails.stock < 10
+                                                                ? "bg-gray-300"
+                                                                : productDetails.stock <= 20
+                                                                    ? "bg-gray-400"
+                                                                    : "bg-secondary"
                                                             }`}
-                                                    ></span>
+                                                    />
+
                                                 </div>
                                             </div>
 

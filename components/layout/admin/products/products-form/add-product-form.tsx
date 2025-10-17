@@ -27,6 +27,7 @@ import ProductLogisticsGroup from './product-logistics-group'
 import ProductSEOGroup from './product-seo-group'
 import { useRouter } from '@/src/i18n/navigation'
 import { useLocale } from 'next-intl'
+import SelectBundleComponent from '../bundle/select-bundle'
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -83,7 +84,8 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             cost: values.cost || values.cost === 0 ? values.cost : undefined,
             final_price: values.final_price ?? values.price ?? undefined,
             price: values.price ?? values.final_price ?? undefined,
-            stock: values.stock ?? 1
+            stock: values.stock ?? 1,
+            is_bundle: values.bundles && values.bundles?.length > 0 ? true : false
         }
 
         if (productValuesClone) {
@@ -175,6 +177,16 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                         <Card>
                                             <CardContent>
                                                 <ProductAdditionalInputs />
+                                            </CardContent>
+                                        </Card>
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="component">
+                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>Product Bundle</AccordionTrigger>
+                                    <AccordionContent className="mt-2">
+                                        <Card>
+                                            <CardContent>
+                                                <SelectBundleComponent currentProduct={productValues} />
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>

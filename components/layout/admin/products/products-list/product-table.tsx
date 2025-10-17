@@ -81,6 +81,25 @@ export function ProductTable<TData, TValue>({
         },
     })
 
+    const transformCartItems = (cartItems: CartItem[]): CartItem[] => {
+        return cartItems.flatMap((item) => {
+            const product = item.products
+
+            if (product.bundles && product.bundles.length > 0) {
+                // Tách ra các dòng con
+                return product.bundles.map((bundle) => ({
+                    ...item,
+                    products: bundle.bundle_item, // thay thế bằng sản phẩm con
+                    quantity: bundle.quantity * item.quantity, // dùng số lượng của bundle
+                }))
+            }
+
+            // Không có bundles thì giữ nguyên
+            return item
+        })
+    }
+
+
     return (
         <div className="flex flex-col gap-4">
             {hasCount ? <p>{totalItems} items found</p> : ''}
@@ -148,7 +167,7 @@ export function ProductTable<TData, TValue>({
                                                     >
                                                         <div className="p-4 text-sm">
                                                             <ProductTable<CartItem, unknown>
-                                                                data={(row.original as CheckOut).cart.items}
+                                                                data={transformCartItems((row.original as CheckOut).cart.items)}
                                                                 columns={getDeliveryOrderColumns({ is_multiple_delivery: (row.original as CheckOut).supplier ? (row.original as CheckOut).supplier.delivery_multiple : false })}
                                                                 page={1}
                                                                 pageSize={5}
@@ -159,7 +178,6 @@ export function ProductTable<TData, TValue>({
                                                                 totalPages={1}
                                                                 hasCount={false}
                                                             />
-
                                                         </div>
                                                     </div>
                                                 </TableCell>

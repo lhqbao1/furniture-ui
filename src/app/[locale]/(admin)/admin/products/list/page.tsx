@@ -22,7 +22,7 @@ const ProductList = () => {
     if (isError) return <div>No data</div>
 
     return (
-        <div className='lg:space-y-12 space-y-6 pb-12'>
+        <div className='space-y-6 pb-12'>
             <AdminBackButton />
             {/* <ProductStatistic statistic={statisticDemo} /> */}
             <div className='text-3xl text-secondary font-bold text-center'>Product List</div>

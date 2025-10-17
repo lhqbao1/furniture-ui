@@ -37,11 +37,13 @@ interface SyncToEbayFormProps {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
     isUpdating?: boolean
     currentMarketplace?: string
+    updating?: boolean
+    setUpdating: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>
 
-const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMarketplace }: SyncToEbayFormProps) => {
+const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMarketplace, updating, setUpdating }: SyncToEbayFormProps) => {
     const updateProductMutation = useEditProduct()
     const syncToEbayMutation = useSyncToEbay()
     // Danh sách marketplace khả dụng
@@ -93,6 +95,7 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
     }, [marketplace, form])
 
     const onSubmit = (values: MarketPlaceFormValues) => {
+        setUpdating(true)
         const normalizedValues: MarketplaceProduct = {
             ...values,
             marketplace: values.marketplace ?? '',
@@ -116,10 +119,19 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                 (m) => m.marketplace === values.marketplace
             )
 
+            const updateValues = {
+                ...normalizedValues,
+                is_active: updatedMarketplaceProducts[index].is_active,
+                marketplace_offer_id: updatedMarketplaceProducts[index].marketplace_offer_id,
+                line_item_id: updatedMarketplaceProducts[index].line_item_id,
+                brand: updatedMarketplaceProducts[index].brand,
+            }
+
+
             if (index !== -1) {
                 updatedMarketplaceProducts[index] = {
                     ...updatedMarketplaceProducts[index],
-                    ...normalizedValues,
+                    ...updateValues,
                 }
             } else {
                 updatedMarketplaceProducts.push(normalizedValues)
@@ -134,6 +146,14 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                     ...product,
                     category_ids: product.categories.map((c) => c.id),
                     marketplace_products: updatedMarketplaceProducts,
+                    ...(product.bundles?.length
+                        ? {
+                            bundles: product.bundles.map(item => ({
+                                product_id: item.bundle_item.id,
+                                quantity: item.quantity,
+                            })),
+                        }
+                        : { bundles: [] }),
                 },
                 id: product.id,
             },
@@ -165,6 +185,7 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                             onSuccess(data, variables, context) {
                                 setOpen(false)
                                 toast.success("Update data to ebay successfully")
+                                setUpdating(false)
                             },
                             onError(error, variables, context) {
                                 toast.error("Update data to ebay fail")

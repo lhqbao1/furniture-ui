@@ -37,7 +37,15 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
                 ...product,
                 is_active: !product.is_active,
                 category_ids: product.categories.map((c) => c.id), // map ra id array
-                // brand_id: product.brand.id
+                // 🔹 Thêm bundles
+                ...(product.bundles?.length
+                    ? {
+                        bundles: product.bundles.map(item => ({
+                            product_id: item.bundle_item.id,
+                            quantity: item.quantity,
+                        })),
+                    }
+                    : { bundles: [] }),
             },
             id: product.id,
         }, {
@@ -65,6 +73,7 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
     const syncToEbayMutation = useSyncToEbay()
     const removeFromEbayMutation = useRemoveFormEbay()
     const [openUpdateMarketplaceDialog, setOpenUpdateMarketplaceDialog] = useState<boolean>(false)
+    const [updating, setUpdating] = useState<boolean>(false)
 
     const handleRemoveFromEbay = () => {
         if (marketplace === 'ebay') {
@@ -135,13 +144,15 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
                 product.marketplace_products.find(m => m.marketplace === marketplace)?.is_active === true ? (
                     <Dialog open={openUpdateMarketplaceDialog} onOpenChange={setOpenUpdateMarketplaceDialog}>
                         <DialogTrigger asChild>
-                            <Button variant="outline">Update</Button>
+                            <Button variant="outline">
+                                {updating ? <Loader2 className="animate-spin" /> : 'Update'}
+                            </Button>
                         </DialogTrigger>
                         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
                             <DialogHeader>
                                 <DialogTitle>Update Marketplace</DialogTitle>
                             </DialogHeader>
-                            <SyncToEbayForm product={product} open={openUpdateMarketplaceDialog} setOpen={setOpenUpdateMarketplaceDialog} isUpdating currentMarketplace={marketplace} />
+                            <SyncToEbayForm updating={updating} setUpdating={setUpdating} product={product} open={openUpdateMarketplaceDialog} setOpen={setOpenUpdateMarketplaceDialog} isUpdating currentMarketplace={marketplace} />
                         </DialogContent>
                     </Dialog>
                 ) : (
@@ -212,18 +223,20 @@ function RemoveFromMarketplace({ product, marketplace }: { product: ProductItem,
 
 function AddProductMarketplace({ product }: { product: ProductItem }) {
     const [openAddMarketplaceDialog, setOpenAddMarketplaceDialog] = useState<boolean>(false)
-
+    const [updating, setUpdating] = useState<boolean>(false)
     return (
         <div className="flex gap-2 justify-center">
             <Dialog open={openAddMarketplaceDialog} onOpenChange={setOpenAddMarketplaceDialog}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Add</Button>
+                    <Button variant="outline">
+                        {updating ? <Loader2 className="animate-spin" /> : 'Add'}
+                    </Button>
                 </DialogTrigger>
                 <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
                     <DialogHeader>
                         <DialogTitle>Add Marketplace</DialogTitle>
                     </DialogHeader>
-                    <SyncToEbayForm product={product} open={openAddMarketplaceDialog} setOpen={setOpenAddMarketplaceDialog} isUpdating={false} />
+                    <SyncToEbayForm setUpdating={setUpdating} product={product} open={openAddMarketplaceDialog} setOpen={setOpenAddMarketplaceDialog} isUpdating={false} />
                 </DialogContent>
             </Dialog>
             {/* <Button variant={'outline'} className="text-red-500 border border-red-500">Remove</Button> */}
@@ -374,7 +387,7 @@ export const productMarketplaceColumns = (
                                 <SyncToMarketplace product={product} marketplace={marketplace} />
                             ) : (
                                 // ✅ Có marketplace + inactive → hiển thị nút Remove
-                                <RemoveFromMarketplace product={product} marketplace={marketplace} />
+                                <div className="text-center">Product is inactive</div>
                             )
                         ) : !product.is_active ? (
                             // ❌ Không có marketplace + inactive

@@ -27,6 +27,7 @@ interface ProductDetailInputsProps {
 
 const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetailInputsProps) => {
     const form = useFormContext()
+    const bundles = form.watch('bundles')
 
     const handleDownloadImages = async () => {
         const files = form.getValues('static_files') as { url: string }[];
@@ -173,6 +174,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                                 <Input
                                     type="number"
                                     inputMode="decimal"
+                                    disabled={bundles.length > 0}
                                     value={field.value ?? ""}
                                     onChange={(e) =>
                                         field.onChange(

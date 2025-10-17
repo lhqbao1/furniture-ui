@@ -13,10 +13,11 @@ import type { CarouselApi } from "@/components/ui/carousel"
 
 interface ProductImageCarouselProps {
     productDetails: ProductItem
+    mainImageIndex: number
+    setMainImageIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
-export function ProductImageCarousel({ productDetails }: ProductImageCarouselProps) {
-    const [mainImageIndex, setMainImageIndex] = useState(0)
+export function ProductImageCarousel({ productDetails, mainImageIndex, setMainImageIndex }: ProductImageCarouselProps) {
     const [api, setApi] = useState<CarouselApi>()
 
     const handleSelectImage = (index: number) => {
@@ -45,7 +46,7 @@ export function ProductImageCarousel({ productDetails }: ProductImageCarouselPro
                                     className={`${mainImageIndex === index
                                         ? "border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover"
                                         : ""
-                                        } lg:h-[80px] h-[60px] object-fill`}
+                                        } lg:h-[100px] h-[80px] object-contain`}
                                     priority={index < 2}
                                     loading={index < 2 ? "eager" : "lazy"}
                                 />

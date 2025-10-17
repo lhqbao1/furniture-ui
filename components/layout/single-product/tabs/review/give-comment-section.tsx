@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { useQuery } from '@tanstack/react-query'
 import { getMe } from '@/features/auth/api'
 import { Button } from '@/components/ui/button'
+import CommentForm from './comment-form'
 
 const GiveCommentSection = () => {
     const [rating, setRating] = useState(0)
@@ -59,7 +60,7 @@ const GiveCommentSection = () => {
                     <p className='text-sm text-gray-600 font-semibold'>{t('yourRating')}</p>
                 </div>
             </div>
-            {/* <CommentForm /> */}
+            <CommentForm />
         </div>
     )
 }

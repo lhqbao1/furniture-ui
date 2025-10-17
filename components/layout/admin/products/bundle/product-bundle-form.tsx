@@ -179,7 +179,6 @@ const ProductBundleForm = ({ productValues, onSubmit, isPending, productValuesCl
                                         <Card>
                                             <CardContent>
                                                 <SelectBundleComponent />
-                                                {/* <ProductDetailInputs isEdit={productValues ? true : false} productId={productValues ? productValues.id_provider : null} /> */}
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>

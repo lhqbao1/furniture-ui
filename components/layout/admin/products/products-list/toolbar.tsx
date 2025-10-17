@@ -76,7 +76,7 @@ export default function TableToolbar({
     return (
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
             {/* Left group */}
-            <div className="flex items-center gap-4 flex-wrap lg:flex-nowrap ">
+            <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="flex items-center gap-1">
