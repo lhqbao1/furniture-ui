@@ -10,9 +10,8 @@ import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import dynamic from "next/dynamic"
-import { Button } from '@/components/ui/button'
-import { toast } from 'sonner'
 import { tags } from '@/data/data'
+import { toast } from 'sonner'
 
 // import RichEditor dynamically to avoid SSR issues
 const RichEditor = dynamic(() => import("@/components/shared/tiptap/tiptap-editor"), {
@@ -63,13 +62,45 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                                 <FormControl>
                                     <Switch
                                         checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
+                                        onCheckedChange={(checked) => {
+                                            if (checked) {
+                                                // Lấy toàn bộ giá trị form hiện tại
+                                                const values = form.getValues();
+
+                                                // Kiểm tra điều kiện
+                                                const missingFields: string[] = [];
+                                                if (!values.name) missingFields.push("name");
+                                                if (!values.final_price) missingFields.push("final_price");
+                                                if (!values.cost) missingFields.push("cost");
+                                                if (!values.delivery_cost) missingFields.push("delivery_cost");
+                                                if (!values.stock) missingFields.push("stock");
+                                                if (!values.static_files?.length)
+                                                    missingFields.push("images");
+                                                if (!values.category_ids?.length)
+                                                    missingFields.push("categories");
+
+                                                if (missingFields.length > 0) {
+                                                    toast.error(
+                                                        `Cannot activate product. Missing fields: ${missingFields.join(", ")}`
+                                                    );
+                                                    // Không cho bật active
+                                                    field.onChange(false);
+                                                    return;
+                                                }
+
+                                                // ✅ Đủ điều kiện
+                                                field.onChange(true);
+                                            } else {
+                                                field.onChange(false);
+                                            }
+                                        }}
+                                        className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer"
                                     />
                                 </FormControl>
                             </FormItem>
                         )}
                     />
+
                 }
 
             </div>
