@@ -143,12 +143,12 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                         {((invoice?.total_shipping ?? 0) + (invoice?.voucher_amount ?? 0))?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                     </div>
                 </div>
-                <div className="flex gap-0 justify-end">
+                {/* <div className="flex gap-0 justify-end">
                     <div className="mr-6">Summe (netto)</div>
                     <div className="w-[100px] text-right">
                         {((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                     </div>
-                </div>
+                </div> */}
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">MwSt.</div>
                     <div className="w-[100px] text-right">
@@ -224,7 +224,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div>Thuy Duong Nguyen</div>
                 <div>Tax code: DE454714336</div>
             </div>
-            {checkout && invoice && (
+            {/* {checkout && invoice && (
                 <div className="absolute bottom-0 right-1/2 translate-x-1/2 transform z-20">
                     <Button variant={'outline'}>
                         <PDFDownloadLink
@@ -235,9 +235,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                         </PDFDownloadLink>
                     </Button>
                 </div>
-            )}
-
-
+            )} */}
         </div>
     )
 }

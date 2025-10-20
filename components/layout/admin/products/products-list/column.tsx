@@ -302,41 +302,57 @@ function SyncToEbay({ product }: { product: ProductItem }) {
     )
 }
 
-function ToogleProductStatus({ product }: { product: ProductItem }) {
+function ToggleProductStatus({ product }: { product: ProductItem }) {
     const editProductMutation = useEditProduct()
-    const handleToogleStatus = () => {
-        if (product.marketplace_products?.length > 0) {
-            toast.error("This product is currently on marketplace")
-        } else {
-            editProductMutation.mutate({
-                input: {
-                    ...product,
-                    is_active: !product.is_active,
-                    category_ids: product.categories.map((c) => c.id), // map ra id array
-                    bundles: product.bundles.length > 0
-                        ? product.bundles.map(item => ({
-                            product_id: item.bundle_item.id,
-                            quantity: item.quantity
-                        }))
-                        : null
-                    // brand_id: product.brand.id
-                },
-                id: product.id,
-            }, {
-                onSuccess(data, variables, context) {
-                    toast.success("Update product status successful")
-                },
-                onError(error, variables, context) {
-                    toast.error("Update product status fail")
-                },
-            })
+    const hasMarketplace = product.marketplace_products?.length > 0;
+
+    const isIncomplete =
+        product.static_files.length === 0 ||
+        !product.name ||
+        !product.final_price ||
+        !product.cost ||
+        !product.delivery_cost ||
+        !product.stock ||
+        product.categories.length === 0;
+
+    const handleToggleStatus = () => {
+        if (hasMarketplace) {
+            toast.error("This product is currently on marketplace");
+            return;
         }
+
+        if (isIncomplete) {
+            toast.error("Product information is incomplete");
+            return;
+        }
+
+        editProductMutation.mutate({
+            input: {
+                ...product,
+                is_active: !product.is_active,
+                category_ids: product.categories.map((c) => c.id), // map ra id array
+                bundles: product.bundles.length > 0
+                    ? product.bundles.map(item => ({
+                        product_id: item.bundle_item.id,
+                        quantity: item.quantity
+                    }))
+                    : null
+            },
+            id: product.id,
+        }, {
+            onSuccess(data, variables, context) {
+                toast.success("Update product status successful")
+            },
+            onError(error, variables, context) {
+                toast.error("Update product status fail")
+            },
+        })
     }
 
     return (
         <Switch
             checked={product.is_active}
-            onCheckedChange={handleToogleStatus}
+            onCheckedChange={handleToggleStatus}
             disabled={editProductMutation.isPending}
             className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
         />
@@ -523,7 +539,7 @@ export const productColumns: ColumnDef<ProductItem>[] = [
             // >
             //     {row.original.is_active ? "active" : "inactive"}
             // </span>
-            <ToogleProductStatus product={row.original} />
+            <ToggleProductStatus product={row.original} />
         ),
     },
     {

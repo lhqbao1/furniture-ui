@@ -2,16 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { BrandResponse } from "@/types/brand";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 import { SupplierResponse } from "@/types/supplier";
 import DeleteDialog from "./delete-dialog";
 import AddOrEditSupplierForm from "./add-or-edit-form";
-
-
 
 const EditSupplierCell = ({ supplier }: { supplier: SupplierResponse }) => {
     const [open, setOpen] = useState(false)
@@ -56,15 +52,6 @@ export const supplierColumns: ColumnDef<SupplierResponse>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
-    },
-    {
-        accessorKey: "salutation",
-        header: "SALUTATION",
-        cell: ({ row }) => {
-            return (
-                <div>{row.original.salutation}</div>
-            )
-        },
     },
     {
         accessorKey: "business_name",

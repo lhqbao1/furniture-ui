@@ -28,7 +28,7 @@ const ProductLogisticsGroup = ({ isDSP = false }: ProductLogisticsGroupProps) =>
     ]
 
 
-    const deliveryTimes = ["1-3", "3-5", "5-8", "8-14", "14-20"]
+    const deliveryTimes = ["1-3", "3-5", "5-8", "8-14", "14-20", "20-30"]
 
     // Lấy giá trị number_of_packages từ form
     const numberOfPackages = useWatch({

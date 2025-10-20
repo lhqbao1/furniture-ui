@@ -55,11 +55,11 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
       return <div className="text-right">{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
     },
   },
-  {
-    accessorKey: "net_price",
-    header: "Summe",
-    cell: ({ row }) => {
-      return <div>{((row.original.products.final_price - (parseTax(row.original.products.tax) / 100 * row.original.products.final_price)) * row.original.quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
-    },
-  },
+  // {
+  //   accessorKey: "net_price",
+  //   header: "Summe",
+  //   cell: ({ row }) => {
+  //     return <div>{((row.original.products.final_price - (parseTax(row.original.products.tax) / 100 * row.original.products.final_price)) * row.original.quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+  //   },
+  // },
 ]

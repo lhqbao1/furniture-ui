@@ -1,5 +1,4 @@
 export interface SupplierInput {
-    salutation: string
     business_name: string
     vat_id: string
     email: string
@@ -10,7 +9,6 @@ export interface SupplierInput {
 }
 
 export interface SupplierResponse {
-    salutation: string
     business_name: string
     delivery_multiple: boolean
   vat_id: string
