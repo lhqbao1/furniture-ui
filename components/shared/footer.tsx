@@ -50,10 +50,10 @@ const Footer = () => {
                 <h4 className="font-semibold mb-3">{t('pages')}</h4>
                 <ul className="space-y-2 text-black-700 text-sm">
                     {/* ✅ thêm locale */}
-                    <li><Link href={`/about-us`}>{t('aboutUs')}</Link></li>
-                    <li><Link href={`/contact`}>{t('contact')}</Link></li>
-                    <li><Link href={`/faq`}>FAQ</Link></li>
-                    <li><Link href={`/impressum`}>{t('imprint')}</Link></li>
+                    <li className="hover:pl-2 transition-all duration-500"><Link href={`/about-us`}>{t('aboutUs')}</Link></li>
+                    <li className="hover:pl-2 transition-all duration-500"><Link href={`/contact`}>{t('contact')}</Link></li>
+                    <li className="hover:pl-2 transition-all duration-500"><Link href={`/faq`}>FAQ</Link></li>
+                    <li className="hover:pl-2 transition-all duration-500"><Link href={`/impressum`}>{t('imprint')}</Link></li>
                 </ul>
             </div>
 
@@ -62,10 +62,10 @@ const Footer = () => {
                 <h4 className="font-semibold mb-3">{t('termPolicy')}</h4>
                 <ul className="space-y-2 text-black-700 text-sm">
                     {/* ✅ thêm locale */}
-                    <li><Link href={`/agb`}>{t('termCondition')}</Link></li>
-                    <li><Link href={`/privacy-policy`}>{t('privacyPolicy')}</Link></li>
-                    <li><Link href={`/cancellation`}>Widerruf</Link></li>
-                    <li>
+                    <li className="hover:pl-2 transition-all duration-500"><Link href={`/agb`}>{t('termCondition')}</Link></li>
+                    <li className="hover:pl-2 transition-all duration-500"><Link href={`/privacy-policy`}>{t('privacyPolicy')}</Link></li>
+                    <li className="hover:pl-2 transition-all duration-500"><Link href={`/cancellation`}>Widerruf</Link></li>
+                    <li className="hover:pl-2 transition-all duration-500">
                         <Link
                             href="#"
                             onClick={(e) => {
