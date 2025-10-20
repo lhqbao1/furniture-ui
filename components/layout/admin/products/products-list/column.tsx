@@ -331,7 +331,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
                 ...product,
                 is_active: !product.is_active,
                 category_ids: product.categories.map((c) => c.id), // map ra id array
-                bundles: product.bundles.length > 0
+                bundles: product.bundles && product.bundles.length > 0
                     ? product.bundles.map(item => ({
                         product_id: item.bundle_item.id,
                         quantity: item.quantity
@@ -404,7 +404,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
                 <Pencil className="w-4 h-4 text-primary" />
             </Button>
             {/* </Link> */}
-            <DeleteDialog product={product} isEbay={product.ebay} />
+            <DeleteDialog product={product} isEbay={product.marketplace_products.find(i => i.marketplace === 'ebay')?.is_active ? true : false} />
             <Link
                 href={`/product${categoryHref}`}
                 target="_blank"
