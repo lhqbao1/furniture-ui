@@ -1,3 +1,6 @@
+export const config = {
+  regions: ['fra1'],
+};
 import { api } from "@/lib/axios"
 import { MailFormValues } from "@/types/mail"
 

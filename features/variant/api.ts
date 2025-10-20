@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { api, apiAdmin, apiFlexible } from "@/lib/axios";
 import { AddOptionToProductInput, VariantOption, VariantOptionInput, VariantOptionsResponse, VariantResponse } from "@/types/variant";
 

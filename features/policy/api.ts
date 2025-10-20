@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { api, apiAdmin } from "@/lib/axios"
 import { PolicyResponse, PolicyVersion } from "@/types/policy"
 

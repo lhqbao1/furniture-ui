@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { api, apiFlexible } from "@/lib/axios"
 import { InvoiceResponse } from "@/types/invoice"
 

@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { api, apiAdmin, apiDSP, apiFlexible } from "@/lib/axios"
 import { CreateOrderFormValues } from "@/lib/schema/checkout"
 import { CheckOut, CheckOutMain, CheckOutMainResponse, CheckOutResponse, CheckOutStatistics } from "@/types/checkout"

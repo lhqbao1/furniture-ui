@@ -1,3 +1,8 @@
+// Đặt ở đầu file
+export const config = {
+  regions: ['fra1'],
+};
+
 import { api } from "@/lib/axios"
 import { AddressFormValues } from "@/lib/schema/address"
 import { Address } from "@/types/address"
