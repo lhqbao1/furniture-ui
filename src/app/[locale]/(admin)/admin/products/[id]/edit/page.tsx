@@ -60,7 +60,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <AdminBackButton />
             <div className="lg:p-6 p-2 mt-6 lg:mt-0">
                 <h1 className="text-xl font-bold mb-4">Edit Product</h1>
-                {/* 2. Wrap the lazy-loaded component with Suspense */}
                 <React.Suspense fallback={<ProductFormSkeleton />}>
                     <ProductForm
                         productValues={data}
