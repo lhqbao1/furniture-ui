@@ -76,43 +76,6 @@ export default function AddOrEditSupplierForm({ onSuccess, submitText, onClose, 
                 )}
                 className="space-y-6"
             >
-                <FormField
-                    control={form.control}
-                    name="salutation"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Salutation</FormLabel>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex space-x-4"
-                                >
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <RadioGroupItem value="MR" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">Mr</FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <RadioGroupItem value="MRS" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">Mrs</FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <RadioGroupItem value="NOT_SPECIFIED" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">Other</FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
                 {/* Business name */}
                 <FormField
                     control={form.control}

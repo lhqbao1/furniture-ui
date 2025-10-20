@@ -283,7 +283,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     </View>
 
                     {/* Invoice total */}
-                    <View
+                    {/* <View
                         style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -297,7 +297,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                         <Text style={{ width: '20%', textAlign: 'right' }}>
                             {((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                         </Text>
-                    </View>
+                    </View> */}
 
                     <View>
                         <View

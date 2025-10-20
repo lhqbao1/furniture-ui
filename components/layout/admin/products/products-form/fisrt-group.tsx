@@ -29,42 +29,6 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
     const form = useFormContext()
     const bundles = form.watch('bundles')
 
-    const handleDownloadImages = async () => {
-        const files = form.getValues('static_files') as { url: string }[];
-
-        if (!files || files.length === 0) {
-            toast.error("Product does not have any image")
-            return;
-        }
-
-        for (const [index, file] of files.entries()) {
-            try {
-                const response = await fetch(file.url);
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-
-                // --- Đoán định dạng ảnh ---
-                const match = file.url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
-                const ext = match ? match[1].toLowerCase() : "jpg";
-
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `image_${index + 1}.${ext}`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                window.URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error("Lỗi tải ảnh:", file.url, error);
-            }
-        }
-
-        toast.success("Download images successful")
-    };
-
-
-
     return (
         <div className='space-y-6'>
             {/*Product Name */}

@@ -29,7 +29,7 @@ const GiveCommentSection = () => {
 
     if (!user) {
         return (
-            <Button>Login to comment</Button>
+            <div className='flex justify-start'><Button>Login to comment</Button></div>
         )
     }
 
