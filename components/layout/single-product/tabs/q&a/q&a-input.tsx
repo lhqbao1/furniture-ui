@@ -53,7 +53,14 @@ const QAInput = ({ productId }: QAInputProps) => {
 
         if (parent_id) payload.parent_id = parent_id
 
-        postQAMutation.mutate(payload)
+        postQAMutation.mutate(payload, {
+            onSuccess(data, variables, context) {
+
+            },
+            onError(error, variables, context) {
+
+            },
+        })
 
         setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
         if (parent_id) setShowReply((prev) => ({ ...prev, [idKey]: false }))
