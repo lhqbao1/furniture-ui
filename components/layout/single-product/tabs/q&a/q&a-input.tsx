@@ -13,6 +13,8 @@ import { getMe } from "@/features/auth/api"
 import { useCreateQA, useGetQAByProduct } from "@/features/qa/hook"
 import { formatDateTime } from "@/lib/date-formated"
 import { QAFormValues } from "@/lib/schema/qa"
+import { toast } from "sonner"
+import QASkeleton from "./qa-skeleton"
 
 interface QAInputProps {
     productId: string
@@ -53,7 +55,19 @@ const QAInput = ({ productId }: QAInputProps) => {
 
         if (parent_id) payload.parent_id = parent_id
 
-        postQAMutation.mutate(payload)
+        postQAMutation.mutate(payload, {
+            onSuccess: () => {
+                toast.success(t("QAsuccess")) // ✅ message theo ngôn ngữ hiện tại
+                setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
+                if (parent_id) {
+                    setShowReply((prev) => ({ ...prev, [idKey]: false }))
+                }
+            },
+            onError: (error) => {
+                console.error(error)
+                toast.error(t("QAerror"))
+            },
+        })
 
         setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
         if (parent_id) setShowReply((prev) => ({ ...prev, [idKey]: false }))
@@ -65,6 +79,10 @@ const QAInput = ({ productId }: QAInputProps) => {
     }
 
     const toggleReply = (key: string) => {
+        if (!userId) {
+            toast.error(t("QAerror"))
+            return
+        }
         setShowReply((prev) => ({ ...prev, [key]: !prev[key] }))
     }
 
@@ -94,7 +112,7 @@ const QAInput = ({ productId }: QAInputProps) => {
             {/* Danh sách câu hỏi và trả lời */}
             <div>
                 {isLoading ? (
-                    <Loader2 className="animate-spin" />
+                    <QASkeleton />
                 ) : listQA && listQA.length > 0 ? (
                     listQA.map((item) => (
                         <div key={item.id} className="mb-8">
@@ -116,7 +134,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                                         className="text-sm !text-blue-500 mt-1 hover:bg-blue-50"
                                         onClick={() => toggleReply(item.id)}
                                     >
-                                        {showReply[item.id] ? "Cancel" : "Reply"}
+                                        {showReply[item.id] ? t('cancel') : t('reply')}
                                     </Button>
                                 </div>
                             )}
@@ -142,54 +160,65 @@ const QAInput = ({ productId }: QAInputProps) => {
                             )}
 
                             {item.replies && item.replies.length > 0 && (
-                                <div className="mt-3 space-y-4">
-                                    {item.replies.map((reply) => (
-                                        <div key={reply.id} className="ml-14">
-                                            <div className="px-4 py-2 bg-gray-200 rounded-lg">
-                                                <div className="flex gap-6">
-                                                    <div className="font-bold">
-                                                        {reply.user.first_name} {reply.user.last_name}
+                                <div className="mt-3 ml-6 relative">
+                                    {/* Line dọc nằm bên trái các reply con */}
+                                    <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-300"></div>
+
+                                    <div className="space-y-4">
+                                        {item.replies.map((reply) => (
+                                            <div
+                                                key={reply.id}
+                                                className="relative pl-8 before:content-[''] before:absolute before:top-6 before:left-3 before:w-5 before:h-px before:bg-gray-300"
+                                            >
+                                                {/* Box comment con */}
+                                                <div className="px-4 py-2 bg-gray-200 rounded-lg">
+                                                    <div className="flex gap-6">
+                                                        <div className="font-bold">
+                                                            {reply.user.first_name} {reply.user.last_name}
+                                                        </div>
+                                                        <div>{formatDateTime(reply.created_at)}</div>
                                                     </div>
-                                                    <div>{formatDateTime(reply.created_at)}</div>
+                                                    <div>{reply.comment}</div>
                                                 </div>
-                                                <div>{reply.comment}</div>
-                                            </div>
 
-                                            {/* Nút Reply riêng cho từng reply con */}
-                                            <div className="flex justify-end">
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    className="text-sm !text-blue-500 mt-1 hover:bg-blue-50"
-                                                    onClick={() => toggleReply(reply.id)}
-                                                >
-                                                    {showReply[reply.id] ? "Cancel" : "Reply"}
-                                                </Button>
-                                            </div>
-
-                                            {/* Nếu reply này đang mở khung trả lời */}
-                                            {showReply[reply.id] && (
-                                                <div className="relative flex mt-2 ml-10">
-                                                    <Textarea
-                                                        placeholder={t("qaSearch")}
-                                                        className="rounded-lg h-30"
-                                                        value={qaInputs[reply.id] || ""}
-                                                        onChange={(e) => handleInputChange(reply.id, e.target.value)}
-                                                    />
+                                                {/* Nút Reply riêng cho từng reply con */}
+                                                <div className="flex justify-end">
                                                     <Button
-                                                        onClick={() => handleSendQa(item.id, reply.id)} // ✅ truyền cả cha & key textarea
                                                         type="button"
                                                         variant="ghost"
-                                                        className="cursor-pointer absolute text-secondary right-0 bottom-0 size-12"
+                                                        className="text-sm !text-blue-500 mt-1 hover:bg-blue-50"
+                                                        onClick={() => toggleReply(reply.id)}
                                                     >
-                                                        <SendHorizonal className="size-6" />
+                                                        {showReply[reply.id] ? t('cancel') : t('reply')}
                                                     </Button>
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
+
+                                                {/* Ô nhập reply cho reply con */}
+                                                {showReply[reply.id] && (
+                                                    <div className="relative flex mt-2 ml-8">
+                                                        <Textarea
+                                                            placeholder={t("qaSearch")}
+                                                            className="rounded-lg h-30"
+                                                            value={qaInputs[reply.id] || ""}
+                                                            onChange={(e) => handleInputChange(reply.id, e.target.value)}
+                                                        />
+                                                        <Button
+                                                            onClick={() => handleSendQa(item.id, reply.id)} // ✅ gửi về cha gốc
+                                                            type="button"
+                                                            variant="ghost"
+                                                            className="cursor-pointer absolute text-secondary right-0 bottom-0 size-12"
+                                                        >
+                                                            <SendHorizonal className="size-6" />
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
+
+
 
                         </div>
                     ))

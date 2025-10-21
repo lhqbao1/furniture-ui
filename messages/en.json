@@ -217,6 +217,7 @@
     "customRequest": "CUSTOM REQUEST",
     "getCustom": "Get a free 3D mock-up in 24 hours",
     "cancel": "Cancel",
+    "reply": "Reply",
     "enterDes": "Enter your description...",
     "chooseAtLeastCart": "You need to choose at least one product to check out",
     "searchProduct": "Search Products",
@@ -279,5 +280,7 @@
     "clear": "Clear",
     "saleProducts": "Sale Products",
     "uploading": "Uploading image...",
-  "selectOrDrop": "Click to select or drag and drop an image here"
+  "selectOrDrop": "Click to select or drag and drop an image here",
+  "QAsuccess": "Your question has been sent successfully!",
+  "QAerror": "Something went wrong. Please try again."
 }
