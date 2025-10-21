@@ -1,4 +1,3 @@
-// Đặt ở đầu file
 export const config = {
   regions: ['fra1'],
 };

@@ -34,7 +34,11 @@ const reviewCount = [
     { title: 1, percent: 2 }
 ]
 
-const ProductReviewTab = () => {
+interface ProductReviewTabProps {
+    productId: string
+}
+
+const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
     const t = useTranslations()
     const [selectedRate, setSelectedRate] = useState<number>()
     const [showPic, setShowPic] = useState(true)
@@ -127,7 +131,7 @@ const ProductReviewTab = () => {
                     </div>
                 </div> */}
 
-                {/* <div className={`grid gap-4 border-b border-gray-300 pb-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
+                <div className={`grid gap-4 border-b border-gray-300 pb-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
                     <div className={`${isMobile ? 'flex flex-row justify-between items-center' : 'col-span-6 flex flex-row justify-between'}`}>
                         <p>{t('all')}</p>
                         {[...reviewCount].reverse().map((item, index) => (
@@ -154,7 +158,7 @@ const ProductReviewTab = () => {
                     </div>
                 </div>
 
-                <ListComments listComments={listComments} showComments={showComments} showPic={showPic} /> */}
+                <ListComments showComments={showComments} showPic={showPic} productId={productId} />
             </div>
 
             {/* RIGHT: Videos + Write Review */}
@@ -179,7 +183,7 @@ const ProductReviewTab = () => {
                     </Carousel>
                 </div> */}
 
-                <GiveCommentSection />
+                <GiveCommentSection productId={productId} />
             </div>
         </div>
     )

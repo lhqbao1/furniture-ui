@@ -276,5 +276,7 @@
     "min": "Die Nachricht muss mindestens 10 Zeichen lang sein",
     "max": "Die Nachricht darf höchstens 1000 Zeichen lang sein"
   },
-  "clear": "Löschen"
+  "clear": "Löschen",
+   "uploading": "Bild wird hochgeladen...",
+  "selectOrDrop": "Klicken Sie hier, um ein Bild auszuwählen oder ziehen Sie es hierher"
 }

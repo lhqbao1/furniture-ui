@@ -4,22 +4,25 @@ import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import CommentImageDialog from './comment-image-dialog'
-import { CustomPagination } from '@/components/shared/custom-pagination'
 import { Button } from '@/components/ui/button'
 import { Comment } from '@/types/comment'
 import { useTranslations } from 'next-intl'
+import { useGetReviewsByProduct } from '@/features/review/hook'
+import { formatDate, formatDateTime } from '@/lib/date-formated'
 
 interface ListCommentsProps {
     showComments: boolean
-    listComments: Comment[]
     showPic: boolean
+    productId: string
 }
 
-const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps) => {
+const ListComments = ({ showComments, showPic, productId }: ListCommentsProps) => {
     const t = useTranslations()
     const textRefs = useRef<(HTMLDivElement | null)[]>([])
     const [expandedIndexes, setExpandedIndexes] = useState<number[]>([])
     const [showButtonIndexes, setShowButtonIndexes] = useState<number[]>([])
+    const { data: listComments, isLoading, isError } = useGetReviewsByProduct(productId)
+
 
     const toggleExpand = (idx: number) => {
         setExpandedIndexes(prev =>
@@ -38,6 +41,8 @@ const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps
             }
         })
     }, [])
+
+    if (!listComments || isLoading) return <div>Loading...</div>
     return (
         <div className='pt-0'>
             <Collapsible open={showComments}>
@@ -48,14 +53,14 @@ const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps
                                 <div className='flex justify-between items-center'>
                                     <div>
                                         <div className='flex items-center gap-2'>
-                                            <p className='text-gray-600 font-bold'>{item.name}</p>
-                                            {item.company && (
+                                            <p className='text-gray-600 font-bold'>Customer</p>
+                                            {/* {item.company && (
                                                 <Image src={`/${item.company}`} width={40} height={40} alt='' unoptimized />
-                                            )}
+                                            )} */}
                                         </div>
                                         <div className='flex gap-2'>
-                                            <p className='text-secondary font-semibold text-sm'>{item.status}</p>
-                                            <p className='text-gray-400 text-sm'>{item.date}</p>
+                                            <p className='text-secondary font-semibold text-sm'>Purchased</p>
+                                            <p className='text-gray-400 text-sm'>{formatDateTime(item.created_at)}</p>
                                         </div>
                                     </div>
                                     <div className='flex flex-row gap-1'>
@@ -79,29 +84,27 @@ const ListComments = ({ showComments, listComments, showPic }: ListCommentsProps
                                         </button>
                                     )}
 
-                                    {item.listImages && item.listImages?.length > 0 && showPic ?
+                                    {item.static_files && item.static_files?.length > 0 && showPic ?
                                         <CommentImageDialog listComments={listComments} comment={item} />
-
                                         : ''}
                                 </div>
 
-                                {item.reply && (
+                                {item.repiles && (
                                     <div className='pl-12 pt-2 relative'>
                                         <div className='flex gap-2 items-center'>
-                                            <p className='text-gray-600 font-bold'>{item.reply.name}</p>
+                                            <p className='text-gray-600 font-bold'>{item.repiles[0].comment}</p>
                                             <div className='flex gap-1 items-center'>
-                                                <p className='text-secondary text-sm font-semibold'>{item.reply.role}</p>
                                                 <Image src={'/logo.svg'} height={30} width={30} alt='' className='size-4' unoptimized />
                                             </div>
                                         </div>
-                                        <p>{item.reply.comment}</p>
+                                        <p>{item.repiles[0].comment}</p>
                                         <div className='absolute w-6 h-14 left-4  border-l border-b top-0'></div>
                                     </div>
                                 )}
                             </div>
                         ))}
                         <div className='py-6 text-center'>
-                            <Button hasEffect className='rounded-full font-bold'>{t('loadMore')}</Button>
+                            {/* <Button hasEffect className='rounded-full font-bold'>{t('loadMore')}</Button> */}
                         </div>
                         {/* <CustomPagination /> */}
                     </div>

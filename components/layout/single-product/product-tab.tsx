@@ -31,7 +31,7 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
     { value: "description", label: t('description'), content: <div className='product-descriptions' dangerouslySetInnerHTML={{ __html: product?.description ?? "" }} /> },
     { value: "properties", label: t('properties'), content: <ProductDetailsProperties product={product} /> },
     { value: "details", label: "Aufbau & Details", content: '' },
-    { value: "review", label: t('review'), content: <ProductReviewTab /> },
+    { value: "review", label: t('review'), content: <ProductReviewTab productId={product.id} /> },
     {
       value: "q&a", label: "Häufig Gestellte Frage", content: <QASection />
     },
