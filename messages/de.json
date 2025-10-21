@@ -280,5 +280,6 @@
    "uploading": "Bild wird hochgeladen...",
   "selectOrDrop": "Klicken Sie hier, um ein Bild auszuwählen oder ziehen Sie es hierher",
   "QAsuccess": "Deine Frage wurde erfolgreich gesendet!",
-    "QAerror": "Etwas ist schief gelaufen. Bitte versuche es erneut."
+    "QAerror": "Etwas ist schief gelaufen. Bitte versuche es erneut.",
+    "reply": "Antworten"
 }

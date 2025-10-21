@@ -14,6 +14,7 @@ import { useCreateQA, useGetQAByProduct } from "@/features/qa/hook"
 import { formatDateTime } from "@/lib/date-formated"
 import { QAFormValues } from "@/lib/schema/qa"
 import { toast } from "sonner"
+import QASkeleton from "./qa-skeleton"
 
 interface QAInputProps {
     productId: string
@@ -78,6 +79,10 @@ const QAInput = ({ productId }: QAInputProps) => {
     }
 
     const toggleReply = (key: string) => {
+        if (!userId) {
+            toast.error(t("QAerror"))
+            return
+        }
         setShowReply((prev) => ({ ...prev, [key]: !prev[key] }))
     }
 
@@ -107,7 +112,7 @@ const QAInput = ({ productId }: QAInputProps) => {
             {/* Danh sách câu hỏi và trả lời */}
             <div>
                 {isLoading ? (
-                    <Loader2 className="animate-spin" />
+                    <QASkeleton />
                 ) : listQA && listQA.length > 0 ? (
                     listQA.map((item) => (
                         <div key={item.id} className="mb-8">
@@ -129,7 +134,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                                         className="text-sm !text-blue-500 mt-1 hover:bg-blue-50"
                                         onClick={() => toggleReply(item.id)}
                                     >
-                                        {showReply[item.id] ? "Cancel" : "Reply"}
+                                        {showReply[item.id] ? t('cancel') : t('reply')}
                                     </Button>
                                 </div>
                             )}
@@ -184,7 +189,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                                                         className="text-sm !text-blue-500 mt-1 hover:bg-blue-50"
                                                         onClick={() => toggleReply(reply.id)}
                                                     >
-                                                        {showReply[reply.id] ? "Cancel" : "Reply"}
+                                                        {showReply[reply.id] ? t('cancel') : t('reply')}
                                                     </Button>
                                                 </div>
 
