@@ -42,6 +42,11 @@ export async function getMe() {
   return data as User
 }
 
+export async function loginGoogle() {
+  const { data } = await api.get("/google/login")
+  return data
+}
+
 // export async function getMe() {
 //   const { data } = await api.get("/me") // BE đọc token từ cookie
 //   return data as User

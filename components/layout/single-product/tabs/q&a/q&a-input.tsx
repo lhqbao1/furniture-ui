@@ -1,12 +1,9 @@
 "use client"
 
-import { z } from "zod"
 import React from 'react'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, SendHorizonal } from "lucide-react"
+import { ImagePlus, SendHorizonal, X } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useQuery } from "@tanstack/react-query"
 import { getMe } from "@/features/auth/api"
@@ -15,6 +12,9 @@ import { formatDateTime } from "@/lib/date-formated"
 import { QAFormValues } from "@/lib/schema/qa"
 import { toast } from "sonner"
 import QASkeleton from "./qa-skeleton"
+import Image from "next/image"
+import { useUploadStaticFile } from '@/features/file/hook'
+import { StaticFileResponse } from '@/types/products'
 
 interface QAInputProps {
     productId: string
@@ -23,12 +23,15 @@ interface QAInputProps {
 const QAInput = ({ productId }: QAInputProps) => {
     const t = useTranslations()
     const postQAMutation = useCreateQA()
+    const uploadImageMutation = useUploadStaticFile() // ✅ Hook upload image
 
-    // ❗ Lưu text của từng textarea theo key
+    // Text inputs
     const [qaInputs, setQaInputs] = React.useState<Record<string, string>>({})
-
-    // ❗ Quản lý trạng thái show/ẩn ô reply
+    // Show/hide reply input
     const [showReply, setShowReply] = React.useState<Record<string, boolean>>({})
+    // Images selected per key
+    const [qaImages, setQaImages] = React.useState<Record<string, File[]>>({})
+
 
     const [userId, setUserId] = React.useState<string | null>(
         typeof window !== "undefined" ? localStorage.getItem("userId") : null
@@ -43,34 +46,105 @@ const QAInput = ({ productId }: QAInputProps) => {
 
     const { data: listQA, isLoading } = useGetQAByProduct(productId)
 
-    const handleSendQa = (parent_id?: string, key?: string) => {
+    const handleImageChange = (key: string, files: FileList | null) => {
+        if (!files) return
+        const newFiles = Array.from(files)
+        setQaImages((prev) => ({
+            ...prev,
+            [key]: [...(prev[key] || []), ...newFiles],
+        }))
+    }
+
+    const removeImage = (key: string, index: number) => {
+        setQaImages((prev) => ({
+            ...prev,
+            [key]: prev[key].filter((_, i) => i !== index),
+        }))
+    }
+
+    // const handleSendQa = (parent_id?: string, key?: string) => {
+    //     const idKey = key || parent_id || "root"
+    //     const comment = qaInputs[idKey] || ""
+    //     if (!comment.trim()) return
+
+    //     const payload: QAFormValues = {
+    //         comment,
+    //         product_id: productId,
+    //     }
+
+    //     if (parent_id) payload.parent_id = parent_id
+
+    //     postQAMutation.mutate(payload, {
+    //         onSuccess: () => {
+    //             toast.success(t("QAsuccess")) // ✅ message theo ngôn ngữ hiện tại
+    //             setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
+    //             if (parent_id) {
+    //                 setShowReply((prev) => ({ ...prev, [idKey]: false }))
+    //             }
+    //         },
+    //         onError: (error) => {
+    //             console.error(error)
+    //             toast.error(t("QAerror"))
+    //         },
+    //     })
+
+    //     setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
+    //     if (parent_id) setShowReply((prev) => ({ ...prev, [idKey]: false }))
+    // }
+
+    const handleSendQa = async (parent_id?: string, key?: string) => {
         const idKey = key || parent_id || "root"
         const comment = qaInputs[idKey] || ""
-        if (!comment.trim()) return
+        const images = qaImages[idKey] || []
 
-        const payload: QAFormValues = {
-            comment,
-            product_id: productId,
+        if (!comment.trim() && images.length === 0) return
+
+        try {
+            let uploadedUrls: string[] = []
+
+            // 🟢 Nếu có ảnh thì upload trước
+            if (images.length > 0) {
+                const formData = new FormData()
+                images.forEach((file) => formData.append("files", file))
+
+                const uploadRes = await new Promise<string[]>((resolve, reject) => {
+                    uploadImageMutation.mutate(formData, {
+                        onSuccess: (data: StaticFileResponse) => {
+                            const urls = data.results?.map((r) => r.url) || []
+                            resolve(urls)
+                        },
+                        onError: reject,
+                    })
+                })
+
+                uploadedUrls = uploadRes
+            }
+
+            // 🟠 Tạo payload
+            const payload: QAFormValues = {
+                comment,
+                product_id: productId,
+            }
+
+            if (uploadedUrls.length > 0) payload.static_files = uploadedUrls
+            if (parent_id) payload.parent_id = parent_id
+
+            postQAMutation.mutate(payload, {
+                onSuccess: () => {
+                    toast.success(t("QAsuccess"))
+                    setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
+                    setQaImages((prev) => ({ ...prev, [idKey]: [] }))
+                    if (parent_id) setShowReply((prev) => ({ ...prev, [idKey]: false }))
+                },
+                onError: (error) => {
+                    console.error(error)
+                    toast.error(t("QAerror"))
+                },
+            })
+        } catch (error) {
+            console.error(error)
+            toast.error(t("QAerror"))
         }
-
-        if (parent_id) payload.parent_id = parent_id
-
-        postQAMutation.mutate(payload, {
-            onSuccess: () => {
-                toast.success(t("QAsuccess")) // ✅ message theo ngôn ngữ hiện tại
-                setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
-                if (parent_id) {
-                    setShowReply((prev) => ({ ...prev, [idKey]: false }))
-                }
-            },
-            onError: (error) => {
-                console.error(error)
-                toast.error(t("QAerror"))
-            },
-        })
-
-        setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
-        if (parent_id) setShowReply((prev) => ({ ...prev, [idKey]: false }))
     }
 
 
@@ -86,10 +160,40 @@ const QAInput = ({ productId }: QAInputProps) => {
         setShowReply((prev) => ({ ...prev, [key]: !prev[key] }))
     }
 
+    const renderImagePreview = (key: string) => {
+        const images = qaImages[key]
+        if (!images || images.length === 0) return null
+
+        return (
+            <div className="flex flex-wrap gap-3 mt-2">
+                {images.map((file, i) => (
+                    <div key={i} className="relative">
+                        <Image
+                            src={URL.createObjectURL(file)}
+                            alt={`preview-${i}`}
+                            width={80}
+                            height={80}
+                            className="rounded-lg object-cover border"
+                        />
+                        <button
+                            onClick={() => removeImage(key, i)}
+                            className="absolute -top-2 -right-2 bg-gray-800 text-white rounded-full p-1"
+                        >
+                            <X size={12} />
+                        </button>
+                    </div>
+                ))}
+            </div>
+        )
+    }
+
     return (
         <div className="space-y-14">
-            {/* Ô nhập câu hỏi chính */}
             <div>
+                <div className="flex gap-1.5 text-xl font-semibold mb-2">
+                    <div className="text-secondary">{t('haveQuestion')}</div>
+                    <div className="text-primary">{t('justAsk')}</div>
+                </div>
                 {user && <div className="text-lg font-bold mb-2">{user.first_name}</div>}
                 <div className="relative flex">
                     <Textarea
@@ -98,15 +202,29 @@ const QAInput = ({ productId }: QAInputProps) => {
                         value={qaInputs["root"] || ""}
                         onChange={(e) => handleInputChange("root", e.target.value)}
                     />
-                    <Button
-                        onClick={() => handleSendQa()}
-                        type="button"
-                        variant="ghost"
-                        className="cursor-pointer absolute text-secondary right-0 bottom-0 size-12"
-                    >
-                        <SendHorizonal className="size-6" />
-                    </Button>
+
+                    <div className="absolute right-0 bottom-0 flex gap-3">
+                        <Button
+                            onClick={() => handleSendQa()}
+                            type="button"
+                            variant="ghost"
+                            className="cursor-pointer  text-secondary size-12"
+                        >
+                            <SendHorizonal className="size-6" />
+                        </Button>
+                        <label className="cursor-pointer text-secondary size-12 flex items-center justify-center">
+                            <ImagePlus className="size-6" />
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                onChange={(e) => handleImageChange("root", e.target.files)}
+                            />
+                        </label>
+                    </div>
                 </div>
+                {renderImagePreview("root")}
             </div>
 
             {/* Danh sách câu hỏi và trả lời */}
@@ -118,11 +236,26 @@ const QAInput = ({ productId }: QAInputProps) => {
                         <div key={item.id} className="mb-8">
                             {/* 🟢 Câu hỏi cha */}
                             <div className="px-4 py-2 bg-gray-200 rounded-lg">
-                                <div className="flex gap-6">
+                                <div className="flex gap-6 items-center">
                                     <div className="font-bold">{item.user.first_name} {item.user.last_name}</div>
-                                    <div>{formatDateTime(item.created_at)}</div>
+                                    <div className="text-sm text-gray-600">{formatDateTime(item.created_at)}</div>
                                 </div>
                                 <div>{item.comment}</div>
+                                <div className='flex gap-2 mt-2'>
+                                    {item.static_files.map((image, imageIndex) => {
+                                        return (
+                                            <div key={imageIndex}>
+                                                <Image
+                                                    src={image}
+                                                    height={100}
+                                                    width={100}
+                                                    alt=''
+                                                    className='rounded-md w-20 h-20 object-cover'
+                                                />
+                                            </div>
+                                        )
+                                    })}
+                                </div>
                             </div>
 
                             {/* Nút Reply ở cha nếu chưa có reply */}
@@ -148,14 +281,26 @@ const QAInput = ({ productId }: QAInputProps) => {
                                         value={qaInputs[item.id] || ""}
                                         onChange={(e) => handleInputChange(item.id, e.target.value)}
                                     />
-                                    <Button
-                                        onClick={() => handleSendQa(item.id)}
-                                        type="button"
-                                        variant="ghost"
-                                        className="cursor-pointer absolute text-secondary right-0 bottom-0 size-12"
-                                    >
-                                        <SendHorizonal className="size-6" />
-                                    </Button>
+                                    <div className="absolute right-0 bottom-0 flex gap-3">
+                                        <Button
+                                            onClick={() => handleSendQa(item.id)}
+                                            type="button"
+                                            variant="ghost"
+                                            className="cursor-pointer text-secondary size-12"
+                                        >
+                                            <SendHorizonal className="size-6" />
+                                        </Button>
+                                        <label className="cursor-pointer text-secondary size-12 flex items-center justify-center">
+                                            <ImagePlus className="size-6" />
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                className="hidden"
+                                                onChange={(e) => handleImageChange(item.id, e.target.files)}
+                                            />
+                                        </label>
+                                    </div>
                                 </div>
                             )}
 
@@ -172,13 +317,33 @@ const QAInput = ({ productId }: QAInputProps) => {
                                             >
                                                 {/* Box comment con */}
                                                 <div className="px-4 py-2 bg-gray-200 rounded-lg">
-                                                    <div className="flex gap-6">
-                                                        <div className="font-bold">
-                                                            {reply.user.first_name} {reply.user.last_name}
+                                                    <div className="flex gap-6 items-center">
+                                                        <div className="flex gap-2 items-center">
+                                                            <span className="font-bold">{reply.user.first_name} {reply.user.last_name}</span>
+                                                            {reply.user.is_admin ?
+                                                                <Image
+                                                                    src="/new-logo.svg"
+                                                                    width={20}
+                                                                    height={20}
+                                                                    alt=""
+                                                                />
+                                                                : ''}
                                                         </div>
-                                                        <div>{formatDateTime(reply.created_at)}</div>
+                                                        <div className="text-sm text-gray-600">{formatDateTime(reply.created_at)}</div>
                                                     </div>
                                                     <div>{reply.comment}</div>
+                                                    {reply.static_files.map((image, imageIndex) => {
+                                                        return (
+                                                            <div key={imageIndex}>
+                                                                <Image
+                                                                    src={image}
+                                                                    height={60}
+                                                                    width={60}
+                                                                    alt=''
+                                                                />
+                                                            </div>
+                                                        )
+                                                    })}
                                                 </div>
 
                                                 {/* Nút Reply riêng cho từng reply con */}
@@ -202,14 +367,24 @@ const QAInput = ({ productId }: QAInputProps) => {
                                                             value={qaInputs[reply.id] || ""}
                                                             onChange={(e) => handleInputChange(reply.id, e.target.value)}
                                                         />
-                                                        <Button
-                                                            onClick={() => handleSendQa(item.id, reply.id)} // ✅ gửi về cha gốc
-                                                            type="button"
-                                                            variant="ghost"
-                                                            className="cursor-pointer absolute text-secondary right-0 bottom-0 size-12"
-                                                        >
-                                                            <SendHorizonal className="size-6" />
-                                                        </Button>
+                                                        <div className="absolute right-0 bottom-0 flex gap-3">
+                                                            <Button
+                                                                onClick={() => handleSendQa(item.id)}
+                                                                type="button"
+                                                                variant="ghost"
+                                                                className="cursor-pointer text-secondary size-12"
+                                                            >
+                                                                <SendHorizonal className="size-6" />
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() => handleSendQa(item.id)}
+                                                                type="button"
+                                                                variant="ghost"
+                                                                className="cursor-pointer text-secondary size-12"
+                                                            >
+                                                                <ImagePlus className="size-6" />
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
@@ -217,9 +392,6 @@ const QAInput = ({ productId }: QAInputProps) => {
                                     </div>
                                 </div>
                             )}
-
-
-
                         </div>
                     ))
                 ) : null}

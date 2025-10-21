@@ -194,7 +194,14 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                             </div>
 
                                             <p className='text-base mb-1'>
-                                                Vorher: €{(product.price ?? product.final_price).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                Vorher: €{
+                                                    product?.price && product?.final_price
+                                                        ? product.final_price.toLocaleString("de-DE", {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        })
+                                                        : ''
+                                                }
                                             </p>
                                             <div className='space-x-2 flex items-center'>
                                                 <div className='flex gap-0.5'>

@@ -282,5 +282,7 @@
     "uploading": "Uploading image...",
   "selectOrDrop": "Click to select or drag and drop an image here",
   "QAsuccess": "Your question has been sent successfully!",
-  "QAerror": "Something went wrong. Please try again."
+  "QAerror": "Something went wrong. Please try again.",
+  "haveQuestion": "Have a question?",
+  "justAsk": "Just ask!"
 }
