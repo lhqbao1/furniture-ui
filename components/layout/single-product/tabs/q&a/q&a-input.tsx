@@ -13,6 +13,7 @@ import { getMe } from "@/features/auth/api"
 import { useCreateQA, useGetQAByProduct } from "@/features/qa/hook"
 import { formatDateTime } from "@/lib/date-formated"
 import { QAFormValues } from "@/lib/schema/qa"
+import { toast } from "sonner"
 
 interface QAInputProps {
     productId: string
@@ -54,11 +55,16 @@ const QAInput = ({ productId }: QAInputProps) => {
         if (parent_id) payload.parent_id = parent_id
 
         postQAMutation.mutate(payload, {
-            onSuccess(data, variables, context) {
-
+            onSuccess: () => {
+                toast.success(t("QAsuccess")) // ✅ message theo ngôn ngữ hiện tại
+                setQaInputs((prev) => ({ ...prev, [idKey]: "" }))
+                if (parent_id) {
+                    setShowReply((prev) => ({ ...prev, [idKey]: false }))
+                }
             },
-            onError(error, variables, context) {
-
+            onError: (error) => {
+                console.error(error)
+                toast.error(t("QAerror"))
             },
         })
 
