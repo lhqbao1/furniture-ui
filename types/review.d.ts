@@ -7,6 +7,6 @@ export interface ReviewResponse {
     user_id: string;
     created_at: Date
     updated_at: Date
-    repiles?: ReviewResponse[]; // phản hồi con
+    replies?: ReviewResponse[]; // phản hồi con
 }
   

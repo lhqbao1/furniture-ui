@@ -163,26 +163,6 @@ const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
 
             {/* RIGHT: Videos + Write Review */}
             <div className={`${isMobile ? 'col-span-1' : 'md:col-span-5 col-span-12'} flex flex-col gap-6`}>
-                {/* <div className="w-full aspect-video">
-                    <YouTube className="w-full h-full rounded-lg" iframeClassName="rounded-lg" videoId={videos[0]} opts={mainVideoOpts} />
-                </div> */}
-
-                {/* <div className='flex justify-center pb-4 border-b border-gray-300'>
-                    <Carousel opts={{ align: "start", loop: true }} className='w-full md:w-3/4'>
-                        <CarouselContent>
-                            {videos.slice(1).map((id, idx) => (
-                                <CarouselItem key={idx} className="basis-1/3 cursor-pointer" onClick={() => handleSwap(idx + 1)}>
-                                    <div className="aspect-video w-full rounded-md overflow-hidden">
-                                        <YouTube className="w-full h-full" iframeClassName="rounded-md" videoId={id} opts={sideVideoOpts} />
-                                    </div>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                        <CarouselPrevious className='text-primary border-primary' />
-                        <CarouselNext className='text-primary border-primary' />
-                    </Carousel>
-                </div> */}
-
                 <GiveCommentSection productId={productId} />
             </div>
         </div>

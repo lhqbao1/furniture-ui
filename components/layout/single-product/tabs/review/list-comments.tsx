@@ -89,15 +89,15 @@ const ListComments = ({ showComments, showPic, productId }: ListCommentsProps) =
                                         : ''}
                                 </div>
 
-                                {item.repiles && (
+                                {item.replies && (
                                     <div className='pl-12 pt-2 relative'>
                                         <div className='flex gap-2 items-center'>
-                                            <p className='text-gray-600 font-bold'>{item.repiles[0].comment}</p>
+                                            <p className='text-gray-600 font-bold'>{item.replies[0].comment}</p>
                                             <div className='flex gap-1 items-center'>
                                                 <Image src={'/logo.svg'} height={30} width={30} alt='' className='size-4' unoptimized />
                                             </div>
                                         </div>
-                                        <p>{item.repiles[0].comment}</p>
+                                        <p>{item.replies[0].comment}</p>
                                         <div className='absolute w-6 h-14 left-4  border-l border-b top-0'></div>
                                     </div>
                                 )}
