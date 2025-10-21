@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { api } from "@/lib/axios"
 
 export async function createPayment(paymentInput: PaymentFormValues) {

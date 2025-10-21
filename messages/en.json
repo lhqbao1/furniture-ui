@@ -277,5 +277,7 @@
     "max": "Message must be at most 1000 characters"
     },
     "clear": "Clear",
-    "saleProducts": "Sale Products"
+    "saleProducts": "Sale Products",
+    "uploading": "Uploading image...",
+  "selectOrDrop": "Click to select or drag and drop an image here"
 }

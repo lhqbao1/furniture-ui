@@ -1,3 +1,6 @@
+export const config = {
+    regions: ['fra1'],
+  };
 import { apiAdmin } from "@/lib/axios";
 
 export async function importAmmProduct(file: FormData){

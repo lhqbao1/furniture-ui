@@ -177,7 +177,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         height={200}
                                         src={product.static_files && product.static_files.length > 0 ? product.static_files[0].url : '/1.png'}
                                         alt={product.name}
-                                        className="w-full h-48 object-contain mb-2 rounded"
+                                        className="w-full h-48 md:h-64 py-0 md:py-10  object-contain mb-2 rounded group-hover:scale-120 duration-500"
                                     />
 
                                     <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>
@@ -196,7 +196,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                             <p className='text-base mb-1'>
                                                 Vorher: €{(product.price ?? product.final_price).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </p>
-                                            <div className='space-x-2 flex items-end'>
+                                            <div className='space-x-2 flex items-center'>
                                                 <div className='flex gap-0.5'>
                                                     {[1, 2, 3, 4, 5].map(item => {
                                                         return (
@@ -206,7 +206,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                                         )
                                                     })}
                                                 </div>
-                                                <p className='leading-4 text-base font-semibold'>(0)</p>
+                                                <p className='text-base font-semibold'>(0)</p>
                                             </div>
                                         </div>
                                     </div>

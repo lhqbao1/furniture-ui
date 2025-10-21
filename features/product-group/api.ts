@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { apiAdmin, apiPublic } from "@/lib/axios"
 import { ProductGroupDetailResponse, ProductGroupResponse } from "@/types/product-group"
 import { ProductItem } from "@/types/products"

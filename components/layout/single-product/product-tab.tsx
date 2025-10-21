@@ -31,11 +31,10 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
     { value: "description", label: t('description'), content: <div className='product-descriptions' dangerouslySetInnerHTML={{ __html: product?.description ?? "" }} /> },
     { value: "properties", label: t('properties'), content: <ProductDetailsProperties product={product} /> },
     { value: "details", label: "Aufbau & Details", content: '' },
-    { value: "review", label: t('review'), content: <ProductReviewTab /> },
+    { value: "review", label: t('review'), content: <ProductReviewTab productId={product.id} /> },
     {
-      value: "q&a", label: "Häufig Gestellte Frage", content: <QASection />
+      value: "q&a", label: "Häufig Gestellte Frage", content: <QASection productId={product.id} />
     },
-
   ]
 
 
@@ -64,8 +63,11 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
         ))}
       </TabsList>
       {sections.map((section) => (
-        <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-1/2' : ''}`}>
+        <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-full grid grid-cols-2 gap-12' : ''}`}>
           {section.content}
+          {section.value === 'description' ?
+            <QASection productId={product.id} />
+            : ''}
         </TabsContent>
       ))}
     </Tabs>

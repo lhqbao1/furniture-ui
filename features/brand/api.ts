@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { apiAdmin, apiPublic } from "@/lib/axios"
 import { BrandInput, BrandResponse } from "@/types/brand"
 

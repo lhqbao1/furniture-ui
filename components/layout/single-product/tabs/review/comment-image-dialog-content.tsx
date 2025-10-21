@@ -1,19 +1,20 @@
 import ListStars from '@/components/shared/list-stars'
 import { Button } from '@/components/ui/button'
 import { Comment } from '@/types/comment'
+import { ReviewResponse } from '@/types/review'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import React, { useCallback, useState } from 'react'
 
 interface CommentImageDialogContentProps {
-    comment: Comment
+    comment: ReviewResponse
     onNext: () => void
     onPrev: () => void
 }
 
 const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDialogContentProps) => {
     const [selectedIdx, setSelectedIdx] = useState(0)
-    const listImages = comment.listImages || []
+    const static_files = comment.static_files || []
 
     const handleSelect = (index: number) => {
         setSelectedIdx(index)
@@ -24,7 +25,7 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
             {/* LEFT */}
             <div className="lg:col-span-8 col-span-12 bg-gray-100 rounded-lg overflow-hidden flex flex-col justify-center items-center relative">
                 <Image
-                    src={`/${listImages[selectedIdx]}`}
+                    src={static_files[selectedIdx]}
                     alt=""
                     width={500}
                     height={500}
@@ -55,21 +56,14 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
             <div className="lg:col-span-4 col-span-12 shadow-lg p-6 rounded-lg flex flex-col gap-2 overflow-auto">
                 {/* Info */}
                 <div className="flex items-center gap-2">
-                    <p className="font-bold text-lg">{comment.name}</p>
-                    <Image
-                        src={comment.company ? `/${comment.company}` : "/amazon.png"}
-                        alt=""
-                        width={40}
-                        height={40}
-                        unoptimized
-                    />
+                    <p className="font-bold text-lg">Customer</p>
                 </div>
                 <ListStars rating={comment.rating} />
                 <p className='text-sm line-clamp-10'>{comment.comment}</p>
 
                 {/* Thumbnails */}
                 <div className="grid grid-cols-4 gap-3 pt-4">
-                    {listImages.map((image, index) => (
+                    {static_files.map((image, index) => (
                         <div
                             key={index}
                             className={`
@@ -79,7 +73,7 @@ const CommentImageDialogContent = ({ comment, onNext, onPrev }: CommentImageDial
                             onClick={() => handleSelect(index)}
                         >
                             <Image
-                                src={`/${image}`}
+                                src={image}
                                 alt=""
                                 width={100}
                                 height={100}

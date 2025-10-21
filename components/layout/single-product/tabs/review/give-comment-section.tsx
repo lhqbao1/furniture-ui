@@ -8,30 +8,29 @@ import { getMe } from '@/features/auth/api'
 import { Button } from '@/components/ui/button'
 import CommentForm from './comment-form'
 
-const GiveCommentSection = () => {
-    const [rating, setRating] = useState(0)
+interface GiveCommentSectionProps {
+    productId: string;
+}
+
+const GiveCommentSection = ({ productId }: GiveCommentSectionProps) => {
     const t = useTranslations()
 
     const [userId, setUserId] = React.useState<string | null>(
         typeof window !== "undefined" ? localStorage.getItem("userId") : null
     );
 
-    const handleRating = useCallback((index: number) => {
-        setRating(index)
-    }, [])
+    // const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useQuery({
+    //     queryKey: ["me", userId],
+    //     queryFn: () => getMe(),
+    //     enabled: !!userId,
+    //     retry: false,
+    // });
 
-    const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useQuery({
-        queryKey: ["me", userId],
-        queryFn: () => getMe(),
-        enabled: !!userId,
-        retry: false,
-    });
-
-    if (!user) {
-        return (
-            <div className='flex justify-start'><Button>Login to comment</Button></div>
-        )
-    }
+    // if (!user) {
+    //     return (
+    //         <div className='flex justify-start'><Button>Login to comment</Button></div>
+    //     )
+    // }
 
     return (
         <div className='flex flex-col gap-4'>
@@ -44,23 +43,8 @@ const GiveCommentSection = () => {
                         <p className='text-sm text-secondary font-semibold'>Purchased</p>
                     </div>
                 </div> */}
-
-                <div>
-                    <div className="flex flex-row gap-1">
-                        {[1, 2, 3, 4, 5].map((item, idx) => (
-                            <button key={item} onClick={() => handleRating(idx + 1)} className="focus:outline-none">
-                                <Star
-                                    stroke="#f15a24"
-                                    fill={idx < rating ? "#f15a24" : "none"}
-                                    className="w-6 h-6"
-                                />
-                            </button>
-                        ))}
-                    </div>
-                    <p className='text-sm text-gray-600 font-semibold'>{t('yourRating')}</p>
-                </div>
             </div>
-            <CommentForm />
+            <CommentForm productId={productId} userId={userId ?? ''} />
         </div>
     )
 }

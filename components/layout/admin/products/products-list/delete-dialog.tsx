@@ -31,19 +31,19 @@ const DeleteDialog = ({ product, isEbay }: DeleteDialogProps) => {
         deleteProduct.mutate(product.id ?? "", {
             onSuccess(data, variables, context) {
                 toast.success("Delete product successfully")
-                if (product.ebay) {
-                    removeFromEbayMutation.mutate(product.sku, {
-                        onSuccess(data, variables, context) {
-                            toast.success("Remove from Ebay successful")
-                            setOpen(false)
-                        },
-                        onError(error, variables, context) {
-                            toast.error("Remove from Ebay fail")
-                        },
-                    })
-                } else {
-                    setOpen(false)
-                }
+                // if (product.ebay) {
+                //     removeFromEbayMutation.mutate(product.sku, {
+                //         onSuccess(data, variables, context) {
+                //             toast.success("Remove from Ebay successful")
+                //             setOpen(false)
+                //         },
+                //         onError(error, variables, context) {
+                //             toast.error("Remove from Ebay fail")
+                //         },
+                //     })
+                // } else {
+                //     setOpen(false)
+                // }
             },
             onError(error, variables, context) {
                 toast.error("Failed to delete product")
@@ -60,6 +60,7 @@ const DeleteDialog = ({ product, isEbay }: DeleteDialogProps) => {
                     onClick={(e) => {
                         e.preventDefault()
                         if (isEbay) {
+                            console.log(product.marketplace_products)
                             toast.error("You need to remove this product from eBay first")
                             return // ❌ Không mở dialog
                         }

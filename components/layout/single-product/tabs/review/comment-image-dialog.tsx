@@ -5,11 +5,12 @@ import Image from "next/image"
 import { Comment } from "@/types/comment"
 import { useState } from "react"
 import CommentImageDialogContent from "./comment-image-dialog-content"
+import { ReviewResponse } from "@/types/review"
 
-export default function CommentImageDialog({ listComments, comment }: { listComments: Comment[], comment: Comment }) {
+export default function CommentImageDialog({ listComments, comment }: { listComments: ReviewResponse[], comment: ReviewResponse }) {
 
-    // Lọc chỉ những comment có listImages
-    const commentsWithImages = listComments.filter(c => c.listImages && c.listImages.length > 0)
+    // Lọc chỉ những comment có static_files
+    const commentsWithImages = listComments.filter(c => c.static_files && c.static_files.length > 0)
 
     // Tìm index của comment hiện tại trong mảng đã lọc
     const commentIndex = commentsWithImages.findIndex(c => c.id === comment.id)
@@ -36,7 +37,7 @@ export default function CommentImageDialog({ listComments, comment }: { listComm
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <div className="flex lg:justify-between justify-start gap-3 pt-4 flex-wrap">
-                {comment.listImages?.map((image, imgIdx, arr) => {
+                {comment.static_files?.map((image, imgIdx, arr) => {
                     const isLast = imgIdx === arr.length - 1
                     return (
                         <div key={imgIdx}>
@@ -48,7 +49,7 @@ export default function CommentImageDialog({ listComments, comment }: { listComm
                                     className="relative rounded-xl bg-white shadow-sm cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl"
                                 >
                                     <Image
-                                        src={`/${image}`}
+                                        src={image}
                                         alt=""
                                         width={80}
                                         height={80}

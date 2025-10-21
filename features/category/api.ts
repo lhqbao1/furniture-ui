@@ -1,3 +1,7 @@
+export const config = {
+  regions: ['fra1'],
+};
+
 import { api, apiAdmin, apiPublic } from "@/lib/axios"
 import { AddOrRemoveProductToCategoryInput, CategoryByIdResponse, CategoryBySlugResponse, CategoryInput, CategoryResponse } from "@/types/categories"
 import { ProductItem } from "@/types/products"
