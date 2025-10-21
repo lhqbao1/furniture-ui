@@ -38,6 +38,7 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
   ]
 
 
+
   if (isMobile) {
     // render accordion
     return (
@@ -63,11 +64,14 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
         ))}
       </TabsList>
       {sections.map((section) => (
-        <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-full grid grid-cols-2 gap-12' : ''}`}>
-          {section.content}
-          {section.value === 'description' ?
-            <QASection productId={product.id} />
-            : ''}
+        <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-full grid grid-cols-5 gap-0' : ''}`}>
+          <div className='col-span-2'>{section.content}</div>
+          <div className='col-span-1'></div>
+          <div className='col-span-2'>
+            {section.value === 'description' ?
+              <QASection productId={product.id} />
+              : ''}
+          </div>
         </TabsContent>
       ))}
     </Tabs>

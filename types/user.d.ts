@@ -5,6 +5,8 @@ export type User = {
     first_name: string
     last_name: string
     is_active: boolean
+    is_supplier: boolean
+    is_admin: boolean
     avatar_url: string
     date_of_birth: string 
     language: string
@@ -20,6 +22,8 @@ export type User = {
     user_code: string
     email: string
     phone_number: string
+    is_supplier: boolean
+    is_admin: boolean
     first_name: string
     last_name: string
     is_active: boolean
