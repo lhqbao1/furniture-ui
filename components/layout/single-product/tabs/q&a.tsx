@@ -9,7 +9,7 @@ interface QASectionProps {
 
 const QASection = ({ productId }: QASectionProps) => {
     return (
-        <div>
+        <div className='w-1/2'>
             <QAInput productId={productId} />
         </div>
     )

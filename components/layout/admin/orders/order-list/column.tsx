@@ -156,18 +156,18 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
             )
         }
     },
-    // {
-    //     accessorKey: "customer",
-    //     header: "CUSTOMER",
-    //     cell: ({ row }) => {
-    //         return (
-    //             <div>
-    //                 <div>{row.original.checkouts[0].user.first_name} {row.original.checkouts[0].user.last_name}</div>
-    //                 <div>{row.original.checkouts[0].user.email}</div>
-    //             </div>
-    //         )
-    //     }
-    // },
+    {
+        accessorKey: "customer",
+        header: "CUSTOMER",
+        cell: ({ row }) => {
+            return (
+                <div>
+                    <div>{row.original.checkouts[0].user.first_name} {row.original.checkouts[0].user.last_name}</div>
+                    <div>{row.original.checkouts[0].user.email}</div>
+                </div>
+            )
+        }
+    },
     {
         accessorKey: "channel",
         header: () => (

@@ -21,7 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 import { User } from '@/types/user'
 import { getUserById } from '@/features/users/api'
 import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
-import { getCartItems } from '@/features/cart/api'
+import { getCartByUserId, getCartItems } from '@/features/cart/api'
 // import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { useCheckMailExist, useSignUpGuess } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
@@ -35,6 +35,8 @@ import { Loader2 } from 'lucide-react'
 import { Link, useRouter } from '@/src/i18n/navigation'
 import { checkoutDefaultValues, CreateOrderFormValues, CreateOrderSchema } from '@/lib/schema/checkout'
 import { mapToSupplierCarts } from '@/hooks/map-cart-to-supplier'
+import { getCart } from '@/lib/utils/cart'
+import { CartResponse } from '@/types/cart'
 const CartTable = dynamic(() => import('@/components/layout/cart/cart-table'), { ssr: false })
 const CartLocalTable = dynamic(() => import('@/components/layout/cart/cart-local-table'), { ssr: false })
 
@@ -247,6 +249,8 @@ export default function CheckOutPageClient() {
                 let invoiceAddressId = invoiceAddress?.id
                 let shippingAddressId = addresses?.find(a => a.is_default)?.id
                 const invoiceAddressCountry = invoiceAddress?.country;
+                let cartData: CartResponse = []
+                let shippingCostCurrent = 0
 
                 if (data.email && !userId) {
                     const exists = await checkMailExistMutation.mutateAsync(data.email)
@@ -273,6 +277,9 @@ export default function CheckOutPageClient() {
 
                             // Sync local cart
                             syncLocalCartMutation.mutate()
+                            const res = await getCartByUserId(newUser.id)
+                            cartData = res
+                            shippingCostCurrent = calculateShipping(normalizeCartItems(cartData.flatMap((group) => group.items), true))
                         }
                     }
                 }
@@ -351,14 +358,15 @@ export default function CheckOutPageClient() {
                     }
                 }
 
+
                 // // Tạo checkout
                 const checkout = await createCheckOutMutation.mutateAsync({
                     ...data,
                     invoice_address_id: invoiceAddressId,
                     shipping_address_id: shippingAddressId,
-                    supplier_carts: mapToSupplierCarts(cartItems ?? []),
+                    supplier_carts: mapToSupplierCarts(cartItems ? cartItems : cartData),
                     note: data.note,
-                    total_shipping: shippingCost
+                    total_shipping: shippingCostCurrent > 0 ? shippingCostCurrent : shippingCost
                 })
                 toast.success(t('orderSuccess'))
                 setCheckOut(checkout.id)

@@ -1,4 +1,5 @@
 import { getProductsFeed } from "@/features/products/api"
+import { ProductItem } from "@/types/products"
 import { google } from "googleapis"
 import { NextResponse } from "next/server"
 
@@ -19,7 +20,12 @@ export async function GET() {
 
     const products = await getProductsFeed() // bạn sẽ viết hàm này
 
-   const values = products.map(p => {
+    // 3️⃣ Lọc sản phẩm đang active và có tồn kho
+    const activeProducts = products.filter(
+      (p: ProductItem) => p.is_active === true && p.stock > 0
+    )
+
+   const values = activeProducts.map(p => {
     const productUrl = p.url_key
       ? `https://www.prestige-home.de/de/product/${p.url_key}`
       : ""

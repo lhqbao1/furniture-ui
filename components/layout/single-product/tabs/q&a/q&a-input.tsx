@@ -192,12 +192,10 @@ const QAInput = ({ productId }: QAInputProps) => {
             <div>
                 <div className="flex gap-1.5 text-xl font-semibold mb-2">
                     <div className="text-secondary">{t('haveQuestion')}</div>
-                    <div className="text-primary">{t('justAsk')}</div>
                 </div>
                 {user && <div className="text-lg font-bold mb-2">{user.first_name}</div>}
                 <div className="relative flex">
                     <Textarea
-                        placeholder={t('qaSearch')}
                         className="rounded-lg h-30"
                         value={qaInputs["root"] || ""}
                         onChange={(e) => handleInputChange("root", e.target.value)}
@@ -212,7 +210,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                         >
                             <SendHorizonal className="size-6" />
                         </Button>
-                        <label className="cursor-pointer text-secondary size-12 flex items-center justify-center">
+                        {/* <label className="cursor-pointer text-secondary size-12 flex items-center justify-center">
                             <ImagePlus className="size-6" />
                             <input
                                 type="file"
@@ -221,7 +219,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                                 className="hidden"
                                 onChange={(e) => handleImageChange("root", e.target.files)}
                             />
-                        </label>
+                        </label> */}
                     </div>
                 </div>
                 {renderImagePreview("root")}
@@ -300,7 +298,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                                         >
                                             <SendHorizonal className="size-6" />
                                         </Button>
-                                        <label className="cursor-pointer text-secondary size-12 flex items-center justify-center">
+                                        {/* <label className="cursor-pointer text-secondary size-12 flex items-center justify-center">
                                             <ImagePlus className="size-6" />
                                             <input
                                                 type="file"
@@ -309,7 +307,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                                                 className="hidden"
                                                 onChange={(e) => handleImageChange(item.id, e.target.files)}
                                             />
-                                        </label>
+                                        </label> */}
                                     </div>
                                 </div>
                             )}
@@ -386,14 +384,14 @@ const QAInput = ({ productId }: QAInputProps) => {
                                                             >
                                                                 <SendHorizonal className="size-6" />
                                                             </Button>
-                                                            <Button
+                                                            {/* <Button
                                                                 onClick={() => handleSendQa(item.id)}
                                                                 type="button"
                                                                 variant="ghost"
                                                                 className="cursor-pointer text-secondary size-12"
                                                             >
                                                                 <ImagePlus className="size-6" />
-                                                            </Button>
+                                                            </Button> */}
                                                         </div>
                                                     </div>
                                                 )}

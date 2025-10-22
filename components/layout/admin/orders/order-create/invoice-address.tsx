@@ -15,8 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 
 interface InvoiceAddressValues {
-    invoice_address_line: string
-    invoice_address_additional?: string
+    invoice_address: string
     invoice_postal_code: string
     invoice_city: string
 }
@@ -43,20 +42,19 @@ const ManualCheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddres
         if (isSameShipping) {
             // Lưu lại dữ liệu invoice hiện tại
             invoiceSnapshot.current = {
-                invoice_address_line: form.getValues("invoice_address_line"),
-                invoice_address_additional: form.getValues("invoice_address_additional"),
+                invoice_address: form.getValues("invoice_address"),
                 invoice_postal_code: form.getValues("invoice_postal_code"),
                 invoice_city: form.getValues("invoice_city"),
             }
 
             // Copy shipping → invoice
-            form.setValue("invoice_address_line", shippingAddressLine)
+            form.setValue("invoice_address", shippingAddressLine)
             form.setValue("invoice_postal_code", shippingPostalCode)
             form.setValue("invoice_city", shippingCity)
         } else {
             // Restore lại snapshot nếu có
             if (invoiceSnapshot.current) {
-                form.setValue("invoice_address_line", invoiceSnapshot.current.invoice_address_line)
+                form.setValue("invoice_address", invoiceSnapshot.current.invoice_address)
                 form.setValue("invoice_postal_code", invoiceSnapshot.current.invoice_postal_code)
                 form.setValue("invoice_city", invoiceSnapshot.current.invoice_city)
             }
