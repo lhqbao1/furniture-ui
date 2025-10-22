@@ -1,11 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { User } from "@/types/user"
-import { deleteCustomer, getAllCustomers, getUserById, updateUser } from "./api"
+import { Customer, User } from "@/types/user"
+import { deleteCustomer, getAllCustomers, getUserById, getUserByIdAdmin, updateUser } from "./api"
 
 export function useGetUserById(userId: string) {
   return useQuery<User>({
     queryKey: ["user", userId],
     queryFn: () => getUserById(userId),
+    enabled: !!userId,
+  })
+}
+
+export function useGetUserByIdAdmin(userId: string) {
+  return useQuery<Customer>({
+    queryKey: ["user", userId],
+    queryFn: () => getUserByIdAdmin(userId),
     enabled: !!userId,
   })
 }

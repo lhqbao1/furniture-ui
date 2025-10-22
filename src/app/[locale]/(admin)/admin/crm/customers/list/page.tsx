@@ -8,14 +8,6 @@ import { useGetAllCustomers } from '@/features/users/hook'
 import { Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
-const userStatistics = [
-    { total: 9999999, label: 'Total sale', textColor: 'rgb(81, 190, 140)' },
-    { total: 5654564, label: 'Total cost', textColor: 'rgb(255, 11, 133)' },
-    { total: 2345678, label: 'Total discount', textColor: 'rgb(250, 166, 26)' },
-    { total: 1543234, label: 'ESTIMATED PROFIT 20%', textColor: 'rgb(41, 171, 226)' }
-]
-
-
 const CustomerListPage = () => {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
@@ -29,7 +21,6 @@ const CustomerListPage = () => {
         <div className='space-y-6'>
             <AdminBackButton />
             <div className='space-y-6'>
-                {/* <ProductStatistic statistic={userStatistics} /> */}
                 <div className='text-3xl text-secondary font-bold text-center'>Customers List</div>
                 {isLoading || !data ? <ProductTableSkeleton /> :
                     <ProductTable

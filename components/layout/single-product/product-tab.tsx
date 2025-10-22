@@ -64,9 +64,8 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
         ))}
       </TabsList>
       {sections.map((section) => (
-        <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-full grid grid-cols-5 gap-0' : ''}`}>
-          <div className='col-span-2'>{section.content}</div>
-          <div className='col-span-1'></div>
+        <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-full grid grid-cols-5 gap-12' : ''}`}>
+          <div className='col-span-3'>{section.content}</div>
           <div className='col-span-2'>
             {section.value === 'description' ?
               <QASection productId={product.id} />
