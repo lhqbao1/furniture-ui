@@ -18,17 +18,17 @@ export async function createQA(input: QAFormValues) {
   }
 
   export const getQAByProduct = async (product_id: string) => {
-      const {data} = await api.get(
+      const {data} = await apiPublic.get(
           `/forum/forum-product/${product_id}`
       )
           return data as QAResponse[]
   }
 
   export const getQAByCustomer = async (customer_id: string) => {
-    const {data} = await api.get(
+    const {data} = await apiPublic.get(
         `/forum/forum-customer/${customer_id}`
     )
-        return data as QAResponse[]
+    return data as QAResponse[]
 }
 
   export async function deleteQA(forum_id: string){

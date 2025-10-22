@@ -10,11 +10,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useTranslations } from "next-intl"
-import { useState, useEffect } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useGetAllCustomers } from "@/features/users/hook"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface CheckOutUserInformationProps {
@@ -26,9 +21,6 @@ interface CheckOutUserInformationProps {
 export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: CheckOutUserInformationProps) {
     const form = useFormContext()
     const t = useTranslations()
-    const [open, setOpen] = useState(false)
-    const [inputValue, setInputValue] = useState("")
-    const { data: listUser, isLoading } = useGetAllCustomers()
 
     return (
         <div className="space-y-4">

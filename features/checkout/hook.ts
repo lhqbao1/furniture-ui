@@ -1,6 +1,7 @@
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCheckOut, GetAllCheckoutParams, getCheckOut, getCheckOutByCheckOutId, getCheckOutByUserId, getCheckOutMain, getCheckOutStatistics, getCheckOutSupplier, getCheckOutSupplierByCheckOutId, getMainCheckOutByMainCheckOutId } from "./api";
+import { createCheckOut, createManualCheckOut, GetAllCheckoutParams, getCheckOut, getCheckOutByCheckOutId, getCheckOutByUserId, getCheckOutMain, getCheckOutMainByUserIdAdmin, getCheckOutStatistics, getCheckOutSupplier, getCheckOutSupplierByCheckOutId, getMainCheckOutByMainCheckOutId } from "./api";
+import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 
 export function useGetCheckOut({ page, page_size }: GetAllCheckoutParams = {}){
     return useQuery({
@@ -38,6 +39,17 @@ export function useCreateCheckOut(){
     })
 }
 
+export function useCreateCheckOutManual(){
+  const qc = useQueryClient();
+  return useMutation({
+      mutationFn: (item: ManualCreateOrderFormValues) => createManualCheckOut(item),
+      onSuccess: () => {
+          qc.refetchQueries({ queryKey: ["checkout"] })
+          qc.refetchQueries({ queryKey: ["checkout-statistic"] })
+      },
+  })
+}
+
 export function useGetCheckOutByCheckOutId(checkout_id: string) {
   return useQuery({
     queryKey: ["checkout-id", checkout_id],
@@ -69,6 +81,15 @@ export function useGetCheckOutByUserId(user_id: string) {
   return useQuery({
     queryKey: ["checkout-user-id", user_id],
     queryFn: () => getCheckOutByUserId(user_id),
+    enabled: !!user_id,
+    retry: false,
+  })
+}
+
+export function useGetCheckOutMainByUserIdAdmin(user_id: string) {
+  return useQuery({
+    queryKey: ["checkout-user-id", user_id],
+    queryFn: () => getCheckOutMainByUserIdAdmin(user_id),
     enabled: !!user_id,
     retry: false,
   })

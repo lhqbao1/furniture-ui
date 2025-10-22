@@ -2,7 +2,7 @@ export const config = {
   regions: ['fra1'],
 };
 
-import { api } from "@/lib/axios"
+import { api, apiAdmin } from "@/lib/axios"
 import { AddressFormValues } from "@/lib/schema/address"
 import { Address } from "@/types/address"
 
@@ -12,8 +12,23 @@ export async function getAddressByUserId(userId: string) {
     )
     return data as Address[]
   }
+
+  export async function getAddressByUserIdAdmin(userId: string) {
+    const {data} = await apiAdmin.get(
+        `/address/${userId}`,
+    )
+    return data as Address[]
+  }
+
   export async function getInvoiceAddressByUserId(userId: string) {
     const {data} = await api.get(
+        `/invoice/address/${userId}`,
+    )
+    return data as Address
+  }
+
+  export async function getInvoiceAddressByUserIdAdmin(userId: string) {
+    const {data} = await apiAdmin.get(
         `/invoice/address/${userId}`,
     )
     return data as Address

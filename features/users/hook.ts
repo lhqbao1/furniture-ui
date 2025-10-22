@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Customer, User } from "@/types/user"
-import { deleteCustomer, getAllCustomers, getUserById, getUserByIdAdmin, updateUser } from "./api"
+import { deleteCustomer, getAllCustomers, getUserById, getUserByIdAdmin, updateUser, updateUserAdmin } from "./api"
 
 export function useGetUserById(userId: string) {
   return useQuery<User>({
@@ -23,6 +23,16 @@ export function useUpdateUser() {
   const qc = useQueryClient()
     return useMutation({
       mutationFn: ({id, user}: {id: string, user: Partial<User>}) => updateUser(id, user),
+      onSuccess: (data, variables) => {
+        qc.refetchQueries({ queryKey: ["user", variables.id] })
+      },
+    })
+}
+
+export function useUpdateUserAdmin() {
+  const qc = useQueryClient()
+    return useMutation({
+      mutationFn: ({id, user}: {id: string, user: Partial<User>}) => updateUserAdmin(id, user),
       onSuccess: (data, variables) => {
         qc.refetchQueries({ queryKey: ["user", variables.id] })
       },
