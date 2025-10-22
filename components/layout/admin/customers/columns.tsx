@@ -5,12 +5,16 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Customer } from "@/types/user"
 import { useDeleteCustomer } from "@/features/users/hook"
 import { Button } from "@/components/ui/button"
-import { Trash } from "lucide-react"
+import { Pencil, Trash } from "lucide-react"
 import { toast } from "sonner"
 import DeleteDialog from "./delete-dialog"
+import { useRouter } from "@/src/i18n/navigation"
+import { useLocale } from "next-intl"
 
 function ActionCell({ user }: { user: Customer }) {
+    const router = useRouter()
     const deleteCustomerMutation = useDeleteCustomer()
+    const locale = useLocale()
 
     const handleDeleteCustomer = () => {
         deleteCustomerMutation.mutate(user.id, {
@@ -24,6 +28,13 @@ function ActionCell({ user }: { user: Customer }) {
     }
     return (
         <div className="flex gap-1.5 justify-center">
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push(`/admin/crm/customers/${user.id}`, { locale })}
+            >
+                <Pencil className="size-4 text-primary" />
+            </Button>
             <DeleteDialog user={user} />
         </div>
     )

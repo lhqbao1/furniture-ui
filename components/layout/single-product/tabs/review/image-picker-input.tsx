@@ -141,8 +141,8 @@ function ImagePickerInput<T extends FieldValues>({
                     const uploadedUrls = data.results.map((r) => r.url)
                     console.log(uploadedUrls)
                     // 🔍 Kiểm tra URL có chứa khoảng trắng
-                    if (uploadedUrls.length > 10) {
-                        toast.error(`At least 10 images per product`)
+                    if (uploadedUrls.length > 20) {
+                        toast.error(`At least 20 images per product`)
                         return
                     }
 

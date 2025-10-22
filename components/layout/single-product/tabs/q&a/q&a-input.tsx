@@ -235,9 +235,19 @@ const QAInput = ({ productId }: QAInputProps) => {
                     listQA.map((item) => (
                         <div key={item.id} className="mb-8">
                             {/* 🟢 Câu hỏi cha */}
-                            <div className="px-4 py-2 bg-gray-200 rounded-lg">
+                            <div className="px-4 py-2 border rounded-lg">
                                 <div className="flex gap-6 items-center">
-                                    <div className="font-bold">{item.user.first_name} {item.user.last_name}</div>
+                                    <div className="flex gap-2 items-center">
+                                        <span className="font-bold">{item.user.first_name} {item.user.last_name}</span>
+                                        {item.user.is_admin ?
+                                            <Image
+                                                src="/new-logo.svg"
+                                                width={20}
+                                                height={20}
+                                                alt=""
+                                            />
+                                            : ''}
+                                    </div>
                                     <div className="text-sm text-gray-600">{formatDateTime(item.created_at)}</div>
                                 </div>
                                 <div>{item.comment}</div>
@@ -316,7 +326,7 @@ const QAInput = ({ productId }: QAInputProps) => {
                                                 className="relative pl-8 before:content-[''] before:absolute before:top-6 before:left-3 before:w-5 before:h-px before:bg-gray-300"
                                             >
                                                 {/* Box comment con */}
-                                                <div className="px-4 py-2 bg-gray-200 rounded-lg">
+                                                <div className="px-4 py-2 border-2 rounded-lg">
                                                     <div className="flex gap-6 items-center">
                                                         <div className="flex gap-2 items-center">
                                                             <span className="font-bold">{reply.user.first_name} {reply.user.last_name}</span>

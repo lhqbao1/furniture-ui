@@ -321,7 +321,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
             return;
         }
 
-        if (isIncomplete) {
+        if (isIncomplete && product.is_active === false) {
             toast.error("Product information is incomplete");
             return;
         }

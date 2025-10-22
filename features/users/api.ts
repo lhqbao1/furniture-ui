@@ -2,11 +2,16 @@ export const config = {
   regions: ['fra1'],
 };
 
-import { api, apiAdmin } from "@/lib/axios"
+import { api, apiAdmin, apiFlexible } from "@/lib/axios"
 import { Customer, User } from "@/types/user"
 
 export async function getUserById(id: string) {
   const { data } = await api.get(`/user/${id}`, { withCredentials: true })
+  return data as Customer
+}
+
+export async function getUserByIdAdmin(id: string) {
+  const { data } = await apiAdmin.get(`/user/${id}`, { withCredentials: true })
   return data as Customer
 }
 
