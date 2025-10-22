@@ -156,18 +156,18 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
             )
         }
     },
-    {
-        accessorKey: "customer",
-        header: "CUSTOMER",
-        cell: ({ row }) => {
-            return (
-                <div>
-                    <div>{row.original.checkouts[0].user.first_name} {row.original.checkouts[0].user.last_name}</div>
-                    <div>{row.original.checkouts[0].user.email}</div>
-                </div>
-            )
-        }
-    },
+    // {
+    //     accessorKey: "customer",
+    //     header: "CUSTOMER",
+    //     cell: ({ row }) => {
+    //         return (
+    //             <div>
+    //                 <div>{row.original.checkouts[0].user.first_name} {row.original.checkouts[0].user.last_name}</div>
+    //                 <div>{row.original.checkouts[0].user.email}</div>
+    //             </div>
+    //         )
+    //     }
+    // },
     {
         accessorKey: "channel",
         header: () => (
@@ -281,6 +281,112 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     //         )
     //     }
     // },
+    {
+        accessorKey: "value",
+        header: () => (
+            <div className="text-center w-full">INVOICE</div>
+        ),
+        cell: ({ row }) => {
+            return (
+                <div className="flex gap-1 items-center justify-end">
+                    <div className={`${row.original.total_amount < 0 ? 'text-red-500' : 'text-[#4D4D4D]'}`}>€{row.original.total_amount.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    {row.original.status === "Pending" ? "" : <ViewFileDialog checkoutId={row.original.id} type="invoice" />}
+                </div>
+            )
+        }
+    },
+    {
+        id: "actions",
+        header: () => (
+            <div className="text-center w-full">ACTIONS</div>
+        ),
+        cell: ({ row }) => <ActionCell id={row.original.id} />,
+    },
+]
+
+export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
+    {
+        accessorKey: "id",
+        header: "ORDER ID",
+        cell: ({ row }) => {
+            return (
+                <div>#{row.original.checkout_code}</div>
+            )
+        }
+    },
+    {
+        accessorKey: "external_id",
+        header: "EXTERNAL ID",
+        cell: ({ row }) => {
+            return (
+                <div>{row.original.marketplace_order_id}</div>
+            )
+        }
+    },
+    {
+        accessorKey: "customer",
+        header: "CUSTOMER",
+        cell: ({ row }) => {
+            return (
+                <div>
+                    <div className="capitalize">{row.original.checkouts[0].user.first_name} {row.original.checkouts[0].user.last_name}</div>
+                    <div>{row.original.checkouts[0].user.email}</div>
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: "channel",
+        header: () => (
+            <div className="text-center w-full">CHANNEL</div>
+        ),
+        cell: ({ row }) => {
+            const currentChanel = row.original.from_marketplace
+            const channelLogo = listChanel.find(ch => ch.name === currentChanel)?.icon || 'new-logo.svg'
+            return (
+                <div className="h-12 relative">
+                    <Image src={`/${channelLogo}`} alt="icon" fill className="object-contain p-2" unoptimized />
+                </div>
+                // <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
+            )
+        },
+    },
+    {
+        accessorKey: "created_at",
+        header: () => (
+            <div className="text-center w-full">DATE CREATED</div>
+        ),
+        cell: ({ row }) => {
+            const isoString = row.original.created_at
+            const date = new Date(isoString)
+
+            const time = date.toLocaleString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false, // bỏ AM/PM nếu muốn
+            })
+
+            const day = date.toLocaleString("en-US", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            })
+
+            return (
+                <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
+                    <span>{time}</span>
+                    <span>{day}</span>
+                </div>
+            )
+        }
+    },
+    {
+        accessorKey: "status",
+        header: () => (
+            <div className="text-center w-full">STATUS</div>
+        ),
+        cell: ({ row }) => <div className="text-center lowercase">{row.original.status}</div>,
+    },
     {
         accessorKey: "value",
         header: () => (

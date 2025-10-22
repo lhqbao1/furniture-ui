@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createAddress, createInvoiceAddress, deleteAddress, getAddressByAddressId, getAddressByUserId, getInvoiceAddressByUserId, setDefaultAddress, updatedAddress, updatedInvoiceAddress } from "./api";
+import { createAddress, createInvoiceAddress, deleteAddress, getAddressByAddressId, getAddressByUserId, getAddressByUserIdAdmin, getInvoiceAddressByUserId, getInvoiceAddressByUserIdAdmin, setDefaultAddress, updatedAddress, updatedInvoiceAddress } from "./api";
 import { AddressFormValues } from "@/lib/schema/address";
 
 export function useGetAddressByUserId(userId: string){
@@ -11,10 +11,28 @@ export function useGetAddressByUserId(userId: string){
      })
 }
 
+export function useGetAddressByUserIdAdmin(userId: string){
+    return useQuery({
+        queryKey: ["address-by-user"],
+        queryFn: () => getAddressByUserIdAdmin(userId),
+        retry: false,
+        enabled: !!userId,
+     })
+}
+
 export function useGetInvoiceAddressByUserId(userId: string){
     return useQuery({
         queryKey: ["invoice-address-by-user", userId],
         queryFn: () => getInvoiceAddressByUserId(userId),
+        retry: false,
+        enabled: !!userId,
+     })
+}
+
+export function useGetInvoiceAddressByUserIdAdmin(userId: string){
+    return useQuery({
+        queryKey: ["invoice-address-by-user", userId],
+        queryFn: () => getInvoiceAddressByUserIdAdmin(userId),
         retry: false,
         enabled: !!userId,
      })

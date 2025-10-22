@@ -20,6 +20,12 @@ export async function updateUser(id: string, user: Partial<User>) {
   return data as Customer
 }
 
+
+export async function updateUserAdmin(id: string, user: Partial<User>) {
+  const { data } = await apiAdmin.put(`/user/${id}`, user, { withCredentials: true })
+  return data as Customer
+}
+
 export async function getAllCustomers() {
     const {data} = await apiAdmin.get(
         '/user',

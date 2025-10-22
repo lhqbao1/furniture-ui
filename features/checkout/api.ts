@@ -4,6 +4,7 @@ export const config = {
 
 import { api, apiAdmin, apiDSP, apiFlexible } from "@/lib/axios"
 import { CreateOrderFormValues } from "@/lib/schema/checkout"
+import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import { CheckOut, CheckOutMain, CheckOutMainResponse, CheckOutResponse, CheckOutStatistics } from "@/types/checkout"
 
 export interface GetAllCheckoutParams {
@@ -21,6 +22,19 @@ export async function createCheckOut(item: CreateOrderFormValues) {
               Authorization: `Bearer ${localStorage.getItem("access_token")}`,
             },
             withCredentials: true,
+        }
+    )
+    return data as CheckOut
+  }
+
+  export async function createManualCheckOut(item: ManualCreateOrderFormValues) {
+    const {data} = await apiAdmin.post(
+        `/checkout/manual-checkout`,
+        item,
+        {
+            headers: {
+              "Content-Type": "application/json",
+            },
         }
     )
     return data as CheckOut
@@ -95,6 +109,13 @@ export async function getCheckOutByUserId(user_id: string) {
 
 export async function getCheckOutMainByUserId(user_id: string) {
   const {data} = await api.get(
+      `/checkout/main-checkout/user/${user_id}`,
+  )
+  return data as CheckOutMain[]
+}
+
+export async function getCheckOutMainByUserIdAdmin(user_id: string) {
+  const {data} = await apiAdmin.get(
       `/checkout/main-checkout/user/${user_id}`,
   )
   return data as CheckOutMain[]
