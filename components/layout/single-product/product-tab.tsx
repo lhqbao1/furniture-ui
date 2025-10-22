@@ -33,7 +33,7 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
     { value: "details", label: "Aufbau & Details", content: '' },
     { value: "review", label: t('review'), content: <ProductReviewTab productId={product.id} /> },
     {
-      value: "q&a", label: "Häufig Gestellte Frage", content: <QASection productId={product.id} />
+      value: "q&a", label: "häufig gestellte Frage", content: <QASection productId={product.id} />
     },
   ]
 
@@ -66,11 +66,6 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
       {sections.map((section) => (
         <TabsContent key={section.value} value={section.value} className={`${section.value === 'description' ? 'w-full grid grid-cols-5 gap-12' : ''}`}>
           <div className='col-span-3'>{section.content}</div>
-          <div className='col-span-2'>
-            {section.value === 'description' ?
-              <QASection productId={product.id} />
-              : ''}
-          </div>
         </TabsContent>
       ))}
     </Tabs>

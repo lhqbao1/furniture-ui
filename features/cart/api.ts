@@ -49,6 +49,13 @@ export async function addToCart(productId: string, quantity: number) {
     return data as CartResponse
   }
 
+  export async function getCartByUserId(user_id: string) {
+    const {data} = await api.get(
+        `/cart/by-user/${user_id}`,
+    )
+    return data as CartResponse
+  }
+
   export async function deleteCartItem(cartItemId: string) {
     const {data} = await api.delete(
         `/cart/remove-item/${cartItemId}`,
