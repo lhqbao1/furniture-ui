@@ -103,54 +103,10 @@ export default function ManualCheckOutShippingAddress({ isAdmin = false }: Check
                         <FormItem>
                             <FormLabel className="text-[#666666] text-sm">City</FormLabel>
                             <FormControl>
-                                <Popover open={open && !isSameInvoice} onOpenChange={setOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            className={cn(
-                                                "w-full justify-between",
-                                                !field.value && "text-muted-foreground"
-                                            )}
-                                            disabled={isSameInvoice}
-                                        >
-                                            {field.value || (isAdmin ? "Select City" : t('selectCity'))}
-                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    {!isSameInvoice && (
-                                        <PopoverContent className="w-full p-0">
-                                            <Command>
-                                                <CommandInput placeholder="" />
-                                                <CommandEmpty>{t('noCity')}</CommandEmpty>
-                                                <CommandList className="h-[400px]">
-                                                    <CommandGroup>
-                                                        <CommandGroup>
-                                                            {cityOptions.map((c, index) => (
-                                                                <CommandItem
-                                                                    key={index}
-                                                                    value={c.value}
-                                                                    onSelect={() => {
-                                                                        field.onChange(c.value)
-                                                                        setOpen(false) // đóng popover sau khi chọn
-                                                                    }}
-                                                                >
-                                                                    <Check
-                                                                        className={cn(
-                                                                            "mr-2 h-4 w-4",
-                                                                            field.value === c.value ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                    {c.label}
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    )}
-                                </Popover>
+                                <Input
+                                    placeholder=""
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
