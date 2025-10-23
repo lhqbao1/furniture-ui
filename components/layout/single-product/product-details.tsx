@@ -254,9 +254,9 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                 shippingRate: {
                                     "@type": "MonetaryAmount",
                                     value:
-                                        productDetails.carrier?.toLowerCase() === "dpd"
-                                            ? "5.95"
-                                            : "35.95",
+                                        productDetails.carrier?.toLowerCase() === "spedition"
+                                            ? "35.95"
+                                            : "5.95",
                                     currency: "EUR",
                                 },
                                 shippingDestination: {
@@ -267,14 +267,14 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                     "@type": "ShippingDeliveryTime",
                                     handlingTime: {
                                         "@type": "QuantitativeValue",
-                                        minValue: 0,
-                                        maxValue: 1,
+                                        minValue: 1,
+                                        maxValue: 2,
                                         unitCode: "d",
                                     },
                                     transitTime: {
                                         "@type": "QuantitativeValue",
-                                        minValue: 2,
-                                        maxValue: 5,
+                                        minValue: 0,
+                                        maxValue: 0,
                                         unitCode: "d",
                                     },
                                 },
@@ -286,7 +286,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                 applicableCountry: "DE",
                                 returnPolicyCategory:
                                     "https://schema.org/MerchantReturnFiniteReturnWindow",
-                                merchantReturnDays: 30,
+                                merchantReturnDays: 14,
                                 returnMethod: "https://schema.org/ReturnByMail",
                                 returnFees: "https://schema.org/FreeReturn",
                             },
