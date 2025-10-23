@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -31,11 +31,10 @@ import { useSyncToEbay } from "@/features/ebay/hook"
 import { syncToEbayInput } from "@/features/ebay/api"
 import { stripHtmlRegex } from "@/hooks/simplifyHtml"
 import RichEditor from "@/components/shared/tiptap/tiptap-editor"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface SyncToEbayFormProps {
     product: ProductItem
-    open: boolean
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>
     isUpdating?: boolean
     currentMarketplace?: string
     updating?: boolean
@@ -44,9 +43,10 @@ interface SyncToEbayFormProps {
 
 type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>
 
-const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMarketplace, updating, setUpdating }: SyncToEbayFormProps) => {
+const SyncToEbayForm = ({ product, isUpdating = false, currentMarketplace, updating, setUpdating }: SyncToEbayFormProps) => {
     const updateProductMutation = useEditProduct()
     const syncToEbayMutation = useSyncToEbay()
+    const [open, setOpen] = useState<boolean>(false)
     // Danh sách marketplace khả dụng
     const ALL_MARKETPLACES = ["ebay", "amazon", "kaufland"]
 
@@ -94,6 +94,7 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
 
     const onSubmit = (values: MarketPlaceFormValues) => {
         setUpdating(true)
+        setOpen(true)
         const normalizedValues: MarketplaceProduct = {
             ...values,
             marketplace: values.marketplace ?? '',
@@ -204,192 +205,207 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
     }
 
     return (
-        <div className="mx-auto space-y-6">
-            <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6"
-                >
-                    {/* Marketplace */}
-                    {isUpdating ? "" :
-                        <FormField
-                            control={form.control}
-                            name="marketplace"
-                            render={({ field }) => {
+        <>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline" type="button">
+                        Update
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
+                    <DialogHeader>
+                        <DialogTitle>Update Marketplace</DialogTitle>
+                    </DialogHeader>
+                    <div className="mx-auto space-y-6">
+                        <Form {...form}>
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit)}
+                                className="space-y-6"
+                            >
+                                {/* Marketplace */}
+                                {isUpdating ? "" :
+                                    <FormField
+                                        control={form.control}
+                                        name="marketplace"
+                                        render={({ field }) => {
 
-                                return (
-                                    <FormItem>
-                                        <FormLabel>Marketplace</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Marketplace</FormLabel>
+                                                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="border">
+                                                                <SelectValue placeholder="Select a marketplace" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {marketplacesToRender.length > 0 ? (
+                                                                marketplacesToRender.map((m) => (
+                                                                    <SelectItem key={m} value={m}>
+                                                                        {m.toUpperCase()}
+                                                                    </SelectItem>
+                                                                ))
+                                                            ) : (
+                                                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                                                    All marketplaces added
+                                                                </div>
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                }
+
+
+                                {/* Name */}
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Product Name</FormLabel>
                                             <FormControl>
-                                                <SelectTrigger className="border">
-                                                    <SelectValue placeholder="Select a marketplace" />
-                                                </SelectTrigger>
+                                                <Input
+                                                    placeholder="Enter product name"
+                                                    {...field}
+                                                />
                                             </FormControl>
-                                            <SelectContent>
-                                                {marketplacesToRender.length > 0 ? (
-                                                    marketplacesToRender.map((m) => (
-                                                        <SelectItem key={m} value={m}>
-                                                            {m.toUpperCase()}
-                                                        </SelectItem>
-                                                    ))
-                                                ) : (
-                                                    <div className="px-3 py-2 text-sm text-muted-foreground">
-                                                        All marketplaces added
-                                                    </div>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )
-                            }}
-                        />
-                    }
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-
-                    {/* Name */}
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Product Name</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        placeholder="Enter product name"
-                                        {...field}
+                                {/* Price + Stock */}
+                                <div className="grid grid-cols-3 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="final_price"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Final Price (€)</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min={0}
+                                                        value={field.value ?? ""}
+                                                        onChange={(e) =>
+                                                            field.onChange(
+                                                                e.target.value === ""
+                                                                    ? null
+                                                                    : e.target.valueAsNumber
+                                                            )
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
 
-                    {/* Price + Stock */}
-                    <div className="grid grid-cols-3 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="final_price"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Final Price (€)</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            min={0}
-                                            value={field.value ?? ""}
-                                            onChange={(e) =>
-                                                field.onChange(
-                                                    e.target.value === ""
-                                                        ? null
-                                                        : e.target.valueAsNumber
-                                                )
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="min_stock"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Min Stock</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            min={0}
-                                            value={field.value ?? ""}
-                                            onChange={(e) =>
-                                                field.onChange(
-                                                    e.target.value === ""
-                                                        ? null
-                                                        : e.target.valueAsNumber
-                                                )
-                                            }
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="max_stock"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Max Stock</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            min={0}
-                                            value={field.value ?? ""}
-                                            onChange={(e) =>
-                                                field.onChange(
-                                                    e.target.value === ""
-                                                        ? null
-                                                        : e.target.valueAsNumber
-                                                )
-                                            }
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-
-                    {/* Description */}
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className='text-black font-semibold text-sm'>Description</FormLabel>
-                                <FormControl>
-                                    <RichEditor
-                                        disabled
-                                        value={field.value || ""}
-                                        onChangeValue={field.onChange}
+                                    <FormField
+                                        control={form.control}
+                                        name="min_stock"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Min Stock</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        min={0}
+                                                        value={field.value ?? ""}
+                                                        onChange={(e) =>
+                                                            field.onChange(
+                                                                e.target.value === ""
+                                                                    ? null
+                                                                    : e.target.valueAsNumber
+                                                            )
+                                                        }
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
                                     />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
 
-                    {/* Submit */}
-                    <div className="flex justify-end">
-                        <Button
-                            type="submit"
-                            className="px-6 py-2 text-lg"
-                            disabled={
-                                isUpdating
-                                    ? syncToEbayMutation.isPending
-                                    : updateProductMutation.isPending
-                            }
-                        >
-                            {isUpdating ? (
-                                syncToEbayMutation.isPending ? (
-                                    <Loader2 className="animate-spin" />
-                                ) : (
-                                    "Update"
-                                )
-                            ) : updateProductMutation.isPending ? (
-                                <Loader2 className="animate-spin" />
-                            ) : (
-                                "Add"
-                            )}
-                        </Button>
+                                    <FormField
+                                        control={form.control}
+                                        name="max_stock"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Max Stock</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        min={0}
+                                                        value={field.value ?? ""}
+                                                        onChange={(e) =>
+                                                            field.onChange(
+                                                                e.target.value === ""
+                                                                    ? null
+                                                                    : e.target.valueAsNumber
+                                                            )
+                                                        }
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
 
+                                {/* Description */}
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className='text-black font-semibold text-sm'>Description</FormLabel>
+                                            <FormControl>
+                                                <RichEditor
+                                                    disabled
+                                                    value={field.value || ""}
+                                                    onChangeValue={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Submit */}
+                                <div className="flex justify-end">
+                                    <Button
+                                        type="submit"
+                                        className="px-6 py-2 text-lg"
+                                        disabled={
+                                            isUpdating
+                                                ? syncToEbayMutation.isPending
+                                                : updateProductMutation.isPending
+                                        }
+                                    >
+                                        {isUpdating ? (
+                                            syncToEbayMutation.isPending ? (
+                                                <Loader2 className="animate-spin" />
+                                            ) : (
+                                                "Update"
+                                            )
+                                        ) : updateProductMutation.isPending ? (
+                                            <Loader2 className="animate-spin" />
+                                        ) : (
+                                            "Add"
+                                        )}
+                                    </Button>
+
+                                </div>
+                            </form>
+                        </Form>
                     </div>
-                </form>
-            </Form>
-        </div>
+                </DialogContent>
+            </Dialog>
+        </>
+
     )
 }
 

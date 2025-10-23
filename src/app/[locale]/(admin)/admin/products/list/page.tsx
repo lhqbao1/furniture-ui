@@ -1,15 +1,15 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { productColumns } from '@/components/layout/admin/products/products-list/column'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import TableToolbar from '@/components/layout/admin/products/products-list/toolbar'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetProductsSelect } from '@/features/product-group/hook'
 import { useGetAllProducts } from '@/features/products/hook'
-import { searchProductQueryStringAtom } from '@/store/product'
+import { searchProductQueryStringAtom, showAllProductsAtom } from '@/store/product'
 import { useAtom } from 'jotai'
 import React, { useEffect, useState } from 'react'
+import { getProductColumns } from '@/components/layout/admin/products/products-list/column'
 
 const ProductList = () => {
     const router = useRouter()
@@ -19,6 +19,10 @@ const ProductList = () => {
     const [page, setPage] = useState(() => Number(searchParams.get('page')) || 1)
     const [pageSize, setPageSize] = useState(50)
     const [searchQuery, setSearchQuery] = useAtom<string>(searchProductQueryStringAtom)
+    const [showAll, setShowAll] = useAtom(showAllProductsAtom)
+    const [sortByStock, setSortByStock] = useState<string | undefined>(() =>
+        searchParams.get("sort_by_stock") || undefined
+    )
 
     // ⚡ Cập nhật URL mỗi khi page thay đổi
     const handlePageChange = (newPage: number) => {
@@ -34,11 +38,23 @@ const ProductList = () => {
         setPage(urlPage)
     }, [searchParams])
 
+    // ✅ Mỗi lần sort thay đổi, cập nhật URL
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams)
+        if (sortByStock) {
+            params.set("sort_by_stock", sortByStock)
+        } else {
+            params.delete("sort_by_stock")
+        }
+        router.push(`?${params.toString()}`, { scroll: false })
+    }, [sortByStock])
+
     const { data, isLoading, isError } = useGetAllProducts({
         page,
         page_size: pageSize,
-        all_products: true,
+        all_products: showAll,
         search: searchQuery,
+        sort_by_stock: sortByStock
     })
     const { data: exportData } = useGetProductsSelect()
 
@@ -47,10 +63,11 @@ const ProductList = () => {
     return (
         <div className='space-y-6 pb-12'>
             <div className='text-3xl text-secondary font-bold text-center'>Product List</div>
-
             <TableToolbar
                 searchQuery={searchQuery}
                 pageSize={pageSize}
+                showAll={showAll}
+                setShowAll={setShowAll} // 🔥 truyền vào toolbar
                 setPageSize={setPageSize}
                 addButtonText='Add Product'
                 addButtonUrl='/admin/products/add'
@@ -63,7 +80,7 @@ const ProductList = () => {
             ) : (
                 <ProductTable
                     data={data ? data.items : []}
-                    columns={productColumns}
+                    columns={getProductColumns(setSortByStock)}
                     page={page}
                     pageSize={pageSize}
                     setPage={handlePageChange}
