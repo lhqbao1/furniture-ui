@@ -127,7 +127,7 @@ export function MenuBar({ editor, showHtml, setShowHtml }: {
     )
 }
 
-export default function RichEditor({ value, onChangeValue }: { value: string; onChangeValue: (val: string) => void }) {
+export default function RichEditor({ value, onChangeValue, disabled = false }: { value: string; onChangeValue: (val: string) => void, disabled?: boolean }) {
     const [showHtml, setShowHtml] = useState(false)
 
     const extensions = [
@@ -165,12 +165,22 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
     const editor = useEditor({
         extensions: extensions,
         content: value || "<p></p>",
+        editable: !disabled,
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
             const html = editor.getHTML()
             onChangeValue(html)
         },
     })
+
+    // Sync `disabled` prop -> editor instance
+    useEffect(() => {
+        if (!editor) return
+        // setEditable là API chính xác để bật/tắt chỉnh sửa
+        editor.setEditable(!disabled)
+        // optional: nếu disabled, blur editor để tránh caret vẫn hiện
+        if (disabled) editor.commands.blur()
+    }, [disabled, editor])
 
     // Đồng bộ từ props -> editor (chỉ khi value thay đổi từ bên ngoài)
     useEffect(() => {
@@ -185,7 +195,7 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
         <div>
             <div className="flex justify-between items-center">
             </div>
-            {editor && <MenuBar editor={editor} showHtml={showHtml} setShowHtml={setShowHtml} />}
+            {editor && !disabled && <MenuBar editor={editor} showHtml={showHtml} setShowHtml={setShowHtml} />}
             {showHtml && editor ? (
                 <textarea
                     className="w-full h-64 border rounded-md p-2 font-mono text-sm bg-gray-50"
@@ -201,6 +211,7 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
                 />
             ) : (
                 <EditorContent
+                    disabled={disabled}
                     editor={editor}
                     className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
                [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline font-sans
@@ -208,7 +219,6 @@ export default function RichEditor({ value, onChangeValue }: { value: string; on
                 "
                 />
             )}
-
         </div>
     )
 }
