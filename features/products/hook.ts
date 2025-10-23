@@ -10,7 +10,7 @@ export function useGetAllProducts({ page, page_size, all_products, search, sort_
   return useQuery({
     queryKey: ["products", page, page_size, all_products, search, sort_by_stock], // queryKey thay đổi khi page/page_size thay đổi
     queryFn: () => getAllProducts({ page, page_size, all_products,search ,sort_by_stock}),
-    placeholderData: keepPreviousData, // ✅ v5 syntax
+    // placeholderData: keepPreviousData,
     retry: false,
   })
 }

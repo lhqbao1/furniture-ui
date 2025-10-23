@@ -127,8 +127,8 @@ function ImagePickerInput<T extends FieldValues>({
 
             // 🔍 Check tổng số ảnh (hiện có + mới)
             const totalImages = items.length + acceptedFiles.length
-            if (totalImages > 10) {
-                toast.error(`You can upload a maximum of 10 images per product.`)
+            if (totalImages > 20) {
+                toast.error(`You can upload a maximum of 20 images per product.`)
                 return
             }
 
