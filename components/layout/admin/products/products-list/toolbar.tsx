@@ -36,6 +36,8 @@ import { saveAs } from "file-saver";
 interface TableToolbarProps {
     searchQuery?: string
     pageSize: number
+    showAll: boolean
+    setShowAll: React.Dispatch<React.SetStateAction<boolean>>
     setPageSize: React.Dispatch<React.SetStateAction<number>>
     setSearchQuery?: React.Dispatch<React.SetStateAction<string>>
     addButtonText?: string
@@ -53,6 +55,8 @@ export default function TableToolbar({
     searchQuery,
     pageSize,
     setPageSize,
+    showAll,
+    setShowAll,
     setSearchQuery,
     addButtonText,
     isAddButtonModal,
@@ -185,7 +189,10 @@ export default function TableToolbar({
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <FilterForm />
+                        <FilterForm
+                            allProducts={showAll}
+                            setAllProducts={setShowAll}
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
 

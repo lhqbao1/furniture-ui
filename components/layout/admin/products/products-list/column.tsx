@@ -424,187 +424,222 @@ function ActionsCell({ product }: { product: ProductItem }) {
 }
 
 
-export const productColumns: ColumnDef<ProductItem>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: "static_files",
-        header: "ICON",
-        cell: ({ row }) => {
-            const image = row.original.static_files?.[0]?.url
-            return (
-                <div className="w-12 h-12 relative">
-                    {image ? (
-                        <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px" unoptimized
-                        />
-                    ) : (
-                        <div className="w-12 h-12 bg-gray-200 rounded-md" />
-                    )}
-                </div>
-            )
+export const getProductColumns = (
+    setSortByStock: (val?: "asc" | "desc") => void
+): ColumnDef<ProductItem>[] => [
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
         },
-    },
-    {
-        accessorKey: "id",
-        header: ({ }) => <div className="text-center">ID</div>,
-        cell: ({ row }) => {
-            return (
-                <div className="text-center">{row.original.id_provider}</div>
-            )
-        }
-    },
-    {
-        accessorKey: "name",
-        header: ({ column }) => (
-            <Button
-                variant={'ghost'}
-                className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-                <div>NAME</div>
-                <div className="mb-0.5">
-                    {{
-                        asc: "↑",
-                        desc: "↓",
-                    }[column.getIsSorted() as string] ?? "↕"}
-                </div>
-            </Button>
-        ),
-        // cell: ({ row }) => <EditableNameCell product={row.original} />,
-        cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>,
-        enableSorting: true
-
-    },
-    {
-        accessorKey: "owner",
-        header: "SUPPLIER",
-        cell: ({ row }) => {
-            return (
-                <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
-            )
-        }
-    },
-    {
-        accessorKey: "category",
-        header: ({ column }) => (
-            <div className="text-center">CATEGORY</div>
-        ),
-        cell: ({ row }) => {
-            return (
-                <div className="flex flex-col gap-1 items-center">
-                    {row.original.categories.map((item, indx) => {
-                        return (
-                            <div key={item.id}>
-                                {item.name}
-                            </div>
-                        )
-                    })}
-                </div>
-            )
-        }
-    },
-    {
-        accessorKey: "stock",
-        header: "STOCK",
-        // cell: ({ row }) => <EditableStockCell product={row.original} />,
-        cell: ({ row }) => <EditableStockCell product={row.original} />
-    },
-    {
-        accessorKey: "is_active",
-        header: "STATUS",
-        cell: ({ row }) => (
-            // <span
-            //     className={`px-2 py-1 rounded-md text-xs ${row.original.is_active ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-            //         }`}
-            // >
-            //     {row.original.is_active ? "active" : "inactive"}
-            // </span>
-            <ToggleProductStatus product={row.original} />
-        ),
-    },
-    {
-        accessorKey: "cost",
-        header: () => <div className="text-right">COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : <div className="text-right">updating</div>}</div>,
-    },
-    {
-        accessorKey: "shipping_cost",
-        header: () => <div className="text-right">DELIVERY COST</div>,
-        cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : <div className="text-right">updating</div>}</div>,
-    },
-    {
-        accessorKey: "final_price",
-        header: () => <div className="text-right">FINAL PRICE</div>,
-        cell: ({ row }) => <EdittbalePriceCell product={row.original} />,
-    },
-    {
-        id: "margin",
-        header: () => <div className="text-right">MARGIN</div>,
-        cell: ({ row }) => {
-            const { final_price, cost, tax } = row.original
-            const taxRate = parseFloat(tax) / 100
-            if (!final_price || !cost || final_price <= 0) return <div className="text-right">updating</div>
-
-            const margin = ((1 / (1 + taxRate)) - (cost / final_price)) * 100
-            return <div className="text-right">{margin.toFixed(1)}%</div>
-        }
-    },
-    {
-        id: "carrier",
-        header: () => <div className="text-center">CARRIER</div>,
-        cell: ({ row }) => {
-            const carrier = row.original.carrier?.toLowerCase()
-
-            let image: string | null = null
-            if (carrier === "amm") {
-                image = "/amm.jpeg"
-            } else if (carrier === "dpd") {
-                image = "/dpd.jpeg"
+        {
+            accessorKey: "static_files",
+            header: "ICON",
+            cell: ({ row }) => {
+                const image = row.original.static_files?.[0]?.url
+                return (
+                    <div className="w-12 h-12 relative">
+                        {image ? (
+                            <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px" unoptimized
+                            />
+                        ) : (
+                            <div className="w-12 h-12 bg-gray-200 rounded-md" />
+                        )}
+                    </div>
+                )
+            },
+        },
+        {
+            accessorKey: "id",
+            header: ({ }) => <div className="text-center">ID</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{row.original.id_provider}</div>
+                )
             }
-
-            return (
-                <div className="flex items-center justify-center">
-                    {image ? (
-                        <Image
-                            src={image}
-                            alt={carrier}
-                            width={60}
-                            height={60}
-                            unoptimized
-                            className="object-fill"
-                        />
-                    ) : (
-                        <div>
-                            updating
-                        </div>
-                    )}
-                </div>
-            )
         },
-    },
-    {
-        id: "actions",
-        header: "ACTION",
-        cell: ({ row }) => <ActionsCell product={row.original} />
-    },
-]
+        {
+            accessorKey: "name",
+            header: ({ column }) => (
+                <Button
+                    variant={'ghost'}
+                    className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    <div>NAME</div>
+                    <div className="mb-0.5">
+                        {{
+                            asc: "↑",
+                            desc: "↓",
+                        }[column.getIsSorted() as string] ?? "↕"}
+                    </div>
+                </Button>
+            ),
+            // cell: ({ row }) => <EditableNameCell product={row.original} />,
+            cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>,
+            enableSorting: true
+
+        },
+        {
+            accessorKey: "owner",
+            header: "SUPPLIER",
+            cell: ({ row }) => {
+                return (
+                    <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "category",
+            header: ({ column }) => (
+                <div className="text-center">CATEGORY</div>
+            ),
+            cell: ({ row }) => {
+                return (
+                    <div className="flex flex-col gap-1 items-center">
+                        {row.original.categories.map((item, indx) => {
+                            return (
+                                <div key={item.id}>
+                                    {item.name}
+                                </div>
+                            )
+                        })}
+                    </div>
+                )
+            }
+        },
+        // ✅ Cột STOCK — thêm sort server-side logic ở đây
+        {
+            accessorKey: "stock",
+            header: ({ column }) => {
+                const direction = column.getIsSorted() as "asc" | "desc" | undefined
+
+                // Xác định hướng sort tiếp theo
+                const nextSort =
+                    direction === "asc"
+                        ? "desc"
+                        : direction === "desc"
+                            ? undefined
+                            : "asc"
+
+                return (
+                    <Button
+                        variant="ghost"
+                        className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+                        onClick={() => {
+                            // Dùng TanStack UI để đổi icon
+                            column.toggleSorting(direction === "asc")
+                            // 🔹 Gửi param sort_by_stock cho API
+                            setSortByStock(nextSort)
+                        }}
+                    >
+                        <div>STOCK</div>
+                        <div className="mb-0.5">
+                            {direction === "asc"
+                                ? "↑"
+                                : direction === "desc"
+                                    ? "↓"
+                                    : "↕"}
+                        </div>
+                    </Button>
+                )
+            },
+            cell: ({ row }) => <EditableStockCell product={row.original} />,
+            enableSorting: true,
+        },
+        {
+            accessorKey: "is_active",
+            header: "STATUS",
+            cell: ({ row }) => (
+                // <span
+                //     className={`px-2 py-1 rounded-md text-xs ${row.original.is_active ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                //         }`}
+                // >
+                //     {row.original.is_active ? "active" : "inactive"}
+                // </span>
+                <ToggleProductStatus product={row.original} />
+            ),
+        },
+        {
+            accessorKey: "cost",
+            header: () => <div className="text-right">COST</div>,
+            cell: ({ row }) => <div className="text-right">{row.original.cost ? <span>€{(row.original.cost).toFixed(2)}</span> : <div className="text-right">updating</div>}</div>,
+        },
+        {
+            accessorKey: "shipping_cost",
+            header: () => <div className="text-right">DELIVERY COST</div>,
+            cell: ({ row }) => <div className="text-right">{row.original.delivery_cost ? <>€{(row.original.delivery_cost)?.toFixed(2)}</> : <div className="text-right">updating</div>}</div>,
+        },
+        {
+            accessorKey: "final_price",
+            header: () => <div className="text-right">FINAL PRICE</div>,
+            cell: ({ row }) => <EdittbalePriceCell product={row.original} />,
+        },
+        {
+            id: "margin",
+            header: () => <div className="text-right">MARGIN</div>,
+            cell: ({ row }) => {
+                const { final_price, cost, tax } = row.original
+                const taxRate = parseFloat(tax) / 100
+                if (!final_price || !cost || final_price <= 0) return <div className="text-right">updating</div>
+
+                const margin = ((1 / (1 + taxRate)) - (cost / final_price)) * 100
+                return <div className="text-right">{margin.toFixed(1)}%</div>
+            }
+        },
+        {
+            id: "carrier",
+            header: () => <div className="text-center">CARRIER</div>,
+            cell: ({ row }) => {
+                const carrier = row.original.carrier?.toLowerCase()
+
+                let image: string | null = null
+                if (carrier === "amm") {
+                    image = "/amm.jpeg"
+                } else if (carrier === "dpd") {
+                    image = "/dpd.jpeg"
+                }
+
+                return (
+                    <div className="flex items-center justify-center">
+                        {image ? (
+                            <Image
+                                src={image}
+                                alt={carrier}
+                                width={60}
+                                height={60}
+                                unoptimized
+                                className="object-fill"
+                            />
+                        ) : (
+                            <div>
+                                updating
+                            </div>
+                        )}
+                    </div>
+                )
+            },
+        },
+        {
+            id: "actions",
+            header: "ACTION",
+            cell: ({ row }) => <ActionsCell product={row.original} />
+        },
+    ]

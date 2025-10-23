@@ -1,23 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CreateProduct, deleteProduct, editProduct, generateSEO, getAllProducts, getProductById, getProductByTag } from "./api"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { CreateProduct, deleteProduct, editProduct, generateSEO, getAllProducts, GetAllProductsParams, getProductById, getProductByTag } from "./api"
 import { ProductInput } from "@/lib/schema/product"
-
-interface UseGetAllProductsParams {
-  page?: number
-  page_size?: number
-  all_products?: boolean
-  search?: string
-}
-
 interface SEOInput {
   title: string
   description: string
 }
 
-export function useGetAllProducts({ page, page_size, all_products, search }: UseGetAllProductsParams = {}) {
+export function useGetAllProducts({ page, page_size, all_products, search, sort_by_stock }: GetAllProductsParams = {}) {
   return useQuery({
-    queryKey: ["products", page, page_size, all_products, search], // queryKey thay đổi khi page/page_size thay đổi
-    queryFn: () => getAllProducts({ page, page_size, all_products,search }),
+    queryKey: ["products", page, page_size, all_products, search, sort_by_stock], // queryKey thay đổi khi page/page_size thay đổi
+    queryFn: () => getAllProducts({ page, page_size, all_products,search ,sort_by_stock}),
+    placeholderData: keepPreviousData, // ✅ v5 syntax
     retry: false,
   })
 }

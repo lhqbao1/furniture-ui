@@ -24,7 +24,6 @@ interface DeleteDialogProps {
 
 const DeleteDialog = ({ product, isEbay }: DeleteDialogProps) => {
     const deleteProduct = useDeleteProduct()
-    const removeFromEbayMutation = useRemoveFormEbay()
     const [open, setOpen] = useState(false)
 
     const handleDelete = () => {

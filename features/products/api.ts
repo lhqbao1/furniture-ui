@@ -6,11 +6,12 @@ import { api, apiAdmin, apiPublic } from "@/lib/axios"
 import { ProductInput } from "@/lib/schema/product"
 import { ProductItem, ProductResponse } from "@/types/products"
 
-interface GetAllProductsParams {
+export interface GetAllProductsParams {
   page?: number
   page_size?: number
   all_products?: boolean
   search?: string
+  sort_by_stock?: string
 }
 
 interface SEOInput {
@@ -48,6 +49,7 @@ export async function getAllProducts(params?: GetAllProductsParams) {
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
       ...(params?.all_products !== undefined && { all_products: params.all_products }),
       ...(params?.search !== undefined && { search: params.search }),
+      ...(params?.sort_by_stock !== undefined && { sort_by_stock: params.sort_by_stock }),
     },
   })
 
