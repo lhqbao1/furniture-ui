@@ -31,19 +31,7 @@ const DeleteDialog = ({ product, isEbay }: DeleteDialogProps) => {
         deleteProduct.mutate(product.id ?? "", {
             onSuccess(data, variables, context) {
                 toast.success("Delete product successfully")
-                // if (product.ebay) {
-                //     removeFromEbayMutation.mutate(product.sku, {
-                //         onSuccess(data, variables, context) {
-                //             toast.success("Remove from Ebay successful")
-                //             setOpen(false)
-                //         },
-                //         onError(error, variables, context) {
-                //             toast.error("Remove from Ebay fail")
-                //         },
-                //     })
-                // } else {
-                //     setOpen(false)
-                // }
+                setOpen(false)
             },
             onError(error, variables, context) {
                 toast.error("Failed to delete product")
