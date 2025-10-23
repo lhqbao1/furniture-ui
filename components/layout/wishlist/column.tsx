@@ -73,7 +73,7 @@ export const GetWishlistColumns = ({
                 return (
                     <div className="flex items-center gap-3">
                         <Image
-                            src={item.image_url || "/1.png"}
+                            src={item.image_url || "/placeholder-product.webp"}
                             alt={item.products.name}
                             width={60}
                             height={60}

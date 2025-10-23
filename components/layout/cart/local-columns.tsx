@@ -35,7 +35,7 @@ export const GetCartLocalColumns = (): ColumnDef<CartTableItem>[] => {
                             <div className="flex items-center gap-3 justify-between w-fit text-wrap flex-wrap">
                                 <div className="flex items-center gap-3 max-w-[300px] lg:max-w-full">
                                     <Image
-                                        src={item.img_url || "/1.png"}
+                                        src={item.img_url || "/placeholder-product.webp"}
                                         alt={item.product_name}
                                         width={60}
                                         height={60}
