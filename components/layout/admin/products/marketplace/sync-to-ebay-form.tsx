@@ -270,24 +270,6 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                         )}
                     />
 
-                    {/* Description */}
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className='text-black font-semibold text-sm'>Description</FormLabel>
-                                <FormControl>
-                                    <RichEditor
-                                        value={field.value || ""}
-                                        onChangeValue={field.onChange}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
                     {/* Price + Stock */}
                     <div className="grid grid-cols-3 gap-4">
                         <FormField
@@ -365,6 +347,24 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                         />
                     </div>
 
+                    {/* Description */}
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-black font-semibold text-sm'>Description</FormLabel>
+                                <FormControl>
+                                    <RichEditor
+                                        disabled
+                                        value={field.value || ""}
+                                        onChangeValue={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
                     {/* Submit */}
                     <div className="flex justify-end">
