@@ -531,39 +531,32 @@ export const getProductColumns = (
             header: ({ column }) => {
                 const direction = column.getIsSorted() as "asc" | "desc" | undefined
 
-                // Xác định hướng sort tiếp theo
-                const nextSort =
-                    direction === "asc"
-                        ? "desc"
-                        : direction === "desc"
-                            ? undefined
-                            : "asc"
-
                 return (
                     <Button
                         variant="ghost"
                         className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
                         onClick={() => {
-                            // Dùng TanStack UI để đổi icon
+                            // toggleSorting sẽ tự xử lý asc/desc/undefined xoay vòng
                             column.toggleSorting(direction === "asc")
-                            // 🔹 Gửi param sort_by_stock cho API
-                            setSortByStock(nextSort)
+
+                            // Đợi 1 tick để state cập nhật rồi sync với API param
+                            setTimeout(() => {
+                                const newDir = column.getIsSorted() as "asc" | "desc" | undefined
+                                setSortByStock(newDir)
+                            }, 0)
                         }}
                     >
                         <div>STOCK</div>
                         <div className="mb-0.5">
-                            {direction === "asc"
-                                ? "↑"
-                                : direction === "desc"
-                                    ? "↓"
-                                    : "↕"}
+                            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
                         </div>
                     </Button>
                 )
             },
             cell: ({ row }) => <EditableStockCell product={row.original} />,
             enableSorting: true,
-        },
+        }
+        ,
         {
             accessorKey: "is_active",
             header: "STATUS",

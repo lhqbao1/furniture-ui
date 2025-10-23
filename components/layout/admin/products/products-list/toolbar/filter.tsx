@@ -5,10 +5,11 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import ProductStatusFilter from './filter/status'
 
 interface FilterFormProps {
     allProducts: boolean
-    setAllProducts: (val: boolean) => void
+    setAllProducts: (value: boolean) => void
     // isActive: boolean
     // setIsActive: (val: boolean) => void
     // brand: string
@@ -47,16 +48,8 @@ export default function FilterForm({
     return (
         <div className="space-y-4">
             {/* All / Active toggles */}
-            <div className="flex items-center justify-between">
-                <Label htmlFor="all-products">Active</Label>
-                <Switch
-                    id="same-invoice"
-                    checked={allProducts}
-                    onCheckedChange={setAllProducts}
-                    className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary"
 
-                />
-            </div>
+            <ProductStatusFilter showAll={allProducts} setShowAll={setAllProducts} />
 
             {/* <div className="flex items-center justify-between">
                 <Label htmlFor="is-active">Active only</Label>

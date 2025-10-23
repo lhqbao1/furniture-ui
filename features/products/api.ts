@@ -49,7 +49,7 @@ export async function getAllProducts(params?: GetAllProductsParams) {
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
       ...(params?.all_products !== undefined && { all_products: params.all_products }),
       ...(params?.search !== undefined && { search: params.search }),
-      ...(params?.sort_by_stock !== undefined && { sort_by_stock: params.sort_by_stock }),
+      ...(params?.sort_by_stock && { sort_by_stock: params.sort_by_stock }),
     },
   })
 

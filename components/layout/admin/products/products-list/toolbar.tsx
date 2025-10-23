@@ -37,7 +37,9 @@ interface TableToolbarProps {
     searchQuery?: string
     pageSize: number
     showAll: boolean
-    setShowAll: React.Dispatch<React.SetStateAction<boolean>>
+    setShowAll: (value: boolean) => void
+    // showAll: boolean
+    // setShowAll: React.Dispatch<React.SetStateAction<boolean>>
     setPageSize: React.Dispatch<React.SetStateAction<number>>
     setSearchQuery?: React.Dispatch<React.SetStateAction<string>>
     addButtonText?: string
@@ -188,7 +190,7 @@ export default function TableToolbar({
                             Filter <ChevronDown className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent className="w-[800px] px-8 py-4">
                         <FilterForm
                             allProducts={showAll}
                             setAllProducts={setShowAll}
