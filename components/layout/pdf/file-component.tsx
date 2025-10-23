@@ -152,7 +152,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div className="flex gap-0 justify-end">
                     <div className="mr-6">MwSt.</div>
                     <div className="w-[100px] text-right">
-                        {((invoice?.total_amount_item ?? 0) - ((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0))).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                        {(((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) + (invoice?.voucher_amount ?? 0)) / 1.19 * 0.19).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                     </div>
                 </div>
 
@@ -224,18 +224,18 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                 <div>Thuy Duong Nguyen</div>
                 <div>Tax code: DE454714336</div>
             </div>
-            {/* {checkout && invoice && (
+            {checkout && invoice && (
                 <div className="absolute bottom-0 right-1/2 translate-x-1/2 transform z-20">
                     <Button variant={'outline'}>
                         <PDFDownloadLink
                             document={<InvoicePDF checkout={checkout} invoice={invoice} />}
-                            fileName="invoice.pdf"
+                            fileName={`${invoice.invoice_code}.pdf`}
                         >
                             {({ loading }) => (loading ? "Generating PDF..." : <div className="cursor-pointer">Download Invoice PDF</div>)}
                         </PDFDownloadLink>
                     </Button>
                 </div>
-            )} */}
+            )}
         </div>
     )
 }

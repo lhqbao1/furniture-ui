@@ -87,7 +87,7 @@ const OrderInformation = ({
                 <div className='grid grid-cols-3'>
                     <div className='text-end col-span-2'>VAT</div>
                     <div className='text-end'>
-                        €{tax}
+                        €{tax?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                 </div>
                 <div className='text-end text-2xl text-primary font-bold'>

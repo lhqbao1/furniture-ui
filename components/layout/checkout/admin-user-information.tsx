@@ -191,18 +191,25 @@ export function CheckOutUserInformation({ userId, setUserId, isAdmin = false }: 
                     name="phone_number"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{isAdmin ? "Phone Number" : t('phone_number')}</FormLabel>
+                            <FormLabel>Phone Number</FormLabel>
                             <FormControl>
                                 <Input
                                     type="number"
                                     placeholder=""
                                     {...field}
+                                    onChange={(e) => {
+                                        const value = e.target.value
+                                        // Nếu input trống => set null
+                                        field.onChange(value === "" ? null : value)
+                                    }}
+                                    value={field.value ?? ""}
                                 />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
+
             </div>
         </div>
     )

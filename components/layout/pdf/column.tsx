@@ -18,7 +18,7 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
   {
     accessorKey: "ean",
     header: "Art.-Nr",
-    cell: ({ row }) => `${row.original.products.ean}`,
+    cell: ({ row }) => `${row.original.products.id_provider}`,
   },
   {
     accessorKey: "name",
@@ -26,7 +26,7 @@ export const invoiceColumns: ColumnDef<CartItem>[] = [
     cell: ({ row }) => (
       <div className="max-w-[300px] text-wrap">
         <div>{row.original.products.name}</div>
-        <div>#{row.original.products.id_provider}</div>
+        <div>#{row.original.products.ean}</div>
       </div>
     ),
   },
