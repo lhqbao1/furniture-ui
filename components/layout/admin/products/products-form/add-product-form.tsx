@@ -28,6 +28,7 @@ import ProductSEOGroup from './product-seo-group'
 import { useRouter } from '@/src/i18n/navigation'
 import { useLocale } from 'next-intl'
 import SelectBundleComponent from '../bundle/select-bundle'
+import AdminBackButton from '@/components/shared/admin-back-button'
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -226,9 +227,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                         "Add"
                                     )}
                                 </Button>
-                                <Button className='cursor-pointer bg-gray-400 hover:bg-gray-500 text-white text-lg px-8' type="button" hasEffect onClick={() => router.push('/admin/products/list')}>
-                                    Discard
-                                </Button>
+                                <AdminBackButton />
                                 {productValues && (
                                     <a
                                         href={`/${locale}/product${productValues?.categories?.length ? `/${productValues.categories[0].slug}` : ''}/${productValues?.url_key}`}

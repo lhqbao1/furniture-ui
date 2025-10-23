@@ -89,38 +89,39 @@ const ListVariant = ({ variant, currentProduct, parentProduct }: ListVariantProp
                             </span>
 
                             <div className="flex gap-2 flex-wrap">
-                                {group.options.map((option) => {
-                                    const isSelected = selectedOptions.includes(option.id)
+                                {group.options
+                                    .map((option) => {
+                                        const isSelected = selectedOptions.includes(option.id)
 
-                                    return (
-                                        <div
-                                            key={option.id}
-                                            className={`cursor-pointer ${isSelected ? 'border-2 border-primary rounded-sm' : 'border border-gray-300 rounded-sm'
-                                                }`}
-                                            onClick={() => handleSelect(group.variant.id, option.id)}
-                                        >
-                                            {option.image_url ? (
-                                                <div className='shadow-sm bg-white rounded-sm border border-gray-300 p-2'>
-                                                    <Image
-                                                        src={option.image_url}
-                                                        width={50}
-                                                        height={50}
-                                                        alt={option.label || group.variant.name}
-                                                        className=""
-                                                        unoptimized
-                                                    />
-                                                    {option.img_description}
-                                                </div>
-                                            ) : (
-                                                <div
-                                                    className={`px-3 py-1 rounded-md text-sm font-semibold`}
-                                                >
-                                                    {option.label}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )
-                                })}
+                                        return (
+                                            <div
+                                                key={option.id}
+                                                className={`cursor-pointer ${isSelected ? 'border-2 border-primary rounded-sm' : 'border border-gray-300 rounded-sm'
+                                                    }`}
+                                                onClick={() => handleSelect(group.variant.id, option.id)}
+                                            >
+                                                {option.image_url ? (
+                                                    <div className='shadow-sm bg-white rounded-sm border border-gray-300 p-2'>
+                                                        <Image
+                                                            src={option.image_url}
+                                                            width={50}
+                                                            height={50}
+                                                            alt={option.label || group.variant.name}
+                                                            className=""
+                                                            unoptimized
+                                                        />
+                                                        {option.img_description}
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className={`px-3 py-1 rounded-md text-sm font-semibold`}
+                                                    >
+                                                        {option.label}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
                             </div>
                         </div>
                     ))}

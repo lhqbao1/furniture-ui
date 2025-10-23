@@ -8,7 +8,7 @@ export const ManualCreateOrderSchema = z.object({
 
   first_name: z.string().min(1, { message: "First name is required" }),
   last_name: z.string().min(1, { message: "Last name is required" }),
-  phone_number: z.string().optional(),
+  phone_number: z.string().optional().nullable(),
 
   address: z.string().min(1, { message: "Address is required" }),
   city: z.string().min(1, { message: "City is required" }),
@@ -49,7 +49,6 @@ export const manualCheckoutDefaultValues: ManualCreateOrderFormValues = {
   email: "",
   first_name: "",
   last_name: "",
-  phone_number: "",
   address: "",
   city: "",
   postal_code: "",

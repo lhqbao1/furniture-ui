@@ -33,7 +33,6 @@ const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (
         <div>
-            <AdminBackButton />
             <div className="p-6">
                 <h1 className="text-xl font-bold mb-4">Clone Product</h1>
                 <ProductForm productValuesClone={data} onSubmit={handleCreate} isPending={createProductMutation.isPending} />

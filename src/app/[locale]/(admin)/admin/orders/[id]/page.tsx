@@ -74,7 +74,7 @@ const OrderDetails = () => {
                 sub_total={order.total_amount_item}
                 shipping_amount={order.total_shipping}
                 discount_amount={order.voucher_amount + order.coupon_amount}
-                tax={order.total_vat}
+                tax={(((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) + (invoice?.voucher_amount ?? 0)) / 1.19 * 0.19)}
                 total_amount={order.total_amount}
                 payment_method={order.payment_method}
                 entry_date={order.created_at}

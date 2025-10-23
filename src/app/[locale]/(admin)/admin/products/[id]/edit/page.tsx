@@ -57,7 +57,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (
         <div>
-            <AdminBackButton />
             <div className="lg:p-6 p-2 mt-6 lg:mt-0">
                 <h1 className="text-xl font-bold mb-4">Edit Product</h1>
                 <React.Suspense fallback={<ProductFormSkeleton />}>
