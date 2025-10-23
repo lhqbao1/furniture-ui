@@ -30,6 +30,7 @@ import { Loader2 } from "lucide-react"
 import { useSyncToEbay } from "@/features/ebay/hook"
 import { syncToEbayInput } from "@/features/ebay/api"
 import { stripHtmlRegex } from "@/hooks/simplifyHtml"
+import RichEditor from "@/components/shared/tiptap/tiptap-editor"
 
 interface SyncToEbayFormProps {
     product: ProductItem
@@ -51,7 +52,7 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
 
     const existingMarketplaces = useMemo(
         () => product.marketplace_products?.map((m) => m.marketplace) ?? [],
-        [product.marketplace_products]
+        [product]
     )
 
     const availableMarketplaces = useMemo(
@@ -275,12 +276,11 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                         name="description"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Description</FormLabel>
+                                <FormLabel className='text-black font-semibold text-sm'>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea
-                                        placeholder="Enter product description"
-                                        {...field}
-                                        className="min-h-[100px]"
+                                    <RichEditor
+                                        value={field.value || ""}
+                                        onChangeValue={field.onChange}
                                     />
                                 </FormControl>
                                 <FormMessage />
