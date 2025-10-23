@@ -72,9 +72,9 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
         resolver: zodResolver(marketPlaceSchema),
         defaultValues: {
             marketplace: currentMarketplace ?? '',
-            name: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.name : product.name,
-            description: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.description : product.description,
-            final_price: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.final_price : product.final_price,
+            name: product.name,
+            description: product.description,
+            final_price: product.final_price,
             min_stock: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.min_stock : undefined,
             max_stock: isUpdating ? product.marketplace_products.find(i => i.marketplace === currentMarketplace)?.max_stock : undefined,
             sku: product.sku,
