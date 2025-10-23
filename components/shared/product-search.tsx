@@ -185,7 +185,7 @@ export default function ProductSearch({
                                                                     src={
                                                                         product.static_files.length > 0
                                                                             ? product.static_files[0].url
-                                                                            : "/1.png"
+                                                                            : "/placeholder-product.webp"
                                                                     }
                                                                     height={50}
                                                                     width={50}
@@ -212,7 +212,7 @@ export default function ProductSearch({
                                                                     src={
                                                                         product.static_files.length > 0
                                                                             ? product.static_files[0].url
-                                                                            : "/1.png"
+                                                                            : "/placeholder-product.webp"
                                                                     }
                                                                     height={50}
                                                                     width={50}

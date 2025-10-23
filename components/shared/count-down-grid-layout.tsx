@@ -140,7 +140,7 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
                             <Image
                                 width={200}
                                 height={200}
-                                src={product.static_files ? product.static_files[0].url : '/1.png'}
+                                src={product.static_files ? product.static_files[0].url : '/placeholder-product.webp'}
                                 alt={product.name}
                                 className='w-full h-48 object-contain mb-2 rounded'
                             />

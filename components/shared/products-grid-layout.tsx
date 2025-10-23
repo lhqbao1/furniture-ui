@@ -76,7 +76,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                     quantity: 1, is_active: true,
                     item_price: currentProduct.final_price,
                     final_price: currentProduct.final_price,
-                    img_url: currentProduct.static_files[0].url,
+                    img_url: currentProduct.static_files.length > 0 ? currentProduct.static_files[0].url : '',
                     product_name: currentProduct.name,
                     stock: currentProduct.stock,
                     carrier: currentProduct.carrier ? currentProduct.carrier : 'amm',
@@ -175,7 +175,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                     <Image
                                         width={200}
                                         height={200}
-                                        src={product.static_files && product.static_files.length > 0 ? product.static_files[0].url : '/1.png'}
+                                        src={product.static_files && product.static_files.length > 0 ? product.static_files[0].url : '/placeholder-product.webp'}
                                         alt={product.name}
                                         className="w-full h-48 md:h-64 py-0 md:py-10  object-contain mb-2 rounded group-hover:scale-120 duration-500"
                                     />

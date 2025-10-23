@@ -168,7 +168,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                         ?
                                                         <div className="flex gap-2 items-center overflow-x-scroll">
                                                             <Image
-                                                                src={listProducts?.find((p) => p.id === selectedAction[idx])?.static_files[0].url ?? '/1.png'}
+                                                                src={listProducts?.find((p) => p.id === selectedAction[idx])?.static_files[0].url ?? '/placeholder-product.webp'}
                                                                 width={40}
                                                                 height={40}
                                                                 alt=""
@@ -216,7 +216,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                                                         src={
                                                                             product.static_files.length > 0
                                                                                 ? product.static_files[0].url
-                                                                                : "/1.png"
+                                                                                : "/placeholder-product.webp"
                                                                         }
                                                                         height={25}
                                                                         width={25}

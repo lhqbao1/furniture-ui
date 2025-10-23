@@ -56,7 +56,7 @@ export const productsColumn: ColumnDef<ProductItem>[] = [
             return (
                 <div className="flex justify-start">
                     <Image
-                        src={row.original.static_files.length > 0 ? row.original.static_files[0].url : '/1.png'}
+                        src={row.original.static_files.length > 0 ? row.original.static_files[0].url : '/placeholder-product.webp'}
                         width={40}
                         height={40}
                         alt=""

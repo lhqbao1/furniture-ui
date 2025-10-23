@@ -69,7 +69,7 @@ export const GetCartColumns = ({
                             <div className="flex items-center gap-3 justify-between">
                                 <div className="flex items-center gap-3 max-w-[300px] lg:max-w-full">
                                     <Image
-                                        src={item.image_url || "/1.png"}
+                                        src={item.image_url || "/placeholder-product.webp"}
                                         alt={item.products.name}
                                         width={60}
                                         height={60}
@@ -139,7 +139,7 @@ export const GetCartColumns = ({
                 return (
                     <div className="flex items-center gap-3 w-60 text-wrap">
                         <Image
-                            src={item.image_url || "/1.png"}
+                            src={item.image_url || "/placeholder-product.webp"}
                             alt={item.products.name}
                             width={60}
                             height={60}

@@ -189,7 +189,7 @@ export default function MobileProductSearch() {
                                                         src={
                                                             product.static_files && product.static_files.length > 0
                                                                 ? product.static_files[0].url
-                                                                : "/1.png"
+                                                                : "/placeholder-product.webp"
                                                         }
                                                         height={50}
                                                         width={50}

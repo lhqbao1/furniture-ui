@@ -18,7 +18,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
             <div className='flex flex-row items-center justify-start gap-0'>
                 <div className='flex flex-col items-center gap-4'>
                     <Image
-                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/1.png'}
+                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/placeholder-product.webp'}
                         alt=''
                         width={300}
                         height={200}
@@ -40,7 +40,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
 
                 <div className='flex flex-col items-center gap-4'>
                     <Image
-                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/1.png'}
+                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/placeholder-product.webp'}
                         alt=''
                         width={300}
                         height={200}
@@ -75,7 +75,7 @@ const BoughtTogetherSection = ({ productDetails }: BoughtTogetherSectionProps) =
 
                 <div className='flex flex-col items-center gap-4'>
                     <Image
-                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/1.png'}
+                        src={productDetails.static_files.length > 0 ? productDetails.static_files[0].url : '/placeholder-product.webp'}
                         alt=''
                         width={300}
                         height={200}

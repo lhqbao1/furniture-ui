@@ -65,9 +65,6 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
         [isUpdating, availableMarketplaces]
     )
 
-
-
-
     const form = useForm<MarketPlaceFormValues>({
         resolver: zodResolver(marketPlaceSchema),
         defaultValues: {
@@ -184,9 +181,9 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
                         }
                         syncToEbayMutation.mutate(payload, {
                             onSuccess(data, variables, context) {
-                                setOpen(false)
                                 toast.success("Update data to ebay successfully")
                                 setUpdating(false)
+                                setOpen(false)
                             },
                             onError(error, variables, context) {
                                 toast.error("Update data to ebay fail")
@@ -205,7 +202,6 @@ const SyncToEbayForm = ({ product, open, setOpen, isUpdating = false, currentMar
             }
         )
     }
-
 
     return (
         <div className="mx-auto space-y-6">

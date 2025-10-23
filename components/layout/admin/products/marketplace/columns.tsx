@@ -144,8 +144,8 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
                 product.marketplace_products.find(m => m.marketplace === marketplace)?.is_active === true ? (
                     <Dialog open={openUpdateMarketplaceDialog} onOpenChange={setOpenUpdateMarketplaceDialog}>
                         <DialogTrigger asChild>
-                            <Button variant="outline">
-                                {updating ? <Loader2 className="animate-spin" /> : 'Update'}
+                            <Button variant="outline" type="button">
+                                Update
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
