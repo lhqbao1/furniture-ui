@@ -108,6 +108,8 @@ export const addProductSchema = z.object({
 
   bundles: z.array(bundleSchema).optional().nullable(),
   is_bundle: z.boolean().optional().nullable(),
+
+  is_econelo: z.boolean().optional().nullable(),
 })
 
 
@@ -120,6 +122,7 @@ export const defaultValues = {
   category: "",
   ebay: false,
   is_bundle: false,
+  is_econelo: false,
   sku: "",
   // delivery_cost: 0,
   collection: null as string | null,

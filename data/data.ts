@@ -377,6 +377,11 @@ export const listChanel = [
         id:4,
         name: 'kaufland',
         icon: 'kau.png',
+    },
+    {
+        id:5,
+        name: 'wordpress',
+        icon: 'econelo.png',
     }
 ]
   

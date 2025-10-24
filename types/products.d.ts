@@ -172,6 +172,8 @@ export type StaticFile = {
     marketplace_products: MarketplaceProduct[]
     bundles: ProductBundles[]
     is_bundle: boolean
+
+    is_econelo: boolean
   }
   
   export type ProductResponse = {
