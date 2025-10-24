@@ -87,7 +87,9 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             price: values.price ?? values.final_price ?? undefined,
             stock: values.stock ?? 1,
             is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
-            tag: values.tag === "" ? undefined : values.tag
+            tag: values.tag === "" ? undefined : values.tag,
+            // is_econelo: true
+            is_econelo: values.brand_id === "d53424ea-5544-49bd-8119-2e6ebed29f4b" ? true : false
         }
 
         if (productValuesClone) {
