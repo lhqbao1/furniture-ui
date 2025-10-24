@@ -357,7 +357,11 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                 <Eye />
                                             </div>
                                             : ''}
-                                        <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
+                                        <div>
+                                            <h2 className='lg:text-3xl text-xl font-semibold text-black/70'>{productDetails.name}</h2>
+                                            <div>Artikelnummer: {productDetails.id_provider}</div>
+                                        </div>
+                                        <div className='hidden'>EAN: {productDetails.ean}</div>
                                         <div className='flex flex-row justify-start gap-4 items-center'>
                                             <div className='flex gap-1 items-center'>
                                                 <ListStars rating={0} />
