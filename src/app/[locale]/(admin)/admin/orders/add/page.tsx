@@ -46,12 +46,17 @@ export default function CreateCheckoutpage() {
         const total_shipping = values.carrier === 'spedition' ? 35.95 : 5.95
         const total_amount = total_amount_item + total_shipping
 
+        if (values.carrier === 'spedition' && !values.phone_number || values.phone_number === "") {
+            toast.error('Phone number is required for SPEDITION carrier')
+            return
+        }
+
         createOrderManualMutation.mutate({
             ...values,
             total_amount_item: total_amount_item,
             total_shipping: total_shipping,
             total_amount: total_amount,
-            email: values.email ? values.email : `${values.first_name}${values.last_name}`
+            email: values.email ? values.email : `${values.first_name}${values.last_name}`,
         }, {
             onSuccess(data, variables, context) {
                 toast.success('Create order successfully')
