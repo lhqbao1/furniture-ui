@@ -205,6 +205,7 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                         description: productDetails.description,
                         sku: productDetails.sku || "",
                         mpn: productDetails.id_provider || "",
+                        gtin13: productDetails.ean,
                         brand: {
                             "@type": "Brand",
                             name: productDetails.brand?.name || "Prestige Home",
