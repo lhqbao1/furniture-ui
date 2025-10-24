@@ -115,7 +115,7 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
                                 <FormItem>
                                     <FormLabel>Category ID</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input {...field} disabled />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

@@ -183,32 +183,6 @@ function SyncToMarketplace({ product, marketplace }: { product: ProductItem, mar
     )
 }
 
-function RemoveFromMarketplace({ product, marketplace }: { product: ProductItem, marketplace: string }) {
-    const removeFromEbayMutation = useRemoveFormEbay()
-
-    const handleRemoveFromEbay = () => {
-        if (marketplace === 'ebay') {
-            removeFromEbayMutation.mutate(product.sku, {
-                onSuccess(data, variables, context) {
-                    toast.success("Remove from Ebay successful")
-                },
-                onError(error, variables, context) {
-                    toast.error("Remove from Ebay fail")
-                },
-            })
-        } else {
-            console.log(marketplace)
-        }
-    }
-
-    return (
-        <Button onClick={() => handleRemoveFromEbay()} variant={'outline'} className="text-red-600 border-red-600" disabled={removeFromEbayMutation.isPending}>
-            {removeFromEbayMutation.isPending ? <Loader2 className="animate-spin" /> : 'Remove'}
-        </Button>
-    )
-
-}
-
 function AddProductMarketplace({ product }: { product: ProductItem }) {
     const [openAddMarketplaceDialog, setOpenAddMarketplaceDialog] = useState<boolean>(false)
     const [updating, setUpdating] = useState<boolean>(false)
@@ -220,100 +194,127 @@ function AddProductMarketplace({ product }: { product: ProductItem }) {
 }
 
 
-export const baseColumns: ColumnDef<ProductItem>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: "static_files",
-        header: "IMAGE",
-        cell: ({ row }) => {
-            const image = row.original.static_files?.[0]?.url
-            return (
-                <div className="w-12 h-12 relative">
-                    {image ? (
-                        <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px" unoptimized
-                        />
-                    ) : (
-                        <div className="w-12 h-12 bg-gray-200 rounded-md" />
-                    )}
-                </div>
-            )
+export const baseColumns = (
+    setSortByStock: (val?: "asc" | "desc") => void
+): ColumnDef<ProductItem>[] => [
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
         },
-    },
-    {
-        accessorKey: "name",
-        header: ({ column }) => (
-            <Button
-                variant={'ghost'}
-                className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-                <div>NAME</div>
-                <div className="mb-0.5">
-                    {{
-                        asc: "↑",
-                        desc: "↓",
-                    }[column.getIsSorted() as string] ?? "↕"}
-                </div>
-            </Button>
-        ),
-        // cell: ({ row }) => <EditableNameCell product={row.original} />,
-        cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>,
-        enableSorting: true
+        {
+            accessorKey: "static_files",
+            header: "IMAGE",
+            cell: ({ row }) => {
+                const image = row.original.static_files?.[0]?.url
+                return (
+                    <div className="w-12 h-12 relative">
+                        {image ? (
+                            <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px" unoptimized
+                            />
+                        ) : (
+                            <div className="w-12 h-12 bg-gray-200 rounded-md" />
+                        )}
+                    </div>
+                )
+            },
+        },
+        {
+            accessorKey: "name",
+            header: ({ column }) => (
+                <Button
+                    variant={'ghost'}
+                    className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    <div>NAME</div>
+                    <div className="mb-0.5">
+                        {{
+                            asc: "↑",
+                            desc: "↓",
+                        }[column.getIsSorted() as string] ?? "↕"}
+                    </div>
+                </Button>
+            ),
+            // cell: ({ row }) => <EditableNameCell product={row.original} />,
+            cell: ({ row }) => <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>,
+            enableSorting: true
 
-    },
-    {
-        accessorKey: "owner",
-        header: "SUPPLIER",
-        cell: ({ row }) => {
-            return (
-                <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
-            )
-        }
-    },
-    {
-        accessorKey: "stock",
-        header: () => <div className="text-center">STOCK</div>,
-        cell: ({ row }) => <div className="text-center">{row.original.stock} pcs.</div>,
-        // cell: ({ row }) => <EditableStockCell product={row.original} />
-    },
-    {
-        accessorKey: "is_active",
-        header: "STATUS",
-        cell: ({ row }) => (
-            <ToogleProductStatus product={row.original} />
-        ),
-    },
-    {
-        accessorKey: "final_price",
-        header: () => <div className="text-right">FINAL PRICE</div>,
-        cell: ({ row }) => <div>{row.original.final_price ? <div className="text-right">€{(row.original.final_price)?.toFixed(2)}</div> : <div className="text-right">updating</div>}
-        </div>,
-    },
-]
+        },
+        {
+            accessorKey: "owner",
+            header: "SUPPLIER",
+            cell: ({ row }) => {
+                return (
+                    <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "stock",
+            header: ({ column }) => {
+                const direction = column.getIsSorted() as "asc" | "desc" | undefined
+
+                return (
+                    <Button
+                        variant="ghost"
+                        className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+                        onClick={() => {
+                            // toggleSorting sẽ tự xử lý asc/desc/undefined xoay vòng
+                            column.toggleSorting(direction === "asc")
+
+                            // Đợi 1 tick để state cập nhật rồi sync với API param
+                            setTimeout(() => {
+                                const newDir = column.getIsSorted() as "asc" | "desc" | undefined
+                                setSortByStock(newDir)
+                            }, 0)
+                        }}
+                    >
+                        <div>STOCK</div>
+                        <div className="mb-0.5">
+                            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+                        </div>
+                    </Button>
+                )
+            },
+            cell: ({ row }) => <div>{row.original.stock} pcs.</div>,
+            enableSorting: true,
+        },
+        {
+            accessorKey: "is_active",
+            header: "STATUS",
+            cell: ({ row }) => (
+                <ToogleProductStatus product={row.original} />
+            ),
+        },
+        {
+            accessorKey: "final_price",
+            header: () => <div className="text-right">FINAL PRICE</div>,
+            cell: ({ row }) => <div>{row.original.final_price ? <div className="text-right">€{(row.original.final_price)?.toFixed(2)}</div> : <div className="text-right">updating</div>}
+            </div>,
+        },
+    ]
 
 export const productMarketplaceColumns = (
-    products: ProductItem[]
+    products: ProductItem[],
+    setSortByStock: (val?: "asc" | "desc") => void
 ): ColumnDef<ProductItem>[] => {
     // Lấy danh sách marketplace duy nhất từ toàn bộ product
     const marketplaces = Array.from(
@@ -379,6 +380,11 @@ export const productMarketplaceColumns = (
         })
     )
 
-    return [...baseColumns, fixedMarketplaceColumn, ...dynamicMarketplaceColumns]
+    return [
+        ...baseColumns(setSortByStock), // ✅ gọi hàm để lấy array
+        fixedMarketplaceColumn,
+        ...dynamicMarketplaceColumns
+    ]
+
 }
 
