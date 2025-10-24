@@ -1,38 +1,57 @@
 'use client'
 
 import { productMarketplaceColumns } from '@/components/layout/admin/products/marketplace/columns'
-import { productColumns } from '@/components/layout/admin/products/products-list/column'
 import { ProductTable } from '@/components/layout/admin/products/products-list/product-table'
 import TableToolbar from '@/components/layout/admin/products/products-list/toolbar'
 import AdminBackButton from '@/components/shared/admin-back-button'
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetProductsSelect } from '@/features/product-group/hook'
 import { useGetAllProducts } from '@/features/products/hook'
-import { searchProductQueryStringAtom } from '@/store/product'
+import { useRouter } from '@/src/i18n/navigation'
+import { searchProductQueryStringAtom, showAllProductsAtom, sortByStockAtom } from '@/store/product'
 import { useAtom } from 'jotai'
-import React, { useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import React, { useEffect, useMemo, useState } from 'react'
 
 
 const ProductMarketplace = () => {
-    const [page, setPage] = useState(1)
+    const router = useRouter()
+    const searchParams = useSearchParams()
+
+    // 🧠 Đọc page từ URL (mặc định 1)
+    const [page, setPage] = useState(() => Number(searchParams.get('page')) || 1)
     const [pageSize, setPageSize] = useState(50)
     const [searchQuery, setSearchQuery] = useAtom<string>(searchProductQueryStringAtom)
+    const [showAll, setShowAll] = useAtom(showAllProductsAtom)
+    const [sortByStock, setSortByStock] = useAtom(sortByStockAtom)
 
-    const { data, isLoading, isError } = useGetAllProducts({ page, page_size: pageSize, all_products: true, search: searchQuery })
-    const { data: exportData, isLoading: isLoadingProductExport, isError: isErrorProductExport } = useGetProductsSelect()
 
-    const sortedData = useMemo(() => {
-        if (!data?.items) return []
-        // Sort is_active: true (active) lên trước
-        return [...data.items].sort((a, b) => {
-            if (a.is_active === b.is_active) return 0
-            return a.is_active ? -1 : 1
-        })
-    }, [data?.items])
+    // ⚡ Cập nhật URL mỗi khi page thay đổi
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage)
+        const params = new URLSearchParams(searchParams)
+        params.set('page', newPage.toString())
+        router.push(`?${params.toString()}`, { scroll: false })
+    }
 
-    if (isError || !data) return <ProductTableSkeleton />
+    // 🧩 Khi user back lại (hoặc reload), đọc page từ URL
+    useEffect(() => {
+        const urlPage = Number(searchParams.get('page')) || 1
+        setPage(urlPage)
+    }, [searchParams])
+
+    const { data, isLoading, isError } = useGetAllProducts({
+        page,
+        page_size: pageSize,
+        all_products: showAll,
+        search: searchQuery,
+        sort_by_stock: sortByStock
+    })
+    const { data: exportData } = useGetProductsSelect()
+
+    if (isError) return <div>No data</div>
     // if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
-    const columns = productMarketplaceColumns(data?.items)
+    const columns = productMarketplaceColumns(data?.items ?? [], setSortByStock)
 
     return (
         <div className='space-y-6'>
@@ -41,6 +60,8 @@ const ProductMarketplace = () => {
                 {/* <ProductStatistic statistic={statisticDemo} /> */}
                 <div className='text-3xl text-secondary font-bold text-center'>Product Marketplace</div>
                 <TableToolbar
+                    showAll={showAll}
+                    setShowAll={setShowAll}
                     searchQuery={searchQuery}
                     pageSize={pageSize}
                     setPageSize={setPageSize}
@@ -51,7 +72,7 @@ const ProductMarketplace = () => {
                 />
                 {isLoading ? <ProductTableSkeleton /> :
                     <ProductTable
-                        data={sortedData}
+                        data={data?.items ?? []}
                         columns={columns}
                         page={page}
                         pageSize={pageSize}

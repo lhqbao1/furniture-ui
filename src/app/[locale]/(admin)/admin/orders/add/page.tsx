@@ -37,7 +37,6 @@ export default function CreateCheckoutpage() {
     })
 
     function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
-        console.log(values)
         const total_amount_item = values.items?.reduce((acc, item) => {
             const price = Number(item.final_price) || 0
             const qty = Number(item.quantity) || 0
@@ -51,7 +50,8 @@ export default function CreateCheckoutpage() {
             ...values,
             total_amount_item: total_amount_item,
             total_shipping: total_shipping,
-            total_amount: total_amount
+            total_amount: total_amount,
+            email: values.email ? values.email : `${values.first_name}${values.last_name}`
         }, {
             onSuccess(data, variables, context) {
                 toast.success('Create order successfully')

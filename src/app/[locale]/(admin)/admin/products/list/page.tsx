@@ -6,7 +6,7 @@ import TableToolbar from '@/components/layout/admin/products/products-list/toolb
 import ProductTableSkeleton from '@/components/shared/table-skeleton'
 import { useGetProductsSelect } from '@/features/product-group/hook'
 import { useGetAllProducts } from '@/features/products/hook'
-import { searchProductQueryStringAtom, showAllProductsAtom } from '@/store/product'
+import { searchProductQueryStringAtom, showAllProductsAtom, sortByStockAtom } from '@/store/product'
 import { useAtom } from 'jotai'
 import React, { useEffect, useState } from 'react'
 import { getProductColumns } from '@/components/layout/admin/products/products-list/column'
@@ -20,9 +20,8 @@ const ProductList = () => {
     const [pageSize, setPageSize] = useState(50)
     const [searchQuery, setSearchQuery] = useAtom<string>(searchProductQueryStringAtom)
     const [showAll, setShowAll] = useAtom(showAllProductsAtom)
-    const [sortByStock, setSortByStock] = useState<string | undefined>(() =>
-        searchParams.get("sort_by_stock") || undefined
-    )
+    const [sortByStock, setSortByStock] = useAtom(sortByStockAtom)
+
 
     // ⚡ Cập nhật URL mỗi khi page thay đổi
     const handlePageChange = (newPage: number) => {
@@ -37,17 +36,6 @@ const ProductList = () => {
         const urlPage = Number(searchParams.get('page')) || 1
         setPage(urlPage)
     }, [searchParams])
-
-    // ✅ Mỗi lần sort thay đổi, cập nhật URL
-    useEffect(() => {
-        const params = new URLSearchParams(searchParams)
-        if (sortByStock) {
-            params.set("sort_by_stock", sortByStock)
-        } else {
-            params.delete("sort_by_stock")
-        }
-        router.push(`?${params.toString()}`, { scroll: false })
-    }, [sortByStock])
 
     const { data, isLoading, isError } = useGetAllProducts({
         page,
