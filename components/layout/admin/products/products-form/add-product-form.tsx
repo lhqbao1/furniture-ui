@@ -86,7 +86,8 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             final_price: values.final_price ?? values.price ?? undefined,
             price: values.price ?? values.final_price ?? undefined,
             stock: values.stock ?? 1,
-            is_bundle: values.bundles && values.bundles?.length > 0 ? true : false
+            is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
+            tag: values.tag === "" ? undefined : values.tag
         }
 
         if (productValuesClone) {
