@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion"
 import { useQuery } from '@tanstack/react-query'
 import { getPolicyItemsByVersion } from '@/features/policy/api'
@@ -19,6 +19,7 @@ import {
 import { useCreateChildLegalPolicy, useCreateLegalPolicy, useCreateVersion } from '@/features/policy/hook'
 import { toast } from 'sonner'
 import RichEditor from '@/components/shared/tiptap/tiptap-editor'
+import { Textarea } from '@/components/ui/textarea'
 
 
 interface ListPolicyAdminProps {
@@ -70,10 +71,11 @@ function parseEditorContent(html: string) {
 
 const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmin = false }: ListPolicyAdminProps) => {
     const t = useTranslations()
-    const [openAccordion, setOpenAccordion] = useState<string | null>(null)
     const [currentPolicyItem, setCurrentPolicyItem] = useState(0)
     const [openDialog, setOpenDialog] = useState(false)
     const [versionNameInput, setVersionNameInput] = useState("")
+    const [openAccordion, setOpenAccordion] = useState<string | null>(null)
+
     // const [editorValue, setEditorValue] = useState("")
     const [editorValues, setEditorValues] = useState<Record<string, string>>({})
 
@@ -83,59 +85,98 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
         enabled: !!versionId,
     })
 
+
     const createVersionMutation = useCreateVersion()
     const createLegalPolicyMutation = useCreateLegalPolicy()
     const createChildLegalPolicyMutation = useCreateChildLegalPolicy()
 
-    const filteredPolicies = policy?.legal_policies ?? []
+    const filteredPolicies = useMemo(() => {
+        return policy?.legal_policies ?? []
+    }, [policy])
+
+
     const currentPolicy = filteredPolicies.find(p => p.id === openAccordion) || filteredPolicies[0]
 
     const contentRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
     const [policies, setPolicies] = useState<Record<string, Record<string, { label: string; content: string, tt: number }>>>({})
 
+
     // useEffect(() => {
     //     if (currentPolicy) {
-    //         const html = buildHtmlFromPolicies(currentPolicy.child_legal_policies.map((cl) => ({ label: cl.label, content: cl.content, tt: cl.tt })))
-    //         setEditorValue(html)
+    //         if (!editorValues[currentPolicy.id]) {
+    //             const html = buildHtmlFromPolicies(
+    //                 currentPolicy.child_legal_policies.map(cl => ({
+    //                     label: cl.label,
+    //                     content: cl.content,
+    //                     tt: cl.tt,
+    //                 }))
+    //             )
+    //             console.log(html)
+    //             setEditorValues(prev => ({
+    //                 ...prev,
+    //                 [currentPolicy.id]: html,
+    //             }))
+    //         }
     //     }
     // }, [currentPolicy])
-    useEffect(() => {
-        if (currentPolicy) {
-            if (!editorValues[currentPolicy.id]) {
-                const html = buildHtmlFromPolicies(
-                    currentPolicy.child_legal_policies.map(cl => ({
-                        label: cl.label,
-                        content: cl.content,
-                        tt: cl.tt,
-                    }))
-                )
-                setEditorValues(prev => ({
-                    ...prev,
-                    [currentPolicy.id]: html,
-                }))
-            }
-        }
-    }, [currentPolicy])
 
 
+    // useEffect(() => {
+    //     if (filteredPolicies.length > 0) {
+    //         const initial: Record<string, Record<string, { label: string; content: string, tt: number }>> = {}
+    //         filteredPolicies.forEach(lp => {
+    //             const children: Record<string, { label: string; content: string, tt: number }> = {}
+    //             lp.child_legal_policies.forEach((cl: ChildLegalPolicy) => {
+    //                 children[cl.id] = {
+    //                     label: cl.label || "",
+    //                     content: cl.content || "",
+    //                     tt: cl.tt || 0
+    //                 }
+    //             })
+    //             initial[lp.id] = children
+    //         })
+    //         setPolicies(initial)
+    //     }
+    // }, [filteredPolicies])
+
+    // ✅ Khi filteredPolicies thay đổi, tạo sẵn HTML cho tất cả policy (đặc biệt là index 0)
     useEffect(() => {
-        if (filteredPolicies.length > 0) {
-            const initial: Record<string, Record<string, { label: string; content: string, tt: number }>> = {}
+        if (filteredPolicies.length === 0) return
+
+        setEditorValues(prev => {
+            const newValues = { ...prev }
+
             filteredPolicies.forEach(lp => {
-                const children: Record<string, { label: string; content: string, tt: number }> = {}
-                lp.child_legal_policies.forEach((cl: ChildLegalPolicy) => {
-                    children[cl.id] = {
-                        label: cl.label || "",
-                        content: cl.content || "",
-                        tt: cl.tt || 0
-                    }
-                })
-                initial[lp.id] = children
+                // chỉ khởi tạo nếu chưa có trong state
+                if (!newValues[lp.id]) {
+                    newValues[lp.id] = buildHtmlFromPolicies(
+                        lp.child_legal_policies.map(cl => ({
+                            label: cl.label,
+                            content: cl.content,
+                            tt: cl.tt,
+                        }))
+                    )
+                }
             })
-            setPolicies(initial)
-        }
+
+            return newValues
+        })
     }, [filteredPolicies])
+
+    useEffect(() => {
+        if (currentPolicy && !editorValues[currentPolicy.id]) {
+            const html = buildHtmlFromPolicies(
+                currentPolicy.child_legal_policies.map(cl => ({
+                    label: cl.label,
+                    content: cl.content,
+                    tt: cl.tt,
+                }))
+            )
+            setEditorValues(prev => ({ ...prev, [currentPolicy.id]: html }))
+        }
+    }, [currentPolicy, editorValues])
+
 
     const handleSaveClick = () => {
         setOpenDialog(true)
@@ -312,17 +353,24 @@ const ListPolicyAdmin = ({ versionId, versionData, policyId, versionName, isAdmi
                 <h1 className='text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap'>
                     {currentPolicy?.name}
                 </h1>
-                <div className='col-span-12'>
-                    <RichEditor
-                        value={editorValues[currentPolicy?.id] || ""}
-                        onChangeValue={(val) =>
-                            setEditorValues(prev => ({
-                                ...prev,
-                                [currentPolicy.id]: val,
-                            }))
-                        }
-                    />
+                <div className="col-span-12">
+                    {editorValues[currentPolicy?.id] ? (
+                        <RichEditor
+                            value={editorValues[currentPolicy.id]}
+                            onChangeValue={(val) =>
+                                setEditorValues(prev => ({
+                                    ...prev,
+                                    [currentPolicy.id]: val,
+                                }))
+                            }
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-40 text-gray-400">
+                            <Loader2 className="animate-spin mr-2" /> Loading editor content...
+                        </div>
+                    )}
                 </div>
+
                 {/* <div className="col-span-12"> <RichEditor value={editorValue} onChangeValue={(val) => setEditorValue(val)} /> </div> */}
             </div>
         </div>
