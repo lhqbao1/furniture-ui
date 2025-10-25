@@ -14,7 +14,7 @@ export const packageSchema = z.object({
 })
 
 export const addProductDSPSchema = z.object({
-  name: z.string().min(1, { message: "Product name is required" }),
+  name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
   cost: z.number().optional().nullable(),
