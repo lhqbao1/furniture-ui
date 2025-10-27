@@ -177,7 +177,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         height={200}
                                         src={product.static_files && product.static_files.length > 0 ? product.static_files[0].url : '/placeholder-product.webp'}
                                         alt={product.name}
-                                        className="w-full h-48 md:h-64 py-0 md:py-10  object-contain mb-2 rounded group-hover:scale-120 duration-500"
+                                        className="w-full h-48 md:h-64 py-0 md:py-2 object-contain mb-2 rounded group-hover:scale-120 duration-500"
                                     />
 
                                     <div className='product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1'>

@@ -29,6 +29,7 @@ import { toast } from "sonner";
 import { CategoryInput } from "@/types/categories";
 import { defaultValues } from "@/lib/schema/product";
 import { Loader2, Pencil } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface AddCategoryDrawerProps {
     categoryId?: string
@@ -44,12 +45,14 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
     const defaultValues: CategoryInput = {
         name: "",
         level: 1,
-        img_url: "",
+        is_econelo: false
     };
     const form = useForm<CategoryInput>({
         resolver: zodResolver(categorySchema),
         defaultValues: categoryValues ? categoryValues : defaultValues,
     });
+
+    const isEconelo = form.watch("is_econelo");
 
 
     const onSubmit = (data: CategoryInput) => {
@@ -110,14 +113,17 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-4 py-2">
                         <FormField
                             control={form.control}
-                            name="code"
+                            name="is_econelo"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Category ID</FormLabel>
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                    <FormLabel className="text-base">Econelo Product</FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled />
+                                        <Switch
+                                            className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -139,7 +145,7 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
                         <ImagePickerInput fieldName="img_url" form={form} isSingle />
 
 
-                        {!categories || isError ? '' :
+                        {!categories || isError ? '' : (
                             <FormField
                                 control={form.control}
                                 name="parent_id"
@@ -152,17 +158,25 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
                                                 value={field.value || ""} // nếu chưa chọn thì là empty
                                                 disabled={isLoading || isError}
                                             >
-                                                <SelectTrigger placeholderColor className="border">
+                                                <SelectTrigger className="border">
                                                     <SelectValue placeholder="Select parent category" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {isLoading && <SelectItem value="">Loading...</SelectItem>}
                                                     {isError && <SelectItem value="">Error loading</SelectItem>}
-                                                    {categories?.map((cat) => (
-                                                        <SelectItem key={cat.id} value={cat.id.toString()}>
-                                                            {cat.name}
-                                                        </SelectItem>
-                                                    ))}
+
+                                                    {/* 🔹 Lọc categories theo is_econelo */}
+                                                    {categories
+                                                        ?.filter(cat => {
+                                                            // Nếu is_econelo = true, chỉ lấy cat.is_econelo = true
+                                                            // Nếu is_econelo = false, lấy tất cả
+                                                            return !isEconelo || cat.is_econelo === true;
+                                                        })
+                                                        .map(cat => (
+                                                            <SelectItem key={cat.id} value={cat.id.toString()}>
+                                                                {cat.name}
+                                                            </SelectItem>
+                                                        ))}
                                                 </SelectContent>
                                             </Select>
                                         </FormControl>
@@ -170,7 +184,7 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
                                     </FormItem>
                                 )}
                             />
-                        }
+                        )}
 
 
                         <FormField
