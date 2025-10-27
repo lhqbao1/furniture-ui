@@ -34,11 +34,11 @@ export function useGetProductById(id: string) {
   })
 }
 
-export function useGetProductByTag(tag: string) {
+export function useGetProductByTag(tag: string, is_customer = false) {
   return useQuery({
-    queryKey: ["product-by-tag", tag],
-    queryFn: () => getProductByTag(tag),
-    enabled: !!tag,
+    queryKey: ["product-by-tag", tag, is_customer],
+    queryFn: () => getProductByTag(tag, is_customer),
+    enabled: !!tag, // chỉ gọi khi tag có giá trị
     retry: false,
   })
 }

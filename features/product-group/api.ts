@@ -35,20 +35,31 @@ export async function getProductGroup(){
     return data as ProductGroupResponse[]
 }
 
-export async function getAllProductsSelect(params?: string){
-    const {data} = await apiPublic.get(
-        `/products/all/`,
-        {
-        params: params ? { search: params } : {}, // backend xử lý param search
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
-        },
-      withCredentials: true, // nếu backend cần cookie/session
-        }
-    )
-    return data as ProductItem[]
+export async function getAllProductsSelect({
+  search,
+  is_customer = false,
+  all_products = false,
+}: {
+  search?: string
+  is_customer?: boolean
+  all_products?: boolean
+}) {
+  const { data } = await apiPublic.get("/products/all", {
+    params: {
+      ...(search ? { search } : {}),
+      is_customer,
+      all_products,
+    },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true, // nếu backend cần cookie/session
+  });
+
+  return data as ProductItem[];
 }
+
 
 export async function getProductGroupDetail(parent_id: string){
     const {data} = await apiPublic.get(

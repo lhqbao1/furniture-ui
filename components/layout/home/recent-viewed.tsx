@@ -16,7 +16,6 @@ const RecentViewed = () => {
                 <ProductGridSkeleton />
                 :
                 <ProductsGridLayout data={products.items} />
-
             }
         </div>
     )

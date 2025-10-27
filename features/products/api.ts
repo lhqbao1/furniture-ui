@@ -77,12 +77,13 @@ export async function getProductBySlug(product_slug: string) {
   return data as ProductItem
 }
 
-export async function getProductByTag(tag: string) {
-  const {data} = await apiPublic.get(
-      `/products/by-tag/${tag}`,
-  )
+export async function getProductByTag(tag: string, is_customer = false) {
+  const { data } = await apiPublic.get(`/products/by-tag/${tag}`, {
+    params: { is_customer }, // truyền query param ở đây
+  })
   return data as ProductItem[]
 }
+
 
 export async function deleteProduct(id: string){
   const {data} = await apiAdmin.delete(

@@ -12,7 +12,9 @@ const TrendingProducts = () => {
     const t = useTranslations()
     const isPhone = useIsPhone()
     // const { data: products, isLoading, isError } = useGetProductByTag('Trending');
-    const { data: products, isLoading, isError } = useGetProductsSelect();
+    const { data: products, isLoading, isError } = useGetProductsSelect({
+        is_customer: true
+    });
 
     return (
         <div className="section-padding">
