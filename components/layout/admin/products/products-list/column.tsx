@@ -457,7 +457,7 @@ export const getProductColumns = (
                 return (
                     <div className="w-12 h-12 relative">
                         {image ? (
-                            <Image src={image} alt="icon" fill className="object-cover rounded-md" sizes="60px" unoptimized
+                            <Image src={image} alt="icon" fill className="object-contain rounded-md" sizes="60px" unoptimized
                             />
                         ) : (
                             <div className="w-12 h-12 bg-gray-200 rounded-md" />
