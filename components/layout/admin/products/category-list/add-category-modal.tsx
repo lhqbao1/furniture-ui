@@ -122,6 +122,7 @@ export default function AddCategoryDrawer({ categoryId, categoryValues }: AddCat
                                             className='data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer'
                                             checked={field.value}
                                             onCheckedChange={field.onChange}
+                                            disabled={categoryValues ? true : false}
                                         />
                                     </FormControl>
                                 </FormItem>

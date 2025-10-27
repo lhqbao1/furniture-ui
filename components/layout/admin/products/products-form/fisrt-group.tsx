@@ -73,7 +73,7 @@ const ProductDetailInputs = ({ isEdit, productId, isDSP = false }: ProductDetail
                                                 if (!values.final_price) missingFields.push("final_price");
                                                 if (!values.cost) missingFields.push("cost");
                                                 if (!values.delivery_cost) missingFields.push("delivery_cost");
-                                                if (!values.stock) missingFields.push("stock");
+                                                // if (!values.stock) missingFields.push("stock");
                                                 if (!values.static_files?.length)
                                                     missingFields.push("images");
                                                 if (!values.category_ids?.length)
