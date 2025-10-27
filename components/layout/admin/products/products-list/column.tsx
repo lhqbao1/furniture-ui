@@ -498,11 +498,20 @@ export const getProductColumns = (
 
         },
         {
-            accessorKey: "owner",
-            header: "SUPPLIER",
+            accessorKey: "sku",
+            header: ({ }) => <div className="text-center">SKU</div>,
             cell: ({ row }) => {
                 return (
-                    <div>{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
+                    <div className="text-center">{row.original.sku}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "owner",
+            header: ({ }) => <div className="text-center">SUPPLIER</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{row.original.owner?.business_name ? row.original.owner?.business_name : "Prestige Home"}</div>
                 )
             }
         },

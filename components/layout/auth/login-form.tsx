@@ -322,21 +322,23 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                     </div>
                 )
             }
-            <div className="flex flex-col gap-4 justify-center items-center mt-8">
-                <Button
-                    className="w-1/2"
-                    variant={'outline'}
-                    onClick={() => handleLoginGoogle()}
-                >
-                    <Image
-                        src={'/google.svg'}
-                        width={20}
-                        height={20}
-                        alt=""
-                    />
-                    Continue with Google
-                </Button>
-            </div>
+            {!isAdmin &&
+                <div className="flex flex-col gap-4 justify-center items-center mt-8">
+                    <Button
+                        className="w-1/2"
+                        variant={'outline'}
+                        onClick={() => handleLoginGoogle()}
+                    >
+                        <Image
+                            src={'/google.svg'}
+                            width={20}
+                            height={20}
+                            alt=""
+                        />
+                        Continue with Google
+                    </Button>
+                </div>
+            }
         </div>
     )
 }

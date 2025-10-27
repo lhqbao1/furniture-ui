@@ -8,5 +8,6 @@ export const categorySchema = z.object({
   meta_keywords: z.string().optional(),
   level: z.number(),
   parent_id: z.string().optional(),
-  code: z.string().optional()
+  code: z.string().optional(),
+  is_econelo: z.boolean()
 });

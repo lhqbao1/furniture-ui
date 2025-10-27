@@ -275,9 +275,9 @@ function ImagePickerInput<T extends FieldValues>({
                         }}
                     >
                         <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
-                            <div className="w-full h-[144px] flex flex-wrap gap-4">
+                            <div className="w-full h-[144px] grid grid-cols-4 gap-8">
                                 {items.map((it, idx) => (
-                                    <div key={it.id} className="flex-1 min-w-[120px] max-w-[200px]">
+                                    <div key={it.id} className="w-full col-span-1">
                                         <SortableImage item={it} onRemove={() => removeImage(idx)} />
                                     </div>
                                 ))}

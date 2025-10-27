@@ -26,6 +26,7 @@ export interface CategoryResponse {
   code: string;
   level: number;
   parent_id: string | null;
+  is_econelo: boolean;
   children: CategoryResponse[]; // đệ quy
   created_at: string; // hoặc Date nếu bạn parse
   updated_at: string; // hoặc Date nếu bạn parse
@@ -40,6 +41,7 @@ export interface CategoryInput {
   level: number;
   parent_id?: string; // optional
   code?: string
+  is_econelo: boolean
 }
 
 

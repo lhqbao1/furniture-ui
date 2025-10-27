@@ -91,7 +91,10 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                                         img_url: category.img_url,
                                         meta_description: category.meta_description,
                                         meta_keywords: category.meta_keywords,
-                                        meta_title: category.meta_title
+                                        meta_title: category.meta_title,
+                                        parent_id: category.parent_id ?? '',
+                                        is_econelo: category.is_econelo,
+                                        code: category.code
                                     }}
                                     categoryId={category.id}
                                 />
@@ -130,7 +133,9 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                                 meta_description: category.meta_description,
                                 meta_keywords: category.meta_keywords,
                                 meta_title: category.meta_title,
-                                code: category.code
+                                code: category.code,
+                                parent_id: category.parent_id ?? '',
+                                is_econelo: category.is_econelo
                             }}
                             categoryId={category.id}
                         />
