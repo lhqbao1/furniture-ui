@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     description:
         "Das Impressum von Prestige Home – Rechtliche Angaben, Kontaktdaten und gesetzliche Informationen gemäß deutscher Gesetzgebung.",
     alternates: {
-        canonical: "/impressum",
+        canonical: "http://prestige-home.de/de/impressum",
     },
     openGraph: {
         title: "Impressum | Prestige Home",
         description:
             "Alle rechtlichen Informationen und Kontaktdaten von Prestige Home finden Sie hier.",
-        url: "https://www.prestige-home.de/impressum",
+        url: "https://www.prestige-home.de/de/impressum",
         siteName: "Prestige Home",
         locale: "de_DE",
         type: "article",
