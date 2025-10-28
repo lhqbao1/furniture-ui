@@ -29,6 +29,7 @@ import { useRouter } from '@/src/i18n/navigation'
 import { useLocale } from 'next-intl'
 import SelectBundleComponent from '../bundle/select-bundle'
 import AdminBackButton from '@/components/shared/admin-back-button'
+import { is } from 'date-fns/locale'
 
 interface AddProductFormProps {
     productValues?: Partial<ProductItem>
@@ -88,6 +89,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             stock: values.stock ?? 1,
             is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
             tag: values.tag === "" ? undefined : values.tag,
+            is_active: productValuesClone ? false : (values.is_active ?? true),
         }
 
         if (payload.is_econelo) {
