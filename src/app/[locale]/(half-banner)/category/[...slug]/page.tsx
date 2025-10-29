@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
                     "@type": "Product",
                     "position": index + 1,
                     "name": p.name,
-                    "image": p.static_files?.[0]?.url || "https://www.prestige-home.de/placeholder.webp",
+                    "image": p.static_files?.[0]?.url || "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/482eb0ac-4c04-4439-9729-c6725ba9530f_product-placeholder.png",
                     "url": `https://www.prestige-home.de/de/product/${p.url_key}`,
                     "offers": {
                         "@type": "Offer",
