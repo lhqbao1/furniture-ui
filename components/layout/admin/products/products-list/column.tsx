@@ -373,25 +373,41 @@ function ActionsCell({ product }: { product: ProductItem }) {
     const level1 = categories.find((c) => c.level === 1);
     const level2 = categories.find((c) => c.level === 2);
 
-    const handleClick = async (id: string) => {
+    const handleClick = async (
+        e: React.MouseEvent<HTMLButtonElement>,
+        id: string
+    ) => {
+        const url = `/${locale}/admin/products/${id}/edit`;
+
+        // 🧭 Nếu user giữ Ctrl / Cmd / middle click → chỉ mở tab mới
+        if (e.ctrlKey || e.metaKey || e.button === 1) {
+            // Prefetch trước cho tab mới load nhanh hơn (optional)
+            queryClient.prefetchQuery({
+                queryKey: ["product", id],
+                queryFn: () => getProductById(id),
+            });
+            router.prefetch(`/admin/products/${id}/edit`);
+
+            // 🚀 Mở tab mới, KHÔNG ảnh hưởng tab hiện tại
+            window.open(url, "_blank", "noopener,noreferrer");
+            return; // 🧠 Dừng ở đây — không router.push nữa
+        }
+
+        // 🟢 Click bình thường → đi trong tab hiện tại
         try {
             await queryClient.prefetchQuery({
                 queryKey: ["product", id],
                 queryFn: () => getProductById(id),
             });
-
-            // Prefetch route (tăng tốc lần đầu load)
             router.prefetch(`/admin/products/${id}/edit`);
-
-            // ✅ Mở trong tab mới
-            const url = `/${locale}/admin/products/${id}/edit`;
-            window.open(url, "_blank", "noopener,noreferrer");
+            router.push(`/admin/products/${id}/edit`, { locale });
         } catch (err) {
             console.error("Prefetch failed:", err);
-            const url = `/${locale}/admin/products/${id}/edit`;
-            window.open(url, "_blank", "noopener,noreferrer");
+            router.push(`/admin/products/${id}/edit`, { locale });
         }
     };
+
+
 
 
     const categoryHref =
@@ -406,9 +422,15 @@ function ActionsCell({ product }: { product: ProductItem }) {
     return (
         <div className="flex gap-2">
             {/* <Link href={`/admin/products/${product.id}/edit`}> */}
-            <Button variant="ghost" size="icon" onClick={() => handleClick(product.id)}>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => handleClick(e, product.id)}
+                title="Edit Product"
+            >
                 <Pencil className="w-4 h-4 text-primary" />
             </Button>
+
             {/* </Link> */}
             <DeleteDialog product={product} isEbay={product.marketplace_products.find(i => i.marketplace === 'ebay')?.is_active ? true : false} />
             <Link
@@ -509,6 +531,15 @@ export const getProductColumns = (
             cell: ({ row }) => {
                 return (
                     <div className="text-center">{row.original.sku}</div>
+                )
+            }
+        },
+        {
+            accessorKey: "sku",
+            header: ({ }) => <div className="text-center">EAN</div>,
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">{row.original.ean}</div>
                 )
             }
         },
