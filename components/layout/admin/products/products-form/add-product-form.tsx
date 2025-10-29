@@ -44,6 +44,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
     const editProductMutation = useEditProduct()
     const addProductMutation = useAddProduct()
     const [isLoadingSEO, setIsLoadingSEO] = useState(false)
+    const [openAccordion, setOpenAccordion] = useState("details");
 
     const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
         if (!productValues) return defaultValues
@@ -177,7 +178,9 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
-                                                <ProductDetailInputs isEdit={productValues ? true : false} productId={productValues ? productValues.id_provider : null} />
+                                                {openAccordion === "details" && (
+                                                    <ProductDetailInputs isEdit={productValues ? true : false} productId={productValues ? productValues.id_provider : null} />
+                                                )}
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>
@@ -187,7 +190,9 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
-                                                <ProductAdditionalInputs />
+                                                {openAccordion === "additional" && (
+                                                    <ProductAdditionalInputs />
+                                                )}
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>
@@ -197,7 +202,9 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
-                                                <SelectBundleComponent currentProduct={productValues} />
+                                                {openAccordion === "component" && (
+                                                    <SelectBundleComponent currentProduct={productValues} />
+                                                )}
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>
@@ -207,17 +214,21 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
-                                                <ProductLogisticsGroup />
+                                                {openAccordion === "logistic" && (
+                                                    <ProductLogisticsGroup />
+                                                )}
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="seo">
-                                    <AccordionTrigger className='bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:'>SEO</AccordionTrigger>
+                                    <AccordionTrigger>SEO</AccordionTrigger>
                                     <AccordionContent className="mt-2">
                                         <Card>
                                             <CardContent>
-                                                <ProductSEOGroup setIsLoadingSEO={setIsLoadingSEO} />
+                                                {openAccordion === "seo" && (
+                                                    <ProductSEOGroup setIsLoadingSEO={setIsLoadingSEO} />
+                                                )}
                                             </CardContent>
                                         </Card>
                                     </AccordionContent>
