@@ -1,6 +1,7 @@
 import ListPolicy from '@/components/layout/policy/list-policy'
 import { getPolicyItemsByVersion, getPolicyVersion } from '@/features/policy/api'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
+import Script from 'next/script'
 
 // ✅ Metadata SEO
 export const metadata = {
@@ -50,21 +51,46 @@ export default async function WiderrufPage() {
     const dehydratedState = dehydrate(queryClient)
 
     return (
-        <HydrationBoundary state={dehydratedState}>
-            <div className="w-full min-h-screen">
-                {firstVersion ? (
-                    <ListPolicy
-                        versionId={firstVersion}
-                        versionData={version}
-                        policyId="9fc87bb9-44d2-428d-9960-1b6074e11d75"
-                        versionName={version[0].name}
-                    />
-                ) : (
-                    <div className="text-center py-20 text-gray-500">
-                        Keine Richtlinie gefunden
-                    </div>
-                )}
-            </div>
-        </HydrationBoundary>
+        <>
+            <Script
+                id="schema-cancellation"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "MerchantReturnPolicy",
+                        "name": "Widerrufsbelehrung – Rückgaberecht",
+                        "url": "https://www.prestige-home.de/de/cancellation",
+                        "applicableCountry": "DE",
+                        "inLanguage": "de",
+                        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                        "merchantReturnDays": 14,
+                        "returnMethod": "https://schema.org/ReturnByMail",
+                        "returnFees": "https://schema.org/FreeReturn",
+                        "publisher": {
+                            "@type": "Organization",
+                            "name": "Prestige Home",
+                            "url": "https://www.prestige-home.de"
+                        }
+                    }),
+                }}
+            />
+
+            <HydrationBoundary state={dehydratedState}>
+                <div className="w-full min-h-screen">
+                    {firstVersion ? (
+                        <ListPolicy
+                            versionId={firstVersion}
+                            versionData={version}
+                            versionName={version[0].name}
+                        />
+                    ) : (
+                        <div className="text-center py-20 text-gray-500">
+                            Keine Richtlinie gefunden
+                        </div>
+                    )}
+                </div>
+            </HydrationBoundary>
+        </>
     )
 }

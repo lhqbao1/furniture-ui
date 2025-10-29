@@ -2,6 +2,7 @@ import ListPolicy from '@/components/layout/policy/list-policy'
 import { getPolicyItemsByVersion, getPolicyVersion } from '@/features/policy/api'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
 import { Metadata } from 'next'
+import Script from 'next/script'
 import React from 'react'
 
 export const revalidate = 3600 // ISR: regenerate mỗi 1h
@@ -48,21 +49,46 @@ export default async function DatenschutzerklarungPage() {
     const dehydratedState = dehydrate(queryClient)
 
     return (
-        <HydrationBoundary state={dehydratedState}>
-            <div className="w-full min-h-screen">
-                {firstVersion ? (
-                    <ListPolicy
-                        versionId={firstVersion}
-                        policyId="808a37bc-2ead-4a90-8a24-73a431df55d0"
-                        versionData={version}
-                        versionName={version[0].name}
-                    />
-                ) : (
-                    <div className="text-center py-20 text-gray-500">
-                        Keine Richtlinie gefunden
-                    </div>
-                )}
-            </div>
-        </HydrationBoundary>
+        <>
+            <Script
+                id="schema-privacy"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "AboutPage",
+                        "name": "Datenschutzerklärung – Prestige Home",
+                        "url": "https://www.prestige-home.de/de/privacy-policy",
+                        "about": { "@type": "Thing", "name": "Privacy Policy / Data Protection" },
+                        "inLanguage": "de",
+                        "publisher": {
+                            "@type": "Organization",
+                            "name": "Prestige Home",
+                            "url": "https://www.prestige-home.de",
+                            "logo": {
+                                "@type": "ImageObject",
+                                "url": "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/5c38c322-bafc-4e6f-8d14-0c1ba4b7b8de_invoice-logo.png"
+                            }
+                        }
+                    }),
+                }}
+            />
+
+            <HydrationBoundary state={dehydratedState}>
+                <div className="w-full min-h-screen">
+                    {firstVersion ? (
+                        <ListPolicy
+                            versionId={firstVersion}
+                            versionData={version}
+                            versionName={version[0].name}
+                        />
+                    ) : (
+                        <div className="text-center py-20 text-gray-500">
+                            Keine Richtlinie gefunden
+                        </div>
+                    )}
+                </div>
+            </HydrationBoundary>
+        </>
     )
 }
