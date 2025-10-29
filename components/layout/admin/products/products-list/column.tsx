@@ -379,14 +379,20 @@ function ActionsCell({ product }: { product: ProductItem }) {
                 queryKey: ["product", id],
                 queryFn: () => getProductById(id),
             });
-            router.prefetch(`/admin/products/${id}/edit`)
-            router.push(`/admin/products/${id}/edit`, { locale });
 
+            // Prefetch route (tăng tốc lần đầu load)
+            router.prefetch(`/admin/products/${id}/edit`);
+
+            // ✅ Mở trong tab mới
+            const url = `/${locale}/admin/products/${id}/edit`;
+            window.open(url, "_blank", "noopener,noreferrer");
         } catch (err) {
             console.error("Prefetch failed:", err);
-            // router.push(`/admin/products/${id}/edit`, { locale });
+            const url = `/${locale}/admin/products/${id}/edit`;
+            window.open(url, "_blank", "noopener,noreferrer");
         }
-    }
+    };
+
 
     const categoryHref =
         level1 && level2

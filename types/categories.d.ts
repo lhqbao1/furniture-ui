@@ -56,6 +56,11 @@ export interface CategoryBySlugResponse {
   total_pages: number
   total_items: number
   page_size: number
+  slug: string
+  code: string
+  level: number,
+  img_url: string,
+  is_econelo: boolean,
   meta_title: string
   meta_description: string
   meta_keywords: string
