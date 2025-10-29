@@ -92,14 +92,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL động cho product
   let products: ProductItem[] = []
   try {
-    const res = await apiPublic.get("/products/all-product")
+    const res = await apiPublic.get("/products/all")
     products = res.data
   } catch (e) {
     products = []
   }
 
   const productUrls: MetadataRoute.Sitemap = products.map((p: ProductItem) => ({
-    url: `https://www.prestige-home.de/product/${p.id}`,
+    url: `https://www.prestige-home.de/product/${p.url_key}`,
     lastModified: new Date(p.updated_at || new Date()),
     changeFrequency: "daily",
     priority: 0.6,
