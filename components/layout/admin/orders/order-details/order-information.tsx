@@ -42,57 +42,33 @@ const OrderInformation = ({
     is_Ebay = false
 }: OrderInformationProps) => {
     return (
-        <div className="grid grid-cols-2 gap-10">
-            <div className="space-y-3 col-span-1">
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-2">Payment Method:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6 capitalize">
-                        {payment_method ?? 'eBay Payment'}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-2">Language:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {language ?? 'None'}
-                    </div>
-                </div>
-                <div className="grid grid-cols-10 items-center gap-2">
-                    <div className="text-right col-span-2">Order type:</div>
-                    <div className="rounded-sm border px-2 py-1 w-full col-span-6">
-                        {order_type ?? 'Sales order'}
-                    </div>
+        <div className="flex flex-col w-full items-end space-y-3">
+            <div className='grid grid-cols-3 w-1/4'>
+                <div className='text-end col-span-2'>Sub total</div>
+                <div className='text-end'>
+                    €{sub_total?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
             </div>
-
-            <div className='space-y-3 col-span-1'>
-                <div className='grid grid-cols-3'>
-                    <div className='text-end col-span-2'>Sub total</div>
-                    <div className='text-end'>
-                        €{sub_total?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
+            <div className='grid grid-cols-3 w-1/4'>
+                <div className='text-end col-span-2'>Shipping</div>
+                <div className='text-end'>
+                    €{((shipping_amount ?? 0) + (discount_amount ?? 0))?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className='grid grid-cols-3'>
-                    <div className='text-end col-span-2'>Shipping</div>
-                    <div className='text-end'>
-                        €{((shipping_amount ?? 0) + (discount_amount ?? 0))?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
+            </div>
+            <div className='grid grid-cols-3 w-1/4'>
+                <div className='text-end col-span-2'>Discount</div>
+                <div className='text-end'>
+                    €{is_Ebay ? '00,00' : discount_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className='grid grid-cols-3'>
-                    <div className='text-end col-span-2'>Discount</div>
-                    <div className='text-end'>
-                        €{is_Ebay ? '00,00' : discount_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
+            </div>
+            <div className='grid grid-cols-3 w-1/4'>
+                <div className='text-end col-span-2'>VAT</div>
+                <div className='text-end'>
+                    €{tax?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
-                <div className='grid grid-cols-3'>
-                    <div className='text-end col-span-2'>VAT</div>
-                    <div className='text-end'>
-                        €{tax?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                </div>
-                <div className='text-end text-2xl text-primary font-bold'>
-                    <div className=''>Total €{total_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                </div>
+            </div>
+            <div className='text-end text-xl text-primary font-bold'>
+                <div className=''>Total €{total_amount?.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
         </div>
     )

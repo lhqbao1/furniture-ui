@@ -288,7 +288,7 @@ export default function CheckOutPageClient() {
                 if (!invoiceAddressCountry || invoiceAddressCountry === "" || !invoiceAddressId) {
                     const newInvoice = await createInvoiceAddressMutation.mutateAsync({
                         user_id: userId ?? '',
-                        recipient_name: data.first_name + data.last_name,
+                        recipient_name: data.first_name + "" + data.last_name,
                         postal_code: data.invoice_postal_code,
                         phone_number: data.phone_number,
                         address_line: data.invoice_address_line,
@@ -307,7 +307,7 @@ export default function CheckOutPageClient() {
                             addressId: invoiceAddressId,
                             address: {
                                 user_id: userId ?? '',
-                                recipient_name: data.first_name + data.last_name,
+                                recipient_name: data.first_name + "" + data.last_name,
                                 postal_code: data.invoice_postal_code,
                                 phone_number: data.phone_number,
                                 address_line: data.invoice_address_line,
@@ -325,7 +325,7 @@ export default function CheckOutPageClient() {
                 if (!shippingAddressId) {
                     const newShipping = await createShippingAddressMutation.mutateAsync({
                         user_id: userId ?? '',
-                        recipient_name: data.first_name + data.last_name,
+                        recipient_name: data.first_name + "" + data.last_name,
                         postal_code: data.invoice_postal_code,
                         phone_number: data.phone_number,
                         address_line: data.invoice_address_line,
@@ -344,7 +344,7 @@ export default function CheckOutPageClient() {
 
                         const newShipping = await createShippingAddressMutation.mutateAsync({
                             user_id: userId ?? '',
-                            recipient_name: data.first_name + data.last_name,
+                            recipient_name: data.first_name + "" + data.last_name,
                             postal_code: data.shipping_postal_code,
                             phone_number: data.phone_number,
                             address_line: data.shipping_address_line,
