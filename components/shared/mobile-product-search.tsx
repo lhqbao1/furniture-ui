@@ -140,7 +140,9 @@ export default function MobileProductSearch() {
         return () => clearTimeout(timeout)
     }, [query])
 
-    const { data: products, isLoading } = useGetProductsSelect(debouncedQuery)
+    const { data: products, isLoading } = useGetProductsSelect({
+        search: debouncedQuery,
+    })
     const results = products ?? []
 
     return (

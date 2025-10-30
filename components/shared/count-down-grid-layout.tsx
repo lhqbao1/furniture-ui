@@ -104,18 +104,8 @@ const CountDownGridLayout = ({ products }: CountDownGridLayoutProps) => {
             {products.map((product, idx) => {
                 const { timeLeft, barWidth } =
                     productTimes[idx] ?? { timeLeft: 0, barWidth: 50 }
-                const categories = product.categories || []
-                const level1 = categories.find(c => c.level === 1)
-                const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
-                const categoryHref = level1 && level2
-                    ? `/${level1.name}/${level2.name}/${product.url_key}`
-                    : level1
-                        ? `/${level1.name}/${product.url_key}`
-                        : level2
-                            ? `/${level2.name}/${product.url_key}`
-                            : `/${product.url_key}`
                 return (
-                    <Link href={`/product/${categoryHref}`} passHref key={product.id}>
+                    <Link href={`/product/${product.url_key}`} passHref key={product.id}>
                         <div
                             className='bg-white p-4 relative group'
                             style={{

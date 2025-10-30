@@ -346,14 +346,6 @@ function ActionsCell({ product }: { product: ProductItem }) {
     const router = useRouter();
     const queryClient = useQueryClient();
 
-
-    const categories = product.categories || [];
-    const formatName = (name: string) =>
-        name.trim().toLowerCase().replace(/\s+/g, "-");
-
-    const level1 = categories.find((c) => c.level === 1);
-    const level2 = categories.find((c) => c.level === 2);
-
     const handleClick = async (id: string) => {
         try {
             await queryClient.prefetchQuery({
