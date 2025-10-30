@@ -3,7 +3,7 @@
 import { invoiceColumns } from "./column"
 import Image from "next/image"
 import { useQuery } from "@tanstack/react-query"
-import { getCheckOutByCheckOutId, getMainCheckOutByMainCheckOutId } from "@/features/checkout/api"
+import { getMainCheckOutByMainCheckOutId } from "@/features/checkout/api"
 import { getInvoiceByCheckOut } from "@/features/invoice/api"
 import { FileTable } from "./table"
 import { formatDate } from "@/lib/date-formated"
@@ -73,7 +73,7 @@ export default function InvoiceTable({ checkoutId, invoiceId }: InvoiceTableProp
                             checkout?.checkouts?.[0]?.invoice_address?.postal_code?.trim()
                                 ? checkout?.checkouts?.[0]?.invoice_address?.postal_code
                                 : checkout?.checkouts?.[0]?.shipping_address?.postal_code
-                        )} - {
+                        )}  {
                             (
                                 checkout?.checkouts?.[0]?.invoice_address?.city?.trim()
                                     ? checkout?.checkouts?.[0]?.invoice_address?.city

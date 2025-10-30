@@ -28,9 +28,13 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
                 <h5 className='font-bold'>Invoice address</h5>
                 <div className='space-y-2.5'>
                     <div className='text-sm'>
+                        <div>{shippingAddress.recipient_name}</div>
                         <div>{invoiceAddress.address_line}</div>
-                        <div>{invoiceAddress.city}</div>
-                        <div>{invoiceAddress.country}</div>
+                        <div className='flex gap-1'>
+                            <div>{invoiceAddress.postal_code}</div>
+
+                            <div>{invoiceAddress.city}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,10 +46,9 @@ const OrderDetailUser = ({ user, shippingAddress, invoiceAddress }: OrderDetailU
                         <div>{shippingAddress.address_line}</div>
                         <div className='flex gap-1'>
                             <div>{shippingAddress.postal_code}</div>
-                            -
+
                             <div>{shippingAddress.city}</div>
                         </div>
-                        <div>{shippingAddress.country}</div>
                     </div>
                 </div>
             </div>
