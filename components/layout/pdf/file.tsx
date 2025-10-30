@@ -371,7 +371,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                                 paddingHorizontal: 6,
                             }}
                         >
-                            <Text style={{ width: '60%', textAlign: 'right', fontWeight: 'bold' }}>Zahlung ({checkout.from_marketplace} Managed Payments) vom {formatDateToNum(invoice.created_at)}</Text>
+                            <Text style={{ width: '60%', textAlign: 'right', fontWeight: 'bold' }}>Zahlung <Text style={{ textTransform: 'capitalize' }}>({checkout.from_marketplace ?? checkout.payment_method}</Text> Managed Payments) vom {formatDateToNum(invoice.created_at)}</Text>
                             <Text style={{ width: '20%', textAlign: 'right', fontWeight: 'bold' }}>
                                 {((((invoice?.total_amount_item ?? 0) + (invoice?.total_shipping ?? 0))) + (invoice?.voucher_amount ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
                             </Text>

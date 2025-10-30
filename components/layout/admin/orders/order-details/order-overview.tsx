@@ -46,7 +46,7 @@ const OrderDetailOverView = ({ created_at, updated_at, status, order }: OrderDet
                 <div className='flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold cursor-pointer'>
                     <div className='flex gap-1'>
                         <div>Payment Method:</div>
-                        <div translate='no' className='capitalize'>{order.payment_method}</div>
+                        <div translate='no' className='capitalize'>{order.from_marketplace ? `${order.from_marketplace} Managed Payments` : order.payment_method}</div>
                     </div>
                     <ArrowRight size={16} />
                 </div>
