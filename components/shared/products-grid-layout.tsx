@@ -135,21 +135,6 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
         <div>
             <div className='grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4'>
                 {data.map((product, idx) => {
-                    // Lấy đường dẫn category
-                    const categories = product.categories || []
-                    const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
-
-                    const level1 = categories.find(c => c.level === 1)
-                    const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
-
-                    const categoryHref = level1 && level2
-                        ? `/${formatName(level1.slug)}/${formatName(level2.slug)}/${product.url_key}`
-                        : level1
-                            ? `/${formatName(level1.slug)}/${product.url_key}`
-                            : level2
-                                ? `/${formatName(level2.slug)}/${product.url_key}`
-                                : `/${product.url_key}`
-
                     return (
                         <div key={product.id}
                             className='relative overflow-hidden'
@@ -168,7 +153,7 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                         : "1px solid #e0e0e0",
                             }}
                         >
-                            <Link href={`/product${categoryHref}`} passHref>
+                            <Link href={`/product/${product.url_key}`} passHref>
                                 <div
                                     className="bg-white p-0 group cursor-pointer z-0 pt-4 lg:px-4 px-2"
                                 >

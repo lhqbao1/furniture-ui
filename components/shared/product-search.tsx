@@ -144,19 +144,6 @@ export default function ProductSearch({
                                 {results.length > 0 && (
                                     <CommandGroup>
                                         {results.map((product: ProductItem) => {
-                                            const categories = product.categories || []
-                                            const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
-
-                                            const level1 = categories.find(c => c.level === 1)
-                                            const level2 = categories.filter(c => c.level === 2)[0] // level 2 đầu tiên
-
-                                            const categoryHref = level1 && level2
-                                                ? `/${formatName(level1.slug)}/${formatName(level2.slug)}/${product.url_key}`
-                                                : level1
-                                                    ? `/${formatName(level1.slug)}/${product.url_key}`
-                                                    : level2
-                                                        ? `/${formatName(level2.slug)}/${product.url_key}`
-                                                        : `/${product.url_key}`
                                             return (
                                                 <CommandItem asChild key={product.id} value={product.name}>
                                                     {isAdmin ? (
@@ -201,7 +188,7 @@ export default function ProductSearch({
                                                         </div>
                                                     ) : (
                                                         <Link
-                                                            href={`/product${categoryHref}`}
+                                                            href={`/product${product.url_key}`}
                                                             passHref
                                                             className="flex justify-between items-center w-full cursor-pointer"
                                                             onClick={() => {

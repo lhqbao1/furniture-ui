@@ -408,17 +408,6 @@ function ActionsCell({ product }: { product: ProductItem }) {
     };
 
 
-
-
-    const categoryHref =
-        level1 && level2
-            ? `/${formatName(level1.slug)}/${formatName(level2.slug)}/${product.url_key}`
-            : level1
-                ? `/${formatName(level1.slug)}/${product.url_key}`
-                : level2
-                    ? `/${formatName(level2.slug)}/${product.url_key}`
-                    : `/${product.url_key}`;
-
     return (
         <div className="flex gap-2">
             {/* <Link href={`/admin/products/${product.id}/edit`}> */}
@@ -434,7 +423,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
             {/* </Link> */}
             <DeleteDialog product={product} isEbay={product.marketplace_products.find(i => i.marketplace === 'ebay')?.is_active ? true : false} />
             <Link
-                href={`/product${categoryHref}`}
+                href={`/product/${product.url_key}`}
                 target="_blank"
                 rel="noopener noreferrer"
             >
