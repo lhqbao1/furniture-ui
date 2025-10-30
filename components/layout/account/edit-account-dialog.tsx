@@ -24,6 +24,7 @@ import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface EditUserDialogProps {
     setOpen: (open: boolean) => void
@@ -52,6 +53,7 @@ export default function EditUserDialog({ setOpen, open, currentUser }: EditUserD
                 ...data,
                 avatar_url: data.avatar_url || undefined,
                 date_of_birth: data.date_of_birth ?? undefined, // chuyển null thành undefined
+                gender: data.gender
             }
         }, {
             onSuccess(data, variables, context) {
@@ -78,28 +80,32 @@ export default function EditUserDialog({ setOpen, open, currentUser }: EditUserD
             >
                 <FormField
                     control={form.control}
-                    name="email"
+                    name="gender"
                     render={({ field }) => (
-                        <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>{t('email')}</FormLabel>
+                        <FormItem className="col-span-2 lg:col-span-2">
+                            {/* <FormLabel>{t("gender")}</FormLabel> */}
                             <FormControl>
-                                <Input type="email" {...field} />
+                                <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                                    <FormItem className="flex gap-1 items-center">
+                                        <FormControl>
+                                            <RadioGroupItem value="male" />
+                                        </FormControl>
+                                        <FormLabel className="ml-2">{t("male")}</FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex gap-1 items-center">
+                                        <FormControl>
+                                            <RadioGroupItem value="female" />
+                                        </FormControl>
+                                        <FormLabel className="ml-2">{t("female")}</FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex gap-1 items-center">
+                                        <FormControl>
+                                            <RadioGroupItem value="other" />
+                                        </FormControl>
+                                        <FormLabel className="ml-2">{t("otherGender")}</FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
                             </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="phone_number"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>{t('phone_number')}</FormLabel>
-                            <FormControl>
-                                <Input type="tel" {...field} />
-                            </FormControl>
-                            <FormMessage />
                         </FormItem>
                     )}
                 />

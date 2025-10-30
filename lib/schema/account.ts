@@ -4,6 +4,7 @@ export const accountSchema = z.object({
   id: z.string(),
   email: z.string().email(),
   phone_number: z.string().optional(),
+  gender: z.string().optional(),
   first_name: z.string().min(1, "First name is required").optional(),
   last_name: z.string().min(1, "Last name is required").optional(),
   is_active: z.boolean(),

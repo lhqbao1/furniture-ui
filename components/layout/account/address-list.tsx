@@ -18,28 +18,33 @@ import { DialogTrigger } from '@radix-ui/react-dialog'
 import { Loader2 } from 'lucide-react'
 import AddressForm from './address-form'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 interface AddressListProps {
     userId: string
 }
 
 const AddressList = ({ userId }: AddressListProps) => {
-    const { data: addresses, isLoading, isError } = useGetAddressByUserId(userId)
-    const deleteAddressMutation = useDeleteAddress()
-    const setDefaultAddressMutation = useSetDefaultAddress()
     const [removeDialogId, setRemoveDialogId] = React.useState<string | null>(null)
     const [defaultDialogId, setDefaultDialogId] = React.useState<string | null>(null)
     const [editDialogId, setEditDialogId] = React.useState<string | null>(null)
 
+    const t = useTranslations()
+
+
+    const { data: addresses, isLoading, isError } = useGetAddressByUserId(userId)
+    const deleteAddressMutation = useDeleteAddress()
+    const setDefaultAddressMutation = useSetDefaultAddress()
+
+
     const handleDeleteAddress = (addressId: string) => {
         deleteAddressMutation.mutate(addressId, {
             onSuccess() {
-                toast.success("Address deleted successfully")
+                toast.success(t('deleteShippingAddress'))
                 setRemoveDialogId(null)
             },
             onError() {
-                toast.error("Failed to delete address")
-                // handle error
+                toast.error(t('deleteShippingAddressFail'))
             },
         })
     }
@@ -47,19 +52,22 @@ const AddressList = ({ userId }: AddressListProps) => {
     const handleSetDefaultAddress = (addressId: string) => {
         setDefaultAddressMutation.mutate(addressId, {
             onSuccess() {
-                toast.success("Set default address successfully")
+                toast.success(t('setDefaultShippingAddress'))
                 setDefaultDialogId(null)
             },
             onError() {
-                toast.error("Failed to set default address")
-                // handle error
+                toast.error(t('setDefaultShippingAddressFail'))
             },
         })
     }
 
-    if (isLoading) return <div>Loading addresses...</div>
-    if (isError) return <div className="text-red-500">You have not created any address for shipping. You need at least one shipping address to buy product</div>
-    if (!addresses || addresses.length === 0) return <div className="text-red-500">You have not created any address for shipping. You need at least one shipping address to buy product</div>
+    if (isLoading) return <div>{t('loading')}...</div>
+    if (isError) return <div className="text-red-500">
+        {t('noShippingAddress')}
+    </div>
+    if (!addresses || addresses.length === 0) return <div className="text-red-500">
+        {t('noShippingAddress')}
+    </div>
 
     return (
         <div className="grid grid-cols-2 gap-4">
@@ -82,7 +90,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                             <p>{address.address_line}</p>
                             <p>{address.city}</p>
                             <p>{address.country}</p>
-                            {address.recipient_name && <p>Recipient: {address.recipient_name}</p>}
+                            {address.recipient_name && <p>{t('recipient')}: {address.recipient_name}</p>}
                             {address.phone_number && <p>{address.phone_number}</p>}
                         </CardContent>
                         <CardFooter className='px-2 justify-center'>
@@ -92,11 +100,11 @@ const AddressList = ({ userId }: AddressListProps) => {
                                     onOpenChange={(open) => setEditDialogId(open ? address.id : null)}
                                 >
                                     <DialogTrigger asChild>
-                                        <Button variant="outline" size="sm" type='button'>Edit</Button>
+                                        <Button variant="outline" size="sm" type='button'>{t('edit')}</Button>
                                     </DialogTrigger>
                                     <DialogContent className='lg:w-[800px]'>
                                         <DialogHeader>
-                                            <DialogTitle>Edit Shipping Address</DialogTitle>
+                                            <DialogTitle>{t('editShippingAddress')}</DialogTitle>
                                             <AddressForm
                                                 userId={userId}
                                                 open={editDialogId === address.id} // boolean
@@ -113,19 +121,19 @@ const AddressList = ({ userId }: AddressListProps) => {
                                     onOpenChange={(open) => setDefaultDialogId(open ? address.id : null)}
                                 >
                                     <DialogTrigger asChild>
-                                        <Button variant="outline" size="sm" type='button'>As Default</Button>
+                                        <Button variant="outline" size="sm" type='button'>{t('asDefault')}</Button>
                                     </DialogTrigger>
 
                                     <DialogContent className="lg:w-[500px]">
                                         <DialogHeader>
-                                            <DialogTitle>Set Default Shipping Address</DialogTitle>
+                                            <DialogTitle>{t('setAsDefaultShippingAddress')}</DialogTitle>
                                             <DialogDescription>
-                                                Are you sure you want to set this address as your default shipping address?
+                                                {t('confirmSetDefaultShippingAddress')}
                                             </DialogDescription>
                                         </DialogHeader>
                                         <DialogFooter>
                                             <DialogClose asChild>
-                                                <Button variant="outline">Cancel</Button>
+                                                <Button variant="outline">{t('cancel')}</Button>
                                             </DialogClose>
                                             <Button
                                                 type="button"
@@ -135,7 +143,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                                             >
                                                 {setDefaultAddressMutation.isPending ? (
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                ) : 'Confirm'}
+                                                ) : t('confirm')}
                                             </Button>
                                         </DialogFooter>
                                     </DialogContent>
@@ -146,20 +154,20 @@ const AddressList = ({ userId }: AddressListProps) => {
                                 >
                                     <DialogTrigger asChild>
                                         <Button variant="outline" size="sm" className="text-red-500">
-                                            Remove
+                                            {t('remove')}
                                         </Button>
                                     </DialogTrigger>
 
                                     <DialogContent className="lg:w-[500px]">
                                         <DialogHeader>
-                                            <DialogTitle>Delete Shipping Address</DialogTitle>
+                                            <DialogTitle>{t('deleteShippingAddress')}</DialogTitle>
                                             <DialogDescription>
-                                                Are you sure you want to delete this address? This action cannot be undone.
+                                                {t('confirmDeleteShippingAddress')}
                                             </DialogDescription>
                                         </DialogHeader>
                                         <DialogFooter>
                                             <DialogClose asChild>
-                                                <Button variant="outline">Cancel</Button>
+                                                <Button variant="outline">{t('cancel')}</Button>
                                             </DialogClose>
                                             <Button
                                                 type="button"
@@ -169,7 +177,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                                             >
                                                 {deleteAddressMutation.isPending ? (
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                ) : 'Confirm'}
+                                                ) : t('confirm')}
                                             </Button>
                                         </DialogFooter>
                                     </DialogContent>

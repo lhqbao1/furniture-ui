@@ -14,8 +14,8 @@ import { useEffect, useRef, useState } from "react"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
-import { loginGoogle } from "@/features/auth/api"
-import { useQuery } from "@tanstack/react-query"
+import LoginGoogleButton from "@/components/shared/login-google-button"
+
 interface LoginFormProps {
     isAdmin?: boolean
 }
@@ -44,7 +44,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
         },
     })
 
-    const loginMutation = useLogin()
     const loginAdminMutation = useSendOtpAdmin()
     const syncLocalCartMutation = useSyncLocalCart();
     const sendOtpMutation = useSendOtp()
@@ -164,12 +163,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             )
         }
     }
-
-    const handleLoginGoogle = async () => {
-        // Gọi thẳng đến backend bằng redirect, không dùng axios
-        window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}google/login`;
-    };
-
 
     return (
         <div className="p-6 bg-white rounded-2xl lg:w-3/4 w-full">
@@ -323,21 +316,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                 )
             }
             {!isAdmin &&
-                <div className="flex flex-col gap-4 justify-center items-center mt-8">
-                    <Button
-                        className="w-1/2"
-                        variant={'outline'}
-                        onClick={() => handleLoginGoogle()}
-                    >
-                        <Image
-                            src={'/google.svg'}
-                            width={20}
-                            height={20}
-                            alt=""
-                        />
-                        Continue with Google
-                    </Button>
-                </div>
+                <LoginGoogleButton />
             }
         </div>
     )

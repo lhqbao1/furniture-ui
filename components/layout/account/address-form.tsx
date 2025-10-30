@@ -19,6 +19,7 @@ import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Address } from "@/types/address"
 import { useEffect } from "react"
+import { useTranslations } from "next-intl"
 
 interface AddressFormProps {
     setOpen: (open: boolean) => void
@@ -33,7 +34,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
     const updateAddressMutation = useUpdateAddress()
     const createInvoiceAddressMutation = useCreateInvoiceAddress()
     const updateInvoiceAddressMutation = useUpdateInvoiceAddress()
-
+    const t = useTranslations()
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(addressSchema),
         defaultValues: addressDefaultValues,
@@ -56,12 +57,12 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                 { addressId: currentAddress.id, address: data },
                 {
                     onSuccess: () => {
-                        toast.success("Invoice address updated successfully")
+                        toast.success(t('invoiceAddressUpdateSuccess'))
                         form.reset()
                         setOpen(false)
                     },
                     onError: () => {
-                        toast.error("Failed to update invoice address")
+                        toast.error(t('invoiceAddressUpdateFail'))
                     },
                 }
             )
@@ -71,12 +72,12 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                 { addressId: currentAddress.id, address: data },
                 {
                     onSuccess: () => {
-                        toast.success("Address updated successfully")
+                        toast.success(t('shippingAddressUpdateSuccess'))
                         form.reset()
                         setOpen(false)
                     },
                     onError: () => {
-                        toast.error("Failed to update address")
+                        toast.error(t('shippingAddressUpdateFail'))
                     },
                 }
             )
@@ -84,24 +85,24 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
             // create invoice address
             createInvoiceAddressMutation.mutate(data, {
                 onSuccess: () => {
-                    toast.success("Invoice address created successfully")
+                    toast.success(t('invoiceAddressCreateSuccess'))
                     form.reset()
                     setOpen(false)
                 },
                 onError: () => {
-                    toast.error("Failed to create invoice address")
+                    toast.error(t('invoiceAddressCreateFail'))
                 },
             })
         } else {
             // create normal address
             createAddressMutation.mutate(data, {
                 onSuccess: () => {
-                    toast.success("Address created successfully")
+                    toast.success(t('shippingAddressCreateSuccess'))
                     form.reset()
                     setOpen(false)
                 },
                 onError: () => {
-                    toast.error("Failed to create address")
+                    toast.error(t('shippingAddressCreateFail'))
                 },
             })
         }
@@ -118,9 +119,9 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     name="name_address"
                     render={({ field }) => (
                         <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>Address Name</FormLabel>
+                            <FormLabel>{t('addressName')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Home / Office" {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -132,9 +133,9 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     name="recipient_name"
                     render={({ field }) => (
                         <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>Recipient Name</FormLabel>
+                            <FormLabel>{t('recipient')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Full name" {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -146,9 +147,9 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     name="phone_number"
                     render={({ field }) => (
                         <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>Phone Number</FormLabel>
+                            <FormLabel>{t('phone_number')}</FormLabel>
                             <FormControl>
-                                <Input type="number" placeholder="Phone number" {...field} />
+                                <Input type="number" placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -160,9 +161,9 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     name="address_line"
                     render={({ field }) => (
                         <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>Address Line</FormLabel>
+                            <FormLabel>{t('addressLine')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Street, Building, etc." {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -174,23 +175,9 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     name="city"
                     render={({ field }) => (
                         <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>City</FormLabel>
+                            <FormLabel>{t('city')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="City" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>State</FormLabel>
-                            <FormControl>
-                                <Input placeholder="State" {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -202,9 +189,9 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     name="postal_code"
                     render={({ field }) => (
                         <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>Postal Code</FormLabel>
+                            <FormLabel>{t('postalCode')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Postal code" {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -216,9 +203,9 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     name="country"
                     render={({ field }) => (
                         <FormItem className="col-span-2 lg:col-span-1">
-                            <FormLabel>Country</FormLabel>
+                            <FormLabel>{t('country')}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Country" {...field} />
+                                <Input placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -234,7 +221,7 @@ export default function AddressForm({ setOpen, open, userId, currentAddress, isI
                     >
                         {createAddressMutation.isPending || updateAddressMutation.isPending || createInvoiceAddressMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : 'Save Address'}
+                        ) : t('save')}
                     </Button>
                 </div>
             </form>

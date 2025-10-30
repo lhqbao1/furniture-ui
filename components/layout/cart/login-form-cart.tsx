@@ -14,6 +14,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { useCartLocal } from "@/hooks/cart"
 import { Link, useRouter } from "@/src/i18n/navigation"
+import LoginGoogleButton from "@/components/shared/login-google-button"
 
 interface CartLoginFormProps {
     onSuccess?: () => void
@@ -267,6 +268,7 @@ export default function CartLoginForm({ onSuccess, onError }: CartLoginFormProps
                     {t("createAccount")}
                 </Link>
             </div>
+            <LoginGoogleButton />
         </div>
     )
 }
