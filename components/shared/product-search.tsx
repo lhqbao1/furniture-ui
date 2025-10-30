@@ -73,7 +73,9 @@ export default function ProductSearch({
         return () => clearTimeout(timeout)
     }, [query])
 
-    const { data: products, isLoading } = useGetProductsSelect(debouncedQuery)
+    const { data: products, isLoading } = useGetProductsSelect({
+        search: debouncedQuery,
+    })
     const results = products ?? []
 
     // Tính toán vị trí dropdown
