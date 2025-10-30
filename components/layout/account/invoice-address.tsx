@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import React, { useState } from 'react'
 import AddressForm from './address-form'
 import { useGetInvoiceAddressByUserId } from '@/features/address/hook'
+import { useTranslations } from 'next-intl'
 
 interface InvoiceAddressProps {
     userId: string
@@ -13,12 +14,16 @@ interface InvoiceAddressProps {
 
 const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
     const [openEdit, setOpenEdit] = useState<boolean>(false)
-
+    const t = useTranslations()
     const { data: address, isLoading, isError } = useGetInvoiceAddressByUserId(userId)
 
     if (isLoading) return <div>Loading addresses...</div>
-    if (isError) return <div className="text-red-500">You have not created any address for invoice. You need at least one shipping address to buy product</div>
-    if (!address) return <div className="text-red-500">You have not created any address for invoice. You need at least one shipping address to buy product</div>
+    if (isError) return <div className="text-red-500">
+        {t('noInvoiceAddress')}
+    </div>
+    if (!address) return <div className="text-red-500">
+        {t('noInvoiceAddress')}
+    </div>
 
     return (
         <Card
@@ -36,18 +41,18 @@ const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
                 <p>{address.address_line}</p>
                 <p>{address.city}</p>
                 <p>{address.country}</p>
-                {address.recipient_name && <p>Recipient: {address.recipient_name}</p>}
+                {address.recipient_name && <p>{t('recipient')}: {address.recipient_name}</p>}
                 {address.phone_number && <p>{address.phone_number}</p>}
             </CardContent>
             <CardFooter>
                 <div className="flex gap-2">
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" type='button'>Edit</Button>
+                            <Button variant="outline" size="sm" type='button'>{t("edit")}</Button>
                         </DialogTrigger>
                         <DialogContent className='lg:w-[800px]'>
                             <DialogHeader>
-                                <DialogTitle>Edit Shipping Address</DialogTitle>
+                                <DialogTitle>{t('editInvoiceAddress')}</DialogTitle>
                                 <AddressForm
                                     userId={userId}
                                     open={openEdit}

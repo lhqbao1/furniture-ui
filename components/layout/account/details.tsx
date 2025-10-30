@@ -100,7 +100,6 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
                                 <HomeIcon className="w-7 h-7" strokeWidth={1} stroke='black' />
                                 <div>
                                     <CardTitle className='text-2xl font-light'>{t('address')}</CardTitle>
-                                    <div className='uppercase text-base text-gray-500 tracking-wider'>{t('defaultAddress')}</div>
                                 </div>
                             </div>
                             <Dialog open={openAddressDialog} onOpenChange={setOpenAddressDialog}>

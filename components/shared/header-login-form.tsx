@@ -15,6 +15,8 @@ import { useLocale, useTranslations } from "next-intl"
 import { useSyncLocalCart } from "@/features/cart/hook"
 import { Switch } from "../ui/switch"
 import { useQueryClient } from "@tanstack/react-query"
+import Image from "next/image"
+import LoginGoogleButton from "./login-google-button"
 interface HeaderLoginFormProps {
     onSuccess?: () => void
 }
@@ -256,6 +258,8 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                     "NEUES KONTO ANLEGEN"
                 )}
             </Button>
+
+            <LoginGoogleButton />
         </div>
     )
 }
