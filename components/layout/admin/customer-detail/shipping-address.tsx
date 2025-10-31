@@ -69,13 +69,9 @@ const ShippingAddress = ({ userId }: ShippingAddressProps) => {
                     .sort((a, b) => (a.is_default === b.is_default ? 0 : a.is_default ? -1 : 1))
                     .map((item) => (
                         <Card key={item.id}>
-                            <CardHeader>
-                                <CardTitle>
-                                    {item.name_address} {item.is_default ? "(Default)" : ""}
-                                </CardTitle>
-                            </CardHeader>
                             <CardContent>
                                 <div className='capitalize'>{item.address_line}</div>
+                                {item.additional_address_line && <div className='capitalize'>{item.additional_address_line}</div>}
                                 <div className='capitalize'>{item.city}</div>
                                 <div className='capitalize'>{item.postal_code} - {item.country}</div>
                                 <div className='flex gap-1'>

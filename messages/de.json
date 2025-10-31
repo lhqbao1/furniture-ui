@@ -116,6 +116,7 @@
     "createInvoiceAddressFail": "Fehler beim Erstellen der Rechnungsadresse",
       "confirm": "Bestätigen",
       "addressName": "Adressname",
+      "additionalAddressLine": "Adresszusatz",
   "country": "Land",
   "recipient" : "Empfänger",
   "save": "Speichern",

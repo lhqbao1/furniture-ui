@@ -60,14 +60,9 @@ const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
             </CardHeader>
             <CardContent className='space-y-4'>
                 <Card>
-                    <CardHeader>
-                        <CardTitle>
-                            {invoiceAddress.name_address}{" "}
-                            {invoiceAddress.is_default ? "(Default)" : ""}
-                        </CardTitle>
-                    </CardHeader>
                     <CardContent>
                         <div className='capitalize'>{invoiceAddress.address_line}</div>
+                        {invoiceAddress.additional_address_line && <div className='capitalize'>{invoiceAddress.additional_address_line}</div>}
                         <div className='capitalize'>{invoiceAddress.city}</div>
                         <div className='capitalize'>
                             {invoiceAddress.postal_code} - {invoiceAddress.country}

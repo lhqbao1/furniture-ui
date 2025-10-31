@@ -78,14 +78,6 @@ const AddressList = ({ userId }: AddressListProps) => {
                         key={address.id}
                         className={cn('col-span-2 lg:col-span-1', address.is_default ? "border-secondary border-2" : "")}
                     >
-                        <CardHeader className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                {/* <RadioGroupItem value={address.id} id={address.id} /> */}
-                                <Label htmlFor={address.id} className="text-lg font-semibold">
-                                    {address.name_address}
-                                </Label>
-                            </div>
-                        </CardHeader>
                         <CardContent className="text-sm text-muted-foreground space-y-1">
                             <p>{address.address_line}</p>
                             <p>{address.city}</p>

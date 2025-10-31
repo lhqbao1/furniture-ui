@@ -15,17 +15,14 @@ import { useAtom } from 'jotai'
 import { checkOutIdAtom, paymentIdAtom } from '@/store/payment'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useLocale, useTranslations } from 'next-intl'
-// import CheckOutInvoiceAddress from '@/components/layout/checkout/invoice-address'
 import { useCartLocal } from '@/hooks/cart'
 import { useQuery } from '@tanstack/react-query'
 import { User } from '@/types/user'
 import { getUserById } from '@/features/users/api'
 import { getAddressByUserId, getInvoiceAddressByUserId } from '@/features/address/api'
 import { getCartByUserId, getCartItems } from '@/features/cart/api'
-// import { CartLocalTable } from '@/components/layout/cart/cart-local-table'
 import { useCheckMailExist, useSignUpGuess } from '@/features/auth/hook'
 import { OtpDialog } from '@/components/layout/checkout/otp-dialog'
-// import { CheckOutUserInformation } from '@/components/layout/checkout/user-information'
 import { calculateShipping, checkShippingType, normalizeCartItems } from '@/hooks/caculate-shipping'
 import BankDialog from '@/components/layout/checkout/bank-dialog'
 import dynamic from 'next/dynamic'
@@ -35,7 +32,6 @@ import { Loader2 } from 'lucide-react'
 import { Link, useRouter } from '@/src/i18n/navigation'
 import { checkoutDefaultValues, CreateOrderFormValues, CreateOrderSchema } from '@/lib/schema/checkout'
 import { mapToSupplierCarts } from '@/hooks/map-cart-to-supplier'
-import { getCart } from '@/lib/utils/cart'
 import { CartResponse } from '@/types/cart'
 const CartTable = dynamic(() => import('@/components/layout/cart/cart-table'), { ssr: false })
 const CartLocalTable = dynamic(() => import('@/components/layout/cart/cart-local-table'), { ssr: false })
@@ -294,8 +290,8 @@ export default function CheckOutPageClient() {
                         address_line: data.invoice_address_line,
                         city: data.invoice_city,
                         country: data.invoice_city,
-                        name_address: "Invoice",
-                        state: data.invoice_city
+                        state: data.invoice_city,
+                        // additional_address_line: data.additional_address_line
                     })
                     invoiceAddressId = newInvoice.id
                 } else {
@@ -313,8 +309,8 @@ export default function CheckOutPageClient() {
                                 address_line: data.invoice_address_line,
                                 city: data.invoice_city,
                                 country: data.invoice_city,
-                                name_address: "Invoice",
                                 state: data.invoice_city
+                                // additional_address_line: data.additional_address_line
                             }
                         })
                         invoiceAddressId = newInvoice.id
@@ -331,9 +327,9 @@ export default function CheckOutPageClient() {
                         address_line: data.invoice_address_line,
                         city: data.shipping_city,
                         country: data.shipping_city,
-                        name_address: "Rechnung",
                         is_default: true,
                         state: data.shipping_city
+                        // additional_address_line: data.additional_address_line
                     })
                     shippingAddressId = newShipping.id
                 } else {
@@ -350,9 +346,9 @@ export default function CheckOutPageClient() {
                             address_line: data.shipping_address_line,
                             city: data.shipping_city,
                             country: data.shipping_city,
-                            name_address: "Rechnung",
                             is_default: true,
-                            state: data.shipping_city
+                            state: data.shipping_city,
+                            // additional_address_line: data.additional_address_line
                         })
                         shippingAddressId = newShipping.id
                     }
