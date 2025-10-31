@@ -178,16 +178,18 @@ const ProductsGridLayout = ({ hasBadge, hasPagination = false, data }: ProductsG
                                                 <div className="text-base font-semibold text-black">€</div>
                                             </div>
 
-                                            <p className='text-base mb-1'>
-                                                Vorher: €{
-                                                    product?.price && product?.final_price
-                                                        ? product.final_price.toLocaleString("de-DE", {
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2
-                                                        })
-                                                        : ''
-                                                }
-                                            </p>
+                                            {
+                                                product.price && product.price > product.final_price && (
+                                                    <p className='text-base mb-1'>
+                                                        Vorher: €{
+                                                            product.price.toLocaleString("de-DE", {
+                                                                minimumFractionDigits: 2,
+                                                                maximumFractionDigits: 2
+                                                            })
+                                                        }
+                                                    </p>
+                                                )
+                                            }
                                             <div className='space-x-2 flex items-center'>
                                                 <div className='flex gap-0.5'>
                                                     {[1, 2, 3, 4, 5].map(item => {
