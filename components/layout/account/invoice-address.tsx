@@ -29,16 +29,9 @@ const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
         <Card
             className={"border-secondary border-2"}
         >
-            <CardHeader className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    {/* <RadioGroupItem value={address.id} id={address.id} /> */}
-                    <Label htmlFor={address.id} className="text-lg font-semibold">
-                        {address.name_address}
-                    </Label>
-                </div>
-            </CardHeader>
             <CardContent className="text-sm text-muted-foreground space-y-1">
                 <p>{address.address_line}</p>
+                {address.additional_address_line && <p>{address.additional_address_line}</p>}
                 <p>{address.city}</p>
                 <p>{address.country}</p>
                 {address.recipient_name && <p>{t('recipient')}: {address.recipient_name}</p>}
