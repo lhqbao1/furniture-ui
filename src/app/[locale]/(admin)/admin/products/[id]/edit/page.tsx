@@ -14,8 +14,8 @@ const ProductForm = React.lazy(() =>
     import("@/components/layout/admin/products/products-form/add-product-form")
 )
 
-const EditProductPage = ({ params }: { params: { id: string } }) => {
-    const { id } = params
+const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
+    const { id } = React.use(params)
     const router = useRouter()
     const locale = useLocale()
     const editProduct = useEditProduct()
