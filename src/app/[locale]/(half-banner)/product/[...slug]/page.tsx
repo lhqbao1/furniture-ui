@@ -20,7 +20,7 @@ export async function generateStaticParams() {
     return products.flatMap((p) =>
         locales.map((locale) => ({
             locale,
-            slug: [p.id], // Nếu có slug riêng, đổi thành [p.slug]
+            slug: [p.url_key], // Nếu có slug riêng, đổi thành [p.slug]
         }))
     )
 }
