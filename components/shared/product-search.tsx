@@ -188,7 +188,7 @@ export default function ProductSearch({
                                                         </div>
                                                     ) : (
                                                         <Link
-                                                            href={`/product${product.url_key}`}
+                                                            href={`/product/${product.url_key}`}
                                                             passHref
                                                             className="flex justify-between items-center w-full cursor-pointer"
                                                             onClick={() => {

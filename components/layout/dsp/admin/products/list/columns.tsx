@@ -367,20 +367,6 @@ function ActionsCell({ product }: { product: ProductItem }) {
             </Button>
             {/* </Link> */}
             <DeleteDialogDSP product={product} />
-            {/* <Link
-                href={`/product/${product.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                <Button variant="ghost" size="icon">
-                    <Eye className="w-4 h-4 text-secondary" />
-                </Button>
-            </Link> */}
-            {/* <Link href={`/admin/products/${product.id}/clone`}>
-                <Button variant="ghost" size="icon">
-                    <CopyCheck className="w-4 h-4 text-secondary" />
-                </Button>
-            </Link> */}
         </div>
     );
 }

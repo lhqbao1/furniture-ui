@@ -59,7 +59,9 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
 
 
     const { data: listProducts, isLoading, isError } = useGetProductsSelect();
-    const { data: listProductsSelect, isLoading: isLoadingSelect, isError: isErrorSelect } = useGetProductsSelect(queryParams);
+    const { data: listProductsSelect, isLoading: isLoadingSelect, isError: isErrorSelect } = useGetProductsSelect({
+        search: queryParams,
+    });
 
     const addOptionToProductMutation = useAddOptionToProduct();
 

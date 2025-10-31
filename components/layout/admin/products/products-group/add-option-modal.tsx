@@ -15,12 +15,7 @@ import { toast } from "sonner"
 import { useCreateVariantOption } from "@/features/variant/hook"
 import { Plus } from "lucide-react"
 import { useUploadStaticFile } from "@/features/file/hook"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDropzone } from "react-dropzone"
-import { useQuery } from "@tanstack/react-query"
-import { useFormContext } from "react-hook-form"
-import { getProductGroupDetail } from "@/features/product-group/api"
 
 interface AddImageOptionDialogProps {
     variantId: string
