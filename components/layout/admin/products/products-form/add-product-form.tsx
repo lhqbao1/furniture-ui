@@ -101,6 +101,8 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             }
         }
 
+        console.log(payload)
+
         // 🧩 Kiểm tra price > final_price
         if (
             typeof payload.price === "number" &&
