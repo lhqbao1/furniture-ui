@@ -278,9 +278,11 @@ const ProductDetails = ({ productDetailsData, productId, parentProductData }: Pr
                                                 <div className="text-base font-semibold text-black">€</div>
                                             </div>
 
-                                            <p className='text-base mb-1'>
-                                                Vorher: €{(productDetails.price ? productDetails.price : productDetails.final_price).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </p>
+                                            {productDetails.price && productDetails.price > productDetails.final_price &&
+                                                <p className='text-base mb-1'>
+                                                    Vorher: €{(productDetails.price).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </p>
+                                            }
                                         </div>
 
                                         <div className='space-y-2'>

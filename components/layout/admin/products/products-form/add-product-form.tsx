@@ -86,18 +86,29 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
             length: values.length || values.length === 0 ? values.length : undefined,
             cost: values.cost || values.cost === 0 ? values.cost : undefined,
             final_price: values.final_price ?? values.price ?? undefined,
-            price: values.price ?? values.final_price ?? undefined,
+            ...(values.price && { price: values.price }),
             stock: values.stock ?? 1,
             is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
             tag: values.tag === "" ? undefined : values.tag,
             is_active: productValuesClone ? false : (values.is_active ?? true),
         }
 
+        // 🟡 Kiểm tra điều kiện Econelo
         if (payload.is_econelo) {
             if (!payload.price || !payload.final_price) {
                 toast.error("Econelo products need both price and sale price")
                 return
             }
+        }
+
+        // 🧩 Kiểm tra price > final_price
+        if (
+            typeof payload.price === "number" &&
+            typeof payload.final_price === "number" &&
+            payload.price <= payload.final_price
+        ) {
+            toast.error("Regular price must be greater than sale price")
+            return
         }
 
         if (productValuesClone) {
