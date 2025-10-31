@@ -197,7 +197,7 @@ const SelectBundleComponent = ({ currentProduct }: SelectBundleComponentProps) =
                                                     #{product.id_provider}
                                                 </span>
                                             </div>
-                                            <Link href={`/product/${product.id}`} target="_blank">
+                                            <Link href={`/product/${product.url_key}`} target="_blank">
                                                 <Eye className="text-secondary cursor-pointer" size={18} />
                                             </Link>
                                         </div>

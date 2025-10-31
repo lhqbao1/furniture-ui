@@ -252,7 +252,7 @@ const ProductForm = ({ productValues, onSubmit, isPending, productValuesClone }:
                                 <AdminBackButton />
                                 {productValues && (
                                     <a
-                                        href={`/${locale}/product${productValues?.categories?.length ? `/${productValues.categories[0].slug}` : ''}/${productValues?.url_key}`}
+                                        href={`/${locale}/product/${productValues?.url_key}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
