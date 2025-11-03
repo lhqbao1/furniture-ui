@@ -113,8 +113,6 @@ const ProductForm = ({
       }
     }
 
-    console.log(payload);
-
     // 🧩 Kiểm tra price > final_price
     if (
       typeof payload.price === "number" &&
@@ -127,9 +125,15 @@ const ProductForm = ({
 
     if (productValuesClone) {
       // 🟢 Clone thì vẫn gọi add
+      // Bỏ marketplace_products và thêm ebay: false
       const { marketplace_products, ...cleanPayload } = payload;
 
-      addProductMutation.mutate(cleanPayload, {
+      const finalPayload = {
+        ...cleanPayload,
+        ebay: false,
+      };
+
+      addProductMutation.mutate(finalPayload, {
         onSuccess: () => {
           toast.success("Product add successfully");
           form.reset();
@@ -187,7 +191,7 @@ const ProductForm = ({
               handleSubmit(values);
             },
             (errors) => {
-              toast.error("Please check the form for errors");
+              toast.error(`Please check the form for errors ${errors}`);
               console.log(errors);
             }
           )}
