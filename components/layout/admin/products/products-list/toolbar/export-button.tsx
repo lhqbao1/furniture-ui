@@ -24,7 +24,7 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
         name: clean(p.name),
         description: clean(p.description),
         technical_description: clean(p.technical_description),
-        categories: clean(p.categories?.map((c) => c.name).join(", ")),
+        categories: clean(p.categories?.map((c) => c.code).join(", ")),
         unit: clean(p.unit),
         amount_unit: clean(p.amount_unit),
         delivery_time: clean(p.delivery_time),
