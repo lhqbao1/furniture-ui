@@ -23,60 +23,71 @@ export async function GET() {
       .filter((p) => p.final_price > 0 && p.is_active)
       .map((p) => {
         const images = p.static_files || [];
-        const largeImage = images[0]
-          ? cleanImageLink(images[0].url)
-          : "";
+        const largeImage = images[0] ? cleanImageLink(images[0].url) : "";
         const subImages = images.slice(1);
 
-        // Tạo XML cho sub images
-        const subImagesXml = subImages
-          .map(
-            (img, idx) =>
-              `  <g:sub_image_${idx + 1}>${escapeXml(
-                encodeURI(cleanImageLink(img.url))
-              )}</g:sub_image_${idx + 1}>`
-          )
-          .join("\n");
+        // Nếu có nhiều ảnh thì lấy thêm 1 ảnh làm alternate/thumbnail
+        const alternateImage = subImages[0]
+          ? cleanImageLink(subImages[0].url)
+          : largeImage;
 
-        const categories = p.categories || [];
-        const colors = p.options
-          ?.filter((opt) => opt.variant_name?.toLowerCase() === "color")
-          .map((opt) => opt.label)
-          .join(", ") || "";
+        const categories =
+          p.categories?.map((c) => c.name).join(" > ") ||
+          "General";
+        const colors =
+          p.options
+            ?.filter((opt) => opt.variant_name?.toLowerCase() === "color")
+            .map((opt) => opt.label)
+            .join(", ") || "";
 
         return `
-<item>
-  <g:id>${escapeXml(p.id_provider)}</g:id>
-  <g:title><![CDATA[${escapeCDATA(p.name.trim())}]]></g:title>
-  <g:description><![CDATA[${escapeCDATA(cleanDescription(p.description))}]]></g:description>
-  <g:large_image>${escapeXml(encodeURI(largeImage))}</g:large_image>
-${subImagesXml}
-  <g:availability>${p.stock > 0 ? "in_stock" : "out_of_stock"}</g:availability>
-  <g:price>${p.final_price.toFixed(2)} EUR</g:price>
-  <g:gtin>${escapeXml(p.ean)}</g:gtin>
-  <g:condition>new</g:condition>
-  <g:adult>no</g:adult>
-  <g:age_group>adult</g:age_group>
-  <g:is_bundle>no</g:is_bundle>
-  <g:shipping>
-    <g:country>DE</g:country>
-    <g:service>Standard</g:service>
-    <g:price>${p.carrier === "dpd" ? "5.95 EUR" : "35.95 EUR"}</g:price>
-  </g:shipping>
-  <g:shipping_label>${p.carrier === "dpd" ? "DPD" : "AMM"}</g:shipping_label>
-</item>`;
+  <product weboffer="no" preorder="no" instock="${
+    p.stock > 0 ? "yes" : "no"
+  }" forsale="${p.is_active ? "yes" : "no"}">
+    <name><![CDATA[${escapeCDATA(p.name.trim())}]]></name>
+    <pid>${escapeXml(p.id_provider || p.id)}</pid>
+    <desc><![CDATA[${escapeCDATA(cleanDescription(p.description))}]]></desc>
+    <category>${escapeXml(categories)}</category>
+    <purl>https://prestige-home.de/product/${escapeXml(p.url_key)}</purl>
+    <imgurl>${escapeXml(encodeURI(largeImage))}</imgurl>
+    <price>
+      <actualp>${p.final_price.toFixed(2)}</actualp>
+      <rrpp>${p.price.toFixed(2)}</rrpp>
+      <storep>${p.price.toFixed(2)}</storep>
+    </price>
+    <ean>${escapeXml(p.ean)}</ean>
+    <upc/>
+    <isbn/>
+    <mpn>${escapeXml(p.id_provider)}</mpn>
+    <parentpid>${escapeXml(p.parent_id ?? "")}</parentpid>
+    <brand>${escapeXml(p.brand.name ?? "Prestige Home")}</brand>
+    <colour>${escapeXml(colors)}</colour>
+    <condition>new</condition>
+    <keywords>${escapeXml(
+      [p.name, p.brand, colors].filter(Boolean).join(", ")
+    )}</keywords>
+    <lang>DE</lang>
+    <ptype>${escapeXml(p.categories?.[0]?.name || "Product")}</ptype>
+    <currency>EUR</currency>
+    <delcost>${p.carrier === "dpd" ? "5.95" : "35.95"}</delcost>
+    <deltime>${
+      p.delivery_time 
+        ? `Standard delivery in ${p.delivery_time} working days`
+        : `Standard delivery in 3-5 working days`
+    }</deltime>
+    <stockquant>${p.stock}</stockquant>
+    <alternate_image>${escapeXml(encodeURI(alternateImage))}</alternate_image>
+    <large_image>${escapeXml(encodeURI(largeImage))}</large_image>
+    <thumburl>${escapeXml(encodeURI(largeImage))}</thumburl>
+    <lastupdated>${new Date().toISOString().replace("T", " ").slice(0, 19)}</lastupdated>
+  </product>`;
       })
       .join("\n");
 
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
-  <channel>
-    <title>Prestige Home Feed</title>
-    <link>https://prestige-home.de</link>
-    <description>Product feed</description>
-    ${itemsXml}
-  </channel>
-</rss>`;
+    const xml = `<?xml version="1.0" encoding="utf-8"?>
+<merchant>
+${itemsXml}
+</merchant>`;
 
     return new Response(xml, {
       headers: {
@@ -86,7 +97,7 @@ ${subImagesXml}
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { success: false, error: "Failed to generate XML feed" },
+      { success: false, error: "Failed to generate AWIN XML feed" },
       { status: 500 }
     );
   }
