@@ -1,296 +1,345 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { FormField, FormMessage } from "@/components/ui/form"
-import { useUploadStaticFile } from "@/features/file/hook"
-import { cn } from "@/lib/utils"
-import { FileIcon, Loader2, UploadIcon } from "lucide-react"
-import Image from "next/image"
-import React, { useCallback, useEffect, useState } from "react"
-import { useDropzone } from "react-dropzone"
-import { UseFormReturn, FieldValues, Path, PathValue } from "react-hook-form"
+import { Button } from "@/components/ui/button";
+import { FormField, FormMessage } from "@/components/ui/form";
+import { useUploadStaticFile } from "@/features/file/hook";
+import { cn } from "@/lib/utils";
+import { FileIcon, Loader2, UploadIcon } from "lucide-react";
+import Image from "next/image";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { UseFormReturn, FieldValues, Path, PathValue } from "react-hook-form";
 
 import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-} from "@dnd-kit/core"
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    rectSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { StaticFileResponse } from "@/types/products"
-import { useTranslations } from "next-intl"
-import { toast } from "sonner"
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { StaticFileResponse } from "@/types/products";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 // ================== TYPES ==================
-export type ImageItem = { id: string; url: string }
+export type ImageItem = { id: string; url: string };
 
 // stable id generator
 const genId = () =>
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? (crypto as Crypto).randomUUID()
-        : Math.random().toString(36).slice(2, 9)
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? (crypto as Crypto).randomUUID()
+    : Math.random().toString(36).slice(2, 9);
 
 interface ImagePickerInputProps<T extends FieldValues> {
-    form: UseFormReturn<T>
-    fieldName: Path<T>
-    description?: string
-    isSingle?: boolean
-    className?: string
-    isSimple?: boolean
-    isFile?: boolean,
-    isAddProduct?: boolean
+  form: UseFormReturn<T>;
+  fieldName: Path<T>;
+  description?: string;
+  isSingle?: boolean;
+  className?: string;
+  isSimple?: boolean;
+  isFile?: boolean;
+  isAddProduct?: boolean;
+  is_add_product?: boolean;
 }
 
 // ================== SORTABLE ITEM ==================
 function SortableImage({
-    item,
-    onRemove,
+  item,
+  onRemove,
 }: {
-    item: ImageItem
-    onRemove: () => void
+  item: ImageItem;
+  onRemove: () => void;
 }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-        useSortable({ id: item.id })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: item.id });
 
-    const style: React.CSSProperties = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    }
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
-    return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            className="relative h-full aspect-square rounded-lg overflow-hidden group cursor-move z-0"
-        >
-            <Image
-                {...listeners}
-                src={item.url}
-                alt={`Uploaded-${item.id}`}
-                fill
-                className="object-cover z-0"
-                unoptimized
-            />
-            <button
-                type="button"
-                onClick={(e) => {
-                    e.stopPropagation()
-                    onRemove()
-                }}
-                className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-            >
-                ✕
-            </button>
-        </div>
-    )
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="relative h-full aspect-square rounded-lg overflow-hidden group cursor-move z-0"
+    >
+      <Image
+        {...listeners}
+        src={item.url}
+        alt={`Uploaded-${item.id}`}
+        fill
+        className="object-cover z-0"
+        unoptimized
+      />
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove();
+        }}
+        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+      >
+        ✕
+      </button>
+    </div>
+  );
 }
 
 // ================== MAIN COMPONENT ==================
 function ImagePickerInput<T extends FieldValues>({
-    form,
-    fieldName,
-    description,
-    isSingle = false,
-    isFile = false,
-    isAddProduct = false,
-    className,
-    isSimple,
+  form,
+  fieldName,
+  description,
+  isSingle = false,
+  isFile = false,
+  isAddProduct = false,
+  className,
+  isSimple,
+  is_add_product = false,
 }: ImagePickerInputProps<T>) {
-    const uploadImage = useUploadStaticFile()
-    const watched = form.watch(fieldName as Path<T>)
-    const t = useTranslations()
-    const [items, setItems] = useState<ImageItem[]>([])
+  const uploadImage = useUploadStaticFile();
+  const watched = form.watch(fieldName as Path<T>);
+  const t = useTranslations();
+  const [items, setItems] = useState<ImageItem[]>([]);
 
-    // Sync form value -> local state (only when multiple)
-    useEffect(() => {
-        if (!isSingle) {
-            const vals: { url: string }[] = (watched as { url: string }[]) || []
-            const normalized: ImageItem[] = vals.map((v) => ({ id: genId(), url: v.url }))
-            setItems(normalized)
-        }
-    }, [watched, isSingle])
+  // Sync form value -> local state (only when multiple)
+  useEffect(() => {
+    if (!isSingle) {
+      const vals: { url: string }[] = (watched as { url: string }[]) || [];
+      const normalized: ImageItem[] = vals.map((v) => ({
+        id: genId(),
+        url: v.url,
+      }));
+      setItems(normalized);
+    }
+  }, [watched, isSingle]);
 
-    // Upload handler
-    const onDrop = useCallback(
-        (acceptedFiles: File[]) => {
-            if (!acceptedFiles?.length) return
+  // Upload handler
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (!acceptedFiles?.length) return;
 
-            // 🔍 Check tổng số ảnh (hiện có + mới)
-            const totalImages = items.length + acceptedFiles.length
-            if (totalImages > 20) {
-                toast.error(`You can upload a maximum of 20 images per product.`)
-                return
-            }
+      // 🔍 Check tổng số ảnh (hiện có + mới)
+      const totalImages = items.length + acceptedFiles.length;
+      if (totalImages > 20) {
+        toast.error(`You can upload a maximum of 20 images per product.`);
+        return;
+      }
 
-            const formData = new FormData()
-            acceptedFiles.forEach((file) => formData.append("files", file))
+      // ⚙️ Nếu là thêm sản phẩm mới (không upload lên server)
+      //   if (is_add_product) {
+      //     const newItems = acceptedFiles.map((file) => ({
+      //       id: genId(),
+      //       file, // giữ nguyên File object
+      //       preview: URL.createObjectURL(file), // có thể thêm preview
+      //     }));
 
+      //     const next = [...items, ...newItems];
+      //     setItems(next);
 
-            uploadImage.mutate(formData, {
-                onSuccess(data: StaticFileResponse) {
-                    const uploadedUrls = data.results.map((r) => r.url)
-                    console.log(uploadedUrls)
-                    // 🔍 Kiểm tra URL có chứa khoảng trắng
-                    if (uploadedUrls.length > 20) {
-                        toast.error(`At least 20 images per product`)
-                        return
-                    }
+      //     form.setValue(
+      //       fieldName,
+      //       next.map((i) => ({ file: i.file })) as PathValue<T, Path<T>>,
+      //       { shouldValidate: true }
+      //     );
 
-                    // ✅ Tiếp tục xử lý bình thường
-                    if (isSingle) {
-                        form.setValue(fieldName, uploadedUrls[0] as PathValue<T, Path<T>>, {
-                            shouldValidate: true,
-                        })
-                    } else {
-                        const newItems = uploadedUrls.map((url) => ({ id: genId(), url }))
-                        const next = [...items, ...newItems]
-                        setItems(next)
-                        form.setValue(
-                            fieldName,
-                            next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
-                            { shouldValidate: true }
-                        )
-                    }
-                },
-            })
+      //     return; // ⛔ Dừng, không uploadImage.mutate
+      //   }
 
-        },
-        [uploadImage, isSingle, items, form, fieldName]
-    )
+      // 🚀 Nếu không phải thêm sản phẩm, upload bình thường
+      const formData = new FormData();
+      acceptedFiles.forEach((file) => formData.append("files", file));
 
-    const removeImage = (index: number) => {
-        if (isSingle) {
-            form.setValue(fieldName, "" as PathValue<T, Path<T>>, { shouldValidate: true })
-        } else {
-            const next = items.filter((_, idx) => idx !== index)
-            setItems(next)
-            form.setValue(
+      //   uploadImage.mutate(formData, {
+      //     onSuccess(data: StaticFileResponse) {
+      //       const uploadedUrls = data.results.map((r) => r.url);
+      //       if (uploadedUrls.length > 20) {
+      //         toast.error(`At least 20 images per product`);
+      //         return;
+      //       }
+
+      //       if (isSingle) {
+      //         form.setValue(fieldName, uploadedUrls[0] as PathValue<T, Path<T>>, {
+      //           shouldValidate: true,
+      //         });
+      //       } else {
+      //         const newItems = uploadedUrls.map((url) => ({ id: genId(), url }));
+      //         const next = [...items, ...newItems];
+      //         setItems(next);
+      //         form.setValue(
+      //           fieldName,
+      //           next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
+      //           { shouldValidate: true }
+      //         );
+      //       }
+      //     },
+      //   });
+    },
+    [uploadImage, isSingle, items, form, fieldName, is_add_product]
+  );
+
+  const removeImage = (index: number) => {
+    if (isSingle) {
+      form.setValue(fieldName, "" as PathValue<T, Path<T>>, {
+        shouldValidate: true,
+      });
+    } else {
+      const next = items.filter((_, idx) => idx !== index);
+      setItems(next);
+      form.setValue(
+        fieldName,
+        next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
+        { shouldValidate: true }
+      );
+    }
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: isFile ? undefined : { "image/*": [] },
+    multiple: !isSingle,
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  return (
+    <div className={cn("col-span-12 grid grid-cols-12 gap-4", className)}>
+      {/* Dropzone */}
+      <div
+        {...getRootProps()}
+        className={`h-full w-full border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center space-y-4 transition-colors cursor-pointer
+          ${
+            isDragActive
+              ? "border-primary bg-primary/5"
+              : "border-gray-300 dark:border-gray-700"
+          } ${isAddProduct ? "col-span-3" : "col-span-12"}`}
+      >
+        {uploadImage.isPending ? (
+          <Loader2
+            className={cn(
+              "w-12 h-12 text-gray-400 animate-spin",
+              isSimple && "w-6 h-6"
+            )}
+          />
+        ) : (
+          <UploadIcon
+            className={cn("w-12 h-12 text-gray-400", isSimple && "w-6 h-6")}
+          />
+        )}
+        {!isSimple && (
+          <>
+            <div className="text-gray-500 dark:text-gray-400 text-center">
+              {isDragActive ? (
+                <div>{t("dragFile")}</div>
+              ) : (
+                <div>{t("dragAndDropFile")}</div>
+              )}
+            </div>
+            {description && (
+              <p className="text-gray-500 text-sm text-center">{description}</p>
+            )}
+          </>
+        )}
+
+        <Button variant="outline" type="button">
+          {t("browseFile")}
+        </Button>
+        <input {...getInputProps()} className="hidden" multiple />
+      </div>
+
+      {/* Preview */}
+      {isSingle ? (
+        watched ? (
+          <div className="col-span-6 relative h-[100px] w-[100px] aspect-square rounded-lg group">
+            {isFile ? (
+              <>
+                <FileIcon className="w-8 h-8 text-gray-500" />
+                <span className="text-xs truncate max-w-[90px]">
+                  {String(watched).split("/").pop()}
+                </span>
+              </>
+            ) : (
+              <Image
+                src={watched as string}
+                alt="Uploaded"
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => removeImage(0)}
+              className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+            >
+              ✕
+            </button>
+          </div>
+        ) : null
+      ) : items.length > 0 ? (
+        <div
+          className={`overflow-y-scroll ${
+            isAddProduct ? "col-span-9" : "col-span-12"
+          }`}
+        >
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={({ active, over }) => {
+              if (!over || active.id === over.id) return;
+              const oldIndex = items.findIndex((it) => it.id === active.id);
+              const newIndex = items.findIndex((it) => it.id === over.id);
+              if (oldIndex === -1 || newIndex === -1) return;
+              const next = arrayMove(items, oldIndex, newIndex);
+              setItems(next);
+              form.setValue(
                 fieldName,
                 next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
                 { shouldValidate: true }
-            )
-        }
-    }
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: isFile ? undefined : { "image/*": [] },
-        multiple: !isSingle,
-    })
-
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-    )
-
-    return (
-        <div className={cn("col-span-12 grid grid-cols-12 gap-4", className)}>
-            {/* Dropzone */}
-            <div
-                {...getRootProps()}
-                className={`h-full w-full border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center space-y-4 transition-colors cursor-pointer
-          ${isDragActive ? "border-primary bg-primary/5" : "border-gray-300 dark:border-gray-700"} ${isAddProduct ? 'col-span-3' : 'col-span-12'}`}
+              );
+            }}
+          >
+            <SortableContext
+              items={items.map((i) => i.id)}
+              strategy={rectSortingStrategy}
             >
-                {uploadImage.isPending ? (
-                    <Loader2
-                        className={cn("w-12 h-12 text-gray-400 animate-spin", isSimple && "w-6 h-6")}
+              <div className="w-full h-[144px] grid grid-cols-4 gap-8">
+                {items.map((it, idx) => (
+                  <div key={it.id} className="w-full col-span-1">
+                    <SortableImage
+                      item={it}
+                      onRemove={() => removeImage(idx)}
                     />
-                ) : (
-                    <UploadIcon
-                        className={cn("w-12 h-12 text-gray-400", isSimple && "w-6 h-6")}
-                    />
-                )}
-                {!isSimple && (
-                    <>
-                        <div className="text-gray-500 dark:text-gray-400 text-center">
-                            {isDragActive ? <div>{t("dragFile")}</div> : <div>{t("dragAndDropFile")}</div>}
-                        </div>
-                        {description && (
-                            <p className="text-gray-500 text-sm text-center">{description}</p>
-                        )}
-                    </>
-                )}
-
-                <Button variant="outline" type="button">
-                    {t("browseFile")}
-                </Button>
-                <input {...getInputProps()} className="hidden" multiple />
-            </div>
-
-            {/* Preview */}
-            {isSingle ? (
-                watched ? (
-                    <div className="col-span-6 relative h-[100px] w-[100px] aspect-square rounded-lg group">
-                        {isFile ? (
-                            <>
-                                <FileIcon className="w-8 h-8 text-gray-500" />
-                                <span className="text-xs truncate max-w-[90px]">
-                                    {String(watched).split("/").pop()}
-                                </span>
-                            </>
-                        ) : <Image
-                            src={watched as string}
-                            alt="Uploaded"
-                            fill
-                            className="object-cover"
-                            unoptimized
-                        />
-                        }
-                        <button
-                            type="button"
-                            onClick={() => removeImage(0)}
-                            className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                ) : null
-            ) : items.length > 0 ? (
-                <div className={`overflow-y-scroll ${isAddProduct ? 'col-span-9' : 'col-span-12'}`}>
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={({ active, over }) => {
-                            if (!over || active.id === over.id) return
-                            const oldIndex = items.findIndex((it) => it.id === active.id)
-                            const newIndex = items.findIndex((it) => it.id === over.id)
-                            if (oldIndex === -1 || newIndex === -1) return
-                            const next = arrayMove(items, oldIndex, newIndex)
-                            setItems(next)
-                            form.setValue(
-                                fieldName,
-                                next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
-                                { shouldValidate: true }
-                            )
-                        }}
-                    >
-                        <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
-                            <div className="w-full h-[144px] grid grid-cols-4 gap-8">
-                                {items.map((it, idx) => (
-                                    <div key={it.id} className="w-full col-span-1">
-                                        <SortableImage item={it} onRemove={() => removeImage(idx)} />
-                                    </div>
-                                ))}
-                            </div>
-                        </SortableContext>
-                    </DndContext>
-                </div>
-            ) : null}
-
-            {/* Hidden field for errors */}
-            <FormField control={form.control} name={fieldName} render={() => <FormMessage />} />
+                  </div>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
-    )
+      ) : null}
+
+      {/* Hidden field for errors */}
+      <FormField
+        control={form.control}
+        name={fieldName}
+        render={() => <FormMessage />}
+      />
+    </div>
+  );
 }
 
-export default ImagePickerInput
+export default ImagePickerInput;
