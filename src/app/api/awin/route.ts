@@ -51,16 +51,14 @@ export async function GET() {
     <purl>https://prestige-home.de/product/${escapeXml(p.url_key)}</purl>
     <imgurl>${escapeXml(encodeURI(largeImage))}</imgurl>
     <price>
-      <actualp>${p.final_price.toFixed(2)}</actualp>
-      <rrpp>${p.price.toFixed(2)}</rrpp>
-      <storep>${p.price.toFixed(2)}</storep>
+      ${p.final_price.toFixed(2)}
     </price>
     <ean>${escapeXml(p.ean)}</ean>
     <upc/>
     <isbn/>
     <mpn>${escapeXml(p.id_provider)}</mpn>
     <parentpid>${escapeXml(p.parent_id ?? "")}</parentpid>
-    <brand>${escapeXml(p.brand.name ?? "Prestige Home")}</brand>
+    <brand>${escapeXml(p.brand ? p.brand.name : "Prestige Home")}</brand>
     <colour>${escapeXml(colors)}</colour>
     <condition>new</condition>
     <keywords>${escapeXml(
