@@ -161,30 +161,30 @@ function ImagePickerInput<T extends FieldValues>({
       const formData = new FormData();
       acceptedFiles.forEach((file) => formData.append("files", file));
 
-      //   uploadImage.mutate(formData, {
-      //     onSuccess(data: StaticFileResponse) {
-      //       const uploadedUrls = data.results.map((r) => r.url);
-      //       if (uploadedUrls.length > 20) {
-      //         toast.error(`At least 20 images per product`);
-      //         return;
-      //       }
+      uploadImage.mutate(formData, {
+        onSuccess(data: StaticFileResponse) {
+          const uploadedUrls = data.results.map((r) => r.url);
+          if (uploadedUrls.length > 20) {
+            toast.error(`At least 20 images per product`);
+            return;
+          }
 
-      //       if (isSingle) {
-      //         form.setValue(fieldName, uploadedUrls[0] as PathValue<T, Path<T>>, {
-      //           shouldValidate: true,
-      //         });
-      //       } else {
-      //         const newItems = uploadedUrls.map((url) => ({ id: genId(), url }));
-      //         const next = [...items, ...newItems];
-      //         setItems(next);
-      //         form.setValue(
-      //           fieldName,
-      //           next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
-      //           { shouldValidate: true }
-      //         );
-      //       }
-      //     },
-      //   });
+          if (isSingle) {
+            form.setValue(fieldName, uploadedUrls[0] as PathValue<T, Path<T>>, {
+              shouldValidate: true,
+            });
+          } else {
+            const newItems = uploadedUrls.map((url) => ({ id: genId(), url }));
+            const next = [...items, ...newItems];
+            setItems(next);
+            form.setValue(
+              fieldName,
+              next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
+              { shouldValidate: true }
+            );
+          }
+        },
+      });
     },
     [uploadImage, isSingle, items, form, fieldName, is_add_product]
   );
