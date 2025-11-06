@@ -97,7 +97,7 @@ export type StaticFile = {
 
   export type MarketplaceProduct = {
     marketplace: string
-    marketplace_offer_id: string
+    marketplace_offer_id?: string
     name: string
     description: string
     final_price: number
