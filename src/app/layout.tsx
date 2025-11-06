@@ -1,39 +1,39 @@
 import type { Metadata } from "next";
 import { Figtree, Libre_Caslon_Display } from "next/font/google";
 import "./globals.css";
-import Providers from "./provider";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
+import { QueryProvider } from "@/lib/query-provider";
 
 const figtree = Figtree({
-    subsets: ["latin"],
-    variable: "--font-figtree",
+  subsets: ["latin"],
+  variable: "--font-figtree",
 });
 
 const libre = Libre_Caslon_Display({
-    subsets: ["latin"],
-    weight: '400',
-    variable: "--font-libre",
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-libre",
 });
 
 export const metadata: Metadata = {
-    title: 'Prestige Home',
-    description: 'Prestige Home',
-    icons: {
-        icon: '/favicon.ico',
-        apple: '/favicon.ico',
-    },
+  title: "Prestige Home",
+  description: "Prestige Home",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="de">
-            <head>
-                {/* <Script
+  return (
+    <html lang="de">
+      <head>
+        {/* <Script
                     id="GTM"
                     dangerouslySetInnerHTML={{
                         __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -46,58 +46,64 @@ export default function RootLayout({
                     async
                 /> */}
 
-                <Script
-                    src="https://www.googletagmanager.com/gtag/js?id=AW-17548008377"
-                    async
-                />
-                <Script
-                    id="gtag-base"
-                    strategy="afterInteractive"
-                >
-                    {`
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17548008377"
+          async
+        />
+        <Script id="gtag-base" strategy="afterInteractive">
+          {`
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}
                         gtag('js', new Date());
                         gtag('config', 'AW-17548008377');
                     `}
-                </Script>
-                <Script id="google-ads-conversion" strategy="afterInteractive">
-                    {`
+        </Script>
+        <Script id="google-ads-conversion" strategy="afterInteractive">
+          {`
                         gtag('event', 'conversion', {
                         'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
                         'transaction_id': ''
                         });
                     `}
-                </Script>
+        </Script>
 
-                <Script
-                    id="usercentrics-autoblocker"
-                    src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
-                    async
-                />
-                <Script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="RlDaintBne_uoh" async strategy="afterInteractive" />
-            </head>
-            <body className={`${figtree.variable} ${libre.variable} font-sans antialiased`}>
-                {/* Google Tag Manager (noscript) */}
-                <noscript>
-                    <iframe
-                        src="https://www.googletagmanager.com/ns.html?id=GTM-WKVQP2QH"
-                        height="0"
-                        width="0"
-                        style={{ display: "none", visibility: "hidden" }}
-                    ></iframe>
-                </noscript>
-                <Providers>{children}</Providers>
-                <Toaster
-                    expand
-                    richColors
-                    position="top-right"
-                    closeButton
-                    toastOptions={{
-                        className: "bg-[rgba(81,190,140,0.2)] text-white z-100 top-10 translate-y-10",
-                    }}
-                />
-            </body>
-        </html >
-    );
+        <Script
+          id="usercentrics-autoblocker"
+          src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
+          async
+        />
+        <Script
+          id="usercentrics-cmp"
+          src="https://web.cmp.usercentrics.eu/ui/loader.js"
+          data-settings-id="RlDaintBne_uoh"
+          async
+          strategy="afterInteractive"
+        />
+      </head>
+      <body
+        className={`${figtree.variable} ${libre.variable} font-sans antialiased`}
+      >
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-WKVQP2QH"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          ></iframe>
+        </noscript>
+        <QueryProvider>{children}</QueryProvider>
+        <Toaster
+          expand
+          richColors
+          position="top-right"
+          closeButton
+          toastOptions={{
+            className:
+              "bg-[rgba(81,190,140,0.2)] text-white z-100 top-10 translate-y-10",
+          }}
+        />
+      </body>
+    </html>
+  );
 }

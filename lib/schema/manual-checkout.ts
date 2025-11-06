@@ -12,10 +12,13 @@ export const ManualCreateOrderSchema = z.object({
   address: z.string().min(1, { message: "Address is required" }),
   city: z.string().min(1, { message: "City is required" }),
   postal_code: z.string().min(1, { message: "Postal code is required" }),
+  additional_address: z.string().optional(),
 
   invoice_address: z.string().optional(),
   invoice_city: z.string().optional(),
   invoice_postal_code: z.string().optional(),
+  invoice_additional_address: z.string().optional(),
+
 
   from_marketplace: z.string().optional(),
   marketplace_order_id: z.string().optional().nullable(),

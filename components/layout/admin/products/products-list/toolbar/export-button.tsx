@@ -48,6 +48,18 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
         SEO_keywords: clean(p.meta_keywords),
         materials: clean(p.materials),
         color: clean(p.color),
+        log_height: clean(
+          p.packages?.reduce((sum, pkg) => sum + (pkg.height || 0), 0)
+        ),
+        log_width: clean(
+          p.packages?.reduce((sum, pkg) => sum + (pkg.width || 0), 0)
+        ),
+        log_length: clean(
+          p.packages?.reduce((sum, pkg) => sum + (pkg.length || 0), 0)
+        ),
+        log_weight: clean(
+          p.packages?.reduce((sum, pkg) => sum + (pkg.weight || 0), 0)
+        ),
       }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
