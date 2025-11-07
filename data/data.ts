@@ -625,6 +625,7 @@ export const invoiceData = {
     { label: "Slate", value: "Schiefer" },
     { label: "Mint Cream", value: "Minzcreme" },
     { label: "Lavender Blush", value: "Lavendelrosa" },
+    { label: "Anthracite", value: "Anthrazit" },
   ]
   
   
