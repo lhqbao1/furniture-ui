@@ -84,6 +84,9 @@ const Footer = () => {
           <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/shipping-and-delivery`}>{t("shippingPolicy")}</Link>
           </li>
+          <li className="hover:pl-2 transition-all duration-500">
+            <Link href={`/payment-terms`}>{t("paymentTerms")}</Link>
+          </li>
 
           <li className="hover:pl-2 transition-all duration-500">
             <Link

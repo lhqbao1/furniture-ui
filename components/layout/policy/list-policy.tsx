@@ -65,6 +65,8 @@ const ListPolicy = ({
         (path?.includes("agb") && name.includes("agb")) ||
         (path?.includes("impressum") && name.includes("impressum")) ||
         (path?.includes("cancellation") && name.includes("widerruf")) ||
+        (path?.includes("payment-terms") &&
+          name.includes("zahlungsbedingungen")) ||
         (path?.includes("shipping-and-delivery") &&
           name.includes("versandbedingungen")) ||
         (path?.includes("privacy-policy") && name.includes("datenschutzer"))
@@ -125,6 +127,12 @@ const ListPolicy = ({
                             .toLowerCase()
                             .includes("versandbedingungen"):
                             router.push("/shipping-and-delivery", { locale });
+                            break;
+
+                          case item.name
+                            .toLowerCase()
+                            .includes("zahlungsbedingungen"):
+                            router.push("/payment-terms", { locale });
                             break;
 
                           case item.name.toLowerCase().includes("widerruf"):
