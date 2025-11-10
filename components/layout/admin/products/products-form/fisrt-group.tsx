@@ -18,6 +18,9 @@ import { Label } from "@/components/ui/label";
 import dynamic from "next/dynamic";
 import { tags } from "@/data/data";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 // import RichEditor dynamically to avoid SSR issues
 const RichEditor = dynamic(
@@ -44,6 +47,62 @@ const ProductDetailInputs = ({
 }: ProductDetailInputsProps) => {
   const form = useFormContext();
   const bundles = form.watch("bundles");
+
+  function sanitizeFolderName(name: string) {
+    return name
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") // loại ký tự không hợp lệ trong tên file
+      .replace(/\s+/g, "_") // đổi khoảng trắng thành _
+      .trim();
+  }
+
+  const handleDownloadZip = async () => {
+    // Lấy dữ liệu realtime từ form
+    const { name, id_provider, static_files } = form.watch();
+
+    if (!name || !static_files?.length) {
+      toast.error("No product selected or no images available");
+      return;
+    }
+
+    const zip = new JSZip();
+    toast.loading("Preparing images...");
+
+    try {
+      // Tên folder dựa trên provider ID và product name
+      const folderName = `${id_provider || "unknown"}-${sanitizeFolderName(
+        name
+      )}`;
+      const folder = zip.folder(folderName);
+
+      let totalCount = 0;
+
+      for (const [index, file] of (static_files || []).entries()) {
+        try {
+          const response = await fetch(file.url);
+          if (!response.ok) throw new Error("Failed to fetch");
+
+          const blob = await response.blob();
+          const ext =
+            file.url
+              .match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)?.[1]
+              ?.toLowerCase() || "jpg";
+          const filename = `image_${index + 1}.${ext}`;
+
+          folder?.file(filename, blob);
+          totalCount++;
+        } catch (error) {
+          console.error("Error downloading image:", file.url, error);
+        }
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      saveAs(zipBlob, `${folderName}.zip`);
+      toast.success(`Downloaded ${totalCount} images`);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to download images");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -297,8 +356,15 @@ const ProductDetailInputs = ({
 
       {/*Product Images */}
       <div className="flex flex-col gap-4">
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-3 items-center justify-between">
           <p className="text-black font-semibold text-sm">Image</p>
+          <Button
+            type="button"
+            variant={"secondary"}
+            onClick={() => handleDownloadZip()}
+          >
+            Download images
+          </Button>
         </div>
         <ImagePickerInput
           form={form}
