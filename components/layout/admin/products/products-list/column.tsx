@@ -19,6 +19,14 @@ import { useLocale } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getProductById } from "@/features/products/api";
+import { useGetSuppliers } from "@/features/supplier/hook";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
@@ -245,6 +253,86 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
           ) : (
             <div className="text-right">updating</div>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditTableSupplierCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState("");
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const { data: suppliers, isLoading, isError } = useGetSuppliers();
+
+  const handleEditSupplier = (owner_id: string) => {
+    console.log(product);
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          owner_id: owner_id,
+          ...(product.categories?.length
+            ? { category_ids: product.categories.map((c) => c.id) }
+            : {}),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Supplier updated successfully");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update failed");
+        },
+      }
+    );
+  };
+
+  return (
+    <div className="flex justify-end text-right w-full">
+      {editing ? (
+        <Select
+          value={value.toString()}
+          onValueChange={(val) => {
+            setValue(val);
+            handleEditSupplier(val); // gọi mutation ngay khi chọn xong
+          }}
+          disabled={EditProductMutation.isPending || isLoading}
+        >
+          <SelectTrigger
+            placeholderColor
+            className={cn(
+              "w-36",
+              EditProductMutation.isPending && "cursor-wait"
+            )}
+          >
+            <SelectValue
+              placeholder={isLoading ? "Loading..." : "Select supplier"}
+            />
+          </SelectTrigger>
+          <SelectContent className="border">
+            {suppliers?.map((s) => (
+              <SelectItem key={s.id} value={s.id.toString()}>
+                {s.business_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+          {product.owner ? product.owner.business_name : "Prestige Home"}
         </div>
       )}
     </div>
@@ -588,9 +676,7 @@ export const getProductColumns = (
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          {row.original.owner?.business_name
-            ? row.original.owner?.business_name
-            : "Prestige Home"}
+          <EditTableSupplierCell product={row.original} />
         </div>
       );
     },

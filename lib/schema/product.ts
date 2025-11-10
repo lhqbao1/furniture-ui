@@ -114,6 +114,7 @@ export const addProductSchema = z.object({
   is_bundle: z.boolean().optional().nullable(),
 
   is_econelo: z.boolean().optional().nullable(),
+  owner_id: z.string().optional().nullable()
 })
 
 
