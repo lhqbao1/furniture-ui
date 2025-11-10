@@ -65,13 +65,11 @@ export async function GET() {
     )
     .map((p) => {
         const categories = p.categories || [];
-       
 
         const colors = p.options
           .filter((opt) => opt.variant_name?.toLowerCase() === "color")
           .map((opt) => opt.label)
           .join(", ");
-
         return `
 <item>
   <g:id>${escapeXml(p.id_provider)}</g:id>
