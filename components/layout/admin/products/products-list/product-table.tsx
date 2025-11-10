@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CustomPagination } from "@/components/shared/custom-pagination";
-import React from "react";
+import React, { useState } from "react";
 import { CheckOut } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
 import { getDeliveryOrderColumns } from "@/components/layout/cart/columns";
@@ -67,6 +67,7 @@ export function ProductTable<TData, TValue>({
     { id: "updated_at", desc: true }, // mặc định sort theo updated_at giảm dần
   ]);
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
     data,
@@ -75,12 +76,14 @@ export function ProductTable<TData, TValue>({
     state: {
       pagination: { pageIndex: page - 1, pageSize },
       sorting,
+      rowSelection, // ✅ state lưu selection ở đây
     },
     manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     manualSorting: true,
+    onRowSelectionChange: setRowSelection, // ✅ cập nhật khi người dùng click
     meta: {
       expandedRowId,
       setExpandedRowId,
