@@ -51,6 +51,10 @@ export const marketPlaceSchema = z.object({
 const bundleSchema = z.object({
   product_id: z.string().min(1, { message: "Bundle product ID is required" }),
   quantity: z.number().min(1, { message: "Quantity must be at least 1" }),
+  length: z.number().optional().nullable(),
+  width: z.number().optional().nullable(),
+  height: z.number().optional().nullable(),
+  weight: z.number().optional().nullable(),
 })
 
 

@@ -203,8 +203,7 @@ const SyncToEbayForm = ({
                 imageUrls:
                   product.static_files?.map((file) =>
                     file.url.replace(/\s+/g, "%20")
-                  ) ?? // Đổi khoảng trắng thành %20
-                  [],
+                  ) ?? [],
                 ean: product.ean ? [product.ean] : [],
               },
               carrier: product.carrier,
@@ -216,14 +215,11 @@ const SyncToEbayForm = ({
                 max_stock: ebayData.max_stock,
               }),
             };
+
             syncToEbayMutation.mutate(payload, {
               onSuccess(data, variables, context) {
-                toast.success("Update data to ebay successfully");
                 setUpdating(false);
                 setOpen(false);
-              },
-              onError(error, variables, context) {
-                toast.error("Update data to ebay fail");
               },
             });
           }
@@ -253,22 +249,17 @@ const SyncToEbayForm = ({
               }),
               marketplace_offer_id: kauflandData?.marketplace_offer_id,
             };
+
+            // Hiển thị toast loading
+            const toastId = toast.loading("Syncing data to Kaufland...");
+
             syncToKauflandMutation.mutate(payload, {
               onSuccess(data, variables, context) {
-                toast.success("Update data to kaufland successfully");
                 setUpdating(false);
                 setOpen(false);
               },
-              onError(error, variables, context) {
-                toast.error("Update data to kaufland fail");
-              },
             });
           }
-          toast.success(
-            isUpdating
-              ? "Marketplace data updated successfully"
-              : "Marketplace data created successfully"
-          );
         },
         onError() {
           toast.error("Failed to update marketplace data");

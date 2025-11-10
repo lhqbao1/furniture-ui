@@ -72,6 +72,7 @@ const ProductLogisticsGroup = ({
       width: b?.width ?? null,
       weight: b?.weight ?? null,
     }));
+
     console.log(bundleItems);
     console.log(filledPackages);
 
