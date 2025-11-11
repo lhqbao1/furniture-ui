@@ -311,5 +311,8 @@
     "haveQuestion": "Haben Sie eine Frage?",
   "justAsk": "Fragen Sie einfach!",
   "shippingPolicy": "Liefer- und Versandbedingungen",
-    "paymentTerms": "Zahlungsbedingungen"
+    "paymentTerms": "Zahlungsbedingungen",
+    "resendOtp": "OTP erneut senden",
+  "resendOtpDes": "Senden Sie den OTP-Code erneut an Ihre E-Mail/Ihre Telefonnummer",
+  "resendIn": "Erneut senden in"
 }

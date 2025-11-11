@@ -267,7 +267,6 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
   const { data: suppliers, isLoading, isError } = useGetSuppliers();
 
   const handleEditSupplier = (owner_id: string) => {
-    console.log(product);
     EditProductMutation.mutate(
       {
         input: {
@@ -314,13 +313,13 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
           <SelectTrigger
             placeholderColor
             className={cn(
-              "w-36",
+              "w-36 border",
               EditProductMutation.isPending && "cursor-wait"
             )}
           >
-            <SelectValue
+            {/* <SelectValue
               placeholder={isLoading ? "Loading..." : "Select supplier"}
-            />
+            /> */}
           </SelectTrigger>
           <SelectContent className="border">
             {suppliers?.map((s) => (

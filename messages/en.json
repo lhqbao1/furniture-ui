@@ -316,5 +316,8 @@
   "haveQuestion": "Have a question?",
   "justAsk": "Just ask!",
       "shippingPolicy": "Delivery and Shipping Terms",
-  "paymentTerms": "Payment Terms"
+  "paymentTerms": "Payment Terms",
+    "resendOtp": "Resend OTP",
+  "resendOtpDes": "Send the OTP again to your email/phone",
+  "resendIn": "Resend in"
 }

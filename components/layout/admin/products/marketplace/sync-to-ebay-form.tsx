@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { email, z } from "zod";
 import {
   Form,
   FormField,
@@ -119,6 +119,12 @@ const SyncToEbayForm = ({
   }, [marketplace, form]);
 
   const onSubmit = (values: MarketPlaceFormValues) => {
+    console.log(product);
+    if (!product.brand) {
+      toast.error("Brand is missing from current product");
+      return;
+    }
+
     setUpdating(true);
     setOpen(true);
     const normalizedValues: MarketplaceProduct = {
@@ -248,11 +254,14 @@ const SyncToEbayForm = ({
                 max_stock: kauflandData.max_stock,
               }),
               marketplace_offer_id: kauflandData?.marketplace_offer_id,
+              brand: {
+                address: product.brand.company_address,
+                email: product.brand.company_email,
+                name: product.brand.name,
+              },
             };
 
             // Hiển thị toast loading
-            const toastId = toast.loading("Syncing data to Kaufland...");
-
             syncToKauflandMutation.mutate(payload, {
               onSuccess(data, variables, context) {
                 setUpdating(false);

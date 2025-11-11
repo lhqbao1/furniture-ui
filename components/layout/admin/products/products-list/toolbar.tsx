@@ -41,6 +41,7 @@ interface TableToolbarProps {
   // showAll: boolean
   // setShowAll: React.Dispatch<React.SetStateAction<boolean>>
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
   setSearchQuery?: React.Dispatch<React.SetStateAction<string>>;
   addButtonText?: string;
   isAddButtonModal?: boolean;
@@ -57,6 +58,7 @@ export default function TableToolbar({
   searchQuery,
   pageSize,
   setPageSize,
+  setPage,
   showAll,
   setShowAll,
   setSearchQuery,
@@ -82,8 +84,21 @@ export default function TableToolbar({
   useEffect(() => {
     if (debouncedValue !== searchQuery && setSearchQuery) {
       setSearchQuery(debouncedValue);
+      setPage(1);
+
+      // 🔹 Cập nhật URL
+      router.push(
+        {
+          pathname: "/admin/products/list",
+          query: {
+            page: 1,
+            // search: debouncedValue || undefined, // thêm search nếu có
+          },
+        },
+        { scroll: false }
+      ); // không scroll lên đầu
     }
-  }, [debouncedValue, searchQuery, setSearchQuery]);
+  }, [debouncedValue, searchQuery, setSearchQuery, router]);
 
   const handleDownloadZip = async () => {
     if (!exportData?.length) {

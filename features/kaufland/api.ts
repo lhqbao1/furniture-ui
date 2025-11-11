@@ -1,5 +1,11 @@
 import { apiAdmin, apiPublic } from "@/lib/axios"
 
+interface KauflandBrandInput {
+  name: string | null
+  email: string | null
+  address: string | null
+}
+
 export interface syncToKauflandInput {
     ean:string
     title: string
@@ -13,6 +19,7 @@ export interface syncToKauflandInput {
     product_id: string
     min_stock?: number
     max_stock?: number
+    brand: KauflandBrandInput
 }
 export async function syncToKaufland(input: syncToKauflandInput) {
   const { data } = await apiAdmin.post(

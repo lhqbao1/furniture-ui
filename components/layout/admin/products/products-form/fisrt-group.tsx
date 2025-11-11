@@ -47,6 +47,7 @@ const ProductDetailInputs = ({
 }: ProductDetailInputsProps) => {
   const form = useFormContext();
   const bundles = form.watch("bundles");
+  const listImages = form.watch("static_files");
 
   function sanitizeFolderName(name: string) {
     return name
@@ -266,41 +267,7 @@ const ProductDetailInputs = ({
       {/*Product price fields */}
       <ProductPricingFields isDsp={isDSP} />
 
-      <div className="grid grid-cols-12 gap-6">
-        {/* <div className="col-span-3">
-                    <FormField
-                        control={form.control}
-                        name="delivery_multiple"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className='text-black font-semibold text-sm'>Delivery Type</FormLabel>
-                                <FormControl>
-                                    <RadioGroup
-                                        onValueChange={(value) => field.onChange(value === "true")}
-                                        value={field.value ? "true" : "false"}
-                                        className="flex flex-col gap-4"
-                                    >
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="true" id="multiple" />
-                                            <FormLabel htmlFor="multiple" className="font-normal">
-                                                Multiple time
-                                            </FormLabel>
-                                        </div>
-
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="false" id="single" />
-                                            <FormLabel htmlFor="single" className="font-normal">
-                                                Single time
-                                            </FormLabel>
-                                        </div>
-                                    </RadioGroup>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div> */}
-      </div>
+      <div className="grid grid-cols-12 gap-6"></div>
 
       {/*Product VAT */}
       <FormField
@@ -363,7 +330,7 @@ const ProductDetailInputs = ({
             variant={"secondary"}
             onClick={() => handleDownloadZip()}
           >
-            Download images
+            Download images ({listImages.length})
           </Button>
         </div>
         <ImagePickerInput
