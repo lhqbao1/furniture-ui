@@ -105,6 +105,11 @@ function SyncToMarketplace({
   };
 
   const handleSync = () => {
+    if (!product.brand) {
+      toast.error("Brand is missing from current product");
+      return;
+    }
+
     if (marketplace === "ebay") {
       const payload: syncToEbayInput = {
         sku: product.sku,
@@ -142,6 +147,11 @@ function SyncToMarketplace({
         carrier: product.carrier,
         sku: product.sku,
         product_id: product.id,
+        brand: {
+          address: product.brand.company_address,
+          email: product.brand.company_email,
+          name: product.brand.name,
+        },
       };
 
       syncToKauflandMutation.mutate(payload, {

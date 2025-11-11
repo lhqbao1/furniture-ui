@@ -21,6 +21,7 @@ import { useSyncLocalCart } from "@/features/cart/hook";
 import { useCartLocal } from "@/hooks/cart";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import LoginGoogleButton from "@/components/shared/login-google-button";
+import ResendOtp from "../auth/resend-otp";
 
 interface CartLoginFormProps {
   onSuccess?: () => void;
@@ -265,6 +266,15 @@ export default function CartLoginForm({
             >
               {t("continueAsGuest")}
             </Button>
+
+            {seePassword && (
+              <ResendOtp
+                username={form.getValues("username")}
+                isAdmin={false}
+                sendOtpMutation={sendOtpMutation}
+                initialCountdown={60}
+              />
+            )}
           </div>
         </form>
       </Form>
