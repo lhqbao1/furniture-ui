@@ -380,7 +380,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
 
         onError(error) {
           const message =
-            error.response?.data?.detail?.errors?.[0]?.message ??
+            // error.response?.data?.detail?.errors?.[0]?.message ??
             "Fail to sync to Ebay";
           toast.error(message);
         },
@@ -460,6 +460,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
           ...product,
           is_active: !product.is_active,
           category_ids: product.categories.map((c) => c.id), // map ra id array
+          brand_id: product.brand.id,
           bundles:
             product.bundles && product.bundles.length > 0
               ? product.bundles.map((item) => ({

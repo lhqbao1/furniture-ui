@@ -23,16 +23,16 @@ export interface syncToEbayInput {
     brand: string
 }
 export async function syncToEbay(input: syncToEbayInput) {
-  const { data } = await apiAdmin.post(
-    "/ebay/publish",
-    input,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
-  return data
+  const { data, status } = await apiAdmin.post("/ebay/publish", input, {
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (status >= 400) {
+    // Throw một lỗi để React Query gọi onError
+    throw new Error(data?.message || "Failed to sync to eBay");
+  }
+
+  return data;
 }
 
 export async function removeFromEbay(sku: string){

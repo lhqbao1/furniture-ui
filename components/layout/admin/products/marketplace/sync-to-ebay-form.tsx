@@ -119,7 +119,6 @@ const SyncToEbayForm = ({
   }, [marketplace, form]);
 
   const onSubmit = (values: MarketPlaceFormValues) => {
-    console.log(product);
     if (!product.brand) {
       toast.error("Brand is missing from current product");
       return;
@@ -187,7 +186,9 @@ const SyncToEbayForm = ({
                 })),
               }
             : { bundles: [] }),
+          brand_id: product.brand.id,
         },
+
         id: product.id,
       },
       {
@@ -222,12 +223,7 @@ const SyncToEbayForm = ({
               }),
             };
 
-            syncToEbayMutation.mutate(payload, {
-              onSuccess(data, variables, context) {
-                setUpdating(false);
-                setOpen(false);
-              },
-            });
+            syncToEbayMutation.mutate(payload);
           }
 
           if (isUpdating && currentMarketplace === "kaufland") {
@@ -266,6 +262,14 @@ const SyncToEbayForm = ({
               onSuccess(data, variables, context) {
                 setUpdating(false);
                 setOpen(false);
+              },
+              onError: (error, _variables, toastId) => {
+                // dùng custom error type để hiển thị thông tin lỗi chi tiết
+                const message =
+                  error.response?.data?.detail.errors[0].message ||
+                  error.message ||
+                  "Update data to Kaufland failed";
+                toast.error(message, { id: toastId });
               },
             });
           }

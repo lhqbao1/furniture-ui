@@ -64,6 +64,11 @@ const ProductForm = ({
           typeof c === "object" ? String(c.id) : String(c)
         ) || [],
       brand_id: productValues.brand?.id,
+      bundles:
+        productValues.bundles?.map((b) => ({
+          product_id: b.bundle_item.id,
+          quantity: b.quantity,
+        })) || [],
     };
   };
 
@@ -103,6 +108,7 @@ const ProductForm = ({
       is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
       tag: values.tag === "" ? undefined : values.tag,
       is_active: productValuesClone ? false : values.is_active ?? true,
+      brand_id: productValuesClone?.brand?.id,
     };
 
     // 🟡 Kiểm tra điều kiện Econelo
@@ -247,15 +253,15 @@ const ProductForm = ({
                     Product Bundle
                   </AccordionTrigger>
                   <AccordionContent className="mt-2">
-                    <Card>
-                      <CardContent>
-                        {openAccordion.includes("component") && (
-                          <SelectBundleComponent
-                            currentProduct={productValues}
-                          />
-                        )}
-                      </CardContent>
-                    </Card>
+                    <div
+                      style={{
+                        display: openAccordion.includes("component")
+                          ? "block"
+                          : "none",
+                      }}
+                    >
+                      <SelectBundleComponent currentProduct={productValues} />
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="logistic">

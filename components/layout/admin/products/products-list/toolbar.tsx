@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import FilterForm from "./toolbar/filter";
 import ImportDialog from "./toolbar/import";
-import { useRouter } from "@/src/i18n/navigation";
+import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { ProductItem } from "@/types/products";
 import ExportExcelButton from "./toolbar/export-button";
@@ -73,6 +73,7 @@ export default function TableToolbar({
   const [openAddModal, setOpenAddModal] = useState(false);
   const [inputValue, setInputValue] = useState(searchQuery ?? "");
   const [isImporting, setIsImporting] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setInputValue(searchQuery ?? "");
@@ -89,7 +90,7 @@ export default function TableToolbar({
       // 🔹 Cập nhật URL
       router.push(
         {
-          pathname: "/admin/products/list",
+          pathname: pathname,
           query: {
             page: 1,
             // search: debouncedValue || undefined, // thêm search nếu có
