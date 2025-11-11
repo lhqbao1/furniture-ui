@@ -103,6 +103,7 @@ const ProductForm = ({
       is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
       tag: values.tag === "" ? undefined : values.tag,
       is_active: productValuesClone ? false : values.is_active ?? true,
+      brand_id: productValuesClone?.brand?.id,
     };
 
     // 🟡 Kiểm tra điều kiện Econelo

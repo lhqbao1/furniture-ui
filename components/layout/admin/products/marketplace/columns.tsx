@@ -30,6 +30,7 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
         input: {
           ...product,
           is_active: !product.is_active,
+          brand_id: product.brand.id,
           category_ids: product.categories.map((c) => c.id), // map ra id array
           // 🔹 Thêm bundles
           ...(product.bundles?.length

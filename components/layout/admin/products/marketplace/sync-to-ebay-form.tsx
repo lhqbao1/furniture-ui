@@ -119,7 +119,6 @@ const SyncToEbayForm = ({
   }, [marketplace, form]);
 
   const onSubmit = (values: MarketPlaceFormValues) => {
-    console.log(product);
     if (!product.brand) {
       toast.error("Brand is missing from current product");
       return;
@@ -187,7 +186,9 @@ const SyncToEbayForm = ({
                 })),
               }
             : { bundles: [] }),
+          brand_id: product.brand.id,
         },
+
         id: product.id,
       },
       {
