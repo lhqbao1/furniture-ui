@@ -151,7 +151,7 @@ function SyncToMarketplace({
         brand: {
           address: product.brand.company_address,
           email: product.brand.company_email,
-          name: product.brand.name,
+          name: product.brand.company_name,
         },
       };
 
