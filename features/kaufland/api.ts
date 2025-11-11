@@ -22,17 +22,19 @@ export interface syncToKauflandInput {
     brand: KauflandBrandInput
 }
 export async function syncToKaufland(input: syncToKauflandInput) {
-  const { data } = await apiAdmin.post(
-    "/kaufland/products/publish",
-    input,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
-  return data
+  const response = await apiAdmin.post("/kaufland/products/publish", input, {
+    headers: { "Content-Type": "application/json" },
+    validateStatus: undefined, // optional: dùng mặc định Axios
+  });
+
+  // Kiểm tra status manual
+  if (response.status >= 400) {
+    throw new Error(response.data?.message || "Failed to sync to Kaufland");
+  }
+
+  return response.data;
 }
+
 
 export async function removeFromKaufland(offer_id: string){
     const {data} = await apiAdmin.delete(

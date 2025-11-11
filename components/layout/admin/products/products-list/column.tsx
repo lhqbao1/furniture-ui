@@ -380,7 +380,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
 
         onError(error) {
           const message =
-            error.response?.data?.detail?.errors?.[0]?.message ??
+            // error.response?.data?.detail?.errors?.[0]?.message ??
             "Fail to sync to Ebay";
           toast.error(message);
         },
