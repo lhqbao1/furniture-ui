@@ -1,7 +1,3 @@
-export const config = {
-  regions: ['fra1'],
-};
-
 import { api, apiAdmin } from "@/lib/axios"
 import { PolicyResponse, PolicyVersion } from "@/types/policy"
 
@@ -39,4 +35,15 @@ export async function getPolicyItemsByVersion(version: string) {
     const { data } = await apiAdmin.post(`/policy/child-legal/${legal_policy_id}`, input)
     return data
   }
+
+export async function editVersion(version_id: string, file_url: string) {
+  const { data } = await apiAdmin.put(
+    `/policy/version/file/${version_id}`,
+    {}, // body trống
+    {
+      params: { file_url }, // query string
+    }
+  );
+  return data;
+}
   
