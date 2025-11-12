@@ -21,6 +21,7 @@ import {
   useRemoveFormKaufland,
   useSyncToKaufland,
 } from "@/features/kaufland/hook";
+import RemoveFromMarketplaceDialog from "./remove-dialog";
 
 function ToogleProductStatus({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
@@ -195,18 +196,11 @@ function SyncToMarketplace({
 
       {/* Nếu đang active => nút Remove */}
       {isActive && (
-        <Button
-          onClick={handleRemove}
-          variant="outline"
-          disabled={isSyncing}
-          className="text-red-600 border-red-600 min-w-[120px]"
-        >
-          {isSyncing ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            `Remove ${marketplace}`
-          )}
-        </Button>
+        <RemoveFromMarketplaceDialog
+          marketplace={marketplace}
+          marketplaceProduct={marketplaceProduct}
+          product={product}
+        />
       )}
     </div>
   );

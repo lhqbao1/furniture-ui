@@ -25,7 +25,7 @@ export async function getPolicyItemsByVersion(version: string) {
     return data as PolicyResponse 
   }
 
-  export async function createVersion(name: string) {
+  export async function createVersion(name?: string | null) {
     const { data } = await apiAdmin.post("/policy/version", { name })
     return data
   }
