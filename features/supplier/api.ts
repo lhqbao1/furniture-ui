@@ -1,7 +1,3 @@
-export const config = {
-  regions: ['fra1'],
-};
-
 import { apiAdmin } from "@/lib/axios"
 import { SupplierInput, SupplierResponse } from "@/types/supplier"
 

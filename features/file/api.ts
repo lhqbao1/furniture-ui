@@ -1,7 +1,3 @@
-export const config = {
-    regions: ['fra1'],
-  };
-  
 import {  apiPublic } from "@/lib/axios";
 import {  StaticFileResponse } from "@/types/products";
 

@@ -1,7 +1,3 @@
-export const config = {
-  regions: ['fra1'],
-};
-
 import { api } from "@/lib/axios"
 import { CartResponse } from "@/types/cart"
 

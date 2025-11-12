@@ -440,7 +440,9 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
     !product.final_price ||
     !product.cost ||
     !product.delivery_cost ||
-    !product.stock ||
+    !product.brand ||
+    !product.delivery_time ||
+    !product.carrier ||
     product.categories.length === 0;
 
   const handleToggleStatus = () => {
