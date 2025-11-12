@@ -57,8 +57,9 @@ export function useEditProduct() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: ProductInput }) => editProduct(input, id),
-    onSuccess: (res) => {
+    onSuccess: (res, variables) => {
       qc.invalidateQueries({ queryKey: ["products"] })
+      qc.invalidateQueries({ queryKey: ["product",variables.id ] })
     },
   })
 }

@@ -1,7 +1,3 @@
-export const config = {
-  regions: ['fra1'],
-};
-
 import { apiAdmin, apiPublic } from "@/lib/axios"
 
 export interface EbayProduct {

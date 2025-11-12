@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChildLegalInput, createChildLegalPolicy, createLegalPolicy, createVersion, getPolicyItemsByVersion, getPolicyVersion } from "./api";
+import { ChildLegalInput, createChildLegalPolicy, createLegalPolicy, createVersion, editVersion, getPolicyItemsByVersion, getPolicyVersion } from "./api";
 
 export function useGetPolicyVersion(){
     return useQuery({
@@ -55,6 +55,19 @@ export function useCreateChildLegalPolicy() {
       // chỗ này bạn có thể refetch list version, hoặc show toast
     },
     onError: (error) => {
+      console.error("Lỗi khi tạo child legal policy:", error)
+    },
+  })
+}
+
+export function useEditVersion(){
+  const qc= useQueryClient()
+  return useMutation({
+    mutationFn: ({version_id, file_url}: {version_id: string, file_url: string}) => editVersion(version_id, file_url),
+    onSuccess(data, variables, context) {
+            qc.invalidateQueries({queryKey: ['policy-items']})
+    },
+     onError: (error) => {
       console.error("Lỗi khi tạo child legal policy:", error)
     },
   })

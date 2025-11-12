@@ -1,33 +1,26 @@
 "use client";
-import React, { useState, useRef, useEffect, useMemo } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-} from "@/components/ui/accordion";
+import React, { useState, useEffect, useMemo } from "react";
+import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
 import { getPolicyItemsByVersion } from "@/features/policy/api";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ChildLegalPolicy, PolicyVersion } from "@/types/policy";
+import { PolicyVersion } from "@/types/policy";
 import { useTranslations } from "next-intl";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import {
   useCreateChildLegalPolicy,
   useCreateLegalPolicy,
   useCreateVersion,
+  useEditVersion,
 } from "@/features/policy/hook";
 import { toast } from "sonner";
 import RichEditor from "@/components/shared/tiptap/tiptap-editor";
-import { Textarea } from "@/components/ui/textarea";
+import { InvoicePDF } from "../../pdf/agb-file";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver"; // npm i file-saver
+import { formatDate } from "@/lib/date-formated";
+import { useUploadStaticFile } from "@/features/file/hook";
 
 interface ListPolicyAdminProps {
   versionId: string;
@@ -105,6 +98,8 @@ const ListPolicyAdmin = ({
   const createVersionMutation = useCreateVersion();
   const createLegalPolicyMutation = useCreateLegalPolicy();
   const createChildLegalPolicyMutation = useCreateChildLegalPolicy();
+  const editVersionMutation = useEditVersion();
+  const uploadFileMutation = useUploadStaticFile();
 
   const filteredPolicies = useMemo(() => {
     return policy?.legal_policies ?? [];
@@ -112,15 +107,6 @@ const ListPolicyAdmin = ({
 
   const currentPolicy =
     filteredPolicies.find((p) => p.id === openAccordion) || filteredPolicies[0];
-
-  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  const [policies, setPolicies] = useState<
-    Record<
-      string,
-      Record<string, { label: string; content: string; tt: number }>
-    >
-  >({});
 
   // ✅ Khi filteredPolicies thay đổi, tạo sẵn HTML cho tất cả policy (đặc biệt là index 0)
   useEffect(() => {
@@ -196,6 +182,32 @@ const ListPolicyAdmin = ({
         });
       }
 
+      const agbContent = policy?.legal_policies.find((i) =>
+        i.name.toLowerCase().includes("agb")
+      );
+
+      if (agbContent) {
+        const blob = await pdf(
+          <InvoicePDF
+            contentHtml={agbContent.child_legal_policies}
+            date={new Date(agbContent.created_at)}
+          />
+        ).toBlob();
+
+        saveAs(blob, `AGB_${formatDate(new Date(agbContent.created_at))}.pdf`);
+
+        const formData = new FormData();
+        formData.append("files", blob);
+
+        const fileResponse = await uploadFileMutation.mutateAsync(formData);
+
+        editVersionMutation.mutateAsync({
+          file_url: fileResponse.results[0].url,
+          version_id: versionRes.id,
+        });
+        toast.success("AGB PDF generated successfully!");
+      }
+
       // 6. Reset state + toast
       setIsCreating(false);
       toast.success("Create new policy version successful");
@@ -224,34 +236,6 @@ const ListPolicyAdmin = ({
           Cancel
         </Button>
       </div>
-
-      {/* Dialog */}
-      {/* <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="w-[400px]">
-          <DialogHeader>
-            <DialogTitle>Enter Version Name</DialogTitle>
-          </DialogHeader>
-          <Input
-            value={versionNameInput}
-            onChange={(e) => setVersionNameInput(e.target.value)}
-            placeholder="Enter version name..."
-          />
-          <DialogFooter>
-            <Button
-              onClick={handleSubmitVersion}
-              disabled={createVersionMutation.isPending}
-            >
-              {createVersionMutation.isPending ||
-              createLegalPolicyMutation.isPending ||
-              createChildLegalPolicyMutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Submit"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog> */}
 
       {/* Sidebar */}
       <div className="col-span-4 border-r overflow-y-auto lg:block hidden">
@@ -303,8 +287,6 @@ const ListPolicyAdmin = ({
             </div>
           )}
         </div>
-
-        {/* <div className="col-span-12"> <RichEditor value={editorValue} onChangeValue={(val) => setEditorValue(val)} /> </div> */}
       </div>
     </div>
   );
