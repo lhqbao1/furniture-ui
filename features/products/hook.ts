@@ -58,6 +58,7 @@ export function useEditProduct() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: ProductInput }) => editProduct(input, id),
     onSuccess: (res, variables) => {
+      qc.invalidateQueries({ queryKey: ["all-products"] })
       qc.invalidateQueries({ queryKey: ["products"] })
       qc.invalidateQueries({ queryKey: ["product",variables.id ] })
     },
