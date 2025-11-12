@@ -3,6 +3,9 @@ import { removeFromEbay, syncToEbay, syncToEbayInput } from "./api";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 
+type SyncErrorResponse = EbaySyncErrorResponse | AuthError | GenericError;
+
+
 export function useRemoveFormEbay() {
     return useMutation({
       mutationFn: (sku: string) => removeFromEbay(sku), 
@@ -12,13 +15,18 @@ export function useRemoveFormEbay() {
 export function useSyncToEbay() {
   const qc = useQueryClient();
 
-  return useMutation({
+ return useMutation<
+  unknown,
+  AxiosError<SyncErrorResponse>,
+  syncToEbayInput,
+  string | number
+>({
     mutationFn: (input: syncToEbayInput) => syncToEbay(input),
     
-    // onMutate: (variables) => {
-    //   // show toast loading khi bắt đầu
-    //   return toast.loading("Syncing data to Ebay...");
-    // },
+    onMutate: (variables) => {
+      // show toast loading khi bắt đầu
+      return toast.loading("Syncing data to Ebay...");
+    },
 
     onSuccess: () => {
       // cập nhật toast loading thành success
@@ -26,15 +34,22 @@ export function useSyncToEbay() {
       qc.invalidateQueries({ queryKey: ["products"] });
     },
 
-    onError: (error) => {
-      // dùng custom error type để hiển thị thông tin lỗi chi tiết
-      const message =
-        // error.response?.data?.detail.errors[0].message ||
-        // error.message ||
-        "Update data to eBay failed";
+ onError: (error, _vars, toastId) => {
+  let message = "Update to Ebay failed";
 
-      toast.error(message);
-    },
+  try {
+    const data = error.response?.data as any;
+    message =
+      data?.detail?.errors?.[0]?.message ||
+      data?.message ||
+      data?.error ||
+      error.message;
+  } catch {
+    message = error.message;
+  }
+
+  toast.error(message, { id: toastId });
+},
   });
 }
 

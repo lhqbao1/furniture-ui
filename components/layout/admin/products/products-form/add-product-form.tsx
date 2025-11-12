@@ -108,7 +108,7 @@ const ProductForm = ({
       is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
       tag: values.tag === "" ? undefined : values.tag,
       is_active: productValuesClone ? false : values.is_active ?? true,
-      brand_id: productValuesClone?.brand?.id,
+      brand_id: values.brand_id,
     };
 
     // 🟡 Kiểm tra điều kiện Econelo
@@ -220,18 +220,24 @@ const ProductForm = ({
                     Details
                   </AccordionTrigger>
                   <AccordionContent className="mt-2">
-                    <Card>
-                      <CardContent>
-                        {openAccordion.includes("details") && (
+                    <div
+                      style={{
+                        display: openAccordion.includes("details")
+                          ? "block"
+                          : "none",
+                      }}
+                    >
+                      <Card>
+                        <CardContent>
                           <ProductDetailInputs
                             isEdit={productValues ? true : false}
                             productId={
                               productValues ? productValues.id_provider : null
                             }
                           />
-                        )}
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="additional">
@@ -239,13 +245,19 @@ const ProductForm = ({
                     Additional Details
                   </AccordionTrigger>
                   <AccordionContent className="mt-2">
-                    <Card>
-                      <CardContent>
-                        {openAccordion.includes("additional") && (
+                    <div
+                      style={{
+                        display: openAccordion.includes("additional")
+                          ? "block"
+                          : "none",
+                      }}
+                    >
+                      <Card>
+                        <CardContent>
                           <ProductAdditionalInputs />
-                        )}
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="component">
@@ -269,13 +281,19 @@ const ProductForm = ({
                     Logistic
                   </AccordionTrigger>
                   <AccordionContent className="mt-2">
-                    <Card>
-                      <CardContent>
-                        {openAccordion.includes("logistic") && (
+                    <div
+                      style={{
+                        display: openAccordion.includes("logistic")
+                          ? "block"
+                          : "none",
+                      }}
+                    >
+                      <Card>
+                        <CardContent>
                           <ProductLogisticsGroup />
-                        )}
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="seo">
@@ -283,13 +301,19 @@ const ProductForm = ({
                     SEO
                   </AccordionTrigger>
                   <AccordionContent className="mt-2">
-                    <Card>
-                      <CardContent>
-                        {openAccordion.includes("seo") && (
+                    <div
+                      style={{
+                        display: openAccordion.includes("seo")
+                          ? "block"
+                          : "none",
+                      }}
+                    >
+                      <Card>
+                        <CardContent>
                           <ProductSEOGroup setIsLoadingSEO={setIsLoadingSEO} />
-                        )}
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

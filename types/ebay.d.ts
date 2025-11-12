@@ -3,3 +3,18 @@ interface EbaySyncErrorResponse {
       errors: { message: string }[]
     }
   }
+
+type KauflandError = {
+  detail: {
+    errors: { message: string }[];
+  };
+};
+  
+type AuthError = { 
+  detail: {
+    error: string
+    error_description: string
+  }
+};
+
+type GenericError = { message: string };
