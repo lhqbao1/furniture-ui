@@ -271,7 +271,7 @@ function SidebarTrigger({
   isClose = false,
   ...props
 }: SidebarTriggerProps) {
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
   const { toggleSidebar } = useSidebar(); // get the open state
 
   return (
