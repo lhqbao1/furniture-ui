@@ -315,7 +315,7 @@
   "QAerror": "Something went wrong. Please try again.",
   "haveQuestion": "Have a question?",
   "justAsk": "Just ask!",
-      "shippingPolicy": "Delivery and Shipping Terms",
+  "shippingPolicy": "Delivery and Shipping Terms",
   "paymentTerms": "Payment Terms",
     "resendOtp": "Resend OTP",
   "resendOtpDes": "Send the OTP again to your email/phone",
