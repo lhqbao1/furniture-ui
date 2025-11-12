@@ -21,7 +21,7 @@ export function useGetPolicyItemsByVersion(version: string) {
 export function useCreateVersion() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (name: string) => createVersion(name),
+    mutationFn: (name?: string | null) => createVersion(name),
     onSuccess: (data) => {
       qc.invalidateQueries({queryKey: ['policy-version']})
       // chỗ này bạn có thể refetch list version, hoặc show toast

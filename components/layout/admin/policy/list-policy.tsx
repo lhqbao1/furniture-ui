@@ -90,11 +90,9 @@ const ListPolicyAdmin = ({
   isAdmin = false,
 }: ListPolicyAdminProps) => {
   const t = useTranslations();
-  const [currentPolicyItem, setCurrentPolicyItem] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
-  const [versionNameInput, setVersionNameInput] = useState("");
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
-
+  const [isCreating, setIsCreating] = useState(false);
   // const [editorValue, setEditorValue] = useState("")
   const [editorValues, setEditorValues] = useState<Record<string, string>>({});
 
@@ -166,15 +164,12 @@ const ListPolicyAdmin = ({
   };
 
   const handleSubmitVersion = async () => {
-    if (!versionNameInput) return;
-
     try {
+      setIsCreating(true);
       // 1. Tạo version trước
-      const versionRes = await createVersionMutation.mutateAsync(
-        versionNameInput
-      );
+      const id = crypto.randomUUID();
 
-      console.log(filteredPolicies);
+      const versionRes = await createVersionMutation.mutateAsync(id);
 
       //   2. Lặp qua từng policy
       for (const lp of filteredPolicies) {
@@ -188,14 +183,6 @@ const ListPolicyAdmin = ({
         const parsedChildren = parseEditorContent(editorContent);
 
         // 4. Merge parsed content với child gốc (để giữ tt, fallback)
-        // const childInputs = lp.child_legal_policies.map((cl, idx) => {
-        //   const parsed = parsedChildren[idx];
-        //   return {
-        //     label: parsed?.label ?? cl.label,
-        //     content: parsed?.content ?? cl.content,
-        //     tt: parsed?.tt ?? cl.tt, // giữ số thứ tự
-        //   };
-        // });
         const childInputs = parsedChildren.map((parsed) => ({
           label: parsed.label,
           content: parsed.content,
@@ -210,8 +197,7 @@ const ListPolicyAdmin = ({
       }
 
       // 6. Reset state + toast
-      setOpenDialog(false);
-      setVersionNameInput("");
+      setIsCreating(false);
       toast.success("Create new policy version successful");
     } catch (err) {
       console.error("Lỗi khi tạo version:", err);
@@ -219,10 +205,11 @@ const ListPolicyAdmin = ({
     }
   };
 
-  if (isLoading)
+  if (isLoading || isCreating)
     return (
-      <div className="">
+      <div className="min-h-screen w-full flex flex-col justify-center items-center bg-gray-50">
         <Loader2 className="animate-spin" />
+        Creating
       </div>
     );
   if (!versionId) return <></>;
@@ -230,7 +217,7 @@ const ListPolicyAdmin = ({
   return (
     <div className="grid grid-cols-12 pt-3 lg:h-[calc(100vh-100px)] h-fit pb-4">
       <div className="space-x-2 col-span-12 mb-12">
-        <Button className="text-xl" onClick={handleSaveClick}>
+        <Button className="text-xl" onClick={handleSubmitVersion}>
           Save
         </Button>
         <Button className="text-xl" variant={"outline"}>
@@ -239,7 +226,7 @@ const ListPolicyAdmin = ({
       </div>
 
       {/* Dialog */}
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      {/* <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent className="w-[400px]">
           <DialogHeader>
             <DialogTitle>Enter Version Name</DialogTitle>
@@ -264,7 +251,7 @@ const ListPolicyAdmin = ({
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       {/* Sidebar */}
       <div className="col-span-4 border-r overflow-y-auto lg:block hidden">
@@ -288,29 +275,6 @@ const ListPolicyAdmin = ({
               <div className="pr-6 px-2 py-3 cursor-pointer font-bold">
                 {item.name}
               </div>
-              {/* <AccordionContent className="flex flex-col gap-1.5 text-balance">
-                                {item.child_legal_policies.map((child, policyItemIndex) => (
-                                    <div
-                                        key={child.id}
-                                        className={cn(
-                                            'cursor-pointer hover:underline lg:pl-6 pl-2 relative',
-                                            currentPolicy?.id === item.id && currentPolicyItem === policyItemIndex
-                                                ? 'bg-secondary/20 px-2 py-1 font-semibold'
-                                                : ''
-                                        )}
-                                        onClick={() => {
-                                            setCurrentPolicyItem(policyItemIndex)
-                                            const refKey = `${item.id}-${policyItemIndex}`
-                                            const el = contentRefs.current[refKey]
-                                            if (el) {
-                                                el.scrollIntoView({ behavior: "smooth", block: "start" })
-                                            }
-                                        }}
-                                    >
-                                        {policies[item.id]?.[child.id]?.label || child.label}
-                                    </div>
-                                ))}
-                            </AccordionContent> */}
             </AccordionItem>
           ))}
         </Accordion>
