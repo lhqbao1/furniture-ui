@@ -1,25 +1,13 @@
 "use client";
-import React, { useState, useRef, useEffect, useMemo } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-} from "@/components/ui/accordion";
+import React, { useState, useEffect, useMemo } from "react";
+import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
 import { getPolicyItemsByVersion } from "@/features/policy/api";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ChildLegalPolicy, PolicyVersion } from "@/types/policy";
+import { PolicyVersion } from "@/types/policy";
 import { useTranslations } from "next-intl";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import {
   useCreateChildLegalPolicy,
   useCreateLegalPolicy,
@@ -28,8 +16,6 @@ import {
 } from "@/features/policy/hook";
 import { toast } from "sonner";
 import RichEditor from "@/components/shared/tiptap/tiptap-editor";
-import { Textarea } from "@/components/ui/textarea";
-import { generateAgbPdf } from "@/hooks/generate-pdf";
 import { InvoicePDF } from "../../pdf/agb-file";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver"; // npm i file-saver
@@ -201,9 +187,11 @@ const ListPolicyAdmin = ({
       );
 
       if (agbContent) {
-        console.log("hehe");
         const blob = await pdf(
-          <InvoicePDF contentHtml={agbContent.child_legal_policies} />
+          <InvoicePDF
+            contentHtml={agbContent.child_legal_policies}
+            date={new Date(agbContent.created_at)}
+          />
         ).toBlob();
 
         saveAs(blob, `AGB_${formatDate(new Date(agbContent.created_at))}.pdf`);
