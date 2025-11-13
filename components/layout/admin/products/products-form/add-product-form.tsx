@@ -1,21 +1,8 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 import { Form } from "@/components/ui/form";
-import "react-quill-new/dist/quill.snow.css";
-import {
-  addProductSchema,
-  defaultValues,
-  ProductInput,
-} from "@/lib/schema/product";
+import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { ProductItem } from "@/types/products";
-import { toast } from "sonner";
-import { CategoryResponse } from "@/types/categories";
-import { useAddProduct, useEditProduct } from "@/features/products/hook";
 import {
   Accordion,
   AccordionContent,
@@ -27,308 +14,148 @@ import ProductDetailInputs from "./fisrt-group";
 import ProductAdditionalInputs from "./product-additional-group";
 import ProductLogisticsGroup from "./product-logistics-group";
 import ProductSEOGroup from "./product-seo-group";
-import { useRouter } from "@/src/i18n/navigation";
-import { useLocale } from "next-intl";
 import SelectBundleComponent from "../bundle/select-bundle";
 import AdminBackButton from "@/components/shared/admin-back-button";
-import { is } from "date-fns/locale";
-
-interface AddProductFormProps {
-  productValues?: Partial<ProductItem>;
-  onSubmit: (values: ProductInput) => Promise<void> | void;
-  isPending?: boolean;
-  productValuesClone?: Partial<ProductItem>;
-}
+import { useProductForm } from "./useProductForm";
+import { ProductItem } from "@/types/products";
 
 const ProductForm = ({
   productValues,
   onSubmit,
   isPending,
   productValuesClone,
-}: AddProductFormProps) => {
-  const router = useRouter();
-  const locale = useLocale();
-  const editProductMutation = useEditProduct();
-  const addProductMutation = useAddProduct();
-  const [isLoadingSEO, setIsLoadingSEO] = useState(false);
+}: {
+  productValues?: Partial<ProductItem>;
+  onSubmit: any;
+  isPending?: boolean;
+  productValuesClone?: Partial<ProductItem>;
+}) => {
+  const {
+    form,
+    onSubmit: handleSubmit,
+    isLoadingSEO,
+    setIsLoadingSEO,
+    addProductMutation,
+    editProductMutation,
+  } = useProductForm({ productValues, productValuesClone });
+
   const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
-
-  const normalizeProductValues = (productValues?: Partial<ProductItem>) => {
-    if (!productValues) return defaultValues;
-
-    return {
-      ...defaultValues,
-      ...productValues,
-      category_ids:
-        productValues.categories?.map((c: CategoryResponse | number) =>
-          typeof c === "object" ? String(c.id) : String(c)
-        ) || [],
-      brand_id: productValues.brand?.id,
-      bundles:
-        productValues.bundles?.map((b) => ({
-          product_id: b.bundle_item.id,
-          quantity: b.quantity,
-        })) || [],
-    };
-  };
-
-  const initialValues = normalizeProductValues(
-    productValuesClone || productValues
-  );
-
-  const form = useForm<z.infer<typeof addProductSchema>>({
-    resolver: zodResolver(addProductSchema),
-    defaultValues: initialValues,
-    mode: "onBlur",
-  });
-
-  useEffect(() => {
-    if (productValuesClone) {
-      form.reset(normalizeProductValues(productValuesClone));
-    } else if (productValues) {
-      form.reset(normalizeProductValues(productValues));
-    }
-  }, [productValuesClone, productValues, form]);
-
-  const handleSubmit = async (values: ProductInput) => {
-    const payload = {
-      ...values,
-      weight: values.weight || values.weight === 0 ? values.weight : undefined,
-      delivery_cost:
-        values.delivery_cost || values.delivery_cost === 0
-          ? values.delivery_cost
-          : undefined,
-      width: values.width || values.width === 0 ? values.width : undefined,
-      height: values.height || values.height === 0 ? values.height : undefined,
-      length: values.length || values.length === 0 ? values.length : undefined,
-      cost: values.cost || values.cost === 0 ? values.cost : undefined,
-      final_price: values.final_price ?? values.price ?? undefined,
-      ...(values.price && { price: values.price }),
-      stock: values.stock ?? 1,
-      is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
-      tag: values.tag === "" ? undefined : values.tag,
-      is_active: productValuesClone ? false : values.is_active ?? true,
-      brand_id: values.brand_id,
-    };
-
-    // 🟡 Kiểm tra điều kiện Econelo
-    if (payload.is_econelo) {
-      if (!payload.price || !payload.final_price) {
-        toast.error("Econelo products need both price and sale price");
-        return;
-      }
-    }
-
-    // 🧩 Kiểm tra price > final_price
-    if (
-      typeof payload.price === "number" &&
-      typeof payload.final_price === "number" &&
-      payload.price <= payload.final_price
-    ) {
-      toast.error("Regular price must be greater than sale price");
-      return;
-    }
-
-    if (productValuesClone) {
-      // 🟢 Clone thì vẫn gọi add
-      // Bỏ marketplace_products và thêm ebay: false
-      const { marketplace_products, ...cleanPayload } = payload;
-
-      const finalPayload = {
-        ...cleanPayload,
-        ebay: false,
-      };
-
-      addProductMutation.mutate(finalPayload, {
-        onSuccess: () => {
-          toast.success("Product add successfully");
-          form.reset();
-          router.push("/admin/products/list", { locale });
-        },
-        onError: (error) => {
-          toast.error(
-            <div className="flex flex-col gap-2">
-              <div>Failed to add product</div>
-              <div>Please check duplication for SKU or EAN</div>
-            </div>
-          );
-          console.log(error);
-        },
-      });
-    } else if (productValues) {
-      // 🟡 Edit
-      editProductMutation.mutate(
-        { id: productValues.id ?? "", input: payload },
-        {
-          onSuccess: () => {
-            toast.success("Product updated successfully");
-          },
-          onError: () => {
-            toast.error("Failed to update product");
-          },
-        }
-      );
-    } else {
-      // 🔵 Add mới
-      addProductMutation.mutate(payload, {
-        onSuccess: () => {
-          toast.success("Product add successfully");
-          form.reset();
-        },
-        onError: (error) => {
-          toast.error(
-            <div className="flex flex-col gap-2">
-              <div>Failed to add product</div>
-              <div>Please check duplication for SKU or EAN</div>
-            </div>
-          );
-          console.log(error);
-        },
-      });
-    }
-  };
 
   return (
     <div className="lg:pb-20 lg:px-30 pb-12">
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(
-            (values) => {
-              handleSubmit(values);
-            },
-            (errors) => {
-              toast.error(`Please check the form for errors ${errors}`);
-              console.log(errors);
-            }
-          )}
-        >
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="lg:grid-cols-12 lg:grid flex flex-col-reverse lg:gap-24 w-full">
             <div className="lg:col-span-9 flex flex-col gap-4">
-              {!defaultValues ? (
-                <h3 className="text-xl text-[#666666]">Add New Product</h3>
-              ) : (
-                ""
-              )}
               <Accordion
                 type="multiple"
                 value={openAccordion}
-                onValueChange={(value) => setOpenAccordion(value)}
+                onValueChange={setOpenAccordion}
                 className="w-full space-y-8"
               >
+                {/* DETAILS */}
                 <AccordionItem value="details">
-                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:">
+                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Details
                   </AccordionTrigger>
-                  <AccordionContent className="mt-2">
-                    <div
-                      style={{
-                        display: openAccordion.includes("details")
-                          ? "block"
-                          : "none",
-                      }}
-                    >
-                      <Card>
-                        <CardContent>
-                          <ProductDetailInputs
-                            isEdit={productValues ? true : false}
-                            productId={
-                              productValues ? productValues.id_provider : null
-                            }
-                          />
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </AccordionContent>
+
+                  {/* Always mounted, only hidden */}
+                  <div
+                    className={
+                      openAccordion.includes("details") ? "block" : "hidden"
+                    }
+                  >
+                    <Card>
+                      <CardContent>
+                        <ProductDetailInputs
+                          isEdit={!!productValues}
+                          productId={productValues?.id_provider ?? null}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
                 </AccordionItem>
+
+                {/* ADDITIONAL */}
                 <AccordionItem value="additional">
-                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:">
+                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Additional Details
                   </AccordionTrigger>
-                  <AccordionContent className="mt-2">
-                    <div
-                      style={{
-                        display: openAccordion.includes("additional")
-                          ? "block"
-                          : "none",
-                      }}
-                    >
-                      <Card>
-                        <CardContent>
-                          <ProductAdditionalInputs />
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </AccordionContent>
+
+                  <div
+                    className={
+                      openAccordion.includes("additional") ? "block" : "hidden"
+                    }
+                  >
+                    <Card>
+                      <CardContent>
+                        <ProductAdditionalInputs />
+                      </CardContent>
+                    </Card>
+                  </div>
                 </AccordionItem>
+
+                {/* BUNDLE */}
                 <AccordionItem value="component">
-                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:">
+                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Product Bundle
                   </AccordionTrigger>
-                  <AccordionContent className="mt-2">
-                    <div
-                      style={{
-                        display: openAccordion.includes("component")
-                          ? "block"
-                          : "none",
-                      }}
-                    >
-                      <SelectBundleComponent currentProduct={productValues} />
-                    </div>
-                  </AccordionContent>
+
+                  <div
+                    className={
+                      openAccordion.includes("component") ? "block" : "hidden"
+                    }
+                  >
+                    <SelectBundleComponent currentProduct={productValues} />
+                  </div>
                 </AccordionItem>
+
+                {/* LOGISTIC */}
                 <AccordionItem value="logistic">
-                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:">
+                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Logistic
                   </AccordionTrigger>
-                  <AccordionContent className="mt-2">
-                    <div
-                      style={{
-                        display: openAccordion.includes("logistic")
-                          ? "block"
-                          : "none",
-                      }}
-                    >
-                      <Card>
-                        <CardContent>
-                          <ProductLogisticsGroup />
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </AccordionContent>
+
+                  <div
+                    className={
+                      openAccordion.includes("logistic") ? "block" : "hidden"
+                    }
+                  >
+                    <Card>
+                      <CardContent>
+                        <ProductLogisticsGroup />
+                      </CardContent>
+                    </Card>
+                  </div>
                 </AccordionItem>
+
+                {/* SEO */}
                 <AccordionItem value="seo">
-                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold flex items-center cursor-pointer hover:">
+                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     SEO
                   </AccordionTrigger>
-                  <AccordionContent className="mt-2">
-                    <div
-                      style={{
-                        display: openAccordion.includes("seo")
-                          ? "block"
-                          : "none",
-                      }}
-                    >
-                      <Card>
-                        <CardContent>
-                          <ProductSEOGroup setIsLoadingSEO={setIsLoadingSEO} />
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </AccordionContent>
+
+                  <div
+                    className={
+                      openAccordion.includes("seo") ? "block" : "hidden"
+                    }
+                  >
+                    <Card>
+                      <CardContent>
+                        <ProductSEOGroup setIsLoadingSEO={setIsLoadingSEO} />
+                      </CardContent>
+                    </Card>
+                  </div>
                 </AccordionItem>
               </Accordion>
             </div>
 
-            <div className="lg:col-span-3  flex flex-col items-end gap-4 relative">
-              {/*Form Button */}
+            <div className="lg:col-span-3 flex flex-col items-end gap-4">
               <div className="grid grid-cols-2 gap-2 justify-end top-24 fixed">
                 <Button
-                  className={`cursor-pointer text-lg px-8 ${
-                    defaultValues ? "bg-secondary" : ""
-                  }`}
                   type="submit"
-                  hasEffect
                   disabled={isLoadingSEO}
+                  className="text-lg px-8"
                 >
                   {addProductMutation.isPending ||
                   editProductMutation.isPending ? (
@@ -340,22 +167,6 @@ const ProductForm = ({
                   )}
                 </Button>
                 <AdminBackButton />
-                {productValues && (
-                  <a
-                    href={`/${locale}/product/${productValues?.url_key}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button
-                      variant="outline"
-                      className="cursor-pointer text-black text-lg px-8"
-                      type="button"
-                      hasEffect
-                    >
-                      View
-                    </Button>
-                  </a>
-                )}
               </div>
             </div>
           </div>

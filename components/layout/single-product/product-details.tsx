@@ -446,7 +446,7 @@ const ProductDetails = ({
 
                                 <li className="flex items-start gap-2">
                                   <span className="text-base leading-5">•</span>
-                                  <span>
+                                  <span className="text-base">
                                     Speditionsversand nach Terminabsprache
                                   </span>
                                 </li>
@@ -455,7 +455,9 @@ const ProductDetails = ({
 
                             <li className="flex items-start gap-2">
                               <span className="text-base leading-5">•</span>
-                              <span>Versand aus Deutschland</span>
+                              <span className="text-base">
+                                Versand aus Deutschland
+                              </span>
                             </li>
                           </ul>
                         </div>
