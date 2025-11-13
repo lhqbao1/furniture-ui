@@ -1,7 +1,3 @@
-export const config = {
-  regions: ['fra1'],
-};
-
 import { api, apiPublic } from "@/lib/axios";
 import { LoginResponse, User } from "@/types/user";
 import qs from 'qs'

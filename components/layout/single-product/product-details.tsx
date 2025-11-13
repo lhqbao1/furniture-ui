@@ -1,7 +1,7 @@
 "use client";
 import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Eye, Heart, Truck } from "lucide-react";
+import { Clock, Eye, Heart, Info, Truck } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { ProductDetailsTab } from "@/components/layout/single-product/product-tab";
@@ -38,7 +38,11 @@ import { CartItemLocal } from "@/lib/utils/cart";
 import { useRouter } from "@/src/i18n/navigation";
 import Script from "next/script";
 import { ProductImageCarousel } from "./sub-images-carousel";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 interface ProductDetailsProps {
   productDetailsData: ProductItem;
   productId: string;
@@ -349,8 +353,8 @@ const ProductDetails = ({
                     </div>
 
                     <div className="space-y-2">
-                      <div>{t("includeVatAndShipping")}</div>
-                      <div className="flex gap-2 items-center ">
+                      {/* <div>{t("includeVatAndShipping")}</div> */}
+                      <div className="flex gap-2 py-0 lg:py-3 items-center ">
                         <div>{t("inStock")}:</div>
                         <div className="grid grid-cols-3 w-1/3 gap-1">
                           <span
@@ -391,17 +395,69 @@ const ProductDetails = ({
                         </div>
                       </div>
 
-                      <div className="flex flex-row gap-4 items-start border px-2.5 py-1.5 rounded-md w-fit border-black/40">
+                      <div className="flex flex-row gap-4 items-start py-1.5 lg:py-3">
                         <Truck size={30} />
                         <div>
-                          <p className="font-bold">{t("delivery")}</p>
-                          <p className="font-light">
+                          <p className="font-bold">
+                            {t("shippingCost", {
+                              shippingCost:
+                                productDetails.carrier === "amm"
+                                  ? "35,95€"
+                                  : "5,95€",
+                            })}
+                          </p>
+                          <p className="text-gray-500">14-Tage-Rückgaberecht</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-row gap-4 items-start  py-1.5 lg:py-3">
+                        <Clock size={30} />
+                        <div>
+                          <p className="font-bold">
                             {productDetails.delivery_time
                               ? t("deliveryTime", {
                                   days: productDetails.delivery_time,
                                 })
                               : t("updating")}
                           </p>
+                          <ul className="space-y-1 text-gray-700 text-sm">
+                            {productDetails.carrier === "amm" && (
+                              <>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-base leading-5">•</span>
+                                  <span>
+                                    Lieferung{" "}
+                                    <strong>frei Bordsteinkante</strong>{" "}
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Info className="inline-block w-3.5 h-3.5 text-gray-500 ml-1 mb-0.5" />
+                                      </TooltipTrigger>
+                                      <TooltipContent className="bg-secondary">
+                                        <p className="text-white text-sm">
+                                          „Frei Bordsteinkante“ bedeutet:
+                                          Lieferung bis zur Grundstücksgrenze –
+                                          kein Transport ins Haus oder zur
+                                          Wohnung.
+                                        </p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </span>
+                                </li>
+
+                                <li className="flex items-start gap-2">
+                                  <span className="text-base leading-5">•</span>
+                                  <span>
+                                    Speditionsversand nach Terminabsprache
+                                  </span>
+                                </li>
+                              </>
+                            )}
+
+                            <li className="flex items-start gap-2">
+                              <span className="text-base leading-5">•</span>
+                              <span>Versand aus Deutschland</span>
+                            </li>
+                          </ul>
                         </div>
                       </div>
                     </div>
