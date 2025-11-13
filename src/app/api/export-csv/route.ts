@@ -54,7 +54,7 @@ export async function GET() {
           escapeCsv(p.id_provider),
           escapeCsv(p.name),
           escapeCsv(cleanDescription(p.description)),
-          escapeCsv(`https://prestige-home.de/product${p.categories && p.categories.length > 0 ? `/${p.categories[0].slug}` : ''}/${p.url_key}`),
+          escapeCsv(`https://prestige-home.de/de/product/${p.url_key}`),
           escapeCsv(cleanImageLink(p.static_files[0]?.url)),
           escapeCsv(p.stock > 0 ? "in_stock" : "out_of_stock"),
           escapeCsv(p.stock ?? ''),
