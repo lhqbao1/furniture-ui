@@ -319,5 +319,7 @@
   "paymentTerms": "Payment Terms",
     "resendOtp": "Resend OTP",
   "resendOtpDes": "Send the OTP again to your email/phone",
-  "resendIn": "Resend in"
+  "resendIn": "Resend in",
+      "shippingCost": "plus {shippingCost} shipping"
+
 }
