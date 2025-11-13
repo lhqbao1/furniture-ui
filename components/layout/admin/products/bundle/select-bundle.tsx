@@ -21,6 +21,7 @@ import Link from "next/link";
 import { Eye, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useGetAllProducts } from "@/features/products/hook";
+import RemoveBundleDialog from "./remove-dialog";
 
 type SelectedProduct = {
   product: ProductItem;
@@ -100,10 +101,6 @@ const SelectBundleComponent = ({
     // Lấy giá trị nhỏ nhất làm giới hạn chung
     return Math.min(...possibleCounts);
   }, [listProducts]);
-
-  const handleRemoveBundleItem = (product: ProductItem) => {
-    setListProducts((prev) => prev.filter((p) => p.product.id !== product.id));
-  };
 
   // ✅ Khởi tạo listProducts từ currentProduct.bundles (nếu có)
   useEffect(() => {
@@ -266,12 +263,10 @@ const SelectBundleComponent = ({
                       className="h-full"
                     />
                   </div>
-                  <Button
-                    variant={"ghost"}
-                    onClick={() => handleRemoveBundleItem(product)}
-                  >
-                    <X className="text-red-400" />
-                  </Button>
+                  <RemoveBundleDialog
+                    product={product}
+                    setListProducts={setListProducts}
+                  />
                 </div>
               ))}
             </div>

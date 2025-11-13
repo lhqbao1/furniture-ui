@@ -50,6 +50,8 @@ const ProductLogisticsGroup = ({
     name: "number_of_packages",
   });
 
+  const isLoading = numberOfPackages === undefined || numberOfPackages === null;
+
   // Tạo field array cho packages
   const { fields, append, remove } = useFieldArray({
     control,
@@ -72,9 +74,6 @@ const ProductLogisticsGroup = ({
       width: b?.width ?? null,
       weight: b?.weight ?? null,
     }));
-
-    console.log(bundleItems);
-    console.log(filledPackages);
 
     form.setValue("packages", filledPackages);
   }, [bundleItems, form]);
@@ -302,8 +301,16 @@ const ProductLogisticsGroup = ({
         />
       </div>
 
-      {/* --- DYNAMIC PACKAGES --- */}
-      {numberOfPackages > 0 && (
+      {/* --- LOADING SKELETON --- */}
+      {isLoading && (
+        <div className="flex flex-col gap-4 mt-2">
+          <PackageSkeleton />
+          <PackageSkeleton />
+        </div>
+      )}
+
+      {/* --- REAL PACKAGE INPUTS --- */}
+      {!isLoading && numberOfPackages > 0 && (
         <div>
           <div className="col-span-2 text-sm text-black font-semibold">
             Packaging (cm)
@@ -319,7 +326,7 @@ const ProductLogisticsGroup = ({
                   Package #{index + 1}
                 </div>
 
-                <div className="flex flex-row gap-3 w-full">
+                <div className="grid grid-cols-4 gap-3 w-full">
                   {["length", "height", "width", "weight"].map((key) => (
                     <FormField
                       key={key}
@@ -343,7 +350,7 @@ const ProductLogisticsGroup = ({
                                     : e.target.valueAsNumber
                                 )
                               }
-                              disabled={bundleItems?.length > 0} // ✅ disable nếu có bundle
+                              disabled={bundleItems?.length > 0}
                             />
                           </FormControl>
                           <FormLabel className="text-black font-semibold text-sm capitalize">
@@ -364,3 +371,18 @@ const ProductLogisticsGroup = ({
 };
 
 export default ProductLogisticsGroup;
+
+const PackageSkeleton = () => (
+  <div className="flex flex-col w-full border p-3 rounded-2xl shadow-sm animate-pulse">
+    <div className="h-4 w-1/3 bg-gray-300 rounded mb-3"></div>
+
+    <div className="grid grid-cols-4 gap-3 w-full">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex flex-col-reverse items-center flex-1">
+          <div className="h-10 w-full bg-gray-300 rounded"></div>
+          <div className="h-3 w-10 bg-gray-300 rounded mb-1"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
