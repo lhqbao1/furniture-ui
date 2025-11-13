@@ -47,12 +47,12 @@ export async function GET() {
     ];
 
     const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0)
+      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0 && p.brand)
       .map((p) => {
         const categories = p.categories?.map(c => c.name).join(", ") || "";
         return [
           escapeCsv(p.id_provider),
-          escapeCsv(p.name.trim()),
+          escapeCsv(p.name),
           escapeCsv(cleanDescription(p.description)),
           escapeCsv(`https://prestige-home.de/product${p.categories && p.categories.length > 0 ? `/${p.categories[0].slug}` : ''}/${p.url_key}`),
           escapeCsv(cleanImageLink(p.static_files[0]?.url)),
