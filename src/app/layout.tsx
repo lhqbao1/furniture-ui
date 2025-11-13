@@ -50,7 +50,10 @@ export default function RootLayout({
           src="https://www.googletagmanager.com/gtag/js?id=AW-17548008377"
           async
         />
-        <Script id="gtag-base" strategy="afterInteractive">
+        <Script
+          id="gtag-base"
+          strategy="afterInteractive"
+        >
           {`
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}
@@ -58,7 +61,10 @@ export default function RootLayout({
                         gtag('config', 'AW-17548008377');
                     `}
         </Script>
-        <Script id="google-ads-conversion" strategy="afterInteractive">
+        <Script
+          id="google-ads-conversion"
+          strategy="afterInteractive"
+        >
           {`
                         gtag('event', 'conversion', {
                         'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
@@ -70,13 +76,14 @@ export default function RootLayout({
         <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
-          async
+          strategy="beforeInteractive"
+          // async
         />
         <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="RlDaintBne_uoh"
-          async
+          // async
           strategy="afterInteractive"
         />
       </head>
