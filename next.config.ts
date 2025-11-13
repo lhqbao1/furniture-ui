@@ -3,6 +3,9 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: [],
+  },
 
   // ✅ Bỏ qua lỗi ESLint và TypeScript khi build production trên Vercel
   eslint: {

@@ -27,70 +27,61 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="de">
       <head>
-        {/* <Script
-                    id="GTM"
-                    dangerouslySetInnerHTML={{
-                        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
-              j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-              f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-WKVQP2QH');`,
-                    }}
-                    async
-                /> */}
-
+        {/* Google Tag Manager script (optimized) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17548008377"
-          async
+          strategy="lazyOnload"
         />
+
         <Script
           id="gtag-base"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         >
           {`
-                        window.dataLayer = window.dataLayer || [];
-                        function gtag(){dataLayer.push(arguments);}
-                        gtag('js', new Date());
-                        gtag('config', 'AW-17548008377');
-                    `}
-        </Script>
-        <Script
-          id="google-ads-conversion"
-          strategy="afterInteractive"
-        >
-          {`
-                        gtag('event', 'conversion', {
-                        'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
-                        'transaction_id': ''
-                        });
-                    `}
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-17548008377');
+          `}
         </Script>
 
+        {/* Google Ads conversion (delayed) */}
+        <Script
+          id="google-ads-conversion"
+          strategy="lazyOnload"
+        >
+          {`
+            gtag('event', 'conversion', {
+              'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B'
+            });
+          `}
+        </Script>
+
+        {/* Autoblocker must be early */}
         <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
           strategy="beforeInteractive"
-          // async
         />
+
+        {/* CMP loader (optimized lazy loading) */}
         <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="RlDaintBne_uoh"
-          // async
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
       </head>
+
       <body
         className={`${figtree.variable} ${libre.variable} font-sans antialiased`}
       >
-        {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-WKVQP2QH"
@@ -99,7 +90,9 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           ></iframe>
         </noscript>
+
         <QueryProvider>{children}</QueryProvider>
+
         <Toaster
           expand
           richColors
