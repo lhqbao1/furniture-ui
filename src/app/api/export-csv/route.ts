@@ -21,6 +21,7 @@ export async function GET() {
       "link",
       "image_link",
       "availability",
+      "stock",
       "price",
       "gtin",
       "condition",
@@ -32,24 +33,31 @@ export async function GET() {
       "shipping_price",
       "shipping_label",
       "colors",
-      "categories"
+      "categories",
+      "length",
+      "width",
+      "height",
+      "weight",
+      "materials",
+      "manufacturer_name",
+      "manufacturer_address",
+      "manufacturer_phone",
+      "manufacturer_email",
+      "delivery_time"
     ];
 
     const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active)
+      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0 && p.brand)
       .map((p) => {
         const categories = p.categories?.map(c => c.name).join(", ") || "";
-        const colors = p.options
-          .filter((opt) => opt.variant_name?.toLowerCase() === "color")
-          .map((opt) => opt.label)
-          .join(", ");
         return [
           escapeCsv(p.id_provider),
-          escapeCsv(p.name.trim()),
+          escapeCsv(p.name),
           escapeCsv(cleanDescription(p.description)),
-          escapeCsv(`https://prestige-home.de/product${p.categories && p.categories.length > 0 ? `/${p.categories[0].slug}` : ''}/${p.id}`),
+          escapeCsv(`https://prestige-home.de/product${p.categories && p.categories.length > 0 ? `/${p.categories[0].slug}` : ''}/${p.url_key}`),
           escapeCsv(cleanImageLink(p.static_files[0]?.url)),
           escapeCsv(p.stock > 0 ? "in_stock" : "out_of_stock"),
+          escapeCsv(p.stock ?? ''),
           escapeCsv(p.final_price.toFixed(2) + " EUR"),
           escapeCsv(p.ean),
           "new",
@@ -57,11 +65,20 @@ export async function GET() {
           "adult",
           "no",
           "DE",
-          "Standard",
+          escapeCsv(p.carrier === "dpd" ? "Paketversand" : "Speditionsversand"),
           escapeCsv(p.carrier === "dpd" ? "5.95 EUR" : "35.95 EUR"),
           escapeCsv(p.carrier === "dpd" ? "DPD" : "AMM"),
-          escapeCsv(colors),
-          escapeCsv(categories)
+          escapeCsv(p.color ?? ''),
+          escapeCsv(categories),
+          escapeCsv(p.length ?? ''),
+          escapeCsv(p.width ?? ''),
+          escapeCsv(p.height?? ''),
+          escapeCsv(p.weight ?? ''),
+          escapeCsv(p.materials ?? ''),
+          escapeCsv(p.brand.company_name ?? ''),
+          escapeCsv(p.brand.company_address ?? ''),
+          escapeCsv(p.brand.company_email ?? ''),
+          escapeCsv(p.delivery_time ?? ''),
         ].join(",");
       });
 
