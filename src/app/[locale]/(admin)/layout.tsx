@@ -1,25 +1,23 @@
-import "../../globals.css"
+import "../../globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSideBar } from "@/components/shared/admin-sidebar";
 import Protected from "@/components/layout/auth/protected";
-import { Button } from "@/components/ui/button";
+import AdminHeader from "@/components/shared/admin-header";
 
 export default function AdminLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <Protected>
-            <SidebarProvider defaultOpen={true}>
-                <AdminSideBar />
-                <div className="container-padding lg:pt-8 pt-2 w-full">
-                    <div>
-                        <SidebarTrigger className={`border-none text-[#4D4D4D] relative`} />
-                    </div>
-                    {children}
-                </div>
-            </SidebarProvider>
-        </Protected>
-    );
+  return (
+    <Protected>
+      <SidebarProvider defaultOpen={true}>
+        <AdminSideBar />
+        <div className="container-padding lg:pt-8 pt-2 w-full">
+          <AdminHeader />
+          {children}
+        </div>
+      </SidebarProvider>
+    </Protected>
+  );
 }

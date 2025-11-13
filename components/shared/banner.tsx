@@ -29,7 +29,7 @@ const Banner = ({ height }: BannerProps) => {
       )}
     >
       <Image
-        src="/home-banner.jpg"
+        src="/home-banner1.webp"
         alt="Banner"
         fill
         className="object-cover"

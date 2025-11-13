@@ -1,0 +1,108 @@
+// hooks/useAddToCartHandler.ts
+"use client";
+
+import { toast } from "sonner";
+import { useAddToCart } from "@/features/cart/hook";
+import { useAddToWishList } from "@/features/wishlist/hook";
+import { HandleApiError } from "@/lib/api-helper";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "@/src/i18n/navigation";
+import { useCartLocal } from "@/hooks/cart";
+import { CartItemLocal } from "@/lib/utils/cart";
+
+export function useAddToCartHandler(productDetails: any) {
+  const createCartMutation = useAddToCart();
+  const addProductToWishlistMutation = useAddToWishList();
+  const t = useTranslations();
+
+  const { addToCartLocal, cart } = useCartLocal();
+  const router = useRouter();
+  const locale = useLocale();
+
+  const handleAddWishlist = () => {
+    addProductToWishlistMutation.mutate(
+      { productId: productDetails?.id ?? "", quantity: 1 },
+      {
+        onSuccess: () => toast.success("Added to wishlist!"),
+        onError: (error) => {
+          const { message } = HandleApiError(error, t);
+          toast.error(message);
+        },
+      }
+    );
+  };
+
+  const handleSubmitToCart = (values: any) => {
+    if (!productDetails) return;
+
+    const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+
+    // LOCAL CART
+    if (!userId) {
+      const existingItem = cart.find(
+        (item: CartItemLocal) => item.product_id === productDetails.id
+      );
+
+      const totalQuantity = (existingItem?.quantity || 0) + values.quantity;
+
+      if (totalQuantity > productDetails.stock) {
+        toast.error("Not enough stock");
+        return;
+      }
+
+      addToCartLocal(
+        {
+          item: {
+            product_id: productDetails.id,
+            quantity: values.quantity,
+            is_active: true,
+            item_price: productDetails.final_price,
+            final_price: productDetails.final_price,
+            img_url:
+              productDetails.static_files.length > 0
+                ? productDetails.static_files[0].url
+                : "",
+            product_name: productDetails.name,
+            stock: productDetails.stock,
+            carrier: productDetails.carrier ?? "amm",
+            id_provider: productDetails.id_provider ?? "",
+            delivery_time: productDetails.delivery_time ?? "",
+          },
+        },
+        {
+          onSuccess: () => toast.success("Added to cart"),
+          onError: () => toast.error("Failed to add to cart"),
+        }
+      );
+
+      return;
+    }
+
+    // SERVER CART
+    createCartMutation.mutate(
+      { productId: productDetails.id, quantity: values.quantity },
+      {
+        onSuccess: () => toast.success("Added to cart"),
+        onError: (error) => {
+          const { status, message } = HandleApiError(error, t);
+
+          if (status === 400) {
+            toast.error("Not enough stock");
+            return;
+          }
+
+          toast.error(message);
+
+          if (status === 401) {
+            router.push("/login", { locale });
+          }
+        },
+      }
+    );
+  };
+
+  return {
+    handleSubmitToCart,
+    handleAddWishlist,
+  };
+}

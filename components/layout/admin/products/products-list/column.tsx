@@ -27,6 +27,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "@/components/ui/hover-card";
 
 function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
@@ -300,7 +305,7 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
   };
 
   return (
-    <div className="flex justify-end text-right w-full">
+    <div className="flex justify-center text-center w-full">
       {editing ? (
         <Select
           value={value.toString()}
@@ -607,24 +612,42 @@ export const getProductColumns = (
   },
   {
     accessorKey: "static_files",
-    header: "ICON",
+    header: "IMAGE",
     cell: ({ row }) => {
       const image = row.original.static_files?.[0]?.url;
+
       return (
-        <div className="w-12 h-12 relative">
-          {image ? (
-            <Image
-              src={image}
-              alt="icon"
-              fill
-              className="object-contain rounded-md"
-              sizes="60px"
-              unoptimized
-            />
-          ) : (
-            <div className="w-12 h-12 bg-gray-200 rounded-md" />
+        <HoverCard openDelay={100} closeDelay={100}>
+          <HoverCardTrigger asChild>
+            <div className="w-12 h-12 relative cursor-pointer">
+              {image ? (
+                <Image
+                  src={image}
+                  fill
+                  alt="icon"
+                  className="object-contain rounded-md"
+                  sizes="60px"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gray-200 rounded-md" />
+              )}
+            </div>
+          </HoverCardTrigger>
+
+          {image && (
+            <HoverCardContent className="p-2 w-[220px] h-[220px] flex items-center justify-center">
+              <Image
+                src={image}
+                alt="preview"
+                width={200}
+                height={200}
+                className="object-contain rounded-md"
+                unoptimized
+              />
+            </HoverCardContent>
           )}
-        </div>
+        </HoverCard>
       );
     },
   },
