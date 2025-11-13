@@ -12,6 +12,7 @@ export type User = {
     language: string
     gender: string
     is_notified: boolean
+    from_marketplace: string
     created_at: string 
     updated_at: string
   }
@@ -31,6 +32,7 @@ export type User = {
     date_of_birth: string
     language: string
     gender: string
+    from_marketplace: string
     is_notified: boolean
     created_at: string // ISO date string
     updated_at: string // ISO date string

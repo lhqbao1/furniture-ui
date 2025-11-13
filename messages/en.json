@@ -320,6 +320,13 @@
     "resendOtp": "Resend OTP",
   "resendOtpDes": "Send the OTP again to your email/phone",
   "resendIn": "Resend in",
-      "shippingCost": "plus {shippingCost} shipping"
-
+  "shippingCost": "plus {shippingCost} shipping",
+  "ogPrice": "Previous price",
+  "itemNumber": "Item number",
+  "noComment": "No reviews yet",
+  "customer": "Customer",
+  "purchased": "Purchased",
+  "401Error": "Please log in to continue to {text}.",
+  "giveReview": "write a review",
+  "reviewRequired": "Please enter rating and comment."
 }

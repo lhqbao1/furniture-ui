@@ -315,6 +315,13 @@
     "resendOtp": "OTP erneut senden",
   "resendOtpDes": "Senden Sie den OTP-Code erneut an Ihre E-Mail/Ihre Telefonnummer",
   "resendIn": "Erneut senden in",
-      "shippingCost": "zzgl. {shippingCost} Versand"
-
+  "shippingCost": "zzgl. {shippingCost} Versand",
+  "ogPrice": "Vorher",
+  "itemNumber": "Artikelnummer",
+  "noComment": "Noch keine Bewertungen",
+  "customer": "Kunde",
+  "purchased": "Gekauft",
+    "401Error": "Bitte melden Sie sich an, um mit {text} fortzufahren.",
+      "giveReview": "bewertung schreiben",
+  "reviewRequired": "Bitte geben Sie eine Bewertung und einen Kommentar ein."
 }

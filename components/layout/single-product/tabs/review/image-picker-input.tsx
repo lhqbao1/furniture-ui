@@ -29,6 +29,11 @@ import { CSS } from "@dnd-kit/utilities";
 import { StaticFileResponse } from "@/types/products";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 // ================== TYPES ==================
 export type ImageItem = { id: string; url: string };
@@ -74,14 +79,30 @@ function SortableImage({
       {...attributes}
       className="relative h-full aspect-square rounded-lg overflow-hidden group cursor-move z-0"
     >
-      <Image
-        {...listeners}
-        src={item.url}
-        alt={`Uploaded-${item.id}`}
-        fill
-        className="object-cover z-0"
-        unoptimized
-      />
+      <HoverCard openDelay={100} closeDelay={100}>
+        <HoverCardTrigger asChild>
+          <Image
+            src={item.url}
+            fill
+            alt="icon"
+            className="object-contain rounded-md"
+            sizes="60px"
+            unoptimized
+          />
+        </HoverCardTrigger>
+
+        <HoverCardContent className="p-2 w-[400px] h-[400px] flex items-center justify-center border-2">
+          <Image
+            {...listeners}
+            src={item.url}
+            alt={`Uploaded-${item.id}`}
+            fill
+            className="object-cover z-0"
+            unoptimized
+          />
+        </HoverCardContent>
+      </HoverCard>
+
       <button
         type="button"
         onClick={(e) => {

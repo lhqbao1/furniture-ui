@@ -273,7 +273,7 @@ const ProductsGridLayout = ({
                 <Button
                   variant="ghost"
                   size="lg"
-                  className="has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white"
+                  className="has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200"
                   onClick={() => handleAddToWishlist(product)}
                 >
                   <Heart className="size-6 stroke-current transition-colors duration-200" />
