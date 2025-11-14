@@ -149,9 +149,7 @@ export default function InvoiceTable({
         <div className="flex gap-0 justify-end">
           <div className="mr-6">Versandkosten (brutto)</div>
           <div className="w-[100px] text-right">
-            {(
-              (invoice?.total_shipping ?? 0) + (invoice?.voucher_amount ?? 0)
-            )?.toLocaleString("de-DE", {
+            {(invoice?.total_shipping ?? 0)?.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -210,11 +208,7 @@ export default function InvoiceTable({
         <div className="flex gap-0 justify-end">
           <div className="mr-6">Zahlbetrag</div>
           <div className="w-[100px] text-right">
-            {(
-              (invoice?.total_amount_item ?? 0) +
-              (invoice?.total_shipping ?? 0) +
-              (invoice?.voucher_amount ?? 0)
-            ).toLocaleString("de-DE", {
+            {(invoice?.total_amount ?? 0).toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}

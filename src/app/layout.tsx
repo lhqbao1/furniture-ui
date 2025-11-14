@@ -33,49 +33,57 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
-        {/* Google Tag Manager script (optimized) */}
+        {/* <Script
+                    id="GTM"
+                    dangerouslySetInnerHTML={{
+                        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+              j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+              f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-WKVQP2QH');`,
+                    }}
+                    async
+                /> */}
+
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17548008377"
-          strategy="lazyOnload"
+          async
         />
-
         <Script
           id="gtag-base"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
         >
           {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-17548008377');
-          `}
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'AW-17548008377');
+                    `}
         </Script>
-
-        {/* Google Ads conversion (delayed) */}
         <Script
           id="google-ads-conversion"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
         >
           {`
-            gtag('event', 'conversion', {
-              'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B'
-            });
-          `}
+                        gtag('event', 'conversion', {
+                        'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
+                        'transaction_id': ''
+                        });
+                    `}
         </Script>
 
-        {/* Autoblocker must be early */}
         <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
-          strategy="beforeInteractive"
+          async
         />
-
-        {/* CMP loader (optimized lazy loading) */}
         <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="RlDaintBne_uoh"
-          strategy="lazyOnload"
+          async
+          strategy="afterInteractive"
         />
       </head>
 

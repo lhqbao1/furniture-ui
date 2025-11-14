@@ -10,7 +10,7 @@ import ProductImageDialog from "../main-image-dialog";
 interface MainImageProps {
   productDetails: any;
   mainImageIndex: number;
-  setMainImageIndex: (n: number) => void;
+  setMainImageIndex: React.Dispatch<React.SetStateAction<number>>;
   position: { x: number; y: number };
   isHover: boolean;
   setIsHover: (v: boolean) => void;
@@ -21,6 +21,7 @@ interface MainImageProps {
 export default function MainImage({
   productDetails,
   mainImageIndex,
+  setMainImageIndex,
   position,
   isHover,
   setIsHover,
@@ -33,7 +34,11 @@ export default function MainImage({
       : "/placeholder-product.webp";
 
   return (
-    <ProductImageDialog productDetails={productDetails}>
+    <ProductImageDialog
+      productDetails={productDetails}
+      mainImageIndex={mainImageIndex}
+      setMainImageIndex={setMainImageIndex}
+    >
       <div
         className="flex justify-center overflow-hidden main-image"
         onMouseMove={handleZoomImage}

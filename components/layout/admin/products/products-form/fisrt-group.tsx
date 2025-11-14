@@ -32,7 +32,7 @@ const RichEditor = dynamic(
         Loading editor...
       </div>
     ),
-  }
+  },
 );
 interface ProductDetailInputsProps {
   isEdit?: boolean;
@@ -71,7 +71,7 @@ const ProductDetailInputs = ({
     try {
       // Tên folder dựa trên provider ID và product name
       const folderName = `${id_provider || "unknown"}-${sanitizeFolderName(
-        name
+        name,
       )}`;
       const folder = zip.folder(folderName);
 
@@ -117,7 +117,10 @@ const ProductDetailInputs = ({
               Product Name
             </FormLabel>
             <FormControl>
-              <Input placeholder="" {...field} />
+              <Input
+                placeholder=""
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -165,8 +168,8 @@ const ProductDetailInputs = ({
                         if (missingFields.length > 0) {
                           toast.error(
                             `Cannot activate product. Missing fields: ${missingFields.join(
-                              ", "
-                            )}`
+                              ", ",
+                            )}`,
                           );
                           // Không cho bật active
                           field.onChange(false);
@@ -188,9 +191,12 @@ const ProductDetailInputs = ({
         )}
       </div>
 
-      <div className="flex gap-6">
+      <div className="grid lg:grid-cols-4 grid-cols-1 lg:gap-6 gap-4">
         {/*Product Category */}
-        <MultiSelectField fieldName="category_ids" label="Categories" />
+        <MultiSelectField
+          fieldName="category_ids"
+          label="Categories"
+        />
 
         {/* SKU input */}
         <FormField
@@ -253,7 +259,7 @@ const ProductDetailInputs = ({
                   value={field.value ?? ""}
                   onChange={(e) =>
                     field.onChange(
-                      e.target.value === "" ? null : e.target.valueAsNumber
+                      e.target.value === "" ? null : e.target.valueAsNumber,
                     )
                   }
                 />
@@ -285,15 +291,24 @@ const ProductDetailInputs = ({
               defaultValue="19%"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="19%" id="19%" />
+                <RadioGroupItem
+                  value="19%"
+                  id="19%"
+                />
                 <Label htmlFor="19%">19%</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="7%" id="7%" />
+                <RadioGroupItem
+                  value="7%"
+                  id="7%"
+                />
                 <Label htmlFor="7%">7%</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="0%" id="0%" />
+                <RadioGroupItem
+                  value="0%"
+                  id="0%"
+                />
                 <Label htmlFor="0%">0%</Label>
               </div>
             </RadioGroup>

@@ -79,7 +79,10 @@ function SortableImage({
       {...attributes}
       className="relative h-full aspect-square rounded-lg overflow-hidden group cursor-move z-0"
     >
-      <HoverCard openDelay={100} closeDelay={100}>
+      <HoverCard
+        openDelay={100}
+        closeDelay={100}
+      >
         <HoverCardTrigger asChild>
           <Image
             src={item.url}
@@ -158,26 +161,6 @@ function ImagePickerInput<T extends FieldValues>({
         return;
       }
 
-      // ⚙️ Nếu là thêm sản phẩm mới (không upload lên server)
-      //   if (is_add_product) {
-      //     const newItems = acceptedFiles.map((file) => ({
-      //       id: genId(),
-      //       file, // giữ nguyên File object
-      //       preview: URL.createObjectURL(file), // có thể thêm preview
-      //     }));
-
-      //     const next = [...items, ...newItems];
-      //     setItems(next);
-
-      //     form.setValue(
-      //       fieldName,
-      //       next.map((i) => ({ file: i.file })) as PathValue<T, Path<T>>,
-      //       { shouldValidate: true }
-      //     );
-
-      //     return; // ⛔ Dừng, không uploadImage.mutate
-      //   }
-
       // 🚀 Nếu không phải thêm sản phẩm, upload bình thường
       const formData = new FormData();
       acceptedFiles.forEach((file) => formData.append("files", file));
@@ -201,13 +184,13 @@ function ImagePickerInput<T extends FieldValues>({
             form.setValue(
               fieldName,
               next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
-              { shouldValidate: true }
+              { shouldValidate: true },
             );
           }
         },
       });
     },
-    [uploadImage, isSingle, items, form, fieldName, is_add_product]
+    [uploadImage, isSingle, items, form, fieldName, is_add_product],
   );
 
   const removeImage = (index: number) => {
@@ -221,7 +204,7 @@ function ImagePickerInput<T extends FieldValues>({
       form.setValue(
         fieldName,
         next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
-        { shouldValidate: true }
+        { shouldValidate: true },
       );
     }
   };
@@ -234,7 +217,9 @@ function ImagePickerInput<T extends FieldValues>({
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   return (
@@ -247,13 +232,13 @@ function ImagePickerInput<T extends FieldValues>({
             isDragActive
               ? "border-primary bg-primary/5"
               : "border-gray-300 dark:border-gray-700"
-          } ${isAddProduct ? "col-span-3" : "col-span-12"}`}
+          } ${isAddProduct ? "lg:col-span-3 col-span-12" : "col-span-12"}`}
       >
         {uploadImage.isPending ? (
           <Loader2
             className={cn(
               "w-12 h-12 text-gray-400 animate-spin",
-              isSimple && "w-6 h-6"
+              isSimple && "w-6 h-6",
             )}
           />
         ) : (
@@ -276,10 +261,17 @@ function ImagePickerInput<T extends FieldValues>({
           </>
         )}
 
-        <Button variant="outline" type="button">
+        <Button
+          variant="outline"
+          type="button"
+        >
           {t("browseFile")}
         </Button>
-        <input {...getInputProps()} className="hidden" multiple />
+        <input
+          {...getInputProps()}
+          className="hidden"
+          multiple
+        />
       </div>
 
       {/* Preview */}
@@ -314,7 +306,7 @@ function ImagePickerInput<T extends FieldValues>({
       ) : items.length > 0 ? (
         <div
           className={`overflow-y-scroll ${
-            isAddProduct ? "col-span-9" : "col-span-12"
+            isAddProduct ? "lg:col-span-9 col-span-12" : "col-span-12"
           }`}
         >
           <DndContext
@@ -330,7 +322,7 @@ function ImagePickerInput<T extends FieldValues>({
               form.setValue(
                 fieldName,
                 next.map((i) => ({ url: i.url })) as PathValue<T, Path<T>>,
-                { shouldValidate: true }
+                { shouldValidate: true },
               );
             }}
           >
@@ -338,9 +330,12 @@ function ImagePickerInput<T extends FieldValues>({
               items={items.map((i) => i.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="w-full h-[144px] grid grid-cols-4 gap-8">
+              <div className="w-full lg:h-[144px] h-full grid grid-cols-4 gap-8">
                 {items.map((it, idx) => (
-                  <div key={it.id} className="w-full col-span-1">
+                  <div
+                    key={it.id}
+                    className="w-full lg:col-span-1 col-span-2"
+                  >
                     <SortableImage
                       item={it}
                       onRemove={() => removeImage(idx)}
