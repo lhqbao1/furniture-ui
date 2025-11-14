@@ -41,14 +41,7 @@ export default function CreateCheckoutpage() {
   });
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
-    const total_amount_item = values.items?.reduce((acc, item) => {
-      const price = Number(item.final_price) || 0;
-      const qty = Number(item.quantity) || 0;
-      return acc + price * qty;
-    }, 0);
-
     const total_shipping = values.carrier === "spedition" ? 35.95 : 5.95;
-    const total_amount = total_amount_item + total_shipping;
 
     if (
       (values.carrier === "spedition" && !values.phone_number) ||
@@ -61,9 +54,7 @@ export default function CreateCheckoutpage() {
     createOrderManualMutation.mutate(
       {
         ...values,
-        total_amount_item: total_amount_item,
         total_shipping: total_shipping,
-        total_amount: total_amount,
         email: values.email
           ? values.email
           : `${values.first_name}${values.last_name}`,
@@ -76,7 +67,7 @@ export default function CreateCheckoutpage() {
         onError(error, variables, context) {
           toast.error("Create order fail");
         },
-      }
+      },
     );
   }
 
@@ -90,7 +81,7 @@ export default function CreateCheckoutpage() {
           (errors) => {
             console.log(errors);
             toast.error(t("checkFormError"));
-          }
+          },
         )}
         className="flex flex-col gap-8 pb-12"
       >
@@ -111,7 +102,10 @@ export default function CreateCheckoutpage() {
           <div className="col-span-1 space-y-4 lg:space-y-4">
             <SelectOrderItems />
             <div className="flex lg:justify-end justify-center gap-2">
-              <Button type="submit" className="text-lg lg:w-1/3 w-1/2 py-6">
+              <Button
+                type="submit"
+                className="text-lg lg:w-1/3 w-1/2 py-6"
+              >
                 {t("continue")}
               </Button>
             </div>

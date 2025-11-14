@@ -69,7 +69,7 @@ const ProductDetailsLogistic = ({
                 productDetails.carrier === "amm" ? "35,95€" : "5,95€",
             })}
           </p>
-          <p className="text-gray-500">14-Tage-Rückgaberecht</p>
+          <p className="text-gray-600">14-Tage-Rückgaberecht</p>
         </div>
       </div>
 
@@ -83,12 +83,12 @@ const ProductDetailsLogistic = ({
                 })
               : t("updating")}
           </p>
-          <ul className="space-y-1 text-gray-700 text-sm">
+          <ul className="space-y-1 text-gray-600 text-sm">
             {productDetails.carrier === "amm" && (
               <>
                 <li className="flex items-start gap-2">
                   <span className="text-base leading-5">•</span>
-                  <span>
+                  <span className="text-base">
                     Lieferung <strong>frei Bordsteinkante</strong>{" "}
                     <Tooltip>
                       <TooltipTrigger asChild>
