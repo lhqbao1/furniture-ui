@@ -2,7 +2,7 @@
 import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Eye, Heart } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { ProductDetailsTab } from "@/components/layout/single-product/product-tab";
 import ListStars from "@/components/shared/list-stars";
 import ProductDetailsSkeleton from "@/components/layout/single-product/product-detail-skeleton";
@@ -47,12 +47,13 @@ const ProductDetails = ({
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
+  const [adminId, setAdminId] = React.useState<string | null>(null);
 
   // ⭐ HOOK: fetch product + parent
   const { productDetails, parentProduct, isLoadingProduct } = useProductData(
     productDetailsData,
     parentProductData,
-    productId
+    productId,
   );
 
   // ⭐ HOOK: add to cart, wishlist
@@ -85,10 +86,9 @@ const ProductDetails = ({
 
   if (isLoadingProduct || !productDetails) return <ProductDetailsSkeleton />;
 
-  const adminId =
-    typeof window !== "undefined"
-      ? localStorage.getItem("admin_access_token")
-      : null;
+  useEffect(() => {
+    setAdminId(localStorage.getItem("admin_access_token"));
+  }, []);
 
   return (
     <>
@@ -111,7 +111,7 @@ const ProductDetails = ({
             <form
               onSubmit={form.handleSubmit(
                 (values) => handleSubmitToCart(values),
-                (e) => console.error("Please check the form for errors", e)
+                (e) => console.error("Please check the form for errors", e),
               )}
               className="space-y-8 lg:px-30"
             >
@@ -119,7 +119,7 @@ const ProductDetails = ({
                 {/*Product details */}
                 <div className="grid grid-cols-12 xl:gap-16 gap-8">
                   {/* LEFT — IMAGE */}
-                  <div className="xl:col-span-6 col-span-12 flex flex-col gap-6">
+                  <div className="xl:col-span-6 col-span-12 flex flex-col gap-6 lg:gap-12">
                     <MainImage
                       productDetails={productDetails}
                       mainImageIndex={mainImageIndex}

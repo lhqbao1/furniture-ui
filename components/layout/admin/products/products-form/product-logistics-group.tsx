@@ -109,7 +109,7 @@ const ProductLogisticsGroup = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 grid-cols-1 gap-6">
         {/* Carrier field */}
         <FormField
           control={form.control}
@@ -132,7 +132,10 @@ const ProductLogisticsGroup = ({
                   </SelectTrigger>
                   <SelectContent>
                     {(isDSP ? DSPcarriers : carriers).map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
+                      <SelectItem
+                        key={c.id}
+                        value={c.id}
+                      >
                         <div className="flex items-center gap-2">
                           <Image
                             src={c.logo}
@@ -182,7 +185,10 @@ const ProductLogisticsGroup = ({
                       — Deselect —
                     </SelectItem>
                     {deliveryTimes.map((t) => (
-                      <SelectItem key={t} value={t}>
+                      <SelectItem
+                        key={t}
+                        value={t}
+                      >
                         {t} business days
                       </SelectItem>
                     ))}
@@ -210,7 +216,7 @@ const ProductLogisticsGroup = ({
                   value={field.value ?? ""}
                   onChange={(e) =>
                     field.onChange(
-                      e.target.value === "" ? null : e.target.valueAsNumber
+                      e.target.value === "" ? null : e.target.valueAsNumber,
                     )
                   }
                   disabled={bundleItems?.length > 0} // ✅ disable nếu có bundleItems
@@ -227,7 +233,7 @@ const ProductLogisticsGroup = ({
         />
       </div>
 
-      <div className="flex gap-6">
+      <div className="grid lg:grid-cols-3 grid-cols-1 gap-6">
         {/* Tariff Number */}
         <FormField
           control={form.control}
@@ -291,7 +297,9 @@ const ProductLogisticsGroup = ({
                   value={field.value ?? ""}
                   onChange={(e) =>
                     field.onChange(
-                      e.target.value === "" ? undefined : e.target.valueAsNumber
+                      e.target.value === ""
+                        ? undefined
+                        : e.target.valueAsNumber,
                     )
                   }
                 />
@@ -326,7 +334,7 @@ const ProductLogisticsGroup = ({
                   Package #{index + 1}
                 </div>
 
-                <div className="grid grid-cols-4 gap-3 w-full">
+                <div className="grid lg:grid-cols-4 grid-cols-2 gap-3 w-full">
                   {["length", "height", "width", "weight"].map((key) => (
                     <FormField
                       key={key}
@@ -347,7 +355,7 @@ const ProductLogisticsGroup = ({
                                 field.onChange(
                                   e.target.value === ""
                                     ? null
-                                    : e.target.valueAsNumber
+                                    : e.target.valueAsNumber,
                                 )
                               }
                               disabled={bundleItems?.length > 0}
@@ -378,7 +386,10 @@ const PackageSkeleton = () => (
 
     <div className="grid grid-cols-4 gap-3 w-full">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="flex flex-col-reverse items-center flex-1">
+        <div
+          key={i}
+          className="flex flex-col-reverse items-center flex-1"
+        >
           <div className="h-10 w-full bg-gray-300 rounded"></div>
           <div className="h-3 w-10 bg-gray-300 rounded mb-1"></div>
         </div>

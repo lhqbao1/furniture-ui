@@ -3,20 +3,18 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CopyCheck, Eye, Loader2, Pencil } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
 import { Switch } from "@/components/ui/switch";
 import SyncToEbayForm from "./sync-to-ebay-form";
 import { syncToEbayInput } from "@/features/ebay/api";
-import { syncToKaufland, syncToKauflandInput } from "@/features/kaufland/api";
+import { syncToKauflandInput } from "@/features/kaufland/api";
 import {
   useRemoveFormKaufland,
   useSyncToKaufland,
@@ -52,7 +50,7 @@ function ToogleProductStatus({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product status fail");
         },
-      }
+      },
     );
   };
 
@@ -85,7 +83,7 @@ function SyncToMarketplace({
 
   // ✅ Tách marketplace cụ thể ra, tránh find() lặp
   const marketplaceProduct = product.marketplace_products?.find(
-    (p) => p.marketplace === marketplace
+    (p) => p.marketplace === marketplace,
   );
 
   const handleRemove = () => {
@@ -101,7 +99,7 @@ function SyncToMarketplace({
         {
           onSuccess: () => toast.success("Removed from Kaufland successfully"),
           onError: () => toast.error("Failed to remove from Kaufland"),
-        }
+        },
       );
     }
   };
@@ -222,7 +220,7 @@ function AddProductMarketplace({ product }: { product: ProductItem }) {
 }
 
 export const baseColumns = (
-  setSortByStock: (val?: "asc" | "desc") => void
+  setSortByStock: (val?: "asc" | "desc") => void,
 ): ColumnDef<ProductItem>[] => [
   {
     id: "select",
@@ -359,15 +357,15 @@ export const baseColumns = (
 
 export const productMarketplaceColumns = (
   products: ProductItem[],
-  setSortByStock: (val?: "asc" | "desc") => void
+  setSortByStock: (val?: "asc" | "desc") => void,
 ): ColumnDef<ProductItem>[] => {
   // Lấy danh sách marketplace duy nhất từ toàn bộ product
   const marketplaces = Array.from(
     new Set(
       products
         .flatMap((p) => p.marketplace_products?.map((m) => m.marketplace))
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   );
 
   // Cột cố định cho marketplace
@@ -392,7 +390,7 @@ export const productMarketplaceColumns = (
       cell: ({ row }) => {
         const product = row.original;
         const hasMarketplace = product.marketplace_products?.some(
-          (m) => m.marketplace === marketplace
+          (m) => m.marketplace === marketplace,
         );
 
         return (
@@ -421,7 +419,7 @@ export const productMarketplaceColumns = (
           </div>
         );
       },
-    })
+    }),
   );
 
   return [

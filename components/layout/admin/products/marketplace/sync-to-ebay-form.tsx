@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Pencil } from "lucide-react";
 import { useSyncToEbay } from "@/features/ebay/hook";
 import { syncToEbayInput } from "@/features/ebay/api";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
@@ -67,17 +67,17 @@ const SyncToEbayForm = ({
 
   const existingMarketplaces = useMemo(
     () => product.marketplace_products?.map((m) => m.marketplace) ?? [],
-    [product]
+    [product],
   );
 
   const availableMarketplaces = useMemo(
     () => ALL_MARKETPLACES.filter((m) => !existingMarketplaces.includes(m)),
-    [existingMarketplaces]
+    [existingMarketplaces],
   );
 
   const marketplacesToRender = useMemo(
     () => (isUpdating ? ALL_MARKETPLACES : availableMarketplaces),
-    [isUpdating, availableMarketplaces]
+    [isUpdating, availableMarketplaces],
   );
 
   const form = useForm<MarketPlaceFormValues>({
@@ -88,17 +88,17 @@ const SyncToEbayForm = ({
       description: product.description,
       final_price: isUpdating
         ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace
+            (i) => i.marketplace === currentMarketplace,
           )?.final_price
         : product.final_price,
       min_stock: isUpdating
         ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace
+            (i) => i.marketplace === currentMarketplace,
           )?.min_stock
         : undefined,
       max_stock: isUpdating
         ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace
+            (i) => i.marketplace === currentMarketplace,
           )?.max_stock
         : undefined,
       sku: product.sku,
@@ -148,7 +148,7 @@ const SyncToEbayForm = ({
 
     if (isUpdating) {
       const index = updatedMarketplaceProducts.findIndex(
-        (m) => m.marketplace === values.marketplace
+        (m) => m.marketplace === values.marketplace,
       );
 
       const updateValues = {
@@ -195,7 +195,7 @@ const SyncToEbayForm = ({
         onSuccess(data) {
           if (isUpdating && currentMarketplace === "ebay") {
             const ebayData = data.marketplace_products?.find(
-              (m) => m.marketplace === "ebay"
+              (m) => m.marketplace === "ebay",
             );
             const payload: syncToEbayInput = {
               price: ebayData?.final_price ?? product.final_price,
@@ -204,12 +204,12 @@ const SyncToEbayForm = ({
               tax: product.tax ? product.tax : null,
               product: {
                 description: stripHtmlRegex(
-                  ebayData?.description ?? product.description
+                  ebayData?.description ?? product.description,
                 ),
                 title: ebayData?.name ?? product.name,
                 imageUrls:
                   product.static_files?.map((file) =>
-                    file.url.replace(/\s+/g, "%20")
+                    file.url.replace(/\s+/g, "%20"),
                   ) ?? [],
                 ean: product.ean ? [product.ean] : [],
               },
@@ -228,7 +228,7 @@ const SyncToEbayForm = ({
 
           if (isUpdating && currentMarketplace === "kaufland") {
             const kauflandData = data.marketplace_products?.find(
-              (m) => m.marketplace === "kaufland"
+              (m) => m.marketplace === "kaufland",
             );
             const payload: syncToKauflandInput = {
               ean: product.ean,
@@ -236,7 +236,7 @@ const SyncToEbayForm = ({
               description: kauflandData?.description ?? product.description,
               image_urls:
                 product.static_files?.map((f) =>
-                  f.url.replace(/\s+/g, "%20")
+                  f.url.replace(/\s+/g, "%20"),
                 ) ?? [],
               price: kauflandData?.final_price ?? product.final_price,
               stock: product.stock,
@@ -264,16 +264,23 @@ const SyncToEbayForm = ({
         onError() {
           toast.error("Failed to update marketplace data");
         },
-      }
+      },
     );
   };
 
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+      >
         <DialogTrigger asChild>
-          <Button variant="outline" type="button">
-            Update
+          <Button
+            variant="outline"
+            type="button"
+            className="bg-amber-50 border-amber-400"
+          >
+            <Pencil className="text-amber-400" />
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
@@ -309,7 +316,10 @@ const SyncToEbayForm = ({
                             <SelectContent>
                               {marketplacesToRender.length > 0 ? (
                                 marketplacesToRender.map((m) => (
-                                  <SelectItem key={m} value={m}>
+                                  <SelectItem
+                                    key={m}
+                                    value={m}
+                                  >
                                     {m.toUpperCase()}
                                   </SelectItem>
                                 ))
@@ -335,7 +345,10 @@ const SyncToEbayForm = ({
                     <FormItem>
                       <FormLabel>Product Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter product name" {...field} />
+                        <Input
+                          placeholder="Enter product name"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -360,7 +373,7 @@ const SyncToEbayForm = ({
                               field.onChange(
                                 e.target.value === ""
                                   ? null
-                                  : e.target.valueAsNumber
+                                  : e.target.valueAsNumber,
                               )
                             }
                           />
@@ -385,7 +398,7 @@ const SyncToEbayForm = ({
                               field.onChange(
                                 e.target.value === ""
                                   ? null
-                                  : e.target.valueAsNumber
+                                  : e.target.valueAsNumber,
                               )
                             }
                           />
@@ -409,7 +422,7 @@ const SyncToEbayForm = ({
                               field.onChange(
                                 e.target.value === ""
                                   ? null
-                                  : e.target.valueAsNumber
+                                  : e.target.valueAsNumber,
                               )
                             }
                           />
