@@ -14,13 +14,17 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface ProductImageDialogProps {
   productDetails: ProductItem;
   children: React.ReactNode;
+  mainImageIndex: number;
+  setMainImageIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function ProductImageDialog({
   productDetails,
   children,
+  mainImageIndex,
+  setMainImageIndex,
 }: ProductImageDialogProps) {
-  const [mainImageIndex, setMainImageIndex] = useState(0);
+  // const [mainImageIndex, setMainImageIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -80,7 +84,7 @@ export default function ProductImageDialog({
               onClick={(e) => {
                 e.stopPropagation();
                 setMainImageIndex((prev) =>
-                  prev < productDetails.static_files.length - 1 ? prev + 1 : 0
+                  prev < productDetails.static_files.length - 1 ? prev + 1 : 0,
                 );
               }}
             >
@@ -91,7 +95,9 @@ export default function ProductImageDialog({
               onClick={(e) => {
                 e.stopPropagation();
                 setMainImageIndex((prev) =>
-                  prev === 0 ? productDetails.static_files.length - 1 : prev - 1
+                  prev === 0
+                    ? productDetails.static_files.length - 1
+                    : prev - 1,
                 );
               }}
             >

@@ -53,7 +53,7 @@ const OrderDetails = () => {
   return (
     <div className="space-y-12 pb-20">
       <AdminBackButton />
-      <div className="grid grid-cols-4 gap-12">
+      <div className="grid lg:grid-cols-4 grid-cols-2 lg:gap-12 gap-4">
         <OrderDetailOverView
           order={order}
           created_at={formatDate(order.created_at)}

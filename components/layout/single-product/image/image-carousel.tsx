@@ -4,10 +4,6 @@
 import React from "react";
 import Image from "next/image";
 import { ProductImageCarousel } from "../sub-images-carousel";
-
-// ---- CHANGE NOTE ----
-// Vẫn dùng component carousel gốc của bạn (không thay đổi logic).
-
 interface ImageGalleryProps {
   productDetails: any;
   mainImageIndex: number;

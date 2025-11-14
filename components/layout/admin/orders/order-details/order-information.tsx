@@ -43,7 +43,7 @@ const OrderInformation = ({
 }: OrderInformationProps) => {
   return (
     <div className="flex flex-col w-full items-end space-y-3">
-      <div className="grid grid-cols-3 w-1/4">
+      <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
         <div className="text-end col-span-2">Sub total</div>
         <div className="text-end">
           €
@@ -53,7 +53,7 @@ const OrderInformation = ({
           })}
         </div>
       </div>
-      <div className="grid grid-cols-3 w-1/4">
+      <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
         <div className="text-end col-span-2">Shipping</div>
         <div className="text-end">
           €
@@ -63,7 +63,7 @@ const OrderInformation = ({
           )}
         </div>
       </div>
-      <div className="grid grid-cols-3 w-1/4">
+      <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
         <div className="text-end col-span-2">Discount</div>
         <div className="text-end">
           €
@@ -75,7 +75,7 @@ const OrderInformation = ({
               })}
         </div>
       </div>
-      <div className="grid grid-cols-3 w-1/4">
+      <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
         <div className="text-end col-span-2">VAT</div>
         <div className="text-end">
           €

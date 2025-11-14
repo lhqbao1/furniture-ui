@@ -45,12 +45,12 @@ export default function CommentForm({
           const formData = new FormData();
           formData.append("files", file);
           return await uploadImageMutation.mutateAsync(formData);
-        })
+        }),
       );
 
       // 🔗 Lấy tất cả URL từ kết quả trả về
       const allUploadedUrls = uploadedResponses.flatMap(
-        (res) => res?.results?.map((r) => r.url) ?? []
+        (res) => res?.results?.map((r) => r.url) ?? [],
       );
 
       // ✅ Lưu URL public
@@ -145,7 +145,7 @@ export default function CommentForm({
         <label
           className={cn(
             "relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer transition hover:border-orange-400 hover:bg-orange-50",
-            isUploading && "opacity-60 pointer-events-none"
+            isUploading && "opacity-60 pointer-events-none",
           )}
         >
           <div className="flex flex-col items-center justify-center">
@@ -171,7 +171,10 @@ export default function CommentForm({
         {previewUrls.length > 0 && (
           <div className="mt-3 grid grid-cols-3 gap-3">
             {previewUrls.map((src, idx) => (
-              <div key={idx} className="relative rounded-xl overflow-hidden">
+              <div
+                key={idx}
+                className="relative rounded-xl overflow-hidden"
+              >
                 <img
                   src={src}
                   alt={`preview-${idx}`}
