@@ -75,8 +75,8 @@ const SelectBundleComponent = ({
   const handleAmountChange = (id: string, value: number) => {
     setListProducts((prev) =>
       prev.map((item) =>
-        item.product.id === id ? { ...item, amount: value } : item
-      )
+        item.product.id === id ? { ...item, amount: value } : item,
+      ),
     );
   };
 
@@ -85,7 +85,7 @@ const SelectBundleComponent = ({
     return products.items
       .filter((p) => p.id !== currentProduct?.id)
       .filter(
-        (p: ProductItem) => !listProducts.some((lp) => lp.product.id === p.id)
+        (p: ProductItem) => !listProducts.some((lp) => lp.product.id === p.id),
       );
   }, [products?.items, listProducts]);
 
@@ -113,7 +113,7 @@ const SelectBundleComponent = ({
           width: b.bundle_item.width ?? 0,
           height: b.bundle_item.height ?? 0,
           weight: b.bundle_item.weight ?? 0,
-        })
+        }),
       );
 
       setListProducts(initialBundles);
@@ -142,7 +142,10 @@ const SelectBundleComponent = ({
   return (
     <div className="space-y-6">
       <div className="col-span-2 flex gap-2 items-center">
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover
+          open={open}
+          onOpenChange={setOpen}
+        >
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -224,7 +227,7 @@ const SelectBundleComponent = ({
                     key={product.id}
                     className="grid grid-cols-4 gap-3 flex-1"
                   >
-                    <div className="flex col-span-3 items-center gap-3 border rounded-md p-2 hover:bg-accent/40 transition">
+                    <div className="flex lg:col-span-3 col-span-4 items-center gap-3 border rounded-md p-2 hover:bg-accent/40 transition">
                       <Image
                         src={
                           product.static_files?.[0]?.url ??
@@ -260,7 +263,7 @@ const SelectBundleComponent = ({
                       onChange={(e) =>
                         handleAmountChange(product.id, Number(e.target.value))
                       }
-                      className="h-full"
+                      className="lg:h-full lg:col-span-1 col-span-4 h-10"
                     />
                   </div>
                   <RemoveBundleDialog

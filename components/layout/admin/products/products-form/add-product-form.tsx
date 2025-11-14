@@ -62,7 +62,9 @@ const ProductForm = ({
                   {/* Always mounted, only hidden */}
                   <div
                     className={
-                      openAccordion.includes("details") ? "block" : "hidden"
+                      openAccordion.includes("details")
+                        ? "block mt-4"
+                        : "hidden"
                     }
                   >
                     <Card>
@@ -84,7 +86,9 @@ const ProductForm = ({
 
                   <div
                     className={
-                      openAccordion.includes("additional") ? "block" : "hidden"
+                      openAccordion.includes("additional")
+                        ? "block mt-4"
+                        : "hidden"
                     }
                   >
                     <Card>
@@ -103,10 +107,16 @@ const ProductForm = ({
 
                   <div
                     className={
-                      openAccordion.includes("component") ? "block" : "hidden"
+                      openAccordion.includes("component")
+                        ? "block mt-4"
+                        : "hidden"
                     }
                   >
-                    <SelectBundleComponent currentProduct={productValues} />
+                    <Card>
+                      <CardContent>
+                        <SelectBundleComponent currentProduct={productValues} />
+                      </CardContent>
+                    </Card>
                   </div>
                 </AccordionItem>
 
@@ -118,7 +128,9 @@ const ProductForm = ({
 
                   <div
                     className={
-                      openAccordion.includes("logistic") ? "block" : "hidden"
+                      openAccordion.includes("logistic")
+                        ? "block mt-4"
+                        : "hidden"
                     }
                   >
                     <Card>
@@ -137,7 +149,7 @@ const ProductForm = ({
 
                   <div
                     className={
-                      openAccordion.includes("seo") ? "block" : "hidden"
+                      openAccordion.includes("seo") ? "block mt-4" : "hidden"
                     }
                   >
                     <Card>

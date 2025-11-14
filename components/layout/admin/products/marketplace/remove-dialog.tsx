@@ -47,12 +47,15 @@ const RemoveFromMarketplaceDialog = ({
         {
           onSuccess: () => toast.success("Removed from Kaufland successfully"),
           onError: () => toast.error("Failed to remove from Kaufland"),
-        }
+        },
       );
     }
   };
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -61,7 +64,7 @@ const RemoveFromMarketplaceDialog = ({
             e.stopPropagation();
           }}
         >
-          Remove
+          <Trash2 className="text-red-600" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
