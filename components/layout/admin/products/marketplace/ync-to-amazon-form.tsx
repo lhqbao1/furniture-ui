@@ -132,95 +132,104 @@ const SyncToAmazonForm = ({
       ...(product.marketplace_products || []),
     ];
 
+    // tìm đúng item theo marketplace
+    const existing = updatedMarketplaceProducts.find(
+      (m) => m.marketplace === values.marketplace,
+    );
+
     if (isUpdating) {
-      const index = updatedMarketplaceProducts.findIndex(
-        (m) => m.marketplace === values.marketplace,
-      );
-
-      const updateValues = {
-        ...normalizedValues,
-        is_active: updatedMarketplaceProducts[index].is_active,
-        marketplace_offer_id:
-          updatedMarketplaceProducts[index].marketplace_offer_id,
-        line_item_id: updatedMarketplaceProducts[index].line_item_id,
-        brand: updatedMarketplaceProducts[index].brand,
-      };
-
-      if (index !== -1) {
-        updatedMarketplaceProducts[index] = {
-          ...updatedMarketplaceProducts[index],
-          ...updateValues,
-        };
+      if (existing) {
+        // update item cũ, preserve một số field
+        Object.assign(existing, {
+          ...normalizedValues,
+          is_active: existing.is_active,
+          marketplace_offer_id: existing.marketplace_offer_id,
+          line_item_id: existing.line_item_id,
+          brand: existing.brand,
+        });
       } else {
-        updatedMarketplaceProducts.push(normalizedValues);
+        // không tìm thấy → push mới
+        updatedMarketplaceProducts.push({
+          ...normalizedValues,
+          is_active: true,
+        });
       }
     } else {
-      updatedMarketplaceProducts.push({
-        ...normalizedValues,
-        is_active: true,
-      });
+      // NOT updating → bật active hoặc tạo mới
+      if (existing) {
+        Object.assign(existing, {
+          ...normalizedValues,
+          is_active: true,
+        });
+      } else {
+        updatedMarketplaceProducts.push({
+          ...normalizedValues,
+          is_active: true,
+        });
+      }
     }
 
-    console.log(values);
-    console.log(updatedMarketplaceProducts);
+    console.log("dnwid", updatedMarketplaceProducts);
+    console.log(product);
+    console.log(currentMarketplace);
 
-    // updateProductMutation.mutate(
-    //   {
-    //     input: {
-    //       ...product,
-    //       category_ids: product.categories.map((c) => c.id),
-    //       marketplace_products: updatedMarketplaceProducts,
-    //       ...(product.bundles?.length
-    //         ? {
-    //             bundles: product.bundles.map((item) => ({
-    //               product_id: item.bundle_item.id,
-    //               quantity: item.quantity,
-    //             })),
-    //           }
-    //         : { bundles: [] }),
-    //       brand_id: product.brand.id,
-    //     },
+    updateProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          category_ids: product.categories.map((c) => c.id),
+          marketplace_products: updatedMarketplaceProducts,
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand.id,
+        },
 
-    //     id: product.id,
-    //   },
-    //   {
-    //     onSuccess(data) {
-    //       const amazonData = data.marketplace_products?.find(
-    //         (m) => m.marketplace === "amazon",
-    //       );
-    //       const payload: SyncToAmazonInput = {
-    //         sku: amazonData?.sku ?? product.sku,
-    //         title: amazonData?.name ?? product.name,
-    //         manufacturer: product.brand ? product.brand.company_name : "",
-    //         description: amazonData?.description ?? product.description,
-    //         price: amazonData?.final_price ?? product.final_price,
-    //         ean: product.ean,
-    //         part_number: product.sku,
-    //         is_fragile: false,
-    //         number_of_items: Number(product.amount_unit) || 0,
-    //         included_components: product.name,
-    //         weight: product.weight,
-    //         height: product.height,
-    //         width: product.width,
-    //         length: product.length,
-    //         depth: 0,
-    //         asin: null,
-    //         stock: product.stock,
-    //         carrier: product.carrier,
-    //         brand: product.brand ? product.brand.name : "",
-    //         images: product.static_files?.map((f) => f.url) ?? [],
-    //         model_number: product.sku,
-    //         size: `${product.length}x${product.width}x${product.height}`,
-    //         country_of_origin: product.manufacture_country,
-    //       };
+        id: product.id,
+      },
+      {
+        onSuccess(data) {
+          const amazonData = data.marketplace_products?.find(
+            (m) => m.marketplace === "amazon",
+          );
+          const payload: SyncToAmazonInput = {
+            sku: amazonData?.sku ?? product.sku,
+            title: amazonData?.name ?? product.name,
+            manufacturer: product.brand ? product.brand.company_name : "",
+            description: amazonData?.description ?? product.description,
+            price: amazonData?.final_price ?? product.final_price,
+            ean: product.ean,
+            part_number: product.sku,
+            is_fragile: false,
+            number_of_items: Number(product.amount_unit) || 0,
+            included_components: product.name,
+            weight: product.weight,
+            height: product.height,
+            width: product.width,
+            length: product.length,
+            depth: 0,
+            asin: null,
+            stock: product.stock,
+            carrier: product.carrier,
+            brand: product.brand ? product.brand.name : "",
+            images: product.static_files?.map((f) => f.url) ?? [],
+            model_number: product.sku,
+            size: `${product.length}x${product.width}x${product.height}`,
+            country_of_origin: product.manufacture_country,
+          };
 
-    //       syncToAmazonMutation.mutate(payload);
-    //     },
-    //     onError() {
-    //       toast.error("Failed to update marketplace data");
-    //     },
-    //   },
-    // );
+          syncToAmazonMutation.mutate(payload);
+        },
+        onError() {
+          toast.error("Failed to update marketplace data");
+        },
+      },
+    );
   };
 
   return (
