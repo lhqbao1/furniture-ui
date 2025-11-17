@@ -57,10 +57,10 @@ const OrderInformation = ({
         <div className="text-end col-span-2">Shipping</div>
         <div className="text-end">
           €
-          {((shipping_amount ?? 0) + (discount_amount ?? 0))?.toLocaleString(
-            "de-DE",
-            { minimumFractionDigits: 2, maximumFractionDigits: 2 },
-          )}
+          {(shipping_amount ?? 0)?.toLocaleString("de-DE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </div>
       </div>
       <div className="grid grid-cols-3 lg:w-1/4 w-1/2">

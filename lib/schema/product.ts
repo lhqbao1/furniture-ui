@@ -4,49 +4,52 @@ import { StaticFile } from "@/types/products";
 // schema cho StaticFile
 const StaticFileSchema = z.object({
   url: z.string(),
-})
+});
 
 export const packageSchema = z.object({
   weight: z.number().nonnegative().optional().nullable(),
   length: z.number().nonnegative().optional().nullable(),
   width: z.number().nonnegative().optional().nullable(),
   height: z.number().nonnegative().optional().nullable(),
-})
+});
 
-export const marketPlaceSchema = z.object({
-  marketplace: z.string().optional(),
-  name: z.string().optional(),
-  description: z.string().optional(),
-  final_price: z.number().nonnegative().optional().nullable(),
-  min_stock: z.number().nonnegative().optional().nullable(),
-  max_stock: z.number().nonnegative().optional().nullable(),
-  current_stock: z.number().nonnegative().optional().nullable(),
-  line_item_id: z.string().optional().nullable(),
-  marketplace_offer_id: z.string().optional().nullable(),
-  brand: z.string().optional().nullable(),
-  is_active: z.boolean().optional().nullable(),
-  sku: z.string().optional().nullable(),
-}).refine(
-  (data) => {
-    if (data.marketplace) {
-      return (
-        data.name &&
-        data.description &&
-        data.final_price !== null &&
-        data.final_price !== undefined &&
-        data.min_stock !== null &&
-        data.min_stock !== undefined &&
-        data.max_stock !== null &&
-        data.max_stock !== undefined
-      );
-    }
-    return true;
-  },
-  {
-    message: "If marketplace is provided, all other fields must also be filled in.",
-    path: ["marketplace"],
-  }
-);
+export const marketPlaceSchema = z
+  .object({
+    marketplace: z.string().optional(),
+    name: z.string().optional(),
+    description: z.string().optional(),
+    final_price: z.number().nonnegative().optional().nullable(),
+    min_stock: z.number().nonnegative().optional().nullable(),
+    max_stock: z.number().nonnegative().optional().nullable(),
+    current_stock: z.number().nonnegative().optional().nullable(),
+    line_item_id: z.string().optional().nullable(),
+    marketplace_offer_id: z.string().optional().nullable(),
+    brand: z.string().optional().nullable(),
+    is_active: z.boolean().optional().nullable(),
+    sku: z.string().optional().nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.marketplace) {
+        return (
+          data.name &&
+          data.description &&
+          data.final_price !== null &&
+          data.final_price !== undefined &&
+          data.min_stock !== null &&
+          data.min_stock !== undefined &&
+          data.max_stock !== null &&
+          data.max_stock !== undefined
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "If marketplace is provided, all other fields must also be filled in.",
+      path: ["marketplace"],
+    },
+  );
 
 const bundleSchema = z.object({
   product_id: z.string().min(1, { message: "Bundle product ID is required" }),
@@ -55,11 +58,13 @@ const bundleSchema = z.object({
   width: z.number().optional().nullable(),
   height: z.number().optional().nullable(),
   weight: z.number().optional().nullable(),
-})
-
+});
 
 export const addProductSchema = z.object({
-  name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
+  name: z
+    .string()
+    .min(1, { message: "Product name is required" })
+    .max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
   cost: z.number().optional().nullable(),
@@ -71,7 +76,7 @@ export const addProductSchema = z.object({
   collection: z.string().optional().nullable(),
   stock: z.number().nonnegative().optional().nullable(),
   delivery_multiple: z.boolean().optional().nullable(),
-  
+
   materials: z.string().optional().nullable(),
   color: z.string().optional().nullable(),
   unit: z.string().optional().nullable(),
@@ -81,7 +86,7 @@ export const addProductSchema = z.object({
   number_of_packages: z.number().optional().nullable(),
   ean: z.string().optional().nullable(),
   carrier: z.string().optional().nullable(),
-  delivery_time:z.string().optional().nullable(),
+  delivery_time: z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),
   tariff_number: z.string().optional().nullable(),
   brand_id: z.string().optional().nullable(),
@@ -109,16 +114,16 @@ export const addProductSchema = z.object({
   pallet_unit: z.number().optional().nullable(),
   packages: z.array(packageSchema).optional(),
   marketplace_products: z.array(marketPlaceSchema).optional(),
+  pdf_files: z.string().optional(),
 
   bundles: z.array(bundleSchema).optional().nullable(),
   is_bundle: z.boolean().optional().nullable(),
 
   is_econelo: z.boolean().optional().nullable(),
-  owner_id: z.string().optional().nullable()
-})
+  owner_id: z.string().optional().nullable(),
+});
 
-
-export type ProductInput = z.infer<typeof addProductSchema>
+export type ProductInput = z.infer<typeof addProductSchema>;
 
 export const defaultValues = {
   name: "",
@@ -140,5 +145,4 @@ export const defaultValues = {
   // delivery_time: "",
   // manufacture_country: "",
   // tariff_number: ""
-}
-  
+};
