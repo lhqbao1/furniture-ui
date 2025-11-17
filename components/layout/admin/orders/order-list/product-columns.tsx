@@ -1,7 +1,20 @@
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronRight, Eye } from "lucide-react";
+import { ProductTable } from "../../products/products-list/product-table";
 
-export const orderDetailColumn: ColumnDef<CartItem>[] = [
+export const orderListExpandColumns: ColumnDef<CartItem>[] = [
   {
     accessorKey: "pos",
     header: () => <div className="text-center w-full">POS.</div>,
@@ -92,4 +105,17 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
       return <div className="text-center">AMM</div>;
     },
   },
+  // {
+  //   id: "actions",
+  //   header: () => <div className="text-center w-full">ACTIONS</div>,
+  //   cell: ({ row, table }) => (
+  //     <ActionCellChild
+  //       checkoutId={row.original.id}
+  //       items={row.original.cart.items}
+  //       expandedRowId={table.options.meta?.expandedRowId || null}
+  //       setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
+  //       currentRowId={row.id}
+  //     />
+  //   ),
+  // },
 ];

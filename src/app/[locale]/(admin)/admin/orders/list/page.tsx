@@ -1,5 +1,6 @@
 "use client";
 import { orderColumns } from "@/components/layout/admin/orders/order-list/column";
+import OrderExpandTable from "@/components/layout/admin/orders/order-list/expand-delivery";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import DownloadInvoiceButton from "@/components/layout/pdf/download-invoice-button";
@@ -79,6 +80,8 @@ const OrderList = () => {
             totalItems={data?.pagination.total_items ?? 0}
             totalPages={data?.pagination.total_pages ?? 0}
             hasBackground
+            hasExpanded
+            renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
           />
         )}
       </div>

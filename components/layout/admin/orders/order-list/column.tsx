@@ -31,10 +31,25 @@ import {
 } from "@/components/layout/cart/columns";
 import CartTable from "@/components/layout/cart/cart-table";
 import ViewFileChildDialog from "@/components/layout/packaging-dialog/packaging-dialog-chil";
+import ReturnConfirmDialog from "./return-confirm-dialog";
 
-const ActionCell = ({ id }: { id: string }) => {
+const ActionCell = ({
+  id,
+  expandedRowId,
+  setExpandedRowId,
+  currentRowId,
+  status,
+}: {
+  id: string;
+  expandedRowId?: string | null;
+  setExpandedRowId?: (id: string | null) => void;
+  currentRowId?: string;
+  status: string;
+}) => {
   const router = useRouter();
   const locale = useLocale();
+
+  const isExpanded = expandedRowId === currentRowId;
 
   return (
     <div className="flex justify-center">
@@ -48,6 +63,28 @@ const ActionCell = ({ id }: { id: string }) => {
           stroke="#F7941D"
         />
       </Button>
+
+      {/* Expand button */}
+      <Button
+        variant={"ghost"}
+        type="button"
+        onClick={() => {
+          setExpandedRowId?.(isExpanded ? null : currentRowId ?? null);
+          console.log("hehe", currentRowId);
+        }}
+        className="p-1"
+      >
+        {isExpanded ? (
+          <ChevronDown className="size-4 text-gray-600" />
+        ) : (
+          <ChevronRight className="size-4 text-gray-600" />
+        )}
+      </Button>
+
+      <ReturnConfirmDialog
+        id={id}
+        status={status}
+      />
     </div>
   );
 };
@@ -231,49 +268,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       );
     },
   },
-  // {
-  //     accessorKey: "customer",
-  //     header: () => (
-  //         <div className="text-center w-full">CUSTOMER</div>
-  //     ),
-  //     cell: ({ row }) => {
-  //         const user = row.original.user
-  //         const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
-  //         return (
-  //             <div className="flex gap-2 items-center justify-center">
-  //                 <Avatar>
-  //                     <AvatarImage src={`${user.avatar_url}`} alt={user.first_name} />
-  //                     <AvatarFallback>{initials}</AvatarFallback>
-  //                 </Avatar>
-  //                 <div className="flex flex-col">
-  //                     <div className="text-[#4D4D4D] font-semibold">{user.first_name} {user.last_name}</div>
-  //                     <div className="text-xs text-[#4D4D4D]">{user.phone_number}</div>
-  //                 </div>
-  //             </div>
-  //         )
-  //     }
-  // },
-  // {
-  //     accessorKey: "payment",
-  //     header: () => <div className="text-center w-full">PAYMENT</div>,
-  //     cell: ({ row }) => {
-  //         const method = row.original.payment_method;
-  //         const option = paymentOptions.find((opt) => opt.id === method);
-  //         const logo = option?.logo || "/ebay.png"; // default Paypal
 
-  //         return (
-  //             <div className="h-12 relative">
-  //                 <Image
-  //                     src={logo}
-  //                     alt={option?.label || "PayPal"}
-  //                     fill
-  //                     className="object-contain p-2"
-  //                     unoptimized
-  //                 />
-  //             </div>
-  //         );
-  //     },
-  // },
   {
     accessorKey: "status",
     header: () => <div className="text-center w-full">STATUS</div>,
@@ -281,24 +276,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       <div className="text-center lowercase">{row.original.status}</div>
     ),
   },
-  // {
-  //     accessorKey: "shipping",
-  //     header: () => (
-  //         <div className="text-center w-full">CARRIER</div>
-  //     ),
-  //     cell: ({ row }) => {
-  //         const shippingCost = row.original.total_shipping
-  //         return (
-  //             <div className="w-full flex justify-center">
-  //                 <div className="h-20 w-20 relative">
-  //                     {shippingCost === 5.95 ?
-  //                         <Image src={'/dpd.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />
-  //                         : <Image src={'/amm.jpeg'} alt="icon" fill className="object-contain px-2" unoptimized />}
-  //                 </div>
-  //             </div>
-  //         )
-  //     }
-  // },
+
   {
     accessorKey: "value",
     header: () => <div className="text-center w-full">INVOICE</div>,
@@ -331,7 +309,15 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
   {
     id: "actions",
     header: () => <div className="text-center w-full">ACTIONS</div>,
-    cell: ({ row }) => <ActionCell id={row.original.id} />,
+    cell: ({ row, table }) => (
+      <ActionCell
+        id={row.original.id}
+        expandedRowId={table.options.meta?.expandedRowId || null}
+        setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
+        currentRowId={row.id}
+        status={row.original.status}
+      />
+    ),
   },
 ];
 
@@ -453,7 +439,15 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
   {
     id: "actions",
     header: () => <div className="text-center w-full">ACTIONS</div>,
-    cell: ({ row }) => <ActionCell id={row.original.id} />,
+    cell: ({ row, table }) => (
+      <ActionCell
+        id={row.original.id}
+        expandedRowId={table.options.meta?.expandedRowId || null}
+        setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
+        currentRowId={row.id}
+        status={row.original.status}
+      />
+    ),
   },
 ];
 

@@ -151,6 +151,7 @@ function SyncToMarketplace({
   const isSyncing =
     syncToEbayMutation.isPending ||
     syncToKauflandMutation.isPending ||
+    syncToAmazonMutation.isPending ||
     removeFromEbayMutation.isPending ||
     removeFromKauflandMutation.isPending;
 
@@ -158,13 +159,24 @@ function SyncToMarketplace({
     <div className="flex justify-start gap-2 items-center">
       {/* Nếu product active trong marketplace => hiện form update */}
       {isActive ? (
-        <SyncToEbayForm
-          updating={updating}
-          setUpdating={setUpdating}
-          product={product}
-          isUpdating
-          currentMarketplace={marketplace}
-        />
+        marketplace === "amazon" ? (
+          // <SyncToAmazonForm
+          //   updating={updating}
+          //   setUpdating={setUpdating}
+          //   product={product}
+          //   isUpdating
+          //   currentMarketplace={marketplace}
+          // />
+          <></>
+        ) : (
+          <SyncToEbayForm
+            updating={updating}
+            setUpdating={setUpdating}
+            product={product}
+            isUpdating
+            currentMarketplace={marketplace}
+          />
+        )
       ) : (
         <Button
           onClick={handleSync}
