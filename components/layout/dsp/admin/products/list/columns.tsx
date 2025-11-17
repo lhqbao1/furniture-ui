@@ -55,7 +55,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product name fail");
         },
-      }
+      },
     );
   };
 
@@ -83,11 +83,14 @@ function EditableNameCell({ product }: { product: ProductItem }) {
           autoFocus
           disabled={EditProductMutation.isPending}
           className={cn(
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text"
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
           )}
         />
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
           {product.name}
         </div>
       )}
@@ -129,7 +132,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product stock fail");
         },
-      }
+      },
     );
   };
 
@@ -158,11 +161,14 @@ function EditableStockCell({ product }: { product: ProductItem }) {
           autoFocus
           disabled={EditProductMutation.isPending}
           className={cn(
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text"
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
           )}
         />
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
           {product.stock} pcs.
         </div>
       )}
@@ -205,7 +211,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product price fail");
         },
-      }
+      },
     );
   };
 
@@ -234,11 +240,14 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
           autoFocus
           disabled={EditProductMutation.isPending}
           className={cn(
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text"
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
           )}
         />
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
           {product.final_price ? (
             <div className="text-right">€{product.final_price?.toFixed(2)}</div>
           ) : (
@@ -250,135 +259,135 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
   );
 }
 
-function SyncToEbay({ product }: { product: ProductItem }) {
-  const syncToEbayMutation = useSyncToEbay();
-  const removeFromEbayMutation = useRemoveFormEbay();
+// function SyncToEbay({ product }: { product: ProductItem }) {
+//   const syncToEbayMutation = useSyncToEbay();
+//   const removeFromEbayMutation = useRemoveFormEbay();
 
-  const handleRemoveFromEbay = () => {
-    removeFromEbayMutation.mutate(product.sku, {
-      onSuccess(data, variables, context) {
-        toast.success("Remove from Ebay successful");
-      },
-      onError(error, variables, context) {
-        toast.error("Remove from Ebay fail");
-      },
-    });
-  };
+//   const handleRemoveFromEbay = () => {
+//     removeFromEbayMutation.mutate(product.sku, {
+//       onSuccess(data, variables, context) {
+//         toast.success("Remove from Ebay successful");
+//       },
+//       onError(error, variables, context) {
+//         toast.error("Remove from Ebay fail");
+//       },
+//     });
+//   };
 
-  const handleSyncToEbay = () => {
-    syncToEbayMutation.mutate(
-      {
-        price: product.final_price,
-        sku: product.sku,
-        stock: product.stock,
-        tax: product.tax ? product.tax : null,
-        brand: product.brand ? product.brand.name : "",
-        product: {
-          description: stripHtmlRegex(product.description),
-          title: JSON.stringify(product.name),
-          imageUrls:
-            product.static_files?.map((file) =>
-              file.url.replace(/\s+/g, "%20")
-            ) ?? // Đổi khoảng trắng thành %20
-            [],
-          ean: product.ean ? [product.ean] : [],
-        },
-        carrier: product.carrier,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Sync to Ebay successful");
-        },
+//   const handleSyncToEbay = () => {
+//     syncToEbayMutation.mutate(
+//       {
+//         price: product.final_price,
+//         sku: product.sku,
+//         stock: product.stock,
+//         tax: product.tax ? product.tax : null,
+//         brand: product.brand ? product.brand.name : "",
+//         product: {
+//           description: stripHtmlRegex(product.description),
+//           title: JSON.stringify(product.name),
+//           imageUrls:
+//             product.static_files?.map((file) =>
+//               file.url.replace(/\s+/g, "%20")
+//             ) ?? // Đổi khoảng trắng thành %20
+//             [],
+//           ean: product.ean ? [product.ean] : [],
+//         },
+//         carrier: product.carrier,
+//       },
+//       {
+//         onSuccess(data, variables, context) {
+//           toast.success("Sync to Ebay successful");
+//         },
 
-        onError(error) {
-          const message =
-            error.response?.data?.detail?.errors?.[0]?.message ??
-            "Fail to sync to Ebay";
-          toast.error(message);
-        },
-      }
-    );
-  };
+//         onError(error) {
+//           const message =
+//             error.response?.data?.detail?.errors?.[0]?.message ??
+//             "Fail to sync to Ebay";
+//           toast.error(message);
+//         },
+//       }
+//     );
+//   };
 
-  return (
-    <div className="flex justify-start gap-2">
-      <Button
-        onClick={() => handleSyncToEbay()}
-        variant={"outline"}
-        disabled={
-          syncToEbayMutation.isPending || removeFromEbayMutation.isPending
-        }
-      >
-        {syncToEbayMutation.isPending ? (
-          <Loader2 className="animate-spin" />
-        ) : (
-          "Sync"
-        )}
-      </Button>
-      {product.ebay ? (
-        <Button
-          onClick={() => handleRemoveFromEbay()}
-          variant={"outline"}
-          className="text-red-600 border-red-600"
-          disabled={
-            removeFromEbayMutation.isPending || syncToEbayMutation.isPending
-          }
-        >
-          {syncToEbayMutation.isPending ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            "Remove"
-          )}
-        </Button>
-      ) : (
-        ""
-      )}
-    </div>
-  );
-}
+//   return (
+//     <div className="flex justify-start gap-2">
+//       <Button
+//         onClick={() => handleSyncToEbay()}
+//         variant={"outline"}
+//         disabled={
+//           syncToEbayMutation.isPending || removeFromEbayMutation.isPending
+//         }
+//       >
+//         {syncToEbayMutation.isPending ? (
+//           <Loader2 className="animate-spin" />
+//         ) : (
+//           "Sync"
+//         )}
+//       </Button>
+//       {product.ebay ? (
+//         <Button
+//           onClick={() => handleRemoveFromEbay()}
+//           variant={"outline"}
+//           className="text-red-600 border-red-600"
+//           disabled={
+//             removeFromEbayMutation.isPending || syncToEbayMutation.isPending
+//           }
+//         >
+//           {syncToEbayMutation.isPending ? (
+//             <Loader2 className="animate-spin" />
+//           ) : (
+//             "Remove"
+//           )}
+//         </Button>
+//       ) : (
+//         ""
+//       )}
+//     </div>
+//   );
+// }
 
-function ToogleProductStatus({ product }: { product: ProductItem }) {
-  const editProductMutation = useEditProduct();
-  const handleToogleStatus = () => {
-    editProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          is_active: !product.is_active,
-          category_ids: product.categories.map((c) => c.id), // map ra id array
-          // 🔹 Thêm bundles
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-          // brand_id: product.brand.id
-        },
-        id: product.id,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Update product status successful");
-        },
-        onError(error, variables, context) {
-          toast.error("Update product status fail");
-        },
-      }
-    );
-  };
+// function ToogleProductStatus({ product }: { product: ProductItem }) {
+//   const editProductMutation = useEditProduct();
+//   const handleToogleStatus = () => {
+//     editProductMutation.mutate(
+//       {
+//         input: {
+//           ...product,
+//           is_active: !product.is_active,
+//           category_ids: product.categories.map((c) => c.id), // map ra id array
+//           // 🔹 Thêm bundles
+//           ...(product.bundles?.length
+//             ? {
+//                 bundles: product.bundles.map((item) => ({
+//                   product_id: item.bundle_item.id,
+//                   quantity: item.quantity,
+//                 })),
+//               }
+//             : { bundles: [] }),
+//           // brand_id: product.brand.id
+//         },
+//         id: product.id,
+//       },
+//       {
+//         onSuccess(data, variables, context) {
+//           toast.success("Update product status successful");
+//         },
+//         onError(error, variables, context) {
+//           toast.error("Update product status fail");
+//         },
+//       },
+//     );
+//   };
 
-  return (
-    <Switch
-      checked={product.is_active}
-      onCheckedChange={handleToogleStatus}
-      disabled={editProductMutation.isPending}
-      className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer"
-    />
-  );
-}
+//   return (
+//     <Switch
+//       checked={product.is_active}
+//       onCheckedChange={handleToogleStatus}
+//       disabled={editProductMutation.isPending}
+//       className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer"
+//     />
+//   );
+// }
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();

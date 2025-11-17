@@ -2,7 +2,7 @@
 import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Eye, Heart } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { ProductDetailsTab } from "@/components/layout/single-product/product-tab";
 import ListStars from "@/components/shared/list-stars";
 import ProductDetailsSkeleton from "@/components/layout/single-product/product-detail-skeleton";
@@ -32,17 +32,20 @@ import MainImage from "./image/main-image";
 import ImageGallery from "./image/image-carousel";
 import ProductDetailsLogistic from "./details/logistics";
 import ProductDetailsPrice from "./details/price";
+import { ReviewResponse } from "@/types/review";
 
 interface ProductDetailsProps {
   productDetailsData: ProductItem;
   productId: string;
   parentProductData: ProductGroupDetailResponse | null;
+  reviews: ReviewResponse[];
 }
 
 const ProductDetails = ({
   productDetailsData,
   productId,
   parentProductData,
+  reviews,
 }: ProductDetailsProps) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -90,6 +93,11 @@ const ProductDetails = ({
     setAdminId(localStorage.getItem("admin_access_token"));
   }, []);
 
+  const avgRating = useMemo(() => {
+    if (!reviews || reviews.length === 0) return 0;
+    const sum = reviews.reduce((total, r) => total + (r.rating || 0), 0);
+    return Number((sum / reviews.length).toFixed(1)); // giữ dạng number
+  }, [reviews]);
   return (
     <>
       <div className="py-3 lg:pt-3 space-y-4">
@@ -161,11 +169,13 @@ const ProductDetails = ({
                       </div>
                     </div>
                     <div className="hidden">EAN: {productDetails.ean}</div>
-                    <div className="flex flex-row justify-start gap-4 items-center">
-                      <div className="flex gap-1 items-center">
-                        <ListStars rating={0} />
+                    {reviews.length > 0 && (
+                      <div className="flex flex-row justify-start gap-4 items-center">
+                        <div className="flex gap-1 items-center">
+                          <ListStars rating={avgRating} />
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <ProductDetailsPrice productDetails={productDetails} />
 
@@ -230,7 +240,10 @@ const ProductDetails = ({
 
                 {/*Product tabs */}
                 <div className="lg:mt-12 mt-8">
-                  <ProductDetailsTab product={productDetails} />
+                  <ProductDetailsTab
+                    reviews={reviews}
+                    product={productDetails}
+                  />
                 </div>
               </div>
             </form>
