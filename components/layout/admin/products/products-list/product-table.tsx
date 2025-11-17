@@ -41,6 +41,7 @@ interface DataTableProps<TData, TValue> {
   is_delivery_multiple?: boolean;
   hasCount?: boolean;
   hasHeaderBackGround?: boolean;
+  renderRowSubComponent?: (row: any) => React.ReactNode;
 }
 
 export function ProductTable<TData, TValue>({
@@ -62,6 +63,7 @@ export function ProductTable<TData, TValue>({
   is_delivery_multiple = false,
   hasCount = true,
   hasHeaderBackGround = false,
+  renderRowSubComponent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "updated_at", desc: true }, // mặc định sort theo updated_at giảm dần
@@ -126,7 +128,7 @@ export function ProductTable<TData, TValue>({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -186,10 +188,10 @@ export function ProductTable<TData, TValue>({
                                                     }
                                                     `}
                           >
-                            <div className="p-4 text-sm">
+                            {/* <div className="p-4 text-sm">
                               <ProductTable<CartItem, unknown>
                                 data={transformCartItems(
-                                  (row.original as CheckOut).cart.items
+                                  (row.original as CheckOut).cart.items,
                                 )}
                                 columns={getDeliveryOrderColumns({
                                   is_multiple_delivery: (
@@ -210,6 +212,37 @@ export function ProductTable<TData, TValue>({
                                 totalPages={1}
                                 hasCount={false}
                               />
+                            </div> */}
+                            <div className="p-4 text-sm">
+                              {/* USE renderRowSubComponent IF provided */}
+                              {typeof renderRowSubComponent === "function" ? (
+                                renderRowSubComponent(row)
+                              ) : (
+                                // fallback: the original nested ProductTable you had
+                                <ProductTable<CartItem, unknown>
+                                  data={transformCartItems(
+                                    (row.original as CheckOut).cart.items,
+                                  )}
+                                  columns={getDeliveryOrderColumns({
+                                    is_multiple_delivery: (
+                                      row.original as CheckOut
+                                    ).supplier
+                                      ? (row.original as CheckOut).supplier
+                                          .delivery_multiple
+                                      : false,
+                                  })}
+                                  page={1}
+                                  pageSize={5}
+                                  setPage={() => {}}
+                                  setPageSize={() => {}}
+                                  hasPagination={false}
+                                  totalItems={
+                                    (row.original as CheckOut).cart.items.length
+                                  }
+                                  totalPages={1}
+                                  hasCount={false}
+                                />
+                              )}
                             </div>
                           </div>
                         </TableCell>

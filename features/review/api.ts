@@ -15,15 +15,13 @@ export async function createReview(input: ReviewFormValues) {
 export const getReviewByProduct = async (product_id: string) => {
   try {
     const { data } = await api.get(`/review/review-product/${product_id}`);
-    return data as ReviewResponse[];
-  } catch (err: any) {
-    // Nếu API trả về 404 ⇒ không có review
-    if (err?.response?.status === 404) {
-      return [] as ReviewResponse[];
-    }
 
-    // Các lỗi khác: ném lỗi
-    throw err;
+    return Array.isArray(data) ? data : []; // ⚠️ bắt buộc
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      return []; // ⬅️ Không có review → trả về mảng rỗng
+    }
+    throw error; // lỗi thật thì throw
   }
 };
 

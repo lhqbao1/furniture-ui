@@ -32,14 +32,14 @@ interface ListPolicyAdminProps {
 
 // Helper: Convert children policies -> HTML
 function buildHtmlFromPolicies(
-  children: { label: string; content: string; tt: number }[]
+  children: { label: string; content: string; tt: number }[],
 ): string {
   return children
     .map(
       (cl) =>
         `<h2>${cl.label || ""}</h2>${
           cl.content || "<p></p> || <strong></strong>"
-        }`
+        }`,
     )
     .join("");
 }
@@ -123,7 +123,7 @@ const ListPolicyAdmin = ({
               label: cl.label,
               content: cl.content,
               tt: cl.tt,
-            }))
+            })),
           );
         }
       });
@@ -139,7 +139,7 @@ const ListPolicyAdmin = ({
           label: cl.label,
           content: cl.content,
           tt: cl.tt,
-        }))
+        })),
       );
       setEditorValues((prev) => ({ ...prev, [currentPolicy.id]: html }));
     }
@@ -183,7 +183,7 @@ const ListPolicyAdmin = ({
       }
 
       const agbContent = policy?.legal_policies.find((i) =>
-        i.name.toLowerCase().includes("agb")
+        i.name.toLowerCase().includes("agb"),
       );
 
       if (agbContent) {
@@ -191,10 +191,10 @@ const ListPolicyAdmin = ({
           <InvoicePDF
             contentHtml={agbContent.child_legal_policies}
             date={new Date(agbContent.created_at)}
-          />
+          />,
         ).toBlob();
 
-        saveAs(blob, `AGB_${formatDate(new Date(agbContent.created_at))}.pdf`);
+        // saveAs(blob, `AGB_${formatDate(new Date(agbContent.created_at))}.pdf`);
 
         const formData = new FormData();
         formData.append("files", blob);
@@ -229,10 +229,16 @@ const ListPolicyAdmin = ({
   return (
     <div className="grid grid-cols-12 pt-3 lg:h-[calc(100vh-100px)] h-fit pb-4">
       <div className="space-x-2 col-span-12 mb-12">
-        <Button className="text-xl" onClick={handleSubmitVersion}>
+        <Button
+          className="text-xl"
+          onClick={handleSubmitVersion}
+        >
           Save
         </Button>
-        <Button className="text-xl" variant={"outline"}>
+        <Button
+          className="text-xl"
+          variant={"outline"}
+        >
           Cancel
         </Button>
       </div>
