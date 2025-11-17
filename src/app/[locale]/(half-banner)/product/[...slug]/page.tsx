@@ -47,14 +47,14 @@ export async function generateMetadata({
   try {
     const product = await getProductBySlug(lastSlug);
 
-    // const reviews = await getReviewByProduct(product.id);
+    const reviews = await getReviewByProduct(product.id);
     if (!product) throw new Error("Not found");
     // if (!reviews) throw new Error("Not found");
 
     // --------------------------
     // ⚠ ONLY ADD RATING IF REAL
     // --------------------------
-    // const hasRating = reviews;
+    const hasRating = reviews && reviews.length > 0;
 
     const schema: any = {
       "@context": "https://schema.org/",
@@ -88,22 +88,19 @@ export async function generateMetadata({
       },
     };
 
-    // const reviewCount = reviews?.length || 0;
-    // const ratingValue =
-    //   reviewCount > 0
-    //     ? (
-    //         reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount
-    //       ).toFixed(1)
-    //     : "0";
+    // ⭐⭐ ONLY add rating if real reviews exist
+    const reviewCount = reviews?.length || 0;
+    if (hasRating) {
+      const ratingValue = (
+        reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount
+      ).toFixed(1);
 
-    // // Add rating ONLY if real data exists
-    // if (hasRating) {
-    //   schema.aggregateRating = {
-    //     "@type": "AggregateRating",
-    //     ratingValue: ratingValue,
-    //     reviewCount: reviewCount,
-    //   };
-    // }
+      schema.aggregateRating = {
+        "@type": "AggregateRating",
+        ratingValue: ratingValue,
+        reviewCount: reviewCount,
+      };
+    }
 
     return {
       title: product.meta_title || product.name,
@@ -157,10 +154,7 @@ export default async function Page({
   const product = await getProductBySlug(lastSlug);
   if (!product) return <div>Not Found</div>;
 
-  // const reviews = await getReviewByProduct(
-  //   "d1c6e2c8-6ca2-4671-ba05-83913a04b200",
-  // );
-  // console.log(product.id);
+  const reviews = await getReviewByProduct(product.id);
 
   const parentProduct = product.parent_id
     ? await getProductGroupDetail(product.parent_id)
@@ -200,7 +194,7 @@ export default async function Page({
         parentProductData={parentProduct}
         productDetailsData={product}
         productId={product.id}
-        reviews={[]}
+        reviews={reviews}
       />
     </HydrationBoundary>
   );
