@@ -1,20 +1,26 @@
 interface EbaySyncErrorResponse {
-    detail: {
-      errors: { message: string }[]
-    }
-  }
+  detail: {
+    errors: { message: string }[];
+  };
+}
 
 type KauflandError = {
   detail: {
     errors: { message: string }[];
   };
 };
-  
-type AuthError = { 
+
+type AmazonError = {
   detail: {
-    error: string
-    error_description: string
-  }
+    errors: { message: string }[];
+  };
+};
+
+type AuthError = {
+  detail: {
+    error: string;
+    error_description: string;
+  };
 };
 
 type GenericError = { message: string };

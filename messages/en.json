@@ -328,5 +328,7 @@
   "purchased": "Purchased",
   "401Error": "Please log in to continue to {text}.",
   "giveReview": "write a review",
-  "reviewRequired": "Please enter rating and comment."
+  "reviewRequired": "Please enter rating and comment.",
+  "companyName": "Company",
+  "vatId": "VAT ID"
 }

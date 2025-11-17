@@ -95,10 +95,10 @@ const Footer = () => {
   return (
     <footer
       id="footer"
-      className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-20 text-black w-full grid lg:grid-cols-6 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:py-10 px-8 py-8 rounded-tl-2lg rounded-tr-2xl"
+      className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-20 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-10 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl"
     >
       {/* Cột 1: Newsletter */}
-      <div className="footer-column col-span-6 lg:col-span-3 space-y-3 mb-6 lg:mb-0">
+      <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
         <h4 className="font-semibold">
           Jetzt Newsletter abonnieren – und mehr entdecken.
         </h4>
@@ -139,7 +139,7 @@ const Footer = () => {
       </div>
 
       {/* Cột 2: Các trang */}
-      <div className="footer-column lg:col-span-1 col-span-6">
+      <div className="footer-column lg:col-span-2 col-span-6">
         <h4 className="font-semibold mb-3">{t("pages")}</h4>
         <ul className="space-y-2 text-black-700 text-sm">
           {/* ✅ thêm locale */}
@@ -159,7 +159,7 @@ const Footer = () => {
       </div>
 
       {/* Cột 3: Term & Policy */}
-      <div className="footer-column lg:col-span-1 col-span-6">
+      <div className="footer-column lg:col-span-3 col-span-6">
         <h4 className="font-semibold mb-3">{t("termPolicy")}</h4>
         <ul className="space-y-2 text-black-700 text-sm">
           {/* ✅ thêm locale */}
@@ -195,9 +195,22 @@ const Footer = () => {
         </ul>
       </div>
 
+      {/* Cột 5: Company Info */}
+      <div className="footer-column lg:col-span-3 col-span-6">
+        <h4 className="font-semibold mb-3">{t("companyTitle")}</h4>
+
+        <ul className="space-y-2 text-black-700 text-sm">
+          <li>{t("companyName")}: Prestige Home GmbH</li>
+          <li>{t("address")}: Greifswalder Straße 226, 10405 Berlin</li>
+          <li>{t("phone")}: +49 1520 6576549</li>
+          <li>{t("email")}: info@prestige-home.de</li>
+          <li>{t("vatId")}: DE454714336</li>
+        </ul>
+      </div>
+
       {/* Cột 4: Social (ngoài, không thêm locale) */}
-      <div className="footer-column lg:col-span-1 col-span-6 flex lg:items-start lg:justify-start lg:flex-col flex-row justify-center">
-        <h4 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h4>
+      <div className="footer-column lg:col-span-12 col-span-6 flex lg:items-center lg:justify-start lg:flex-col flex-row justify-center">
+        {/* <h4 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h4> */}
         <div className="flex gap-1 mt-2 lg:mt-0">
           <Link
             href="https://www.facebook.com/profile.php?id=61578621160298"

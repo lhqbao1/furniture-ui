@@ -323,5 +323,8 @@
   "purchased": "Gekauft",
     "401Error": "Bitte melden Sie sich an, um mit {text} fortzufahren.",
       "giveReview": "bewertung schreiben",
-  "reviewRequired": "Bitte geben Sie eine Bewertung und einen Kommentar ein."
+  "reviewRequired": "Bitte geben Sie eine Bewertung und einen Kommentar ein.",
+  "companyTitle": "Unternehmensinformationen",
+  "companyName": "Firma",
+  "vatId": "USt-IdNr"
 }
