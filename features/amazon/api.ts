@@ -16,13 +16,13 @@ export type SyncToAmazonInput = {
   width: number;
   length: number;
   depth: number;
-  asin: string;
+  asin: string | null;
   stock: number;
   carrier: string;
   images: string[];
   brand: string;
   model_number: string;
-  browse_node: string;
+  browse_node?: string;
   size: string;
   country_of_origin: string;
 };

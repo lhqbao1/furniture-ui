@@ -25,7 +25,14 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  FileText,
+  Loader2,
+  Upload,
+  X,
+} from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -36,9 +43,12 @@ import {
 } from "@/components/ui/command";
 import countries from "world-countries";
 import { ColorSelect } from "./form-input/color-seclect";
+import { useUploadStaticFile } from "@/features/file/hook";
+import { toast } from "sonner";
 
 const ProductAdditionalInputs = () => {
   const form = useFormContext();
+  const uploadFileMutation = useUploadStaticFile();
 
   const unit = [
     { id: "pcs." },
@@ -62,6 +72,33 @@ const ProductAdditionalInputs = () => {
     value: c.name.common,
     label: c.name.common,
   }));
+
+  const handleUploadPDF = async (files: File[]) => {
+    try {
+      const urls: string[] = [];
+
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("files", file);
+
+        const res = await uploadFileMutation.mutateAsync(formData);
+
+        if (res?.results[0]?.url) {
+          urls.push(res?.results[0]?.url);
+        }
+      }
+
+      // Ghép URL thành | | |
+      const joined = urls.join("|");
+
+      form.setValue("pdf_files", joined, { shouldDirty: true });
+
+      return joined;
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload PDF failed");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -93,66 +130,6 @@ const ProductAdditionalInputs = () => {
         />
 
         {/* Product color */}
-        {/* <FormField
-                    control={form.control}
-                    name="color"
-                    render={({ field }) => {
-                        const selectedColors = field.value ? field.value.split(", ") : []
-
-                        return (
-                            <FormItem className="flex flex-col col-span-1">
-                                <FormLabel className="text-black font-semibold text-sm">Color</FormLabel>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <FormControl>
-                                            <Button
-                                                variant="outline"
-                                                role="combobox"
-                                                className="w-full justify-between"
-                                            >
-                                                {selectedColors.length > 0
-                                                    ? selectedColors.join(", ")
-                                                    : "Select colors..."}
-                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                            </Button>
-                                        </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="p-0 w-[300px]">
-                                        <Command>
-                                            <CommandInput placeholder="Search color..." />
-                                            <CommandGroup className='overflow-y-scroll h-[400px]'>
-                                                {COLORS.map((color) => {
-                                                    const isSelected = selectedColors.includes(color.label)
-                                                    return (
-                                                        <CommandItem
-                                                            key={color.value}
-                                                            value={color.label}
-                                                            onSelect={() => {
-                                                                const newSelected = isSelected
-                                                                    ? selectedColors.filter((c: string) => c !== color.label)
-                                                                    : [...selectedColors, color.label]
-                                                                field.onChange(newSelected.join(", "))
-                                                            }}
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    isSelected ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            {color.label} ({color.value})
-                                                        </CommandItem>
-                                                    )
-                                                })}
-                                            </CommandGroup>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                            </FormItem>
-                        )
-                    }}
-                /> */}
         <ColorSelect />
       </div>
 
@@ -213,6 +190,88 @@ const ProductAdditionalInputs = () => {
               </Popover>
             </FormControl>
             <FormMessage className="col-span-6" />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="pdf_files"
+        render={({ field }) => (
+          <FormItem className="flex flex-col w-full">
+            <FormLabel className="text-black font-semibold text-sm">
+              PDF Files
+            </FormLabel>
+
+            <FormControl>
+              <div className="space-y-3">
+                {/* Upload input */}
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  multiple
+                  className="hidden"
+                  id="pdf-upload"
+                  onChange={async (e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (!files.length) return;
+
+                    const urls = await handleUploadPDF(files);
+                    field.onChange(urls);
+                  }}
+                />
+
+                <label
+                  htmlFor="pdf-upload"
+                  className="cursor-pointer flex items-center gap-2 text-sm w-fit px-4 py-1.5 border rounded-md text-center bg-white hover:bg-secondary/10 transition"
+                >
+                  {uploadFileMutation.isPending ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <>
+                      <Upload className="size-6" />
+                      Upload file(s)
+                    </>
+                  )}
+                </label>
+
+                {/* Preview list */}
+                <div className="space-y-2">
+                  {field.value &&
+                    field.value.split("|").map((url: string, idx: number) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between border p-2 rounded-md bg-gray-50"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="text-red-500 font-bold">PDF</div>
+                          <span className="text-sm truncate max-w-[180px]">
+                            {url.split("/").pop()}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            // remove file
+                            const filtered = field.value
+                              .split("|")
+                              .filter((u: string) => u !== url)
+                              .join("|");
+
+                            field.onChange(filtered);
+                          }}
+                          className="text-red-500 hover:underline text-xs"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </FormControl>
+
+            <FormMessage />
           </FormItem>
         )}
       />

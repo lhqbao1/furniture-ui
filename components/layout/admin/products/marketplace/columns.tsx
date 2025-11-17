@@ -21,6 +21,7 @@ import {
 } from "@/features/kaufland/hook";
 import RemoveFromMarketplaceDialog from "./remove-dialog";
 import { useSyncToAmazon } from "@/features/amazon/hook";
+import SyncToAmazonForm from "./ync-to-amazon-form";
 
 function ToogleProductStatus({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
@@ -159,15 +160,18 @@ function SyncToMarketplace({
     <div className="flex justify-start gap-2 items-center">
       {/* Nếu product active trong marketplace => hiện form update */}
       {isActive ? (
+        // 🔹 CASE 1: Product đã active trên marketplace
         marketplace === "amazon" ? (
-          // <SyncToAmazonForm
-          //   updating={updating}
-          //   setUpdating={setUpdating}
-          //   product={product}
-          //   isUpdating
-          //   currentMarketplace={marketplace}
-          // />
-          <></>
+          <>
+            <SyncToAmazonForm
+              updating={updating}
+              setUpdating={setUpdating}
+              product={product}
+              isUpdating
+              currentMarketplace={marketplace}
+              isActive={isActive ?? false}
+            />
+          </>
         ) : (
           <SyncToEbayForm
             updating={updating}
@@ -177,6 +181,17 @@ function SyncToMarketplace({
             currentMarketplace={marketplace}
           />
         )
+      ) : // 🔹 CASE 2: Product CHƯA active — kiểm tra marketplace
+      marketplace === "amazon" ? (
+        <>
+          <SyncToAmazonForm
+            updating={updating}
+            setUpdating={setUpdating}
+            product={product}
+            currentMarketplace={marketplace}
+            isActive={isActive ?? false}
+          />
+        </>
       ) : (
         <Button
           onClick={handleSync}
