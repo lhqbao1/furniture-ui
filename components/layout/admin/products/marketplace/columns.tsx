@@ -20,6 +20,7 @@ import {
   useSyncToKaufland,
 } from "@/features/kaufland/hook";
 import RemoveFromMarketplaceDialog from "./remove-dialog";
+import { useSyncToAmazon } from "@/features/amazon/hook";
 
 function ToogleProductStatus({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
@@ -73,6 +74,7 @@ function SyncToMarketplace({
 }) {
   const syncToEbayMutation = useSyncToEbay();
   const syncToKauflandMutation = useSyncToKaufland();
+  const syncToAmazonMutation = useSyncToAmazon();
 
   const removeFromEbayMutation = useRemoveFormEbay();
   const removeFromKauflandMutation = useRemoveFormKaufland();
@@ -85,24 +87,6 @@ function SyncToMarketplace({
   const marketplaceProduct = product.marketplace_products?.find(
     (p) => p.marketplace === marketplace,
   );
-
-  const handleRemove = () => {
-    if (marketplace === "ebay" && marketplaceProduct) {
-      removeFromEbayMutation.mutate(product.sku, {
-        onSuccess: () => toast.success("Removed from eBay successfully"),
-        onError: () => toast.error("Failed to remove from eBay"),
-      });
-    } else if (marketplace === "kaufland" && marketplaceProduct) {
-      removeFromKauflandMutation.mutate(
-        product.marketplace_products.find((m) => m.marketplace === "kaufland")
-          ?.marketplace_offer_id ?? "",
-        {
-          onSuccess: () => toast.success("Removed from Kaufland successfully"),
-          onError: () => toast.error("Failed to remove from Kaufland"),
-        },
-      );
-    }
-  };
 
   const handleSync = () => {
     if (!product.brand) {

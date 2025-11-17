@@ -541,6 +541,17 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     },
   },
   {
+    accessorKey: "ship_code",
+    header: ({}) => <div className="text-center">SHIPPING CODE</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          {row.original?.shipment ? row.original?.shipment?.ship_code : ""}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "carrier",
     header: () => <div className="text-center w-full">CARRIER</div>,
     cell: ({ row }) => (
