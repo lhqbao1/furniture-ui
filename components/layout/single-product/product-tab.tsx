@@ -12,12 +12,17 @@ import QASection from "./tabs/q&a";
 import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import ProductDetailsProperties from "./tabs/properties/page";
+import { ReviewResponse } from "@/types/review";
 
 interface ProductDetailsTabProps {
   product: ProductItem;
+  reviews: ReviewResponse[];
 }
 
-export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
+export function ProductDetailsTab({
+  product,
+  reviews,
+}: ProductDetailsTabProps) {
   const isMobile = useMediaQuery({ maxWidth: 640 }); // mobile breakpoint
   const t = useTranslations();
 
@@ -53,9 +58,16 @@ export function ProductDetailsTab({ product }: ProductDetailsTabProps) {
   if (isMobile) {
     // render accordion
     return (
-      <Accordion type="single" collapsible className="space-y-2">
+      <Accordion
+        type="single"
+        collapsible
+        className="space-y-2"
+      >
         {sections.map((section) => (
-          <AccordionItem value={section.value} key={section.value}>
+          <AccordionItem
+            value={section.value}
+            key={section.value}
+          >
             <AccordionTrigger>{section.label}</AccordionTrigger>
             <AccordionContent>{section.content}</AccordionContent>
           </AccordionItem>

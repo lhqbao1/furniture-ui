@@ -45,7 +45,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
           ...product,
           name: value,
           category_ids: product.categories.map((c) => c.id),
-          brand_id: product.brand.id,
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
           // 🔹 Thêm bundles
           ...(product.bundles?.length
             ? {
@@ -66,7 +66,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product name fail");
         },
-      }
+      },
     );
   };
 
@@ -94,11 +94,14 @@ function EditableNameCell({ product }: { product: ProductItem }) {
           autoFocus
           disabled={EditProductMutation.isPending}
           className={cn(
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text"
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
           )}
         />
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
           {product.name}
         </div>
       )}
@@ -141,7 +144,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product stock fail");
         },
-      }
+      },
     );
   };
 
@@ -171,11 +174,14 @@ function EditableStockCell({ product }: { product: ProductItem }) {
           disabled={EditProductMutation.isPending}
           className={cn(
             "w-20",
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text"
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
           )}
         />
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
           {product.stock} pcs.
         </div>
       )}
@@ -218,7 +224,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product price fail");
         },
-      }
+      },
     );
   };
 
@@ -248,11 +254,14 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
           disabled={EditProductMutation.isPending}
           className={cn(
             "w-28",
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text"
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
           )}
         />
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
           {product.final_price ? (
             <div className="text-right">€{product.final_price?.toFixed(2)}</div>
           ) : (
@@ -300,7 +309,7 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
         onError() {
           toast.error("Update failed");
         },
-      }
+      },
     );
   };
 
@@ -319,7 +328,7 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
             placeholderColor
             className={cn(
               "w-36 border",
-              EditProductMutation.isPending && "cursor-wait"
+              EditProductMutation.isPending && "cursor-wait",
             )}
           >
             {/* <SelectValue
@@ -328,14 +337,20 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
           </SelectTrigger>
           <SelectContent className="border">
             {suppliers?.map((s) => (
-              <SelectItem key={s.id} value={s.id.toString()}>
+              <SelectItem
+                key={s.id}
+                value={s.id.toString()}
+              >
                 {s.business_name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
           {product.owner ? product.owner.business_name : "Prestige Home"}
         </div>
       )}
@@ -371,7 +386,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
           title: JSON.stringify(product.name),
           imageUrls:
             product.static_files?.map((file) =>
-              file.url.replace(/\s+/g, "%20")
+              file.url.replace(/\s+/g, "%20"),
             ) ?? // Đổi khoảng trắng thành %20
             [],
           ean: product.ean ? [product.ean] : [],
@@ -389,7 +404,7 @@ function SyncToEbay({ product }: { product: ProductItem }) {
             "Fail to sync to Ebay";
           toast.error(message);
         },
-      }
+      },
     );
   };
 
@@ -437,7 +452,9 @@ function SyncToEbay({ product }: { product: ProductItem }) {
 
 function ToggleProductStatus({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
-  const hasMarketplace = product.marketplace_products?.length > 0;
+  const hasMarketplace =
+    product.marketplace_products?.some((item) => item.is_active === true) ??
+    false;
 
   const isIncomplete =
     product.static_files.length === 0 ||
@@ -467,7 +484,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
           ...product,
           is_active: !product.is_active,
           category_ids: product.categories.map((c) => c.id), // map ra id array
-          brand_id: product.brand.id,
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
           bundles:
             product.bundles && product.bundles.length > 0
               ? product.bundles.map((item) => ({
@@ -485,7 +502,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
         onError(error, variables, context) {
           toast.error("Update product status fail");
         },
-      }
+      },
     );
   };
 
@@ -513,7 +530,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
 
   const handleClick = async (
     e: React.MouseEvent<HTMLButtonElement>,
-    id: string
+    id: string,
   ) => {
     const url = `/${locale}/admin/products/${id}/edit`;
 
@@ -572,12 +589,21 @@ function ActionsCell({ product }: { product: ProductItem }) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost"
+          size="icon"
+        >
           <Eye className="w-4 h-4 text-secondary" />
         </Button>
       </Link>
-      <Link href={`/admin/products/${product.id}/clone`} prefetch={true}>
-        <Button variant="ghost" size="icon">
+      <Link
+        href={`/admin/products/${product.id}/clone`}
+        prefetch={true}
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+        >
           <CopyCheck className="w-4 h-4 text-secondary" />
         </Button>
       </Link>
@@ -586,7 +612,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
 }
 
 export const getProductColumns = (
-  setSortByStock: (val?: "asc" | "desc") => void
+  setSortByStock: (val?: "asc" | "desc") => void,
 ): ColumnDef<ProductItem>[] => [
   {
     id: "select",
@@ -617,7 +643,10 @@ export const getProductColumns = (
       const image = row.original.static_files?.[0]?.url;
 
       return (
-        <HoverCard openDelay={100} closeDelay={100}>
+        <HoverCard
+          openDelay={100}
+          closeDelay={100}
+        >
           <HoverCardTrigger asChild>
             <div className="w-12 h-12 relative cursor-pointer">
               {image ? (
