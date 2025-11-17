@@ -169,7 +169,7 @@ const ProductDetails = ({
                       </div>
                     </div>
                     <div className="hidden">EAN: {productDetails.ean}</div>
-                    {reviews.length > 0 && (
+                    {reviews && reviews.length > 0 && (
                       <div className="flex flex-row justify-start gap-4 items-center">
                         <div className="flex gap-1 items-center">
                           <ListStars rating={avgRating} />
