@@ -36,7 +36,7 @@ export const GetCartColumns = ({
 
   const handleAddToWishlist = (
     currentProduct: ProductItem,
-    deleteItem: CartItem
+    deleteItem: CartItem,
   ) => {
     if (!currentProduct) return;
     addToWishlistMutation.mutate(
@@ -50,7 +50,7 @@ export const GetCartColumns = ({
           const { message } = HandleApiError(error, t);
           toast.error(message);
         },
-      }
+      },
     );
   };
 

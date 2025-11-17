@@ -98,6 +98,7 @@ const ProductDetails = ({
     const sum = reviews.reduce((total, r) => total + (r.rating || 0), 0);
     return Number((sum / reviews.length).toFixed(1)); // giữ dạng number
   }, [reviews]);
+
   return (
     <>
       <div className="py-3 lg:pt-3 space-y-4">
