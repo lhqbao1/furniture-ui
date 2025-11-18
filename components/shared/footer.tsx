@@ -117,11 +117,11 @@ const Footer = () => {
           <Input
             type="email"
             placeholder="Email"
-            className="w-full lg:w-1/3"
+            className="w-full lg:w-1/2"
           />
         </div>
 
-        <button className="w-full lg:w-1/3 bg-black text-white py-2 rounded-md hover:bg-gray-800 transition ">
+        <button className="w-full lg:w-1/2 bg-black text-white py-2 rounded-md hover:bg-gray-800 transition ">
           Jetzt anmelden
         </button>
 
