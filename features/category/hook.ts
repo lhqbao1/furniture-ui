@@ -1,13 +1,34 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AddOrRemoveProductToCategoryInput, CategoryInput, CategoryResponse } from "@/types/categories";
-import { addProductToCategory, createCategory, deleteCategory, editCategory, getCategories, getCategoryById, getCategoryByName, removeProductFromCategory } from "./api";
-
+import {
+  AddOrRemoveProductToCategoryInput,
+  CategoryInput,
+  CategoryResponse,
+} from "@/types/categories";
+import {
+  addProductToCategory,
+  createCategory,
+  deleteCategory,
+  editCategory,
+  getCategories,
+  getCategoriesWithChildren,
+  getCategoryById,
+  getCategoryByName,
+  removeProductFromCategory,
+} from "./api";
 
 // --- GET ALL CATEGORIES ---
 export function useGetCategories() {
   return useQuery({
     queryKey: ["categories"],
     queryFn: () => getCategories(),
+    retry: false,
+  });
+}
+
+export function useGetCategoriesWithChildren() {
+  return useQuery({
+    queryKey: ["categories-with-children"],
+    queryFn: () => getCategoriesWithChildren(),
     retry: false,
   });
 }
@@ -28,7 +49,8 @@ export function useCreateCategory() {
   return useMutation({
     mutationFn: (input: CategoryInput) => createCategory(input),
     onSuccess: () => {
-        qc.invalidateQueries({ queryKey: ["categories"] })
+      qc.invalidateQueries({ queryKey: ["categories"] });
+      qc.invalidateQueries({ queryKey: ["categories-with-children"] });
     },
   });
 }
@@ -40,8 +62,9 @@ export function useEditCategory() {
     mutationFn: ({ id, input }: { id: string; input: CategoryInput }) =>
       editCategory(input, id),
     onSuccess: (_, variables) => {
-      qc.invalidateQueries({queryKey: ["categories"]});
-      qc.invalidateQueries({queryKey: ["category", variables.id]});
+      qc.invalidateQueries({ queryKey: ["categories"] });
+      qc.invalidateQueries({ queryKey: ["category", variables.id] });
+      qc.invalidateQueries({ queryKey: ["categories-with-children"] });
     },
   });
 }
@@ -52,21 +75,27 @@ export function useDeleteCategory() {
   return useMutation({
     mutationFn: (id: string) => deleteCategory(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["categories"]});
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-with-children"] });
     },
   });
 }
-
 
 // --- ADD PRODUCT TO CATEGORY ---
 export function useAddProductToCategory() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({input, categoryId}: {input: AddOrRemoveProductToCategoryInput, categoryId: string}) =>
-      addProductToCategory(input, categoryId),
+    mutationFn: ({
+      input,
+      categoryId,
+    }: {
+      input: AddOrRemoveProductToCategoryInput;
+      categoryId: string;
+    }) => addProductToCategory(input, categoryId),
     onSuccess: (data, variables) => {
       qc.invalidateQueries({ queryKey: ["category", variables.categoryId] });
+      qc.invalidateQueries({ queryKey: ["categories-with-children"] });
     },
   });
 }
@@ -76,17 +105,23 @@ export function useRemoveProductFromCategory() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({input, categoryId}: {input: AddOrRemoveProductToCategoryInput, categoryId: string}) =>
-      removeProductFromCategory(input, categoryId),
+    mutationFn: ({
+      input,
+      categoryId,
+    }: {
+      input: AddOrRemoveProductToCategoryInput;
+      categoryId: string;
+    }) => removeProductFromCategory(input, categoryId),
     onSuccess: (data, variables) => {
       qc.invalidateQueries({ queryKey: ["category", variables.categoryId] });
+      qc.invalidateQueries({ queryKey: ["categories-with-children"] });
     },
   });
 }
 
-export function useGetCategoryByName(params?: string){
-    return useQuery({
-       queryKey: ["category-by-name", params],
-       queryFn: () => getCategoryByName(params),
-    })
+export function useGetCategoryByName(params?: string) {
+  return useQuery({
+    queryKey: ["category-by-name", params],
+    queryFn: () => getCategoryByName(params),
+  });
 }

@@ -61,7 +61,6 @@ export default function AppSidebar({
     currentCategoryNameAtom,
   );
 
-  console.log(categories);
   function mapCategories(
     categories: CategoryResponse[],
     parentSlug = "",

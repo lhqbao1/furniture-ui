@@ -18,6 +18,9 @@ import React, { useState } from "react";
 const OrderList = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+  const [fromDate, setFromDate] = useState<string>();
+  const [endDate, setEndDate] = useState<string>();
+
   const { data, isLoading, isError } = useGetCheckOutMain({
     page,
     page_size: pageSize,
@@ -26,27 +29,33 @@ const OrderList = () => {
     data: statistic,
     isLoading: isLoadingStatistic,
     isError: isErrorStatistic,
-  } = useGetCheckOutStatistic();
+  } = useGetCheckOutStatistic({
+    from_date: fromDate,
+    to_date: endDate,
+  });
 
   const mergedStatistic = [
     {
-      total: statistic?.order_processing ?? 0,
-      label: "Orders Processing",
+      count: statistic?.count_order,
+      total: statistic?.total_order ?? 0,
+      label: "Orders",
       textColor: "rgb(41, 171, 226)",
-      isMain: true,
     },
     {
-      total: statistic?.processing_transaction ?? 0,
-      label: "Processing Transaction",
+      count: statistic?.count_return_cancel_order,
+      total: statistic?.total_return_cancel_order ?? 0,
+      label: "Returned",
       textColor: "rgb(255, 11, 133)",
     },
     {
-      total: statistic?.cancel_transaction ?? 0,
-      label: "Returned",
+      count: statistic?.count_processing_order,
+      total: statistic?.total_processing_order ?? 0,
+      label: "Processing",
       textColor: "rgba(242, 5, 5, 0.8)",
     },
     {
-      total: statistic?.completed_transaction ?? 0,
+      count: statistic?.count_completed_order,
+      total: statistic?.total_completed_order ?? 0,
       label: "Done",
       textColor: "rgb(81, 190, 140)",
     },
@@ -59,7 +68,14 @@ const OrderList = () => {
         {isLoadingStatistic || !statistic ? (
           <ProductStatisticSkeleton />
         ) : (
-          <ProductStatistic statistic={mergedStatistic} />
+          <ProductStatistic
+            statistic={mergedStatistic}
+            isOrder
+            fromDate={fromDate}
+            endDate={endDate}
+            setFromDate={setFromDate}
+            setEndDate={setEndDate}
+          />
         )}
         <div className="text-3xl text-secondary font-bold text-center">
           Order List

@@ -50,7 +50,7 @@ const ProductsGridLayout = ({
         gsap.fromTo(
           btn,
           { x: 20 },
-          { display: "block", opacity: 1, duration: 0.3, x: 0 }
+          { display: "block", opacity: 1, duration: 0.3, x: 0 },
         );
       });
       card.addEventListener("mouseleave", () => {
@@ -64,7 +64,7 @@ const ProductsGridLayout = ({
             onComplete: () => {
               gsap.set(btn, { display: "none" });
             },
-          }
+          },
         );
       });
     });
@@ -80,7 +80,7 @@ const ProductsGridLayout = ({
 
     if (!userId) {
       const existingItem = cart.find(
-        (item: CartItemLocal) => item.product_id === currentProduct.id
+        (item: CartItemLocal) => item.product_id === currentProduct.id,
       );
       const totalQuantity = (existingItem?.quantity || 0) + 1;
       if (totalQuantity > currentProduct.stock) {
@@ -117,7 +117,7 @@ const ProductsGridLayout = ({
           onError(error, variables, context) {
             toast.error(t("addToCartFail"));
           },
-        }
+        },
       );
     } else {
       addToCartMutation.mutate(
@@ -135,7 +135,7 @@ const ProductsGridLayout = ({
             toast.error(message);
             if (status === 401) router.push("/login", { locale });
           },
-        }
+        },
       );
     }
   };
@@ -157,7 +157,7 @@ const ProductsGridLayout = ({
           toast.error(message);
           if (status === 401) router.push("/login", { locale });
         },
-      }
+      },
     );
   };
 
@@ -186,7 +186,10 @@ const ProductsGridLayout = ({
                   : "1px solid #e0e0e0",
               }}
             >
-              <Link href={`/product/${product.url_key}`} passHref>
+              <Link
+                href={`/product/${product.url_key}`}
+                passHref
+              >
                 <div className="bg-white p-0 group cursor-pointer z-0 pt-4 lg:px-4 px-2">
                   <Image
                     width={200}
@@ -210,7 +213,7 @@ const ProductsGridLayout = ({
                           {Math.floor(
                             product.final_price
                               ? product.final_price
-                              : product.price
+                              : product.price,
                           )}
                         </div>
                         <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
@@ -232,7 +235,7 @@ const ProductsGridLayout = ({
 
                       {product.price && product.price > product.final_price && (
                         <p className="text-base mb-1">
-                          Vorher: €
+                          UVP: €
                           {product.price.toLocaleString("de-DE", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,

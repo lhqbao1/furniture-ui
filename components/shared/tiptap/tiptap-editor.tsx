@@ -349,7 +349,7 @@ export default function RichEditor({
       )}
       {showHtml && editor ? (
         <textarea
-          className="w-full h-96 border rounded-md p-2 font-mono text-sm bg-gray-50"
+          className="w-full h-96 border rounded-md p-2 text-sm bg-gray-50"
           value={htmlCode}
           onChange={(e) => {
             const newValue = e.target.value;
