@@ -16,6 +16,7 @@ import { useCartLocal } from "@/hooks/cart";
 import { toast } from "sonner";
 import { HandleApiError } from "@/lib/api-helper";
 import { CartItemLocal } from "@/lib/utils/cart";
+import { useGetReviewsByProduct } from "@/features/review/hook";
 
 interface ProductsGridLayoutProps {
   hasBadge?: boolean;
@@ -208,29 +209,32 @@ const ProductsGridLayout = ({
                       {product.name}
                     </h3>
                     <div className="flex gap-2 flex-col">
-                      <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
-                        <div className="text-4xl">
-                          {Math.floor(
-                            product.final_price
-                              ? product.final_price
-                              : product.price,
-                          )}
-                        </div>
-                        <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                          ,
-                          {
-                            (
-                              (product.final_price
+                      <div className="flex gap-2 items-end">
+                        <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
+                          <div className="text-4xl">
+                            {Math.floor(
+                              product.final_price
                                 ? product.final_price
-                                : product.price) % 1
-                            )
-                              .toFixed(2)
-                              .split(".")[1]
-                          }
+                                : product.price,
+                            )}
+                          </div>
+                          <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
+                            ,
+                            {
+                              (
+                                (product.final_price
+                                  ? product.final_price
+                                  : product.price) % 1
+                              )
+                                .toFixed(2)
+                                .split(".")[1]
+                            }
+                          </div>
+                          <div className="text-base font-semibold text-black">
+                            €
+                          </div>
                         </div>
-                        <div className="text-base font-semibold text-black">
-                          €
-                        </div>
+                        <div>inkl. MwSt.</div>
                       </div>
 
                       {product.price && product.price > product.final_price && (
