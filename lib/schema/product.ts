@@ -114,7 +114,7 @@ export const addProductSchema = z.object({
   pallet_unit: z.number().optional().nullable(),
   packages: z.array(packageSchema).optional(),
   marketplace_products: z.array(marketPlaceSchema).optional(),
-  pdf_files: z.string().optional(),
+  pdf_files: z.string().optional().nullable(),
 
   bundles: z.array(bundleSchema).optional().nullable(),
   is_bundle: z.boolean().optional().nullable(),
