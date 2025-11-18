@@ -317,6 +317,7 @@
   "resendIn": "Erneut senden in",
   "shippingCost": "zzgl. {shippingCost} Versand",
   "ogPrice": "Vorher",
+  "ogPriceSupplier": "UVP",
   "itemNumber": "Artikelnummer",
   "noComment": "Noch keine Bewertungen",
   "customer": "Kunde",

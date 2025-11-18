@@ -1,18 +1,5 @@
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, Eye } from "lucide-react";
-import { ProductTable } from "../../products/products-list/product-table";
 
 export const orderListExpandColumns: ColumnDef<CartItem>[] = [
   {
