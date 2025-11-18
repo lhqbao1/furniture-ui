@@ -55,15 +55,16 @@ export default function AppSidebar({
   const t = useTranslations();
   const locale = useLocale(); // 👈 thêm locale
   const [currentCategoryId, setCurrentCategoryId] = useAtom(
-    currentCategoryIdAtom
+    currentCategoryIdAtom,
   );
   const [currentCategoryName, setCurrentCategoryName] = useAtom(
-    currentCategoryNameAtom
+    currentCategoryNameAtom,
   );
 
+  console.log(categories);
   function mapCategories(
     categories: CategoryResponse[],
-    parentSlug = ""
+    parentSlug = "",
   ): MenuItem[] {
     return categories.map((cat) => {
       const currentSlug = parentSlug ? `${parentSlug}/${cat.slug}` : cat.slug;
@@ -113,7 +114,10 @@ export default function AppSidebar({
   const isPhone = useIsPhone();
 
   return (
-    <Sidebar className="app-sidebar custom-scroll" collapsible="offcanvas">
+    <Sidebar
+      className="app-sidebar custom-scroll"
+      collapsible="offcanvas"
+    >
       <SidebarContent>
         <SidebarHeader className="items-end flex lg:hidden">
           <SidebarTrigger
