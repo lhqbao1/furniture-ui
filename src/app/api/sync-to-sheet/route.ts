@@ -70,6 +70,7 @@ export async function GET() {
         p.brand?.name ?? "",
         shipping,
         additionalImages,
+        "new",
       ];
     });
 
