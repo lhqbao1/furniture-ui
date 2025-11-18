@@ -13,6 +13,7 @@ import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import ProductDetailsProperties from "./tabs/properties/page";
 import { ReviewResponse } from "@/types/review";
+import UserManualTab from "./tabs/user-manual/user-manual-tab";
 
 interface ProductDetailsTabProps {
   product: ProductItem;
@@ -42,7 +43,11 @@ export function ProductDetailsTab({
       label: t("properties"),
       content: <ProductDetailsProperties product={product} />,
     },
-    { value: "details", label: "Aufbau & Details", content: "" },
+    {
+      value: "details",
+      label: "Aufbau & Details",
+      content: <UserManualTab files={product.pdf_files} />,
+    },
     {
       value: "review",
       label: t("review"),

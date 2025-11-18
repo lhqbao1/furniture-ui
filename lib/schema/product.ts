@@ -60,6 +60,11 @@ const bundleSchema = z.object({
   weight: z.number().optional().nullable(),
 });
 
+const pdfFileSchema = z.object({
+  title: z.string().min(1),
+  url: z.string().min(1),
+});
+
 export const addProductSchema = z.object({
   name: z
     .string()
@@ -114,7 +119,7 @@ export const addProductSchema = z.object({
   pallet_unit: z.number().optional().nullable(),
   packages: z.array(packageSchema).optional(),
   marketplace_products: z.array(marketPlaceSchema).optional(),
-  pdf_files: z.string().optional().nullable(),
+  pdf_files: z.array(pdfFileSchema).optional().nullable(),
 
   bundles: z.array(bundleSchema).optional().nullable(),
   is_bundle: z.boolean().optional().nullable(),

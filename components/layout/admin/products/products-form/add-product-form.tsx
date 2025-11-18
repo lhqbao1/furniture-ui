@@ -18,6 +18,7 @@ import SelectBundleComponent from "../bundle/select-bundle";
 import AdminBackButton from "@/components/shared/admin-back-button";
 import { useProductForm } from "./useProductForm";
 import { ProductItem } from "@/types/products";
+import ProductManual from "./product-manual";
 
 const ProductForm = ({
   productValues,
@@ -136,6 +137,25 @@ const ProductForm = ({
                     <Card>
                       <CardContent>
                         <ProductLogisticsGroup />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </AccordionItem>
+
+                {/* MANUAL */}
+                <AccordionItem value="manual">
+                  <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
+                    User Manual
+                  </AccordionTrigger>
+
+                  <div
+                    className={
+                      openAccordion.includes("manual") ? "block mt-4" : "hidden"
+                    }
+                  >
+                    <Card>
+                      <CardContent>
+                        <ProductManual />
                       </CardContent>
                     </Card>
                   </div>
