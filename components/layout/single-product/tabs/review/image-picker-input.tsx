@@ -84,7 +84,7 @@
 //         closeDelay={100}
 //       >
 //         <HoverCardTrigger asChild>
-         
+
 //         </HoverCardTrigger>
 
 //         <HoverCardContent className="p-2 w-[400px] h-[400px] flex items-center justify-center border-2">
@@ -360,7 +360,6 @@
 
 // export default ImagePickerInput;
 
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -493,8 +492,8 @@ function ImagePickerInput<T extends FieldValues>({
 
       // 🔍 Check tổng số ảnh (hiện có + mới)
       const totalImages = items.length + acceptedFiles.length;
-      if (totalImages > 10) {
-        toast.error(`You can upload a maximum of 10 images per product.`);
+      if (totalImages > 20) {
+        toast.error(`You can upload a maximum of 20 images per product.`);
         return;
       }
 
@@ -504,10 +503,9 @@ function ImagePickerInput<T extends FieldValues>({
       uploadImage.mutate(formData, {
         onSuccess(data: StaticFileResponse) {
           const uploadedUrls = data.results.map((r) => r.url);
-          console.log(uploadedUrls);
           // 🔍 Kiểm tra URL có chứa khoảng trắng
-          if (uploadedUrls.length > 10) {
-            toast.error(`At least 10 images per product`);
+          if (uploadedUrls.length > 20) {
+            toast.error(`Maximum 20 images per product`);
             return;
           }
 
