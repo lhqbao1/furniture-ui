@@ -47,9 +47,10 @@ const ReturnConfirmDialog = ({ id, status }: ReturnConfirmDialogProps) => {
         <Button
           variant="ghost"
           size="icon"
+          className="px-0 py-0"
           onClick={(e) => {
             e.preventDefault();
-            if (status !== "Completed") {
+            if (status.toLocaleLowerCase() !== "completed") {
               toast.error("Can not return this order due to its status");
             } else {
               setOpen(true); // ✅ Mở dialog nếu không phải eBay

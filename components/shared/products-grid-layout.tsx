@@ -235,7 +235,11 @@ const ProductsGridLayout = ({
 
                       {product.price && product.price > product.final_price && (
                         <p className="text-base mb-1">
-                          UVP: €
+                          {!product.owner ||
+                          product.owner.business_name === "Prestige Home"
+                            ? t("ogPrice")
+                            : t("ogPriceSupplier")}
+                          : €
                           {product.price.toLocaleString("de-DE", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,

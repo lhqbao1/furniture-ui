@@ -7,6 +7,7 @@ interface ProductDetailsPriceProps {
 }
 
 const ProductDetailsPrice = ({ productDetails }: ProductDetailsPriceProps) => {
+  console.log(productDetails);
   const t = useTranslations();
   return (
     <div className="space-y-2">
@@ -15,7 +16,7 @@ const ProductDetailsPrice = ({ productDetails }: ProductDetailsPriceProps) => {
           {Math.floor(
             productDetails.final_price
               ? productDetails.final_price
-              : productDetails.price
+              : productDetails.price,
           )}
         </div>
         <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
@@ -36,7 +37,11 @@ const ProductDetailsPrice = ({ productDetails }: ProductDetailsPriceProps) => {
       {productDetails.price &&
         productDetails.price > productDetails.final_price && (
           <p className="text-base mb-1">
-            {t("ogPrice")}: €
+            {!productDetails.owner ||
+            productDetails.owner.business_name === "Prestige Home"
+              ? t("ogPrice")
+              : t("ogPriceSupplier")}
+            : €
             {productDetails.price.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
