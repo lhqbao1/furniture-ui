@@ -120,10 +120,22 @@ export function useGetCheckOutStatistic(params?: {
   from_date?: string;
   to_date?: string;
 }) {
+  // ❗ chỉ disable khi chỉ có 1 giá trị
+  const onlyOneFilled =
+    (params?.from_date && !params?.to_date) ||
+    (!params?.from_date && params?.to_date);
+
+  // ✔ enabled = false khi chỉ có 1 giá trị
+  // ✔ enabled = true khi:
+  //    - cả 2 undefined (initial load)
+  //    - cả 2 có giá trị (filter)
+  const enabled = !onlyOneFilled;
+
   return useQuery({
     queryKey: ["checkout-statistic", params],
-    queryFn: () => getCheckOutStatistics(params ?? {}),
+    queryFn: () => getCheckOutStatistics(params),
     retry: false,
+    enabled, // ← logic đúng yêu cầu
   });
 }
 

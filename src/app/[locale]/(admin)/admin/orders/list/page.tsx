@@ -25,14 +25,16 @@ const OrderList = () => {
     page,
     page_size: pageSize,
   });
+
+  // OrderList.tsx (chỉ phần liên quan)
+  const params =
+    fromDate && endDate ? { from_date: fromDate, to_date: endDate } : undefined;
+
   const {
     data: statistic,
     isLoading: isLoadingStatistic,
     isError: isErrorStatistic,
-  } = useGetCheckOutStatistic({
-    from_date: fromDate,
-    to_date: endDate,
-  });
+  } = useGetCheckOutStatistic(params);
 
   const mergedStatistic = [
     {

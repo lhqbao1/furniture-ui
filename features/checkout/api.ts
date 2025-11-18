@@ -18,6 +18,11 @@ export interface GetAllCheckoutParams {
   page_size?: number;
 }
 
+export interface OrderStatisticsParams {
+  from_date?: string;
+  to_date?: string;
+}
+
 export async function createCheckOut(item: CreateOrderFormValues) {
   const { data } = await api.post(`/checkout`, item, {
     headers: {
@@ -106,14 +111,13 @@ export async function getCheckOutMainByUserIdAdmin(user_id: string) {
   return data as CheckOutMain[];
 }
 
-export async function getCheckOutStatistics(params: {
-  from_date?: string;
-  to_date?: string;
-}) {
+export async function getCheckOutStatistics(params?: OrderStatisticsParams) {
   const { data } = await apiAdmin.get("/checkout/statistics", {
-    params,
+    params: {
+      ...(params?.from_date !== undefined && { from_date: params.from_date }),
+      ...(params?.to_date !== undefined && { to_date: params.to_date }),
+    },
   });
-
   return data as CheckOutStatistics;
 }
 
