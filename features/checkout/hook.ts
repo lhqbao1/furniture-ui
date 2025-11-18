@@ -116,10 +116,13 @@ export function useGetCheckOutMainByUserIdAdmin(user_id: string) {
   });
 }
 
-export function useGetCheckOutStatistic() {
+export function useGetCheckOutStatistic(params?: {
+  from_date?: string;
+  to_date?: string;
+}) {
   return useQuery({
-    queryKey: ["checkout-statistic"],
-    queryFn: () => getCheckOutStatistics(),
+    queryKey: ["checkout-statistic", params],
+    queryFn: () => getCheckOutStatistics(params ?? {}),
     retry: false,
   });
 }

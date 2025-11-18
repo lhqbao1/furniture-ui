@@ -238,6 +238,7 @@ const ProductAdditionalInputs = () => {
                 {/* Preview list */}
                 <div className="space-y-2">
                   {field.value &&
+                    field.value.length > 0 &&
                     field.value.split("|").map((url: string, idx: number) => (
                       <div
                         key={idx}

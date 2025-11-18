@@ -4,4 +4,5 @@ export interface Statistic {
   color?: string;
   textColor: string;
   isMain?: boolean;
+  count?: number;
 }

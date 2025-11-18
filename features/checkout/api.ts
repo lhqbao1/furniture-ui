@@ -106,8 +106,14 @@ export async function getCheckOutMainByUserIdAdmin(user_id: string) {
   return data as CheckOutMain[];
 }
 
-export async function getCheckOutStatistics() {
-  const { data } = await apiAdmin.get("/checkout/statistics");
+export async function getCheckOutStatistics(params: {
+  from_date?: string;
+  to_date?: string;
+}) {
+  const { data } = await apiAdmin.get("/checkout/statistics", {
+    params,
+  });
+
   return data as CheckOutStatistics;
 }
 

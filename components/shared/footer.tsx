@@ -200,9 +200,8 @@ const Footer = () => {
         <h4 className="font-semibold mb-3">{t("companyTitle")}</h4>
 
         <ul className="space-y-2 text-black-700 text-sm">
-          <li>{t("companyName")}: Prestige Home GmbH</li>
-          <li>{t("address")}: Greifswalder Straße 226, 10405 Berlin</li>
-          <li>{t("phone")}: +49 1520 6576549</li>
+          <li>Prestige Home GmbH</li>
+          <li>Greifswalder Straße 226, 10405 Berlin</li>
           <li>{t("email")}: info@prestige-home.de</li>
           <li>{t("vatId")}: DE454714336</li>
         </ul>
