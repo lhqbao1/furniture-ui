@@ -7,9 +7,9 @@ import { Upload, Loader2 } from "lucide-react";
 import { useUploadStaticFile } from "@/features/file/hook";
 
 const MANUAL_SECTIONS = [
-  { key: "benutzerhandbuch", label: "User Manual" },
-  { key: "sicherheit_information", label: "Safety Information" },
-  { key: "aufbauanleitung", label: "Assembly Instructions" },
+  { key: "benutzerhandbuch", label: "Benutzerhandbuch" },
+  { key: "sicherheit_information", label: "Sicherheitsinformationen" },
+  { key: "aufbauanleitung", label: "Aufbauanleitung" },
 ];
 
 const ProductManual = () => {
