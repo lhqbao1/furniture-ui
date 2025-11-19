@@ -1,63 +1,56 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import ProductStatusFilter from './filter/status'
+import React from "react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import ProductStatusFilter from "./filter/status";
+import { usePathname, useRouter } from "@/src/i18n/navigation";
 
 interface FilterFormProps {
-    allProducts: boolean
-    setAllProducts: (value: boolean) => void
-    // isActive: boolean
-    // setIsActive: (val: boolean) => void
-    // brand: string
-    // setBrand: (val: string) => void
-    // minPrice?: number
-    // setMinPrice: (val?: number) => void
-    // maxPrice?: number
-    // setMaxPrice: (val?: number) => void
-    // sortByStock?: string
-    // setSortByStock: (val?: string) => void
+  // isActive: boolean
+  // setIsActive: (val: boolean) => void
+  // brand: string
+  // setBrand: (val: string) => void
+  // minPrice?: number
+  // setMinPrice: (val?: number) => void
+  // maxPrice?: number
+  // setMaxPrice: (val?: number) => void
+  // sortByStock?: string
+  // setSortByStock: (val?: string) => void
 }
 
-export default function FilterForm({
-    allProducts,
-    setAllProducts,
-    // isActive,
-    // setIsActive,
-    // brand,
-    // setBrand,
-    // minPrice,
-    // setMinPrice,
-    // maxPrice,
-    // setMaxPrice,
-    // sortByStock,
-    // setSortByStock,
-}: FilterFormProps) {
-    const handleReset = () => {
-        setAllProducts(true)
-        // setIsActive(false)
-        // setBrand('')
-        // setMinPrice(undefined)
-        // setMaxPrice(undefined)
-        // setSortByStock(undefined)
-    }
+export default function FilterForm({}: // isActive,
+// setIsActive,
+// brand,
+// setBrand,
+// minPrice,
+// setMinPrice,
+// maxPrice,
+// setMaxPrice,
+// sortByStock,
+// setSortByStock,
+FilterFormProps) {
+  const router = useRouter();
+  const pathname = usePathname(); // ví dụ "/admin/products"
 
-    return (
-        <div className="space-y-4">
-            {/* All / Active toggles */}
+  const handleReset = () => {
+    router.push(pathname, { scroll: false });
+  };
+  return (
+    <div className="space-y-4">
+      {/* All / Active toggles */}
 
-            <ProductStatusFilter showAll={allProducts} setShowAll={setAllProducts} />
+      <ProductStatusFilter />
 
-            {/* <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
                 <Label htmlFor="is-active">Active only</Label>
                 <Switch id="is-active" checked={isActive} onCheckedChange={setIsActive} />
             </div> */}
 
-            {/* Sort by stock */}
-            {/* <div className="flex flex-col gap-2">
+      {/* Sort by stock */}
+      {/* <div className="flex flex-col gap-2">
                 <Label>Sort by stock</Label>
                 <select
                     value={sortByStock ?? ''}
@@ -70,8 +63,8 @@ export default function FilterForm({
                 </select>
             </div> */}
 
-            {/* Price range */}
-            {/* <div className="flex flex-col gap-2">
+      {/* Price range */}
+      {/* <div className="flex flex-col gap-2">
                 <Label>Price Range (€)</Label>
                 <div className="flex gap-2">
                     <Input
@@ -89,8 +82,8 @@ export default function FilterForm({
                 </div>
             </div> */}
 
-            {/* Brand */}
-            {/* <div className="flex flex-col gap-2">
+      {/* Brand */}
+      {/* <div className="flex flex-col gap-2">
                 <Label>Brand</Label>
                 <Input
                     placeholder="Enter brand..."
@@ -99,12 +92,16 @@ export default function FilterForm({
                 />
             </div> */}
 
-            {/* Reset */}
-            <div className="flex justify-end pt-3">
-                <Button variant="outline" size="sm" onClick={handleReset}>
-                    Reset
-                </Button>
-            </div>
-        </div>
-    )
+      {/* Reset */}
+      <div className="flex justify-end pt-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleReset}
+        >
+          Reset
+        </Button>
+      </div>
+    </div>
+  );
 }

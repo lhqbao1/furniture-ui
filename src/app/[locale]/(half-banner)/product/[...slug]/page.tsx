@@ -11,6 +11,7 @@ import ProductDetails from "@/components/layout/single-product/product-details";
 import getQueryClient from "@/lib/get-query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getReviewByProduct } from "@/features/review/api";
+import { notFound } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ slug: string[]; locale: string }>;
@@ -46,9 +47,9 @@ export async function generateMetadata({
 
   try {
     const product = await getProductBySlug(lastSlug);
+    if (!product) return notFound();
 
     const reviews = await getReviewByProduct(product.id);
-    if (!product) throw new Error("Not found");
     // if (!reviews) throw new Error("Not found");
 
     // --------------------------
@@ -152,7 +153,7 @@ export default async function Page({
   const lastSlug = slugArr[slugArr.length - 1];
 
   const product = await getProductBySlug(lastSlug);
-  if (!product) return <div>Not Found</div>;
+  if (!product) return notFound();
 
   const reviews = await getReviewByProduct(product.id);
 

@@ -11,29 +11,31 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Undo2 } from "lucide-react";
+import { Circle, Loader2, Trash2, Undo2, X } from "lucide-react";
+import { ProductItem } from "@/types/products";
 import { toast } from "sonner";
-import { useReturnOrder } from "@/features/checkout/hook";
+import { useRemoveFormEbay } from "@/features/ebay/hook";
+import { useCancelOrder, useReturnOrder } from "@/features/checkout/hook";
 
 interface ReturnConfirmDialogProps {
   id: string;
   status: string;
-  open: boolean;
+  open: boolean; // 🔥 nhận từ parent
   onClose: () => void;
 }
 
-const ReturnConfirmDialog = ({
+const CancelConfirmDialog = ({
   id,
   status,
   open,
   onClose,
 }: ReturnConfirmDialogProps) => {
-  const returnOrderMutation = useReturnOrder();
+  const cancelOrderMutation = useCancelOrder();
 
-  const handleDelete = () => {
-    returnOrderMutation.mutate(id, {
+  const handleCancel = () => {
+    cancelOrderMutation.mutate(id, {
       onSuccess(data, variables, context) {
-        toast.success("Return order successfully");
+        toast.success("Cancel order successfully");
         onClose();
       },
       onError(error, variables, context) {
@@ -54,21 +56,21 @@ const ReturnConfirmDialog = ({
           className="px-0 py-0"
           onClick={(e) => {
             e.preventDefault();
-            if (status.toLocaleLowerCase() !== "completed") {
-              toast.error("Can not return this order due to its status");
+            if (status.toLocaleLowerCase() !== "paid") {
+              toast.error("Can not cancel this order due to its status");
             } else {
-              setOpen(true); // ✅ Mở dialog nếu không phải eBay
+              onClose();
             }
           }}
         >
-          <Undo2 className="size-4 text-red-500" />
+          <X className="size-4 text-red-500" />
         </Button>
       </DialogTrigger> */}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Return Order</DialogTitle>
+          <DialogTitle>Cancel Order</DialogTitle>
           <DialogDescription>
-            Are you sure you want to return this order? This action cannot be
+            Are you sure you want to cancel this order? This action cannot be
             undone.
           </DialogDescription>
         </DialogHeader>
@@ -77,22 +79,22 @@ const ReturnConfirmDialog = ({
             <Button
               type="button"
               className="bg-gray-400 text-white hover:bg-gray-500"
-              disabled={returnOrderMutation.isPending}
+              disabled={cancelOrderMutation.isPending}
             >
               Cancel
             </Button>
           </DialogClose>
           <Button
             type="button"
-            onClick={handleDelete}
+            onClick={handleCancel}
             hasEffect
             variant="secondary"
-            disabled={returnOrderMutation.isPending}
+            disabled={cancelOrderMutation.isPending}
           >
-            {returnOrderMutation.isPending ? (
+            {cancelOrderMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              "Return"
+              "Cancel"
             )}
           </Button>
         </DialogFooter>
@@ -101,4 +103,4 @@ const ReturnConfirmDialog = ({
   );
 };
 
-export default ReturnConfirmDialog;
+export default CancelConfirmDialog;

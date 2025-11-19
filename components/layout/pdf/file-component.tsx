@@ -60,7 +60,7 @@ export default function InvoiceTable({
   return (
     <div
       id="invoice-table"
-      className="flex flex-col gap-6 items-start w-[894px] h-screen overflow-y-scroll p-12 pb-4 relative"
+      className="flex flex-col gap-6 items-start w-[894px] h-screen p-12 pb-4 relative"
     >
       <Image
         src="/invoice-logo.png"
@@ -255,44 +255,63 @@ export default function InvoiceTable({
         />
       </div>
 
-      <div className="absolute bottom-0 left-12 z-20">
-        <div
-          className="font-semibold"
-          translate="no"
-        >
-          Prestige Home GmbH
+      <div className="absolute bottom-0 z-20 grid grid-cols-3 gap-6">
+        <div className="">
+          <div
+            className="font-semibold"
+            translate="no"
+          >
+            Prestige Home GmbH
+          </div>
+          <div>Greifswalder Straße 226</div>
+          <div>10405 Berlin</div>
+          <div>Tel: info@prestige-home.de</div>
         </div>
-        <div>Greifswalder Straße 226, 10405 Berlin.</div>
-        <div>Tel: info@prestige-home.de</div>
-      </div>
-      <div className="absolute bottom-0 right-12 z-20">
-        <div className="font-semibold">Chief Executive Office</div>
-        <div>Thuy Duong Nguyen</div>
-        <div>Tax code: DE454714336</div>
-      </div>
-      {checkout && invoice && (
-        <div className="absolute bottom-0 right-1/2 translate-x-1/2 transform z-20">
-          <Button variant={"outline"}>
-            <PDFDownloadLink
-              document={
-                <InvoicePDF
-                  checkout={checkout}
-                  invoice={invoice}
-                />
-              }
-              fileName={`${invoice.invoice_code}.pdf`}
-            >
-              {({ loading }) =>
-                loading ? (
-                  "Generating PDF..."
-                ) : (
-                  <div className="cursor-pointer">Download Invoice PDF</div>
-                )
-              }
-            </PDFDownloadLink>
-          </Button>
+
+        <div className="">
+          <div
+            className="font-semibold"
+            translate="no"
+          >
+            Kontoverbindung
+          </div>
+          <div>OLINDA Zweigniederlassung Deutschland</div>
+          <div>IBAN:</div>
+          <div>DE57100101232316418882</div>
+          <div>BIC:</div>
+          <div>QNTODEB2XXX</div>
         </div>
-      )}
+
+        <div className="">
+          <div className="font-semibold">Chief Executive Office</div>
+          <div>Thuy Duong Nguyen</div>
+          <div>Tax code: DE454714336</div>
+        </div>
+
+        {checkout && invoice && (
+          <div className="w-full flex justify-center col-span-3">
+            <Button variant={"outline"}>
+              <PDFDownloadLink
+                document={
+                  <InvoicePDF
+                    checkout={checkout}
+                    invoice={invoice}
+                  />
+                }
+                fileName={`${invoice.invoice_code}.pdf`}
+              >
+                {({ loading }) =>
+                  loading ? (
+                    "Generating PDF..."
+                  ) : (
+                    <div className="cursor-pointer">Download Invoice PDF</div>
+                  )
+                }
+              </PDFDownloadLink>
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

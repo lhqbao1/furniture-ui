@@ -12,6 +12,7 @@ import {
 } from "@react-pdf/renderer";
 import { Font } from "@react-pdf/renderer";
 import { useMemo } from "react";
+import { FooterSection } from "./file-footer";
 
 Font.register({
   family: "Roboto",
@@ -617,7 +618,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
         {/* <View style={{ marginTop: 50, display: 'flex', justifyContent: 'space-between', flexDirection: "row", fontSize: 9, position: "absolute"}}>
                     
                 </View> */}
-        <View
+        {/* <View
           style={{ position: "absolute", bottom: 10, left: 48, zIndex: 20 }}
         >
           <Text style={styles.boldWithGap}>Prestige Home GmbH</Text>
@@ -633,7 +634,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
           <Text style={styles.boldWithGap}>Geschäftsführer</Text>
           <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
           <Text style={styles.gapY5}>USt-ID: DE454714336</Text>
-        </View>
+        </View> */}
+        <FooterSection />
       </Page>
     </Document>
   );

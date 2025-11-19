@@ -5,33 +5,22 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChevronDown, ChevronRight, Eye, File } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye } from "lucide-react";
 import ViewFileDialog from "./view-file";
-import { listChanel, paymentOptions } from "@/data/data";
+import { listChanel } from "@/data/data";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
-import { Product } from "@/types/products";
-import { CartItem, CartResponseItem } from "@/types/cart";
+import { CartItem } from "@/types/cart";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
   DialogTrigger,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { use, useState } from "react";
 import { ProductTable } from "../../products/products-list/product-table";
-import {
-  cartSupplierColumn,
-  GetCartColumns,
-} from "@/components/layout/cart/columns";
-import CartTable from "@/components/layout/cart/cart-table";
+import { cartSupplierColumn } from "@/components/layout/cart/columns";
 import ViewFileChildDialog from "@/components/layout/packaging-dialog/packaging-dialog-chil";
-import ReturnConfirmDialog from "./return-confirm-dialog";
 
 const ActionCell = ({
   id,
@@ -70,7 +59,6 @@ const ActionCell = ({
         type="button"
         onClick={() => {
           setExpandedRowId?.(isExpanded ? null : currentRowId ?? null);
-          console.log("hehe", currentRowId);
         }}
         className="p-1"
       >
@@ -272,11 +260,49 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
   {
     accessorKey: "status",
     header: () => <div className="text-center w-full">STATUS</div>,
-    cell: ({ row }) => (
-      <div className="text-center lowercase">{row.original.status}</div>
-    ),
-  },
+    cell: ({ row }) => {
+      const raw = row.original.status?.toLowerCase() ?? "";
 
+      let display = "";
+
+      switch (raw) {
+        case "pending":
+          display = "Waiting for payment";
+          break;
+        case "paid":
+          display = "Payment received";
+          break;
+        case "tock_reserved":
+          display = "Stock reserved";
+          break;
+        case "preparation_shipping":
+          display = "In preparation for shipping";
+          break;
+        case "ds_informed":
+          display = "DS informed";
+          break;
+        case "shipped":
+          display = "Dispatched";
+          break;
+        case "completed":
+          display = "Completed";
+          break;
+        case "cancel_request":
+          display = "Cancel requested";
+          break;
+        case "canceled":
+          display = "Canceled";
+          break;
+        case "return":
+          display = "Return";
+          break;
+        default:
+          display = raw || "-";
+      }
+
+      return <div className="text-center lowercase">{display}</div>;
+    },
+  },
   {
     accessorKey: "value",
     header: () => <div className="text-center w-full">INVOICE</div>,

@@ -60,10 +60,16 @@ export async function getProductById(id: string) {
 }
 
 export async function getProductBySlug(product_slug: string) {
-  const { data } = await apiPublic.get(`/products/by-slug/${product_slug}`);
-  return data as ProductItem;
+  try {
+    const { data } = await apiPublic.get(`/products/by-slug/${product_slug}`);
+    return data as ProductItem;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      return null; // ⭐ Trả null khi slug không tồn tại
+    }
+    throw error; // lỗi khác thì throw để debug
+  }
 }
-
 export async function getProductByTag(tag: string, is_customer = false) {
   const { data } = await apiPublic.get(`/products/by-tag/${tag}`, {
     params: { is_customer }, // truyền query param ở đây

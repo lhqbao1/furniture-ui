@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Pencil, Plus } from "lucide-react";
+import { Loader2, Pencil, Plus, RefreshCw } from "lucide-react";
 import { useSyncToEbay } from "@/features/ebay/hook";
 import { syncToEbayInput } from "@/features/ebay/api";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
@@ -46,6 +46,7 @@ interface SyncToEbayFormProps {
   currentMarketplace?: string;
   updating?: boolean;
   setUpdating: React.Dispatch<React.SetStateAction<boolean>>;
+  isAdd?: boolean;
 }
 
 type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>;
@@ -56,6 +57,7 @@ const SyncToEbayForm = ({
   currentMarketplace,
   updating,
   setUpdating,
+  isAdd,
 }: SyncToEbayFormProps) => {
   const updateProductMutation = useEditProduct();
   const syncToEbayMutation = useSyncToEbay();
@@ -146,31 +148,68 @@ const SyncToEbayForm = ({
       ...(product.marketplace_products || []),
     ];
 
+    // tìm đúng item theo marketplace
+    const existing = updatedMarketplaceProducts.find(
+      (m) => m.marketplace === values.marketplace,
+    );
+
     if (isUpdating) {
-      const index = updatedMarketplaceProducts.findIndex(
-        (m) => m.marketplace === values.marketplace,
-      );
-
-      const updateValues = {
-        ...normalizedValues,
-        is_active: updatedMarketplaceProducts[index].is_active,
-        marketplace_offer_id:
-          updatedMarketplaceProducts[index].marketplace_offer_id,
-        line_item_id: updatedMarketplaceProducts[index].line_item_id,
-        brand: updatedMarketplaceProducts[index].brand,
-      };
-
-      if (index !== -1) {
-        updatedMarketplaceProducts[index] = {
-          ...updatedMarketplaceProducts[index],
-          ...updateValues,
-        };
+      if (existing) {
+        // ⭐ Update item cũ, giữ lại một số field quan trọng
+        Object.assign(existing, {
+          ...normalizedValues,
+          is_active: existing.is_active, // giữ nguyên
+          marketplace_offer_id: existing.marketplace_offer_id,
+          line_item_id: existing.line_item_id,
+          brand: existing.brand,
+        });
       } else {
-        updatedMarketplaceProducts.push(normalizedValues);
+        // ⭐ Không tồn tại → thêm mới
+        updatedMarketplaceProducts.push({
+          ...normalizedValues,
+          is_active: true,
+        });
       }
     } else {
-      updatedMarketplaceProducts.push(normalizedValues);
+      // ⭐ NOT updating → bật active hoặc tạo mới
+      if (existing) {
+        Object.assign(existing, {
+          ...normalizedValues,
+          is_active: true, // bật active
+        });
+      } else {
+        updatedMarketplaceProducts.push({
+          ...normalizedValues,
+          is_active: true,
+        });
+      }
     }
+
+    // if (isUpdating) {
+    //   const index = updatedMarketplaceProducts.findIndex(
+    //     (m) => m.marketplace === values.marketplace,
+    //   );
+
+    //   const updateValues = {
+    //     ...normalizedValues,
+    //     is_active: updatedMarketplaceProducts[index].is_active,
+    //     marketplace_offer_id:
+    //       updatedMarketplaceProducts[index].marketplace_offer_id,
+    //     line_item_id: updatedMarketplaceProducts[index].line_item_id,
+    //     brand: updatedMarketplaceProducts[index].brand,
+    //   };
+
+    //   if (index !== -1) {
+    //     updatedMarketplaceProducts[index] = {
+    //       ...updatedMarketplaceProducts[index],
+    //       ...updateValues,
+    //     };
+    //   } else {
+    //     updatedMarketplaceProducts.push(normalizedValues);
+    //   }
+    // } else {
+    //   updatedMarketplaceProducts.push(normalizedValues);
+    // }
 
     updateProductMutation.mutate(
       {
@@ -193,7 +232,7 @@ const SyncToEbayForm = ({
       },
       {
         onSuccess(data) {
-          if (isUpdating && currentMarketplace === "ebay") {
+          if (isUpdating || (isAdd && currentMarketplace === "ebay")) {
             const ebayData = data.marketplace_products?.find(
               (m) => m.marketplace === "ebay",
             );
@@ -226,7 +265,7 @@ const SyncToEbayForm = ({
             syncToEbayMutation.mutate(payload);
           }
 
-          if (isUpdating && currentMarketplace === "kaufland") {
+          if (isUpdating || (isAdd && currentMarketplace === "kaufland")) {
             const kauflandData = data.marketplace_products?.find(
               (m) => m.marketplace === "kaufland",
             );
@@ -278,12 +317,18 @@ const SyncToEbayForm = ({
           <Button
             variant="outline"
             type="button"
-            className="bg-amber-50 border-amber-400"
+            className={`${
+              isUpdating
+                ? "bg-amber-50 border-amber-400"
+                : "bg-green-50 border-green-400"
+            }`}
           >
             {isUpdating ? (
               <Pencil className="text-amber-400" />
+            ) : isAdd ? (
+              <RefreshCw className="text-green-400" />
             ) : (
-              <Plus className="text-amber-400" />
+              <Plus className="text-green-400" />
             )}
           </Button>
         </DialogTrigger>
@@ -298,7 +343,7 @@ const SyncToEbayForm = ({
                 className="space-y-6"
               >
                 {/* Marketplace */}
-                {isUpdating ? (
+                {isUpdating || isAdd ? (
                   ""
                 ) : (
                   <FormField
