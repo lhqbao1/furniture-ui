@@ -185,31 +185,31 @@ const SyncToEbayForm = ({
       }
     }
 
-    // if (isUpdating) {
-    //   const index = updatedMarketplaceProducts.findIndex(
-    //     (m) => m.marketplace === values.marketplace,
-    //   );
+    if (isUpdating) {
+      const index = updatedMarketplaceProducts.findIndex(
+        (m) => m.marketplace === values.marketplace,
+      );
 
-    //   const updateValues = {
-    //     ...normalizedValues,
-    //     is_active: updatedMarketplaceProducts[index].is_active,
-    //     marketplace_offer_id:
-    //       updatedMarketplaceProducts[index].marketplace_offer_id,
-    //     line_item_id: updatedMarketplaceProducts[index].line_item_id,
-    //     brand: updatedMarketplaceProducts[index].brand,
-    //   };
+      const updateValues = {
+        ...normalizedValues,
+        is_active: updatedMarketplaceProducts[index].is_active,
+        marketplace_offer_id:
+          updatedMarketplaceProducts[index].marketplace_offer_id,
+        line_item_id: updatedMarketplaceProducts[index].line_item_id,
+        brand: updatedMarketplaceProducts[index].brand,
+      };
 
-    //   if (index !== -1) {
-    //     updatedMarketplaceProducts[index] = {
-    //       ...updatedMarketplaceProducts[index],
-    //       ...updateValues,
-    //     };
-    //   } else {
-    //     updatedMarketplaceProducts.push(normalizedValues);
-    //   }
-    // } else {
-    //   updatedMarketplaceProducts.push(normalizedValues);
-    // }
+      if (index !== -1) {
+        updatedMarketplaceProducts[index] = {
+          ...updatedMarketplaceProducts[index],
+          ...updateValues,
+        };
+      } else {
+        updatedMarketplaceProducts.push(normalizedValues);
+      }
+    } else {
+      updatedMarketplaceProducts.push(normalizedValues);
+    }
 
     updateProductMutation.mutate(
       {
@@ -232,7 +232,7 @@ const SyncToEbayForm = ({
       },
       {
         onSuccess(data) {
-          if (isUpdating || (isAdd && currentMarketplace === "ebay")) {
+          if ((isUpdating || isAdd) && currentMarketplace === "ebay") {
             const ebayData = data.marketplace_products?.find(
               (m) => m.marketplace === "ebay",
             );
@@ -265,7 +265,7 @@ const SyncToEbayForm = ({
             syncToEbayMutation.mutate(payload);
           }
 
-          if (isUpdating || (isAdd && currentMarketplace === "kaufland")) {
+          if ((isUpdating || isAdd) && currentMarketplace === "kaufland") {
             const kauflandData = data.marketplace_products?.find(
               (m) => m.marketplace === "kaufland",
             );

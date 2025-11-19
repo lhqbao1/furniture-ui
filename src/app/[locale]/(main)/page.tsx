@@ -10,6 +10,9 @@ import { getAllProducts, getProductByTag } from "@/features/products/api";
 import { getCartItems } from "@/features/cart/api";
 import { getAllProductsSelect } from "@/features/product-group/api";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
+import { getCategoriesWithChildren } from "@/features/category/api";
+import { Loader2 } from "lucide-react";
+import ListCategoriesHome from "@/components/layout/home/list-categories";
 
 export const revalidate = 60; // ISR: regenerate every 60 seconds
 
@@ -47,12 +50,28 @@ export default async function HomePage() {
     staleTime: 30_000,
   });
 
+  // Prefetch list categories
+  await queryClient.prefetchQuery({
+    queryKey: ["categories-with-children"],
+    queryFn: () => getCategoriesWithChildren(),
+    staleTime: 60_000,
+  });
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div
         id="home"
         className="w-full"
       >
+        <Suspense
+          fallback={
+            <div className="p-10">
+              <Loader2 className="animate-spin" />
+            </div>
+          }
+        >
+          <ListCategoriesHome />
+        </Suspense>
         {/* Suspense fallback for trending section */}
         <Suspense
           fallback={
