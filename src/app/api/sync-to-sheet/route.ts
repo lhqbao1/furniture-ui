@@ -18,6 +18,12 @@ export async function GET() {
 
     const sheets = google.sheets({ version: "v4", auth });
 
+    // 2️⃣ Xoá toàn bộ dữ liệu trừ hàng 1
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: SHEET_ID,
+      range: "Sheet1!A2:Z9999", // xoá từ dòng 2 trở xuống
+    });
+
     const products = await getProductsFeed(); // bạn sẽ viết hàm này
 
     // 3️⃣ Lọc sản phẩm đang active và có tồn kho

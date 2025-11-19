@@ -13,16 +13,21 @@ import CancelConfirmDialog from "../order-list/canceled-confirm-dialog";
 import { CheckOutMain } from "@/types/checkout";
 
 const STATUS_OPTIONS = [
-  { key: "pending", label: "Waiting for payment" },
-  { key: "paid", label: "Payment received" },
-  { key: "stock_reserved", label: "Stock reserved" },
-  { key: "preparation_shipping", label: "In preparation for shipping" },
-  { key: "ds_informed", label: "DS informed" },
-  { key: "shipped", label: "Dispatched" },
-  { key: "completed", label: "Completed" },
-  { key: "cancel_request", label: "Cancel requested" },
-  { key: "canceled", label: "Canceled" },
-  { key: "return", label: "Return" },
+  { key: "pending", label: "Waiting for payment", active: true, pos: 2 },
+  { key: "paid", label: "Payment received", active: true, pos: 3 },
+  { key: "stock_reserved", label: "Stock reserved", active: true, pos: 4 },
+  {
+    key: "preparation_shipping",
+    label: "In preparation for shipping",
+    active: true,
+    pos: 5,
+  },
+  { key: "ds_informed", label: "DS informed", active: true, pos: 6 },
+  { key: "shipped", label: "Dispatched", active: true, pos: 7 },
+  { key: "completed", label: "Completed", active: true, pos: 0 },
+  { key: "cancel_request", label: "Cancel requested", active: true, pos: 8 },
+  { key: "canceled", label: "Canceled", active: true, pos: 9 },
+  { key: "return", label: "Return", active: true, pos: 10 },
 ];
 
 export default function OrderStatusSelector({
@@ -39,15 +44,28 @@ export default function OrderStatusSelector({
   // compute items to show in dropdown:
   // if current status is completed -> only show "return" option
   const options = React.useMemo(() => {
-    if (String(status).toLowerCase() === "completed") {
-      return STATUS_OPTIONS.filter((s) => s.key === "return");
-    }
+    const current = String(status).toLowerCase();
 
-    if (String(status).toLowerCase() === "paid") {
-      return STATUS_OPTIONS.filter((s) => s.key === "canceled");
-    }
-    // otherwise show all except 'completed' itself as option (optional)
-    return STATUS_OPTIONS;
+    return STATUS_OPTIONS.map((item) => {
+      // Khi status là completed → chỉ return được phép active
+      if (current === "completed") {
+        return {
+          ...item,
+          active: item.key === "return",
+        };
+      }
+
+      // Khi status là paid → chỉ canceled active
+      if (current === "paid") {
+        return {
+          ...item,
+          active: item.key === "canceled",
+        };
+      }
+
+      // Các trạng thái khác → tất cả active
+      return { ...item, active: true };
+    });
   }, [status]);
 
   const handleChange = (val: string) => {
@@ -56,7 +74,7 @@ export default function OrderStatusSelector({
     // open dialogs for specific choices
     if (val === "return") {
       setOpenReturn(true);
-    } else if (val === "paid") {
+    } else if (val === "canceled") {
       // keep previous behavior: choosing "paid" can open CancelConfirmDialog
       setOpenCancel(true);
     } else {
@@ -75,7 +93,12 @@ export default function OrderStatusSelector({
     <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold">
       <div className="flex gap-1 items-center flex-1">
         <div>Status:</div>
-        <div>{labelFor(value)}</div>
+        <div>
+          {labelFor(
+            STATUS_OPTIONS.find((i) => i.key === status.toLowerCase())?.label ??
+              "",
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -94,8 +117,9 @@ export default function OrderStatusSelector({
               <SelectItem
                 key={opt.key}
                 value={opt.key}
+                disabled={!opt.active} // ⬅️ disable option không hợp lệ
               >
-                {opt.label}
+                {opt.key === "completed" ? "" : `${opt.pos}.`} {opt.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -109,7 +133,10 @@ export default function OrderStatusSelector({
           status={status}
           // close handler to hide dialog after finished/cancelled
           open={openReturn}
-          onClose={() => setOpenReturn(false)}
+          onClose={() => {
+            setOpenReturn(false);
+            setValue(status.toLocaleLowerCase());
+          }}
         />
       )}
 
@@ -118,7 +145,10 @@ export default function OrderStatusSelector({
           id={order.id}
           status={status}
           open={openCancel}
-          onClose={() => setOpenCancel(false)}
+          onClose={() => {
+            setOpenCancel(false);
+            setValue(status.toLocaleLowerCase());
+          }}
         />
       )}
     </div>
