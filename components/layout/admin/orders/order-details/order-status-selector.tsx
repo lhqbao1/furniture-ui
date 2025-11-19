@@ -69,7 +69,7 @@ export default function OrderStatusSelector({
 
   return (
     <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold">
-      <div className="flex gap-1 items-center">
+      <div className="flex gap-1 items-center flex-1">
         <div>Status:</div>
         <div>{labelFor(value)}</div>
       </div>
@@ -79,8 +79,8 @@ export default function OrderStatusSelector({
           value={value}
           onValueChange={handleChange}
         >
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder={labelFor(value) || "Select"} />
+          <SelectTrigger className="w-fit">
+            {/* <SelectValue placeholder={labelFor(value) || "Select"} /> */}
           </SelectTrigger>
           <SelectContent>
             {options.map((opt) => (
