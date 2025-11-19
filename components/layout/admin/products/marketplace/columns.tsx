@@ -193,14 +193,23 @@ function SyncToMarketplace({
           />
         </>
       ) : (
-        <Button
-          onClick={handleSync}
-          variant="outline"
-          disabled={isSyncing}
-          className="min-w-[80px]"
-        >
-          {isSyncing ? <Loader2 className="animate-spin" /> : "Sync"}
-        </Button>
+        <>
+          <SyncToEbayForm
+            updating={updating}
+            setUpdating={setUpdating}
+            product={product}
+            isAdd
+            currentMarketplace={marketplace}
+          />
+          {/* <Button
+            onClick={handleSync}
+            variant="outline"
+            disabled={isSyncing}
+            className="min-w-[80px]"
+          >
+            {isSyncing ? <Loader2 className="animate-spin" /> : "Sync"}
+          </Button> */}
+        </>
       )}
 
       {/* Nếu đang active => nút Remove */}
@@ -302,11 +311,25 @@ export const baseColumns = (
     enableSorting: true,
   },
   {
+    accessorKey: "sku",
+    header: ({ column }) => <div className="text-center">SKU</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.sku}</div>;
+    },
+  },
+  {
+    accessorKey: "ean",
+    header: ({ column }) => <div className="text-center">EAN</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.ean}</div>;
+    },
+  },
+  {
     accessorKey: "owner",
-    header: "SUPPLIER",
+    header: ({ column }) => <div className="text-center">SUPPLIER</div>,
     cell: ({ row }) => {
       return (
-        <div>
+        <div className="text-center">
           {row.original.owner?.business_name
             ? row.original.owner?.business_name
             : "Prestige Home"}

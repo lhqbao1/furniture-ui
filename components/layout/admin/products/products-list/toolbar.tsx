@@ -36,10 +36,6 @@ import { saveAs } from "file-saver";
 interface TableToolbarProps {
   searchQuery?: string;
   pageSize: number;
-  showAll: boolean;
-  setShowAll: (value: boolean) => void;
-  // showAll: boolean
-  // setShowAll: React.Dispatch<React.SetStateAction<boolean>>
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   setSearchQuery?: React.Dispatch<React.SetStateAction<string>>;
@@ -59,8 +55,6 @@ export default function TableToolbar({
   pageSize,
   setPageSize,
   setPage,
-  showAll,
-  setShowAll,
   setSearchQuery,
   addButtonText,
   isAddButtonModal,
@@ -96,7 +90,7 @@ export default function TableToolbar({
             // search: debouncedValue || undefined, // thêm search nếu có
           },
         },
-        { scroll: false }
+        { scroll: false },
       ); // không scroll lên đầu
     }
   }, [debouncedValue, searchQuery, setSearchQuery, router]);
@@ -114,7 +108,7 @@ export default function TableToolbar({
 
     for (const item of exportData) {
       const folderName = sanitizeFolderName(
-        `${item.id_provider}-${item.name}` || "unknown"
+        `${item.id_provider}-${item.name}` || "unknown",
       );
       const folder = zip.folder(folderName);
 
@@ -141,7 +135,7 @@ export default function TableToolbar({
     saveAs(zipBlob, "images.zip");
 
     toast.success(
-      `Downloaded ${totalCount} images from ${exportData.length} products`
+      `Downloaded ${totalCount} images from ${exportData.length} products`,
     );
   };
 
@@ -159,7 +153,10 @@ export default function TableToolbar({
       <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              className="flex items-center gap-1"
+            >
               Group action <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -207,18 +204,24 @@ export default function TableToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-1"
+            >
               Filter <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[800px] px-8 py-4">
-            <FilterForm allProducts={showAll} setAllProducts={setShowAll} />
+            <FilterForm />
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-1"
+            >
               View <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -230,7 +233,10 @@ export default function TableToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-1"
+            >
               Columns <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -256,12 +262,18 @@ export default function TableToolbar({
           </Button>
         )}
       </div>
-      <Button variant={"secondary"} onClick={() => handleDownloadZip()}>
+      <Button
+        variant={"secondary"}
+        onClick={() => handleDownloadZip()}
+      >
         Download images
       </Button>
 
       {isAddButtonModal && (
-        <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
+        <Dialog
+          open={openAddModal}
+          onOpenChange={setOpenAddModal}
+        >
           <DialogContent className="w-1/3">
             <DialogHeader>
               <DialogTitle>{addButtonText}</DialogTitle>
@@ -271,7 +283,7 @@ export default function TableToolbar({
                 addButtonModalContent as React.ReactElement<{
                   onClose?: () => void;
                 }>,
-                { onClose: () => setOpenAddModal(false) }
+                { onClose: () => setOpenAddModal(false) },
               )}
           </DialogContent>
         </Dialog>

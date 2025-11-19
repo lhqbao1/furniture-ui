@@ -33,7 +33,7 @@ const ListComments = ({
 
   const toggleExpand = (idx: number) => {
     setExpandedIndexes((prev) =>
-      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
+      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx],
     );
   };
 
@@ -56,7 +56,10 @@ const ListComments = ({
         <CollapsibleContent>
           <div className="pt-0">
             {listComments.map((item, index) => (
-              <div key={index} className="border-b border-gray-300 pt-4 pb-6">
+              <div
+                key={index}
+                className="border-b border-gray-300 pt-4 pb-6"
+              >
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="flex items-center gap-2">

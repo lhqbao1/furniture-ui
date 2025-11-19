@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar1 } from "lucide-react";
+import { useState } from "react";
 
 interface SingleDatePickerProps {
   label: string;
@@ -39,11 +40,21 @@ export const SingleDatePicker = ({
   value,
   onChange,
 }: SingleDatePickerProps) => {
+  const [open, setOpen] = useState(false);
   const selected = parseDate(value);
   const today = new Date();
 
+  const handleSelect = (d?: Date) => {
+    if (!d) return;
+    onChange(formatFull(d)); // update state
+    setOpen(false); // 🔥 đóng popover khi chọn ngày
+  };
+
   return (
-    <Popover>
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+    >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -59,9 +70,9 @@ export const SingleDatePicker = ({
         <Calendar
           mode="single"
           selected={selected}
-          onSelect={(d) => onChange(d ? formatFull(d) : undefined)}
+          onSelect={handleSelect}
           initialFocus
-          disabled={(date) => date > today} // 🚫 Block ngày tương lai
+          disabled={(date) => date > today}
         />
       </PopoverContent>
     </Popover>

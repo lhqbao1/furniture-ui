@@ -3,30 +3,47 @@ import { orderColumns } from "@/components/layout/admin/orders/order-list/column
 import OrderExpandTable from "@/components/layout/admin/orders/order-list/expand-delivery";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
-import DownloadInvoiceButton from "@/components/layout/pdf/download-invoice-button";
+import TableToolbar from "@/components/layout/admin/products/products-list/toolbar";
 import AdminBackButton from "@/components/shared/admin-back-button";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
-import { getCheckOutMain } from "@/features/checkout/api";
 import {
-  useGetCheckOut,
   useGetCheckOutMain,
   useGetCheckOutStatistic,
 } from "@/features/checkout/hook";
-import React, { useState } from "react";
+import { useRouter } from "@/src/i18n/navigation";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 const OrderList = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [fromDate, setFromDate] = useState<string>();
   const [endDate, setEndDate] = useState<string>();
+  const [showAll, setShowAll] = useState<boolean>();
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // ⚡ Cập nhật URL mỗi khi page thay đổi
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  // 🧩 Khi user back lại (hoặc reload), đọc page từ URL
+  useEffect(() => {
+    const urlPage = Number(searchParams.get("page")) || 1;
+    setPage(urlPage);
+  }, [searchParams]);
 
   const { data, isLoading, isError } = useGetCheckOutMain({
     page,
     page_size: pageSize,
   });
 
-  // OrderList.tsx (chỉ phần liên quan)
   const params =
     fromDate && endDate ? { from_date: fromDate, to_date: endDate } : undefined;
 
@@ -66,7 +83,7 @@ const OrderList = () => {
   return (
     <div className="space-y-6">
       <AdminBackButton />
-      <div className="space-y-12 pb-30">
+      <div className="space-y-6 pb-30">
         {isLoadingStatistic || !statistic ? (
           <ProductStatisticSkeleton />
         ) : (
@@ -82,6 +99,11 @@ const OrderList = () => {
         <div className="text-3xl text-secondary font-bold text-center">
           Order List
         </div>
+        <TableToolbar
+          pageSize={pageSize}
+          setPage={setPage}
+          setPageSize={setPageSize}
+        />
         {isLoading ? (
           <ProductTableSkeleton
             columnsCount={6}
@@ -92,7 +114,7 @@ const OrderList = () => {
             data={data ? data.items : []}
             columns={orderColumns}
             page={page}
-            setPage={setPage}
+            setPage={handlePageChange}
             pageSize={pageSize}
             setPageSize={setPageSize}
             totalItems={data?.pagination.total_items ?? 0}

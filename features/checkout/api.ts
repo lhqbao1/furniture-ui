@@ -125,3 +125,8 @@ export async function returnOrder(main_checkout_id: string) {
   const { data } = await apiAdmin.put(`/checkout/return/${main_checkout_id}`);
   return data;
 }
+
+export async function cancelOrder(main_checkout_id: string) {
+  const { data } = await apiAdmin.put(`/checkout/cancel/${main_checkout_id}`);
+  return data;
+}

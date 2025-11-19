@@ -23,9 +23,10 @@ const ProductList = () => {
   const [page, setPage] = useState(() => Number(searchParams.get("page")) || 1);
   const [pageSize, setPageSize] = useState(50);
   const [searchQuery, setSearchQuery] = useAtom<string>(
-    searchProductQueryStringAtom
+    searchProductQueryStringAtom,
   );
-  const [showAll, setShowAll] = useAtom(showAllProductsAtom);
+  const showAll = searchParams.get("all_products") === "true";
+
   const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
@@ -61,8 +62,6 @@ const ProductList = () => {
       <TableToolbar
         searchQuery={searchQuery}
         pageSize={pageSize}
-        showAll={showAll}
-        setShowAll={setShowAll} // 🔥 truyền vào toolbar
         setPageSize={setPageSize}
         addButtonText="Add Product"
         addButtonUrl="/admin/products/add"

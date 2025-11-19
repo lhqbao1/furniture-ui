@@ -169,10 +169,6 @@ const SyncToAmazonForm = ({
       }
     }
 
-    console.log("dnwid", updatedMarketplaceProducts);
-    console.log(product);
-    console.log(currentMarketplace);
-
     updateProductMutation.mutate(
       {
         input: {

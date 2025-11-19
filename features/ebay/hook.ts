@@ -27,9 +27,9 @@ export function useSyncToEbay() {
       return toast.loading("Syncing data to Ebay...");
     },
 
-    onSuccess: () => {
+    onSuccess: (data, variables, toastId) => {
       // cập nhật toast loading thành success
-      toast.success("Update data to eBay successfully");
+      toast.success("Update data to eBay successfully", { id: toastId });
       qc.invalidateQueries({ queryKey: ["products"] });
     },
 
