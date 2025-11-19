@@ -20,33 +20,6 @@ interface OrderDetailOverViewProps {
   order: CheckOutMain;
 }
 
-function getReadableStatus(status: string) {
-  switch (status.toLowerCase()) {
-    case "pending":
-      return "Waiting for payment";
-    case "paid":
-      return "Payment received";
-    case "stock_reserved":
-      return "Stock reserved";
-    case "preparation_shipping":
-      return "In preparation for shipping";
-    case "ds_informed":
-      return "DS informed";
-    case "shipped":
-      return "Dispatched";
-    case "completed":
-      return "Completed";
-    case "cancel_request":
-      return "Cancel requested";
-    case "canceled":
-      return "Canceled";
-    case "return":
-      return "Return";
-    default:
-      return status; // fallback
-  }
-}
-
 const OrderDetailOverView = ({
   created_at,
   updated_at,
