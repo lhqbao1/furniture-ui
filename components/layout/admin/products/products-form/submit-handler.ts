@@ -38,14 +38,14 @@ export const submitProduct = async ({
     }
   }
 
-  if (
-    typeof payload.price === "number" &&
-    typeof payload.final_price === "number" &&
-    payload.price <= payload.final_price
-  ) {
-    toast.error("Regular price must be greater than sale price");
-    return;
-  }
+  // if (
+  //   typeof payload.price === "number" &&
+  //   typeof payload.final_price === "number" &&
+  //   payload.price <= payload.final_price
+  // ) {
+  //   toast.error("Regular price must be greater than sale price");
+  //   return;
+  // }
 
   if (productValuesClone) {
     const { marketplace_products, ...cleanPayload } = payload;
@@ -63,7 +63,7 @@ export const submitProduct = async ({
       },
       onError: () => {
         toast.error(
-          "Failed to add product. Please check duplication for SKU or EAN"
+          "Failed to add product. Please check duplication for SKU or EAN",
         );
       },
     });
@@ -80,7 +80,7 @@ export const submitProduct = async ({
         onError: () => {
           toast.error("Failed to update product");
         },
-      }
+      },
     );
     return;
   }
@@ -92,7 +92,7 @@ export const submitProduct = async ({
     },
     onError: () => {
       toast.error(
-        "Failed to add product. Please check duplication for SKU or EAN"
+        "Failed to add product. Please check duplication for SKU or EAN",
       );
     },
   });

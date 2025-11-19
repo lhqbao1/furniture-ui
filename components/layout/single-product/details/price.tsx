@@ -33,7 +33,7 @@ const ProductDetailsPrice = ({ productDetails }: ProductDetailsPriceProps) => {
           </div>
           <div className="text-base font-semibold text-black">€</div>
         </div>
-        <div>inkl. MwSt.</div>
+        <div>(inkl. MwSt.)</div>
       </div>
 
       {productDetails.price &&

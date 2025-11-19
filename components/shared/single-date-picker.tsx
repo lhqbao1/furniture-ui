@@ -40,6 +40,7 @@ export const SingleDatePicker = ({
   onChange,
 }: SingleDatePickerProps) => {
   const selected = parseDate(value);
+  const today = new Date();
 
   return (
     <Popover>
@@ -60,6 +61,7 @@ export const SingleDatePicker = ({
           selected={selected}
           onSelect={(d) => onChange(d ? formatFull(d) : undefined)}
           initialFocus
+          disabled={(date) => date > today} // 🚫 Block ngày tương lai
         />
       </PopoverContent>
     </Popover>

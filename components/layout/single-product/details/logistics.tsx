@@ -67,7 +67,8 @@ const ProductDetailsLogistic = ({
             {t("shippingCost", {
               shippingCost:
                 productDetails.carrier === "amm" ? "35,95€" : "5,95€",
-            })}
+            })}{" "}
+            inkl. MwSt.
           </p>
           <p className="text-gray-600">14-Tage-Rückgaberecht</p>
         </div>
