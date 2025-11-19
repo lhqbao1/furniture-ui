@@ -1,5 +1,4 @@
 "use client";
-
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { getAllProductsSelect } from "@/features/product-group/api";
