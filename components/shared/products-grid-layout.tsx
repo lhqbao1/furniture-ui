@@ -234,7 +234,6 @@ const ProductsGridLayout = ({
                             €
                           </div>
                         </div>
-                        <div>inkl. MwSt.</div>
                       </div>
 
                       {product.price && product.price > product.final_price && (

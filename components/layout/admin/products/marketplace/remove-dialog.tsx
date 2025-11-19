@@ -37,16 +37,28 @@ const RemoveFromMarketplaceDialog = ({
   const handleRemove = () => {
     if (marketplace === "ebay" && marketplaceProduct) {
       removeFromEbayMutation.mutate(product.sku, {
-        onSuccess: () => toast.success("Removed from eBay successfully"),
-        onError: () => toast.error("Failed to remove from eBay"),
+        onSuccess: () => {
+          toast.success("Removed from eBay successfully");
+          setOpen(false);
+        },
+        onError: () => {
+          toast.error("Failed to remove from eBay");
+          setOpen(false);
+        },
       });
     } else if (marketplace === "kaufland" && marketplaceProduct) {
       removeFromKauflandMutation.mutate(
         product.marketplace_products.find((m) => m.marketplace === "kaufland")
           ?.marketplace_offer_id ?? "",
         {
-          onSuccess: () => toast.success("Removed from Kaufland successfully"),
-          onError: () => toast.error("Failed to remove from Kaufland"),
+          onSuccess: () => {
+            toast.success("Removed from Kaufland successfully");
+            setOpen(false);
+          },
+          onError: () => {
+            toast.error("Failed to remove from Kaufland");
+            setOpen(false);
+          },
         },
       );
     }

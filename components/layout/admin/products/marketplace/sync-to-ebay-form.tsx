@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Pencil } from "lucide-react";
+import { Loader2, Pencil, Plus } from "lucide-react";
 import { useSyncToEbay } from "@/features/ebay/hook";
 import { syncToEbayInput } from "@/features/ebay/api";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
@@ -280,7 +280,11 @@ const SyncToEbayForm = ({
             type="button"
             className="bg-amber-50 border-amber-400"
           >
-            <Pencil className="text-amber-400" />
+            {isUpdating ? (
+              <Pencil className="text-amber-400" />
+            ) : (
+              <Plus className="text-amber-400" />
+            )}
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">

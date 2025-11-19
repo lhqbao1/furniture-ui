@@ -53,11 +53,11 @@ const ProductStatistic = ({
       ))}
 
       {/* Date pickers */}
-      <div className="col-span-1 flex flex-col gap-4 mt-2">
+      <div className="grid grid-cols-2 gap-2 mt-2">
         <div className="flex gap-2 items-center justify-start">
-          <div className="">From Date:</div>
+          <div className="">From:</div>
           <SingleDatePicker
-            label="From Date"
+            label=""
             value={fromDate}
             onChange={(v) => {
               if (!v) return setFromDate?.(undefined);
@@ -69,9 +69,9 @@ const ProductStatistic = ({
         </div>
 
         <div className="flex gap-2 items-center justify-start">
-          <div>To Date:</div>
+          <div>To:</div>
           <SingleDatePicker
-            label="To Date"
+            label=""
             value={endDate}
             onChange={(v) => {
               if (!v) return setEndDate?.(undefined);
