@@ -42,6 +42,10 @@ export default function OrderStatusSelector({
     if (String(status).toLowerCase() === "completed") {
       return STATUS_OPTIONS.filter((s) => s.key === "return");
     }
+
+    if (String(status).toLowerCase() === "paid") {
+      return STATUS_OPTIONS.filter((s) => s.key === "canceled");
+    }
     // otherwise show all except 'completed' itself as option (optional)
     return STATUS_OPTIONS;
   }, [status]);
@@ -79,7 +83,10 @@ export default function OrderStatusSelector({
           value={value}
           onValueChange={handleChange}
         >
-          <SelectTrigger className="w-fit">
+          <SelectTrigger
+            className="w-fit px-0 py-0 border-none"
+            iconColor="black"
+          >
             {/* <SelectValue placeholder={labelFor(value) || "Select"} /> */}
           </SelectTrigger>
           <SelectContent>
@@ -93,9 +100,6 @@ export default function OrderStatusSelector({
             ))}
           </SelectContent>
         </Select>
-
-        {/* fallback icon when no dialog action */}
-        <ArrowRight size={16} />
       </div>
 
       {/* Dialogs */}

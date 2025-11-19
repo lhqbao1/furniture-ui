@@ -1,18 +1,31 @@
-import React from 'react'
-import OrderPlacedWrapper from './page-client'
+import React from "react";
+import OrderPlacedWrapper from "./page-client";
+import Script from "next/script";
 
 export const metadata = {
-    robots: {
-        index: false,
-        follow: false,
-        nocache: true,
-    },
-}
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
 
 const OrderPlacePage = () => {
-    return (
-        <OrderPlacedWrapper />
-    )
-}
+  return (
+    <>
+      {/* Google Ads Conversion Event */}
+      <Script
+        id="google-ads-conversion-event"
+        strategy="afterInteractive"
+      >
+        {`
+          gtag('event', 'ads_conversion_Gi_h_ng_1', {});
+        `}
+      </Script>
 
-export default OrderPlacePage
+      <OrderPlacedWrapper />
+    </>
+  );
+};
+
+export default OrderPlacePage;
