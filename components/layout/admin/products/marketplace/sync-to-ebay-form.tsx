@@ -185,32 +185,6 @@ const SyncToEbayForm = ({
       }
     }
 
-    if (isUpdating) {
-      const index = updatedMarketplaceProducts.findIndex(
-        (m) => m.marketplace === values.marketplace,
-      );
-
-      const updateValues = {
-        ...normalizedValues,
-        is_active: updatedMarketplaceProducts[index].is_active,
-        marketplace_offer_id:
-          updatedMarketplaceProducts[index].marketplace_offer_id,
-        line_item_id: updatedMarketplaceProducts[index].line_item_id,
-        brand: updatedMarketplaceProducts[index].brand,
-      };
-
-      if (index !== -1) {
-        updatedMarketplaceProducts[index] = {
-          ...updatedMarketplaceProducts[index],
-          ...updateValues,
-        };
-      } else {
-        updatedMarketplaceProducts.push(normalizedValues);
-      }
-    } else {
-      updatedMarketplaceProducts.push(normalizedValues);
-    }
-
     updateProductMutation.mutate(
       {
         input: {
@@ -305,6 +279,8 @@ const SyncToEbayForm = ({
         },
       },
     );
+    console.log(updatedMarketplaceProducts);
+    console.log(normalizedValues);
   };
 
   return (

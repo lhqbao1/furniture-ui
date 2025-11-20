@@ -29,6 +29,8 @@ import {
   currentCategoryNameAtom,
 } from "@/store/category";
 import { useIsPhone } from "@/hooks/use-is-phone";
+import Link from "next/link";
+import Image from "next/image";
 
 type MenuItem = {
   title: string;
@@ -125,9 +127,31 @@ export default function AppSidebar({
       collapsible="offcanvas"
     >
       <SidebarContent>
-        <SidebarHeader className="items-end flex lg:hidden">
+        <SidebarHeader className="flex items-end lg:items-center lg:border-b-2 lg:border-black/50">
+          <div className={`flex flex-col gap-4 items-center`}>
+            <Link
+              href={`/`}
+              className="relative w-10 h-10 hidden lg:flex"
+            >
+              <Image
+                src="/new-logo.svg"
+                alt=""
+                fill
+                style={{ objectFit: "contain" }}
+              />
+            </Link>
+            <Link href={"/"}>
+              <div
+                className="hidden lg:flex text-[29px] gap-1"
+                translate="no"
+              >
+                <span className="text-secondary font-bold">Prestige</span>
+                <span className="text-primary font-bold">Home</span>
+              </div>
+            </Link>
+          </div>
           <SidebarTrigger
-            className={`border-none text-[#4D4D4D] relative`}
+            className={`border-none text-[#4D4D4D] relative lg:hidden`}
             isMobile={isPhone ? true : false}
             isClose
           />
@@ -147,11 +171,14 @@ export default function AppSidebar({
                   return (
                     <SidebarMenuItem
                       key={item.id}
-                      className={`flex justify-start ${
-                        item.id === "account"
-                          ? "border-t-2 border-black/50"
-                          : ""
-                      }`}
+                      // className={`flex justify-start
+                      //   ${
+                      //     item.id === "account"
+                      //       ? "border-t-2 border-black/50"
+                      //       : ""
+                      //   }
+                      // `}
+                      className="flex justify-start"
                     >
                       <Collapsible
                         className="w-full"
@@ -215,7 +242,7 @@ export default function AppSidebar({
                                     }
                                   }}
                                   variant={"ghost"}
-                                  className={`relative flex flex-row items-start justify-start lg:pl-16 pl-4 text-wrap gap-3 h-fit rounded-none py-1 flex-wrap max-w-full text-base transition-colors ${
+                                  className={`relative flex flex-row items-start justify-start lg:pl-16 pl-12 text-wrap gap-3 h-fit rounded-none py-1 flex-wrap max-w-full text-base transition-colors ${
                                     isChildActive
                                       ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
                                       : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
@@ -241,9 +268,10 @@ export default function AppSidebar({
                 return (
                   <SidebarMenuItem
                     key={item.id}
-                    className={`flex justify-start ${
-                      item.id === "sale" ? "border-b-2 border-black/50" : ""
-                    }`}
+                    // className={`flex justify-start ${
+                    //   item.id === "sale" ? "border-b-2 border-black/50" : ""
+                    // }`}
+                    className="flex justify-start"
                   >
                     <SidebarMenuButton asChild>
                       <Button

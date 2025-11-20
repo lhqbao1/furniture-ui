@@ -3,7 +3,9 @@ import { orderColumns } from "@/components/layout/admin/orders/order-list/column
 import OrderExpandTable from "@/components/layout/admin/orders/order-list/expand-delivery";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
-import TableToolbar from "@/components/layout/admin/products/products-list/toolbar";
+import TableToolbar, {
+  ToolbarType,
+} from "@/components/layout/admin/products/products-list/toolbar";
 import AdminBackButton from "@/components/shared/admin-back-button";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
@@ -103,6 +105,7 @@ const OrderList = () => {
           pageSize={pageSize}
           setPage={setPage}
           setPageSize={setPageSize}
+          type={ToolbarType.order}
         />
         {isLoading ? (
           <ProductTableSkeleton

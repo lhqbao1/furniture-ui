@@ -89,63 +89,6 @@ function SyncToMarketplace({
     (p) => p.marketplace === marketplace,
   );
 
-  const handleSync = () => {
-    if (!product.brand) {
-      toast.error("Brand is missing from current product");
-      return;
-    }
-
-    if (marketplace === "ebay") {
-      const payload: syncToEbayInput = {
-        sku: product.sku,
-        price: product.final_price,
-        stock: product.stock,
-        tax: product.tax ?? null,
-        brand: product.brand?.name ?? "",
-        carrier: product.carrier,
-        product: {
-          title: product.name,
-          description: stripHtmlRegex(product.description),
-          ean: product.ean ? [product.ean] : [],
-          imageUrls:
-            product.static_files?.map((f) => f.url.replace(/\s+/g, "%20")) ??
-            [],
-        },
-      };
-
-      syncToEbayMutation.mutate(payload, {
-        onSuccess: () => toast.success("Synced to eBay successfully"),
-        onError: () => toast.error("Failed to sync to eBay"),
-      });
-    }
-
-    if (marketplace === "kaufland") {
-      // console.log(product.marketplace_products)
-      const payload: syncToKauflandInput = {
-        ean: product.ean,
-        title: product.name,
-        description: product.description,
-        image_urls:
-          product.static_files?.map((f) => f.url.replace(/\s+/g, "%20")) ?? [],
-        price: product.final_price,
-        stock: product.stock,
-        carrier: product.carrier,
-        sku: product.sku,
-        product_id: product.id,
-        brand: {
-          address: product.brand.company_address,
-          email: product.brand.company_email,
-          name: product.brand.company_name,
-        },
-      };
-
-      syncToKauflandMutation.mutate(payload, {
-        onSuccess: () => toast.success("Synced to Kaufland successfully"),
-        onError: () => toast.error("Failed to sync to Kaufland"),
-      });
-    }
-  };
-
   // ✅ Button UI logic rõ ràng
   const isActive = marketplaceProduct?.is_active;
 
@@ -155,6 +98,8 @@ function SyncToMarketplace({
     syncToAmazonMutation.isPending ||
     removeFromEbayMutation.isPending ||
     removeFromKauflandMutation.isPending;
+
+  console.log(isActive);
 
   return (
     <div className="flex justify-start gap-2 items-center">

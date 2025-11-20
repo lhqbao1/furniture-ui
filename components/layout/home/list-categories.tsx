@@ -5,8 +5,10 @@ import { currentCategoryIdAtom } from "@/store/category";
 import { useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import React from "react";
+import { useMediaQuery } from "react-responsive";
 
 const ListCategoriesHome = () => {
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   const {
     open: sidebarOpen,
     setOpen,
@@ -33,14 +35,18 @@ const ListCategoriesHome = () => {
       {isLoading || isError || !categories ? (
         <div>loading</div>
       ) : (
-        <div className="flex items-center gap-6">
+        <div className="flex items-center justify-center gap-6 flex-wrap">
           {categories?.map((item, index) => {
             return (
               <div
                 className="px-3 py-1.5 border rounded-full cursor-pointer"
                 key={index}
                 onClick={() => {
-                  setOpen(true);
+                  if (isMobile) {
+                    setOpenMobile(true);
+                  } else {
+                    setOpen(true);
+                  }
                   setCurrentCategoryId(item.id);
                 }}
               >

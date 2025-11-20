@@ -11,24 +11,7 @@ import { ArrowRight } from "lucide-react";
 import ReturnConfirmDialog from "../order-list/return-confirm-dialog";
 import CancelConfirmDialog from "../order-list/canceled-confirm-dialog";
 import { CheckOutMain } from "@/types/checkout";
-
-const STATUS_OPTIONS = [
-  { key: "pending", label: "Waiting for payment", active: true, pos: 2 },
-  { key: "paid", label: "Payment received", active: true, pos: 3 },
-  { key: "stock_reserved", label: "Stock reserved", active: true, pos: 4 },
-  {
-    key: "preparation_shipping",
-    label: "In preparation for shipping",
-    active: true,
-    pos: 5,
-  },
-  { key: "ds_informed", label: "DS informed", active: true, pos: 6 },
-  { key: "shipped", label: "Dispatched", active: true, pos: 7 },
-  { key: "completed", label: "Completed", active: true, pos: 0 },
-  { key: "cancel_request", label: "Cancel requested", active: true, pos: 8 },
-  { key: "canceled", label: "Canceled", active: true, pos: 9 },
-  { key: "return", label: "Return", active: true, pos: 10 },
-];
+import { STATUS_OPTIONS } from "@/data/data";
 
 export default function OrderStatusSelector({
   status,

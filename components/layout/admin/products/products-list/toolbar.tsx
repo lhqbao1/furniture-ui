@@ -33,6 +33,13 @@ import ExportExcelButton from "./toolbar/export-button";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import OrderFilterForm from "../../orders/order-list/filter/filter-form";
+
+export enum ToolbarType {
+  product = "product",
+  order = "order",
+}
+
 interface TableToolbarProps {
   searchQuery?: string;
   pageSize: number;
@@ -44,6 +51,7 @@ interface TableToolbarProps {
   addButtonUrl?: string;
   addButtonModalContent?: React.ReactNode;
   exportData?: ProductItem[];
+  type: ToolbarType;
 }
 
 type ImageFile = {
@@ -61,6 +69,7 @@ export default function TableToolbar({
   addButtonUrl,
   addButtonModalContent,
   exportData,
+  type,
 }: TableToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -212,7 +221,8 @@ export default function TableToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[800px] px-8 py-4">
-            <FilterForm />
+            {type === ToolbarType.product && <FilterForm />}
+            {type === ToolbarType.order && <OrderFilterForm />}
           </DropdownMenuContent>
         </DropdownMenu>
 
