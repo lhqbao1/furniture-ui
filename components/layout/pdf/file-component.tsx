@@ -15,11 +15,13 @@ import { Button } from "@/components/ui/button";
 interface InvoiceTableProps {
   checkoutId: string;
   invoiceId?: string;
+  isCreditNode?: boolean;
 }
 
 export default function InvoiceTable({
   checkoutId,
   invoiceId,
+  isCreditNode,
 }: InvoiceTableProps) {
   const {
     data: checkout,
