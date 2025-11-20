@@ -25,6 +25,8 @@ export type SyncToAmazonInput = {
   browse_node?: string;
   size: string;
   country_of_origin: string;
+  min_stock: number;
+  max_stock: number;
 };
 
 export async function syncToAmazon(input: SyncToAmazonInput) {

@@ -51,6 +51,45 @@ export const marketPlaceSchema = z
     },
   );
 
+export const amazonMarketplaceSchema = z
+  .object({
+    marketplace: z.string().optional(),
+    marketplace_offer_id: z.string().optional().nullable(),
+    name: z.string().optional(),
+    description: z.string().optional(),
+    final_price: z.number().nonnegative().optional().nullable(),
+    min_stock: z.number().nonnegative().optional().nullable(),
+    max_stock: z.number().nonnegative().optional().nullable(),
+    is_active: z.boolean().optional(),
+    sku: z.string(),
+    country_of_origin: z.string(),
+    current_stock: z.number().nonnegative().optional().nullable(),
+    line_item_id: z.string().optional().nullable(),
+    brand: z.string().optional().nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.marketplace) {
+        return (
+          data.name &&
+          data.description &&
+          data.final_price !== null &&
+          data.final_price !== undefined &&
+          data.min_stock !== null &&
+          data.min_stock !== undefined &&
+          data.max_stock !== null &&
+          data.max_stock !== undefined
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "If marketplace is provided, all other fields must also be filled in.",
+      path: ["marketplace"],
+    },
+  );
+
 const bundleSchema = z.object({
   product_id: z.string().min(1, { message: "Bundle product ID is required" }),
   quantity: z.number().min(1, { message: "Quantity must be at least 1" }),

@@ -5,17 +5,11 @@ import { syncToAmazon, SyncToAmazonInput } from "./api";
 
 type SyncErrorResponse = AmazonError | AuthError | GenericError;
 
-// export function useRemoveFormKaufland() {
-//     return useMutation({
-//       mutationFn: (offer_id: string) => removeFromKaufland(offer_id),
-//     });
-//   }
-
 export function useSyncToAmazon() {
   const qc = useQueryClient();
 
   return useMutation<
-    unknown,
+    any, // response data kiểu nào cũng nhận
     AxiosError<SyncErrorResponse>,
     SyncToAmazonInput,
     string | number
@@ -24,7 +18,27 @@ export function useSyncToAmazon() {
 
     onMutate: () => toast.loading("Syncing data to Amazon..."),
 
-    onSuccess: (_data, _vars, toastId) => {
+    onSuccess: (data, _vars, toastId) => {
+      const status = data?.status;
+      const issues = data?.issues ?? [];
+
+      // 1) Tìm issues có severity = ERROR
+      const errorIssue = issues.find(
+        (i: any) => i.severity?.toUpperCase() === "ERROR",
+      );
+
+      if (errorIssue) {
+        toast.error(errorIssue.message, { id: toastId });
+        return;
+      }
+
+      // 2) Nếu status không phải ACCEPTED → báo lỗi chung
+      if (status !== "ACCEPTED") {
+        toast.error(`Amazon returned status: ${status}`, { id: toastId });
+        return;
+      }
+
+      // 3) Thành công
       toast.success("Update data to Amazon successfully", { id: toastId });
       qc.invalidateQueries({ queryKey: ["products"] });
     },

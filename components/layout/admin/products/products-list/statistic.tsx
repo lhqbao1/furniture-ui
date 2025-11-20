@@ -53,7 +53,7 @@ const ProductStatistic = ({
       ))}
 
       {/* Date pickers */}
-      <div className="grid lg:grid-cols-2 grid-cols-1 gap-2 mt-2">
+      {/* <div className="grid lg:grid-cols-2 grid-cols-1 gap-2 mt-2">
         <div className="flex gap-2 items-center justify-start">
           <div className="">From:</div>
           <SingleDatePicker
@@ -81,7 +81,7 @@ const ProductStatistic = ({
             }}
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

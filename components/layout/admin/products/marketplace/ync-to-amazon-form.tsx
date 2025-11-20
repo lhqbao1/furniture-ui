@@ -15,7 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { marketPlaceSchema } from "@/lib/schema/product";
+import {
+  amazonMarketplaceSchema,
+  marketPlaceSchema,
+} from "@/lib/schema/product";
 import { MarketplaceProduct, ProductItem } from "@/types/products";
 import { useEditProduct } from "@/features/products/hook";
 import {
@@ -25,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Pencil } from "lucide-react";
+import { Loader2, Pencil, Plus, RefreshCw } from "lucide-react";
 import { useSyncToEbay } from "@/features/ebay/hook";
 import { syncToEbayInput } from "@/features/ebay/api";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
@@ -41,6 +44,7 @@ import { syncToKauflandInput } from "@/features/kaufland/api";
 import { useSyncToKaufland } from "@/features/kaufland/hook";
 import { useSyncToAmazon } from "@/features/amazon/hook";
 import { SyncToAmazonInput } from "@/features/amazon/api";
+import { COUNTRY_OPTIONS } from "@/data/data";
 
 interface SyncToAmazonFormProps {
   product: ProductItem;
@@ -49,9 +53,10 @@ interface SyncToAmazonFormProps {
   updating?: boolean;
   isActive: boolean;
   setUpdating: React.Dispatch<React.SetStateAction<boolean>>;
+  isAdd?: boolean;
 }
 
-type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>;
+type MarketPlaceFormValues = z.infer<typeof amazonMarketplaceSchema>;
 
 const SyncToAmazonForm = ({
   product,
@@ -60,6 +65,7 @@ const SyncToAmazonForm = ({
   updating,
   isActive,
   setUpdating,
+  isAdd,
 }: SyncToAmazonFormProps) => {
   const updateProductMutation = useEditProduct();
   const syncToAmazonMutation = useSyncToAmazon();
@@ -67,7 +73,7 @@ const SyncToAmazonForm = ({
   const [open, setOpen] = useState<boolean>(false);
 
   const form = useForm<MarketPlaceFormValues>({
-    resolver: zodResolver(marketPlaceSchema),
+    resolver: zodResolver(amazonMarketplaceSchema),
     defaultValues: {
       marketplace: currentMarketplace ?? "",
       name: product.name,
@@ -77,34 +83,24 @@ const SyncToAmazonForm = ({
             (i) => i.marketplace === currentMarketplace,
           )?.final_price
         : product.final_price,
-      min_stock: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.min_stock
-        : undefined,
-      max_stock: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.max_stock
-        : undefined,
+      min_stock: product.marketplace_products.find(
+        (i) => i.marketplace === currentMarketplace,
+      )?.min_stock,
+      max_stock: product.marketplace_products.find(
+        (i) => i.marketplace === currentMarketplace,
+      )?.max_stock,
       sku: product.sku,
+      is_active: product.marketplace_products.find(
+        (i) => i.marketplace === currentMarketplace,
+      )?.is_active,
+      country_of_origin: product.marketplace_products.find(
+        (i) => i.marketplace === currentMarketplace,
+      )?.country_of_origin,
     },
   });
 
-  const marketplace = form.watch("marketplace");
-
-  useEffect(() => {
-    if (isUpdating) return;
-    if (marketplace === "ebay") {
-      form.setValue("min_stock", 0);
-      form.setValue("max_stock", 10);
-    } else {
-      form.setValue("min_stock", null);
-      form.setValue("max_stock", null);
-    }
-  }, [marketplace, form]);
-
-  const onSubmit = (values: MarketPlaceFormValues) => {
+  console.log(currentMarketplace);
+  const handleSubmit = (values: MarketPlaceFormValues) => {
     if (!product.brand) {
       toast.error("Brand is missing from current product");
       return;
@@ -120,7 +116,10 @@ const SyncToAmazonForm = ({
       max_stock: values.max_stock ?? 10,
       current_stock: values.current_stock ?? 0,
       line_item_id: values.line_item_id ?? "",
-      is_active: values.is_active ?? true,
+      is_active:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.is_active ?? true,
       marketplace_offer_id: values.marketplace_offer_id ?? "",
       name: values.name ?? "",
       description: values.description ?? "",
@@ -159,17 +158,14 @@ const SyncToAmazonForm = ({
       if (existing) {
         Object.assign(existing, {
           ...normalizedValues,
-          is_active: true,
         });
       } else {
         updatedMarketplaceProducts.push({
           ...normalizedValues,
-          is_active: true,
+          is_active: false,
         });
       }
     }
-
-    console.log(updatedMarketplaceProducts);
 
     updateProductMutation.mutate(
       {
@@ -195,6 +191,31 @@ const SyncToAmazonForm = ({
           const amazonData = data.marketplace_products?.find(
             (m) => m.marketplace === "amazon",
           );
+          if (!product.sku) {
+            toast.error("sku is missing");
+            return;
+          }
+          if (!product.length) {
+            toast.error("length is missing");
+            return;
+          }
+          if (!product.weight) {
+            toast.error("weight is missing");
+            return;
+          }
+          if (!product.width) {
+            toast.error("width is missing");
+            return;
+          }
+          if (!product.height) {
+            toast.error("height is missing");
+            return;
+          }
+          if (!product.brand) {
+            toast.error("brand is missing");
+            return;
+          }
+
           const payload: SyncToAmazonInput = {
             sku: amazonData?.sku ?? product.sku,
             title: amazonData?.name ?? product.name,
@@ -218,7 +239,9 @@ const SyncToAmazonForm = ({
             images: product.static_files?.map((f) => f.url) ?? [],
             model_number: product.sku,
             size: `${product.length}x${product.width}x${product.height}`,
-            country_of_origin: product.manufacture_country,
+            country_of_origin: values.country_of_origin,
+            min_stock: values.min_stock ?? 0,
+            max_stock: values.max_stock ?? 10,
           };
 
           syncToAmazonMutation.mutate(payload);
@@ -246,8 +269,13 @@ const SyncToAmazonForm = ({
                 : "bg-white border-gray-500"
             }`}
           >
-            {isUpdating ? <Pencil className="text-amber-400" /> : "Sync"}
-            asdasd
+            {isUpdating ? (
+              <Pencil className="text-amber-400" />
+            ) : isAdd ? (
+              <RefreshCw className="text-green-400" />
+            ) : (
+              <Plus className="text-green-400" />
+            )}
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
@@ -258,7 +286,15 @@ const SyncToAmazonForm = ({
           <div className="mx-auto space-y-6">
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(
+                  (values) => {
+                    handleSubmit(values);
+                  },
+                  (errors) => {
+                    console.log(errors);
+                    toast.error("Please check the form for errors");
+                  },
+                )}
                 className="space-y-6"
               >
                 {/* Name */}
@@ -274,6 +310,43 @@ const SyncToAmazonForm = ({
                           {...field}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="country_of_origin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country of Origin</FormLabel>
+
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger
+                            className="w-full border"
+                            placeholderColor
+                          >
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+
+                          <SelectContent className="max-h-80">
+                            {COUNTRY_OPTIONS.map((c) => (
+                              <SelectItem
+                                key={c.value}
+                                value={c.value}
+                              >
+                                {c.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+
                       <FormMessage />
                     </FormItem>
                   )}

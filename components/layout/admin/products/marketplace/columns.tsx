@@ -99,8 +99,6 @@ function SyncToMarketplace({
     removeFromEbayMutation.isPending ||
     removeFromKauflandMutation.isPending;
 
-  console.log(isActive);
-
   return (
     <div className="flex justify-start gap-2 items-center">
       {/* Nếu product active trong marketplace => hiện form update */}

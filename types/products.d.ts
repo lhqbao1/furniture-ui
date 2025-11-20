@@ -108,6 +108,7 @@ export type MarketplaceProduct = {
   line_item_id: string;
   current_stock: number;
   brand: string;
+  country_of_origin?: string;
 };
 
 export type ProductPdfFiles = {

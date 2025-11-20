@@ -167,7 +167,7 @@ const SyncToEbayForm = ({
         // ⭐ Không tồn tại → thêm mới
         updatedMarketplaceProducts.push({
           ...normalizedValues,
-          is_active: true,
+          // is_active: true,
         });
       }
     } else {
@@ -175,12 +175,11 @@ const SyncToEbayForm = ({
       if (existing) {
         Object.assign(existing, {
           ...normalizedValues,
-          is_active: true, // bật active
         });
       } else {
         updatedMarketplaceProducts.push({
           ...normalizedValues,
-          is_active: true,
+          // is_active: false,
         });
       }
     }
@@ -279,8 +278,6 @@ const SyncToEbayForm = ({
         },
       },
     );
-    console.log(updatedMarketplaceProducts);
-    console.log(normalizedValues);
   };
 
   return (

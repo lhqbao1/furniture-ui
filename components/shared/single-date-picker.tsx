@@ -54,11 +54,12 @@ export const SingleDatePicker = ({
     <Popover
       open={open}
       onOpenChange={setOpen}
+      modal={false}
     >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="justify-start flex-1"
+          className="justify-start flex-1 w-full"
           type="button"
         >
           <Calendar1 className="mr-2 h-4 w-4" />
@@ -66,7 +67,7 @@ export const SingleDatePicker = ({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="p-0">
+      <PopoverContent className="p-0 z-[10000] pointer-events-auto">
         <Calendar
           mode="single"
           selected={selected}

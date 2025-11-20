@@ -1,7 +1,4 @@
-export const config = {
-  regions: ["fra1"],
-};
-
+import qs from "qs";
 import { api, apiAdmin, apiDSP, apiFlexible } from "@/lib/axios";
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
@@ -16,6 +13,10 @@ import {
 export interface GetAllCheckoutParams {
   page?: number;
   page_size?: number;
+  status?: string[]; // <-- Mảng
+  channel?: string[] | null; // ✔ cho phép null
+  from_date?: string;
+  to_date?: string;
 }
 
 export interface OrderStatisticsParams {
@@ -68,8 +69,16 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
     params: {
       ...(params?.page !== undefined && { page: params.page }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
+      ...(params?.status !== undefined && { status: params.status }), // array
+      ...(params?.channel !== undefined && { channel: params.channel }), // array
+      ...(params?.from_date !== undefined && { from_date: params.from_date }),
+      ...(params?.to_date !== undefined && { to_date: params.to_date }),
     },
+
+    paramsSerializer: (params) =>
+      qs.stringify(params, { arrayFormat: "repeat" }),
   });
+
   return data as CheckOutMainResponse;
 }
 

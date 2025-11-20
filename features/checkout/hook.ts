@@ -37,13 +37,20 @@ export function useGetCheckOutSupplier({
   });
 }
 
-export function useGetCheckOutMain({
-  page,
-  page_size,
-}: GetAllCheckoutParams = {}) {
+export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
+  const { page, page_size, status, channel, from_date, to_date } = params;
+
   return useQuery({
-    queryKey: ["checkout-main", page, page_size],
-    queryFn: () => getCheckOutMain({ page, page_size }),
+    queryKey: [
+      "checkout-main",
+      page ?? 1,
+      page_size ?? 50,
+      (status ?? []).join(","), // 🔥 fix array issues
+      (channel ?? []).join(","), // 🔥 fix array issues
+      from_date ?? null,
+      to_date ?? null,
+    ],
+    queryFn: () => getCheckOutMain(params),
     retry: false,
   });
 }
