@@ -1,17 +1,6 @@
-import { CheckOut, CheckOutMain } from "@/types/checkout";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { CheckOutMain } from "@/types/checkout";
+import { ArrowRight } from "lucide-react";
 import React from "react";
-import ReturnConfirmDialog from "../order-list/return-confirm-dialog";
-import CancelConfirmDialog from "../order-list/canceled-confirm-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import OrderStatusSelector from "./order-status-selector";
 interface OrderDetailOverViewProps {
   created_at: string;
@@ -51,7 +40,7 @@ const OrderDetailOverView = ({
           order={order}
           status={status}
         />
-        <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold cursor-pointer">
+        {/* <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold cursor-pointer">
           <div className="flex gap-1">
             <div>Chanel:</div>
             <div
@@ -76,7 +65,7 @@ const OrderDetailOverView = ({
             </div>
           </div>
           <ArrowRight size={16} />
-        </div>
+        </div> */}
       </div>
     </div>
   );
