@@ -175,12 +175,6 @@ export default async function Page({
     staleTime: 30000,
   });
 
-  await queryClient.prefetchQuery({
-    queryKey: ["product", product.id],
-    queryFn: () => getProductById(product.id),
-    staleTime: 30000,
-  });
-
   if (product.parent_id) {
     await queryClient.prefetchQuery({
       queryKey: ["product-group", product.parent_id],

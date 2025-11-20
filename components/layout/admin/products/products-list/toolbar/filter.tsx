@@ -1,37 +1,11 @@
 "use client";
 
 import React from "react";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ProductStatusFilter from "./filter/status";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 
-interface FilterFormProps {
-  // isActive: boolean
-  // setIsActive: (val: boolean) => void
-  // brand: string
-  // setBrand: (val: string) => void
-  // minPrice?: number
-  // setMinPrice: (val?: number) => void
-  // maxPrice?: number
-  // setMaxPrice: (val?: number) => void
-  // sortByStock?: string
-  // setSortByStock: (val?: string) => void
-}
-
-export default function FilterForm({}: // isActive,
-// setIsActive,
-// brand,
-// setBrand,
-// minPrice,
-// setMinPrice,
-// maxPrice,
-// setMaxPrice,
-// sortByStock,
-// setSortByStock,
-FilterFormProps) {
+export default function FilterForm() {
   const router = useRouter();
   const pathname = usePathname(); // ví dụ "/admin/products"
 

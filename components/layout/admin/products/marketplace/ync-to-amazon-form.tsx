@@ -169,63 +169,65 @@ const SyncToAmazonForm = ({
       }
     }
 
-    updateProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          category_ids: product.categories.map((c) => c.id),
-          marketplace_products: updatedMarketplaceProducts,
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-          brand_id: product.brand.id,
-        },
+    console.log(updatedMarketplaceProducts);
 
-        id: product.id,
-      },
-      {
-        onSuccess(data) {
-          const amazonData = data.marketplace_products?.find(
-            (m) => m.marketplace === "amazon",
-          );
-          const payload: SyncToAmazonInput = {
-            sku: amazonData?.sku ?? product.sku,
-            title: amazonData?.name ?? product.name,
-            manufacturer: product.brand ? product.brand.company_name : "",
-            description: amazonData?.description ?? product.description,
-            price: amazonData?.final_price ?? product.final_price,
-            ean: product.ean,
-            part_number: product.sku,
-            is_fragile: false,
-            number_of_items: Number(product.amount_unit) || 0,
-            included_components: product.name,
-            weight: product.weight,
-            height: product.height,
-            width: product.width,
-            length: product.length,
-            depth: 0,
-            asin: null,
-            stock: product.stock,
-            carrier: product.carrier,
-            brand: product.brand ? product.brand.name : "",
-            images: product.static_files?.map((f) => f.url) ?? [],
-            model_number: product.sku,
-            size: `${product.length}x${product.width}x${product.height}`,
-            country_of_origin: product.manufacture_country,
-          };
+    // updateProductMutation.mutate(
+    //   {
+    //     input: {
+    //       ...product,
+    //       category_ids: product.categories.map((c) => c.id),
+    //       marketplace_products: updatedMarketplaceProducts,
+    //       ...(product.bundles?.length
+    //         ? {
+    //             bundles: product.bundles.map((item) => ({
+    //               product_id: item.bundle_item.id,
+    //               quantity: item.quantity,
+    //             })),
+    //           }
+    //         : { bundles: [] }),
+    //       brand_id: product.brand.id,
+    //     },
 
-          syncToAmazonMutation.mutate(payload);
-        },
-        onError() {
-          toast.error("Failed to update marketplace data");
-        },
-      },
-    );
+    //     id: product.id,
+    //   },
+    //   {
+    //     onSuccess(data) {
+    //       const amazonData = data.marketplace_products?.find(
+    //         (m) => m.marketplace === "amazon",
+    //       );
+    //       const payload: SyncToAmazonInput = {
+    //         sku: amazonData?.sku ?? product.sku,
+    //         title: amazonData?.name ?? product.name,
+    //         manufacturer: product.brand ? product.brand.company_name : "",
+    //         description: amazonData?.description ?? product.description,
+    //         price: amazonData?.final_price ?? product.final_price,
+    //         ean: product.ean,
+    //         part_number: product.sku,
+    //         is_fragile: false,
+    //         number_of_items: Number(product.amount_unit) || 0,
+    //         included_components: product.name,
+    //         weight: product.weight,
+    //         height: product.height,
+    //         width: product.width,
+    //         length: product.length,
+    //         depth: 0,
+    //         asin: null,
+    //         stock: product.stock,
+    //         carrier: product.carrier,
+    //         brand: product.brand ? product.brand.name : "",
+    //         images: product.static_files?.map((f) => f.url) ?? [],
+    //         model_number: product.sku,
+    //         size: `${product.length}x${product.width}x${product.height}`,
+    //         country_of_origin: product.manufacture_country,
+    //       };
+
+    //       syncToAmazonMutation.mutate(payload);
+    //     },
+    //     onError() {
+    //       toast.error("Failed to update marketplace data");
+    //     },
+    //   },
+    // );
   };
 
   return (
@@ -245,6 +247,7 @@ const SyncToAmazonForm = ({
             }`}
           >
             {isUpdating ? <Pencil className="text-amber-400" /> : "Sync"}
+            asdasd
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">

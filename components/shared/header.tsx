@@ -97,7 +97,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
       className="home-banner-top__content sticky top-0 overflow-hidden z-50 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 
     lg:flex lg:items-center lg:justify-end lg:px-4 lg:py-3 lg:gap-6"
     >
-      <div className={`flex gap-4 items-center`}>
+      {/* <div className={`flex gap-4 items-center`}>
         <Link
           href={`/`}
           className="relative w-10 h-10"
@@ -118,7 +118,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
             <span className="text-primary font-bold">Home</span>
           </div>
         </Link>
-      </div>
+      </div> */}
 
       {/*Product search desktop */}
       <div className="hidden lg:block flex-1">

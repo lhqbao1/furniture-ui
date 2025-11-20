@@ -2,7 +2,9 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import TableToolbar from "@/components/layout/admin/products/products-list/toolbar";
+import TableToolbar, {
+  ToolbarType,
+} from "@/components/layout/admin/products/products-list/toolbar";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
 import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useGetAllProducts } from "@/features/products/hook";
@@ -68,6 +70,7 @@ const ProductList = () => {
         setSearchQuery={setSearchQuery}
         exportData={exportData}
         setPage={setPage}
+        type={ToolbarType.product}
       />
 
       {isLoading ? (
