@@ -20,7 +20,6 @@ const CART_KEY = "guest_cart";
 export function getCart(): CartItemLocal[] {
   if (typeof window === "undefined") return [];
   const data = localStorage.getItem(CART_KEY);
-  console.log(data);
   return data ? JSON.parse(data) : [];
 }
 

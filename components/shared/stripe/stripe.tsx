@@ -78,14 +78,14 @@ function CheckoutForm({
   const locale = useLocale();
 
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(
-    null
+    null,
   );
 
   const handlePaymentSuccess = (paymentIntentId: string) => {
     // Redirect sang trang kết quả và gửi PaymentIntent.id vào query
     router.push(
-      `http://prestige-home.de/payment-result?payment_intent=${paymentIntentId}`,
-      { locale }
+      `http://prestige-home.de/thank-you?payment_intent=${paymentIntentId}`,
+      { locale },
     );
   };
 
@@ -131,13 +131,13 @@ function CheckoutForm({
       });
 
       const handlePaymentMethod = async (
-        ev: PaymentRequestPaymentMethodEvent
+        ev: PaymentRequestPaymentMethodEvent,
       ) => {
         try {
           const { error, paymentIntent } = await stripe.confirmCardPayment(
             clientSecret,
             { payment_method: ev.paymentMethod.id },
-            { handleActions: false }
+            { handleActions: false },
           );
           if (error) {
             ev.complete("fail");
@@ -196,7 +196,7 @@ function CheckoutForm({
                 address: { country: "DE" },
               },
             },
-            return_url: `https://www.prestige-home.de/payment-result`,
+            return_url: `https://www.prestige-home.de/thank-you`,
           });
 
           if (error) {
@@ -225,7 +225,7 @@ function CheckoutForm({
     try {
       const { error, paymentIntent } = await stripe.confirmCardPayment(
         clientSecret,
-        { payment_method: { card } }
+        { payment_method: { card } },
       );
 
       if (error) {
@@ -269,7 +269,10 @@ function CheckoutForm({
                       className="flex items-center gap-2 space-y-0"
                     >
                       <FormControl>
-                        <RadioGroupItem value={option.id} id={option.id} />
+                        <RadioGroupItem
+                          value={option.id}
+                          id={option.id}
+                        />
                       </FormControl>
                       <FormLabel
                         htmlFor={option.id}
@@ -296,7 +299,10 @@ function CheckoutForm({
         />
 
         {selectedMethod === "card" && clientSecret && (
-          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+          <Dialog
+            open={openDialog}
+            onOpenChange={setOpenDialog}
+          >
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>{t("enterCardDetails")}</DialogTitle>

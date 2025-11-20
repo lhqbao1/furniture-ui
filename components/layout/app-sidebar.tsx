@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import {
   Sidebar,
@@ -51,7 +51,8 @@ export default function AppSidebar({
     setOpen,
     openMobile,
     setOpenMobile,
-  } = useSidebar(); // true = expanded, false = collapsed
+  } = useSidebar();
+
   const t = useTranslations();
   const locale = useLocale(); // 👈 thêm locale
   const [currentCategoryId, setCurrentCategoryId] = useAtom(
@@ -109,8 +110,14 @@ export default function AppSidebar({
     accountMenu,
   ];
 
-  const [openItem, setOpenItem] = useState<string | null>();
+  const [openItem, setOpenItem] = useState<string | null>(null);
   const isPhone = useIsPhone();
+
+  useEffect(() => {
+    // Khi atom thay đổi từ component khác -> mở item tương ứng
+    // Nếu currentCategoryId là falsy (undefined/null/""), sẽ đóng tất cả.
+    setOpenItem(currentCategoryId ?? null);
+  }, [currentCategoryId]);
 
   return (
     <Sidebar
@@ -130,7 +137,11 @@ export default function AppSidebar({
             <SidebarMenu className="gap-3">
               {items.map((item) => {
                 const isActive = pathname?.startsWith(item.url); // ✅ cho phép match /category/slug/...
-                const isOpen = openItem === item.id;
+                const isOpen =
+                  currentCategoryId === item.id
+                    ? openItem === currentCategoryId
+                    : openItem === item.id;
+
                 // Nếu có children → dùng Collapsible
                 if (item.children) {
                   return (
@@ -145,9 +156,13 @@ export default function AppSidebar({
                       <Collapsible
                         className="w-full"
                         open={isOpen}
-                        onOpenChange={(open) =>
-                          setOpenItem(open ? item.id : null)
-                        }
+                        onOpenChange={(open) => {
+                          setOpenItem(open ? item.id : null);
+                          if (!open && currentCategoryId === item.id) {
+                            setCurrentCategoryId(null); // nếu muốn clear atom khi đóng
+                            setCurrentCategoryName("");
+                          }
+                        }}
                       >
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton asChild>
@@ -157,9 +172,12 @@ export default function AppSidebar({
                                   ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
                                   : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                               }
-                                                                focus:bg-secondary/20 active:bg-secondary/20 focus:text-black active:text-black
-                                                                `}
+                                                                  focus:bg-secondary/20 active:bg-secondary/20 focus:text-black active:text-black
+                                                                  `}
                               variant={"ghost"}
+                              onClick={() => {
+                                setCurrentCategoryId(item.id);
+                              }}
                             >
                               <span className="lg:text-lg text-lg">
                                 {item.title}
@@ -237,9 +255,9 @@ export default function AppSidebar({
                             ? "bg-secondary/20 text-[#4D4D4D] hover:text-black hover:bg-secondary/20"
                             : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                         }
-                                                        focus:bg-secondary/20 active:bg-secondary/20 focus:text-black active:text-black
+                                                          focus:bg-secondary/20 active:bg-secondary/20 focus:text-black active:text-black
 
-                                                    `}
+                                                      `}
                         variant={"ghost"}
                         hasEffect
                       >
@@ -256,31 +274,6 @@ export default function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {/* <SidebarFooter className="data-[state=collapsed]:justify-center data-[state=expanded]:justify-end flex-row ">
-                <SidebarTrigger className={`cursor-pointer bg-transparent border-none text-secondary`} />
-                {isPhone ? (
-                    <Select
-                        defaultValue="de"
-                        onValueChange={(value) => {
-                            if (value === "de") {
-                                const path = pathname.startsWith('/en') ? pathname.replace('/en', '') : pathname
-                                router.push(path)
-                            } else if (value === "en") {
-                                const path = pathname.startsWith('/en') ? pathname : `/en${pathname}`
-                                router.push(path)
-                            }
-                        }}
-                    >
-                        <SelectTrigger className={`w-fit text-secondary text-xl font-bold xl:border-0 border-2 border-secondary`} placeholderColor iconColor="#00B159">
-                            <SelectValue placeholder={t('german')} className='text-secondary' />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="de" className='font-semibold'>{t('german')}</SelectItem>
-                            <SelectItem value="en" className='font-semibold'>{t('english')}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                ) : ''}
-            </SidebarFooter> */}
     </Sidebar>
   );
 }
