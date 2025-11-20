@@ -13,6 +13,7 @@ import {
   useGetCheckOutMain,
   useGetCheckOutStatistic,
 } from "@/features/checkout/hook";
+import { useOrderListFilters } from "@/hooks/admin-order-list/useOrderListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -26,6 +27,7 @@ const OrderList = () => {
 
   const searchParams = useSearchParams();
   const router = useRouter();
+  const filters = useOrderListFilters();
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
@@ -44,16 +46,20 @@ const OrderList = () => {
   const { data, isLoading, isError } = useGetCheckOutMain({
     page,
     page_size: pageSize,
+    status: filters.status, // <-- thêm
+    channel: filters.channel, // <-- thêm
+    from_date: filters.fromDate,
+    to_date: filters.toDate,
   });
-
-  const params =
-    fromDate && endDate ? { from_date: fromDate, to_date: endDate } : undefined;
 
   const {
     data: statistic,
     isLoading: isLoadingStatistic,
     isError: isErrorStatistic,
-  } = useGetCheckOutStatistic(params);
+  } = useGetCheckOutStatistic({
+    from_date: filters.fromDate,
+    to_date: filters.toDate,
+  });
 
   const mergedStatistic = [
     {

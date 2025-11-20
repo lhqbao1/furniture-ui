@@ -12,37 +12,26 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
-export const STATUS_OPTIONS = [
-  { key: "pending", label: "Waiting for payment", active: true, pos: 2 },
-  { key: "paid", label: "Payment received", active: true, pos: 3 },
-  { key: "tock_reserved", label: "Stock reserved", active: true, pos: 4 },
-  {
-    key: "preparation_shipping",
-    label: "In preparation for shipping",
-    active: true,
-    pos: 5,
-  },
-  { key: "ds_informed", label: "DS informed", active: true, pos: 6 },
-  { key: "shipped", label: "Dispatched", active: true, pos: 7 },
-  { key: "completed", label: "Completed", active: true, pos: 0 },
-  { key: "cancel_request", label: "Cancel requested", active: true, pos: 8 },
-  { key: "canceled", label: "Canceled", active: true, pos: 9 },
-  { key: "return", label: "Return", active: true, pos: 10 },
+export const CHANEL_OPTIONS = [
+  { key: "prestige_home", label: "Prestige Home" },
+  { key: "amazon", label: "Amazon" },
+  { key: "kaufland", label: "Kaufland" },
+  { key: "ebay", label: "Ebay" },
 ];
 
-export default function OrderStatusFilter() {
+export default function OrderChanelFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Lấy giá trị hiện tại từ URL
-  const param = searchParams.get("status") || "";
+  const param = searchParams.get("channel") || "";
   const initialSelected = param ? param.split(",") : [];
 
   const [selected, setSelected] = useState<string[]>(initialSelected);
 
   // Sync params -> UI khi user chuyển trang
   useEffect(() => {
-    const current = searchParams.get("status") || "";
+    const current = searchParams.get("channel") || "";
     setSelected(current ? current.split(",") : []);
   }, [searchParams]);
 
@@ -60,9 +49,9 @@ export default function OrderStatusFilter() {
     const params = new URLSearchParams(searchParams);
 
     if (updated.length > 0) {
-      params.set("status", updated.join(","));
+      params.set("channel", updated.join(","));
     } else {
-      params.delete("status");
+      params.delete("channel");
     }
 
     router.push(`?${params.toString()}`, { scroll: false });
@@ -70,19 +59,18 @@ export default function OrderStatusFilter() {
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>Status:</Label>
-
+      <Label>Chanel:</Label>
       <Select>
         <SelectTrigger
           className="w-[200px] cursor-pointer border text-black justify-center"
           placeholderColor
           iconColor="black"
         >
-          <SelectValue placeholder="Choose status" />
+          <SelectValue placeholder="Choose channel" />
         </SelectTrigger>
 
         <SelectContent className="max-h-96">
-          {STATUS_OPTIONS.map((item) => (
+          {CHANEL_OPTIONS.map((item) => (
             <div
               key={item.key}
               className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-accent rounded-md"
