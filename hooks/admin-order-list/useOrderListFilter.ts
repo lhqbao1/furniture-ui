@@ -27,5 +27,6 @@ export function useOrderListFilters() {
 
     fromDate: searchParams.get("from_date") || undefined,
     toDate: searchParams.get("to_date") || undefined,
+    search: searchParams.get("search") || "",
   };
 }

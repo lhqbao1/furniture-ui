@@ -17,6 +17,7 @@ export interface GetAllCheckoutParams {
   channel?: string[] | null; // ✔ cho phép null
   from_date?: string;
   to_date?: string;
+  search?: string;
 }
 
 export interface OrderStatisticsParams {
@@ -73,6 +74,7 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
       ...(params?.channel !== undefined && { channel: params.channel }), // array
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(params?.search !== undefined && { search: params.search }),
     },
 
     paramsSerializer: (params) =>

@@ -114,7 +114,7 @@ export function ProductTable<TData, TValue>({
     <div className="flex flex-col gap-4">
       {hasCount ? <p>{totalItems} items found</p> : ""}
 
-      <div className="rounded-md border w-full overflow-x-scroll">
+      <div className="rounded-md border w-full overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

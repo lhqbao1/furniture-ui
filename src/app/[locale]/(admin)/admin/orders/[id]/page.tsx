@@ -81,35 +81,37 @@ const OrderDetails = () => {
         hasCount={false}
         hasHeaderBackGround
       />
-      <OrderInformation
-        language={order.checkouts[0].user.language ?? ""}
-        sub_total={order.total_amount_item}
-        shipping_amount={order.total_shipping}
-        discount_amount={order.voucher_amount + order.coupon_amount}
-        tax={
-          (((invoice?.total_amount_item ?? 0) +
-            (invoice?.total_shipping ?? 0) +
-            (invoice?.voucher_amount ?? 0)) /
-            1.19) *
-          0.19
-        }
-        total_amount={order.total_amount}
-        payment_method={order.payment_method}
-        entry_date={order.created_at}
-        is_Ebay={order.from_marketplace === "ebay" ? true : false}
-      />
+      <div className="flex justify-between w-full">
+        {order.status !== "Pending" ? (
+          <div className="flex gap-12">
+            <DocumentTable
+              order={order}
+              invoiceCode={invoice?.invoice_code}
+            />
+            {/* <DocumentTable /> */}
+          </div>
+        ) : (
+          ""
+        )}
+        <OrderInformation
+          language={order.checkouts[0].user.language ?? ""}
+          sub_total={order.total_amount_item}
+          shipping_amount={order.total_shipping}
+          discount_amount={order.voucher_amount + order.coupon_amount}
+          tax={
+            (((invoice?.total_amount_item ?? 0) +
+              (invoice?.total_shipping ?? 0) +
+              (invoice?.voucher_amount ?? 0)) /
+              1.19) *
+            0.19
+          }
+          total_amount={order.total_amount}
+          payment_method={order.payment_method}
+          entry_date={order.created_at}
+          is_Ebay={order.from_marketplace === "ebay" ? true : false}
+        />
+      </div>
       <OrderDeliveryOrder data={order.checkouts} />
-      {order.status !== "Pending" ? (
-        <div className="flex gap-12">
-          <DocumentTable
-            order={order}
-            invoiceCode={invoice?.invoice_code}
-          />
-          {/* <DocumentTable /> */}
-        </div>
-      ) : (
-        ""
-      )}
     </div>
   );
 };

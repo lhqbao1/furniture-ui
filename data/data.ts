@@ -546,7 +546,7 @@ export const listComments: Comment[] = [
     name: "Olivia Grace",
     status: "purchased",
     date: "March 20,2025",
-    company: "ebay.png",
+    company: "ebay-1.png",
     comment:
       "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim adminim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquipex ea commodo consequat",
     rating: 4,
@@ -678,7 +678,7 @@ export const listChanel = [
   {
     id: 2,
     name: "ebay",
-    icon: "ebay.png",
+    icon: "ebay-1.png",
   },
   {
     id: 3,
@@ -715,7 +715,7 @@ export const listDE = [
   },
   {
     id: 5,
-    icon: "/ebay.png",
+    icon: "/ebay-1.png",
   },
   {
     id: 6,

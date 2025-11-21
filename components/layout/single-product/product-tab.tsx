@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 import ProductDetailsProperties from "./tabs/properties/page";
 import { ReviewResponse } from "@/types/review";
 import UserManualTab from "./tabs/user-manual/user-manual-tab";
+import ProductDescription from "./tabs/description/product-description";
 
 interface ProductDetailsTabProps {
   product: ProductItem;
@@ -32,9 +33,9 @@ export function ProductDetailsTab({
       value: "description",
       label: t("description"),
       content: (
-        <div
-          className="product-descriptions"
-          dangerouslySetInnerHTML={{ __html: product?.description ?? "" }}
+        <ProductDescription
+          description={product.description}
+          productId={product.id}
         />
       ),
     },
@@ -53,11 +54,11 @@ export function ProductDetailsTab({
       label: t("review"),
       content: <ProductReviewTab productId={product.id} />,
     },
-    {
-      value: "q&a",
-      label: "häufig gestellte Frage",
-      content: <QASection productId={product.id} />,
-    },
+    // {
+    //   value: "q&a",
+    //   label: "häufig gestellte Frage",
+    //   content: <QASection productId={product.id} />,
+    // },
   ];
 
   if (isMobile) {
@@ -99,11 +100,11 @@ export function ProductDetailsTab({
         <TabsContent
           key={section.value}
           value={section.value}
-          className={`${
-            section.value === "description"
-              ? "w-full grid grid-cols-5 gap-12"
-              : ""
-          }`}
+          // className={`${
+          //   section.value === "description"
+          //     ? "w-full grid grid-cols-5 gap-12"
+          //     : ""
+          // }`}
         >
           <div className="col-span-3">{section.content}</div>
         </TabsContent>
