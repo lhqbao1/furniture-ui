@@ -133,6 +133,7 @@ function SyncToMarketplace({
             product={product}
             currentMarketplace={marketplace}
             isActive={isActive ?? false}
+            isAdd
           />
         </>
       ) : (
@@ -235,7 +236,7 @@ export const baseColumns = (
     header: ({ column }) => (
       <Button
         variant={"ghost"}
-        className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+        className=" flex items-center px-0 justify-center gap-1 w-fit"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         <div>NAME</div>
@@ -288,7 +289,7 @@ export const baseColumns = (
       return (
         <Button
           variant="ghost"
-          className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+          className=" flex items-center px-0 justify-center gap-1 w-fit"
           onClick={() => {
             // toggleSorting sẽ tự xử lý asc/desc/undefined xoay vòng
             column.toggleSorting(direction === "asc");
@@ -348,9 +349,7 @@ export const productMarketplaceColumns = (
   // Cột cố định cho marketplace
   const fixedMarketplaceColumn: ColumnDef<ProductItem> = {
     id: "marketplace",
-    header: () => (
-      <div className="text-center font-semibold uppercase">MARKETPLACE</div>
-    ),
+    header: () => <div className="text-center  uppercase">MARKETPLACE</div>,
     cell: ({ row }) => {
       const product = row.original;
       return <AddProductMarketplace product={product} />;
@@ -361,9 +360,34 @@ export const productMarketplaceColumns = (
   const dynamicMarketplaceColumns: ColumnDef<ProductItem>[] = marketplaces.map(
     (marketplace) => ({
       id: marketplace,
-      header: () => (
-        <div className="text-center font-semibold uppercase">{marketplace}</div>
-      ),
+      header: () => {
+        const key = marketplace?.toLowerCase();
+
+        const icons: Record<string, string> = {
+          amazon: "/amazon.png",
+          kaufland: "/kau.png",
+          ebay: "/ebay-1.png",
+        };
+
+        // nếu có icon → hiển thị icon, không thì text
+        const iconSrc = icons[key];
+
+        return (
+          <div className="flex justify-center items-center uppercase">
+            {iconSrc ? (
+              <Image
+                src={iconSrc}
+                alt={marketplace}
+                width={28}
+                height={28}
+                className="object-contain"
+              />
+            ) : (
+              marketplace
+            )}
+          </div>
+        );
+      },
       cell: ({ row }) => {
         const product = row.original;
         const hasMarketplace = product.marketplace_products?.some(

@@ -327,5 +327,6 @@
   "reviewRequired": "Bitte geben Sie eine Bewertung und einen Kommentar ein.",
   "companyTitle": "Unternehmensinformationen",
   "companyName": "Firma",
-  "vatId": "USt-IdNr"
+  "vatId": "USt-IdNr",
+  "relatedProduct": "Ähnliche Produkte"
 }

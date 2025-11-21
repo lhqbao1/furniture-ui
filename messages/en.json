@@ -141,6 +141,7 @@
     "back": "Back",
     "subject": "Subject",
     "relatedToOrder": "Related to Order ID (optional)",
+    "relatedProduct": "Related Products",
     "message": "Message",
     "emailPlaceholder": "Enter your email",
     "subjectPlaceholder": "Select subjects",

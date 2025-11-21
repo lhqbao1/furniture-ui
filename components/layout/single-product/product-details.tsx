@@ -33,6 +33,7 @@ import ImageGallery from "./image/image-carousel";
 import ProductDetailsLogistic from "./details/logistics";
 import ProductDetailsPrice from "./details/price";
 import { ReviewResponse } from "@/types/review";
+import RelatedCategoryProducts from "./related-category";
 
 interface ProductDetailsProps {
   productDetailsData: ProductItem;
@@ -246,6 +247,11 @@ const ProductDetails = ({
                     product={productDetails}
                   />
                 </div>
+
+                {/*Related Product same category */}
+                <RelatedCategoryProducts
+                  categorySlug={productDetailsData.categories[0].slug}
+                />
               </div>
             </form>
           </FormProvider>

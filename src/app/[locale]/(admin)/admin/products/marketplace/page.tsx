@@ -2,7 +2,9 @@
 
 import { productMarketplaceColumns } from "@/components/layout/admin/products/marketplace/columns";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import TableToolbar from "@/components/layout/admin/products/products-list/toolbar";
+import TableToolbar, {
+  ToolbarType,
+} from "@/components/layout/admin/products/products-list/toolbar";
 import AdminBackButton from "@/components/shared/admin-back-button";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
 import { useGetProductsSelect } from "@/features/product-group/hook";
@@ -25,7 +27,7 @@ const ProductMarketplace = () => {
   const [page, setPage] = useState(() => Number(searchParams.get("page")) || 1);
   const [pageSize, setPageSize] = useState(50);
   const [searchQuery, setSearchQuery] = useAtom<string>(
-    searchProductQueryStringAtom
+    searchProductQueryStringAtom,
   );
   const [showAll, setShowAll] = useAtom(showAllProductsAtom);
   const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
@@ -66,8 +68,7 @@ const ProductMarketplace = () => {
           Product Marketplace
         </div>
         <TableToolbar
-          showAll={showAll}
-          setShowAll={setShowAll}
+          type={ToolbarType.product}
           searchQuery={searchQuery}
           pageSize={pageSize}
           setPageSize={setPageSize}
@@ -89,6 +90,7 @@ const ProductMarketplace = () => {
             setPageSize={setPageSize}
             totalItems={data?.pagination.total_items ?? 0}
             totalPages={data?.pagination.total_pages ?? 0}
+            hasHeaderBackGround
           />
         )}
       </div>

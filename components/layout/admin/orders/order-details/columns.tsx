@@ -1,5 +1,7 @@
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
+import Link from "next/link";
 
 export const orderDetailColumn: ColumnDef<CartItem>[] = [
   {
@@ -29,7 +31,21 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     accessorKey: "product_name",
     header: "NAME",
     cell: ({ row }) => {
-      return <div>{row.original.products.name}</div>;
+      return (
+        <div className="flex gap-2 items-center">
+          {/* <Image
+            src={
+              row.original.products.static_files
+                ? row.original.products.static_files[0].url
+                : ""
+            }
+            height={40}
+            width={40}
+            alt=""
+          /> */}
+          {row.original.products.name}
+        </div>
+      );
     },
   },
 
@@ -89,7 +105,17 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     accessorKey: "ware_house",
     header: () => <div className="text-center w-full">WAREHOUSE</div>,
     cell: ({ row }) => {
-      return <div className="text-center">AMM</div>;
+      return (
+        <div className="flex justify-center">
+          <Image
+            src={"/amm.jpeg"}
+            height={40}
+            width={40}
+            alt=""
+            className="w-12 h-12 object-contain"
+          />
+        </div>
+      );
     },
   },
 ];

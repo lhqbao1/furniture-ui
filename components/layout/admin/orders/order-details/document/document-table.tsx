@@ -79,10 +79,7 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead
-                    key={header.id}
-                    className="bg-gray-200"
-                  >
+                  <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(

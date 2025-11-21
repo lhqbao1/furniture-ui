@@ -27,10 +27,8 @@ import {
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { ProductItem } from "@/types/products";
-import { toast } from "sonner";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
+import { useSearchParams } from "next/navigation";
 
 export enum ToolbarType {
   product = "product",
@@ -38,11 +36,9 @@ export enum ToolbarType {
 }
 
 interface OrderToolbarProps {
-  searchQuery?: string;
   pageSize: number;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
-  setSearchQuery?: React.Dispatch<React.SetStateAction<string>>;
   addButtonText?: string;
   isAddButtonModal?: boolean;
   addButtonUrl?: string;
@@ -51,16 +47,10 @@ interface OrderToolbarProps {
   type: ToolbarType;
 }
 
-type ImageFile = {
-  url: string;
-};
-
 export default function OrderToolbar({
-  searchQuery,
   pageSize,
   setPageSize,
   setPage,
-  setSearchQuery,
   addButtonText,
   isAddButtonModal,
   addButtonUrl,
@@ -70,88 +60,30 @@ export default function OrderToolbar({
 }: OrderToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [inputValue, setInputValue] = useState(searchQuery ?? "");
-  const [isImporting, setIsImporting] = useState(false);
+  const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const defaultSearch = searchParams.get("search") ?? "";
+  const [searchValue, setSearchValue] = useState(defaultSearch);
+
+  const [debouncedSearch] = useDebounce(searchValue, 600);
+
+  // push URL khi debounce hoàn thành
   useEffect(() => {
-    setInputValue(searchQuery ?? "");
-  }, [searchQuery]);
-
-  // debounce inputValue
-  const [debouncedValue] = useDebounce(inputValue, 400);
-
-  useEffect(() => {
-    if (debouncedValue !== searchQuery && setSearchQuery) {
-      setSearchQuery(debouncedValue);
-      setPage(1);
-
-      // 🔹 Cập nhật URL
-      router.push(
-        {
-          pathname: pathname,
-          query: {
-            page: 1,
-            // search: debouncedValue || undefined, // thêm search nếu có
-          },
+    router.push(
+      {
+        pathname,
+        query: {
+          page: 1,
+          search: debouncedSearch || "",
         },
-        { scroll: false },
-      ); // không scroll lên đầu
-    }
-  }, [debouncedValue, searchQuery, setSearchQuery, router]);
-
-  const handleDownloadZip = async () => {
-    if (!exportData?.length) {
-      toast.error("Không có sản phẩm nào để tải ảnh");
-      return;
-    }
-
-    const zip = new JSZip();
-    toast.loading("Uploading...");
-
-    let totalCount = 0;
-
-    for (const item of exportData) {
-      const folderName = sanitizeFolderName(
-        `${item.id_provider}-${item.name}` || "unknown",
-      );
-      const folder = zip.folder(folderName);
-
-      for (const [index, file] of (item.static_files || []).entries()) {
-        try {
-          const response = await fetch(file.url);
-          const blob = await response.blob();
-
-          const ext =
-            file.url
-              .match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)?.[1]
-              ?.toLowerCase() || "jpg";
-          const filename = `image_${index + 1}.${ext}`;
-
-          folder?.file(filename, blob);
-          totalCount++;
-        } catch (error) {
-          console.error("Lỗi tải ảnh:", file.url, error);
-        }
-      }
-    }
-
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, "images.zip");
-
-    toast.success(
-      `Downloaded ${totalCount} images from ${exportData.length} products`,
+      },
+      { scroll: false },
     );
-  };
 
-  // Helper: loại bỏ ký tự đặc biệt trong tên folder
-  function sanitizeFolderName(name: string) {
-    return name
-      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") // loại ký tự không hợp lệ trong tên file
-      .replace(/\s+/g, "_") // đổi khoảng trắng thành _
-      .trim();
-  }
+    setPage(1);
+  }, [debouncedSearch]);
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
@@ -183,8 +115,8 @@ export default function OrderToolbar({
       <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap">
         <Input
           placeholder="Search"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
         />
       </div>
 

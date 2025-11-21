@@ -29,9 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Pencil, Plus, RefreshCw } from "lucide-react";
-import { useSyncToEbay } from "@/features/ebay/hook";
-import { syncToEbayInput } from "@/features/ebay/api";
-import { stripHtmlRegex } from "@/hooks/simplifyHtml";
 import RichEditor from "@/components/shared/tiptap/tiptap-editor";
 import {
   Dialog,
@@ -40,8 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { syncToKauflandInput } from "@/features/kaufland/api";
-import { useSyncToKaufland } from "@/features/kaufland/hook";
+
 import { useSyncToAmazon } from "@/features/amazon/hook";
 import { SyncToAmazonInput } from "@/features/amazon/api";
 import { COUNTRY_OPTIONS } from "@/data/data";

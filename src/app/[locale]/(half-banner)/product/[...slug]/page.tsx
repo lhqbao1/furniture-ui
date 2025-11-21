@@ -110,7 +110,6 @@ export async function generateMetadata({
         product.meta_description ||
         product.description?.slice(0, 150) ||
         product.name,
-
       openGraph: {
         title: product.meta_title || product.name,
         description:

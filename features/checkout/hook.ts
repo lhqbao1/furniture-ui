@@ -122,7 +122,8 @@ export function useGetCheckOutStatistic(params?: {
 }
 
 export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
-  const { page, page_size, status, channel, from_date, to_date } = params;
+  const { page, page_size, status, channel, from_date, to_date, search } =
+    params;
 
   return useQuery({
     queryKey: [
@@ -133,6 +134,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       (channel ?? []).join(","), // 🔥 fix array issues
       from_date ?? null,
       to_date ?? null,
+      search ?? null,
     ],
     queryFn: () => getCheckOutMain(params),
     retry: false,

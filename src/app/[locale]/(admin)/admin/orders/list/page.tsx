@@ -50,6 +50,7 @@ const OrderList = () => {
     channel: filters.channel, // <-- thêm
     from_date: filters.fromDate,
     to_date: filters.toDate,
+    search: filters.search,
   });
 
   const {
