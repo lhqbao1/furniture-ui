@@ -73,6 +73,7 @@ export async function GET() {
         price,
         p.ean ? "yes" : "no",
         p.ean ?? "",
+        p.sku,
         p.brand?.name ?? "",
         shipping,
         additionalImages,
