@@ -37,24 +37,6 @@ export function useGetCheckOutSupplier({
   });
 }
 
-export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
-  const { page, page_size, status, channel, from_date, to_date } = params;
-
-  return useQuery({
-    queryKey: [
-      "checkout-main",
-      page ?? 1,
-      page_size ?? 50,
-      (status ?? []).join(","), // 🔥 fix array issues
-      (channel ?? []).join(","), // 🔥 fix array issues
-      from_date ?? null,
-      to_date ?? null,
-    ],
-    queryFn: () => getCheckOutMain(params),
-    retry: false,
-  });
-}
-
 export function useCreateCheckOut() {
   const qc = useQueryClient();
   return useMutation({
@@ -128,22 +110,32 @@ export function useGetCheckOutStatistic(params?: {
   from_date?: string;
   to_date?: string;
 }) {
-  // ❗ chỉ disable khi chỉ có 1 giá trị
-  const onlyOneFilled =
-    (params?.from_date && !params?.to_date) ||
-    (!params?.from_date && params?.to_date);
-
-  // ✔ enabled = false khi chỉ có 1 giá trị
-  // ✔ enabled = true khi:
-  //    - cả 2 undefined (initial load)
-  //    - cả 2 có giá trị (filter)
-  const enabled = !onlyOneFilled;
-
   return useQuery({
-    queryKey: ["checkout-statistic", params],
+    queryKey: [
+      "checkout-statistic",
+      params?.from_date ?? null,
+      params?.to_date ?? null,
+    ],
     queryFn: () => getCheckOutStatistics(params),
     retry: false,
-    enabled, // ← logic đúng yêu cầu
+  });
+}
+
+export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
+  const { page, page_size, status, channel, from_date, to_date } = params;
+
+  return useQuery({
+    queryKey: [
+      "checkout-main",
+      page ?? 1,
+      page_size ?? 50,
+      (status ?? []).join(","), // 🔥 fix array issues
+      (channel ?? []).join(","), // 🔥 fix array issues
+      from_date ?? null,
+      to_date ?? null,
+    ],
+    queryFn: () => getCheckOutMain(params),
+    retry: false,
   });
 }
 
