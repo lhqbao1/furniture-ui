@@ -13,7 +13,7 @@ export default function AdminLayout({
     <Protected>
       <SidebarProvider defaultOpen={true}>
         <AdminSideBar />
-        <div className="container-padding lg:pt-8 pt-2 w-full">
+        <div className="container-padding lg:pt-8 pt-2 w-full pointer-events-auto">
           <AdminHeader />
           {children}
         </div>

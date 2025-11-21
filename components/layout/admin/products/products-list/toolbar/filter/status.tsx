@@ -8,16 +8,18 @@ export default function ProductStatusFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const showAll = searchParams.get("all_products") === "true";
+  const showAllParam = searchParams.get("all_products");
 
-  // map state -> radio value
+  // ⭐ default = true → nếu không có param thì mặc định là ALL
+  const showAll = showAllParam === "true" || showAllParam === null;
+
   const value = showAll ? "all" : "active";
 
   const handleChange = (v: string) => {
     const params = new URLSearchParams(searchParams);
 
     if (v === "active") {
-      params.delete("all_products");
+      params.set("all_products", "false");
     } else {
       params.set("all_products", "true");
     }

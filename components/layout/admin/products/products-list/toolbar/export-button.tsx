@@ -38,7 +38,7 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
         vat: clean(p.tax),
         stock: clean(p.stock),
         img_url: clean(
-          p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|")
+          p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
         ),
         length: clean(p.length),
         width: clean(p.width),
@@ -50,16 +50,19 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
         materials: clean(p.materials),
         color: clean(p.color),
         log_height: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.height || 0), 0)
+          p.packages?.reduce((sum, pkg) => sum + (pkg.height || 0), 0),
         ),
         log_width: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.width || 0), 0)
+          p.packages?.reduce((sum, pkg) => sum + (pkg.width || 0), 0),
         ),
         log_length: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.length || 0), 0)
+          p.packages?.reduce((sum, pkg) => sum + (pkg.length || 0), 0),
         ),
         log_weight: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.weight || 0), 0)
+          p.packages?.reduce((sum, pkg) => sum + (pkg.weight || 0), 0),
+        ),
+        document: clean(
+          p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
         ),
       }));
 
@@ -77,7 +80,10 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
   };
 
   return (
-    <Button variant={"ghost"} onClick={handleExport}>
+    <Button
+      variant={"ghost"}
+      onClick={handleExport}
+    >
       Export Excel
     </Button>
   );

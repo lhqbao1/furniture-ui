@@ -10,87 +10,87 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 const Footer = () => {
   const t = useTranslations();
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+  // useEffect(() => {
+  //   gsap.registerPlugin(ScrollTrigger);
 
-    const columns = gsap.utils.toArray<HTMLElement>(".footer-column");
+  //   const columns = gsap.utils.toArray<HTMLElement>(".footer-column");
 
-    if (!columns) return;
+  //   if (!columns) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "#footer",
-        start: "top 85%",
-        once: true,
-      },
-    });
+  //   const tl = gsap.timeline({
+  //     scrollTrigger: {
+  //       trigger: "#footer",
+  //       start: "top 85%",
+  //       once: true,
+  //     },
+  //   });
 
-    tl.from(columns[0], {
-      x: -40,
-      autoAlpha: 0,
-      duration: 0.8,
-      ease: "power3.out",
-      immediateRender: false,
-    })
-      .from(
-        columns[1],
-        {
-          y: 40,
-          autoAlpha: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          immediateRender: false,
-        },
-        "-=0.4",
-      )
-      .from(
-        columns[2],
-        {
-          x: 40,
-          autoAlpha: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          immediateRender: false,
-        },
-        "-=0.4",
-      )
-      .from(
-        columns[3],
-        {
-          scale: 0.6,
-          autoAlpha: 0,
-          duration: 0.9,
-          ease: "back.out(1.7)",
-          immediateRender: false,
-        },
-        "-=0.4",
-      );
+  //   tl.from(columns[0], {
+  //     x: -40,
+  //     autoAlpha: 0,
+  //     duration: 0.8,
+  //     ease: "power3.out",
+  //     immediateRender: false,
+  //   })
+  //     .from(
+  //       columns[1],
+  //       {
+  //         y: 40,
+  //         autoAlpha: 0,
+  //         duration: 0.8,
+  //         ease: "power3.out",
+  //         immediateRender: false,
+  //       },
+  //       "-=0.4",
+  //     )
+  //     .from(
+  //       columns[2],
+  //       {
+  //         x: 40,
+  //         autoAlpha: 0,
+  //         duration: 0.8,
+  //         ease: "power3.out",
+  //         immediateRender: false,
+  //       },
+  //       "-=0.4",
+  //     )
+  //     .from(
+  //       columns[3],
+  //       {
+  //         scale: 0.6,
+  //         autoAlpha: 0,
+  //         duration: 0.9,
+  //         ease: "back.out(1.7)",
+  //         immediateRender: false,
+  //       },
+  //       "-=0.4",
+  //     );
 
-    columns.forEach((col: any) => {
-      const items = col.querySelectorAll("li, input, button, img, p");
+  //   columns.forEach((col: any) => {
+  //     const items = col.querySelectorAll("li, input, button, img, p");
 
-      gsap.from(items, {
-        autoAlpha: 0,
-        y: 20,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "power2.out",
-        immediateRender: false,
-        scrollTrigger: {
-          trigger: col,
-          start: "top 90%",
-          once: true,
-        },
-      });
-    });
+  //     gsap.from(items, {
+  //       autoAlpha: 0,
+  //       y: 20,
+  //       duration: 0.6,
+  //       stagger: 0.1,
+  //       ease: "power2.out",
+  //       immediateRender: false,
+  //       scrollTrigger: {
+  //         trigger: col,
+  //         start: "top 90%",
+  //         once: true,
+  //       },
+  //     });
+  //   });
 
-    // ⛔ return () => () => tl.kill() → Sai
-    // ✅ return cleanup đúng chuẩn:
-    return () => {
-      tl.kill();
-      ScrollTrigger.getAll().forEach((st) => st.kill());
-    };
-  }, []);
+  //   // ⛔ return () => () => tl.kill() → Sai
+  //   // ✅ return cleanup đúng chuẩn:
+  //   return () => {
+  //     tl.kill();
+  //     ScrollTrigger.getAll().forEach((st) => st.kill());
+  //   };
+  // }, []);
 
   return (
     <footer

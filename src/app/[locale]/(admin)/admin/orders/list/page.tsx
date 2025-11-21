@@ -1,6 +1,7 @@
 "use client";
 import { orderColumns } from "@/components/layout/admin/orders/order-list/column";
 import OrderExpandTable from "@/components/layout/admin/orders/order-list/expand-delivery";
+import OrderToolbar from "@/components/layout/admin/orders/order-list/order-toolbar";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import TableToolbar, {
@@ -23,7 +24,6 @@ const OrderList = () => {
   const [pageSize, setPageSize] = useState(50);
   const [fromDate, setFromDate] = useState<string>();
   const [endDate, setEndDate] = useState<string>();
-  const [showAll, setShowAll] = useState<boolean>();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -72,13 +72,13 @@ const OrderList = () => {
       count: statistic?.count_return_cancel_order,
       total: statistic?.total_return_cancel_order ?? 0,
       label: "Returned",
-      textColor: "rgb(255, 11, 133)",
+      textColor: "rgba(242, 5, 5, 0.8)",
     },
     {
       count: statistic?.count_processing_order,
       total: statistic?.total_processing_order ?? 0,
       label: "Processing",
-      textColor: "rgba(242, 5, 5, 0.8)",
+      textColor: "rgb(255, 11, 133)",
     },
     {
       count: statistic?.count_completed_order,
@@ -107,7 +107,7 @@ const OrderList = () => {
         <div className="text-3xl text-secondary font-bold text-center">
           Order List
         </div>
-        <TableToolbar
+        <OrderToolbar
           pageSize={pageSize}
           setPage={setPage}
           setPageSize={setPageSize}
@@ -131,6 +131,7 @@ const OrderList = () => {
             hasBackground
             hasExpanded
             renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
+            hasHeaderBackGround
           />
         )}
       </div>
