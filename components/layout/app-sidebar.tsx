@@ -127,11 +127,11 @@ export default function AppSidebar({
       collapsible="offcanvas"
     >
       <SidebarContent>
-        <SidebarHeader className="flex items-end lg:items-center lg:border-b-2 lg:border-black/50">
+        <SidebarHeader className="flex items-end lg:items-center">
           <div className={`flex flex-col gap-4 items-center`}>
             <Link
               href={`/`}
-              className="relative w-10 h-10 hidden lg:flex"
+              className="relative w-16 h-16 hidden lg:flex"
             >
               <Image
                 src="/new-logo.svg"
@@ -210,7 +210,7 @@ export default function AppSidebar({
                                 {item.title}
                               </span>
                               <ChevronDown
-                                className={`size-4 opacity-70 transition-transform text-[#4D4D4D] ${
+                                className={`size-4 opacity-70 transition-transform text-[#51BE8C] ${
                                   isOpen ? "rotate-180" : ""
                                 }`}
                               />
@@ -242,7 +242,7 @@ export default function AppSidebar({
                                     }
                                   }}
                                   variant={"ghost"}
-                                  className={`relative flex flex-row items-start justify-start lg:pl-16 pl-12 text-wrap gap-3 h-fit rounded-none py-1 flex-wrap max-w-full text-base transition-colors ${
+                                  className={`relative flex flex-row items-start justify-start lg:pl-8 pl-12 text-wrap gap-3 h-fit rounded-none py-1 flex-wrap max-w-full text-base transition-colors ${
                                     isChildActive
                                       ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
                                       : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"

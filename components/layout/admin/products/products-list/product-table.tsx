@@ -122,7 +122,9 @@ export function ProductTable<TData, TValue>({
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={`${hasHeaderBackGround ? "bg-secondary/5" : ""}`}
+                    className={`${
+                      hasHeaderBackGround ? "bg-secondary/10" : ""
+                    }`}
                   >
                     {header.isPlaceholder
                       ? null

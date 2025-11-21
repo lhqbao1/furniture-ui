@@ -22,8 +22,16 @@ const ProductManual = () => {
     const newItems: any[] = [];
 
     for (const file of files) {
+      // sanitize filename: replace spaces with -
+      const sanitizedName = file.name.replace(/\s+/g, "-");
+
+      // tạo file mới với name đã clean
+      const sanitizedFile = new File([file], sanitizedName, {
+        type: file.type,
+      });
+
       const formData = new FormData();
-      formData.append("files", file);
+      formData.append("files", sanitizedFile);
 
       const res = await uploadFileMutation.mutateAsync(formData);
 

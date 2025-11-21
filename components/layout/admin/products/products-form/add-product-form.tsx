@@ -145,7 +145,7 @@ const ProductForm = ({
                 {/* MANUAL */}
                 <AccordionItem value="manual">
                   <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
-                    User Manual
+                    Document
                   </AccordionTrigger>
 
                   <div
