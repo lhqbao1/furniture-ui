@@ -62,21 +62,22 @@ export async function generateMetadata({
       "@type": "Product",
       name: product.name,
       description: product.description,
-      sku: product.sku || "",
-      mpn: product.id_provider || "",
-      gtin13: product.ean,
+      sku: String(product.sku || ""),
+      mpn: String(product.id_provider || ""),
+      gtin13: String(product.ean || ""),
       brand: {
         "@type": "Brand",
         name: product.brand?.name || "Prestige Home",
       },
-      image: product.static_files?.map((f: StaticFile) => f.url) ?? [
-        "/placeholder-product.webp",
-      ],
+      image: (product.static_files || [])
+        .map((f: StaticFile) => f.url)
+        .filter(Boolean),
+
       offers: {
         "@type": "Offer",
         url: `https://www.prestige-home.de/${locale}/product/${product.url_key}`,
         priceCurrency: "EUR",
-        price: product.final_price ?? product.price,
+        price: String(product.final_price),
         availability:
           product.stock > 0
             ? "https://schema.org/InStock"
@@ -184,13 +185,22 @@ export default async function Page({
   }
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProductDetails
-        parentProductData={parentProduct}
-        productDetailsData={product}
-        productId={product.id}
-        reviews={reviews}
-      />
-    </HydrationBoundary>
+    <>
+      {/* <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schema),
+        }}
+      /> */}
+
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <ProductDetails
+          parentProductData={parentProduct}
+          productDetailsData={product}
+          productId={product.id}
+          reviews={reviews}
+        />
+      </HydrationBoundary>
+    </>
   );
 }

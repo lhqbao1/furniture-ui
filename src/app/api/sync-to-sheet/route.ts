@@ -80,9 +80,8 @@ export async function GET() {
         "new",
       ];
     });
-
     // 4️⃣ Ghi vào Google Sheet (ví dụ từ A2)
-    await sheets.spreadsheets.values.update({
+    https: await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: "Sheet1!A2",
       valueInputOption: "RAW",
