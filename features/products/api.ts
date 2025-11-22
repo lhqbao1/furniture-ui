@@ -5,7 +5,7 @@ import { ProductItem, ProductResponse } from "@/types/products";
 export interface GetAllProductsParams {
   page?: number;
   page_size?: number;
-  all_products?: boolean;
+  all_products?: string;
   search?: string;
   sort_by_stock?: string;
 }

@@ -22,6 +22,7 @@ import { useCartLocal } from "@/hooks/cart";
 import { useIsPhone } from "@/hooks/use-is-phone";
 import { CartDrawer } from "./cart-drawer";
 import { LoginDrawer } from "./login-drawer";
+import SearchBox from "./search-gg";
 
 interface PageHeaderProps {
   hasSideBar?: boolean;
