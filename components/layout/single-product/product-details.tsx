@@ -1,15 +1,21 @@
 "use client";
-import CustomBreadCrumb from "@/components/shared/breadcrumb";
+import React, { useMemo, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Eye, Heart } from "lucide-react";
-import React, { useEffect, useMemo } from "react";
-import { ProductDetailsTab } from "@/components/layout/single-product/product-tab";
-import ListStars from "@/components/shared/list-stars";
-import ProductDetailsSkeleton from "@/components/layout/single-product/product-detail-skeleton";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "@/src/i18n/navigation";
 import { cartFormSchema } from "@/lib/schema/cart";
-import z from "zod";
+import { ProductItem } from "@/types/products";
+import { ProductGroupDetailResponse } from "@/types/product-group";
+import { ReviewResponse } from "@/types/review";
+
+// Components
+import CustomBreadCrumb from "@/components/shared/breadcrumb";
+import ProductDetailsSkeleton from "@/components/layout/single-product/product-detail-skeleton";
+import ListStars from "@/components/shared/list-stars";
 import {
   FormControl,
   FormField,
@@ -17,24 +23,29 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import ListVariant from "@/components/layout/single-product/list-variant";
 import { FormNumberInput } from "@/components/layout/single-product/form-number.input";
-import { ProductItem } from "@/types/products";
-import { useLocale, useTranslations } from "next-intl";
-import { ProductGroupDetailResponse } from "@/types/product-group";
-import { useRouter } from "@/src/i18n/navigation";
 
+// Hooks
 import { useProductData } from "@/hooks/single-product/useProductData";
 import { useAddToCartHandler } from "@/hooks/single-product/useAddToCartHandler";
 import { useImageZoom } from "@/hooks/single-product/useImageZoom";
 import { useSwipeImage } from "@/hooks/single-product/useSwipeImage";
+
+// Memoized / Dynamic Components
 import MainImage from "./image/main-image";
 import ImageGallery from "./image/image-carousel";
 import ProductDetailsLogistic from "./details/logistics";
 import ProductDetailsPrice from "./details/price";
-import { ReviewResponse } from "@/types/review";
-import RelatedCategoryProducts from "./related-category";
+import z from "zod";
+import ListVariant from "./list-variant";
+import { ProductDetailsTab } from "./product-tab";
 
+const RelatedCategoryProducts = dynamic(() => import("./related-category"), {
+  ssr: false,
+});
+
+const MemoMainImage = React.memo(MainImage);
+const MemoImageGallery = React.memo(ImageGallery);
 interface ProductDetailsProps {
   productDetailsData: ProductItem;
   productId: string;
@@ -51,7 +62,9 @@ const ProductDetails = ({
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const [adminId, setAdminId] = React.useState<string | null>(null);
+  const [adminId, setAdminId] = React.useState<string | null>(
+    localStorage.getItem("admin_access_token"),
+  );
 
   // ⭐ HOOK: fetch product + parent
   const { productDetails, parentProduct, isLoadingProduct } = useProductData(
@@ -88,33 +101,30 @@ const ProductDetails = ({
     },
   });
 
-  if (isLoadingProduct || !productDetails) return <ProductDetailsSkeleton />;
-
-  useEffect(() => {
-    setAdminId(localStorage.getItem("admin_access_token"));
-  }, []);
-
+  // Memoized avgRating
   const avgRating = useMemo(() => {
     if (!reviews || reviews.length === 0) return 0;
     const sum = reviews.reduce((total, r) => total + (r.rating || 0), 0);
-    return Number((sum / reviews.length).toFixed(1)); // giữ dạng number
+    return Number((sum / reviews.length).toFixed(1));
   }, [reviews]);
+
+  if (isLoadingProduct || !productDetails) return <ProductDetailsSkeleton />;
+
+  const currentCategory = productDetails.categories[0];
+  const currentCategoryName = currentCategory.children?.length
+    ? currentCategory.children[0].name
+    : currentCategory.name;
+  const currentCategoryLink = currentCategory.children?.length
+    ? `category/${currentCategory.children[0].slug}`
+    : `category/${currentCategory.slug}`;
 
   return (
     <>
       <div className="py-3 lg:pt-3 space-y-4">
         <CustomBreadCrumb
           isProductPage
-          currentPage={
-            productDetails?.categories[0]?.children?.length
-              ? productDetails.categories[0].children[0].name
-              : productDetails?.categories[0]?.name
-          }
-          currentPageLink={
-            productDetails?.categories[0]?.children?.length
-              ? `category/${productDetails.categories[0].children[0].slug}`
-              : `category/${productDetails?.categories[0]?.slug}`
-          }
+          currentPage={currentCategoryName}
+          currentPageLink={currentCategoryLink}
         />
         {!isLoadingProduct && productDetails ? (
           <FormProvider {...form}>
@@ -130,7 +140,7 @@ const ProductDetails = ({
                 <div className="grid grid-cols-12 xl:gap-16 gap-8">
                   {/* LEFT — IMAGE */}
                   <div className="xl:col-span-6 col-span-12 flex flex-col gap-6 lg:gap-12">
-                    <MainImage
+                    <MemoMainImage
                       productDetails={productDetails}
                       mainImageIndex={mainImageIndex}
                       setMainImageIndex={setMainImageIndex}
@@ -141,7 +151,7 @@ const ProductDetails = ({
                       handlers={handlers}
                     />
 
-                    <ImageGallery
+                    <MemoImageGallery
                       productDetails={productDetails}
                       mainImageIndex={mainImageIndex}
                       setMainImageIndex={setMainImageIndex}
