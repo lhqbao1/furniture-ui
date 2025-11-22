@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
+import { useSearchParams } from "next/navigation";
 
 export enum ToolbarType {
   product = "product",
@@ -73,36 +74,33 @@ export default function TableToolbar({
 }: TableToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [inputValue, setInputValue] = useState(searchQuery ?? "");
   const [isImporting, setIsImporting] = useState(false);
   const pathname = usePathname();
+  const defaultSearch = searchParams.get("search") ?? "";
 
-  useEffect(() => {
-    setInputValue(searchQuery ?? "");
-  }, [searchQuery]);
+  const [searchValue, setSearchValue] = useState(defaultSearch);
 
   // debounce inputValue
-  const [debouncedValue] = useDebounce(inputValue, 400);
+  const [debouncedSearch] = useDebounce(searchValue, 600);
 
+  // push URL khi debounce hoàn thành
   useEffect(() => {
-    if (debouncedValue !== searchQuery && setSearchQuery) {
-      setSearchQuery(debouncedValue);
-      setPage(1);
-
-      // 🔹 Cập nhật URL
-      router.push(
-        {
-          pathname: pathname,
-          query: {
-            page: 1,
-            // search: debouncedValue || undefined, // thêm search nếu có
-          },
+    router.push(
+      {
+        pathname,
+        query: {
+          page: 1,
+          search: debouncedSearch || "",
         },
-        { scroll: false },
-      ); // không scroll lên đầu
-    }
-  }, [debouncedValue, searchQuery, setSearchQuery, router]);
+      },
+      { scroll: false },
+    );
+
+    setPage(1);
+  }, [debouncedSearch]);
 
   const handleDownloadZip = async () => {
     if (!exportData?.length) {
@@ -186,8 +184,8 @@ export default function TableToolbar({
       <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap">
         <Input
           placeholder="Search"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
         />
       </div>
 

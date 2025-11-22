@@ -12,20 +12,17 @@ import { searchProductQueryStringAtom, sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
+import { useProductListFilters } from "@/hooks/product-list/useProductListFilter";
 
 const ProductList = () => {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 🧠 Đọc page từ URL (mặc định 1)
-  const [page, setPage] = useState(() => Number(searchParams.get("page")) || 1);
-  const [pageSize, setPageSize] = useState(50);
-  const [searchQuery, setSearchQuery] = useAtom<string>(
-    searchProductQueryStringAtom,
-  );
-  const showAll = searchParams.get("all_products") === "true";
-
-  const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
+  const filters = useProductListFilters();
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
@@ -41,12 +38,22 @@ const ProductList = () => {
     setPage(urlPage);
   }, [searchParams]);
 
+  // useEffect(() => {
+  //   const params = new URLSearchParams(searchParams);
+
+  //   const showAllParams = params.get("all_products");
+  //   if (!showAllParams) {
+  //     params.set("all_products", "true");
+  //   }
+  //   router.push(`?${params.toString()}`, { scroll: false });
+  // }, [searchParams]);
+
   const { data, isLoading, isError } = useGetAllProducts({
     page,
     page_size: pageSize,
-    all_products: showAll,
-    search: searchQuery,
-    sort_by_stock: sortByStock,
+    all_products: filters.all_products,
+    search: filters.search,
+    sort_by_stock: filters.sort_by_stock,
   });
   const { data: exportData } = useGetProductsSelect();
 
@@ -58,12 +65,10 @@ const ProductList = () => {
         Product List
       </div>
       <TableToolbar
-        searchQuery={searchQuery}
         pageSize={pageSize}
         setPageSize={setPageSize}
         addButtonText="Add Product"
         addButtonUrl="/admin/products/add"
-        setSearchQuery={setSearchQuery}
         exportData={exportData}
         setPage={setPage}
         type={ToolbarType.product}

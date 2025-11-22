@@ -21,6 +21,7 @@ import {
 import { ProductTable } from "../../products/products-list/product-table";
 import { cartSupplierColumn } from "@/components/layout/cart/columns";
 import ViewFileChildDialog from "@/components/layout/packaging-dialog/packaging-dialog-chil";
+import { getStatusStyle } from "./status-styles";
 
 const ActionCell = ({
   id,
@@ -262,6 +263,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     header: () => <div className="text-center w-full">STATUS</div>,
     cell: ({ row }) => {
       const raw = row.original.status?.toLowerCase() ?? "";
+      const { text, bg, color } = getStatusStyle(raw);
 
       let display = "";
 
@@ -300,7 +302,14 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
           display = raw || "-";
       }
 
-      return <div className="text-center lowercase">{display}</div>;
+      return (
+        <div
+          className={`mx-auto px-4 py-1 rounded-full text-sm font-medium capitalize ${bg} ${color}`}
+          style={{ width: "fit-content" }}
+        >
+          {text}
+        </div>
+      );
     },
   },
   {

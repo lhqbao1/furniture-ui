@@ -13,6 +13,7 @@ import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { getCategoriesWithChildren } from "@/features/category/api";
 import { Loader2 } from "lucide-react";
 import ListCategoriesHome from "@/components/layout/home/list-categories";
+import SearchBox from "@/components/shared/search-gg";
 
 export const revalidate = 60; // ISR: regenerate every 60 seconds
 
