@@ -12,7 +12,7 @@ import { searchProductQueryStringAtom, sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
-import { useProductListFilters } from "@/hooks/product-list/useProductListFilter";
+import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 
 const ProductList = () => {
   const [page, setPage] = useState(1);
@@ -37,16 +37,6 @@ const ProductList = () => {
     const urlPage = Number(searchParams.get("page")) || 1;
     setPage(urlPage);
   }, [searchParams]);
-
-  // useEffect(() => {
-  //   const params = new URLSearchParams(searchParams);
-
-  //   const showAllParams = params.get("all_products");
-  //   if (!showAllParams) {
-  //     params.set("all_products", "true");
-  //   }
-  //   router.push(`?${params.toString()}`, { scroll: false });
-  // }, [searchParams]);
 
   const { data, isLoading, isError } = useGetAllProducts({
     page,

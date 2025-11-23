@@ -9,6 +9,7 @@ import AdminBackButton from "@/components/shared/admin-back-button";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
 import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useGetAllProducts } from "@/features/products/hook";
+import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import {
   searchProductQueryStringAtom,
@@ -26,11 +27,8 @@ const ProductMarketplace = () => {
   // 🧠 Đọc page từ URL (mặc định 1)
   const [page, setPage] = useState(() => Number(searchParams.get("page")) || 1);
   const [pageSize, setPageSize] = useState(50);
-  const [searchQuery, setSearchQuery] = useAtom<string>(
-    searchProductQueryStringAtom,
-  );
-  const [showAll, setShowAll] = useAtom(showAllProductsAtom);
   const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
+  const filters = useProductListFilters();
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
@@ -49,9 +47,9 @@ const ProductMarketplace = () => {
   const { data, isLoading, isError } = useGetAllProducts({
     page,
     page_size: pageSize,
-    all_products: showAll,
-    search: searchQuery,
-    sort_by_stock: sortByStock,
+    all_products: filters.all_products,
+    search: filters.search,
+    sort_by_stock: filters.sort_by_stock,
   });
   const { data: exportData } = useGetProductsSelect();
 
@@ -69,12 +67,10 @@ const ProductMarketplace = () => {
         </div>
         <TableToolbar
           type={ToolbarType.product}
-          searchQuery={searchQuery}
           pageSize={pageSize}
           setPageSize={setPageSize}
           addButtonText="Add Product"
           addButtonUrl="/admin/products/add"
-          setSearchQuery={setSearchQuery}
           exportData={exportData}
           setPage={setPage}
         />
@@ -86,7 +82,7 @@ const ProductMarketplace = () => {
             columns={columns}
             page={page}
             pageSize={pageSize}
-            setPage={setPage}
+            setPage={handlePageChange}
             setPageSize={setPageSize}
             totalItems={data?.pagination.total_items ?? 0}
             totalPages={data?.pagination.total_pages ?? 0}
