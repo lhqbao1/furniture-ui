@@ -21,6 +21,7 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver"; // npm i file-saver
 import { formatDate } from "@/lib/date-formated";
 import { useUploadStaticFile } from "@/features/file/hook";
+import { FadeLoader } from "react-spinners";
 
 interface ListPolicyAdminProps {
   versionId: string;
@@ -220,8 +221,7 @@ const ListPolicyAdmin = ({
   if (isLoading || isCreating)
     return (
       <div className="min-h-screen w-full flex flex-col justify-center items-center bg-gray-50">
-        <Loader2 className="animate-spin" />
-        Creating
+        <FadeLoader color="#00B159" />
       </div>
     );
   if (!versionId) return <></>;
