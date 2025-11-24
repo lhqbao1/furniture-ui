@@ -1,34 +1,22 @@
 "use client";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
-import { getAllProductsSelect } from "@/features/product-group/api";
-import { useGetProductsSelect } from "@/features/product-group/hook";
-import { useGetProductByTag } from "@/features/products/hook";
-import { useIsPhone } from "@/hooks/use-is-phone";
-import { useQuery } from "@tanstack/react-query";
+import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import React from "react";
+import { useMediaQuery } from "react-responsive";
 
-const TrendingProducts = () => {
+interface TrendingProductsProps {
+  products: ProductItem[];
+}
+
+const TrendingProducts = ({ products }: TrendingProductsProps) => {
   const t = useTranslations();
-  const isPhone = useIsPhone();
-
-  const {
-    data: products,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["all-products"],
-    queryFn: () =>
-      getAllProductsSelect({
-        all_products: false,
-        is_customer: true,
-      }),
-  });
+  const isPhone = useMediaQuery({ maxWidth: 767 });
 
   return (
     <div className="section-padding">
-      {isLoading || isError || !products ? (
+      {!products ? (
         <ProductGridSkeleton />
       ) : (
         <>

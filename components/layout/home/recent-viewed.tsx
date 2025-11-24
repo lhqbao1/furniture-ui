@@ -1,21 +1,24 @@
-"use client";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { useGetAllProducts } from "@/features/products/hook";
+import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import React from "react";
 
-const RecentViewed = () => {
+interface RecentViewedProps {
+  products: ProductItem[];
+}
+
+const RecentViewed = ({ products }: RecentViewedProps) => {
   const t = useTranslations();
 
-  const { data: products, isLoading, isError } = useGetAllProducts();
   return (
     <div className="section-padding lg:mt-0 mt-40">
       <h2 className="section-header">{t("recentViewed")}</h2>
-      {isLoading || isError || !products ? (
+      {!products ? (
         <ProductGridSkeleton />
       ) : (
-        <ProductsGridLayout data={products.items.slice(0, 8)} />
+        <ProductsGridLayout data={products.slice(0, 8)} />
       )}
     </div>
   );

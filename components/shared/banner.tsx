@@ -7,34 +7,44 @@ interface BannerProps {
   height?: number;
 }
 
-const Banner = ({ height }: BannerProps) => {
+const Banner = ({ height = 500 }: BannerProps) => {
   const [isSticky, setIsSticky] = useState(false);
 
-  // Xử lý scroll (desktop mới cần, mobile ko render banner)
   useEffect(() => {
+    let last = 0;
+    const threshold = height ?? 500;
+
     const handleScroll = () => {
-      const bannerHeight = height || 400;
-      setIsSticky(window.scrollY >= bannerHeight);
+      const now = performance.now();
+      if (now - last < 150) return; // throttle 150ms
+      last = now;
+
+      const y = window.scrollY;
+      const sticky = y >= threshold;
+
+      // tránh setState liên tục khi giá trị không đổi
+      setIsSticky((prev) => {
+        if (prev === sticky) return prev;
+        return sticky;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [height]);
 
   return (
     <div
-      className={cn(
-        "relative w-full flex-shrink-0 z-0 hidden lg:block", // ẩn ở mobile, hiện ở desktop
-        height ? `lg:h-[${height}px]` : "lg:h-[500px]"
-      )}
+      className={cn("relative w-full flex-shrink-0 z-0 hidden lg:block")}
+      style={{ height }}
     >
       <Image
-        src="/home-banner1.webp"
+        src="/home-banner11.webp"
         alt="Banner"
         fill
         className="object-cover"
-        priority
-        sizes="100vw"
+        priority // ảnh hero -> improve LCP
+        sizes="(min-width: 1024px) 100vw"
         unoptimized
       />
     </div>
