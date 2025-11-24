@@ -99,16 +99,31 @@ export type MarketplaceProduct = {
   marketplace: string;
   marketplace_offer_id?: string;
   name: string;
-  description: string;
+  description?: string;
   final_price: number;
   min_stock: number;
   max_stock: number;
   is_active: boolean;
   sku: string;
+  brand: string;
   line_item_id: string;
   current_stock: number;
-  brand: string;
+  manufacturer?: string;
+  weight?: number;
+  part_number?: string;
+  is_fragile?: boolean;
+  number_of_items?: number;
+  included_components?: string;
+  height?: number;
+  width?: number;
+  length?: number;
+  depth?: number;
+  asin?: string;
+  model_number?: string;
+  browse_node?: string;
+  size?: string;
   country_of_origin?: string;
+  handling_time?: number;
 };
 
 export type ProductPdfFiles = {
@@ -181,6 +196,8 @@ export type ProductItem = {
   is_econelo: boolean;
 
   pdf_files: ProductPdfFiles[];
+  is_fsc: boolean | null;
+  note: string | null;
 };
 
 export type ProductResponse = {

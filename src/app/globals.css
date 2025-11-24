@@ -229,7 +229,8 @@
   }
 
   to {
-    height: var(--radix-collapsible-content-height);
+    /* height: var(--radix-collapsible-content-height); */
+    height: 200;
     opacity: 1;
     transform: translateY(0);
   }
@@ -237,7 +238,8 @@
 
 @keyframes collapsible-up {
   from {
-    height: var(--radix-collapsible-content-height);
+    /* height: var(--radix-collapsible-content-height); */
+    height: 200;
     opacity: 1;
     transform: translateY(0);
   }

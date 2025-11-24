@@ -43,12 +43,10 @@ import {
 } from "@/components/ui/command";
 import countries from "world-countries";
 import { ColorSelect } from "./form-input/color-seclect";
-import { useUploadStaticFile } from "@/features/file/hook";
-import { toast } from "sonner";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const ProductAdditionalInputs = () => {
   const form = useFormContext();
-  const uploadFileMutation = useUploadStaticFile();
 
   const unit = [
     { id: "pcs." },
@@ -72,33 +70,6 @@ const ProductAdditionalInputs = () => {
     value: c.name.common,
     label: c.name.common,
   }));
-
-  const handleUploadPDF = async (files: File[]) => {
-    try {
-      const urls: string[] = [];
-
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append("files", file);
-
-        const res = await uploadFileMutation.mutateAsync(formData);
-
-        if (res?.results[0]?.url) {
-          urls.push(res?.results[0]?.url);
-        }
-      }
-
-      // Ghép URL thành | | |
-      const joined = urls.join("|");
-
-      form.setValue("pdf_files", joined, { shouldDirty: true });
-
-      return joined;
-    } catch (err) {
-      console.error(err);
-      toast.error("Upload PDF failed");
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -425,6 +396,46 @@ const ProductAdditionalInputs = () => {
                   type="number"
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div>
+        <FormField
+          control={form.control}
+          name="is_fsc"
+          render={({ field }) => (
+            <FormItem className="flex flex-col space-y-3">
+              <FormLabel className="text-black font-semibold text-sm">
+                Is FCS?
+              </FormLabel>
+
+              <FormControl>
+                <RadioGroup
+                  onValueChange={(val) => {
+                    field.onChange(val === "true");
+                  }}
+                  value={field.value ? "true" : "false"}
+                  className="flex gap-6"
+                >
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <RadioGroupItem value="true" />
+                    </FormControl>
+                    <FormLabel className="font-normal">True</FormLabel>
+                  </FormItem>
+
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <RadioGroupItem value="false" />
+                    </FormControl>
+                    <FormLabel className="font-normal">False</FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+
               <FormMessage />
             </FormItem>
           )}

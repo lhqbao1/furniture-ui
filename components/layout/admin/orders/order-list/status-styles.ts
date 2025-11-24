@@ -11,31 +11,44 @@ export function getStatusStyle(raw: string) {
       };
 
     case "tock_reserved":
+      return {
+        text: "stock reserved",
+        bg: "bg-[#ffe4e9]",
+        color: "text-[#ff4f7b]",
+      };
     case "reserved":
       return { text: "reserved", bg: "bg-[#ffe4e9]", color: "text-[#ff4f7b]" };
 
     case "preparation_shipping":
       return {
         text: "preparing to ship",
-        bg: "bg-[#dbeafe]",
-        color: "text-[#3182ce]",
+        bg: "bg-[#D4EEF9]",
+        color: "text-[#29ABE2]",
       };
 
     case "ds_informed":
       return {
-        text: "supplier informed",
+        text: "DS informed",
         bg: "bg-[#dbeafe]",
         color: "text-[#3182ce]",
       };
 
     case "paid":
-      return { text: "paid", bg: "bg-[#fef9c3]", color: "text-[#d97706]" };
+      return { text: "paid", bg: "bg-[#FFF6CC]", color: "text-[#FED000]" };
 
     case "shipped":
-      return { text: "shipped", bg: "bg-[#dcfce7]", color: "text-[#22c55e]" };
+      return {
+        text: "dispatched",
+        bg: "bg-[#dcfce7]",
+        color: "text-[#22c55e]",
+      };
 
     case "completed":
-      return { text: "completed", bg: "bg-[#dcfce7]", color: "text-[#39B54A]" };
+      return {
+        text: "dispatched",
+        bg: "bg-[#dcfce7]",
+        color: "text-[#39B54A]",
+      };
 
     case "cancel_request":
       return {
@@ -45,10 +58,10 @@ export function getStatusStyle(raw: string) {
       };
 
     case "canceled":
-      return { text: "canceled", bg: "bg-[#ffe4e6]", color: "text-[#e11d48]" };
+      return { text: "canceled", bg: "bg-[#FFD2D3]", color: "text-[#FF0000]" };
 
     case "return":
-      return { text: "returned", bg: "bg-[#fef9c3]", color: "text-[#d97706]" };
+      return { text: "returned", bg: "bg-[#FDE9D2]", color: "text-[#F7931E]" };
 
     default:
       return { text: key, bg: "bg-gray-200", color: "text-gray-700" };

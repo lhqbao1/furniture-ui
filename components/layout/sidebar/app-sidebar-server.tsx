@@ -2,7 +2,7 @@ import {
   getCategoriesWithChildren,
   serverGetCategories,
 } from "@/features/category/api";
-import AppSidebarClient from "./app-sidebar";
+import AppSidebar from "./app-sidebar";
 
 interface AppSideBarServerProps {
   defaultOpen?: boolean;
@@ -13,7 +13,7 @@ const AppSidebarServer = async ({
 }: AppSideBarServerProps) => {
   const categories = await getCategoriesWithChildren();
   return (
-    <AppSidebarClient
+    <AppSidebar
       categories={categories}
       defaultOpen={defaultOpen}
     />

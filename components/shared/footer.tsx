@@ -202,6 +202,7 @@ const Footer = () => {
         <ul className="space-y-2 text-black-700 text-sm">
           <li>Prestige Home GmbH</li>
           <li>Greifswalder Straße 226, 10405 Berlin</li>
+          <li>{t("phone_number")}: +49 3222 1808038</li>
           <li>{t("email")}: info@prestige-home.de</li>
           <li>{t("vatId")}: DE454714336</li>
         </ul>

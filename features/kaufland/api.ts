@@ -1,25 +1,26 @@
-import { apiAdmin, apiPublic } from "@/lib/axios"
+import { apiAdmin, apiPublic } from "@/lib/axios";
 
 interface KauflandBrandInput {
-  name: string | null
-  email: string | null
-  address: string | null
+  name: string | null;
+  email: string | null;
+  address: string | null;
 }
 
 export interface syncToKauflandInput {
-    ean:string
-    title: string
-    description: string
-    image_urls: string[]
-    price: number
-    stock: number
-    carrier: string
-    sku: string
-    marketplace_offer_id?: string
-    product_id: string
-    min_stock?: number
-    max_stock?: number
-    brand: KauflandBrandInput
+  ean: string;
+  title: string;
+  description: string;
+  image_urls: string[];
+  price: number;
+  stock: number;
+  carrier: string;
+  sku: string;
+  marketplace_offer_id?: string;
+  product_id: string;
+  min_stock?: number;
+  max_stock?: number;
+  brand: KauflandBrandInput;
+  handling_time?: number;
 }
 export async function syncToKaufland(input: syncToKauflandInput) {
   const response = await apiAdmin.post("/kaufland/products/publish", input, {
@@ -35,10 +36,9 @@ export async function syncToKaufland(input: syncToKauflandInput) {
   return response.data;
 }
 
-
-export async function removeFromKaufland(offer_id: string){
-    const {data} = await apiAdmin.delete(
-        `/kaufland/products/delete/${offer_id}`
-    )
-    return data
+export async function removeFromKaufland(offer_id: string) {
+  const { data } = await apiAdmin.delete(
+    `/kaufland/products/delete/${offer_id}`,
+  );
+  return data;
 }

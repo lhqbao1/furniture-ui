@@ -92,13 +92,22 @@ const SyncToAmazonForm = ({
       country_of_origin: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,
       )?.country_of_origin,
+      handling_time: isUpdating
+        ? product.marketplace_products.find(
+            (i) => i.marketplace === currentMarketplace,
+          )?.handling_time
+        : undefined,
     },
   });
 
-  console.log(currentMarketplace);
   const handleSubmit = (values: MarketPlaceFormValues) => {
     if (!product.brand) {
       toast.error("Brand is missing from current product");
+      return;
+    }
+
+    if (!values.handling_time || values.handling_time === 0) {
+      toast.error("Handling times is missing from current product");
       return;
     }
 
@@ -121,6 +130,7 @@ const SyncToAmazonForm = ({
       description: values.description ?? "",
       sku: values.sku ?? "",
       brand: product.brand ? product.brand.name : "",
+      handling_time: values.handling_time ?? 0,
     };
 
     const updatedMarketplaceProducts = [
@@ -238,6 +248,7 @@ const SyncToAmazonForm = ({
             country_of_origin: values.country_of_origin,
             min_stock: values.min_stock ?? 0,
             max_stock: values.max_stock ?? 10,
+            handling_time: values.handling_time ?? 0,
           };
 
           syncToAmazonMutation.mutate(payload);
@@ -276,7 +287,7 @@ const SyncToAmazonForm = ({
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
           <DialogHeader>
-            <DialogTitle>Update Marketplace</DialogTitle>
+            <DialogTitle>Update Marketplace AMZ</DialogTitle>
             {isUpdating}
           </DialogHeader>
           <div className="mx-auto space-y-6">
@@ -311,42 +322,71 @@ const SyncToAmazonForm = ({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="country_of_origin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country of Origin</FormLabel>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="country_of_origin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Country of Origin</FormLabel>
 
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger
-                            className="w-full border"
-                            placeholderColor
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
                           >
-                            <SelectValue placeholder="Select country" />
-                          </SelectTrigger>
+                            <SelectTrigger
+                              className="w-full border"
+                              placeholderColor
+                            >
+                              <SelectValue placeholder="Select country" />
+                            </SelectTrigger>
 
-                          <SelectContent className="max-h-80">
-                            {COUNTRY_OPTIONS.map((c) => (
-                              <SelectItem
-                                key={c.value}
-                                value={c.value}
-                              >
-                                {c.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                            <SelectContent className="max-h-80">
+                              {COUNTRY_OPTIONS.map((c) => (
+                                <SelectItem
+                                  key={c.value}
+                                  value={c.value}
+                                >
+                                  {c.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
 
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="handling_time"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col w-full">
+                        <FormLabel className="text-black font-semibold text-sm">
+                          Handling Time (days)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Enter handling time"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value),
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 {/* Price + Stock */}
                 <div className="grid grid-cols-3 gap-4">

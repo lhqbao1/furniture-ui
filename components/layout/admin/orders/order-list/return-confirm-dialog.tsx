@@ -47,23 +47,6 @@ const ReturnConfirmDialog = ({
       open={open}
       onOpenChange={onClose}
     >
-      {/* <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="px-0 py-0"
-          onClick={(e) => {
-            e.preventDefault();
-            if (status.toLocaleLowerCase() !== "completed") {
-              toast.error("Can not return this order due to its status");
-            } else {
-              setOpen(true); // ✅ Mở dialog nếu không phải eBay
-            }
-          }}
-        >
-          <Undo2 className="size-4 text-red-500" />
-        </Button>
-      </DialogTrigger> */}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Return Order</DialogTitle>

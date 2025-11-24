@@ -4,11 +4,12 @@
 import React from "react";
 import Image from "next/image";
 import ProductImageDialog from "../main-image-dialog";
+import { ProductItem } from "@/types/products";
 // ---- CHANGE NOTE ----
 // vẫn reuse dialog gốc của bạn (không thay đổi logic hoặc file name)
 
 interface MainImageProps {
-  productDetails: any;
+  productDetails: ProductItem;
   mainImageIndex: number;
   setMainImageIndex: React.Dispatch<React.SetStateAction<number>>;
   position: { x: number; y: number };
@@ -40,7 +41,7 @@ export default function MainImage({
       setMainImageIndex={setMainImageIndex}
     >
       <div
-        className="flex justify-center overflow-hidden main-image"
+        className="flex justify-center overflow-hidden main-image relative"
         onMouseMove={handleZoomImage}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
@@ -52,12 +53,24 @@ export default function MainImage({
           height={300}
           alt={productDetails.name}
           priority
-          className="transition-transform duration-300 lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer"
+          className="transition-transform duration-300 lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer rounded-xs"
           style={{
             transformOrigin: `${position.x}% ${position.y}%`,
             transform: isHover ? "scale(1.5)" : "scale(1)",
           }}
         />
+
+        {productDetails.is_fsc && (
+          <div className="absolute top-4 right-4 cursor-pointer">
+            <Image
+              src={"/fcs1.webp"}
+              width={50}
+              height={50}
+              alt=""
+              className="object-cover hover:scale-110 transition-all duration-300"
+            />
+          </div>
+        )}
       </div>
     </ProductImageDialog>
   );

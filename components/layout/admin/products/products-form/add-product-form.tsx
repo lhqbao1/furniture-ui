@@ -1,6 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import {
@@ -19,6 +26,7 @@ import AdminBackButton from "@/components/shared/admin-back-button";
 import { useProductForm } from "./useProductForm";
 import { ProductItem } from "@/types/products";
 import ProductManual from "./product-manual";
+import { Textarea } from "@/components/ui/textarea";
 
 const ProductForm = ({
   productValues,
@@ -199,6 +207,32 @@ const ProductForm = ({
                   )}
                 </Button>
                 <AdminBackButton />
+                <div className="col-span-2 lg:mt-4">
+                  <FormField
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col w-full">
+                        <FormLabel className="text-black font-semibold text-sm">
+                          Note
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Write product description..."
+                            className="min-h-[120px] resize-none"
+                            value={field.value ?? ""} // null → empty string
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === "" ? null : e.target.value,
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </div>
           </div>

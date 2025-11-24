@@ -27,6 +27,7 @@ export const marketPlaceSchema = z
     brand: z.string().optional().nullable(),
     is_active: z.boolean().optional().nullable(),
     sku: z.string().optional().nullable(),
+    handling_time: z.number().optional().nullable(),
   })
   .refine(
     (data) => {
@@ -62,10 +63,11 @@ export const amazonMarketplaceSchema = z
     max_stock: z.number().nonnegative().optional().nullable(),
     is_active: z.boolean().optional(),
     sku: z.string(),
-    country_of_origin: z.string(),
-    current_stock: z.number().nonnegative().optional().nullable(),
-    line_item_id: z.string().optional().nullable(),
     brand: z.string().optional().nullable(),
+    line_item_id: z.string().optional().nullable(),
+    current_stock: z.number().nonnegative().optional().nullable(),
+    country_of_origin: z.string(),
+    handling_time: z.number().min(1, "Handling time is required"),
   })
   .refine(
     (data) => {
@@ -165,6 +167,8 @@ export const addProductSchema = z.object({
 
   is_econelo: z.boolean().optional().nullable(),
   owner_id: z.string().optional().nullable(),
+  is_fsc: z.boolean().optional().nullable(),
+  note: z.string().optional().nullable(),
 });
 
 export type ProductInput = z.infer<typeof addProductSchema>;

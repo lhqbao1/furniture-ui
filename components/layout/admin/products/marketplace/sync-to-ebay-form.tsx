@@ -104,6 +104,11 @@ const SyncToEbayForm = ({
           )?.max_stock
         : undefined,
       sku: product.sku,
+      handling_time: isUpdating
+        ? product.marketplace_products.find(
+            (i) => i.marketplace === currentMarketplace,
+          )?.handling_time
+        : undefined,
     },
   });
 
@@ -126,6 +131,11 @@ const SyncToEbayForm = ({
       return;
     }
 
+    if (!values.handling_time || values.handling_time === 0) {
+      toast.error("Handling times is missing from current product");
+      return;
+    }
+
     setUpdating(true);
     setOpen(true);
     const normalizedValues: MarketplaceProduct = {
@@ -142,6 +152,7 @@ const SyncToEbayForm = ({
       description: values.description ?? "",
       sku: values.sku ?? "",
       brand: product.brand ? product.brand.name : "",
+      handling_time: values.handling_time ?? 0,
     };
 
     const updatedMarketplaceProducts = [
@@ -267,6 +278,7 @@ const SyncToEbayForm = ({
                 email: product.brand.company_email,
                 name: product.brand.company_name,
               },
+              handling_time: values.handling_time ?? 0,
             };
 
             // Hiển thị toast loading
@@ -307,7 +319,7 @@ const SyncToEbayForm = ({
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
           <DialogHeader>
-            <DialogTitle>Update Marketplace</DialogTitle>
+            <DialogTitle>Update Marketplace EBAY</DialogTitle>
           </DialogHeader>
           <div className="mx-auto space-y-6">
             <Form {...form}>
@@ -376,6 +388,35 @@ const SyncToEbayForm = ({
                     </FormItem>
                   )}
                 />
+
+                {currentMarketplace !== "ebay" && (
+                  <FormField
+                    control={form.control}
+                    name="handling_time"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col w-full">
+                        <FormLabel className="text-black font-semibold text-sm">
+                          Handling Time (days)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Enter handling time"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value),
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 {/* Price + Stock */}
                 <div className="grid grid-cols-3 gap-4">

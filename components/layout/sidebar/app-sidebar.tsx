@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import {
   Sidebar,
@@ -19,7 +19,7 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import { usePathname } from "next/navigation";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { CategoryResponse } from "@/types/categories";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
@@ -31,6 +31,8 @@ import {
 import { useIsPhone } from "@/hooks/use-is-phone";
 import Link from "next/link";
 import Image from "next/image";
+import gsap from "gsap";
+import { SidebarCollapsibleItem } from "./app-sidebar-collapsible";
 
 type MenuItem = {
   title: string;
@@ -54,6 +56,10 @@ export default function AppSidebar({
     openMobile,
     setOpenMobile,
   } = useSidebar();
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const t = useTranslations();
   const locale = useLocale(); // 👈 thêm locale
@@ -127,8 +133,8 @@ export default function AppSidebar({
       collapsible="offcanvas"
     >
       <SidebarContent>
-        <SidebarHeader className="flex items-end lg:items-center">
-          <div className={`flex flex-col gap-4 items-center`}>
+        <SidebarHeader className="flex items-end   lg:items-center">
+          <div className={`flex flex-col gap-0 items-center`}>
             <Link
               href={`/`}
               className="relative w-16 h-16 hidden lg:flex"
@@ -171,95 +177,25 @@ export default function AppSidebar({
                   return (
                     <SidebarMenuItem
                       key={item.id}
-                      // className={`flex justify-start
-                      //   ${
-                      //     item.id === "account"
-                      //       ? "border-t-2 border-black/50"
-                      //       : ""
-                      //   }
-                      // `}
                       className="flex justify-start"
                     >
-                      <Collapsible
-                        className="w-full"
-                        open={isOpen}
+                      <SidebarCollapsibleItem
+                        item={item}
+                        isOpen={isOpen}
                         onOpenChange={(open) => {
                           setOpenItem(open ? item.id : null);
                           if (!open && currentCategoryId === item.id) {
-                            setCurrentCategoryId(null); // nếu muốn clear atom khi đóng
+                            setCurrentCategoryId(null);
                             setCurrentCategoryName("");
                           }
                         }}
-                      >
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton asChild>
-                            <Button
-                              className={`flex w-full flex-row items-center justify-between gap-3 rounded-none px-4 py-6 transition-colors data-[state=open]:hover:bg-secondary-30 data-[state=open]:hover:text-black hover:[&>svg]:stroke-black ${
-                                isActive
-                                  ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"
-                                  : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
-                              }
-                                                                  focus:bg-secondary/20 active:bg-secondary/20 focus:text-black active:text-black
-                                                                  `}
-                              variant={"ghost"}
-                              onClick={() => {
-                                setCurrentCategoryId(item.id);
-                              }}
-                            >
-                              <span className="lg:text-lg text-lg">
-                                {item.title}
-                              </span>
-                              <ChevronDown
-                                className={`size-4 opacity-70 transition-transform text-[#51BE8C] ${
-                                  isOpen ? "rotate-180" : ""
-                                }`}
-                              />
-                            </Button>
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-
-                        {isOpen && (
-                          <CollapsibleContent
-                            // style={{ transition: "all" }}
-                            className="flex flex-col gap-1.5 mt-1 overflow-hidden [data-state=closed]:hidden [data-state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down"
-                          >
-                            {item.children.map((child) => {
-                              const isChildActive =
-                                pathname === child.url ||
-                                pathname === `/${locale}${child.url}`; // 👈 check kèm locale
-                              return (
-                                <Button
-                                  key={child.id}
-                                  onClick={() => {
-                                    router.push(child.url, { locale }); // 👈 thêm locale
-                                    if (isPhone) setOpenMobile(false);
-                                    if (
-                                      item.url &&
-                                      item.url.includes("category")
-                                    ) {
-                                      setCurrentCategoryId(child.id);
-                                      setCurrentCategoryName(child.title);
-                                    }
-                                  }}
-                                  variant={"ghost"}
-                                  className={`relative flex flex-row items-start justify-start lg:pl-8 pl-12 text-wrap gap-3 h-fit rounded-none py-1 flex-wrap max-w-full text-base transition-colors ${
-                                    isChildActive
-                                      ? "bg-secondary/20 text-[#4D4D4D] !hover:bg-secondary/20"
-                                      : "hover:bg-secondary/20 hover:text-foreground text-[#4D4D4D]"
-                                  }`}
-                                >
-                                  <span className="text-wrap lg:text-[17px] text-start">
-                                    {child.title}
-                                  </span>
-                                  {isOpen && isChildActive && (
-                                    <span className="absolute w-1 h-full bg-secondary right-0 top-0"></span>
-                                  )}
-                                </Button>
-                              );
-                            })}
-                          </CollapsibleContent>
-                        )}
-                      </Collapsible>
+                        locale={locale}
+                        isPhone={isPhone ?? false}
+                        setOpenMobile={setOpenMobile}
+                        setCurrentCategoryId={setCurrentCategoryId}
+                        setCurrentCategoryName={setCurrentCategoryName}
+                        pathname={pathname}
+                      />
                     </SidebarMenuItem>
                   );
                 }
