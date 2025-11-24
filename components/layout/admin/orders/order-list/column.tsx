@@ -287,7 +287,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
           display = "Dispatched";
           break;
         case "completed":
-          display = "Completed";
+          display = "Dispatched";
           break;
         case "cancel_request":
           display = "Cancel requested";
@@ -329,7 +329,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
               maximumFractionDigits: 2,
             })}
           </div>
-          {row.original.status === "Pending" ? (
+          {row.original.status.toLocaleLowerCase() === "pending" ? (
             ""
           ) : (
             <ViewFileDialog
@@ -438,9 +438,19 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
   {
     accessorKey: "status",
     header: () => <div className="text-center w-full">STATUS</div>,
-    cell: ({ row }) => (
-      <div className="text-center lowercase">{row.original.status}</div>
-    ),
+    cell: ({ row }) => {
+      const raw = row.original.status?.toLowerCase() ?? "";
+      const { text, bg, color } = getStatusStyle(raw);
+
+      return (
+        <div
+          className={`mx-auto px-4 py-1 rounded-full text-sm font-medium capitalize ${bg} ${color}`}
+          style={{ width: "fit-content" }}
+        >
+          {text}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "value",

@@ -77,31 +77,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
 
-  const handleResend = () => {
-    const username = form.getValues("username");
-    if (!username) return;
-
-    if (!isAdmin) {
-      sendOtpMutation.mutate(username, {
-        onSuccess: () => {
-          toast.success(t("sendedEmail"));
-          setResendCountdown(60);
-          setCanResend(false);
-        },
-        onError: () => toast.error(t("invalidEmail")),
-      });
-    } else {
-      loginAdminMutation.mutate(username, {
-        onSuccess: () => {
-          toast.success(t("sendedEmail"));
-          setResendCountdown(60);
-          setCanResend(false);
-        },
-        onError: () => toast.error(t("invalidEmail")),
-      });
-    }
-  };
-
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!seePassword && !isAdmin) {
       sendOtpMutation.mutate(values.username, {
@@ -147,7 +122,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
           onError(error, variables, context) {
             toast.error(t("invalidCredentials"));
           },
-        }
+        },
       );
     } else if (seePassword && isAdmin) {
       submitOtpMutation.mutate(
@@ -168,9 +143,9 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             toast.success(t("loginSuccess"));
           },
           onError(error, variables, context) {
-            toast.error(error.message);
+            toast.error(t("invalidCredentials"));
           },
-        }
+        },
       );
     }
   };
@@ -194,9 +169,9 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             toast.success(t("loginSuccess"));
           },
           onError() {
-            toast.error(t("invalidCredentials"));
+            toast.error(t("invalidOTP"));
           },
-        }
+        },
       );
     } else {
       submitOtpMutation.mutate(
@@ -213,9 +188,9 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             toast.success(t("loginSuccess"));
           },
           onError(error) {
-            toast.error(error.message);
+            toast.error(t("invalidOTP"));
           },
-        }
+        },
       );
     }
   };
@@ -224,10 +199,18 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     <div className="p-6 bg-white rounded-2xl lg:w-3/4 w-full">
       <div className="flex flex-col items-center mb-12 gap-3">
         {/* Logo giả */}
-        <Image src={"/new-logo.svg"} width={100} height={100} alt="" />
+        <Image
+          src={"/new-logo.svg"}
+          width={100}
+          height={100}
+          alt=""
+        />
         <h1 className="text-3xl font-semibold text-secondary text-center space-x-2 lg:block flex flex-col">
           <span>{t("welcomeTo")}</span>
-          <span className="text-primary" translate="no">
+          <span
+            className="text-primary"
+            translate="no"
+          >
             Prestige Home
           </span>
         </h1>
@@ -244,7 +227,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             (errors) => {
               // toast.error("Please check the form for errors")
               console.log(errors);
-            }
+            },
           )}
         >
           {" "}
@@ -300,7 +283,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                               // tự động focus sang input kế
                               if (val && idx < 5) {
                                 const next = document.getElementById(
-                                  `otp-${idx + 1}`
+                                  `otp-${idx + 1}`,
                                 ) as HTMLInputElement;
                                 next?.focus();
                               }

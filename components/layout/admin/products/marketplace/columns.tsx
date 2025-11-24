@@ -80,8 +80,6 @@ function SyncToMarketplace({
   const removeFromEbayMutation = useRemoveFormEbay();
   const removeFromKauflandMutation = useRemoveFormKaufland();
 
-  const [openUpdateMarketplaceDialog, setOpenUpdateMarketplaceDialog] =
-    useState<boolean>(false);
   const [updating, setUpdating] = useState<boolean>(false);
 
   // ✅ Tách marketplace cụ thể ra, tránh find() lặp
@@ -145,14 +143,6 @@ function SyncToMarketplace({
             isAdd
             currentMarketplace={marketplace}
           />
-          {/* <Button
-            onClick={handleSync}
-            variant="outline"
-            disabled={isSyncing}
-            className="min-w-[80px]"
-          >
-            {isSyncing ? <Loader2 className="animate-spin" /> : "Sync"}
-          </Button> */}
         </>
       )}
 
@@ -169,8 +159,6 @@ function SyncToMarketplace({
 }
 
 function AddProductMarketplace({ product }: { product: ProductItem }) {
-  const [openAddMarketplaceDialog, setOpenAddMarketplaceDialog] =
-    useState<boolean>(false);
   const [updating, setUpdating] = useState<boolean>(false);
   return (
     <div className="flex justify-center">

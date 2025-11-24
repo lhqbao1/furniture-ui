@@ -27,6 +27,7 @@ export type SyncToAmazonInput = {
   country_of_origin: string;
   min_stock: number;
   max_stock: number;
+  handling_time?: number;
 };
 
 export async function syncToAmazon(input: SyncToAmazonInput) {

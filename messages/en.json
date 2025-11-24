@@ -331,5 +331,6 @@
   "giveReview": "write a review",
   "reviewRequired": "Please enter rating and comment.",
   "companyName": "Company",
-  "vatId": "VAT ID"
+  "vatId": "VAT ID",
+    "invalidOTP": "Invalid OTP" 
 }

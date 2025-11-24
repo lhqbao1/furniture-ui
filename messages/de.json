@@ -328,5 +328,6 @@
   "companyTitle": "Unternehmensinformationen",
   "companyName": "Firma",
   "vatId": "USt-IdNr",
-  "relatedProduct": "Ähnliche Produkte"
+  "relatedProduct": "Ähnliche Produkte",
+  "invalidOTP": "Ungültiger OTP" 
 }
