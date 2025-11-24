@@ -75,10 +75,10 @@ export const submitProduct = async ({
       { id: productValues.id ?? "", input: payload },
       {
         onSuccess: () => {
-          toast.success("Product updated successfully");
+          toast.success("Updated product successfully");
         },
         onError: () => {
-          toast.error("Failed to update product");
+          toast.error("Updated product fail");
         },
       },
     );
@@ -87,7 +87,7 @@ export const submitProduct = async ({
 
   addProductMutation.mutate(payload, {
     onSuccess: () => {
-      toast.success("Product add successfully");
+      toast.success("Add product successfully");
       form.reset();
     },
     onError: () => {

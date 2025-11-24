@@ -4,7 +4,7 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "@/src/i18n/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useAtom } from "jotai";
 import { checkOutIdAtom, paymentIdAtom } from "@/store/payment";
 import {
@@ -51,6 +51,7 @@ export function useCheckoutSubmit({
   locale: string; // locale hiện tại
 }) {
   const router = useRouter();
+  const t = useTranslations();
 
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
   const [checkoutId, setCheckoutId] = useAtom(checkOutIdAtom);
@@ -188,7 +189,7 @@ export function useCheckoutSubmit({
             shippingCostCurrent > 0 ? shippingCostCurrent : shippingCost,
         });
 
-        toast.success("Order created successfully");
+        toast.success(t("orderSuccess"));
         setCheckoutId(checkout.id);
 
         // Payment flow
@@ -214,7 +215,7 @@ export function useCheckoutSubmit({
         cleanupNeeded = false;
       } catch (err) {
         console.error(err);
-        toast.error("Order failed");
+        toast.error(t("orderFail"));
         form.reset();
         cleanupNeeded = true;
       } finally {
