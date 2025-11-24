@@ -2,12 +2,17 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { getCategoriesWithChildren } from "@/features/category/api";
 import { currentCategoryIdAtom } from "@/store/category";
+import { Category, CategoryResponse } from "@/types/categories";
 import { useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 
-const ListCategoriesHome = () => {
+interface ListCategoriesHomeProps {
+  categories: CategoryResponse[];
+}
+
+const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const {
     open: sidebarOpen,
@@ -20,19 +25,9 @@ const ListCategoriesHome = () => {
     currentCategoryIdAtom,
   );
 
-  const {
-    data: categories,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["categories-with-children"],
-    queryFn: () => getCategoriesWithChildren(),
-    retry: false,
-  });
-
   return (
     <div className="w-full flex justify-center py-6">
-      {isLoading || isError || !categories ? (
+      {!categories ? (
         <div>loading</div>
       ) : (
         <div className="flex items-center justify-center gap-6 flex-wrap">

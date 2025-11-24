@@ -49,9 +49,6 @@ export const homeBannerItems: HomeBannerItems[] = [
   { id: 6, image: "/6.png", name: "Coffee Table" },
   { id: 7, image: "/7.png", name: "TV Stand" },
   { id: 8, image: "/8.png", name: "Office Chair" },
-  // { id: 9, image: "/home-banner-image1.png", name: "Desk" },
-  // { id: 10, image: "/home-banner-image1.png", name: "Nightstand" },
-  // { id: 11, image: "/home-banner-image1.png", name: "Outdoor Furniture" },
 ];
 
 export const preOrderItems: PreOrderProduct[] = [
