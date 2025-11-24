@@ -77,7 +77,7 @@ const CheckOutInvoiceAddress = ({
       invoiceSnapshot.current = {
         invoice_address_line: form.getValues("invoice_address_line"),
         invoice_address_additional: form.getValues(
-          "invoice_address_additional"
+          "invoice_address_additional",
         ),
         invoice_postal_code: form.getValues("invoice_postal_code"),
         invoice_city: form.getValues("invoice_city"),
@@ -93,15 +93,15 @@ const CheckOutInvoiceAddress = ({
       if (invoiceSnapshot.current) {
         form.setValue(
           "invoice_address_line",
-          invoiceSnapshot.current.invoice_address_line
+          invoiceSnapshot.current.invoice_address_line,
         );
         form.setValue(
           "invoice_address_additional",
-          invoiceSnapshot.current.invoice_address_additional ?? ""
+          invoiceSnapshot.current.invoice_address_additional ?? "",
         );
         form.setValue(
           "invoice_postal_code",
-          invoiceSnapshot.current.invoice_postal_code
+          invoiceSnapshot.current.invoice_postal_code,
         );
         form.setValue("invoice_city", invoiceSnapshot.current.invoice_city);
       }
@@ -119,7 +119,7 @@ const CheckOutInvoiceAddress = ({
   const states = State.getStatesOfCountry("DE");
   // Lấy tất cả thành phố từ tất cả bang
   const allCities = states.flatMap((state) =>
-    City.getCitiesOfState("DE", state.isoCode)
+    City.getCitiesOfState("DE", state.isoCode),
   );
   // Danh sách tên thành phố
   const cityOptions = allCities.map((city) => ({
@@ -129,7 +129,7 @@ const CheckOutInvoiceAddress = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between lg:flex-row flex-col bg-secondary/10 p-2">
+      <div className="flex justify-between flex-col bg-secondary/10 p-2">
         <h2 className="text-lg text-black font-semibold">
           {isAdmin ? "Invoice Address" : t("invoiceAddress")}
         </h2>
@@ -158,7 +158,11 @@ const CheckOutInvoiceAddress = ({
                   {isAdmin ? "Address line" : t("streetAndHouse")}
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="" {...field} disabled={isSameShipping} />
+                  <Input
+                    placeholder=""
+                    {...field}
+                    disabled={isSameShipping}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -174,7 +178,11 @@ const CheckOutInvoiceAddress = ({
                   {isAdmin ? "Additional Address" : t("addressSupplement")}
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="" {...field} disabled={isSameShipping} />
+                  <Input
+                    placeholder=""
+                    {...field}
+                    disabled={isSameShipping}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -190,7 +198,11 @@ const CheckOutInvoiceAddress = ({
                   {isAdmin ? "Postal Code" : t("postalCode")}
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="" {...field} disabled={isSameShipping} />
+                  <Input
+                    placeholder=""
+                    {...field}
+                    disabled={isSameShipping}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -206,14 +218,20 @@ const CheckOutInvoiceAddress = ({
                   {isAdmin ? "City" : t("city")}
                 </FormLabel>
                 <FormControl>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild disabled={isSameShipping}>
+                  <Popover
+                    open={open}
+                    onOpenChange={setOpen}
+                  >
+                    <PopoverTrigger
+                      asChild
+                      disabled={isSameShipping}
+                    >
                       <Button
                         variant="outline"
                         role="combobox"
                         className={cn(
                           "w-full justify-between",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ||
@@ -241,7 +259,7 @@ const CheckOutInvoiceAddress = ({
                                     "mr-2 h-4 w-4",
                                     field.value === c.value
                                       ? "opacity-100"
-                                      : "opacity-0"
+                                      : "opacity-0",
                                   )}
                                 />
                                 {c.label}
