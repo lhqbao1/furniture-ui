@@ -1,120 +1,39 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import CartSummary from "@/components/layout/cart/cart-summary";
 import CartTable from "@/components/layout/cart/cart-table";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { useCartLocal } from "@/hooks/cart";
 import { useRouter } from "@/src/i18n/navigation";
-import { getCartItems } from "@/features/cart/api";
 import { useLocale, useTranslations } from "next-intl";
 import { LoginDrawer } from "@/components/shared/login-drawer";
 import CartLocalTable from "@/components/layout/cart/cart-local-table";
-import { CartItem, CartResponse, CartResponseItem } from "@/types/cart";
-import { CartItemLocal } from "@/lib/utils/cart";
+
+import { CartActions, useCartData } from "@/hooks/cart/useCart";
 
 const CartPageClient = () => {
-  const [userId, setUserId] = React.useState<string | null>(
-    typeof window !== "undefined" ? localStorage.getItem("userId") : "",
-  );
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const t = useTranslations();
-  const router = useRouter();
   const locale = useLocale();
-  const [localQuantities, setLocalQuantities] = useState<
-    Record<string, number>
-  >({});
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const newUserId = localStorage.getItem("userId");
-      setUserId(newUserId);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  const { cart: localCart } = useCartLocal();
+  const router = useRouter();
 
   const {
-    data: cart,
-    isLoading: isLoadingCart,
-    isError: isErrorCart,
-  } = useQuery({
-    queryKey: ["cart-items", userId],
-    queryFn: async () => {
-      const response = await getCartItems(); // CartResponse
+    userId,
+    setUserId,
+    cart,
+    localCart,
+    displayedCart,
+    isLoadingCart,
+    localQuantities,
+    setLocalQuantities,
+    updateStatus,
+    total,
+  } = useCartData();
 
-      // 🧩 Lấy thời gian mới nhất trong từng CartResponseItem (flatten tạm)
-      const sorted = [...response].sort((a, b) => {
-        const latestA = Math.max(
-          ...a.items.map((item) => new Date(item.created_at).getTime()),
-        );
-        const latestB = Math.max(
-          ...b.items.map((item) => new Date(item.created_at).getTime()),
-        );
-        return latestB - latestA;
-      });
-
-      return sorted; // ✅ vẫn trả về CartResponse, không đổi type
-    },
-    retry: false,
-    enabled: !!userId,
+  const { proceedToCheckout } = CartActions({
+    userId,
+    displayedCart,
+    setIsLoginOpen,
   });
-
-  // Nếu có user thì hiển thị cart trên server, không thì localCart
-  const displayedCart = useMemo(
-    () => (userId ? cart ?? [] : localCart),
-    [cart, localCart, userId],
-  );
-
-  const { updateStatus } = useCartLocal();
-
-  let total = 0;
-
-  if (userId && cart) {
-    // 🛒 Trường hợp user đăng nhập → cart là CartResponse
-    total = cart
-      .flatMap((group) => group.items)
-      .filter((item) => item.is_active)
-      .reduce((acc, item) => {
-        const key = item.id;
-        const quantity = localQuantities[key ?? ""] ?? item.quantity;
-        return acc + quantity * item.item_price;
-      }, 0);
-  } else {
-    // 🧺 Trường hợp guest → localCart là CartItem[]
-    total =
-      localCart
-        ?.filter((item) => item.is_active)
-        .reduce((acc, item) => {
-          const key =
-            "id" in item ? item.id : (item as CartItemLocal).product_id;
-          const quantity = localQuantities[key ?? ""] ?? item.quantity;
-          return acc + quantity * item.item_price;
-        }, 0) ?? 0;
-  }
-
-  // Proceed checkout
-  const proceedToCart = () => {
-    if (userId) {
-      if (displayedCart.length === 0) {
-        toast.error(t("chooseAtLeastCart"));
-      } else {
-        // Navigate checkout
-        router.push("/check-out", { locale });
-      }
-    } else {
-      if (displayedCart.length === 0) {
-        toast.error(t("chooseAtLeastCart"));
-        return;
-      }
-      // Nếu chưa login → mở dialog
-      setIsLoginOpen(true);
-    }
-  };
 
   return (
     <div className="mt-6 lg:px-0 px-4">
@@ -147,7 +66,7 @@ const CartPageClient = () => {
           <div className="col-span-12 md:col-span-4">
             <CartSummary
               total={total}
-              onCheckout={proceedToCart}
+              onCheckout={proceedToCheckout}
               cart={cart}
             />
           </div>

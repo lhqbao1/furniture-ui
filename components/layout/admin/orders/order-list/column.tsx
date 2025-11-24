@@ -265,43 +265,6 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       const raw = row.original.status?.toLowerCase() ?? "";
       const { text, bg, color } = getStatusStyle(raw);
 
-      let display = "";
-
-      switch (raw) {
-        case "pending":
-          display = "Waiting for payment";
-          break;
-        case "paid":
-          display = "Payment received";
-          break;
-        case "tock_reserved":
-          display = "Stock reserved";
-          break;
-        case "preparation_shipping":
-          display = "In preparation for shipping";
-          break;
-        case "ds_informed":
-          display = "DS informed";
-          break;
-        case "shipped":
-          display = "Dispatched";
-          break;
-        case "completed":
-          display = "Dispatched";
-          break;
-        case "cancel_request":
-          display = "Cancel requested";
-          break;
-        case "canceled":
-          display = "Canceled";
-          break;
-        case "return":
-          display = "Return";
-          break;
-        default:
-          display = raw || "-";
-      }
-
       return (
         <div
           className={`mx-auto px-4 py-1 rounded-full text-sm font-medium capitalize ${bg} ${color}`}

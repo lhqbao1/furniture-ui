@@ -21,7 +21,7 @@ export function getStatusStyle(raw: string) {
 
     case "preparation_shipping":
       return {
-        text: "preparing to ship",
+        text: "preparing",
         bg: "bg-[#D4EEF9]",
         color: "text-[#29ABE2]",
       };

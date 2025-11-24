@@ -1,102 +1,68 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { Link } from "@/src/i18n/navigation";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Input } from "../ui/input";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ListStars from "./list-stars";
 
-gsap.registerPlugin(ScrollTrigger);
 const Footer = () => {
   const t = useTranslations();
-  // useEffect(() => {
-  //   gsap.registerPlugin(ScrollTrigger);
-
-  //   const columns = gsap.utils.toArray<HTMLElement>(".footer-column");
-
-  //   if (!columns) return;
-
-  //   const tl = gsap.timeline({
-  //     scrollTrigger: {
-  //       trigger: "#footer",
-  //       start: "top 85%",
-  //       once: true,
-  //     },
-  //   });
-
-  //   tl.from(columns[0], {
-  //     x: -40,
-  //     autoAlpha: 0,
-  //     duration: 0.8,
-  //     ease: "power3.out",
-  //     immediateRender: false,
-  //   })
-  //     .from(
-  //       columns[1],
-  //       {
-  //         y: 40,
-  //         autoAlpha: 0,
-  //         duration: 0.8,
-  //         ease: "power3.out",
-  //         immediateRender: false,
-  //       },
-  //       "-=0.4",
-  //     )
-  //     .from(
-  //       columns[2],
-  //       {
-  //         x: 40,
-  //         autoAlpha: 0,
-  //         duration: 0.8,
-  //         ease: "power3.out",
-  //         immediateRender: false,
-  //       },
-  //       "-=0.4",
-  //     )
-  //     .from(
-  //       columns[3],
-  //       {
-  //         scale: 0.6,
-  //         autoAlpha: 0,
-  //         duration: 0.9,
-  //         ease: "back.out(1.7)",
-  //         immediateRender: false,
-  //       },
-  //       "-=0.4",
-  //     );
-
-  //   columns.forEach((col: any) => {
-  //     const items = col.querySelectorAll("li, input, button, img, p");
-
-  //     gsap.from(items, {
-  //       autoAlpha: 0,
-  //       y: 20,
-  //       duration: 0.6,
-  //       stagger: 0.1,
-  //       ease: "power2.out",
-  //       immediateRender: false,
-  //       scrollTrigger: {
-  //         trigger: col,
-  //         start: "top 90%",
-  //         once: true,
-  //       },
-  //     });
-  //   });
-
-  //   // ⛔ return () => () => tl.kill() → Sai
-  //   // ✅ return cleanup đúng chuẩn:
-  //   return () => {
-  //     tl.kill();
-  //     ScrollTrigger.getAll().forEach((st) => st.kill());
-  //   };
-  // }, []);
-
   return (
     <footer
       id="footer"
-      className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-20 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-10 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl"
+      className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-32 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-26 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl relative"
     >
+      <div className="w-1/2 shadow-[0_4px_20px_rgba(0,177,89,0.15)] flex lg:items-center justify-center gap-24 mb-6 absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 bg-white px-6 py-4 rounded-tl-2xl rounded-tr-2xl">
+        <div className="flex flex-col gap-2 items-center justify-center">
+          <Link
+            href={
+              "https://www.ebay.de/sch/i.html?item=365962209706&rt=nc&_trksid=p4429486.m3561.l161211&_ssn=prestige.home"
+            }
+          >
+            <Image
+              src={"/ebay.png"}
+              width={80}
+              height={80}
+              alt="ebay"
+              className="object-cover h-7 w-auto"
+            />
+          </Link>
+          <ListStars rating={5} />
+          <div className="text-sm font-semibold">100% 5-Stars</div>
+        </div>
+        <div className="flex flex-col gap-2 items-center justify-center">
+          <Link
+            href={
+              "https://www.amazon.de/s?k=PRESTIGE+HOME+LIVING+OUTDOOR&i=kitchen&language=en&search-type=ss&ref=bl_dp_s_web_0"
+            }
+          >
+            <Image
+              src={"/amazon.png"}
+              width={80}
+              height={80}
+              alt="amazon"
+              className="object-cover h-7 w-auto"
+            />
+          </Link>
+          <ListStars rating={5} />
+          <div className="text-sm font-semibold">100% 5-Stars</div>
+        </div>
+        <div className="flex flex-col gap-2 items-center justify-center">
+          <Link href={"https://www.kaufland.de/shops/Prestige_Home_GmbH/"}>
+            <Image
+              src={"/kau.png"}
+              width={80}
+              height={80}
+              alt="kaufland"
+              className="object-cover h-7 w-auto"
+            />
+          </Link>
+          <ListStars rating={5} />
+          <div className="text-sm font-semibold">100% 5-Stars</div>
+        </div>
+      </div>
+
       {/* Cột 1: Newsletter */}
       <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
         <h4 className="font-semibold">
