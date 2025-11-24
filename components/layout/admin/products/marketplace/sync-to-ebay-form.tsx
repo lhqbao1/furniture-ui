@@ -131,7 +131,10 @@ const SyncToEbayForm = ({
       return;
     }
 
-    if (!values.handling_time || values.handling_time === 0) {
+    if (
+      currentMarketplace !== "ebay" &&
+      (!values.handling_time || values.handling_time === 0)
+    ) {
       toast.error("Handling times is missing from current product");
       return;
     }
