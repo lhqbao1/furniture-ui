@@ -13,12 +13,15 @@ const Footer = () => {
       id="footer"
       className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-32 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-26 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl relative"
     >
-      <div className="w-1/2 shadow-[0_4px_20px_rgba(0,177,89,0.15)] flex lg:items-center justify-center gap-24 mb-6 absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 bg-white px-6 py-4 rounded-tl-2xl rounded-tr-2xl">
+      <div className="lg:w-1/2 w-full lg:col-span-12 col-span-6 shadow-[0_4px_20px_rgba(0,177,89,0.15)] flex lg:flex-row flex-col lg:items-center justify-center lg:gap-24 gap-6 mb-6 lg:absolute lg:left-1/2 lg:-translate-x-1/2 top-0 lg:-translate-y-1/2 bg-white px-6 py-4 rounded-tl-2xl rounded-tr-2xl">
         <div className="flex flex-col gap-2 items-center justify-center">
           <Link
             href={
               "https://www.ebay.de/sch/i.html?item=365962209706&rt=nc&_trksid=p4429486.m3561.l161211&_ssn=prestige.home"
             }
+            target="_blank"
+            rel="noopener noreferrer"
+            prefetch={false}
           >
             <Image
               src={"/ebay.png"}
@@ -36,6 +39,9 @@ const Footer = () => {
             href={
               "https://www.amazon.de/s?k=PRESTIGE+HOME+LIVING+OUTDOOR&i=kitchen&language=en&search-type=ss&ref=bl_dp_s_web_0"
             }
+            target="_blank"
+            rel="noopener noreferrer"
+            prefetch={false}
           >
             <Image
               src={"/amazon.png"}
@@ -49,7 +55,12 @@ const Footer = () => {
           <div className="text-sm font-semibold">100% 5-Stars</div>
         </div>
         <div className="flex flex-col gap-2 items-center justify-center">
-          <Link href={"https://www.kaufland.de/shops/Prestige_Home_GmbH/"}>
+          <Link
+            href={"https://www.kaufland.de/shops/Prestige_Home_GmbH/"}
+            target="_blank"
+            rel="noopener noreferrer"
+            prefetch={false}
+          >
             <Image
               src={"/kau.png"}
               width={80}
@@ -178,7 +189,7 @@ const Footer = () => {
       <div className="footer-column lg:col-span-12 col-span-6 flex lg:items-center lg:justify-start lg:flex-col flex-row justify-center">
         {/* <h4 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h4> */}
         <div className="flex gap-1 mt-2 lg:mt-0">
-          <Link
+          {/* <Link
             href="https://www.facebook.com/profile.php?id=61578621160298"
             target="_blank"
           >
@@ -190,7 +201,7 @@ const Footer = () => {
               className="w-12 h-12 object-fill hover:scale-110 duration-300 transition-all"
               unoptimized
             />
-          </Link>
+          </Link> */}
           <Link
             href="https://x.com/prestihome_de"
             target="_blank"

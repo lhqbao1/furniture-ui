@@ -204,9 +204,9 @@ export function useCheckoutSubmit({
             router.push(payment.approve_url, { locale });
           } else if (data.payment_method === "card") {
             setOpenCardDialog(true);
-            setTotal(payment.amount);
-            setClientSecret(payment.clientSecret);
           }
+          setTotal(payment.amount);
+          setClientSecret(payment.clientSecret);
         } else {
           setOpenBankDialog(true);
         }

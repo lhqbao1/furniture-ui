@@ -111,6 +111,9 @@ function CheckoutForm({
 
   // PaymentRequest logic (Apple/Google Pay)
   useEffect(() => {
+    console.log(stripe);
+    console.log(clientSecret);
+    console.log(selectedMethod);
     if (!stripe || !clientSecret) return;
 
     // Reset paymentRequest cũ
@@ -187,6 +190,7 @@ function CheckoutForm({
 
     // Klarna
     if (selectedMethod === "klarna") {
+      console.log("klarna");
       const confirmKlarna = async () => {
         try {
           const { error } = await stripe.confirmKlarnaPayment(clientSecret, {
