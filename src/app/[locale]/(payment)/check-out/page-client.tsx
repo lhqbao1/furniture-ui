@@ -36,6 +36,9 @@ import { useCheckoutSubmit } from "@/hooks/checkout/useCheckoutSubmit";
 import { useCartLocal } from "@/hooks/cart";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import CheckOutUserInformation from "@/components/layout/checkout/user-information";
+import CheckOutShippingAddress from "@/components/layout/checkout/shipping-address";
+import CheckOutInvoiceAddress from "@/components/layout/checkout/invoice-address";
 
 // Dynamic imports giữ nguyên
 const CartTable = dynamic(() => import("@/components/layout/cart/cart-table"), {
@@ -44,28 +47,6 @@ const CartTable = dynamic(() => import("@/components/layout/cart/cart-table"), {
 const CartLocalTable = dynamic(
   () => import("@/components/layout/cart/cart-local-table"),
   { ssr: false },
-);
-
-const CheckOutShippingAddress = dynamic(
-  () =>
-    import("@/components/layout/checkout/shipping-address").then(
-      (m) => m.default,
-    ),
-  { ssr: false, loading: () => <SectionSkeleton /> },
-);
-const CheckOutUserInformation = dynamic(
-  () =>
-    import("@/components/layout/checkout/user-information").then(
-      (m) => m.default,
-    ),
-  { ssr: false, loading: () => <SectionSkeleton /> },
-);
-const CheckOutInvoiceAddress = dynamic(
-  () =>
-    import("@/components/layout/checkout/invoice-address").then(
-      (m) => m.default,
-    ),
-  { ssr: false, loading: () => <SectionSkeleton /> },
 );
 
 export default function CheckOutPageClient() {
