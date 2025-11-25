@@ -28,6 +28,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { City, State } from "country-state-city";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { COUNTRY_OPTIONS } from "@/data/data";
 
 interface CheckOutShippingAddressProps {
   isAdmin?: boolean;
@@ -48,7 +56,7 @@ export default function ManualCheckOutShippingAddress({
         module.default.map((c) => ({
           value: c.name.common,
           label: c.name.common,
-        }))
+        })),
       );
     });
   }, []);
@@ -57,7 +65,7 @@ export default function ManualCheckOutShippingAddress({
   const states = State.getStatesOfCountry("DE");
   // Lấy tất cả thành phố từ tất cả bang
   const allCities = states.flatMap((state) =>
-    City.getCitiesOfState("DE", state.isoCode)
+    City.getCitiesOfState("DE", state.isoCode),
   );
   // Danh sách tên thành phố
   const cityOptions = allCities.map((city) => ({
@@ -77,11 +85,15 @@ export default function ManualCheckOutShippingAddress({
           name="address"
           render={({ field }) => (
             <FormItem className="col-span-2">
-              <FormLabel className="text-[#666666] text-sm">
+              <FormLabel className="text-black font-semibold text-sm">
                 Address Line
               </FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} disabled={isSameInvoice} />
+                <Input
+                  placeholder=""
+                  {...field}
+                  disabled={isSameInvoice}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,13 +104,70 @@ export default function ManualCheckOutShippingAddress({
           control={form.control}
           name="additional_address"
           render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel className="text-[#666666] text-sm">
+            <FormItem>
+              <FormLabel className="text-black font-semibold text-sm">
                 Additional Address Line
               </FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} disabled={isSameInvoice} />
+                <Input
+                  placeholder=""
+                  {...field}
+                  disabled={isSameInvoice}
+                />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="company_country"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel className="text-black font-semibold text-sm">
+                Company country
+              </FormLabel>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between"
+                    >
+                      {field.value
+                        ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
+                            ?.label
+                        : "Select country"}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-full p-0 h-[400px]">
+                  <Command>
+                    <CommandInput placeholder="Search country..." />
+                    <CommandList>
+                      <CommandEmpty>No country found.</CommandEmpty>
+                      <CommandGroup>
+                        {COUNTRY_OPTIONS.map((c) => (
+                          <CommandItem
+                            key={c.value}
+                            value={c.label}
+                            onSelect={() => {
+                              field.onChange(c.value);
+                            }}
+                          >
+                            {c.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
               <FormMessage />
             </FormItem>
           )}
@@ -110,11 +179,15 @@ export default function ManualCheckOutShippingAddress({
           name="postal_code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[#666666] text-sm">
+              <FormLabel className="text-black font-semibold text-sm">
                 Postal Code
               </FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} disabled={isSameInvoice} />
+                <Input
+                  placeholder=""
+                  {...field}
+                  disabled={isSameInvoice}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -127,9 +200,14 @@ export default function ManualCheckOutShippingAddress({
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[#666666] text-sm">City</FormLabel>
+              <FormLabel className="text-black font-semibold text-sm">
+                City
+              </FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input
+                  placeholder=""
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

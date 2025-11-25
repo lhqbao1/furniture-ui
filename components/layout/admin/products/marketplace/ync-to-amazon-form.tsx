@@ -287,7 +287,7 @@ const SyncToAmazonForm = ({
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
           <DialogHeader>
-            <DialogTitle>Update Marketplace AMZ</DialogTitle>
+            <DialogTitle>Update Marketplace</DialogTitle>
             {isUpdating}
           </DialogHeader>
           <div className="mx-auto space-y-6">

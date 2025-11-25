@@ -8,9 +8,7 @@ import { toast } from "sonner";
 import { useCreateCheckOutManual } from "@/features/checkout/hook";
 import { useTranslations } from "next-intl";
 import z from "zod";
-import ProductSearch from "@/components/shared/product-search";
 import { CheckOutUserInformation } from "@/components/layout/checkout/admin-user-information";
-import { ProductManual } from "@/components/layout/pdf/manual-invoice";
 import {
   manualCheckoutDefaultValues,
   ManualCreateOrderFormValues,

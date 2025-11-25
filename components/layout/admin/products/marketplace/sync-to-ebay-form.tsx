@@ -247,6 +247,18 @@ const SyncToEbayForm = ({
               ...(ebayData?.max_stock !== undefined && {
                 max_stock: ebayData.max_stock,
               }),
+              manufacturer: {
+                name: product.brand.company_name,
+                address: product.brand.company_address,
+                city: product.brand.company_city,
+                country: product.brand.company_country,
+                email: product.brand.company_email,
+                postal_code: product.brand.company_postal_code,
+              },
+              documents:
+                product.pdf_files && product.pdf_files.length > 0
+                  ? product.pdf_files
+                  : null,
             };
 
             syncToEbayMutation.mutate(payload);
