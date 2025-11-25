@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import React, { useEffect, useRef } from "react";
-import ListReviewButton from "./list-review-buttons";
 import gsap from "gsap";
 import { ProductItem } from "@/types/products";
 import { useMediaQuery } from "react-responsive";
@@ -16,18 +15,20 @@ import { useCartLocal } from "@/hooks/cart";
 import { toast } from "sonner";
 import { HandleApiError } from "@/lib/api-helper";
 import { CartItemLocal } from "@/lib/utils/cart";
-import { useGetReviewsByProduct } from "@/features/review/hook";
+import { cn } from "@/lib/utils";
 
 interface ProductsGridLayoutProps {
   hasBadge?: boolean;
   hasPagination?: boolean;
   data: ProductItem[];
+  className?: string; // 👈 thêm dòng này
 }
 
 const ProductsGridLayout = ({
   hasBadge,
   hasPagination = false,
   data,
+  className,
 }: ProductsGridLayoutProps) => {
   const cardRefs = useRef<HTMLDivElement[]>([]);
   const isMobile = useMediaQuery({ maxWidth: 650 });
@@ -205,7 +206,12 @@ const ProductsGridLayout = ({
                   />
 
                   <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
-                    <h3 className="text-lg text-black text-left line-clamp-2 lg:min-h-[60px] min-h-[52px]">
+                    <h3
+                      className={cn(
+                        "text-lg text-black text-left line-clamp-2 ",
+                        className ? className : "lg:min-h-[60px] min-h-[52px]",
+                      )}
+                    >
                       {product.name}
                     </h3>
                     <div className="flex gap-2 flex-col">
@@ -291,9 +297,6 @@ const ProductsGridLayout = ({
                   <Heart className="size-6 stroke-current transition-colors duration-200" />
                 </Button>
               </div>
-              {/* <div className="absolute bottom-18 right-0 list-review-btn">
-                                <ListReviewButton currentProduct={product} />
-                            </div> */}
             </div>
           );
         })}

@@ -25,7 +25,10 @@ const RelatedCategoryProducts = ({
       <h3 className="text-center text-secondary text-3xl font-semibold">
         {t("relatedProduct")}
       </h3>
-      <ProductsGridLayout data={relatedProducts.products.slice(0, 4)} />
+      <ProductsGridLayout
+        data={relatedProducts.products.slice(0, 4)}
+        className="lg:min-h-[52px] min-h-[48px]"
+      />
     </div>
   );
 };
