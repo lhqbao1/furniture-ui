@@ -1,116 +1,122 @@
-"use client"
+"use client";
 
-import { useFormContext, Controller, useWatch } from "react-hook-form"
+import { useFormContext } from "react-hook-form";
 import {
-    FormField,
-    FormItem,
-    FormLabel,
-    FormControl,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useTranslations } from "next-intl"
-import { useState, useEffect } from "react"
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandInput } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { City, State } from "country-state-city"
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useTranslations } from "next-intl";
+import React, { useState } from "react";
 
 interface CheckOutShippingAddressProps {
-    isAdmin?: boolean
+  isAdmin?: boolean;
 }
 
-export default function CheckOutShippingAddress({ isAdmin = false }: CheckOutShippingAddressProps) {
-    const form = useFormContext()
-    const t = useTranslations()
-    const [open, setOpen] = useState(false)
-    const [isSameInvoice, setIsSameInvoice] = useState(false)
-    const [countries, setCountries] = useState<{ value: string; label: string }[]>([])
+function CheckOutShippingAddress({
+  isAdmin = false,
+}: CheckOutShippingAddressProps) {
+  const form = useFormContext();
+  const t = useTranslations();
 
-    useEffect(() => {
-        import("world-countries").then((module) => {
-            setCountries(
-                module.default.map((c) => ({ value: c.name.common, label: c.name.common }))
-            )
-        })
-    }, [])
-
-    // Lấy tất cả bang của Đức
-    const states = State.getStatesOfCountry("DE")
-    // Lấy tất cả thành phố từ tất cả bang
-    const allCities = states.flatMap((state) => City.getCitiesOfState("DE", state.isoCode))
-    // Danh sách tên thành phố
-    const cityOptions = allCities.map((city) => ({
-        value: city.name,
-        label: city.name,
-    }))
-
-    return (
-        <div className="space-y-4">
-            <div className="flex justify-between bg-secondary/10 p-2">
-                <h2 className="text-lg text-black font-semibold ">{isAdmin ? "Shipping Address" : t('shippingAddress')}</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-                {/* Address Line */}
-                <FormField
-                    control={form.control}
-                    name="shipping_address_line"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel className="text-[#666666] text-sm">
-                                {isAdmin ? "Address Line" : t('addressLine')}
-                            </FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder=""
-                                    {...field}
-                                    disabled={isSameInvoice}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between bg-secondary/10 p-2">
+        <h2 className="text-lg text-black font-semibold ">
+          {isAdmin ? "Shipping Address" : t("shippingAddress")}
+        </h2>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        {/* Address Line */}
+        <FormField
+          control={form.control}
+          name="shipping_address_line"
+          render={({ field }) => (
+            <FormItem className="col-span-2">
+              <FormLabel className="text-[#666666] text-sm">
+                {isAdmin ? "Address Line" : t("addressLine")}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  autoComplete="address-line1"
+                  placeholder=""
+                  {...field}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <FormField
-                    control={form.control}
-                    name="shipping_address_additional"
-                    render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel>{isAdmin ? "Additional Address" : t('addressSupplement')}</FormLabel>
-                            <FormControl>
-                                <Input placeholder="" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+        <FormField
+          control={form.control}
+          name="shipping_address_additional"
+          render={({ field }) => (
+            <FormItem className="col-span-2">
+              <FormLabel>
+                {isAdmin ? "Additional Address" : t("addressSupplement")}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  autoComplete="address-line2"
+                  placeholder=""
+                  {...field}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                {/* Postal Code */}
-                <FormField
-                    control={form.control}
-                    name="shipping_postal_code"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-[#666666] text-sm">
-                                {isAdmin ? "Postal Code" : t('postalCode')}
-                            </FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder=""
-                                    {...field}
-                                    disabled={isSameInvoice}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+        {/* Postal Code */}
+        <FormField
+          control={form.control}
+          name="shipping_postal_code"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-[#666666] text-sm">
+                {isAdmin ? "Postal Code" : t("postalCode")}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                  {...field}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                {/* City */}
-                <FormField
+        {/* City */}
+        <FormField
+          control={form.control}
+          name="shipping_city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-[#666666] text-sm">
+                {isAdmin ? "City" : t("city")}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  autoComplete="address-level2"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* <FormField
                     control={form.control}
                     name="shipping_city"
                     render={({ field }) => (
@@ -169,8 +175,10 @@ export default function CheckOutShippingAddress({ isAdmin = false }: CheckOutShi
                             <FormMessage />
                         </FormItem>
                     )}
-                />
-            </div>
-        </div>
-    )
+                /> */}
+      </div>
+    </div>
+  );
 }
+
+export default React.memo(CheckOutShippingAddress);

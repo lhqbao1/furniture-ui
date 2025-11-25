@@ -97,7 +97,7 @@ const OrderDetails = () => {
           language={order.checkouts[0].user.language ?? ""}
           sub_total={order.total_amount_item}
           shipping_amount={order.total_shipping}
-          discount_amount={order.voucher_amount + order.coupon_amount}
+          discount_amount={Math.abs(order.voucher_amount)}
           tax={
             (((invoice?.total_amount_item ?? 0) +
               (invoice?.total_shipping ?? 0) +

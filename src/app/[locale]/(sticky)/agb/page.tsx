@@ -3,12 +3,14 @@ import {
   getPolicyItemsByVersion,
   getPolicyVersion,
 } from "@/features/policy/api";
+import { PolicyResponse } from "@/types/policy";
 import {
   HydrationBoundary,
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Script from "next/script";
 import React from "react";
 
@@ -35,23 +37,18 @@ export const metadata: Metadata = {
 export default async function AGBPage() {
   const queryClient = new QueryClient();
 
-  // Lấy phiên bản policy
-  const version = await getPolicyVersion();
-  const firstVersion = version.length > 0 ? version[0].id : null;
+  const versions = await getPolicyVersion();
+  queryClient.setQueryData(["policy-version"], versions);
 
-  // Prefetch version list
-  await queryClient.prefetchQuery({
-    queryKey: ["policy-version"],
-    queryFn: () => getPolicyVersion(),
-  });
+  const firstVersion = versions?.[0]?.id;
 
-  // Prefetch items nếu có version
-  if (firstVersion) {
-    await queryClient.prefetchQuery({
-      queryKey: ["policy-items", firstVersion],
-      queryFn: () => getPolicyItemsByVersion(firstVersion),
-    });
+  if (!firstVersion) {
+    // không có version → skip hết, tránh API thừa
+    return notFound();
   }
+
+  const items = await getPolicyItemsByVersion(firstVersion);
+  queryClient.setQueryData(["policy-items", firstVersion], items);
 
   const dehydratedState = dehydrate(queryClient);
 
@@ -86,8 +83,8 @@ export default async function AGBPage() {
           {firstVersion ? (
             <ListPolicy
               versionId={firstVersion}
-              versionData={version}
-              versionName={version[0].name}
+              versionData={versions}
+              versionName={versions[0].name}
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

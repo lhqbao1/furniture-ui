@@ -8,6 +8,7 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { notFound } from "next/navigation";
 import Script from "next/script";
 
 // ✅ Metadata SEO cho trang Payment Terms
@@ -40,23 +41,18 @@ export const revalidate = 3600; // ISR: regen mỗi 1h
 export default async function PaymentTermsPage() {
   const queryClient = new QueryClient();
 
-  // Lấy phiên bản policy
-  const version = await getPolicyVersion();
-  const firstVersion = version.length > 0 ? version[0].id : null;
+  const versions = await getPolicyVersion();
+  queryClient.setQueryData(["policy-version"], versions);
 
-  // Prefetch version list
-  await queryClient.prefetchQuery({
-    queryKey: ["policy-version"],
-    queryFn: () => getPolicyVersion(),
-  });
+  const firstVersion = versions?.[0]?.id;
 
-  // Prefetch items nếu có version
-  if (firstVersion) {
-    await queryClient.prefetchQuery({
-      queryKey: ["policy-items", firstVersion],
-      queryFn: () => getPolicyItemsByVersion(firstVersion),
-    });
+  if (!firstVersion) {
+    // không có version → skip hết, tránh API thừa
+    return notFound();
   }
+
+  const items = await getPolicyItemsByVersion(firstVersion);
+  queryClient.setQueryData(["policy-items", firstVersion], items);
 
   const dehydratedState = dehydrate(queryClient);
 
@@ -95,8 +91,8 @@ export default async function PaymentTermsPage() {
           {firstVersion ? (
             <ListPolicy
               versionId={firstVersion}
-              versionData={version}
-              versionName={version[0].name}
+              versionData={versions}
+              versionName={versions[0].name}
             />
           ) : (
             <div className="text-center py-20 text-gray-500">

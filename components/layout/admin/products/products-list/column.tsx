@@ -776,7 +776,9 @@ export const getProductColumns = (
         </Button>
       );
     },
-    cell: ({ row }) => <EditableStockCell product={row.original} />,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.stock} pcs.</div>
+    ),
     enableSorting: true,
   },
   {

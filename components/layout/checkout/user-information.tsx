@@ -11,13 +11,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import React from "react";
 
 interface CheckOutUserInformationProps {
   isLogin: boolean;
   userId?: string;
 }
 
-export default function CheckOutUserInformation({
+function CheckOutUserInformation({
   isLogin,
   userId,
 }: CheckOutUserInformationProps) {
@@ -69,6 +70,7 @@ export default function CheckOutUserInformation({
             )}
           />
         </div>
+
         <FormField
           control={form.control}
           name="first_name"
@@ -145,3 +147,5 @@ export default function CheckOutUserInformation({
     </div>
   );
 }
+
+export default React.memo(CheckOutUserInformation);
