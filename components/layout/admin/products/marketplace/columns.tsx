@@ -3,18 +3,14 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
 import { toast } from "sonner";
 import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook";
-import { stripHtmlRegex } from "@/hooks/simplifyHtml";
 import { Switch } from "@/components/ui/switch";
 import SyncToEbayForm from "./sync-to-ebay-form";
-import { syncToEbayInput } from "@/features/ebay/api";
-import { syncToKauflandInput } from "@/features/kaufland/api";
 import {
   useRemoveFormKaufland,
   useSyncToKaufland,
@@ -354,7 +350,7 @@ export const productMarketplaceColumns = (
         const icons: Record<string, string> = {
           amazon: "/amazon.png",
           kaufland: "/kau.png",
-          ebay: "/ebay-1.png",
+          ebay: "/ebay.png",
         };
 
         // nếu có icon → hiển thị icon, không thì text
@@ -366,9 +362,9 @@ export const productMarketplaceColumns = (
               <Image
                 src={iconSrc}
                 alt={marketplace}
-                width={28}
-                height={28}
-                className="object-contain"
+                width={60}
+                height={50}
+                className="object-contain h-full"
               />
             ) : (
               marketplace
