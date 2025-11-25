@@ -365,9 +365,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               Versandkosten (brutto)
             </Text>
             <Text style={{ width: "20%", textAlign: "right" }}>
-              {(
-                (invoice?.total_shipping ?? 0) + (invoice?.voucher_amount ?? 0)
-              )?.toLocaleString("de-DE", {
+              {(invoice?.total_shipping ?? 0)?.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
@@ -459,8 +457,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               >
                 {(
                   (invoice?.total_amount_item ?? 0) +
-                  (invoice?.total_shipping ?? 0) +
-                  (invoice?.voucher_amount ?? 0)
+                  (invoice?.total_shipping ?? 0) -
+                  Math.abs(invoice?.voucher_amount ?? 0)
                 ).toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -495,7 +493,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 }}
               >
                 {(
-                  (invoice?.coupon_amount ?? 0) + (invoice?.voucher_amount ?? 0)
+                  (invoice?.coupon_amount ?? 0) +
+                  Math.abs(invoice?.voucher_amount ?? 0)
                 ).toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -532,8 +531,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               >
                 {(
                   (invoice?.total_amount_item ?? 0) +
-                  (invoice?.total_shipping ?? 0) +
-                  (invoice?.voucher_amount ?? 0)
+                  (invoice?.total_shipping ?? 0) -
+                  Math.abs(invoice?.voucher_amount ?? 0)
                 ).toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -573,8 +572,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               >
                 {(
                   (invoice?.total_amount_item ?? 0) +
-                  (invoice?.total_shipping ?? 0) +
-                  (invoice?.voucher_amount ?? 0)
+                  (invoice?.total_shipping ?? 0) -
+                  Math.abs(invoice?.voucher_amount ?? 0)
                 ).toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,

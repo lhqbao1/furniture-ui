@@ -50,6 +50,8 @@ const ProductForm = ({
 
   const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
 
+  console.log("hehe");
+
   return (
     <div className="lg:pb-20 lg:px-30 pb-12">
       <Form {...form}>

@@ -26,6 +26,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 
 interface VariantCombinationsProps {
   combinations: VariantOptionResponse[][];
@@ -66,6 +67,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
   const parent_id = watch("parent_id") || "";
   const [queryParams, setQueryParams] = useState("");
   const [localCombinations, setLocalCombinations] = useState(combinations);
+  const locale = useLocale();
 
   const [selectedAction, setSelectedAction] =
     useState<Record<number, string>>(filteredProduct);
@@ -225,11 +227,14 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                 }
                               </div>
                               <Link
-                                href={`/product/${
+                                href={`/de/product/${
                                   listProducts?.find(
                                     (p) => p.id === selectedAction[idx],
                                   )?.url_key
                                 }`}
+                                locale={locale}
+                                target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <Eye
                                   className="text-secondary cursor-pointer"

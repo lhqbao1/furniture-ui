@@ -199,7 +199,8 @@ export default function InvoiceTable({
           <div className="mr-6">Wertgutschein (brutto)</div>
           <div className="w-[100px] text-right">
             {(
-              (invoice?.coupon_amount ?? 0) + (invoice?.voucher_amount ?? 0)
+              (invoice?.coupon_amount ?? 0) +
+              Math.abs(invoice?.voucher_amount ?? 0)
             ).toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

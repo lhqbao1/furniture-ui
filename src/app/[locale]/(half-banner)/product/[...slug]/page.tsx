@@ -152,6 +152,8 @@ export default async function Page({
     : [resolved.slug];
   const lastSlug = slugArr[slugArr.length - 1];
 
+  if (!lastSlug) return notFound();
+
   const product = await getProductBySlug(lastSlug);
   if (!product) return notFound();
 

@@ -64,6 +64,7 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
         document: clean(
           p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
         ),
+        product_link: `https://www.prestige-home.de/de/product/${p.url_key}`,
       }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
