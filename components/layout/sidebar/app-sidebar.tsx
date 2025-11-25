@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,11 +12,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
+
 import { usePathname } from "next/navigation";
 import { Button } from "../../ui/button";
 import { CategoryResponse } from "@/types/categories";
@@ -31,7 +26,6 @@ import {
 import { useIsPhone } from "@/hooks/use-is-phone";
 import Link from "next/link";
 import Image from "next/image";
-import gsap from "gsap";
 import { SidebarCollapsibleItem } from "./app-sidebar-collapsible";
 
 type MenuItem = {
@@ -56,10 +50,6 @@ export default function AppSidebar({
     openMobile,
     setOpenMobile,
   } = useSidebar();
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const t = useTranslations();
   const locale = useLocale(); // 👈 thêm locale
@@ -137,11 +127,12 @@ export default function AppSidebar({
           <div className={`flex flex-col gap-0 items-center`}>
             <Link
               href={`/`}
+              aria-label="Go to homepage"
               className="relative w-16 h-16 hidden lg:flex"
             >
               <Image
                 src="/new-logo.svg"
-                alt=""
+                alt="Go to homepage"
                 fill
                 style={{ objectFit: "contain" }}
               />

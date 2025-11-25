@@ -113,7 +113,6 @@ function EditableStockCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.stock);
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
-  const syncToEbayMutation = useSyncToEbay();
 
   const handleEditProductStock = () => {
     EditProductMutation.mutate(
@@ -353,98 +352,6 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
         >
           {product.owner ? product.owner.business_name : "Prestige Home"}
         </div>
-      )}
-    </div>
-  );
-}
-
-function SyncToEbay({ product }: { product: ProductItem }) {
-  const syncToEbayMutation = useSyncToEbay();
-  const removeFromEbayMutation = useRemoveFormEbay();
-
-  const handleRemoveFromEbay = () => {
-    removeFromEbayMutation.mutate(product.sku, {
-      onSuccess(data, variables, context) {
-        toast.success("Remove from Ebay successful");
-      },
-      onError(error, variables, context) {
-        toast.error("Remove from Ebay fail");
-      },
-    });
-  };
-
-  const handleSyncToEbay = () => {
-    syncToEbayMutation.mutate(
-      {
-        price: product.final_price,
-        sku: product.sku,
-        stock: product.stock,
-        tax: product.tax ? product.tax : null,
-        brand: product.brand ? product.brand.name : "",
-        product: {
-          description: stripHtmlRegex(product.description),
-          title: JSON.stringify(product.name),
-          imageUrls:
-            product.static_files?.map((file) =>
-              file.url.replace(/\s+/g, "%20"),
-            ) ?? // Đổi khoảng trắng thành %20
-            [],
-          ean: product.ean ? [product.ean] : [],
-        },
-        carrier: product.carrier,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Sync to Ebay successful");
-        },
-
-        onError(error) {
-          const message =
-            // error.response?.data?.detail?.errors?.[0]?.message ??
-            "Fail to sync to Ebay";
-          toast.error(message);
-        },
-      },
-    );
-  };
-
-  return (
-    <div className="flex justify-start gap-2">
-      {product.is_active === false ? (
-        ""
-      ) : (
-        <Button
-          onClick={() => handleSyncToEbay()}
-          variant={"outline"}
-          disabled={
-            syncToEbayMutation.isPending || removeFromEbayMutation.isPending
-          }
-        >
-          {syncToEbayMutation.isPending ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            "Sync"
-          )}
-        </Button>
-      )}
-
-      {product.ebay ? (
-        <Button
-          onClick={() => handleRemoveFromEbay()}
-          variant={"outline"}
-          className="text-red-600 border-red-600"
-          disabled={
-            removeFromEbayMutation.isPending || syncToEbayMutation.isPending
-          }
-        >
-          {syncToEbayMutation.isPending ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            "Remove"
-          )}
-        </Button>
-      ) : (
-        ""
       )}
     </div>
   );

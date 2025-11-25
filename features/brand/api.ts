@@ -1,4 +1,5 @@
 import { apiAdmin, apiPublic } from "@/lib/axios";
+import { BrandFormValues } from "@/lib/schema/brand";
 import { BrandInput, BrandResponse } from "@/types/brand";
 
 export const getBrand = async () => {

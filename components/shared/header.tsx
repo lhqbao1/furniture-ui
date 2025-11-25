@@ -144,6 +144,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
           <Link
             href={`/cart`}
             className={`cursor-pointer relative`}
+            aria-label="Go to cart"
           >
             <ShoppingCart
               stroke={`#4D4D4D`}
@@ -180,13 +181,13 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
               <div className="flex">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <div className="flex gap-2 justify-start items-end">
+                    <button className="flex gap-2 justify-start items-end">
                       <User
                         className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
                         stroke="#4D4D4D"
                         size={30}
                       />
-                    </div>
+                    </button>
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent

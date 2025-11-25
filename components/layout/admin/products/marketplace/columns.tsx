@@ -8,15 +8,9 @@ import { ProductItem } from "@/types/products";
 import { useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
 import { toast } from "sonner";
-import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook";
 import { Switch } from "@/components/ui/switch";
 import SyncToEbayForm from "./sync-to-ebay-form";
-import {
-  useRemoveFormKaufland,
-  useSyncToKaufland,
-} from "@/features/kaufland/hook";
 import RemoveFromMarketplaceDialog from "./remove-dialog";
-import { useSyncToAmazon } from "@/features/amazon/hook";
 import SyncToAmazonForm from "./ync-to-amazon-form";
 
 function ToogleProductStatus({ product }: { product: ProductItem }) {
@@ -69,13 +63,6 @@ function SyncToMarketplace({
   product: ProductItem;
   marketplace: string;
 }) {
-  const syncToEbayMutation = useSyncToEbay();
-  const syncToKauflandMutation = useSyncToKaufland();
-  const syncToAmazonMutation = useSyncToAmazon();
-
-  const removeFromEbayMutation = useRemoveFormEbay();
-  const removeFromKauflandMutation = useRemoveFormKaufland();
-
   const [updating, setUpdating] = useState<boolean>(false);
 
   // ✅ Tách marketplace cụ thể ra, tránh find() lặp
@@ -85,13 +72,6 @@ function SyncToMarketplace({
 
   // ✅ Button UI logic rõ ràng
   const isActive = marketplaceProduct?.is_active;
-
-  const isSyncing =
-    syncToEbayMutation.isPending ||
-    syncToKauflandMutation.isPending ||
-    syncToAmazonMutation.isPending ||
-    removeFromEbayMutation.isPending ||
-    removeFromKauflandMutation.isPending;
 
   return (
     <div className="flex justify-start gap-2 items-center">

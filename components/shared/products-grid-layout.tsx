@@ -275,6 +275,7 @@ const ProductsGridLayout = ({
                 <Button
                   variant={"ghost"}
                   size={"lg"}
+                  aria-label="Add to cart"
                   className="has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group"
                   onClick={() => handleAddToCart(product)}
                 >
@@ -283,6 +284,7 @@ const ProductsGridLayout = ({
                 <Button
                   variant="ghost"
                   size="lg"
+                  aria-label="Add to cart"
                   className="has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200"
                   onClick={() => handleAddToWishlist(product)}
                 >

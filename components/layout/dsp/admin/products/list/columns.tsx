@@ -102,7 +102,6 @@ function EditableStockCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.stock);
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
-  const syncToEbayMutation = useSyncToEbay();
 
   const handleEditProductStock = () => {
     EditProductMutation.mutate(
