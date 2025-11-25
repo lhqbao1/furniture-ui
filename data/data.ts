@@ -675,7 +675,7 @@ export const listChanel = [
   {
     id: 2,
     name: "ebay",
-    icon: "ebay-1.png",
+    icon: "ebay.png",
   },
   {
     id: 3,
