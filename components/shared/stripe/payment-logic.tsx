@@ -53,9 +53,6 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
   const t = useTranslations();
   const locale = useLocale();
 
-  console.log(stripe);
-  console.log(elements);
-
   const selectedMethod = form.watch("payment_method");
   const { control } = form;
 

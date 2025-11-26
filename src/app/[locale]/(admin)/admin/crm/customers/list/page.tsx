@@ -1,12 +1,11 @@
 "use client";
 import { customerColumns } from "@/components/layout/admin/customers/columns";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import AdminBackButton from "@/components/shared/admin-back-button";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
 import { useGetAllCustomers } from "@/features/users/hook";
-import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
+import CustomerListSkeleton from "./skeleton";
 
 const CustomerListPage = () => {
   const [page, setPage] = useState(1);
@@ -15,12 +14,7 @@ const CustomerListPage = () => {
   const { data, isLoading, isError } = useGetAllCustomers();
 
   if (isError) return <div>No data</div>;
-  if (isLoading)
-    return (
-      <div className="flex justify-center">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
+  if (isLoading) return <CustomerListSkeleton />;
 
   return (
     <div className="space-y-6">
