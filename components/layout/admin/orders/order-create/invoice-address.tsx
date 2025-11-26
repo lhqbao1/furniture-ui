@@ -38,6 +38,7 @@ interface InvoiceAddressValues {
   invoice_city: string;
   invoice_additional_address?: string;
   invoice_country: string;
+  invoice_recipient_name: string;
 }
 
 interface CheckOutInvoiceAddressProps {
@@ -72,6 +73,11 @@ const ManualCheckOutInvoiceAddress = ({
     control: form.control,
   });
 
+  const shippingRecipient = useWatch({
+    name: "recipient_name",
+    control: form.control,
+  });
+
   // Dùng ref lưu snapshot invoice gốc
   const invoiceSnapshot = useRef<InvoiceAddressValues | null>(null);
 
@@ -86,6 +92,7 @@ const ManualCheckOutInvoiceAddress = ({
           "invoice_additional_address",
         ),
         invoice_country: form.getValues("invoice_country"),
+        invoice_recipient_name: form.getValues("invoice_recipient_name"),
       };
 
       // Copy shipping → invoice
@@ -94,6 +101,7 @@ const ManualCheckOutInvoiceAddress = ({
       form.setValue("invoice_city", shippingCity);
       form.setValue("invoice_country", shippingCountry);
       form.setValue("invoice_additional_address", shippingAdditionalAddress);
+      form.setValue("invoice_recipient_name", shippingRecipient);
     } else {
       // Restore lại snapshot nếu có
       if (invoiceSnapshot.current) {
@@ -115,6 +123,10 @@ const ManualCheckOutInvoiceAddress = ({
           "invoice_additional_address",
           invoiceSnapshot.current.invoice_additional_address,
         );
+        form.setValue(
+          "invoice_recipient_name",
+          invoiceSnapshot.current.invoice_recipient_name,
+        );
       }
     }
   }, [
@@ -124,6 +136,7 @@ const ManualCheckOutInvoiceAddress = ({
     shippingCity,
     shippingAdditionalAddress,
     shippingCountry,
+    shippingRecipient,
     form,
   ]);
 
@@ -153,7 +166,7 @@ const ManualCheckOutInvoiceAddress = ({
             control={form.control}
             name="invoice_address"
             render={({ field }) => (
-              <FormItem className="col-span-2">
+              <FormItem className="">
                 <FormLabel>
                   {isAdmin ? "Address line" : t("streetAndHouse")}
                 </FormLabel>
@@ -162,6 +175,25 @@ const ManualCheckOutInvoiceAddress = ({
                     placeholder=""
                     {...field}
                     disabled={isSameShipping}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="invoice_recipient_name"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Recipient Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder=""
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />

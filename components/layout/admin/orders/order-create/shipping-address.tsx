@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Command,
   CommandEmpty,
@@ -24,7 +24,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { City, State } from "country-state-city";
 import { COUNTRY_OPTIONS } from "@/data/data";
 
 interface CheckOutShippingAddressProps {
@@ -48,9 +47,28 @@ export default function ManualCheckOutShippingAddress({
           control={form.control}
           name="address"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem className="">
               <FormLabel className="text-black font-semibold text-sm">
                 Address Line
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="recipient_name"
+          render={({ field }) => (
+            <FormItem className="">
+              <FormLabel className="text-black font-semibold text-sm">
+                Recipient Name
               </FormLabel>
               <FormControl>
                 <Input

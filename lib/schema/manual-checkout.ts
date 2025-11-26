@@ -12,12 +12,14 @@ export const ManualCreateOrderSchema = z.object({
   postal_code: z.string().min(1, { message: "Postal code is required" }),
   additional_address: z.string().optional(),
   country: z.string().min(1, { message: "Country is required" }),
+  recipient_name: z.string().min(1, "Recipient Name is required"),
 
   invoice_address: z.string().optional(),
   invoice_city: z.string().optional(),
   invoice_postal_code: z.string().optional(),
   invoice_additional_address: z.string().optional(),
   invoice_country: z.string().optional(),
+  invoice_recipient_name: z.string().min(1, "Recipient Name is required"),
 
   from_marketplace: z.string().nullable(),
   marketplace_order_id: z.string().optional().nullable(),
@@ -68,4 +70,6 @@ export const manualCheckoutDefaultValues: ManualCreateOrderFormValues = {
   total_shipping: 0,
   carrier: "",
   items: [],
+  recipient_name: "",
+  invoice_recipient_name: "",
 };
