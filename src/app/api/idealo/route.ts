@@ -60,7 +60,7 @@ export async function GET() {
               .join(", "),
           ),
           escapeCsv(p.final_price.toFixed(2)),
-          escapeCsv(p.delivery_time),
+          escapeCsv(`Delivery in ${p.delivery_time} working days`),
           "NEW",
           escapeCsv(p.ean),
           escapeCsv(p.number_of_packages ?? 1),
