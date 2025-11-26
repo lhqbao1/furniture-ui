@@ -14,6 +14,7 @@ export interface EbayManufacturer {
   city: string;
   postal_code: string;
   country: string;
+  phone: string | null;
 }
 
 export interface EbayDocument {

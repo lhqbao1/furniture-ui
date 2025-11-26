@@ -187,9 +187,9 @@ const Footer = () => {
         <ul className="space-y-2 text-black-700 text-sm mt-6">
           <li className="font-bold">Lager</li>
           <li>Prestige Home</li>
-          <li>c/o AMM GmbH & Co KG</li>
-          <li>Bremer Strasse 152 b</li>
-          <li>90451 Nürnberg</li>
+          <li>Amm GmbH & Co KG Spedition</li>
+          <li>Hamburger Straße 99</li>
+          <li>90451 Nuremberg</li>
         </ul>
       </div>
 

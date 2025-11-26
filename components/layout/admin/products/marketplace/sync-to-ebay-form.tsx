@@ -254,6 +254,7 @@ const SyncToEbayForm = ({
                 country: product.brand.company_country,
                 email: product.brand.company_email,
                 postal_code: product.brand.company_postal_code,
+                phone: product.brand.company_phone,
               },
               documents:
                 product.pdf_files && product.pdf_files.length > 0
@@ -292,6 +293,7 @@ const SyncToEbayForm = ({
                 address: product.brand.company_address,
                 email: product.brand.company_email,
                 name: product.brand.company_name,
+                phone: product.brand.company_phone,
               },
               handling_time: values.handling_time ?? 0,
             };

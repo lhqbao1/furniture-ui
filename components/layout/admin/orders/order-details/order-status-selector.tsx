@@ -47,7 +47,7 @@ export default function OrderStatusSelector({
       }
 
       // Các trạng thái khác → tất cả active
-      return { ...item, active: true };
+      return { ...item, active: false };
     });
   }, [status]);
 
@@ -102,7 +102,7 @@ export default function OrderStatusSelector({
                 value={opt.key}
                 disabled={!opt.active} // ⬅️ disable option không hợp lệ
               >
-                {opt.key === "completed" ? "" : `${opt.pos}.`} {opt.label}
+                {opt.key === "completed" ? "" : `${opt.pos - 1}.`} {opt.label}
               </SelectItem>
             ))}
           </SelectContent>
