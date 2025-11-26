@@ -25,7 +25,7 @@ export const dynamicParams = true;
  * ------------------------------------------------------*/
 export async function generateStaticParams() {
   const products = await getProductsFeed();
-  const locales = ["de", "en"];
+  const locales = ["de"];
 
   return products.flatMap((p) =>
     locales.map((locale) => ({
