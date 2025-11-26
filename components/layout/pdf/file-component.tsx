@@ -93,6 +93,11 @@ export default function InvoiceTable({
               ? checkout?.checkouts?.[0]?.invoice_address?.city
               : checkout?.checkouts?.[0]?.shipping_address?.city}
           </span>
+          <span>
+            {checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
+              ? checkout?.checkouts?.[0]?.invoice_address?.country
+              : checkout?.checkouts?.[0]?.shipping_address?.country}
+          </span>
         </div>
 
         <div className="w-[320px] border border-gray-400 text-[13px]">
