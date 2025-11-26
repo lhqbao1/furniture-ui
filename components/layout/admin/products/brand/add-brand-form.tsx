@@ -56,6 +56,7 @@ export default function AddOrEditBrandForm({
           company_city: brandValues.company_city,
           company_country: brandValues.company_country,
           company_postal_code: brandValues.company_postal_code,
+          company_phone: brandValues.company_phone,
         }
       : brandDefaultValues,
   });
@@ -77,6 +78,7 @@ export default function AddOrEditBrandForm({
             company_city: values.company_city,
             company_country: values.company_country,
             company_postal_code: values.company_postal_code,
+            company_phone: values.company_phone,
           },
         },
         {
@@ -101,6 +103,7 @@ export default function AddOrEditBrandForm({
           company_city: values.company_city,
           company_country: values.company_country,
           company_postal_code: values.company_postal_code,
+          company_phone: values.company_phone,
         },
         {
           onSuccess(data, variables, context) {
@@ -130,22 +133,41 @@ export default function AddOrEditBrandForm({
         )}
         className="space-y-6"
       >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Brand name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder=""
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Brand name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder=""
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="company_phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Company phone number</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder=""
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormImageUpload
           form={form}

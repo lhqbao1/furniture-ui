@@ -11,8 +11,6 @@ import { useEditProduct } from "@/features/products/hook";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook";
-import { stripHtmlRegex } from "@/hooks/simplifyHtml";
 import { Switch } from "@/components/ui/switch";
 import DeleteDialog from "./delete-dialog";
 import { useLocale } from "next-intl";
@@ -25,7 +23,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import {
   HoverCard,

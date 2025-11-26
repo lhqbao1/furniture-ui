@@ -2,6 +2,7 @@ export interface BrandResponse {
   name: string;
   img_url: string;
   id: string;
+  company_phone: string;
   company_name: string;
   company_address: string;
   company_email: string;
@@ -17,6 +18,7 @@ export interface BrandInput {
   name: string;
   img_url?: string;
   company_name: string;
+  company_phone: string;
   company_address: string;
   company_email: string;
   company_city: string;

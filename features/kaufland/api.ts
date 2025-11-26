@@ -4,6 +4,7 @@ interface KauflandBrandInput {
   name: string | null;
   email: string | null;
   address: string | null;
+  phone: string | null;
 }
 
 export interface syncToKauflandInput {
