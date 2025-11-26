@@ -64,25 +64,6 @@ export default function ManualCheckOutShippingAddress({
 
         <FormField
           control={form.control}
-          name="recipient_name"
-          render={({ field }) => (
-            <FormItem className="">
-              <FormLabel className="text-black font-semibold text-sm">
-                Recipient Name
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder=""
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
           name="additional_address"
           render={({ field }) => (
             <FormItem>
@@ -198,6 +179,45 @@ export default function ManualCheckOutShippingAddress({
             </FormItem>
           )}
         />
+
+        <div className="col-span-2 grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="recipient_name"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Recipient Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder=""
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Recipient Phone Number
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder=""
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
     </div>
   );

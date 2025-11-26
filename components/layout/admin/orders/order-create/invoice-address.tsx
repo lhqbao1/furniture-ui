@@ -39,6 +39,7 @@ interface InvoiceAddressValues {
   invoice_additional_address?: string;
   invoice_country: string;
   invoice_recipient_name: string;
+  invoice_phone: string;
 }
 
 interface CheckOutInvoiceAddressProps {
@@ -78,6 +79,11 @@ const ManualCheckOutInvoiceAddress = ({
     control: form.control,
   });
 
+  const shippingPhone = useWatch({
+    name: "phone",
+    control: form.control,
+  });
+
   // Dùng ref lưu snapshot invoice gốc
   const invoiceSnapshot = useRef<InvoiceAddressValues | null>(null);
 
@@ -93,6 +99,7 @@ const ManualCheckOutInvoiceAddress = ({
         ),
         invoice_country: form.getValues("invoice_country"),
         invoice_recipient_name: form.getValues("invoice_recipient_name"),
+        invoice_phone: form.getValues("invoice_phone"),
       };
 
       // Copy shipping → invoice
@@ -102,6 +109,7 @@ const ManualCheckOutInvoiceAddress = ({
       form.setValue("invoice_country", shippingCountry);
       form.setValue("invoice_additional_address", shippingAdditionalAddress);
       form.setValue("invoice_recipient_name", shippingRecipient);
+      form.setValue("invoice_phone", shippingPhone);
     } else {
       // Restore lại snapshot nếu có
       if (invoiceSnapshot.current) {
@@ -127,6 +135,7 @@ const ManualCheckOutInvoiceAddress = ({
           "invoice_recipient_name",
           invoiceSnapshot.current.invoice_recipient_name,
         );
+        form.setValue("invoice_phone", invoiceSnapshot.current.invoice_phone);
       }
     }
   }, [
@@ -137,6 +146,7 @@ const ManualCheckOutInvoiceAddress = ({
     shippingAdditionalAddress,
     shippingCountry,
     shippingRecipient,
+    shippingPhone,
     form,
   ]);
 
@@ -175,25 +185,6 @@ const ManualCheckOutInvoiceAddress = ({
                     placeholder=""
                     {...field}
                     disabled={isSameShipping}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="invoice_recipient_name"
-            render={({ field }) => (
-              <FormItem className="">
-                <FormLabel className="text-black font-semibold text-sm">
-                  Recipient Name
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -319,6 +310,45 @@ const ManualCheckOutInvoiceAddress = ({
               </FormItem>
             )}
           />
+
+          <div className="col-span-2 grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="invoice_recipient_name"
+              render={({ field }) => (
+                <FormItem className="">
+                  <FormLabel className="text-black font-semibold text-sm">
+                    Recipient Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />{" "}
+            <FormField
+              control={form.control}
+              name="invoice_phone"
+              render={({ field }) => (
+                <FormItem className="">
+                  <FormLabel className="text-black font-semibold text-sm">
+                    Recipient Phone Number
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
       )}
     </div>
