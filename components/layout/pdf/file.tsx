@@ -329,7 +329,14 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
         </View>
 
         {/* Summary */}
-        <View style={{ fontSize: 10, width: "100%", marginTop: 10 }}>
+        <View
+          style={{
+            fontSize: 10,
+            width: "100%",
+            marginTop: 10,
+            borderBottom: "1pt solid #e6e6e6",
+          }}
+        >
           {/* Net and VAT */}
           <View
             style={{
@@ -541,46 +548,50 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               </Text>
             </View>
 
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                paddingVertical: 3,
-                paddingHorizontal: 6,
-              }}
-            >
-              <Text
+            {checkout.status.toLowerCase() === "pending" ? (
+              ""
+            ) : (
+              <View
                 style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  paddingVertical: 3,
+                  paddingHorizontal: 6,
                 }}
               >
-                Zahlung{" "}
-                <Text style={{ textTransform: "capitalize" }}>
-                  ({checkout.from_marketplace ?? checkout.payment_method}
-                </Text>{" "}
-                Managed Payments) vom {formatDateToNum(invoice.created_at)}
-              </Text>
-              <Text
-                style={{
-                  width: "20%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                {(
-                  (invoice?.total_amount_item ?? 0) +
-                  (invoice?.total_shipping ?? 0) -
-                  Math.abs(invoice?.voucher_amount ?? 0)
-                ).toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                €
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    width: "60%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Zahlung{" "}
+                  <Text style={{ textTransform: "capitalize" }}>
+                    ({checkout.from_marketplace ?? checkout.payment_method}
+                  </Text>{" "}
+                  Managed Payments) vom {formatDateToNum(invoice.created_at)}
+                </Text>
+                <Text
+                  style={{
+                    width: "20%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {(
+                    (invoice?.total_amount_item ?? 0) +
+                    (invoice?.total_shipping ?? 0) -
+                    Math.abs(invoice?.voucher_amount ?? 0)
+                  ).toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  €
+                </Text>
+              </View>
+            )}
 
             <View
               style={{
@@ -607,33 +618,34 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   fontWeight: "bold",
                 }}
               >
-                0,00€
+                {checkout.status.toLowerCase() === "pending"
+                  ? (
+                      (invoice?.total_amount_item ?? 0) +
+                      (invoice?.total_shipping ?? 0) -
+                      Math.abs(invoice?.voucher_amount ?? 0)
+                    ).toLocaleString("de-DE", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  : "00,00"}
+                €
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Footer */}
-        {/* <View style={{ marginTop: 50, display: 'flex', justifyContent: 'space-between', flexDirection: "row", fontSize: 9, position: "absolute"}}>
-                    
-                </View> */}
-        {/* <View
-          style={{ position: "absolute", bottom: 10, left: 48, zIndex: 20 }}
-        >
-          <Text style={styles.boldWithGap}>Prestige Home GmbH</Text>
-          <Text style={styles.gapY5}>
-            Greifswalder Straße 226, 10405 Berlin.
-          </Text>
-          <Text style={styles.gapY5}>Email: info@prestige-home.de</Text>
-        </View>
+        {checkout.status.toLowerCase() === "pending" ? (
+          <View style={{ marginTop: 10, textAlign: "left", fontSize: 10 }}>
+            <Text>
+              Zahlungsbedingungen: Zahlung innerhalb von 14 Tagen ab
+              Rechnungseingang ohne Abzüge.
+            </Text>
+          </View>
+        ) : (
+          ""
+        )}
 
-        <View
-          style={{ position: "absolute", bottom: 10, right: 48, zIndex: 20 }}
-        >
-          <Text style={styles.boldWithGap}>Geschäftsführer</Text>
-          <Text style={styles.gapY5}>Thuy Duong Nguyen</Text>
-          <Text style={styles.gapY5}>USt-ID: DE454714336</Text>
-        </View> */}
+        {/* Footer */}
         <FooterSection />
       </Page>
     </Document>

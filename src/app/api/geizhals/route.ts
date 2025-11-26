@@ -52,42 +52,47 @@ export async function GET() {
   }" forsale="${p.is_active ? "yes" : "no"}">
     <Artikelnummer>${escapeXml(p.id_provider)}</Artikelnummer>
     
-    <Produktbezeichnung><![CDATA[${escapeCDATA(
-      p.name.trim(),
-    )}]]></Produktbezeichnung>
+    <Produktbezeichnung>
+    <![CDATA[${escapeCDATA(p.name.trim())}]]>
+    </Produktbezeichnung>
 
-    <Herstellername>${escapeXml(
-      p.brand ? p.brand.name : "Prestige Home",
-    )}</Herstellername>
+    <Herstellername>
+    <![CDATA[${escapeXml(p.brand ? p.brand.name : "Prestige Home")}]]>
+    </Herstellername>
 
     <Preis>
       ${p.final_price.toFixed(2)}
     </Preis>
 
-    <Deeplink>https://prestige-home.de/product/${escapeXml(
-      p.url_key,
-    )}</Deeplink>
+    <Deeplink>
+    https://prestige-home.de/product/${escapeXml(p.url_key)}
+    </Deeplink>
 
     <MPN>${escapeXml(p.ean)}</MPN>
 
-    <Verfügbarkeit>${categoryPath}</Verfügbarkeit>
+    <Verfügbarkeit>
+    <![CDATA[${categoryPath}]]>
+    </Verfügbarkeit>
 
-    <Versand AT Vorkasse>${
-      p.carrier === "dpd" ? 5.95 : 35.95
-    }</Versand AT Vorkasse>
-    <Versand DE Vorkasse>${
-      p.carrier === "dpd" ? 5.95 : 35.95
-    }</Versand DE Vorkasse>
+    <Versand AT Vorkasse>
+    ${p.carrier === "dpd" ? 5.95 : 35.95}
+    </Versand AT Vorkasse>
+
+    <Versand DE Vorkasse>
+    ${p.carrier === "dpd" ? 5.95 : 35.95}
+    </Versand DE Vorkasse>
 
     <EAN>${escapeXml(p.ean)}</EAN>
 
-    <Kategorie>${escapeXml(categories)}</Kategorie>
+    <Kategorie>
+    <![CDATA[${escapeXml(categories)}]]>
+    </Kategorie>
 
     <Bild>${escapeXml(encodeURI(largeImage))}</Bild>
 
-    <Beschreibung><![CDATA[${escapeCDATA(
-      cleanDescription(p.description),
-    )}]]></Beschreibung>
+    <Beschreibung>
+    <![CDATA[${escapeCDATA(cleanDescription(p.description))}]]>
+    </Beschreibung>
   </product>`;
       })
       .join("\n");

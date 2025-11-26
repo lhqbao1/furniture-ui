@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   },
   bold: {
     // fontFamily: "Helvetica-Bold",
-    marginBottom: 4,
+    marginBottom: 3,
     fontSize: 8,
   },
   gap: {
@@ -31,7 +31,7 @@ export const FooterSection = () => (
       <Text style={styles.bold}>Prestige Home GmbH</Text>
       <Text style={styles.gap}>Greifswalder Straße 226</Text>
       <Text style={styles.gap}>10405 Berlin</Text>
-      <Text style={styles.gap}>Tel: info@prestige-home.de</Text>
+      <Text style={styles.gap}>info@prestige-home.de</Text>
     </View>
 
     {/* COLUMN 2 */}
@@ -44,9 +44,9 @@ export const FooterSection = () => (
 
     {/* COLUMN 3 */}
     <View style={{ width: "20%" }}>
-      <Text style={styles.bold}>Chief Executive Office</Text>
-      <Text style={styles.gap}>Thuy Duong Nguyen</Text>
-      <Text style={styles.gap}>Tax code: DE454714336</Text>
+      <Text style={styles.bold}>Geschäftsführung</Text>
+      <Text style={styles.gap}>Duong Thuy Nguyen</Text>
+      <Text style={styles.gap}>Ust-IdNr: DE454714336</Text>
     </View>
   </View>
 );
