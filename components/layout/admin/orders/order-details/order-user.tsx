@@ -35,14 +35,14 @@ const OrderDetailUser = ({
         <h5 className="font-bold">Invoice address</h5>
         <div className="space-y-2.5">
           <div className="text-sm">
-            <div>{shippingAddress.recipient_name}</div>
+            <div>{invoiceAddress.recipient_name}</div>
             <div>{invoiceAddress.address_line}</div>
             <div>{invoiceAddress.additional_address_line}</div>
             <div className="flex gap-1">
               <div>{invoiceAddress.postal_code}</div>
-
               <div>{invoiceAddress.city}</div>
             </div>
+            <div>{invoiceAddress.country}</div>
           </div>
         </div>
       </div>
@@ -51,13 +51,14 @@ const OrderDetailUser = ({
         <div className="space-y-2.5">
           <div className="text-sm">
             <div>{shippingAddress.recipient_name}</div>
+            <div>{shippingAddress.phone_number}</div>
             <div>{shippingAddress.address_line}</div>
             <div>{shippingAddress.additional_address_line}</div>
             <div className="flex gap-1">
               <div>{shippingAddress.postal_code}</div>
-
               <div>{shippingAddress.city}</div>
             </div>
+            <div>{shippingAddress.country}</div>
           </div>
         </div>
       </div>

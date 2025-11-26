@@ -164,6 +164,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {checkout.checkouts[0].invoice_address.postal_code} -{" "}
               {checkout.checkouts[0].invoice_address.city}
             </Text>
+            <Text>{checkout.checkouts[0].invoice_address.country}</Text>
           </View>
           <View
             style={{
