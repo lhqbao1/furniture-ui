@@ -66,7 +66,7 @@ export async function GET() {
 
   <MPN>${escapeXml(p.sku)}</MPN>
 
-  <Verfügbarkeit><![CDATA[${categoryPath}]]></Verfügbarkeit>
+  <Verfügbarkeit>${p.delivery_time} Werktage</Verfügbarkeit>
 
 <Versand_AT_Vorkasse>${p.carrier === "dpd" ? 5.95 : 35.95}</Versand_AT_Vorkasse>
 
