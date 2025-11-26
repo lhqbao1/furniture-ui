@@ -35,33 +35,7 @@ export default function ManualCheckOutShippingAddress({
   isAdmin = false,
 }: CheckOutShippingAddressProps) {
   const form = useFormContext();
-  const [isSameInvoice, setIsSameInvoice] = useState(false);
-  const [countries, setCountries] = useState<
-    { value: string; label: string }[]
-  >([]);
-
-  useEffect(() => {
-    import("world-countries").then((module) => {
-      setCountries(
-        module.default.map((c) => ({
-          value: c.name.common,
-          label: c.name.common,
-        })),
-      );
-    });
-  }, []);
-
-  // Lấy tất cả bang của Đức
-  const states = State.getStatesOfCountry("DE");
-  // Lấy tất cả thành phố từ tất cả bang
-  const allCities = states.flatMap((state) =>
-    City.getCitiesOfState("DE", state.isoCode),
-  );
-  // Danh sách tên thành phố
-  const cityOptions = allCities.map((city) => ({
-    value: city.name,
-    label: city.name,
-  }));
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -82,7 +56,6 @@ export default function ManualCheckOutShippingAddress({
                 <Input
                   placeholder=""
                   {...field}
-                  disabled={isSameInvoice}
                 />
               </FormControl>
               <FormMessage />
@@ -102,7 +75,6 @@ export default function ManualCheckOutShippingAddress({
                 <Input
                   placeholder=""
                   {...field}
-                  disabled={isSameInvoice}
                 />
               </FormControl>
               <FormMessage />
@@ -116,16 +88,20 @@ export default function ManualCheckOutShippingAddress({
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-black font-semibold text-sm">
-                Company country
+                Country
               </FormLabel>
 
-              <Popover>
+              <Popover
+                open={open}
+                onOpenChange={setOpen}
+              >
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant="outline"
                       role="combobox"
                       className="w-full justify-between"
+                      onClick={() => setOpen(!open)}
                     >
                       {field.value
                         ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
@@ -135,7 +111,7 @@ export default function ManualCheckOutShippingAddress({
                   </FormControl>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-full p-0 h-[400px]">
+                <PopoverContent className="w-full p-0 h-[150px]">
                   <Command>
                     <CommandInput placeholder="Search country..." />
                     <CommandList>
@@ -147,7 +123,9 @@ export default function ManualCheckOutShippingAddress({
                             value={c.label}
                             onSelect={() => {
                               field.onChange(c.value);
+                              setOpen(false); // 🔥 đóng popover sau khi chọn
                             }}
+                            className="cursor-pointer"
                           >
                             {c.label}
                           </CommandItem>
@@ -176,7 +154,6 @@ export default function ManualCheckOutShippingAddress({
                 <Input
                   placeholder=""
                   {...field}
-                  disabled={isSameInvoice}
                 />
               </FormControl>
               <FormMessage />
