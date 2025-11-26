@@ -50,6 +50,7 @@ const ManualCheckOutInvoiceAddress = ({
   const form = useFormContext();
   const t = useTranslations();
   const [isSameShipping, setIsSameShipping] = useState(true);
+  const [open, setOpen] = useState(false);
 
   // Watch shipping fields
   const shippingAddressLine = useWatch({
@@ -196,16 +197,20 @@ const ManualCheckOutInvoiceAddress = ({
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="text-black font-semibold text-sm">
-                  Invoice country
+                  Country
                 </FormLabel>
 
-                <Popover>
+                <Popover
+                  open={open}
+                  onOpenChange={setOpen}
+                >
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant="outline"
                         role="combobox"
                         className="w-full justify-between"
+                        onClick={() => setOpen(!open)}
                       >
                         {field.value
                           ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
@@ -215,7 +220,7 @@ const ManualCheckOutInvoiceAddress = ({
                     </FormControl>
                   </PopoverTrigger>
 
-                  <PopoverContent className="w-full p-0 h-[400px]">
+                  <PopoverContent className="w-full p-0 h-[150px]">
                     <Command>
                       <CommandInput placeholder="Search country..." />
                       <CommandList>
@@ -227,7 +232,9 @@ const ManualCheckOutInvoiceAddress = ({
                               value={c.label}
                               onSelect={() => {
                                 field.onChange(c.value);
+                                setOpen(false); // 🔥 đóng popover sau khi chọn
                               }}
+                              className="cursor-pointer"
                             >
                               {c.label}
                             </CommandItem>

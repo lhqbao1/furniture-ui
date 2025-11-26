@@ -292,14 +292,10 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
               maximumFractionDigits: 2,
             })}
           </div>
-          {row.original.status.toLocaleLowerCase() === "pending" ? (
-            ""
-          ) : (
-            <ViewFileDialog
-              checkoutId={row.original.id}
-              type="invoice"
-            />
-          )}
+          <ViewFileDialog
+            checkoutId={row.original.id}
+            type="invoice"
+          />
         </div>
       );
     },

@@ -26,11 +26,18 @@ interface SelectedProduct {
   final_price: number;
 }
 
-const SelectOrderItems = () => {
+interface SelectOrderItemsProps {
+  listProducts: SelectedProduct[];
+  setListProducts: React.Dispatch<React.SetStateAction<SelectedProduct[]>>;
+}
+
+const SelectOrderItems = ({
+  listProducts,
+  setListProducts,
+}: SelectOrderItemsProps) => {
   const form = useFormContext();
   const { setValue } = form;
 
-  const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);
   const [queryParams, setQueryParams] = useState("");
   const [open, setOpen] = useState(false);
 

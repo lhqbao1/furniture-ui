@@ -137,6 +137,13 @@ export async function returnOrder(main_checkout_id: string) {
   return data;
 }
 
+export async function makeOrderPaid(main_checkout_id: string) {
+  const { data } = await apiAdmin.post(
+    `/checkout/make-checkout-paid/${main_checkout_id}`,
+  );
+  return data;
+}
+
 export async function cancelOrder(main_checkout_id: string) {
   const { data } = await apiAdmin.put(`/checkout/cancel/${main_checkout_id}`);
   return data;

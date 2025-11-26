@@ -14,6 +14,7 @@ import {
   getCheckOutSupplier,
   getCheckOutSupplierByCheckOutId,
   getMainCheckOutByMainCheckOutId,
+  makeOrderPaid,
   returnOrder,
 } from "./api";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
@@ -156,6 +157,17 @@ export function useCancelOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (main_checkout_id: string) => cancelOrder(main_checkout_id),
+    onSuccess: () => {
+      qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+    },
+  });
+}
+
+export function useMakeOrderPaid() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (main_checkout_id: string) => makeOrderPaid(main_checkout_id),
     onSuccess: () => {
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });

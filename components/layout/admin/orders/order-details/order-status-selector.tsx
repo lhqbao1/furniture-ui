@@ -2,16 +2,14 @@ import React from "react";
 import {
   Select,
   SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import ReturnConfirmDialog from "../order-list/return-confirm-dialog";
-import CancelConfirmDialog from "../order-list/canceled-confirm-dialog";
+import ReturnConfirmDialog from "./dialog/return-confirm-dialog";
+import CancelConfirmDialog from "./dialog/canceled-confirm-dialog";
 import { CheckOutMain } from "@/types/checkout";
 import { STATUS_OPTIONS } from "@/data/data";
+import PaidConfirmDialog from "./dialog/paid-comfirm-dialog";
 
 export default function OrderStatusSelector({
   status,
@@ -23,6 +21,7 @@ export default function OrderStatusSelector({
   const [value, setValue] = React.useState<string>(status?.toLowerCase() ?? "");
   const [openReturn, setOpenReturn] = React.useState(false);
   const [openCancel, setOpenCancel] = React.useState(false);
+  const [openPaid, setOpenPaid] = React.useState(false);
 
   // compute items to show in dropdown:
   // if current status is completed -> only show "return" option
@@ -35,6 +34,13 @@ export default function OrderStatusSelector({
         return {
           ...item,
           active: item.key === "return",
+        };
+      }
+
+      if (current === "pending") {
+        return {
+          ...item,
+          active: item.key === "paid",
         };
       }
 
@@ -60,7 +66,8 @@ export default function OrderStatusSelector({
     } else if (val === "canceled") {
       // keep previous behavior: choosing "paid" can open CancelConfirmDialog
       setOpenCancel(true);
-    } else {
+    } else if (val === "paid") {
+      setOpenPaid(true);
       // other statuses: no dialog, you can trigger an API call here if needed
       // e.g. updateStatusAPI(order.id, val)
     }
@@ -130,6 +137,18 @@ export default function OrderStatusSelector({
           open={openCancel}
           onClose={() => {
             setOpenCancel(false);
+            setValue(status.toLocaleLowerCase());
+          }}
+        />
+      )}
+
+      {openPaid && (
+        <PaidConfirmDialog
+          id={order.id}
+          status={status}
+          open={openCancel}
+          onClose={() => {
+            setOpenPaid(false);
             setValue(status.toLocaleLowerCase());
           }}
         />

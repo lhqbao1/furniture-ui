@@ -336,7 +336,7 @@ const SyncToEbayForm = ({
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
           <DialogHeader>
-            <DialogTitle>Update Marketplace EBAY</DialogTitle>
+            <DialogTitle>Update Marketplace</DialogTitle>
           </DialogHeader>
           <div className="mx-auto space-y-6">
             <Form {...form}>
