@@ -100,6 +100,9 @@ export default function CreateCheckoutpage() {
         email: values.email
           ? values.email
           : `${values.first_name}${values.last_name}`,
+        recipient_name: values.recipient_name
+          ? values.recipient_name
+          : values.first_name + values.last_name,
       },
       {
         onSuccess(data, variables, context) {

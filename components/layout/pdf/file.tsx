@@ -159,10 +159,10 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {checkout.checkouts[0].user.first_name}{" "}
               {checkout.checkouts[0].user.last_name}
             </Text>
-            <Text>{checkout.checkouts[0].shipping_address.address_line}</Text>
+            <Text>{checkout.checkouts[0].invoice_address.address_line}</Text>
             <Text>
-              {checkout.checkouts[0].shipping_address.postal_code} -{" "}
-              {checkout.checkouts[0].shipping_address.city}
+              {checkout.checkouts[0].invoice_address.postal_code} -{" "}
+              {checkout.checkouts[0].invoice_address.city}
             </Text>
           </View>
           <View
