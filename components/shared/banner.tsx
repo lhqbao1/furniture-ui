@@ -44,6 +44,7 @@ const Banner = ({ height = 500 }: BannerProps) => {
         fill
         className="object-cover"
         priority // ảnh hero -> improve LCP
+        fetchPriority="high"
         sizes="(min-width: 1024px) 100vw"
         unoptimized
       />

@@ -295,7 +295,7 @@ export default function InvoiceTable({
             className="font-semibold"
             translate="no"
           >
-            Kontoverbindung
+            Bankverbindung
           </div>
           <div>OLINDA Zweigniederlassung Deutschland</div>
           <div>IBAN:</div>
