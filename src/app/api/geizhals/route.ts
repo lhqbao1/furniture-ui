@@ -47,53 +47,40 @@ export async function GET() {
             .join(", ") || "";
 
         return `
-  <product weboffer="no" preorder="no" instock="${
-    p.stock > 0 ? "yes" : "no"
-  }" forsale="${p.is_active ? "yes" : "no"}">
-    <Artikelnummer>${escapeXml(p.id_provider)}</Artikelnummer>
-    
-    <Produktbezeichnung>
-    <![CDATA[${escapeCDATA(p.name.trim())}]]>
-    </Produktbezeichnung>
+ <product>
+  <Artikelnummer>${escapeXml(p.id_provider)}</Artikelnummer>
 
-    <Herstellername>
-    <![CDATA[${escapeXml(p.brand ? p.brand.name : "Prestige Home")}]]>
-    </Herstellername>
+  <Produktbezeichnung><![CDATA[${escapeCDATA(
+    p.name.trim(),
+  )}]]></Produktbezeichnung>
 
-    <Preis>
-      ${p.final_price.toFixed(2)}
-    </Preis>
+  <Herstellername><![CDATA[${
+    p.brand?.name || "Prestige Home"
+  }]]></Herstellername>
 
-    <Deeplink>
-    https://prestige-home.de/product/${escapeXml(p.url_key)}
-    </Deeplink>
+  <Preis>${p.final_price.toFixed(2)}</Preis>
 
-    <MPN>${escapeXml(p.ean)}</MPN>
+  <Deeplink><![CDATA[https://prestige-home.de/product/${p.url_key}]]></Deeplink>
 
-    <Verfügbarkeit>
-    <![CDATA[${categoryPath}]]>
-    </Verfügbarkeit>
+  <MPN>${escapeXml(p.ean)}</MPN>
 
-    <Versand AT Vorkasse>
-    ${p.carrier === "dpd" ? 5.95 : 35.95}
-    </Versand AT Vorkasse>
+  <Verfügbarkeit><![CDATA[${categoryPath}]]></Verfügbarkeit>
 
-    <Versand DE Vorkasse>
-    ${p.carrier === "dpd" ? 5.95 : 35.95}
-    </Versand DE Vorkasse>
+<Versand_AT_Vorkasse>${p.carrier === "dpd" ? 5.95 : 35.95}</Versand_AT_Vorkasse>
 
-    <EAN>${escapeXml(p.ean)}</EAN>
+<Versand_DE_Vorkasse>${p.carrier === "dpd" ? 5.95 : 35.95}</Versand_DE_Vorkasse>
 
-    <Kategorie>
-    <![CDATA[${escapeXml(categories)}]]>
-    </Kategorie>
+  <EAN>${escapeXml(p.ean)}</EAN>
 
-    <Bild>${escapeXml(encodeURI(largeImage))}</Bild>
+  <Kategorie><![CDATA[${categories}]]></Kategorie>
 
-    <Beschreibung>
-    <![CDATA[${escapeCDATA(cleanDescription(p.description))}]]>
-    </Beschreibung>
-  </product>`;
+  <Bild><![CDATA[${encodeURI(largeImage)}]]></Bild>
+
+  <Beschreibung><![CDATA[${escapeCDATA(
+    cleanDescription(p.description),
+  )}]]></Beschreibung>
+</product>
+`;
       })
       .join("\n");
 
