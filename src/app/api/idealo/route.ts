@@ -38,7 +38,12 @@ export async function GET() {
       .map((p) => {
         const categories =
           p.categories
-            ?.map((c) => c.children?.[0]?.name || c.name)
+            ?.map((c) => {
+              const parent = c.name;
+              const child = c.children?.[0]?.name;
+
+              return child ? `${parent} > ${child}` : parent;
+            })
             .join(", ") || "";
         return [
           escapeCsv(p.id_provider),

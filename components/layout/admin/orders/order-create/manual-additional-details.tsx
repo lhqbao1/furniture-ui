@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext, Controller, useWatch } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -48,7 +48,10 @@ export default function ManualAdditionalInformation({
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
-                  <SelectTrigger placeholderColor className="border">
+                  <SelectTrigger
+                    placeholderColor
+                    className="border"
+                  >
                     <SelectValue placeholder="Select marketplace" />
                   </SelectTrigger>
                   <SelectContent>
@@ -100,7 +103,10 @@ export default function ManualAdditionalInformation({
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
-                  <SelectTrigger placeholderColor className="border">
+                  <SelectTrigger
+                    placeholderColor
+                    className="border"
+                  >
                     <SelectValue placeholder="Select carrier" />
                   </SelectTrigger>
                   <SelectContent>
@@ -133,7 +139,7 @@ export default function ManualAdditionalInformation({
                     value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value === "" ? null : e.target.valueAsNumber
+                        e.target.value === "" ? null : e.target.valueAsNumber,
                       )
                     }
                   />

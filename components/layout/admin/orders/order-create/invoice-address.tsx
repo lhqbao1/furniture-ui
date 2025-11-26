@@ -30,12 +30,14 @@ import { useTranslations } from "next-intl";
 import { City, State } from "country-state-city";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { COUNTRY_OPTIONS } from "@/data/data";
 
 interface InvoiceAddressValues {
   invoice_address: string;
   invoice_postal_code: string;
   invoice_city: string;
   invoice_additional_address?: string;
+  invoice_country: string;
 }
 
 interface CheckOutInvoiceAddressProps {
@@ -47,7 +49,6 @@ const ManualCheckOutInvoiceAddress = ({
 }: CheckOutInvoiceAddressProps) => {
   const form = useFormContext();
   const t = useTranslations();
-  const [open, setOpen] = useState(false);
   const [isSameShipping, setIsSameShipping] = useState(true);
 
   // Watch shipping fields
@@ -65,6 +66,11 @@ const ManualCheckOutInvoiceAddress = ({
     control: form.control,
   });
 
+  const shippingCountry = useWatch({
+    name: "country",
+    control: form.control,
+  });
+
   // Dùng ref lưu snapshot invoice gốc
   const invoiceSnapshot = useRef<InvoiceAddressValues | null>(null);
 
@@ -76,30 +82,37 @@ const ManualCheckOutInvoiceAddress = ({
         invoice_postal_code: form.getValues("invoice_postal_code"),
         invoice_city: form.getValues("invoice_city"),
         invoice_additional_address: form.getValues(
-          "invoice_additional_address"
+          "invoice_additional_address",
         ),
+        invoice_country: form.getValues("invoice_country"),
       };
 
       // Copy shipping → invoice
       form.setValue("invoice_address", shippingAddressLine);
       form.setValue("invoice_postal_code", shippingPostalCode);
       form.setValue("invoice_city", shippingCity);
+      form.setValue("invoice_country", shippingCountry);
       form.setValue("invoice_additional_address", shippingAdditionalAddress);
     } else {
       // Restore lại snapshot nếu có
       if (invoiceSnapshot.current) {
         form.setValue(
           "invoice_address",
-          invoiceSnapshot.current.invoice_address
+          invoiceSnapshot.current.invoice_address,
         );
         form.setValue(
           "invoice_postal_code",
-          invoiceSnapshot.current.invoice_postal_code
+          invoiceSnapshot.current.invoice_postal_code,
         );
         form.setValue("invoice_city", invoiceSnapshot.current.invoice_city);
         form.setValue(
+          "invoice_country",
+          invoiceSnapshot.current.invoice_country,
+        );
+
+        form.setValue(
           "invoice_additional_address",
-          invoiceSnapshot.current.invoice_additional_address
+          invoiceSnapshot.current.invoice_additional_address,
         );
       }
     }
@@ -109,20 +122,9 @@ const ManualCheckOutInvoiceAddress = ({
     shippingPostalCode,
     shippingCity,
     shippingAdditionalAddress,
+    shippingCountry,
     form,
   ]);
-
-  // Lấy tất cả bang của Đức
-  const states = State.getStatesOfCountry("DE");
-  // Lấy tất cả thành phố từ tất cả bang
-  const allCities = states.flatMap((state) =>
-    City.getCitiesOfState("DE", state.isoCode)
-  );
-  // Danh sách tên thành phố
-  const cityOptions = allCities.map((city) => ({
-    value: city.name,
-    label: city.name,
-  }));
 
   return (
     <div className="space-y-4">
@@ -155,7 +157,11 @@ const ManualCheckOutInvoiceAddress = ({
                   {isAdmin ? "Address line" : t("streetAndHouse")}
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="" {...field} disabled={isSameShipping} />
+                  <Input
+                    placeholder=""
+                    {...field}
+                    disabled={isSameShipping}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,20 +172,76 @@ const ManualCheckOutInvoiceAddress = ({
             control={form.control}
             name="invoice_additional_address"
             render={({ field }) => (
-              <FormItem className="col-span-2">
+              <FormItem className="">
                 <FormLabel>
                   {isAdmin
                     ? "Additional Address line"
                     : t("additionalAddressLine")}
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="" {...field} disabled={isSameShipping} />
+                  <Input
+                    placeholder=""
+                    {...field}
+                    disabled={isSameShipping}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="invoice_country"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Invoice country
+                </FormLabel>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between"
+                      >
+                        {field.value
+                          ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
+                              ?.label
+                          : "Select country"}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+
+                  <PopoverContent className="w-full p-0 h-[400px]">
+                    <Command>
+                      <CommandInput placeholder="Search country..." />
+                      <CommandList>
+                        <CommandEmpty>No country found.</CommandEmpty>
+                        <CommandGroup>
+                          {COUNTRY_OPTIONS.map((c) => (
+                            <CommandItem
+                              key={c.value}
+                              value={c.label}
+                              onSelect={() => {
+                                field.onChange(c.value);
+                              }}
+                            >
+                              {c.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="invoice_postal_code"
@@ -189,7 +251,11 @@ const ManualCheckOutInvoiceAddress = ({
                   {isAdmin ? "Postal Code" : t("postalCode")}
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="" {...field} disabled={isSameShipping} />
+                  <Input
+                    placeholder=""
+                    {...field}
+                    disabled={isSameShipping}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -201,56 +267,14 @@ const ManualCheckOutInvoiceAddress = ({
             name="invoice_city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[#666666] text-sm">
-                  {isAdmin ? "City" : t("city")}
+                <FormLabel className="text-black font-semibold text-sm">
+                  City
                 </FormLabel>
                 <FormControl>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild disabled={isSameShipping}>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-full justify-between",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ||
-                          (isAdmin ? "Select City" : t("selectCity"))}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command>
-                        <CommandInput placeholder="" />
-                        <CommandEmpty>{t("noCity")}</CommandEmpty>
-                        <CommandList className="h-[400px]">
-                          <CommandGroup>
-                            {cityOptions.map((c, index) => (
-                              <CommandItem
-                                key={index}
-                                value={c.value}
-                                onSelect={() => {
-                                  field.onChange(c.value);
-                                  setOpen(false); // đóng popover sau khi chọn
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    field.value === c.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {c.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <Input
+                    placeholder=""
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

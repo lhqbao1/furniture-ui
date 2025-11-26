@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext, Controller, useWatch } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import {
   Command,
@@ -25,16 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { City, State } from "country-state-city";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { COUNTRY_OPTIONS } from "@/data/data";
 
 interface CheckOutShippingAddressProps {
@@ -122,7 +112,7 @@ export default function ManualCheckOutShippingAddress({
 
         <FormField
           control={form.control}
-          name="company_country"
+          name="country"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-black font-semibold text-sm">

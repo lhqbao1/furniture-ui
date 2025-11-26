@@ -18,7 +18,6 @@ import {
 import { Input } from "@/components/ui/input";
 import type { BrandResponse } from "@/types/brand";
 import { useCreateBrand, useEditBrand } from "@/features/brand/hook";
-import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import {
@@ -118,7 +117,6 @@ export default function AddOrEditBrandForm({
       );
     }
   }
-  console.log(brandValues);
 
   return (
     <Form {...form}>
@@ -133,41 +131,22 @@ export default function AddOrEditBrandForm({
         )}
         className="space-y-6"
       >
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Brand name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="company_phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Company phone number</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Brand name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormImageUpload
           form={form}
@@ -196,7 +175,7 @@ export default function AddOrEditBrandForm({
             name="company_email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company email</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
                     placeholder=""
@@ -213,7 +192,7 @@ export default function AddOrEditBrandForm({
             name="company_address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company address</FormLabel>
+                <FormLabel>Address</FormLabel>
                 <FormControl>
                   <Input
                     placeholder=""
@@ -230,7 +209,7 @@ export default function AddOrEditBrandForm({
             name="company_city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company city</FormLabel>
+                <FormLabel>City</FormLabel>
                 <FormControl>
                   <Input
                     placeholder=""
@@ -247,7 +226,7 @@ export default function AddOrEditBrandForm({
             name="company_postal_code"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company postal code</FormLabel>
+                <FormLabel>Postal code</FormLabel>
                 <FormControl>
                   <Input
                     placeholder=""
@@ -264,7 +243,7 @@ export default function AddOrEditBrandForm({
             name="company_country"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company country</FormLabel>
+                <FormLabel>Country</FormLabel>
 
                 <FormControl>
                   <Select
@@ -291,6 +270,23 @@ export default function AddOrEditBrandForm({
                   </Select>
                 </FormControl>
 
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="company_phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone number</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder=""
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

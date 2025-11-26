@@ -12,9 +12,6 @@ import { CartActions, useCartData } from "@/hooks/cart/useCart";
 
 const CartPageClient = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const t = useTranslations();
-  const locale = useLocale();
-  const router = useRouter();
 
   const {
     userId,
