@@ -156,7 +156,7 @@ const ManualCheckOutInvoiceAddress = ({
         <h2 className="text-lg text-black font-semibold">
           {isAdmin ? "Invoice Address" : t("invoiceAddress")}
         </h2>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 cursor-pointer">
           <Label htmlFor="same-invoice">
             {isAdmin ? "Same as Shipping" : t("sameAsShipping")}
           </Label>

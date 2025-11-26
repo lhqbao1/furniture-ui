@@ -21,6 +21,7 @@ import { useCartLocal } from "@/hooks/cart";
 import { useIsPhone } from "@/hooks/use-is-phone";
 import { CartDrawer } from "./cart-drawer";
 import { LoginDrawer } from "./login-drawer";
+import { Button } from "../ui/button";
 
 interface PageHeaderProps {
   hasSideBar?: boolean;
@@ -179,13 +180,17 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
               <div className="flex">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex gap-2 justify-start items-end">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="p-0 h-auto"
+                    >
                       <User
-                        className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
+                        className="cursor-pointer hover:scale-110 transition-all duration-300"
                         stroke="#4D4D4D"
                         size={30}
                       />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent

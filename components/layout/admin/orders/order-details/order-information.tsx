@@ -41,7 +41,6 @@ const OrderInformation = ({
   total_amount,
   is_Ebay = false,
 }: OrderInformationProps) => {
-  console.log(discount_amount);
   return (
     <div className="flex flex-col w-full items-end space-y-3">
       <div className="grid grid-cols-3 lg:w-1/4 w-1/2">

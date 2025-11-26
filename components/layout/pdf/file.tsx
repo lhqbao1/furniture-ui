@@ -13,6 +13,7 @@ import {
 import { Font } from "@react-pdf/renderer";
 import { useMemo } from "react";
 import { FooterSection } from "./file-footer";
+import { calculateVAT } from "@/lib/caculate-vat";
 
 Font.register({
   family: "Roboto",
@@ -424,13 +425,12 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   fontWeight: "bold",
                 }}
               >
-                {(
-                  (((invoice?.total_amount_item ?? 0) +
-                    (invoice?.total_shipping ?? 0) +
-                    (invoice?.voucher_amount ?? 0)) /
-                    1.19) *
-                  0.19
-                ).toLocaleString("de-DE", {
+                {calculateVAT({
+                  items: invoice?.total_amount_item,
+                  shipping: invoice?.total_shipping,
+                  discount: invoice?.voucher_amount,
+                  taxPercent: checkout?.tax ?? 19,
+                }).toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
