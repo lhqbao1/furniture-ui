@@ -19,7 +19,7 @@ export const ManualCreateOrderSchema = z.object({
   invoice_additional_address: z.string().optional(),
   invoice_country: z.string().optional(),
 
-  from_marketplace: z.string().min(1, "Marketplace is required"),
+  from_marketplace: z.string().nullable(),
   marketplace_order_id: z.string().optional().nullable(),
 
   total_amount: z.number().optional(),

@@ -45,7 +45,9 @@ export default function ManualAdditionalInformation({
               </FormLabel>
               <FormControl>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value === "prestige" ? null : value);
+                  }}
                   defaultValue={field.value}
                 >
                   <SelectTrigger
@@ -59,6 +61,7 @@ export default function ManualAdditionalInformation({
                     <SelectItem value="kaufland">Kaufland</SelectItem>
                     <SelectItem value="netto">Netto</SelectItem>
                     <SelectItem value="freakout">FreakOut</SelectItem>
+                    <SelectItem value="prestige">Prestige Home</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
