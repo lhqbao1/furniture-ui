@@ -60,9 +60,11 @@ export async function GET() {
 
   <Preis>${p.final_price.toFixed(2)}</Preis>
 
-  <Deeplink><![CDATA[https://prestige-home.de/product/${p.url_key}]]></Deeplink>
+  <Deeplink><![CDATA[https://prestige-home.de/product/de/${
+    p.url_key
+  }]]></Deeplink>
 
-  <MPN>${escapeXml(p.ean)}</MPN>
+  <MPN>${escapeXml(p.sku)}</MPN>
 
   <Verfügbarkeit><![CDATA[${categoryPath}]]></Verfügbarkeit>
 
