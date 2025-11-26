@@ -75,7 +75,7 @@ export async function generateMetadata({
 
       offers: {
         "@type": "Offer",
-        url: `https://www.prestige-home.de/${locale}/product/${product.url_key}`,
+        url: `https://www.prestige-home.de/de/product/${product.url_key}`,
         priceCurrency: "EUR",
         price: String(product.final_price),
         availability:
@@ -116,14 +116,14 @@ export async function generateMetadata({
           product.meta_description ||
           product.description?.slice(0, 150) ||
           product.name,
-        url: `https://www.prestige-home.de/${locale}/product/${product.url_key}`,
+        url: `https://www.prestige-home.de/de/product/${product.url_key}`,
         images:
           product.static_files?.map((img: StaticFile) => ({ url: img.url })) ??
           [],
       },
 
       alternates: {
-        canonical: `https://www.prestige-home.de/${locale}/product/${product.url_key}`,
+        canonical: `https://www.prestige-home.de/de/product/${product.url_key}`,
       },
 
       other: {
