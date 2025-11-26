@@ -57,7 +57,8 @@ export default function ManualAdditionalInformation({
                   <SelectContent>
                     <SelectItem value="amazon">Amazon</SelectItem>
                     <SelectItem value="kaufland">Kaufland</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="netto">Netto</SelectItem>
+                    <SelectItem value="freakout">FreakOut</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -145,6 +146,33 @@ export default function ManualAdditionalInformation({
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem className="col-span-1">
+              <FormLabel className="text-black font-semibold text-sm">
+                Status
+              </FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="border">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PAID">Payment received</SelectItem>
+                    <SelectItem value="PENDING">Waiting for payment</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

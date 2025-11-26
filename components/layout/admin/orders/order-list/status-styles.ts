@@ -34,7 +34,11 @@ export function getStatusStyle(raw: string) {
       };
 
     case "paid":
-      return { text: "paid", bg: "bg-[#FFF6CC]", color: "text-[#FED000]" };
+      return {
+        text: "Payment received",
+        bg: "bg-[#FFF6CC]",
+        color: "text-[#FED000]",
+      };
 
     case "shipped":
       return {

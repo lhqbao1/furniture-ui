@@ -19,7 +19,7 @@ export const ManualCreateOrderSchema = z.object({
   invoice_additional_address: z.string().optional(),
   invoice_country: z.string().optional(),
 
-  from_marketplace: z.string().optional(),
+  from_marketplace: z.string().min(1, "Marketplace is required"),
   marketplace_order_id: z.string().optional().nullable(),
 
   total_amount: z.number().optional(),
@@ -27,6 +27,8 @@ export const ManualCreateOrderSchema = z.object({
   total_shipping: z.number().optional(),
   total_discount: z.number().optional(),
   carrier: z.string().optional(),
+
+  status: z.string().min(1, "Status is required"),
 
   items: z
     .array(
@@ -55,6 +57,7 @@ export const manualCheckoutDefaultValues: ManualCreateOrderFormValues = {
   first_name: "",
   last_name: "",
   address: "",
+  status: "PAID",
   city: "",
   postal_code: "",
   country: "",

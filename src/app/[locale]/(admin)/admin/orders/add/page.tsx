@@ -14,10 +14,47 @@ import {
   ManualCreateOrderFormValues,
   ManualCreateOrderSchema,
 } from "@/lib/schema/manual-checkout";
-import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/order-create/shipping-address";
-import ManualCheckOutInvoiceAddress from "@/components/layout/admin/orders/order-create/invoice-address";
-import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
-import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
+import dynamic from "next/dynamic";
+import { ProductItem } from "@/types/products";
+// import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/order-create/shipping-address";
+// import ManualCheckOutInvoiceAddress from "@/components/layout/admin/orders/order-create/invoice-address";
+// import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
+// import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
+// Shipping Address
+const ManualCheckOutShippingAddress = dynamic(
+  () =>
+    import("@/components/layout/admin/orders/order-create/shipping-address"),
+  {
+    ssr: false,
+  },
+);
+
+// Invoice Address
+const ManualCheckOutInvoiceAddress = dynamic(
+  () => import("@/components/layout/admin/orders/order-create/invoice-address"),
+  {
+    ssr: false,
+  },
+);
+
+// Additional Info
+const ManualAdditionalInformation = dynamic(
+  () =>
+    import(
+      "@/components/layout/admin/orders/order-create/manual-additional-details"
+    ),
+  {
+    ssr: false,
+  },
+);
+
+// Select Products
+const SelectOrderItems = dynamic(
+  () => import("@/components/layout/admin/orders/order-create/select-product"),
+  {
+    ssr: false,
+  },
+);
 
 export interface CartItem {
   id: number;
@@ -29,9 +66,16 @@ export interface CartItem {
   imageUrl: string;
 }
 
+interface SelectedProduct {
+  product: ProductItem;
+  quantity: number;
+  final_price: number;
+}
+
 export default function CreateCheckoutpage() {
   const t = useTranslations();
   const createOrderManualMutation = useCreateCheckOutManual();
+  const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);
 
   const form = useForm<ManualCreateOrderFormValues>({
     resolver: zodResolver(ManualCreateOrderSchema),
@@ -61,6 +105,7 @@ export default function CreateCheckoutpage() {
         onSuccess(data, variables, context) {
           toast.success("Create order successfully");
           form.reset();
+          setListProducts([]);
         },
         onError(error, variables, context) {
           toast.error("Create order fail");
@@ -89,7 +134,6 @@ export default function CreateCheckoutpage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* User information and address */}
           <div className="col-span-1 space-y-4 lg:space-y-12">
-            {/* <AdminManualCreateOrder /> */}
             <CheckOutUserInformation isAdmin />
             <ManualAdditionalInformation />
             <ManualCheckOutShippingAddress isAdmin />
@@ -98,7 +142,10 @@ export default function CreateCheckoutpage() {
 
           {/* Table cart and total */}
           <div className="col-span-1 space-y-4 lg:space-y-4">
-            <SelectOrderItems />
+            <SelectOrderItems
+              listProducts={listProducts}
+              setListProducts={setListProducts}
+            />
             <div className="flex lg:justify-end justify-center gap-2">
               <Button
                 type="submit"

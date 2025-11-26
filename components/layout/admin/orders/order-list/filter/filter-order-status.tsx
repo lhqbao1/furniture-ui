@@ -18,7 +18,7 @@ export const STATUS_OPTIONS = [
   { key: "tock_reserved", label: "Stock reserved", active: true, pos: 4 },
   {
     key: "preparation_shipping",
-    label: "In preparation for shipping",
+    label: "Preparing",
     active: true,
     pos: 5,
   },

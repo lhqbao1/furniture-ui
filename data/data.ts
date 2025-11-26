@@ -990,6 +990,7 @@ export const STATUS_OPTIONS = [
 
 export const COUNTRY_OPTIONS = [
   { value: "AF", label: "Afghanistan" },
+  { value: "AT", label: "Austria" },
   { value: "AL", label: "Albanien" },
   { value: "DZ", label: "Algerien" },
   { value: "AS", label: "Amerikanisch-Samoa" },
