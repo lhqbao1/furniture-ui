@@ -151,7 +151,7 @@ const ManualCheckOutInvoiceAddress = ({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="invoice_address_line"
+            name="invoice_address"
             render={({ field }) => (
               <FormItem className="col-span-2">
                 <FormLabel>

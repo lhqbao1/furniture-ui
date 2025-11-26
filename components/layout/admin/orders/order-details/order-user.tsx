@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Address } from "@/types/address";
 import { User } from "@/types/user";
 import React from "react";
