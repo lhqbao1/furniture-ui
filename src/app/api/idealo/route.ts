@@ -47,7 +47,7 @@ export async function GET() {
             .join(", ") || "";
         return [
           escapeCsv(p.id_provider),
-          escapeCsv(p.brand.company_name ?? ""),
+          escapeCsv(p.brand.company_name ?? "Prestige Home"),
           escapeCsv(p.name),
           escapeCsv(categories),
           escapeCsv(`https://prestige-home.de/de/product/${p.url_key}`),
