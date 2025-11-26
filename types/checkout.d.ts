@@ -70,6 +70,7 @@ export interface CheckOutMain {
   marketplace_order_id: string;
   payment_method: string;
   checkouts: CheckOut[];
+  tax: number;
   created_at: Date;
   updated_at: Date;
 }

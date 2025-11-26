@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect } from "react";
 
 interface ManualAdditionalInformationProps {
   isAdmin?: boolean;
@@ -25,6 +26,18 @@ export default function ManualAdditionalInformation({
   isAdmin = false,
 }: ManualAdditionalInformationProps) {
   const form = useFormContext();
+  const country = form.watch("country");
+
+  useEffect(() => {
+    if (!country) return;
+
+    const TAX_BY_COUNTRY: Record<string, number> = {
+      AT: 20,
+      DE: 19,
+    };
+
+    form.setValue("tax", TAX_BY_COUNTRY[country] ?? 19);
+  }, [country, form]);
 
   return (
     <div className="space-y-4">
@@ -126,6 +139,64 @@ export default function ManualAdditionalInformation({
 
         <FormField
           control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem className="col-span-1">
+              <FormLabel className="text-black font-semibold text-sm">
+                Status
+              </FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="border">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PAID">Payment received</SelectItem>
+                    <SelectItem value="PENDING">Waiting for payment</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tax"
+          render={({ field }) => (
+            <FormItem className="flex flex-col col-span-1">
+              <FormLabel className="text-black font-semibold text-sm">
+                Tax
+              </FormLabel>
+              <FormControl>
+                <div className="relative flex items-center w-full">
+                  <Input
+                    {...field}
+                    type="number"
+                    min={0}
+                    className="pl-7"
+                    step="0.01"
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === "" ? null : e.target.valueAsNumber,
+                      )
+                    }
+                  />
+                  <span className="absolute left-3 text-gray-500">%</span>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="total_discount"
           render={({ field }) => (
             <FormItem className="flex flex-col col-span-1">
@@ -149,33 +220,6 @@ export default function ManualAdditionalInformation({
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem className="col-span-1">
-              <FormLabel className="text-black font-semibold text-sm">
-                Status
-              </FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="border">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PAID">Payment received</SelectItem>
-                    <SelectItem value="PENDING">Waiting for payment</SelectItem>
-                  </SelectContent>
-                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

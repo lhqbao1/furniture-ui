@@ -31,6 +31,7 @@ export const ManualCreateOrderSchema = z.object({
   total_shipping: z.number().optional(),
   total_discount: z.number().optional(),
   carrier: z.string().optional(),
+  tax: z.number().min(0, "Tax is required"),
 
   status: z.string().min(1, "Status is required"),
 
@@ -76,4 +77,5 @@ export const manualCheckoutDefaultValues: ManualCreateOrderFormValues = {
   invoice_recipient_name: "",
   phone: "",
   invoice_phone: "",
+  tax: 19,
 };

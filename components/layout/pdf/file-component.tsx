@@ -11,6 +11,7 @@ import { useMemo } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { InvoicePDF } from "./file";
 import { Button } from "@/components/ui/button";
+import { calculateVAT } from "@/lib/caculate-vat";
 
 interface InvoiceTableProps {
   checkoutId: string;
@@ -172,13 +173,12 @@ export default function InvoiceTable({
         <div className="flex gap-0 justify-end">
           <div className="mr-6">MwSt.</div>
           <div className="w-[100px] text-right">
-            {(
-              (((invoice?.total_amount_item ?? 0) +
-                (invoice?.total_shipping ?? 0) +
-                (invoice?.voucher_amount ?? 0)) /
-                1.19) *
-              0.19
-            ).toLocaleString("de-DE", {
+            {calculateVAT({
+              items: invoice?.total_amount_item,
+              shipping: invoice?.total_shipping,
+              discount: invoice?.voucher_amount,
+              taxPercent: checkout?.tax ?? 19,
+            }).toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}

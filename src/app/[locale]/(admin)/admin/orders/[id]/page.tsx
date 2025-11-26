@@ -9,6 +9,7 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import AdminBackButton from "@/components/shared/admin-back-button";
 import { useGetMainCheckOutByMainCheckOutId } from "@/features/checkout/hook";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
+import { calculateVAT } from "@/lib/caculate-vat";
 import { formatDate, formatDateTime } from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
 import { CheckOutMain } from "@/types/checkout";
@@ -35,6 +36,7 @@ const OrderDetails = () => {
     isLoading,
     isError,
   } = useGetMainCheckOutByMainCheckOutId(checkoutId);
+
   const {
     data: invoice,
     isLoading: isLoadingInvoice,
@@ -98,13 +100,12 @@ const OrderDetails = () => {
           sub_total={order.total_amount_item}
           shipping_amount={order.total_shipping}
           discount_amount={Math.abs(order.voucher_amount)}
-          tax={
-            (((invoice?.total_amount_item ?? 0) +
-              (invoice?.total_shipping ?? 0) +
-              (invoice?.voucher_amount ?? 0)) /
-              1.19) *
-            0.19
-          }
+          tax={calculateVAT({
+            items: invoice?.total_amount_item,
+            shipping: invoice?.total_shipping,
+            discount: invoice?.voucher_amount,
+            taxPercent: order.tax ?? 19,
+          })}
           total_amount={order.total_amount}
           payment_method={order.payment_method}
           entry_date={order.created_at}
