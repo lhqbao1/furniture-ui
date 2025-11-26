@@ -36,7 +36,7 @@ export const FooterSection = () => (
 
     {/* COLUMN 2 */}
     <View style={{ width: "42%" }}>
-      <Text style={styles.bold}>Kontoverbindung</Text>
+      <Text style={styles.bold}>Bankverbindung</Text>
       <Text style={styles.gap}>OLINDA Zweigniederlassung Deutschland</Text>
       <Text style={styles.gap}>IBAN: DE57100101232316418882</Text>
       <Text style={styles.gap}>BIC: QNTODEB2XXX</Text>
