@@ -195,6 +195,7 @@ export default function InvoiceTable({
             €
           </div>
         </div>
+
         <div className="flex gap-0 justify-end">
           <div className="mr-6">Wertgutschein (brutto)</div>
           <div className="w-[100px] text-right">
@@ -208,13 +209,31 @@ export default function InvoiceTable({
             €
           </div>
         </div>
+
+        {checkout?.status.toLowerCase() === "pending" ? (
+          ""
+        ) : (
+          <div className="flex gap-0 justify-end">
+            <div className="mr-6">Zahlbetrag</div>
+            <div className="w-[100px] text-right">
+              {(invoice?.total_amount ?? 0).toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              €
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-0 justify-end">
-          <div className="mr-6">Zahlbetrag</div>
+          <div className="mr-6">Offener Betrag</div>
           <div className="w-[100px] text-right">
-            {(invoice?.total_amount ?? 0).toLocaleString("de-DE", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {checkout?.status.toLowerCase() === "pending"
+              ? (invoice?.total_amount ?? 0).toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              : "00,00"}
             €
           </div>
         </div>
@@ -268,7 +287,7 @@ export default function InvoiceTable({
           </div>
           <div>Greifswalder Straße 226</div>
           <div>10405 Berlin</div>
-          <div>Tel: info@prestige-home.de</div>
+          <div>info@prestige-home.de</div>
         </div>
 
         <div className="">
@@ -286,9 +305,9 @@ export default function InvoiceTable({
         </div>
 
         <div className="">
-          <div className="font-semibold">Chief Executive Office</div>
-          <div>Thuy Duong Nguyen</div>
-          <div>Tax code: DE454714336</div>
+          <div className="font-semibold">Geschäftsführung</div>
+          <div>Duong Thuy Nguyen</div>
+          <div>Ust-IdNr: DE454714336</div>
         </div>
 
         {checkout && invoice && (
