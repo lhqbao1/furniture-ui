@@ -329,5 +329,6 @@
   "companyName": "Firma",
   "vatId": "USt-IdNr",
   "relatedProduct": "Ähnliche Produkte",
-  "invalidOTP": "Ungültiger OTP" 
+  "invalidOTP": "Ungültiger OTP",
+  "inStock1": "Lagerbestand"
 }
