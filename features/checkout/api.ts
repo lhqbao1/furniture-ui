@@ -25,6 +25,16 @@ export interface OrderStatisticsParams {
   to_date?: string;
 }
 
+export interface DeliveryOrderItem {
+  product_id: string;
+  quantity: number;
+}
+
+export interface DeliveryOrderPayload {
+  items: DeliveryOrderItem[];
+  carrier: string;
+}
+
 export async function createCheckOut(item: CreateOrderFormValues) {
   const { data } = await api.post(`/checkout`, item, {
     headers: {
@@ -146,5 +156,16 @@ export async function makeOrderPaid(main_checkout_id: string) {
 
 export async function cancelOrder(main_checkout_id: string) {
   const { data } = await apiAdmin.put(`/checkout/cancel/${main_checkout_id}`);
+  return data;
+}
+
+export async function createDeliveryOrder(
+  main_checkout_id: string,
+  payload: DeliveryOrderPayload,
+) {
+  const { data } = await apiAdmin.post(
+    `/checkout/create-delivery-order/${main_checkout_id}`,
+    payload,
+  );
   return data;
 }
