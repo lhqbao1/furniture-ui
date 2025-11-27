@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
-import { ChevronDown, ChevronRight, Eye } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, X } from "lucide-react";
 import ViewFileDialog from "./view-file";
 import { listChanel } from "@/data/data";
 import { useRouter } from "@/src/i18n/navigation";
@@ -22,6 +22,9 @@ import { ProductTable } from "../../products/products-list/product-table";
 import { cartSupplierColumn } from "@/components/layout/cart/columns";
 import ViewFileChildDialog from "@/components/layout/packaging-dialog/packaging-dialog-chil";
 import { getStatusStyle } from "./status-styles";
+import { useCancelExchangeOrder } from "@/features/checkout/hook";
+import { toast } from "sonner";
+import CancelExchangeDialog from "../order-details/dialog/cancel-exchange-dialog";
 
 const ActionCell = ({
   id,
@@ -69,11 +72,6 @@ const ActionCell = ({
           <ChevronRight className="size-4 text-gray-600" />
         )}
       </Button>
-
-      {/* <ReturnConfirmDialog
-        id={id}
-        status={status}
-      /> */}
     </div>
   );
 };
@@ -85,6 +83,7 @@ const ActionCellChild = ({
   expandedRowId,
   setExpandedRowId,
   currentRowId,
+  status,
 }: {
   items: CartItem[];
   checkoutId: string;
@@ -92,6 +91,7 @@ const ActionCellChild = ({
   expandedRowId?: string | null;
   setExpandedRowId?: (id: string | null) => void;
   currentRowId?: string;
+  status?: string;
 }) => {
   const isExpanded = expandedRowId === currentRowId;
 
@@ -104,11 +104,9 @@ const ActionCellChild = ({
             <Button
               variant="ghost"
               size="icon"
+              className="hover:bg-amber-50"
             >
-              <Eye
-                className="w-4 h-4"
-                stroke="#F7941D"
-              />
+              <Eye className="w-4 h-4 text-amber-500" />
             </Button>
           </DialogTrigger>
           <DialogContent className="lg:w-[800px]">
@@ -136,6 +134,10 @@ const ActionCellChild = ({
         checkoutId={checkoutId}
         data={items}
       />
+
+      {status?.toLowerCase() === "exchange" && (
+        <CancelExchangeDialog id={checkoutId} />
+      )}
 
       {/* Expand button */}
       <Button
@@ -563,11 +565,20 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
   {
     accessorKey: "status",
     header: () => <div className="text-center w-full">STATUS</div>,
-    cell: ({ row }) => (
-      <div className="text-center lowercase">
-        {row.original.shipment ? row.original.shipment.status : "pending"}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const status = row.original.status?.toLowerCase();
+      const shipmentStatus = row.original.shipment?.status;
+
+      let displayStatus = "pending";
+
+      if (status === "cancel_exchange") {
+        displayStatus = "cancel exchange";
+      } else if (row.original.shipment) {
+        displayStatus = shipmentStatus;
+      }
+
+      return <div className="text-center lowercase">{displayStatus}</div>;
+    },
   },
   {
     id: "actions",
@@ -579,6 +590,7 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
         expandedRowId={table.options.meta?.expandedRowId || null}
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
         currentRowId={row.id}
+        status={row.original.status}
       />
     ),
   },

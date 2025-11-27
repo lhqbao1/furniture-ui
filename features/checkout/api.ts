@@ -169,3 +169,10 @@ export async function createDeliveryOrder(
   );
   return data;
 }
+
+export async function cancelExchangeOrder(checkout_id: string) {
+  const { data } = await apiAdmin.post(
+    `/checkout/cancel-exchange/${checkout_id}`,
+  );
+  return data;
+}

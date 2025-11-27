@@ -46,18 +46,28 @@ export default function InvoiceTable({
   });
 
   const flattenedCartItems = useMemo(() => {
-    if (!invoice?.main_checkout?.checkouts) return [];
+    const checkouts = invoice?.main_checkout?.checkouts;
+    if (!checkouts) return [];
 
-    // Flatten toàn bộ items trong tất cả các checkout
-    return invoice.main_checkout.checkouts.flatMap((checkout) => {
-      // Nếu checkout.cart là mảng (CartResponse)
-      if (Array.isArray(checkout.cart)) {
-        return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
-      }
+    return (
+      checkouts
+        // ❌ Loại checkout có status "exchange" hoặc "cancel_exchange"
+        .filter((checkout) => {
+          const status = checkout.status?.toLowerCase();
+          return status !== "exchange" && status !== "cancel_exchange";
+        })
 
-      // Nếu checkout.cart là object (CartResponseItem)
-      return checkout.cart?.items ?? [];
-    });
+        // ✔ Flatten items
+        .flatMap((checkout) => {
+          // Nếu checkout.cart là array (CartResponse)
+          if (Array.isArray(checkout.cart)) {
+            return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
+          }
+
+          // Nếu checkout.cart là object (CartResponseItem)
+          return checkout.cart?.items ?? [];
+        })
+    );
   }, [invoice]);
 
   return (
@@ -99,6 +109,7 @@ export default function InvoiceTable({
               ? checkout?.checkouts?.[0]?.invoice_address?.country
               : checkout?.checkouts?.[0]?.shipping_address?.country}
           </span>
+          <span>{checkout?.checkouts?.[0]?.user?.tax_id}</span>
         </div>
 
         <div className="w-[320px] border border-gray-400 text-[13px]">

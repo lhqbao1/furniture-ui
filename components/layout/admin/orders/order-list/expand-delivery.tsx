@@ -26,8 +26,17 @@ function transformCartItems(items: CartItem[]): CartItem[] {
 }
 
 export function flattenCheckOutCart(checkoutMain: CheckOutMain): CartItem[] {
-  return checkoutMain.checkouts.flatMap((checkout) =>
-    transformCartItems(checkout.cart.items),
+  if (!checkoutMain?.checkouts) return [];
+
+  return (
+    checkoutMain.checkouts
+      // ❌ lọc bỏ exchange và cancel_exchange
+      .filter((checkout) => {
+        const status = checkout.status?.toLowerCase();
+        return status !== "exchange" && status !== "cancel_exchange";
+      })
+      // ✔ flatten items
+      .flatMap((checkout) => transformCartItems(checkout.cart.items))
   );
 }
 

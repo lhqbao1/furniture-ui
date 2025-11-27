@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect } from "react";
+import { Calendar } from "lucide-react";
 
 interface ManualAdditionalInformationProps {
   isAdmin?: boolean;
@@ -27,6 +28,14 @@ export default function ManualAdditionalInformation({
 }: ManualAdditionalInformationProps) {
   const form = useFormContext();
   const country = form.watch("country");
+  const status = form.watch("status")?.toLowerCase();
+
+  // Khi status = paid → set giá trị về null
+  useEffect(() => {
+    if (status === "paid") {
+      form.setValue("payment_term", null);
+    }
+  }, [status, form]);
 
   useEffect(() => {
     if (!country) return;
@@ -224,6 +233,44 @@ export default function ManualAdditionalInformation({
               <FormMessage />
             </FormItem>
           )}
+        />
+
+        <FormField
+          control={form.control}
+          name="payment_term"
+          render={({ field }) => {
+            const status = form.watch("status")?.toLowerCase();
+
+            return (
+              <FormItem className="flex flex-col col-span-1">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Payment Term
+                </FormLabel>
+                <FormControl>
+                  <div className="relative flex items-center w-full">
+                    <Input
+                      {...field}
+                      type="number"
+                      min={0}
+                      className="pl-8"
+                      step="1"
+                      value={field.value ?? ""}
+                      disabled={status === "paid"} // ✅ DISABLED WHEN PAID
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "" ? null : e.target.valueAsNumber,
+                        )
+                      }
+                    />
+                    <span className="absolute left-3 text-gray-500">
+                      <Calendar className="size-4" />
+                    </span>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
       </div>
     </div>

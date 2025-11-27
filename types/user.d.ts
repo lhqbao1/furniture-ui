@@ -12,6 +12,7 @@ export type User = {
   language: string;
   gender: string;
   is_notified: boolean;
+  tax_id: string;
   from_marketplace: string;
   created_at: string;
   updated_at: string;
@@ -39,6 +40,7 @@ export type Customer = {
   gender: string;
   from_marketplace: string;
   is_notified: boolean;
+  tax_id: string;
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
 };
