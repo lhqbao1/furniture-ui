@@ -72,6 +72,13 @@ const Footer = () => {
           <ListStars rating={5} />
           <div className="text-sm font-semibold">100% 5-Stars</div>
         </div>
+        <Image
+          src={"/idealo.jpg"}
+          width={100}
+          height={70}
+          alt=""
+          className="object-cover"
+        />
         {/* <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
           <img
             src="https://img.idealo.com/badges/336129/05b1de33-5dae-4864-bd06-131f2cfe3ece"
