@@ -85,7 +85,7 @@ export function useGetSupplierCheckOutByCheckOutId(checkout_id: string) {
 
 export function useGetMainCheckOutByMainCheckOutId(main_checkout_id: string) {
   return useQuery({
-    queryKey: ["checkout-id", main_checkout_id],
+    queryKey: ["checkout-main-id", main_checkout_id],
     queryFn: () => getMainCheckOutByMainCheckOutId(main_checkout_id),
     enabled: !!main_checkout_id,
     retry: false,
@@ -134,8 +134,8 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       "checkout-main",
       page ?? 1,
       page_size ?? 50,
-      (status ?? []).join(","), // 🔥 fix array issues
-      (channel ?? []).join(","), // 🔥 fix array issues
+      (status ?? []).join(","),
+      (channel ?? []).join(","),
       from_date ?? null,
       to_date ?? null,
       search ?? null,
@@ -149,9 +149,13 @@ export function useReturnOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (main_checkout_id: string) => returnOrder(main_checkout_id),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables],
+      });
     },
   });
 }
@@ -160,9 +164,13 @@ export function useCancelOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (main_checkout_id: string) => cancelOrder(main_checkout_id),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables],
+      });
     },
   });
 }
@@ -171,9 +179,13 @@ export function useMakeOrderPaid() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (main_checkout_id: string) => makeOrderPaid(main_checkout_id),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables],
+      });
     },
   });
 }
@@ -181,12 +193,19 @@ export function useMakeOrderPaid() {
 export function useCancelExchangeOrder() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (checkout_id: string) => cancelExchangeOrder(checkout_id),
-    onSuccess: () => {
+    mutationFn: ({
+      checkout_id,
+      main_checkout_id,
+    }: {
+      checkout_id: string;
+      main_checkout_id: string;
+    }) => cancelExchangeOrder(checkout_id),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
       qc.refetchQueries({
-        queryKey: ["checkout-id"],
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
       });
     },
   });
@@ -206,10 +225,11 @@ export function useCreateDeliveryOrder() {
 
     onSuccess: (data, variables) => {
       // refetch các query liên quan
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
       qc.refetchQueries({
-        queryKey: ["checkout-id", variables.main_checkout_id],
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
       });
     },
   });

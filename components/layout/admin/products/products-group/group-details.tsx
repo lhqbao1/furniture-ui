@@ -1,26 +1,28 @@
-import React from 'react'
-import SelectProductAttributes from './select-attributes'
-import { useAtom } from 'jotai'
-import { currentProductGroup } from '@/store/product-group'
-import ListVariantOption from './list-variant-options'
+import React from "react";
+import SelectProductAttributes from "./select-attributes";
+import { useAtom } from "jotai";
+import { currentProductGroup } from "@/store/product-group";
+import ListVariantOption from "./list-variant-options";
 
 const GroupDetails = () => {
-    const [currentGroup, setCurrentGroup] = useAtom(currentProductGroup)
+  const [currentGroup, setCurrentGroup] = useAtom(currentProductGroup);
 
-    return (
-        <div className='flex flex-col items-start gap-6 w-full'>
-            <div className="grid grid-cols-6 w-full gap-8">
-                <p className='col-span-1 text-right'>Group name:</p>
-                <div className='flex gap-4 items-center col-span-5'>
-                    <span className='font-semibold col-span-5 text-xl text-secondary'>{currentGroup ? currentGroup : 'None'}</span>
-                </div>
-            </div>
-            <div className='w-full space-y-6'>
-                <SelectProductAttributes />
-                <ListVariantOption />
-            </div>
+  return (
+    <div className="flex flex-col items-start gap-6 w-full">
+      <div className="grid grid-cols-6 w-full gap-8 items-center">
+        <p className="col-span-1 text-right">Group name:</p>
+        <div className="flex gap-4 items-center col-span-5">
+          <span className="font-semibold col-span-5 text-xl text-secondary">
+            {currentGroup ? currentGroup : "None"}
+          </span>
         </div>
-    )
-}
+      </div>
+      <div className="w-full space-y-6">
+        <SelectProductAttributes />
+        <ListVariantOption />
+      </div>
+    </div>
+  );
+};
 
-export default GroupDetails
+export default GroupDetails;
