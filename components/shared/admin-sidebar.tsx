@@ -105,6 +105,11 @@ export function AdminSideBar() {
           url: "/admin/settings/policy",
           icon: CornerDownRight,
         },
+        {
+          title: "Voucher",
+          url: "/admin/settings/voucher",
+          icon: CornerDownRight,
+        },
       ],
     },
     {

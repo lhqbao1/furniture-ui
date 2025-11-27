@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogClose,
@@ -11,11 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Circle, Loader2, Trash2, Undo2, X } from "lucide-react";
-import { ProductItem } from "@/types/products";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useRemoveFormEbay } from "@/features/ebay/hook";
-import { useCancelOrder, useReturnOrder } from "@/features/checkout/hook";
+import { useCancelOrder } from "@/features/checkout/hook";
 
 interface ReturnConfirmDialogProps {
   id: string;

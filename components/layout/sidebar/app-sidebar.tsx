@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -50,6 +50,15 @@ export default function AppSidebar({
     openMobile,
     setOpenMobile,
   } = useSidebar();
+
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const uid = localStorage.getItem("userId");
+      setUserId(uid);
+    }
+  }, []);
 
   const t = useTranslations();
   const locale = useLocale(); // 👈 thêm locale
@@ -105,7 +114,7 @@ export default function AppSidebar({
     newProducts,
     sale,
     ...(categories && categories.length > 0 ? mapCategories(categories) : []),
-    accountMenu,
+    ...(userId ? [accountMenu] : []), // 👈 Chỉ thêm khi có userId
   ];
 
   const [openItem, setOpenItem] = useState<string | null>(null);

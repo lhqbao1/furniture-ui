@@ -180,17 +180,11 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
               <div className="flex">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="p-0 h-auto"
-                    >
-                      <User
-                        className="cursor-pointer hover:scale-110 transition-all duration-300"
-                        stroke="#4D4D4D"
-                        size={30}
-                      />
-                    </Button>
+                    <User
+                      className="cursor-pointer hover:scale-110 transition-all duration-300"
+                      stroke="#4D4D4D"
+                      size={30}
+                    />
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent

@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { email, z } from "zod";
+import { z } from "zod";
 import {
   Form,
   FormField,
@@ -225,7 +225,7 @@ const SyncToEbayForm = ({
             );
             const payload: syncToEbayInput = {
               price: ebayData?.final_price ?? product.final_price,
-              sku: ebayData?.sku ?? product.sku,
+              sku: product.id_provider,
               stock: product.stock,
               tax: product.tax ? product.tax : null,
               product: {
