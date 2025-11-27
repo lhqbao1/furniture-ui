@@ -45,7 +45,9 @@ const ProductList = () => {
     search: filters.search,
     sort_by_stock: filters.sort_by_stock,
   });
-  const { data: exportData } = useGetProductsSelect();
+  const { data: exportData } = useGetProductsSelect({
+    is_customer: false,
+  });
 
   if (isError) return <div>No data</div>;
 

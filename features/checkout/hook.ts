@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   cancelOrder,
   createCheckOut,
+  createDeliveryOrder,
   createManualCheckOut,
+  DeliveryOrderPayload,
   GetAllCheckoutParams,
   getCheckOut,
   getCheckOutByCheckOutId,
@@ -171,6 +173,29 @@ export function useMakeOrderPaid() {
     onSuccess: () => {
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+    },
+  });
+}
+
+export function useCreateDeliveryOrder() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      payload,
+    }: {
+      main_checkout_id: string;
+      payload: DeliveryOrderPayload;
+    }) => createDeliveryOrder(main_checkout_id, payload),
+
+    onSuccess: (data, variables) => {
+      // refetch các query liên quan
+      qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-id", variables.main_checkout_id],
+      });
     },
   });
 }
