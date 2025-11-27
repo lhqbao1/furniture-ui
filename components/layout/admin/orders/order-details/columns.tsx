@@ -1,7 +1,6 @@
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
-import Link from "next/link";
 
 export const orderDetailColumn: ColumnDef<CartItem>[] = [
   {

@@ -10,6 +10,7 @@ import CancelConfirmDialog from "./dialog/canceled-confirm-dialog";
 import { CheckOutMain } from "@/types/checkout";
 import { STATUS_OPTIONS } from "@/data/data";
 import PaidConfirmDialog from "./dialog/paid-comfirm-dialog";
+import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
 
 export default function OrderStatusSelector({
   status,
@@ -22,6 +23,7 @@ export default function OrderStatusSelector({
   const [openReturn, setOpenReturn] = React.useState(false);
   const [openCancel, setOpenCancel] = React.useState(false);
   const [openPaid, setOpenPaid] = React.useState(false);
+  const [openExchange, setOpenExchange] = React.useState(false);
 
   // compute items to show in dropdown:
   // if current status is completed -> only show "return" option
@@ -34,6 +36,13 @@ export default function OrderStatusSelector({
         return {
           ...item,
           active: item.key === "return",
+        };
+      }
+
+      if (current === "shipped") {
+        return {
+          ...item,
+          active: item.key === "exchange",
         };
       }
 
@@ -64,12 +73,11 @@ export default function OrderStatusSelector({
     if (val === "return") {
       setOpenReturn(true);
     } else if (val === "canceled") {
-      // keep previous behavior: choosing "paid" can open CancelConfirmDialog
       setOpenCancel(true);
     } else if (val === "paid") {
       setOpenPaid(true);
-      // other statuses: no dialog, you can trigger an API call here if needed
-      // e.g. updateStatusAPI(order.id, val)
+    } else if (val === "exchange") {
+      setOpenExchange(true);
     }
   };
 
@@ -149,6 +157,18 @@ export default function OrderStatusSelector({
           open={openCancel}
           onClose={() => {
             setOpenPaid(false);
+            setValue(status.toLocaleLowerCase());
+          }}
+        />
+      )}
+
+      {openExchange && (
+        <ExchangeConfirmDialog
+          id={order.id}
+          status={status}
+          open={openExchange}
+          onClose={() => {
+            setOpenExchange(false);
             setValue(status.toLocaleLowerCase());
           }}
         />

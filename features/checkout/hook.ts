@@ -1,6 +1,7 @@
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  cancelExchangeOrder,
   cancelOrder,
   createCheckOut,
   createDeliveryOrder,
@@ -173,6 +174,20 @@ export function useMakeOrderPaid() {
     onSuccess: () => {
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+    },
+  });
+}
+
+export function useCancelExchangeOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (checkout_id: string) => cancelExchangeOrder(checkout_id),
+    onSuccess: () => {
+      qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-id"],
+      });
     },
   });
 }

@@ -986,6 +986,7 @@ export const STATUS_OPTIONS = [
   { key: "cancel_request", label: "Cancel requested", active: true, pos: 8 },
   { key: "canceled", label: "Canceled", active: true, pos: 9 },
   { key: "return", label: "Return", active: true, pos: 10 },
+  { key: "exchange", label: "Exchange", active: true, pos: 11 },
 ];
 
 export const COUNTRY_OPTIONS = [

@@ -20,8 +20,17 @@ import React, { useState } from "react";
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   if (!checkOutMain?.checkouts) return [];
 
-  return checkOutMain.checkouts.flatMap((checkout) =>
-    checkout.cart.items.flatMap((cartGroup) => cartGroup),
+  return (
+    checkOutMain.checkouts
+      // lọc bỏ exchange + cancel_exchange
+      .filter((checkout) => {
+        const status = checkout.status?.toLowerCase();
+        return status !== "exchange" && status !== "cancel_exchange";
+      })
+      // sau đó mới lấy cart items
+      .flatMap((checkout) =>
+        checkout.cart.items.flatMap((cartGroup) => cartGroup),
+      )
   );
 }
 

@@ -93,6 +93,8 @@ export default function CreateCheckoutpage() {
       return;
     }
 
+    console.log(values);
+
     createOrderManualMutation.mutate(
       {
         ...values,
@@ -126,7 +128,7 @@ export default function CreateCheckoutpage() {
           },
           (errors) => {
             console.log(errors);
-            toast.error(t("checkFormError"));
+            toast.error(errors.items?.message);
           },
         )}
         className="flex flex-col gap-8 pb-12"

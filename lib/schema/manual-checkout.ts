@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const ManualCreateOrderSchema = z.object({
   email: z.string().optional().nullable(),
-
+  tax_id: z.string().optional().nullable(),
   first_name: z.string().min(1, { message: "First name is required" }),
   last_name: z.string().min(1, { message: "Last name is required" }),
   phone_number: z.string().optional().nullable(),
@@ -32,6 +32,7 @@ export const ManualCreateOrderSchema = z.object({
   total_discount: z.number().optional(),
   carrier: z.string().optional(),
   tax: z.number().min(0, "Tax is required"),
+  payment_term: z.number().optional().nullable(),
 
   status: z.string().min(1, "Status is required"),
 
