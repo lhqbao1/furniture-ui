@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import {
   Accordion,
-  AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -49,9 +48,6 @@ const ProductForm = ({
   } = useProductForm({ productValues, productValuesClone });
 
   const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
-
-  console.log("hehe");
-
   return (
     <div className="lg:pb-20 lg:px-30 pb-12">
       <Form {...form}>

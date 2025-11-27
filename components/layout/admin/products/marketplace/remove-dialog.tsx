@@ -36,7 +36,7 @@ const RemoveFromMarketplaceDialog = ({
 
   const handleRemove = () => {
     if (marketplace === "ebay" && marketplaceProduct) {
-      removeFromEbayMutation.mutate(product.sku, {
+      removeFromEbayMutation.mutate(product.id_provider, {
         onSuccess: () => {
           toast.success("Removed from eBay successfully");
           setOpen(false);
