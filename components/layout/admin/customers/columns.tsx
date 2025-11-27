@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import DeleteDialog from "./delete-dialog";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
+import { listChanel } from "@/data/data";
+import Image from "next/image";
 
 function ActionCell({ user }: { user: Customer }) {
   const router = useRouter();
@@ -91,12 +93,22 @@ export const customerColumns: ColumnDef<Customer>[] = [
     },
   },
   {
-    accessorKey: "email",
+    accessorKey: "channel",
     header: () => <div className="text-center w-full">CHANNEL</div>,
     cell: ({ row }) => {
+      const currentChanel = row.original.from_marketplace;
+      const channelLogo =
+        listChanel.find((ch) => ch.name === currentChanel)?.icon ||
+        "new-logo.svg";
       return (
-        <div className="uppercase text-center">
-          {row.original.from_marketplace}
+        <div className="h-12 relative">
+          <Image
+            src={`/${channelLogo}`}
+            alt="icon"
+            fill
+            className="object-contain p-2"
+            unoptimized
+          />
         </div>
       );
     },

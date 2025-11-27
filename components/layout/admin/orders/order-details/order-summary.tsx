@@ -1,4 +1,3 @@
-import { formatDateTime } from "@/lib/date-formated";
 import { User } from "@/types/user";
 import React from "react";
 
@@ -22,7 +21,7 @@ interface OrderInformationProps {
   is_Ebay?: boolean;
 }
 
-const OrderInformation = ({
+const OrderSummary = ({
   payment_method,
   language,
   external_id,
@@ -96,4 +95,4 @@ const OrderInformation = ({
   );
 };
 
-export default OrderInformation;
+export default OrderSummary;

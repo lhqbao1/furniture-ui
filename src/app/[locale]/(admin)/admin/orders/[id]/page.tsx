@@ -2,9 +2,9 @@
 import { orderDetailColumn } from "@/components/layout/admin/orders/order-details/columns";
 import DocumentTable from "@/components/layout/admin/orders/order-details/document/document-table";
 import OrderDeliveryOrder from "@/components/layout/admin/orders/order-details/order-delivery-order";
-import OrderInformation from "@/components/layout/admin/orders/order-details/order-information";
+import OrderSummary from "@/components/layout/admin/orders/order-details/order-summary";
 import OrderDetailOverView from "@/components/layout/admin/orders/order-details/order-overview";
-import OrderDetailUser from "@/components/layout/admin/orders/order-details/order-user";
+import OrderDetailUser from "@/components/layout/admin/orders/order-details/order-customer";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import AdminBackButton from "@/components/shared/admin-back-button";
 import { useGetMainCheckOutByMainCheckOutId } from "@/features/checkout/hook";
@@ -104,7 +104,7 @@ const OrderDetails = () => {
         ) : (
           ""
         )}
-        <OrderInformation
+        <OrderSummary
           language={order.checkouts[0].user.language ?? ""}
           sub_total={order.total_amount_item}
           shipping_amount={order.total_shipping}

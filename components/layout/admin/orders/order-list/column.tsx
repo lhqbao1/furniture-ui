@@ -136,7 +136,10 @@ const ActionCellChild = ({
       />
 
       {status?.toLowerCase() === "exchange" && (
-        <CancelExchangeDialog id={checkoutId} />
+        <CancelExchangeDialog
+          id={checkoutId}
+          main_checkout_id={checkoutId}
+        />
       )}
 
       {/* Expand button */}
@@ -228,7 +231,6 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
             unoptimized
           />
         </div>
-        // <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
       );
     },
   },

@@ -20,23 +20,33 @@ import {
 
 interface CancelExchangeDialogProps {
   id: string;
+  main_checkout_id: string;
 }
 
-const CancelExchangeDialog = ({ id }: CancelExchangeDialogProps) => {
+const CancelExchangeDialog = ({
+  id,
+  main_checkout_id,
+}: CancelExchangeDialogProps) => {
   const [open, setOpen] = useState(false);
   const cancelExchangeMutation = useCancelExchangeOrder();
 
   const handleCancelExchange = () => {
-    cancelExchangeMutation.mutate(id, {
-      onSuccess(data, variables, context) {
-        toast.success("Cancel exchange successful");
-        setOpen(false);
+    cancelExchangeMutation.mutate(
+      {
+        main_checkout_id: main_checkout_id,
+        checkout_id: id,
       },
-      onError(data, variables, context) {
-        toast.error("Cancel exchange fail");
-        // setOpen(false);
+      {
+        onSuccess(data, variables, context) {
+          toast.success("Cancel exchange successful");
+          setOpen(false);
+        },
+        onError(data, variables, context) {
+          toast.error("Cancel exchange fail");
+          // setOpen(false);
+        },
       },
-    });
+    );
   };
   return (
     <Dialog

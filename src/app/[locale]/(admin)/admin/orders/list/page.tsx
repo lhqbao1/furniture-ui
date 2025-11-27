@@ -72,7 +72,7 @@ const OrderList = () => {
     {
       count: statistic?.count_return_cancel_order,
       total: statistic?.total_return_cancel_order ?? 0,
-      label: "Returned",
+      label: "Returned & Cancelled",
       textColor: "rgba(242, 5, 5, 0.8)",
     },
     {

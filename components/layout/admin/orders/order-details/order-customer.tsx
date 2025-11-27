@@ -13,10 +13,6 @@ const OrderDetailUser = ({
   shippingAddress,
   invoiceAddress,
 }: OrderDetailUserProps) => {
-  const initials = `${user.first_name?.[0] ?? ""}${
-    user.last_name?.[0] ?? ""
-  }`.toUpperCase();
-
   return (
     <>
       <div className="col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5">
@@ -28,6 +24,7 @@ const OrderDetailUser = ({
             </div>
             <div>{user.email}</div>
             <div>{user.phone_number}</div>
+            {user.tax_id && <div>{user.tax_id}</div>}
           </div>
         </div>
       </div>
