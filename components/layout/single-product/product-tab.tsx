@@ -85,7 +85,7 @@ export function ProductDetailsTab({
   // render tabs
   return (
     <Tabs defaultValue="description">
-      <TabsList className="flex flex-row lg:gap-12 gap-8 overflow-x-scroll">
+      <TabsList className="flex flex-row lg:gap-12 gap-8">
         {sections.map((section) => (
           <TabsTrigger
             key={section.value}

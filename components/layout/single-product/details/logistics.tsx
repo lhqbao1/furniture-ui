@@ -60,6 +60,10 @@ const ProductDetailsLogistic = ({
         </div>
       </div>
 
+      <div>
+        {t("inStock1")}: {productDetails.stock} Stück
+      </div>
+
       <div className="flex flex-row gap-4 items-start py-1.5 lg:py-3">
         <Truck size={30} />
         <div>

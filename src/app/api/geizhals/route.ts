@@ -60,7 +60,7 @@ export async function GET() {
 
   <Preis>${p.final_price.toFixed(2)}</Preis>
 
-  <Deeplink><![CDATA[https://prestige-home.de/product/de/${
+  <Deeplink><![CDATA[https://prestige-home.de/de/product/${
     p.url_key
   }]]></Deeplink>
 

@@ -332,5 +332,6 @@
   "reviewRequired": "Please enter rating and comment.",
   "companyName": "Company",
   "vatId": "VAT ID",
-    "invalidOTP": "Invalid OTP" 
+  "invalidOTP": "Invalid OTP",
+  "inStock1": "Stock availability"
 }
