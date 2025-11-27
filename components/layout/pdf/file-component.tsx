@@ -109,6 +109,7 @@ export default function InvoiceTable({
               ? checkout?.checkouts?.[0]?.invoice_address?.country
               : checkout?.checkouts?.[0]?.shipping_address?.country}
           </span>
+          <span>{checkout?.checkouts?.[0]?.user?.tax_id}</span>
         </div>
 
         <div className="w-[320px] border border-gray-400 text-[13px]">

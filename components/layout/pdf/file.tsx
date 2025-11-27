@@ -177,6 +177,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {checkout.checkouts[0].invoice_address.city}
             </Text>
             <Text>{checkout.checkouts[0].invoice_address.country}</Text>
+            <Text>{checkout.checkouts[0].user.tax_id}</Text>
           </View>
           <View
             style={{
@@ -649,8 +650,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
         {checkout.status.toLowerCase() === "pending" ? (
           <View style={{ marginTop: 10, textAlign: "left", fontSize: 10 }}>
             <Text>
-              Zahlungsbedingungen: Zahlung innerhalb von 14 Tagen ab
-              Rechnungseingang ohne Abzüge.
+              Zahlungsbedingungen: Zahlung innerhalb von {invoice.payment_term}{" "}
+              Tagen ab Rechnungseingang ohne Abzüge.
             </Text>
           </View>
         ) : (
