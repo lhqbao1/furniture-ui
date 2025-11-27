@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trash2 } from "lucide-react";
-import { useDeleteProduct } from "@/features/products/hook";
 import { ProductItem } from "@/types/products";
-import { toast } from "sonner";
-import { useRemoveFormEbay } from "@/features/ebay/hook";
 
 type SelectedProduct = {
   product: ProductItem;
@@ -43,7 +40,7 @@ const RemoveBundleDialog = ({
 
     setTimeout(() => {
       setListProducts((prev) =>
-        prev.filter((p) => p.product.id !== product.id)
+        prev.filter((p) => p.product.id !== product.id),
       );
 
       setIsDeleting(false);
@@ -52,7 +49,10 @@ const RemoveBundleDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
       <DialogTrigger asChild>
         <Button
           variant="ghost"
