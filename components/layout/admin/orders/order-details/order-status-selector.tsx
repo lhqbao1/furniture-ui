@@ -49,7 +49,7 @@ export default function OrderStatusSelector({
       if (current === "pending") {
         return {
           ...item,
-          active: item.key === "paid",
+          active: item.key === "paid" || item.key === "canceled",
         };
       }
 
