@@ -12,6 +12,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { InvoicePDF } from "./file";
 import { Button } from "@/components/ui/button";
 import { calculateVAT } from "@/lib/caculate-vat";
+import { getCountryName } from "@/lib/country-name";
 
 interface InvoiceTableProps {
   checkoutId: string;
@@ -105,9 +106,11 @@ export default function InvoiceTable({
               : checkout?.checkouts?.[0]?.shipping_address?.city}
           </span>
           <span>
-            {checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
-              ? checkout?.checkouts?.[0]?.invoice_address?.country
-              : checkout?.checkouts?.[0]?.shipping_address?.country}
+            {getCountryName(
+              checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
+                ? checkout?.checkouts?.[0]?.invoice_address?.country
+                : checkout?.checkouts?.[0]?.shipping_address?.country ?? "",
+            )}
           </span>
           <span>{checkout?.checkouts?.[0]?.user?.tax_id}</span>
         </div>

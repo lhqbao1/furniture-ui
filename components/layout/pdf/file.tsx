@@ -14,6 +14,7 @@ import { Font } from "@react-pdf/renderer";
 import { useMemo } from "react";
 import { FooterSection } from "./file-footer";
 import { calculateVAT } from "@/lib/caculate-vat";
+import { getCountryName } from "@/lib/country-name";
 
 Font.register({
   family: "Roboto",
@@ -176,7 +177,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {checkout.checkouts[0].invoice_address.postal_code} -{" "}
               {checkout.checkouts[0].invoice_address.city}
             </Text>
-            <Text>{checkout.checkouts[0].invoice_address.country}</Text>
+            <Text>
+              {getCountryName(checkout.checkouts[0].invoice_address.country)}
+            </Text>
             <Text>{checkout.checkouts[0].user.tax_id}</Text>
           </View>
           <View

@@ -16,6 +16,7 @@ import { CheckOutMain } from "@/types/checkout";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
+import OrderDetailsSkeleton from "./skeleton";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   if (!checkOutMain?.checkouts) return [];
@@ -57,12 +58,12 @@ const OrderDetails = () => {
     retry: false,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <OrderDetailsSkeleton />;
   if (isError) return <div>Error loading order</div>;
   if (!order) return <div>Error loading order</div>;
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="space-y-12 pb-20 mt-6">
       <AdminBackButton />
       <div className="grid lg:grid-cols-4 grid-cols-2 lg:gap-12 gap-4">
         <OrderDetailOverView

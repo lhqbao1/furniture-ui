@@ -65,7 +65,7 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
   // ============================
   const handlePaymentSuccess = (paymentIntentId: string) => {
     router.push(
-      `https://prestige-home.de/thank-you?payment_intent=${paymentIntentId}`,
+      `https://prestige-home.de/de/thank-you?payment_intent=${paymentIntentId}`,
       { locale },
     );
   };
@@ -153,7 +153,7 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
               address: { country: "DE" },
             },
           },
-          return_url: `https://prestige-home.de/thank-you`,
+          return_url: `https://prestige-home.de/de/thank-you`,
         })
         .then(({ error }) => {
           if (error) handlePaymentFail(error.message);
@@ -214,7 +214,7 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
           open={openDialog}
           onOpenChange={setOpenDialog}
         >
-          <DialogContent>
+          <DialogContent className="lg:max-w-[600px]! max-w-11/12">
             <DialogHeader>
               <DialogTitle>{t("enterCardDetails")}</DialogTitle>
             </DialogHeader>
