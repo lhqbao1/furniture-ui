@@ -38,20 +38,14 @@ export const submitProduct = async ({
     }
   }
 
-  // if (
-  //   typeof payload.price === "number" &&
-  //   typeof payload.final_price === "number" &&
-  //   payload.price <= payload.final_price
-  // ) {
-  //   toast.error("Regular price must be greater than sale price");
-  //   return;
-  // }
-
   if (productValuesClone) {
     const { marketplace_products, ...cleanPayload } = payload;
 
+    const { url_key, meta_title, meta_description, meta_keywords, ...rest } =
+      cleanPayload;
+
     const finalPayload = {
-      ...cleanPayload,
+      ...rest,
       ebay: false,
     };
 

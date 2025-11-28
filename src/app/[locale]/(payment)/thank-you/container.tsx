@@ -29,7 +29,6 @@ const OrderPlaced = () => {
   const hasProcessedRef = React.useRef(false);
   const [delayed, setDelayed] = React.useState(false);
 
-  const [counter, setCounter] = useState(5);
   const [userId, setUserId] = useState<string | null>(null);
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
@@ -42,7 +41,7 @@ const OrderPlaced = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDelayed(true); // 🔥 sau 3 giây mới cho phép chạy query
-    }, 3000);
+    }, 6000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -54,16 +53,34 @@ const OrderPlaced = () => {
     if (id) setUserId(id);
   }, []);
 
-  const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
-    queryKey: ["checkout-id", checkoutId],
-    enabled: delayed && Boolean(checkoutId) && !hasFetchedRef.current, // 🔥 chạy sau 3s
-    retry: false,
-    queryFn: async () => {
-      hasFetchedRef.current = true; // 🔥 khóa luôn, queryFn sẽ không bao giờ chạy lại
+  const retryCaptureUntilSuccess = async (paymentId: string) => {
+    while (true) {
+      try {
+        const res = await capturePaymentMutation.mutateAsync(paymentId);
 
-      // Capture payment nếu cần
+        // Nếu API trả success → break khỏi vòng lặp
+        if (res?.success || res?.status === "succeeded") {
+          return res;
+        }
+      } catch (err) {
+        // ❗ lỗi 500 → retry
+        console.log("Retry capture payment...", err);
+      }
+
+      // ⏳ chờ 3s trước khi retry
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+  };
+
+  const { data: checkout } = useQuery({
+    queryKey: ["checkout-id", checkoutId],
+    enabled: delayed && Boolean(checkoutId) && !hasFetchedRef.current,
+    retry: false, // Ta tự retry rồi nên không cần retry của React Query
+    queryFn: async () => {
+      hasFetchedRef.current = true;
+
       if (!paymentIntentId && paymentId) {
-        await capturePaymentMutation.mutateAsync(paymentId);
+        await retryCaptureUntilSuccess(paymentId);
       }
 
       return getMainCheckOutByMainCheckOutId(checkoutId!);
