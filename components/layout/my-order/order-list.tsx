@@ -38,21 +38,16 @@ import { cn } from "@/lib/utils";
 import { useAtom } from "jotai";
 import { contactOrderIdAtom } from "@/store/checkout";
 import { useRouter } from "@/src/i18n/navigation";
+import { userIdAtom } from "@/store/auth";
 
 const OrderList = () => {
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useAtom(userIdAtom);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [contactOrderId, setContactOrderId] = useAtom(contactOrderIdAtom);
   const t = useTranslations();
   const router = useRouter();
   const locale = useLocale();
-
-  // Lấy userId từ localStorage
-  useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    setUserId(storedUserId);
-  }, []);
 
   const {
     data: order,

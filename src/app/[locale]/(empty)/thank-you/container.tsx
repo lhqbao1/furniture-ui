@@ -19,6 +19,7 @@ import { useCapturePayment } from "@/features/payment/hook";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { userIdAtom } from "@/store/auth";
 
 const OrderPlaced = () => {
   const router = useRouter();
@@ -29,7 +30,7 @@ const OrderPlaced = () => {
   const hasProcessedRef = React.useRef(false);
   const [delayed, setDelayed] = React.useState(false);
 
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useAtom(userIdAtom);
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
 
@@ -44,13 +45,6 @@ const OrderPlaced = () => {
     }, 6000);
 
     return () => clearTimeout(timer);
-  }, []);
-
-  // Lấy userId từ localStorage
-  useEffect(() => {
-    const id =
-      localStorage.getItem("userIdGuest") || localStorage.getItem("userId");
-    if (id) setUserId(id);
   }, []);
 
   const retryCaptureUntilSuccess = async (paymentId: string) => {

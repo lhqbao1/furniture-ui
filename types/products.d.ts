@@ -131,6 +131,17 @@ export type ProductPdfFiles = {
   url: string;
 };
 
+export interface InventoryItem {
+  product_id: string;
+  incoming_stock: number;
+  date_received: string; // ISO datetime
+  cost_received: number;
+  total_cost: number;
+  id: string;
+  created_at: string; // ISO datetime
+  updated_at: string; // ISO datetime
+}
+
 export type ProductItem = {
   name: string;
   description: string;
@@ -199,6 +210,8 @@ export type ProductItem = {
   pdf_files: ProductPdfFiles[];
   is_fsc: boolean | null;
   note: string | null;
+
+  inventory: InventoryItem[];
 };
 
 export type ProductResponse = {

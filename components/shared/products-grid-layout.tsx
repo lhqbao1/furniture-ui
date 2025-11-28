@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { HandleApiError } from "@/lib/api-helper";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { cn } from "@/lib/utils";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 interface ProductsGridLayoutProps {
   hasBadge?: boolean;
@@ -36,6 +38,7 @@ const ProductsGridLayout = ({
   const t = useTranslations();
   const router = useRouter();
   const locale = useLocale();
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const addToCartMutation = useAddToCart();
   const addToWishlistMutation = useAddToWishList();
@@ -78,7 +81,6 @@ const ProductsGridLayout = ({
 
   const handleAddToCart = (currentProduct: ProductItem) => {
     if (!currentProduct) return;
-    const userId = localStorage.getItem("userId");
 
     if (!userId) {
       const existingItem = cart.find(
