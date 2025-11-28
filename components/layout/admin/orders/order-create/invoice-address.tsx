@@ -53,6 +53,8 @@ const ManualCheckOutInvoiceAddress = ({
   const t = useTranslations();
   const [isSameShipping, setIsSameShipping] = useState(true);
   const [open, setOpen] = useState(false);
+  const invoiceSnapshot = useRef<InvoiceAddressValues | null>(null);
+  const prevIsSameShipping = useRef(isSameShipping);
 
   // Watch shipping fields
   const shippingAddressLine = useWatch({
@@ -84,12 +86,34 @@ const ManualCheckOutInvoiceAddress = ({
     control: form.control,
   });
 
-  // Dùng ref lưu snapshot invoice gốc
-  const invoiceSnapshot = useRef<InvoiceAddressValues | null>(null);
-
+  // 1) Sync invoice <- shipping KHI VÀ CHỈ KHI isSameShipping = true
   useEffect(() => {
-    if (isSameShipping) {
-      // Lưu lại dữ liệu invoice hiện tại
+    if (!isSameShipping) return; // ❗ rất quan trọng
+
+    form.setValue("invoice_address", shippingAddressLine);
+    form.setValue("invoice_postal_code", shippingPostalCode);
+    form.setValue("invoice_city", shippingCity);
+    form.setValue("invoice_country", shippingCountry);
+    form.setValue("invoice_additional_address", shippingAdditionalAddress);
+    form.setValue("invoice_recipient_name", shippingRecipient);
+    form.setValue("invoice_phone", shippingPhone);
+  }, [
+    isSameShipping,
+    shippingAddressLine,
+    shippingPostalCode,
+    shippingCity,
+    shippingAdditionalAddress,
+    shippingCountry,
+    shippingRecipient,
+    shippingPhone,
+    form,
+  ]);
+
+  // 2) Bắt moment toggle để snapshot / restore
+  useEffect(() => {
+    // từ false -> true
+    if (isSameShipping && !prevIsSameShipping.current) {
+      // snapshot invoice hiện tại
       invoiceSnapshot.current = {
         invoice_address: form.getValues("invoice_address"),
         invoice_postal_code: form.getValues("invoice_postal_code"),
@@ -101,17 +125,10 @@ const ManualCheckOutInvoiceAddress = ({
         invoice_recipient_name: form.getValues("invoice_recipient_name"),
         invoice_phone: form.getValues("invoice_phone"),
       };
+    }
 
-      // Copy shipping → invoice
-      form.setValue("invoice_address", shippingAddressLine);
-      form.setValue("invoice_postal_code", shippingPostalCode);
-      form.setValue("invoice_city", shippingCity);
-      form.setValue("invoice_country", shippingCountry);
-      form.setValue("invoice_additional_address", shippingAdditionalAddress);
-      form.setValue("invoice_recipient_name", shippingRecipient);
-      form.setValue("invoice_phone", shippingPhone);
-    } else {
-      // Restore lại snapshot nếu có
+    // từ true -> false
+    if (!isSameShipping && prevIsSameShipping.current) {
       if (invoiceSnapshot.current) {
         form.setValue(
           "invoice_address",
@@ -126,7 +143,6 @@ const ManualCheckOutInvoiceAddress = ({
           "invoice_country",
           invoiceSnapshot.current.invoice_country,
         );
-
         form.setValue(
           "invoice_additional_address",
           invoiceSnapshot.current.invoice_additional_address,
@@ -138,17 +154,9 @@ const ManualCheckOutInvoiceAddress = ({
         form.setValue("invoice_phone", invoiceSnapshot.current.invoice_phone);
       }
     }
-  }, [
-    isSameShipping,
-    shippingAddressLine,
-    shippingPostalCode,
-    shippingCity,
-    shippingAdditionalAddress,
-    shippingCountry,
-    shippingRecipient,
-    shippingPhone,
-    form,
-  ]);
+
+    prevIsSameShipping.current = isSameShipping;
+  }, [isSameShipping, form]);
 
   return (
     <div className="space-y-4">

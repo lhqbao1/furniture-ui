@@ -74,7 +74,8 @@ export async function GET() {
 
     return new Response(csv, {
       headers: {
-        "Content-Type": "text/plain", // trình duyệt sẽ hiển thị trực tiếp
+        "Content-Type": "text/csv",
+        "Content-Disposition": "attachment; filename=feed.csv",
       },
     });
   } catch (err) {

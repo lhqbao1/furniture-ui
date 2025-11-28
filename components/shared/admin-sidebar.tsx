@@ -79,6 +79,18 @@ export function AdminSideBar() {
       ],
     },
     {
+      title: "Logistics",
+      url: "/admin/logistic",
+      icon: ChevronRight,
+      children: [
+        {
+          title: "Inventory",
+          url: "/admin/logistic/inventory/list",
+          icon: CornerDownRight,
+        },
+      ],
+    },
+    {
       title: "CRM",
       url: "/admin/crm",
       icon: ChevronRight,

@@ -16,10 +16,7 @@ import {
 } from "@/lib/schema/manual-checkout";
 import dynamic from "next/dynamic";
 import { ProductItem } from "@/types/products";
-// import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/order-create/shipping-address";
-// import ManualCheckOutInvoiceAddress from "@/components/layout/admin/orders/order-create/invoice-address";
-// import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
-// import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
+
 // Shipping Address
 const ManualCheckOutShippingAddress = dynamic(
   () =>
