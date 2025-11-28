@@ -25,14 +25,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  Check,
-  ChevronsUpDown,
-  FileText,
-  Loader2,
-  Upload,
-  X,
-} from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -101,7 +94,27 @@ const ProductAdditionalInputs = () => {
         />
 
         {/* Product color */}
-        <ColorSelect />
+        <FormField
+          control={form.control}
+          name="color"
+          render={({ field }) => (
+            <FormItem className="flex flex-col col-span-1">
+              <FormLabel className="text-black font-semibold text-sm">
+                Color
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  className="col-span-4"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       {/* Manufacture Country */}
