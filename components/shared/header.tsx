@@ -22,6 +22,8 @@ import { useIsPhone } from "@/hooks/use-is-phone";
 import { CartDrawer } from "./cart-drawer";
 import { LoginDrawer } from "./login-drawer";
 import { Button } from "../ui/button";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 interface PageHeaderProps {
   hasSideBar?: boolean;
@@ -38,9 +40,7 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
   const queryClient = useQueryClient();
 
-  const [userId, setUserId] = React.useState<string | null>(
-    typeof window !== "undefined" ? localStorage.getItem("userId") : "",
-  );
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   //Get cart local and server
   const { cart: localCart } = useCartLocal();
