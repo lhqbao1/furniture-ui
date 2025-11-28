@@ -297,9 +297,7 @@ const ProductLogisticsGroup = ({
                   value={field.value ?? ""}
                   onChange={(e) =>
                     field.onChange(
-                      e.target.value === ""
-                        ? undefined
-                        : e.target.valueAsNumber,
+                      e.target.value === "" ? undefined : e.target.value,
                     )
                   }
                 />

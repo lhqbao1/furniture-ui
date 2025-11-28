@@ -12,13 +12,12 @@ import AddressForm from "./address-form";
 import AddressList from "./address-list";
 import { useGetInvoiceAddressByUserId } from "@/features/address/hook";
 import InvoiceAddress from "./invoice-address";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BoxIcon,
   Heart,
   HomeIcon,
-  LockKeyholeIcon,
   LucideEye,
   Mails,
   PenBoxIcon,
@@ -38,7 +37,6 @@ interface AccountDetailsProps {
 
 const AccountDetails = ({ user }: AccountDetailsProps) => {
   const t = useTranslations();
-  const locale = useLocale();
 
   const [openAddressDialog, setOpenAddressDialog] = useState(false);
   const [openUserDialog, setOpenUserDialog] = useState(false);

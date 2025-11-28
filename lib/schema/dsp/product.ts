@@ -4,17 +4,20 @@ import { StaticFile } from "@/types/products";
 // schema cho StaticFile
 const StaticFileSchema = z.object({
   url: z.string(),
-})
+});
 
 export const packageSchema = z.object({
   weight: z.number().nonnegative().optional().nullable(),
   length: z.number().nonnegative().optional().nullable(),
   width: z.number().nonnegative().optional().nullable(),
   height: z.number().nonnegative().optional().nullable(),
-})
+});
 
 export const addProductDSPSchema = z.object({
-  name: z.string().min(1, { message: "Product name is required" }).max(80, "Product name must be less than 80 characters"),
+  name: z
+    .string()
+    .min(1, { message: "Product name is required" })
+    .max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
   cost: z.number().optional().nullable(),
@@ -25,18 +28,18 @@ export const addProductDSPSchema = z.object({
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
   stock: z
-  .number("Stock is required")
-  .min(0, { message: "Stock must be at least 0" }),
+    .number("Stock is required")
+    .min(0, { message: "Stock must be at least 0" }),
   materials: z.string().optional().nullable(),
   color: z.string().optional().nullable(),
   unit: z.string().optional().nullable(),
   amount_unit: z.string().optional().nullable(),
   incoterm: z.string().optional().nullable(),
-  sku: z.string().min(1, {message: "Sku is required"}),
+  sku: z.string().min(1, { message: "Sku is required" }),
   packaging_amount: z.string().optional().nullable(),
-  ean: z.string().min(1, {message: "EAN is required"}),
+  ean: z.string().min(1, { message: "EAN is required" }),
   carrier: z.string().optional().nullable(),
-  delivery_time:z.string().optional().nullable(),
+  delivery_time: z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),
   tariff_number: z.string().optional().nullable(),
   brand_id: z.string().min(1, "Brand is required"),
@@ -50,8 +53,8 @@ export const addProductDSPSchema = z.object({
   is_active: z.boolean(),
   tag: z.string().optional().nullable(),
   static_files: z
-  .array(StaticFileSchema)
-  .min(1, { message: "Image is required" }),
+    .array(StaticFileSchema)
+    .min(1, { message: "Image is required" }),
   category_ids: z.array(z.string()).optional().nullable(),
 
   weee_nr: z.string().optional().nullable(),
@@ -63,13 +66,12 @@ export const addProductDSPSchema = z.object({
   meta_description: z.string().optional().nullable(),
   meta_keywords: z.string().optional().nullable(),
 
-  pallet_unit: z.number().optional().nullable(),
+  pallet_unit: z.string().optional().nullable(),
   packages: z.array(packageSchema).optional(),
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
-})
+});
 
-
-export type ProductInputDSP = z.infer<typeof addProductDSPSchema>
+export type ProductInputDSP = z.infer<typeof addProductDSPSchema>;
 
 export const defaultValuesDSP = {
   name: "",
@@ -90,5 +92,4 @@ export const defaultValuesDSP = {
   // delivery_time: "",
   // manufacture_country: "",
   // tariff_number: ""
-}
-  
+};

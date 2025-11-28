@@ -1,5 +1,9 @@
 // features/auth/state.ts
-import { atomWithStorage } from "jotai/utils"
+import { atomWithStorage } from "jotai/utils";
 
-export const userIdAtom = atomWithStorage<string | null>("id", null)
-export const accessTokenAtom = atomWithStorage<string | null>("access_token", null)
+export const userIdAtom = atomWithStorage<string | null>("user_id", null);
+
+export const accessTokenAtom = atomWithStorage<string | null>(
+  "access_token",
+  null,
+);

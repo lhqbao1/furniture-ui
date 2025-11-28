@@ -1,17 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  useDeleteAddress,
-  useGetAddressByUserId,
-  useSetDefaultAddress,
-} from "@/features/address/hook";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import React from "react";
 import {
   Dialog,
@@ -22,12 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Loader2 } from "lucide-react";
 import AddressForm from "./address-form";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
 import { useAddressManager } from "@/hooks/account/useAccountAddress";
 
 interface AddressListProps {

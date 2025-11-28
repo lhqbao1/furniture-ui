@@ -1,10 +1,7 @@
 "use client";
 import React, { useState } from "react";
-
 import CartSummary from "@/components/layout/cart/cart-summary";
 import CartTable from "@/components/layout/cart/cart-table";
-import { useRouter } from "@/src/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
 import { LoginDrawer } from "@/components/shared/login-drawer";
 import CartLocalTable from "@/components/layout/cart/cart-local-table";
 

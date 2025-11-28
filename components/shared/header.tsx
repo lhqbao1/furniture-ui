@@ -52,7 +52,6 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     queryKey: ["cart-items", userId],
     queryFn: async () => {
       const data = await getCartItems();
-      // data.items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       return data;
     },
     enabled: !!userId,
@@ -97,29 +96,6 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
       className="home-banner-top__content sticky top-0 overflow-hidden z-50 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 
     lg:flex lg:items-center lg:justify-end lg:px-4 lg:py-3 lg:gap-6"
     >
-      {/* <div className={`flex gap-4 items-center`}>
-        <Link
-          href={`/`}
-          className="relative w-10 h-10"
-        >
-          <Image
-            src="/new-logo.svg"
-            alt=""
-            fill
-            style={{ objectFit: "contain" }}
-          />
-        </Link>
-        <Link href={"/"}>
-          <div
-            className="hidden lg:flex text-[29px] gap-1"
-            translate="no"
-          >
-            <span className="text-secondary font-bold">Prestige</span>
-            <span className="text-primary font-bold">Home</span>
-          </div>
-        </Link>
-      </div> */}
-
       {/*Product search desktop */}
       <div className="hidden lg:block flex-1">
         <ProductSearch />
@@ -163,73 +139,74 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
 
         {/*User */}
         {/* User section — ẩn icon nếu đang ở trang cart/checkout mà chưa login */}
-        {!(
+        {/* {!(
           !userId &&
           (pathName.endsWith("/cart") || pathName.endsWith("/check-out"))
         ) && (
-          <>
-            {isLoadingUser ? (
-              // Loading state
-              <User
-                stroke="#4D4D4D"
-                size={24}
-                className="animate-pulse opacity-50"
-              />
-            ) : user ? (
-              // Logged in -> dropdown
-              <div className="flex">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <User
-                      className="cursor-pointer hover:scale-110 transition-all duration-300"
-                      stroke="#4D4D4D"
-                      size={30}
-                    />
-                  </DropdownMenuTrigger>
+         
+        )} */}
+        <>
+          {isLoadingUser ? (
+            // Loading state
+            <User
+              stroke="#4D4D4D"
+              size={24}
+              className="animate-pulse opacity-50"
+            />
+          ) : user ? (
+            // Logged in -> dropdown
+            <div className="flex">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <User
+                    className="cursor-pointer hover:scale-110 transition-all duration-300"
+                    stroke="#4D4D4D"
+                    size={30}
+                  />
+                </DropdownMenuTrigger>
 
-                  <DropdownMenuContent
-                    side="bottom"
-                    className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]
+                <DropdownMenuContent
+                  side="bottom"
+                  className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]
                         data-[state=open]:slide-in-from-right duration-500
                         data-[state=closed]:slide-out-to-right"
+                >
+                  <DropdownMenuLabel>
+                    {t("greeting")}, {user.last_name}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => router.push("/my-order", { locale })}
                   >
-                    <DropdownMenuLabel>
-                      {t("greeting")}, {user.last_name}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => router.push("/my-order", { locale })}
-                    >
-                      {t("myOrder")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => router.push("/account", { locale })}
-                    >
-                      {t("accountInformation")}
-                    </DropdownMenuItem>
-                    {/* Ẩn nút Logout nếu đang ở trang /cart hoặc /check-out */}
-                    {!pathName.endsWith("/cart") &&
-                      !pathName.endsWith("/check-out") && (
-                        <DropdownMenuItem onClick={onLogout}>
-                          {t("logout")}
-                        </DropdownMenuItem>
-                      )}
-                    <Link href={`/wishlist`}>
-                      <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
-                    </Link>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              // Not logged in -> Login drawer
-              <LoginDrawer
-                openLogin={open}
-                setOpenLogin={setOpen}
-                setUserId={setUserId}
-              />
-            )}
-          </>
-        )}
+                    {t("myOrder")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/account", { locale })}
+                  >
+                    {t("accountInformation")}
+                  </DropdownMenuItem>
+                  {/* Ẩn nút Logout nếu đang ở trang /cart hoặc /check-out */}
+                  {!pathName.endsWith("/cart") &&
+                    !pathName.endsWith("/check-out") && (
+                      <DropdownMenuItem onClick={onLogout}>
+                        {t("logout")}
+                      </DropdownMenuItem>
+                    )}
+                  <Link href={`/wishlist`}>
+                    <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
+                  </Link>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            // Not logged in -> Login drawer
+            <LoginDrawer
+              openLogin={open}
+              setOpenLogin={setOpen}
+              setUserId={setUserId}
+            />
+          )}
+        </>
 
         {hasSideBar ? (
           <SidebarTrigger

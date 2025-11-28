@@ -22,6 +22,9 @@ import { useCartLocal } from "@/hooks/cart";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import LoginGoogleButton from "@/components/shared/login-google-button";
 import ResendOtp from "../auth/resend-otp";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 interface CartLoginFormProps {
   onSuccess?: () => void;
@@ -37,6 +40,8 @@ export default function CartLoginForm({
   const locale = useLocale();
   const t = useTranslations();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const queryClient = useQueryClient();
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const { cart: localCart } = useCartLocal();
 
@@ -97,7 +102,7 @@ export default function CartLoginForm({
           onError(error) {
             toast.error(t("invalidCredentials"));
           },
-        }
+        },
       );
     }
   };
@@ -114,9 +119,12 @@ export default function CartLoginForm({
         onSuccess: (data) => {
           const token = data.access_token;
           localStorage.setItem("access_token", token);
-          localStorage.setItem("userId", data.id);
+          setUserId(data.id);
           syncLocalCartMutation.mutate();
-
+          queryClient.invalidateQueries({
+            queryKey: ["cart-items"],
+            exact: false,
+          });
           toast.success(t("loginSuccess"));
           router.push("/check-out", { locale });
           // gọi callback onSuccess nếu được truyền
@@ -125,14 +133,17 @@ export default function CartLoginForm({
         onError(error) {
           toast.error(t("invalidCredentials"));
         },
-      }
+      },
     );
   };
 
   return (
     <div className="p-6 bg-white rounded-2xl w-full">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-6"
+        >
           {/* Email */}
           <FormField
             control={form.control}
@@ -183,7 +194,7 @@ export default function CartLoginForm({
                             // tự động focus sang input kế
                             if (val && idx < 5) {
                               const next = document.getElementById(
-                                `otp-${idx + 1}`
+                                `otp-${idx + 1}`,
                               ) as HTMLInputElement;
                               next?.focus();
                             }
@@ -280,14 +291,6 @@ export default function CartLoginForm({
       </Form>
 
       {/* Forgot password */}
-      {/* <div className="flex justify-end mt-2 lg:mt-4">
-                <Link href={`/forgot-password`} className="text-sm text-secondary hover:underline">
-
-                    {t("forgotPassword")}?
-                </Link>
-            </div> */}
-
-      {/* Sign up link */}
       <div className="text-sm text-center mt-6 space-x-1">
         <span>{t("noAccount")}</span>
         <Link

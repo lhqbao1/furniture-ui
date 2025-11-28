@@ -27,13 +27,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { useSyncLocalCart } from "@/features/cart/hook";
 import LoginGoogleButton from "@/components/shared/login-google-button";
 import ResendOtp from "./resend-otp";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 interface LoginFormProps {
   isAdmin?: boolean;
 }
 
 export default function LoginForm({ isAdmin = false }: LoginFormProps) {
-  // const [userId, setUserId] = useAtom(userIdAtom)
+  const [userId, setUserId] = useAtom(userIdAtom);
   const [seePassword, setSeePassword] = useState(false);
   const router = useRouter();
   const locale = useLocale();
@@ -111,7 +113,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
             localStorage.setItem("access_token", token);
             router.push("/", { locale });
-            localStorage.setItem("userId", data.id);
+            setUserId(data.id);
 
             syncLocalCartMutation.mutate();
 
@@ -136,7 +138,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
             router.push("/admin/orders/list", { locale });
-            localStorage.setItem("userId", data.id);
+            setUserId(data.id);
 
             // Có thể lưu userId nếu cần
             // setUserId(data.id)
@@ -163,7 +165,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
           onSuccess: (data) => {
             const token = data.access_token;
             localStorage.setItem("access_token", token);
-            localStorage.setItem("userId", data.id);
+            setUserId(data.id);
             router.push("/", { locale });
             syncLocalCartMutation.mutate();
             toast.success(t("loginSuccess"));
@@ -183,7 +185,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
           onSuccess: (data) => {
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
-            localStorage.setItem("userId", data.id);
+            setUserId(data.id);
             router.push("/admin/orders/list", { locale });
             toast.success(t("loginSuccess"));
           },

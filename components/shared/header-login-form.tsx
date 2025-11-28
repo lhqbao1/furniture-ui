@@ -12,29 +12,28 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { useLogin, useLoginOtp, useSendOtp } from "@/features/auth/hook";
+import { Loader2, Mail } from "lucide-react";
+import { useLoginOtp, useSendOtp } from "@/features/auth/hook";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
-import { useRouter } from "@/src/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useSyncLocalCart } from "@/features/cart/hook";
-import { Switch } from "../ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
-import Image from "next/image";
 import LoginGoogleButton from "./login-google-button";
 import ResendOtp from "../layout/auth/resend-otp";
+import Link from "next/link";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 interface HeaderLoginFormProps {
   onSuccess?: () => void;
 }
 
 export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
   const [seePassword, setSeePassword] = useState(false);
-  const router = useRouter();
   const t = useTranslations();
   const queryClient = useQueryClient();
-  const locale = useLocale();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const formSchema = z.object({
     username: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
@@ -48,7 +47,6 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
     },
   });
 
-  const loginMutation = useLogin();
   const syncLocalCartMutation = useSyncLocalCart();
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
@@ -74,11 +72,11 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
           onSuccess(data, variables, context) {
             const token = data.access_token;
             localStorage.setItem("access_token", token);
-            localStorage.setItem("userId", data.id);
+            setUserId(data.id);
             queryClient.refetchQueries({ queryKey: ["me"], exact: true });
             queryClient.refetchQueries({
-              queryKey: ["cart-items"],
-              exact: true,
+              queryKey: ["cart-items", data.id],
+              exact: false,
             });
             syncLocalCartMutation.mutate();
 
@@ -90,7 +88,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
           onError(error) {
             toast.error(t("invalidCredentials"));
           },
-        }
+        },
       );
     }
   };
@@ -107,9 +105,12 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
         onSuccess(data, variables, context) {
           const token = data.access_token;
           localStorage.setItem("access_token", token);
-          localStorage.setItem("userId", data.id);
+          setUserId(data.id);
           queryClient.refetchQueries({ queryKey: ["me"], exact: true });
-          queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true });
+          queryClient.refetchQueries({
+            queryKey: ["cart-items", data.id],
+            exact: false,
+          });
           syncLocalCartMutation.mutate();
 
           toast.success(t("loginSuccess"));
@@ -120,14 +121,17 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
         onError(error) {
           toast.error(t("invalidCredentials"));
         },
-      }
+      },
     );
   };
 
   return (
-    <div className="bg-white rounded-2xl w-full">
+    <div className="p-6 bg-white rounded-2xl w-full">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-6"
+        >
           {/* Email */}
           <FormField
             control={form.control}
@@ -136,10 +140,11 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
               <FormItem>
                 <FormControl>
                   <div className="relative">
+                    <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
                     <Input
                       placeholder={t("email")}
                       {...field}
-                      className="lg:h-16 h-14 bg-gray-100 rounded-xs "
+                      className="pl-12 py-3 h-fit"
                     />
                   </div>
                 </FormControl>
@@ -177,7 +182,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                             // tự động focus sang input kế
                             if (val && idx < 5) {
                               const next = document.getElementById(
-                                `otp-${idx + 1}`
+                                `otp-${idx + 1}`,
                               ) as HTMLInputElement;
                               next?.focus();
                             }
@@ -230,25 +235,10 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
             ""
           )}
 
-          <div className="flex justify-between items-center">
-            <Switch className="data-[state=unchecked]:bg-gray-400" />
-            <p className="text-black/70 text-lg">Angemeldet bleiben</p>
-          </div>
-
-          {seePassword && (
-            <ResendOtp
-              username={form.getValues("username")}
-              isAdmin={false}
-              sendOtpMutation={sendOtpMutation}
-              initialCountdown={60}
-            />
-          )}
-
           <div className="space-y-2">
             <Button
               type="submit"
-              className="w-full text-lg rounded-none h-14"
-              variant={"secondary"}
+              className="w-full bg-secondary/95 hover:bg-secondary"
               hasEffect
               disabled={
                 submitOtpMutation.isPending || sendOtpMutation.isPending
@@ -266,28 +256,29 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
                 t("getOtp")
               )}
             </Button>
+
+            {seePassword && (
+              <ResendOtp
+                username={form.getValues("username")}
+                isAdmin={false}
+                sendOtpMutation={sendOtpMutation}
+                initialCountdown={60}
+              />
+            )}
           </div>
         </form>
       </Form>
 
       {/* Sign up link */}
-      <Button
-        type="button"
-        variant={"outline"}
-        className="w-full text-lg rounded-none h-14 text-black/50 mt-4"
-        hasEffect
-        disabled={loginMutation.isPending}
-        onClick={() => {
-          router.push("/sign-up", { locale });
-        }}
-      >
-        {loginMutation.isPending ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          "NEUES KONTO ANLEGEN"
-        )}
-      </Button>
-
+      <div className="text-sm text-center mt-6 space-x-1">
+        <span>{t("noAccount")}</span>
+        <Link
+          href={`/sign-up`}
+          className="font-medium text-secondary hover:underline"
+        >
+          {t("createAccount")}
+        </Link>
+      </div>
       <LoginGoogleButton />
     </div>
   );
