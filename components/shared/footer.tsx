@@ -95,7 +95,7 @@ const Footer = () => {
       </div>
 
       {/* Cột 1: Newsletter */}
-      <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
+      {/* <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
         <h4 className="font-semibold">
           Jetzt Newsletter abonnieren – und mehr entdecken.
         </h4>
@@ -125,7 +125,6 @@ const Footer = () => {
         <p className="leading-relaxed font-semibold text-sm w-full">
           Die Abmeldung des Newsletters ist jederzeit über den Abmeldelink in
           jeder Mail oder als Anfrage in unserem Kontaktformular möglich.{" "}
-          {/* ✅ thêm locale */}
           <Link
             href={`/privacy-policy`}
             className="underline text-gray-600 hover:text-gray-800"
@@ -133,7 +132,7 @@ const Footer = () => {
             Datenschutz
           </Link>
         </p>
-      </div>
+      </div> */}
 
       {/* Cột 2: Các trang */}
       <div className="footer-column lg:col-span-2 col-span-6">
@@ -193,24 +192,26 @@ const Footer = () => {
       </div>
 
       {/* Cột 5: Company Info */}
-      <div className="footer-column lg:col-span-3 col-span-6">
+      <div className="footer-column lg:col-span-6 col-span-6">
         <h4 className="font-semibold mb-3">{t("companyTitle")}</h4>
 
-        <ul className="space-y-2 text-black-700 text-sm">
-          <li className="font-bold">Büro </li>
-          <li>Prestige Home GmbH</li>
-          <li>Greifswalder Straße 226, 10405 Berlin</li>
-          <li>{t("phone_number")}: +49 3222 1808038</li>
-          <li>{t("email")}: info@prestige-home.de</li>
-          <li>{t("vatId")}: DE454714336</li>
-        </ul>
-        <ul className="space-y-2 text-black-700 text-sm mt-6">
-          <li className="font-bold">Lager</li>
-          <li>Prestige Home</li>
-          <li>Amm GmbH & Co KG Spedition</li>
-          <li>Hamburger Straße 99</li>
-          <li>90451 Nuremberg</li>
-        </ul>
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <ul className="space-y-2 text-black-700 text-sm">
+            <li className="font-bold">Büro </li>
+            <li>Prestige Home GmbH</li>
+            <li>Greifswalder Straße 226, 10405 Berlin</li>
+            <li>{t("phone_number")}: +49 3222 1808038</li>
+            <li>{t("email")}: info@prestige-home.de</li>
+            <li>{t("vatId")}: DE454714336</li>
+          </ul>
+          <ul className="space-y-2 text-black-700 text-sm">
+            <li className="font-bold">Lager</li>
+            <li>Prestige Home</li>
+            <li>Amm GmbH & Co KG Spedition</li>
+            <li>Hamburger Straße 99</li>
+            <li>90451 Nuremberg</li>
+          </ul>
+        </div>
       </div>
 
       {/* Cột 4: Social (ngoài, không thêm locale) */}
