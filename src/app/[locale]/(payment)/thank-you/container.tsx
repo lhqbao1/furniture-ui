@@ -25,6 +25,8 @@ const OrderPlaced = () => {
   const locale = useLocale();
   const params = useSearchParams();
   const paymentIntentId = params?.get("payment_intent"); // Lấy param paymentIntent.id nếu có
+  const hasFetchedRef = React.useRef(false);
+  const hasProcessedRef = React.useRef(false);
 
   const [counter, setCounter] = useState(5);
   const [userId, setUserId] = useState<string | null>(null);
@@ -44,20 +46,19 @@ const OrderPlaced = () => {
   }, []);
 
   const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
-    queryKey: ["checkout-id", checkoutId, paymentId],
+    queryKey: ["checkout-id", checkoutId],
+    enabled: Boolean(checkoutId) && !hasFetchedRef.current,
+    retry: false,
     queryFn: async () => {
-      if (!checkoutId) return null;
+      hasFetchedRef.current = true; // 🔥 khóa luôn, queryFn sẽ không bao giờ chạy lại
 
-      // Chỉ capture payment khi không có paymentIntentId
+      // Capture payment nếu cần
       if (!paymentIntentId && paymentId) {
         await capturePaymentMutation.mutateAsync(paymentId);
       }
 
-      // 2. Sau đó fetch checkout
-      return getMainCheckOutByMainCheckOutId(checkoutId);
+      return getMainCheckOutByMainCheckOutId(checkoutId!);
     },
-    enabled: !!checkoutId,
-    retry: false,
   });
 
   const { data: invoice } = useQuery({
@@ -71,9 +72,12 @@ const OrderPlaced = () => {
 
   // Luồng xử lý khi có user
   useEffect(() => {
-    const process = async () => {
-      if (!checkout || !invoice || !user) return;
+    if (!checkout || !invoice || !user) return;
+    if (hasProcessedRef.current) return; // 🔥 tránh chạy lại useEffect
 
+    hasProcessedRef.current = true;
+
+    const process = async () => {
       try {
         const doc = (
           <InvoicePDF
@@ -112,16 +116,6 @@ const OrderPlaced = () => {
     };
     process();
   }, [checkout, invoice, user]);
-
-  // Redirect về home sau 5s
-  // useEffect(() => {
-  //     if (counter <= 0) {
-  //         router.push('/', { locale })
-  //         return
-  //     }
-  //     const timer = setTimeout(() => setCounter(prev => prev - 1), 1000)
-  //     return () => clearTimeout(timer)
-  // }, [counter, router])
 
   return (
     <div className="w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10">

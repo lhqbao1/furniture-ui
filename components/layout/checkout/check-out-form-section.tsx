@@ -144,17 +144,18 @@ export default function CheckOutFormSection() {
     setUserIdLogin(verifiedUserId);
   };
 
-  const [localQuantities, setLocalQuantities] = useState<
-    Record<string, number>
-  >({});
-
-  const { updateStatus } = useCartLocal();
-
   return (
     <form
       onSubmit={form.handleSubmit(
         (values) => handleSubmit(values),
-        () => toast.error(t("checkFormError")),
+        (error) => {
+          const firstKey = Object.keys(error)[0] as keyof typeof error;
+          const firstMessage = error[firstKey]?.message;
+
+          toast.error(t("checkFormError"), {
+            description: firstMessage,
+          });
+        },
       )}
       className="flex flex-col gap-8 section-padding"
     >

@@ -1,3 +1,4 @@
+import { getCountryName } from "@/lib/country-name";
 import { Address } from "@/types/address";
 import { User } from "@/types/user";
 import React from "react";
@@ -39,7 +40,7 @@ const OrderDetailUser = ({
               <div>{invoiceAddress.postal_code}</div>
               <div>{invoiceAddress.city}</div>
             </div>
-            <div>{invoiceAddress.country}</div>
+            <div>{getCountryName(invoiceAddress.country)}</div>
           </div>
         </div>
       </div>
@@ -55,7 +56,7 @@ const OrderDetailUser = ({
               <div>{shippingAddress.postal_code}</div>
               <div>{shippingAddress.city}</div>
             </div>
-            <div>{shippingAddress.country}</div>
+            <div>{getCountryName(invoiceAddress.country)}</div>
           </div>
         </div>
       </div>
