@@ -7,6 +7,7 @@ export interface GetAllProductsParams {
   page_size?: number;
   all_products?: string;
   search?: string;
+  is_inventory?: boolean;
   sort_by_stock?: string;
 }
 
@@ -42,6 +43,9 @@ export async function getAllProducts(params?: GetAllProductsParams) {
         all_products: params.all_products,
       }),
       ...(params?.search !== undefined && { search: params.search }),
+      ...(params?.is_inventory !== undefined && {
+        is_inventory: params.is_inventory,
+      }),
       ...(params?.sort_by_stock && { sort_by_stock: params.sort_by_stock }),
     },
   });

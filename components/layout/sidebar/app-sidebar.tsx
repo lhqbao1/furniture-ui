@@ -104,8 +104,8 @@ export default function AppSidebar({
   };
 
   const items: MenuItem[] = [
-    newProducts,
-    sale,
+    // newProducts,
+    // sale,
     ...(categories && categories.length > 0 ? mapCategories(categories) : []),
     ...(userId ? [accountMenu] : []), // 👈 Chỉ thêm khi có userId
   ];

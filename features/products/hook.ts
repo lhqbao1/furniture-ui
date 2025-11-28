@@ -1,28 +1,65 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CreateProduct, deleteProduct, editProduct, generateSEO, getAllProducts, GetAllProductsParams, getProductById, getProductByTag } from "./api"
-import { ProductInput } from "@/lib/schema/product"
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  CreateProduct,
+  deleteProduct,
+  editProduct,
+  generateSEO,
+  getAllProducts,
+  GetAllProductsParams,
+  getProductById,
+  getProductByTag,
+} from "./api";
+import { ProductInput } from "@/lib/schema/product";
 interface SEOInput {
-  title: string
-  description: string
+  title: string;
+  description: string;
 }
 
-export function useGetAllProducts({ page, page_size, all_products, search, sort_by_stock }: GetAllProductsParams = {}) {
+export function useGetAllProducts({
+  page,
+  page_size,
+  all_products,
+  search,
+  sort_by_stock,
+  is_inventory,
+}: GetAllProductsParams = {}) {
   return useQuery({
-    queryKey: ["products", page, page_size, all_products, search, sort_by_stock], // queryKey thay đổi khi page/page_size thay đổi
-    queryFn: () => getAllProducts({ page, page_size, all_products,search ,sort_by_stock}),
+    queryKey: [
+      "products",
+      page,
+      page_size,
+      all_products,
+      search,
+      sort_by_stock,
+      is_inventory,
+    ], // queryKey thay đổi khi page/page_size thay đổi
+    queryFn: () =>
+      getAllProducts({
+        page,
+        page_size,
+        all_products,
+        search,
+        sort_by_stock,
+        is_inventory,
+      }),
     // placeholderData: keepPreviousData,
     retry: false,
-  })
+  });
 }
 
-export function useDeleteProduct(){
-  const qc = useQueryClient()
+export function useDeleteProduct() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteProduct(id),
     onSuccess: (res) => {
-      qc.invalidateQueries({ queryKey: ["products"] })
+      qc.invalidateQueries({ queryKey: ["products"] });
     },
-  })
+  });
 }
 
 export function useGetProductById(id: string) {
@@ -31,7 +68,7 @@ export function useGetProductById(id: string) {
     queryFn: () => getProductById(id),
     enabled: !!id,
     retry: false,
-  })
+  });
 }
 
 export function useGetProductByTag(tag: string, is_customer = false) {
@@ -40,37 +77,38 @@ export function useGetProductByTag(tag: string, is_customer = false) {
     queryFn: () => getProductByTag(tag, is_customer),
     enabled: !!tag, // chỉ gọi khi tag có giá trị
     retry: false,
-  })
+  });
 }
 
 export function useAddProduct() {
-    const qc = useQueryClient()
-    return useMutation({
-      mutationFn: (input: ProductInput) => CreateProduct(input),
-      onSuccess: (res) => {
-        qc.invalidateQueries({ queryKey: ["products"] })
-      },
-    })
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: ProductInput) => CreateProduct(input),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
 }
 
 export function useEditProduct() {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: ProductInput }) => editProduct(input, id),
+    mutationFn: ({ id, input }: { id: string; input: ProductInput }) =>
+      editProduct(input, id),
     onSuccess: (res, variables) => {
-      qc.invalidateQueries({ queryKey: ["all-products"] })
-      qc.invalidateQueries({ queryKey: ["products"] })
-      qc.invalidateQueries({ queryKey: ["product",variables.id ] })
+      qc.invalidateQueries({ queryKey: ["all-products"] });
+      qc.invalidateQueries({ queryKey: ["products"] });
+      qc.invalidateQueries({ queryKey: ["product", variables.id] });
     },
-  })
+  });
 }
 
 export function useGenerateSEO() {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: SEOInput) => generateSEO(input),
     // onSuccess: (res) => {
     //   qc.invalidateQueries({ queryKey: ["products"] })
     // },
-  })
+  });
 }
