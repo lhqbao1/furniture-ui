@@ -27,6 +27,7 @@ const OrderPlaced = () => {
   const paymentIntentId = params?.get("payment_intent"); // Lấy param paymentIntent.id nếu có
   const hasFetchedRef = React.useRef(false);
   const hasProcessedRef = React.useRef(false);
+  const [delayed, setDelayed] = React.useState(false);
 
   const [counter, setCounter] = useState(5);
   const [userId, setUserId] = useState<string | null>(null);
@@ -38,6 +39,14 @@ const OrderPlaced = () => {
   const sendMailMutation = useSendMail();
   const t = useTranslations();
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDelayed(true); // 🔥 sau 3 giây mới cho phép chạy query
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Lấy userId từ localStorage
   useEffect(() => {
     const id =
@@ -47,7 +56,7 @@ const OrderPlaced = () => {
 
   const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
     queryKey: ["checkout-id", checkoutId],
-    enabled: Boolean(checkoutId) && !hasFetchedRef.current,
+    enabled: delayed && Boolean(checkoutId) && !hasFetchedRef.current, // 🔥 chạy sau 3s
     retry: false,
     queryFn: async () => {
       hasFetchedRef.current = true; // 🔥 khóa luôn, queryFn sẽ không bao giờ chạy lại
