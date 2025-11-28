@@ -3,17 +3,13 @@ import { useGetUserById } from "@/features/users/hook";
 import React, { useEffect, useState } from "react";
 import AccountSkeleton from "./skeleton";
 import AccountDetails from "./details";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 const AccountForm = () => {
-  const [userId, setUserId] = useState<string>("");
+  const [userId, setUserId] = useAtom(userIdAtom);
 
-  // SSR-safe: chỉ đọc localStorage sau khi client mounted
-  useEffect(() => {
-    const storedId = localStorage.getItem("userId");
-    if (storedId) setUserId(storedId);
-  }, []);
-
-  const { data: user, isLoading, isError } = useGetUserById(userId);
+  const { data: user, isLoading, isError } = useGetUserById(userId ?? "");
 
   if (isLoading || isError || !user) return <AccountSkeleton />;
 

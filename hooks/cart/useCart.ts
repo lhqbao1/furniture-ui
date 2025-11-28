@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCartItems } from "@/features/cart/api";
 import { useCartLocal } from "@/hooks/cart";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { toast } from "sonner";
-import { CartItem, CartResponse } from "@/types/cart";
+import { CartResponse } from "@/types/cart";
 import { useLocale } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { useTranslations } from "use-intl";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 interface CartActionsProps {
   userId: string | null;
@@ -18,9 +20,7 @@ interface CartActionsProps {
 }
 
 export function useCartData() {
-  const [userId, setUserId] = React.useState<string | null>(
-    typeof window !== "undefined" ? localStorage.getItem("userId") : "",
-  );
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const [localQuantities, setLocalQuantities] = useState<
     Record<string, number>

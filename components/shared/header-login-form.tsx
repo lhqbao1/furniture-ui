@@ -22,6 +22,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import LoginGoogleButton from "./login-google-button";
 import ResendOtp from "../layout/auth/resend-otp";
 import Link from "next/link";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 interface HeaderLoginFormProps {
   onSuccess?: () => void;
 }
@@ -31,6 +33,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
   const t = useTranslations();
   const queryClient = useQueryClient();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const formSchema = z.object({
     username: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
@@ -69,7 +72,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
           onSuccess(data, variables, context) {
             const token = data.access_token;
             localStorage.setItem("access_token", token);
-            localStorage.setItem("userId", data.id);
+            setUserId(data.id);
             queryClient.refetchQueries({ queryKey: ["me"], exact: true });
             queryClient.refetchQueries({
               queryKey: ["cart-items", data.id],
@@ -102,9 +105,12 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
         onSuccess(data, variables, context) {
           const token = data.access_token;
           localStorage.setItem("access_token", token);
-          localStorage.setItem("userId", data.id);
+          setUserId(data.id);
           queryClient.refetchQueries({ queryKey: ["me"], exact: true });
-          queryClient.refetchQueries({ queryKey: ["cart-items"], exact: true });
+          queryClient.refetchQueries({
+            queryKey: ["cart-items", data.id],
+            exact: false,
+          });
           syncLocalCartMutation.mutate();
 
           toast.success(t("loginSuccess"));

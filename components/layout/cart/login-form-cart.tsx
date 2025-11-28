@@ -23,6 +23,8 @@ import { Link, useRouter } from "@/src/i18n/navigation";
 import LoginGoogleButton from "@/components/shared/login-google-button";
 import ResendOtp from "../auth/resend-otp";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 interface CartLoginFormProps {
   onSuccess?: () => void;
@@ -39,6 +41,7 @@ export default function CartLoginForm({
   const t = useTranslations();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const queryClient = useQueryClient();
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const { cart: localCart } = useCartLocal();
 
@@ -116,10 +119,10 @@ export default function CartLoginForm({
         onSuccess: (data) => {
           const token = data.access_token;
           localStorage.setItem("access_token", token);
-          localStorage.setItem("userId", data.id);
+          setUserId(data.id);
           syncLocalCartMutation.mutate();
-          queryClient.refetchQueries({
-            queryKey: ["cart-items", data.id],
+          queryClient.invalidateQueries({
+            queryKey: ["cart-items"],
             exact: false,
           });
           toast.success(t("loginSuccess"));
