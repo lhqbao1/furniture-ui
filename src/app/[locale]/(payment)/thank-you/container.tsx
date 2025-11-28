@@ -54,22 +54,30 @@ const OrderPlaced = () => {
   }, []);
 
   const retryCaptureUntilSuccess = async (paymentId: string) => {
-    while (true) {
+    const maxRetries = 5;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const res = await capturePaymentMutation.mutateAsync(paymentId);
 
-        // Nếu API trả success → break khỏi vòng lặp
-        if (res?.success || res?.status === "succeeded") {
+        // Nếu API trả success → break
+        if (res?.status === "completed") {
           return res;
         }
+
+        console.log(`Attempt ${attempt}: status = ${res?.status}`);
       } catch (err) {
-        // ❗ lỗi 500 → retry
-        console.log("Retry capture payment...", err);
+        console.log(`Attempt ${attempt} failed:`, err);
       }
 
-      // ⏳ chờ 3s trước khi retry
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Nếu chưa đến lần retry cuối → chờ 3s rồi retry
+      if (attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
     }
+
+    // ❗ Sau 5 lần vẫn lỗi
+    throw new Error("Capture payment failed after 5 retries");
   };
 
   const { data: checkout } = useQuery({
