@@ -157,7 +157,7 @@ export const addProductSchema = z.object({
   meta_description: z.string().optional().nullable(),
   meta_keywords: z.string().optional().nullable(),
 
-  pallet_unit: z.number().optional().nullable(),
+  pallet_unit: z.string().optional().nullable(),
   packages: z.array(packageSchema).optional(),
   marketplace_products: z.array(marketPlaceSchema).optional(),
   pdf_files: z.array(pdfFileSchema).optional().nullable(),

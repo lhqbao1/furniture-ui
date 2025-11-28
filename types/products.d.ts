@@ -163,6 +163,7 @@ export type ProductItem = {
   gpsr_info: string;
   technical_description: string;
   return_cost: number;
+  pallet_unit: string;
 
   delivery_cost: number;
   weight: number;

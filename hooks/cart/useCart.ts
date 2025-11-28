@@ -18,20 +18,14 @@ interface CartActionsProps {
 }
 
 export function useCartData() {
-  const [userId, setUserId] = useState<string | null>(
-    typeof window !== "undefined" ? localStorage.getItem("userId") : null,
+  const [userId, setUserId] = React.useState<string | null>(
+    typeof window !== "undefined" ? localStorage.getItem("userId") : "",
   );
 
   const [localQuantities, setLocalQuantities] = useState<
     Record<string, number>
   >({});
   const { cart: localCart, updateStatus } = useCartLocal();
-
-  useEffect(() => {
-    const listener = () => setUserId(localStorage.getItem("userId"));
-    window.addEventListener("storage", listener);
-    return () => window.removeEventListener("storage", listener);
-  }, []);
 
   const { data: cart, isLoading: isLoadingCart } = useQuery({
     queryKey: ["cart-items", userId],
