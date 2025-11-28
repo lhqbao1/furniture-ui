@@ -27,6 +27,7 @@ import { useIsPhone } from "@/hooks/use-is-phone";
 import Link from "next/link";
 import Image from "next/image";
 import { SidebarCollapsibleItem } from "./app-sidebar-collapsible";
+import { userIdAtom } from "@/store/auth";
 
 type MenuItem = {
   title: string;
@@ -50,15 +51,7 @@ export default function AppSidebar({
     openMobile,
     setOpenMobile,
   } = useSidebar();
-
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const uid = localStorage.getItem("userId");
-      setUserId(uid);
-    }
-  }, []);
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const t = useTranslations();
   const locale = useLocale(); // 👈 thêm locale

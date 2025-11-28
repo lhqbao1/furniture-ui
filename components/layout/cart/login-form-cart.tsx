@@ -92,6 +92,7 @@ export default function CartLoginForm({
             const token = data.access_token;
             localStorage.setItem("access_token", token);
             localStorage.setItem("userId", data.id);
+            setUserId(data.id);
             syncLocalCartMutation.mutate();
 
             toast.success(t("loginSuccess"));
@@ -119,6 +120,7 @@ export default function CartLoginForm({
         onSuccess: (data) => {
           const token = data.access_token;
           localStorage.setItem("access_token", token);
+          localStorage.setItem("userId", data.id);
           setUserId(data.id);
           syncLocalCartMutation.mutate();
           queryClient.invalidateQueries({

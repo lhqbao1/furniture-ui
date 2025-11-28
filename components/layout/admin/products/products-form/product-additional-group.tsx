@@ -422,7 +422,7 @@ const ProductAdditionalInputs = () => {
           render={({ field }) => (
             <FormItem className="flex flex-col space-y-3">
               <FormLabel className="text-black font-semibold text-sm">
-                Is FCS?
+                Is FSC?
               </FormLabel>
 
               <FormControl>

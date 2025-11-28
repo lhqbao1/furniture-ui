@@ -15,18 +15,18 @@ export async function GET() {
 
     // Header CSV
     const headers = [
+      "eans",
       "sku",
       "brand",
       "title",
       "categoryPath",
       "url",
       "hans",
-      "description",
+      // "description",
       "imageUrls",
       "price",
       "delivery",
       "conditionType",
-      "eans",
       "packagingUnit",
       "deliveryCosts",
       "colour",
@@ -46,13 +46,14 @@ export async function GET() {
             })
             .join(", ") || "";
         return [
+          escapeCsv(p.ean),
           escapeCsv(p.id_provider),
           escapeCsv(p.brand.company_name ?? "Prestige Home"),
           escapeCsv(p.name),
           escapeCsv(categories),
           escapeCsv(`https://prestige-home.de/de/product/${p.url_key}`),
           escapeCsv(p.sku),
-          escapeCsv(cleanDescription(p.description)),
+          // escapeCsv(cleanDescription(p.description)),
           escapeCsv(
             (p.static_files || [])
               .map((f) => cleanImageLink(f?.url || ""))
@@ -62,7 +63,6 @@ export async function GET() {
           escapeCsv(p.final_price.toFixed(2)),
           escapeCsv(`Delivery in ${p.delivery_time} working days`),
           "NEW",
-          escapeCsv(p.ean),
           escapeCsv(p.number_of_packages ?? 1),
           escapeCsv(p.carrier === "dpd" ? 5.95 : 35.95),
           escapeCsv(p.color ?? ""),
