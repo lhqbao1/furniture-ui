@@ -21,7 +21,6 @@ interface CartActionsProps {
 
 export function useCartData() {
   const [userId, setUserId] = useAtom(userIdAtom);
-
   const [localQuantities, setLocalQuantities] = useState<
     Record<string, number>
   >({});
@@ -59,17 +58,18 @@ export function useCartData() {
           const qty = localQuantities[key] ?? item.quantity;
           return acc + qty * item.item_price;
         }, 0);
+    } else {
+      return (
+        localCart
+          ?.filter((item) => item.is_active)
+          .reduce((acc, item) => {
+            const key =
+              "id" in item ? item.id : (item as CartItemLocal).product_id;
+            const quantity = localQuantities[key ?? ""] ?? item.quantity;
+            return acc + quantity * item.item_price;
+          }, 0) ?? 0
+      );
     }
-    return (
-      localCart
-        ?.filter((item) => item.is_active)
-        .reduce((acc, item) => {
-          const key =
-            "id" in item ? item.id : (item as CartItemLocal).product_id;
-          const quantity = localQuantities[key ?? ""] ?? item.quantity;
-          return acc + quantity * item.item_price;
-        }, 0) ?? 0
-    );
   }, [userId, cart, localCart, localQuantities]);
 
   return {

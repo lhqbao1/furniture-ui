@@ -23,30 +23,31 @@ export function useAddToCartHandler(productDetails: any) {
     addProductToWishlistMutation.mutate(
       { productId: productDetails?.id ?? "", quantity: 1 },
       {
-        onSuccess: () => toast.success("Added to wishlist!"),
+        onSuccess: () => toast.success(t("addToWishlistSuccess")),
         onError: (error) => {
           const { message } = HandleApiError(error, t);
           toast.error(message);
         },
-      }
+      },
     );
   };
 
   const handleSubmitToCart = (values: any) => {
     if (!productDetails) return;
 
-    const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+    const userId =
+      typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
     // LOCAL CART
     if (!userId) {
       const existingItem = cart.find(
-        (item: CartItemLocal) => item.product_id === productDetails.id
+        (item: CartItemLocal) => item.product_id === productDetails.id,
       );
 
       const totalQuantity = (existingItem?.quantity || 0) + values.quantity;
 
       if (totalQuantity > productDetails.stock) {
-        toast.error("Not enough stock");
+        toast.error(t("notEnoughStock"));
         return;
       }
 
@@ -70,9 +71,9 @@ export function useAddToCartHandler(productDetails: any) {
           },
         },
         {
-          onSuccess: () => toast.success("Added to cart"),
-          onError: () => toast.error("Failed to add to cart"),
-        }
+          onSuccess: () => toast.success(t("addToCartSuccess")),
+          onError: () => toast.error(t("addToCartFail")),
+        },
       );
 
       return;
@@ -82,12 +83,12 @@ export function useAddToCartHandler(productDetails: any) {
     createCartMutation.mutate(
       { productId: productDetails.id, quantity: values.quantity },
       {
-        onSuccess: () => toast.success("Added to cart"),
+        onSuccess: () => toast.success(t("addToCartSuccess")),
         onError: (error) => {
           const { status, message } = HandleApiError(error, t);
 
           if (status === 400) {
-            toast.error("Not enough stock");
+            toast.error(t("notEnoughStock"));
             return;
           }
 
@@ -97,7 +98,7 @@ export function useAddToCartHandler(productDetails: any) {
             router.push("/login", { locale });
           }
         },
-      }
+      },
     );
   };
 

@@ -6,13 +6,14 @@ import { LoginDrawer } from "@/components/shared/login-drawer";
 import CartLocalTable from "@/components/layout/cart/cart-local-table";
 
 import { CartActions, useCartData } from "@/hooks/cart/useCart";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 const CartPageClient = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const {
-    userId,
-    setUserId,
     cart,
     localCart,
     displayedCart,
