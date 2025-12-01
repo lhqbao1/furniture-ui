@@ -25,6 +25,7 @@ import ResendOtp from "../auth/resend-otp";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
+import { preloadCheckout } from "@/lib/preload-checkout";
 
 interface CartLoginFormProps {
   onSuccess?: () => void;
@@ -62,13 +63,18 @@ export default function CartLoginForm({
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
 
-  const handleRedirectToCheckOut = () => {
-    if (!localCart || localCart.length === 0) {
-      toast.error(t("chooseAtLeastCart"));
-    } else {
-      if (onError) onError();
-    }
-  };
+const handleRedirectToCheckOut = () => {
+  if (!localCart || localCart.length === 0) {
+    toast.error(t("chooseAtLeastCart"));
+    return;
+  }
+
+  // PRELOAD CHECKOUT CHUNK
+  preloadCheckout();
+
+  // Sau khi preload (không cần warten)
+  router.push("/checkout");
+};
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!seePassword) {
