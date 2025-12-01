@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useCreateCheckOutManual } from "@/features/checkout/hook";
 import { useTranslations } from "next-intl";
 import z from "zod";
-import { CheckOutUserInformation } from "@/components/layout/checkout/admin-user-information";
+import { AdminCheckOutUserInformation } from "@/components/layout/admin/orders/order-create/admin-user-information";
 import {
   manualCheckoutDefaultValues,
   ManualCreateOrderFormValues,
@@ -102,6 +102,16 @@ export default function CreateCheckoutpage() {
         recipient_name: values.recipient_name
           ? values.recipient_name
           : values.first_name + values.last_name,
+        company_name:
+          values.company_name?.trim() === "" ? null : values.company_name,
+        additional_address:
+          values.additional_address?.trim() === ""
+            ? null
+            : values.additional_address,
+        invoice_additional_address:
+          values.invoice_additional_address?.trim() === ""
+            ? null
+            : values.invoice_additional_address,
       },
       {
         onSuccess(data, variables, context) {
@@ -136,14 +146,14 @@ export default function CreateCheckoutpage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* User information and address */}
           <div className="col-span-1 space-y-4 lg:space-y-12">
-            <CheckOutUserInformation isAdmin />
-            <ManualAdditionalInformation />
+            <AdminCheckOutUserInformation isAdmin />
             <ManualCheckOutShippingAddress isAdmin />
-            <ManualCheckOutInvoiceAddress isAdmin />
+            {/* <ManualCheckOutInvoiceAddress isAdmin /> */}
           </div>
 
           {/* Table cart and total */}
           <div className="col-span-1 space-y-4 lg:space-y-4">
+            <ManualAdditionalInformation />
             <SelectOrderItems
               listProducts={listProducts}
               setListProducts={setListProducts}

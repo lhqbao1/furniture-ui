@@ -87,6 +87,7 @@ export default function InvoiceTable({
           <span className="text-sm">
             Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
           </span>
+          <span>{checkout?.checkouts?.[0]?.user?.company_name}</span>
           <span>
             {checkout?.checkouts?.[0]?.user?.first_name}{" "}
             {checkout?.checkouts?.[0]?.user?.last_name}
