@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Loader2 } from "lucide-react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +33,7 @@ import {
   useUpdateInventory,
 } from "@/features/products/inventory/hook";
 import React from "react";
+import { toast } from "sonner";
 
 interface AddOrEditInventoryDialogProps {
   productId: string;
@@ -48,6 +49,15 @@ interface AddOrEditInventoryDialogProps {
   }[];
 }
 
+function toIsoWithoutZ(date: Date) {
+  return date.toISOString().replace(/Z$/, "");
+}
+
+function fromDateInputToIsoNoZ(value: string) {
+  const d = new Date(value);
+  return d.toISOString().replace(/Z$/, "");
+}
+
 export default function AddOrEditInventoryDialog({
   productId,
   cost,
@@ -56,13 +66,16 @@ export default function AddOrEditInventoryDialog({
 }: AddOrEditInventoryDialogProps) {
   const isEdit = inventoryData.length > 0;
   const editItem = inventoryData[0];
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<InventoryCreateValues>({
     resolver: zodResolver(InventoryCreateSchema),
     defaultValues: {
       product_id: productId,
       incoming_stock: editItem?.incoming_stock ?? 0,
-      date_received: editItem?.date_received ?? new Date().toISOString(),
+      date_received: editItem?.date_received
+        ? editItem.date_received.replace(/Z$/, "") // bỏ Z nếu có
+        : toIsoWithoutZ(new Date()),
       cost_received: editItem?.cost_received ?? 0,
       total_cost: editItem?.total_cost ?? 0,
     },
@@ -80,6 +93,10 @@ export default function AddOrEditInventoryDialog({
   const createInventoryDataMutation = useCreateInventory();
   const editInventoryDataMutation = useUpdateInventory();
 
+  const loading = isEdit
+    ? editInventoryDataMutation.isPending
+    : createInventoryDataMutation.isPending;
+
   const onSubmit = (values: InventoryCreateValues) => {
     const totalCost = stock * cost;
 
@@ -90,20 +107,45 @@ export default function AddOrEditInventoryDialog({
     };
 
     if (isEdit && editItem?.id) {
-      editInventoryDataMutation.mutate({
-        id: editItem.id,
-        payload,
-      });
+      editInventoryDataMutation.mutate(
+        {
+          id: editItem.id,
+          payload,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Inventory updated successfully");
+            setOpen(false);
+          },
+          onError: () => {
+            toast.error("Failed to update inventory");
+          },
+        },
+      );
     } else {
-      createInventoryDataMutation.mutate({
-        ...payload,
-        product_id: productId,
-      });
+      createInventoryDataMutation.mutate(
+        {
+          ...payload,
+          product_id: productId,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Inventory created successfully");
+            setOpen(false);
+          },
+          onError: () => {
+            toast.error("Failed to create inventory");
+          },
+        },
+      );
     }
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
       {/* Trigger */}
       <DialogTrigger asChild>
         {isEdit ? (
@@ -182,10 +224,14 @@ export default function AddOrEditInventoryDialog({
                   <FormControl>
                     <Input
                       type="date"
-                      value={field.value?.split("T")[0]}
-                      onChange={(e) =>
-                        field.onChange(new Date(e.target.value).toISOString())
+                      value={
+                        field.value
+                          ? field.value.split("T")[0] // vì field.value đã là dạng không Z
+                          : ""
                       }
+                      onChange={(e) => {
+                        field.onChange(fromDateInputToIsoNoZ(e.target.value));
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -213,12 +259,15 @@ export default function AddOrEditInventoryDialog({
             />
 
             {/* ❌ total_cost field removed — handled internally */}
-
             <Button
               type="submit"
-              className="w-full mt-4"
+              className="w-full mt-4 flex items-center justify-center gap-2"
+              disabled={loading}
             >
-              {isEdit ? "Save Changes" : "Add Inventory"}
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              <span className={loading ? "opacity-50" : ""}>
+                {isEdit ? "Save Changes" : "Add Inventory"}
+              </span>
             </Button>
           </form>
         </Form>

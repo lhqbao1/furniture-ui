@@ -151,12 +151,29 @@ export function AdminCheckOutUserInformation({
           control={form.control}
           name="company_name"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem className="">
               <FormLabel>Company name (Optional)</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   value={field.value ?? ""} // 👈 đảm bảo controlled
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tax_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tax ID (Optional)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -207,26 +224,9 @@ export function AdminCheckOutUserInformation({
 
         <FormField
           control={form.control}
-          name="tax_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tax ID (Optional)</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder=""
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
           name="invoice_address"
           render={({ field }) => (
-            <FormItem className="">
+            <FormItem className="col-span-2">
               <FormLabel>Street and House number</FormLabel>
               <FormControl>
                 <Input
