@@ -73,7 +73,7 @@ const handleRedirectToCheckOut = () => {
   preloadCheckout();
 
   // Sau khi preload (không cần warten)
-  router.push("/checkout");
+  router.push("/checkout", {locale});
 };
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
