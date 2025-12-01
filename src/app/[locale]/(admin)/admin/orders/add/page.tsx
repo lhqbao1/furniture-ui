@@ -92,28 +92,38 @@ export default function CreateCheckoutpage() {
 
     console.log(values);
 
-    // createOrderManualMutation.mutate(
-    //   {
-    //     ...values,
-    //     total_shipping: total_shipping,
-    //     email: values.email
-    //       ? values.email
-    //       : `${values.first_name}${values.last_name}`,
-    //     recipient_name: values.recipient_name
-    //       ? values.recipient_name
-    //       : values.first_name + values.last_name,
-    //   },
-    //   {
-    //     onSuccess(data, variables, context) {
-    //       toast.success("Create order successfully");
-    //       form.reset();
-    //       setListProducts([]);
-    //     },
-    //     onError(error, variables, context) {
-    //       toast.error("Create order fail");
-    //     },
-    //   },
-    // );
+    createOrderManualMutation.mutate(
+      {
+        ...values,
+        total_shipping: total_shipping,
+        email: values.email
+          ? values.email
+          : `${values.first_name}${values.last_name}`,
+        recipient_name: values.recipient_name
+          ? values.recipient_name
+          : values.first_name + values.last_name,
+        company_name:
+          values.company_name?.trim() === "" ? null : values.company_name,
+        additional_address:
+          values.additional_address?.trim() === ""
+            ? null
+            : values.additional_address,
+        invoice_additional_address:
+          values.invoice_additional_address?.trim() === ""
+            ? null
+            : values.invoice_additional_address,
+      },
+      {
+        onSuccess(data, variables, context) {
+          toast.success("Create order successfully");
+          form.reset();
+          setListProducts([]);
+        },
+        onError(error, variables, context) {
+          toast.error("Create order fail");
+        },
+      },
+    );
   }
 
   return (

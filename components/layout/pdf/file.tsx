@@ -168,6 +168,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             <Text style={{ fontSize: 8 }}>
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
+            <Text>{invoice.main_checkout.checkouts[0].user.company_name}</Text>
             <Text>
               {checkout.checkouts[0].user.first_name}{" "}
               {checkout.checkouts[0].user.last_name}
