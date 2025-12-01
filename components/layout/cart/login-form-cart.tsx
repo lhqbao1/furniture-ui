@@ -69,11 +69,9 @@ const handleRedirectToCheckOut = () => {
     return;
   }
 
-  // PRELOAD CHECKOUT CHUNK
-  preloadCheckout();
+  router.prefetch("/check-out", { locale }); // 🔥 preload đúng cách
 
-  // Sau khi preload (không cần warten)
-  router.push("/check-out", {locale});
+  router.push("/check-out");
 };
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
