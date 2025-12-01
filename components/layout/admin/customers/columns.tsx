@@ -117,25 +117,33 @@ export const customerColumns: ColumnDef<Customer>[] = [
     accessorKey: "created_at",
     header: () => <div className="text-center w-full">CREATED</div>,
     cell: ({ row }) => {
-      const isoString = row.original.created_at;
-      const date = new Date(isoString);
+      let iso = row.original.created_at.toString();
+
+      // 👉 Nếu backend không gửi Z, mình thêm vào để JS parse đúng UTC
+      if (!iso.endsWith("Z")) {
+        iso += "Z";
+      }
+
+      const date = new Date(iso);
 
       const time = date.toLocaleString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false, // bỏ AM/PM nếu muốn
+        hour12: false,
+        timeZone: "Europe/Berlin", // giờ Berlin
       });
 
       const day = date.toLocaleString("en-US", {
         day: "2-digit",
         month: "short",
         year: "numeric",
+        timeZone: "Europe/Berlin",
       });
 
       return (
         <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
-          <span>{time}</span>
           <span>{day}</span>
+          <span>{time}</span>
         </div>
       );
     },

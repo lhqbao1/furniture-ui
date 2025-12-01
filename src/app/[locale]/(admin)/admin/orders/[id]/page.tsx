@@ -10,7 +10,11 @@ import AdminBackButton from "@/components/shared/admin-back-button";
 import { useGetMainCheckOutByMainCheckOutId } from "@/features/checkout/hook";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { calculateVAT } from "@/lib/caculate-vat";
-import { formatDate, formatDateTime } from "@/lib/date-formated";
+import {
+  formatDate,
+  formatDateTime,
+  formatDateTimeString,
+} from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
 import { CheckOutMain } from "@/types/checkout";
 import { useQuery } from "@tanstack/react-query";
@@ -69,7 +73,7 @@ const OrderDetails = () => {
         <OrderDetailOverView
           order={order}
           created_at={formatDate(order.created_at)}
-          updated_at={formatDateTime(order.updated_at)}
+          updated_at={formatDateTimeString(order.updated_at.toString())}
           status={order.status}
         />
         <OrderDetailUser
