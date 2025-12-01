@@ -96,7 +96,6 @@ const ManualCheckOutInvoiceAddress = ({
     form.setValue("invoice_country", shippingCountry);
     form.setValue("invoice_additional_address", shippingAdditionalAddress);
     form.setValue("invoice_recipient_name", shippingRecipient);
-    form.setValue("invoice_phone", shippingPhone);
   }, [
     isSameShipping,
     shippingAddressLine,
@@ -105,7 +104,6 @@ const ManualCheckOutInvoiceAddress = ({
     shippingAdditionalAddress,
     shippingCountry,
     shippingRecipient,
-    shippingPhone,
     form,
   ]);
 

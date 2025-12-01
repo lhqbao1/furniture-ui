@@ -188,7 +188,7 @@ export default function ManualAdditionalInformation({
                     type="number"
                     min={0}
                     className="pl-7"
-                    step="0.01"
+                    step="1"
                     value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(

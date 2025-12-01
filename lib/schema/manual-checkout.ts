@@ -6,13 +6,14 @@ export const ManualCreateOrderSchema = z.object({
   first_name: z.string().min(1, { message: "First name is required" }),
   last_name: z.string().min(1, { message: "Last name is required" }),
   phone_number: z.string().optional().nullable(),
+  company_name: z.string().optional().nullable(),
 
   address: z.string().min(1, { message: "Address is required" }),
   city: z.string().min(1, { message: "City is required" }),
   postal_code: z.string().min(1, { message: "Postal code is required" }),
   additional_address: z.string().optional(),
   country: z.string().min(1, { message: "Country is required" }),
-  recipient_name: z.string().min(1, "Recipient Name is required"),
+  recipient_name: z.string().optional().nullable(),
   phone: z.string().min(1, "Phone number is required"),
 
   invoice_address: z.string().optional(),
@@ -20,7 +21,7 @@ export const ManualCreateOrderSchema = z.object({
   invoice_postal_code: z.string().optional(),
   invoice_additional_address: z.string().optional(),
   invoice_country: z.string().optional(),
-  invoice_recipient_name: z.string().min(1, "Recipient Name is required"),
+  invoice_recipient_name: z.string().optional().nullable(),
   invoice_phone: z.string().min(1, "Phone number is required"),
 
   from_marketplace: z.string().nullable(),
