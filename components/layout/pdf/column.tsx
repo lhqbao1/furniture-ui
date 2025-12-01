@@ -1,65 +1,103 @@
-import { CartItem } from "@/types/cart"
-import { ColumnDef } from "@tanstack/react-table"
+// invoice-columns.tsx
+import React from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { CartItem } from "@/types/cart";
+
+export type InvoiceColumnsProps = {
+  locale?: string; // ví dụ "de-DE"
+  currency?: string; // ví dụ "€"
+  // callback khi click vào mã sản phẩm (Art.-Nr)
+  onProductClick?: (productId: string) => void;
+  // tùy chỉnh formatter nếu cần
+  numberFormatOptions?: Intl.NumberFormatOptions;
+  // nếu muốn hiển thị EAN hay không
+  showEan?: boolean;
+  // parseTax function override (optional)
+  tax?: string | number;
+};
 
 export const parseTax = (tax: string | number): number => {
-  if (typeof tax === "number") return tax
-  const cleaned = tax.replace("%", "")
-  const parsed = parseFloat(cleaned)
-  return isNaN(parsed) ? 0 : parsed
-}
+  if (typeof tax === "number") return tax;
+  const cleaned = tax.replace("%", "");
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
+};
 
+export const createInvoiceColumns = ({
+  locale = "de-DE",
+  currency = "€",
+  onProductClick,
+  numberFormatOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+  showEan = true,
+  tax,
+}: InvoiceColumnsProps = {}): ColumnDef<CartItem>[] => {
+  const moneyFormatter = (value: number) =>
+    `${Number(value).toLocaleString(locale, numberFormatOptions)}${currency}`;
 
-export const invoiceColumns: ColumnDef<CartItem>[] = [
-  {
-    id: "pos",
-    header: "Pos.",
-    cell: ({ row }) => row.index + 1,
-  },
-  {
-    accessorKey: "ean",
-    header: "Art.-Nr",
-    cell: ({ row }) => `${row.original.products.id_provider}`,
-  },
-  {
-    accessorKey: "name",
-    header: "Bezeichnung",
-    cell: ({ row }) => (
-      <div className="max-w-[300px] text-wrap">
-        <div>{row.original.products.name}</div>
-        <div>#{row.original.products.ean}</div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "quantity",
-    header: "Menge",
-    cell: ({ row }) => <div className="text-center">{row.original.quantity}</div>,
-
-  },
-  {
-    accessorKey: "vat",
-    header: "MwSt.",
-    cell: ({ row }) => {
-      return <div>{row.original.products.tax}</div>
+  return [
+    {
+      id: "pos",
+      header: "Pos.",
+      cell: ({ row }) => row.index + 1,
     },
-  },
-  {
-    accessorKey: "unit_price",
-    header: () => <div className="text-right">E.-Peris</div>,
-    cell: ({ row }) => <div className="text-right">{row.original.item_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>,
-  },
-  {
-    id: "amount",
-    header: () => <div className="text-right">G.-Peris</div>,
-    cell: ({ row }) => {
-      return <div className="text-right">{row.original.final_price.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
+    {
+      accessorKey: "ean",
+      header: "Art.-Nr",
+      cell: ({ row }) => {
+        const idProvider = row.original.products.id_provider;
+        return onProductClick ? (
+          <button
+            type="button"
+            onClick={() => onProductClick(row.original.products.id)}
+            className="underline font-semibold text-left"
+          >
+            {idProvider}
+          </button>
+        ) : (
+          <span className="underline font-semibold">{idProvider}</span>
+        );
+      },
     },
-  },
-  // {
-  //   accessorKey: "net_price",
-  //   header: "Summe",
-  //   cell: ({ row }) => {
-  //     return <div>{((row.original.products.final_price - (parseTax(row.original.products.tax) / 100 * row.original.products.final_price)) * row.original.quantity).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</div>
-  //   },
-  // },
-]
+    {
+      accessorKey: "name",
+      header: "Bezeichnung",
+      cell: ({ row }) => (
+        <div className="max-w-[300px] text-wrap">
+          <div>{row.original.products.name}</div>
+          {showEan && <div>#{row.original.products.ean}</div>}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "quantity",
+      header: "Menge",
+      cell: ({ row }) => (
+        <div className="text-center">{row.original.quantity}</div>
+      ),
+    },
+    {
+      accessorKey: "vat",
+      header: "MwSt.",
+      cell: ({ row }) => {
+        return <div>{tax}%</div>;
+      },
+    },
+    {
+      accessorKey: "unit_price",
+      header: () => <div className="text-right">E.-Peris</div>,
+      cell: ({ row }) => (
+        <div className="text-right">
+          {moneyFormatter(row.original.item_price)}
+        </div>
+      ),
+    },
+    {
+      id: "amount",
+      header: () => <div className="text-right">G.-Peris</div>,
+      cell: ({ row }) => {
+        const amount = row.original.final_price; // final_price assumed per row (already multiplied by qty)
+        return <div className="text-right">{moneyFormatter(amount)}</div>;
+      },
+    },
+  ];
+};

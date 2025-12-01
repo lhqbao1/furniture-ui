@@ -1,6 +1,6 @@
 "use client";
 
-import { invoiceColumns } from "./column";
+import { createInvoiceColumns } from "./column";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { getMainCheckOutByMainCheckOutId } from "@/features/checkout/api";
@@ -151,7 +151,9 @@ export default function InvoiceTable({
       <div className="text-center w-full space-y-4">
         {/* <h2 className="text-3xl text-secondary font-bold">Invoice</h2> */}
         <FileTable
-          columns={invoiceColumns}
+          columns={createInvoiceColumns({
+            tax: checkout?.tax ?? "",
+          })}
           data={flattenedCartItems}
           voucher={invoice?.voucher_amount}
           coupon={invoice?.coupon_amount}

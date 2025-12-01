@@ -169,16 +169,22 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
   // ============================
   // 🔹 Stripe NOT ready → show loader
   // ============================
-  if (!stripe || !elements) return <Loader2 className="animate-spin" />;
+  // if (!stripe) return <Loader2 className="animate-spin" />;
 
   // ============================
   // 🔹 Card payment click
   // ============================
   const handleCardPay = async () => {
-    if (!stripe || !elements || !clientSecret) return;
+    if (!stripe || !elements || !clientSecret) {
+      toast.error(t("stripeWating"));
+      return;
+    }
 
     const card = elements.getElement(CardElement);
-    if (!card) return;
+    if (!card) {
+      toast.error(t("changePayment"));
+      return;
+    }
 
     try {
       const { error, paymentIntent } = await stripe.confirmCardPayment(

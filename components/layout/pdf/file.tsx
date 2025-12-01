@@ -325,7 +325,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   {item.quantity}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
-                  {item.products.tax}
+                  {checkout.tax}%
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>
                   {item.item_price.toLocaleString("de-DE", {

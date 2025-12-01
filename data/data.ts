@@ -774,6 +774,10 @@ export const paymentOptions = [
   { id: "googlepay", label: "Google Pay", logo: "/google-pay.png" },
 ];
 
+export const stripeOptions = [
+  { id: "paypal", label: "PayPal", logo: "/paypal.svg" },
+];
+
 export const cartItems = [
   {
     id: 1,
