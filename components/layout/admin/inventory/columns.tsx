@@ -17,6 +17,7 @@ import {
 import { formatDate } from "@/lib/date-formated";
 import { formatIOSDate } from "@/lib/ios-to-num";
 import AddOrEditInventoryDialog from "./dialog/add-or-edit-inventory";
+import ProductInventoryDeleteDialog from "./dialog/delete-dialog";
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -32,6 +33,8 @@ function ActionsCell({ product }: { product: ProductItem }) {
         cost={product.cost}
         stock={product.stock}
       />
+
+      {/* {product.inventory && product.inventory.length > 0 ? <ProductInventoryDeleteDialog id={}/> : ""} */}
     </div>
   );
 }
@@ -128,7 +131,7 @@ export const getInventoryColumns = (
   {
     accessorKey: "incomming",
     header: () => (
-      <div className="text-right uppercase">Incoming stock/date/cost</div>
+      <div className="text-center uppercase">Incoming stock/date/cost</div>
     ),
     cell: ({ row }) => {
       const inventoryData = row.original.inventory;
@@ -137,10 +140,12 @@ export const getInventoryColumns = (
           {inventoryData && inventoryData.length > 0
             ? inventoryData.map((item, index) => {
                 return (
-                  <div className="space-y-1">
-                    <span>{item.incoming_stock}</span>
-                    <span>{formatIOSDate(item.date_received)}</span>
-                    <span>
+                  <div className="flex justify-center items-center divide-x divide-gray-300">
+                    <span className="px-2">{item.incoming_stock} pcs</span>
+                    <span className="px-2">
+                      {formatIOSDate(item.date_received)}
+                    </span>
+                    <span className="px-2">
                       €
                       {(row.original.cost * item.incoming_stock).toLocaleString(
                         "de-DE",
