@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
-import { formatDateTime } from "@/lib/date-formated";
+import { formatDateTime, formatDateTimeString } from "@/lib/date-formated";
 
 interface DocumentTableProps {
   order?: CheckOutMain;
@@ -29,8 +29,10 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
       {
         document: "Invoice",
         code: invoiceCode ?? "",
-        dateSent: formatDateTime(
-          order.created_at ? new Date(order.created_at) : new Date(),
+        dateSent: formatDateTimeString(
+          order.created_at
+            ? order.created_at.toString()
+            : new Date().toString(),
         ),
         viewType: "invoice",
         checkOutId: order.id,
@@ -42,8 +44,10 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
       baseData.push({
         document: "Package Slip",
         code: order.checkout_code ?? "",
-        dateSent: formatDateTime(
-          order.created_at ? new Date(order.created_at) : new Date(),
+        dateSent: formatDateTimeString(
+          order.created_at
+            ? order.created_at.toString()
+            : new Date().toString(),
         ),
         viewType: "package",
         checkOutId: order.id,
@@ -54,8 +58,10 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
       baseData.push({
         document: "Credit Node",
         code: order.checkout_code ?? "",
-        dateSent: formatDateTime(
-          order.created_at ? new Date(order.created_at) : new Date(),
+        dateSent: formatDateTimeString(
+          order.created_at
+            ? order.created_at.toString()
+            : new Date().toString(),
         ),
         viewType: "credit-node",
         checkOutId: order.id,

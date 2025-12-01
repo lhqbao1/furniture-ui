@@ -90,8 +90,6 @@ export default function CreateCheckoutpage() {
       return;
     }
 
-    console.log(values);
-
     createOrderManualMutation.mutate(
       {
         ...values,
