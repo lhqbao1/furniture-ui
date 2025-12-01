@@ -23,8 +23,8 @@ import { useCartLocal } from "@/hooks/cart";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import CheckOutUserInformation from "@/components/layout/checkout/user-information";
-import CheckOutShippingAddress from "@/components/layout/checkout/shipping-address";
-import CheckOutInvoiceAddress from "@/components/layout/checkout/invoice-address";
+// import CheckOutShippingAddress from "@/components/layout/checkout/shipping-address";
+// import CheckOutInvoiceAddress from "@/components/layout/checkout/invoice-address";
 import CheckoutSummary from "./checkout-summary";
 import CheckoutProducts from "./check-out-products";
 import CartTable from "../cart/cart-table";
@@ -41,15 +41,15 @@ import StripeLayout from "@/components/shared/stripe/stripe";
 //   { ssr: false },
 // );
 
-// const CheckOutShippingAddress = dynamic(
-//   () => import("@/components/layout/checkout/shipping-address"),
-//   { ssr: false },
-// );
+const CheckOutShippingAddress = dynamic(
+  () => import("@/components/layout/checkout/shipping-address"),
+  { ssr: false },
+);
 
-// const CheckOutInvoiceAddress = dynamic(
-//   () => import("@/components/layout/checkout/invoice-address"),
-//   { ssr: false },
-// );
+const CheckOutInvoiceAddress = dynamic(
+  () => import("@/components/layout/checkout/invoice-address"),
+  { ssr: false },
+);
 
 export default function CheckOutFormSection() {
   const t = useTranslations();
