@@ -330,5 +330,7 @@
   "vatId": "USt-IdNr",
   "relatedProduct": "Ähnliche Produkte",
   "invalidOTP": "Ungültiger OTP",
-  "inStock1": "Lagerbestand"
+  "inStock1": "Lagerbestand",
+  "stripeWating": "Bitte versuchen Sie es in ein paar Sekunden erneut",
+      "changePayment": "Bitte wählen Sie eine andere Zahlungsart oder versuchen Sie es in wenigen Sekunden erneut."
 }
