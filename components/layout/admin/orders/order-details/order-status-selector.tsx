@@ -154,7 +154,7 @@ export default function OrderStatusSelector({
         <PaidConfirmDialog
           id={order.id}
           status={status}
-          open={openCancel}
+          open={openPaid}
           onClose={() => {
             setOpenPaid(false);
             setValue(status.toLocaleLowerCase());
