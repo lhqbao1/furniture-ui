@@ -14,7 +14,7 @@ const RecentViewed = ({ products }: RecentViewedProps) => {
 
   return (
     <div className="section-padding lg:mt-0 mt-40">
-      <h2 className="section-header">{t("recentViewed")}</h2>
+      <h2 className="section-header">{t("trending")}</h2>
       {!products ? (
         <ProductGridSkeleton />
       ) : (

@@ -24,6 +24,10 @@ import { LoginDrawer } from "./login-drawer";
 import { Button } from "../ui/button";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
+import ListCategoriesHome from "../layout/home/list-categories";
+import { getCategoriesWithChildren } from "@/features/category/api";
+import { useGetCategoriesWithChildren } from "@/features/category/hook";
+import Image from "next/image";
 
 interface PageHeaderProps {
   hasSideBar?: boolean;
@@ -37,7 +41,6 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
   const [openCart, setOpenCart] = useState(false);
   const pathName = usePathname();
   const locale = useLocale();
-
   const queryClient = useQueryClient();
 
   const [userId, setUserId] = useAtom(userIdAtom);
@@ -57,6 +60,12 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     enabled: !!userId,
     retry: false,
   });
+
+  const {
+    data: categories,
+    isLoading: isLoadingCategories,
+    isError: isErrorCategories,
+  } = useGetCategoriesWithChildren();
 
   const {
     data: user,
@@ -92,132 +101,149 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
     : localCart.length;
 
   return (
-    <div
-      className="home-banner-top__content sticky top-0 overflow-hidden z-50 flex flex-row gap-4 h-16 w-full bg-white shadow-secondary/10 shadow-xl py-4 items-center px-4 
-    lg:flex lg:items-center lg:justify-end lg:px-4 lg:py-3 lg:gap-6"
-    >
-      {/*Product search desktop */}
-      <div className="hidden lg:block flex-1">
-        <ProductSearch />
-      </div>
-
-      <div className="flex h-full items-center justify-end w-full lg:w-fit gap-3 lg:items-end lg:gap-6">
-        {/*Mobile Search */}
-        <div className="block lg:hidden">
-          <MobileProductSearch />
-        </div>
-
-        {/*Shopping cart */}
-        <div className="lg:hidden">
-          <CartDrawer
-            openCart={openCart}
-            setOpenCart={setOpenCart}
-            cartNumber={displayedCart}
-          />
-        </div>
-        <div className="hidden lg:block relative">
+    <header className="home-banner-top__content sticky top-0 overflow-hidden z-50 bg-white shadow-secondary/10 shadow-xl">
+      <div className=" flex flex-row gap-4 w-full py-4 items-center px-4 lg:flex lg:items-center lg:justify-end lg:px-20 lg:py-3 lg:gap-6 border-b">
+        <div className={`flex flex-row gap-2 items-center`}>
           <Link
-            href={`/cart`}
-            className={`cursor-pointer relative`}
-            aria-label="Go to cart"
+            href={`/`}
+            aria-label="Go to homepage"
+            className="relative w-16 h-16 flex"
           >
-            <ShoppingCart
-              stroke={`#4D4D4D`}
-              size={30}
-              className="hover:scale-110 transition-all duration-300"
+            <Image
+              src="/new-logo.svg"
+              alt="Go to homepage"
+              fill
+              style={{ objectFit: "contain" }}
             />
-            {displayedCart && displayedCart > 0 ? (
-              <span className="absolute -top-1.5 -right-1 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
-              </span>
-            ) : (
-              ""
-            )}
+          </Link>
+          <Link href={"/"}>
+            <div
+              className="hidden lg:flex text-[29px] gap-1"
+              translate="no"
+            >
+              <span className="text-secondary font-bold">Prestige</span>
+              <span className="text-primary font-bold">Home</span>
+            </div>
           </Link>
         </div>
+        {/*Product search desktop */}
+        <div className="hidden lg:block flex-1">
+          <ProductSearch />
+        </div>
 
-        {/*User */}
-        {/* User section — ẩn icon nếu đang ở trang cart/checkout mà chưa login */}
-        {/* {!(
-          !userId &&
-          (pathName.endsWith("/cart") || pathName.endsWith("/check-out"))
-        ) && (
-         
-        )} */}
-        <>
-          {isLoadingUser ? (
-            // Loading state
-            <User
-              stroke="#4D4D4D"
-              size={24}
-              className="animate-pulse opacity-50"
+        <div className="flex h-full items-center justify-end w-full lg:w-fit gap-3 lg:items-end lg:gap-6">
+          {/*Mobile Search */}
+          <div className="block lg:hidden">
+            <MobileProductSearch />
+          </div>
+
+          {/*Shopping cart */}
+          <div className="lg:hidden">
+            <CartDrawer
+              openCart={openCart}
+              setOpenCart={setOpenCart}
+              cartNumber={displayedCart}
             />
-          ) : user ? (
-            // Logged in -> dropdown
-            <div className="flex">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <User
-                    className="cursor-pointer hover:scale-110 transition-all duration-300"
-                    stroke="#4D4D4D"
-                    size={30}
-                  />
-                </DropdownMenuTrigger>
+          </div>
+          <div className="hidden lg:block relative">
+            <Link
+              href={`/cart`}
+              className={`cursor-pointer relative`}
+              aria-label="Go to cart"
+            >
+              <ShoppingCart
+                stroke={`#4D4D4D`}
+                size={30}
+                className="hover:scale-110 transition-all duration-300"
+              />
+              {displayedCart && displayedCart > 0 ? (
+                <span className="absolute -top-1.5 -right-1 flex size-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
+                </span>
+              ) : (
+                ""
+              )}
+            </Link>
+          </div>
 
-                <DropdownMenuContent
-                  side="bottom"
-                  className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]
+          <>
+            {isLoadingUser ? (
+              // Loading state
+              <User
+                stroke="#4D4D4D"
+                size={24}
+                className="animate-pulse opacity-50"
+              />
+            ) : user ? (
+              // Logged in -> dropdown
+              <div className="flex">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <User
+                      className="cursor-pointer hover:scale-110 transition-all duration-300"
+                      stroke="#4D4D4D"
+                      size={30}
+                    />
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent
+                    side="bottom"
+                    className="w-48 !absolute top-0 lg:-left-[180px] -left-[180px]
                         data-[state=open]:slide-in-from-right duration-500
                         data-[state=closed]:slide-out-to-right"
-                >
-                  <DropdownMenuLabel>
-                    {t("greeting")}, {user.last_name}
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => router.push("/my-order", { locale })}
                   >
-                    {t("myOrder")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => router.push("/account", { locale })}
-                  >
-                    {t("accountInformation")}
-                  </DropdownMenuItem>
-                  {/* Ẩn nút Logout nếu đang ở trang /cart hoặc /check-out */}
-                  {!pathName.endsWith("/cart") &&
-                    !pathName.endsWith("/check-out") && (
-                      <DropdownMenuItem onClick={onLogout}>
-                        {t("logout")}
-                      </DropdownMenuItem>
-                    )}
-                  <Link href={`/wishlist`}>
-                    <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ) : (
-            // Not logged in -> Login drawer
-            <LoginDrawer
-              openLogin={open}
-              setOpenLogin={setOpen}
-              setUserId={setUserId}
-            />
-          )}
-        </>
+                    <DropdownMenuLabel>
+                      {t("greeting")}, {user.last_name}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => router.push("/my-order", { locale })}
+                    >
+                      {t("myOrder")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/account", { locale })}
+                    >
+                      {t("accountInformation")}
+                    </DropdownMenuItem>
+                    {/* Ẩn nút Logout nếu đang ở trang /cart hoặc /check-out */}
+                    {!pathName.endsWith("/cart") &&
+                      !pathName.endsWith("/check-out") && (
+                        <DropdownMenuItem onClick={onLogout}>
+                          {t("logout")}
+                        </DropdownMenuItem>
+                      )}
+                    <Link href={`/wishlist`}>
+                      <DropdownMenuItem>{t("wishlist")}</DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              // Not logged in -> Login drawer
+              <LoginDrawer
+                openLogin={open}
+                setOpenLogin={setOpen}
+                setUserId={setUserId}
+              />
+            )}
+          </>
 
-        {hasSideBar ? (
-          <SidebarTrigger
-            className={`border-none text-[#4D4D4D] relative`}
-            isMobile={isPhone ? true : false}
-          />
-        ) : (
-          ""
-        )}
+          {hasSideBar ? (
+            <SidebarTrigger
+              className={`border-none text-[#4D4D4D] relative`}
+              isMobile={isPhone ? true : false}
+            />
+          ) : (
+            ""
+          )}
+        </div>
       </div>
-    </div>
+      <div className="min-h-16 bg-white lg:px-20 hidden lg:block">
+        <ListCategoriesHome categories={categories ?? []} />
+      </div>
+    </header>
   );
 };
 
