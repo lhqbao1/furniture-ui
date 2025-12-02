@@ -227,7 +227,7 @@ function CheckOutUserInformation({
           name="invoice_country"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel className="text-black font-semibold text-sm">
+              <FormLabel className="text-black text-sm">
                 {t("country")}
               </FormLabel>
 

@@ -174,7 +174,7 @@ function CheckOutShippingAddress({
             name="shipping_recipient_name"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel className="text-black font-semibold text-sm">
+                <FormLabel className="text-black text-sm">
                   {t("recipientName")}
                 </FormLabel>
                 <FormControl>
@@ -194,7 +194,7 @@ function CheckOutShippingAddress({
             name="shipping_phone_number"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel className="text-black font-semibold text-sm">
+                <FormLabel className="text-black text-sm">
                   {t("phone_number")}
                 </FormLabel>
                 <FormControl>
@@ -214,7 +214,7 @@ function CheckOutShippingAddress({
             name="shipping_address_line"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel className="text-black font-semibold text-sm">
+                <FormLabel className="text-black text-sm">
                   {t("streetAndHouse")}
                 </FormLabel>
                 <FormControl>
@@ -235,7 +235,7 @@ function CheckOutShippingAddress({
             name="shipping_address_additional"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel className="text-black font-semibold text-sm">
+                <FormLabel className="text-black text-sm">
                   {isAdmin ? "Additional Address" : t("addressSupplement")}
                 </FormLabel>
                 <FormControl>
@@ -257,7 +257,7 @@ function CheckOutShippingAddress({
             name="shipping_postal_code"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-black font-semibold text-sm">
+                <FormLabel className="text-black text-sm">
                   {isAdmin ? "Postal Code" : t("postalCode")}
                 </FormLabel>
                 <FormControl>
@@ -279,7 +279,7 @@ function CheckOutShippingAddress({
             name="shipping_city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-black font-semibold text-sm">
+                <FormLabel className="text-black text-sm">
                   {isAdmin ? "City" : t("city")}
                 </FormLabel>
                 <FormControl>
@@ -299,7 +299,7 @@ function CheckOutShippingAddress({
             name="shipping_country"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel className="text-black font-semibold text-sm">
+                <FormLabel className="text-black text-sm">
                   {t("country")}
                 </FormLabel>
 
