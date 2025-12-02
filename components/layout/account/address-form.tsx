@@ -27,8 +27,22 @@ import {
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Address } from "@/types/address";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandInput,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { COUNTRY_OPTIONS } from "@/data/data";
 
 // 🧩 Extend schema để thêm first_name + last_name (chỉ dùng ở UI)
 const extendedAddressSchema = addressSchema.extend({
@@ -58,6 +72,7 @@ export default function AddressForm({
   const createInvoiceAddressMutation = useCreateInvoiceAddress();
   const updateInvoiceAddressMutation = useUpdateInvoiceAddress();
   const t = useTranslations();
+  const [openCountry, setOpenCountry] = useState(false);
 
   const form = useForm<ExtendedAddressFormValues>({
     resolver: zodResolver(extendedAddressSchema),
@@ -96,7 +111,7 @@ export default function AddressForm({
     }
   }, [currentAddress, form]);
 
-  const onSubmit = (data: ExtendedAddressFormValues) => {
+  const handleSubmit = (data: ExtendedAddressFormValues) => {
     const payload: AddressFormValues = {
       ...data,
       user_id: userId,
@@ -160,7 +175,15 @@ export default function AddressForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(
+          (values) => {
+            handleSubmit(values);
+          },
+          (errors) => {
+            console.log(errors);
+            toast.error("Please check the form for errors");
+          },
+        )}
         className="grid grid-cols-2 gap-6"
       >
         {/* First Name */}
@@ -223,7 +246,7 @@ export default function AddressForm({
           name="address_line"
           render={({ field }) => (
             <FormItem className="col-span-2 lg:col-span-1">
-              <FormLabel>{t("addressLine")}</FormLabel>
+              <FormLabel>{t("streetAndHouse")}</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -240,7 +263,10 @@ export default function AddressForm({
             <FormItem className="col-span-2 lg:col-span-2">
               <FormLabel>{t("additionalAddressLine")}</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  value={field.value ?? ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -272,6 +298,65 @@ export default function AddressForm({
               <FormControl>
                 <Input {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="country"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel className="text-black text-sm">
+                {t("country")}
+              </FormLabel>
+
+              <Popover
+                open={openCountry}
+                onOpenChange={setOpenCountry}
+              >
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between"
+                      onClick={() => setOpenCountry(!openCountry)}
+                    >
+                      {field.value
+                        ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
+                            ?.label
+                        : "Select country"}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-full p-0 h-[150px] pointer-events-auto">
+                  <Command>
+                    <CommandInput placeholder="" />
+                    <CommandList>
+                      <CommandEmpty>{t("noCountry")}</CommandEmpty>
+                      <CommandGroup>
+                        {COUNTRY_OPTIONS.map((c) => (
+                          <CommandItem
+                            key={c.value}
+                            value={c.label}
+                            onSelect={() => {
+                              field.onChange(c.value);
+                              setOpenCountry(false); // 🔥 đóng popover sau khi chọn
+                            }}
+                            className="cursor-pointer"
+                          >
+                            {c.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
               <FormMessage />
             </FormItem>
           )}

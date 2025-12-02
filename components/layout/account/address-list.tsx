@@ -16,6 +16,7 @@ import { Loader2 } from "lucide-react";
 import AddressForm from "./address-form";
 import { cn } from "@/lib/utils";
 import { useAddressManager } from "@/hooks/account/useAccountAddress";
+import { COUNTRY_OPTIONS } from "@/data/data";
 
 interface AddressListProps {
   userId: string;
@@ -60,7 +61,10 @@ const AddressList = ({ userId }: AddressListProps) => {
             <CardContent className="text-sm text-muted-foreground space-y-1">
               <p>{address.address_line}</p>
               <p>{address.city}</p>
-              <p>{address.country}</p>
+              <p>
+                {COUNTRY_OPTIONS.find((c) => c.value === address.country)
+                  ?.label || address.country}
+              </p>
               {address.recipient_name && (
                 <p>
                   {t("recipient")}: {address.recipient_name}
