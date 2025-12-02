@@ -16,6 +16,8 @@ const TrendingProducts = ({ products }: TrendingProductsProps) => {
 
   return (
     <div className="section-padding">
+      <h2 className="section-header">{t("trending")}</h2>
+
       {!products ? (
         <ProductGridSkeleton />
       ) : (

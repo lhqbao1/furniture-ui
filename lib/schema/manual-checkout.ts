@@ -26,7 +26,7 @@ export const ManualCreateOrderSchema = z.object({
   invoice_recipient_name: z.string().optional().nullable(),
   invoice_phone: z.string().min(1, "Phone number is required"),
 
-  from_marketplace: z.string().min(1, "Marketplace is required"),
+  from_marketplace: z.string().optional().nullable(),
   marketplace_order_id: z.string().optional().nullable(),
 
   total_amount: z.number().optional(),
