@@ -25,7 +25,9 @@ interface CheckOutInvoiceAddressProps {
   isAdmin?: boolean;
 }
 
-const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps) => {
+const CheckOutInvoiceAddress = ({
+  isAdmin = false,
+}: CheckOutInvoiceAddressProps) => {
   const form = useFormContext();
   const t = useTranslations();
 
@@ -47,7 +49,10 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
     if (!hasShipping) return; // shipping chưa có dữ liệu → không sync
 
     form.setValue("invoice_address_line", s.shipping_address_line || "");
-    form.setValue("invoice_address_additional", s.shipping_address_additional || "");
+    form.setValue(
+      "invoice_address_additional",
+      s.shipping_address_additional || "",
+    );
     form.setValue("invoice_postal_code", s.shipping_postal_code || "");
     form.setValue("invoice_city", s.shipping_city || "");
   }, [form]);
@@ -58,7 +63,9 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
       // Lưu lại invoice hiện tại
       invoiceSnapshot.current = {
         invoice_address_line: form.getValues("invoice_address_line"),
-        invoice_address_additional: form.getValues("invoice_address_additional"),
+        invoice_address_additional: form.getValues(
+          "invoice_address_additional",
+        ),
         invoice_postal_code: form.getValues("invoice_postal_code"),
         invoice_city: form.getValues("invoice_city"),
       };
@@ -132,7 +139,9 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
             render={({ field }) => (
               <FormItem className="col-span-2">
                 <FormLabel>{t("streetAndHouse")}</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -144,7 +153,9 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
             render={({ field }) => (
               <FormItem className="col-span-2">
                 <FormLabel>{t("addressSupplement")}</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -157,7 +168,12 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
               <FormItem>
                 <FormLabel>{t("postalCode")}</FormLabel>
                 <FormControl>
-                  <Input type="text" inputMode="numeric" autoComplete="postal-code" {...field} />
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="postal-code"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,7 +186,9 @@ const CheckOutInvoiceAddress = ({ isAdmin = false }: CheckOutInvoiceAddressProps
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("city")}</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

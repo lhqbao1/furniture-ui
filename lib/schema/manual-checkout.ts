@@ -16,11 +16,13 @@ export const ManualCreateOrderSchema = z.object({
   recipient_name: z.string().optional().nullable(),
   phone: z.string().min(1, "Phone number is required"),
 
-  invoice_address: z.string().optional(),
-  invoice_city: z.string().optional(),
-  invoice_postal_code: z.string().optional(),
+  invoice_address: z.string().min(1, { message: "Address is required" }),
+  invoice_city: z.string().min(1, { message: "City is required" }),
+  invoice_postal_code: z
+    .string()
+    .min(1, { message: "Postal code is required" }),
   invoice_additional_address: z.string().optional().nullable(),
-  invoice_country: z.string().optional(),
+  invoice_country: z.string().min(1, { message: "Country is required" }),
   invoice_recipient_name: z.string().optional().nullable(),
   invoice_phone: z.string().min(1, "Phone number is required"),
 
@@ -67,11 +69,12 @@ export const manualCheckoutDefaultValues: ManualCreateOrderFormValues = {
   status: "PAID",
   city: "",
   postal_code: "",
-  country: "",
+  country: "DE",
+  invoice_country: "DE",
   invoice_address: "",
   invoice_city: "",
   invoice_postal_code: "",
-  from_marketplace: "",
+  from_marketplace: "amazon",
   total_shipping: 0,
   carrier: "",
   items: [],

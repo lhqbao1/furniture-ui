@@ -11,7 +11,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import React from "react";
+import React, { useState } from "react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { COUNTRY_OPTIONS } from "@/data/data";
 
 interface CheckOutUserInformationProps {
   isLogin: boolean;
@@ -24,6 +39,7 @@ function CheckOutUserInformation({
 }: CheckOutUserInformationProps) {
   const form = useFormContext();
   const t = useTranslations();
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -139,6 +155,127 @@ function CheckOutUserInformation({
                   disabled={isLogin}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="invoice_address_line"
+          render={({ field }) => (
+            <FormItem className="col-span-2">
+              <FormLabel>{t("streetAndHouse")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="invoice_address_additional"
+          render={({ field }) => (
+            <FormItem className="col-span-2">
+              <FormLabel>{t("addressSupplement")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="invoice_postal_code"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("postalCode")}</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="invoice_city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("city")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="invoice_country"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel className="text-black font-semibold text-sm">
+                {t("country")}
+              </FormLabel>
+
+              <Popover
+                open={open}
+                onOpenChange={setOpen}
+              >
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between"
+                      onClick={() => setOpen(!open)}
+                    >
+                      {field.value
+                        ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
+                            ?.label
+                        : "Select country"}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-full p-0 h-[150px]">
+                  <Command>
+                    <CommandInput placeholder="Search country..." />
+                    <CommandList>
+                      <CommandEmpty>{t("noCountry")}</CommandEmpty>
+                      <CommandGroup>
+                        {COUNTRY_OPTIONS.map((c) => (
+                          <CommandItem
+                            key={c.value}
+                            value={c.label}
+                            onSelect={() => {
+                              field.onChange(c.value);
+                              setOpen(false); // 🔥 đóng popover sau khi chọn
+                            }}
+                            className="cursor-pointer"
+                          >
+                            {c.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
               <FormMessage />
             </FormItem>
           )}

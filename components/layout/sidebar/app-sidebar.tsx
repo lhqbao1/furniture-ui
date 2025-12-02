@@ -107,7 +107,7 @@ export default function AppSidebar({
     // newProducts,
     // sale,
     ...(categories && categories.length > 0 ? mapCategories(categories) : []),
-    ...(userId ? [accountMenu] : []), // 👈 Chỉ thêm khi có userId
+    // ...(userId ? [accountMenu] : []), // 👈 Chỉ thêm khi có userId
   ];
 
   const [openItem, setOpenItem] = useState<string | null>(null);

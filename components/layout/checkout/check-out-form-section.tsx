@@ -160,7 +160,6 @@ export default function CheckOutFormSection() {
       className="flex flex-col gap-8 section-padding"
     >
       <h2 className="section-header">{t("order")}</h2>
-
       {/* Main container */}
       <div
         className={cn(
@@ -172,7 +171,7 @@ export default function CheckOutFormSection() {
         <div className="col-span-1 space-y-4 lg:space-y-12">
           <CheckOutUserInformation isLogin={!!userIdLogin} />
           <CheckOutShippingAddress key={`shipping-${userId}`} />
-          <CheckOutInvoiceAddress key={`invoice-${userId}`} />
+          {/* <CheckOutInvoiceAddress key={`invoice-${userId}`} /> */}
         </div>
 
         {/* Right side */}
