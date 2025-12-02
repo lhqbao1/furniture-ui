@@ -88,8 +88,8 @@ const Footer = () => {
       </div> */}
 
       {/* Cột 1: Newsletter */}
-      {/* <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
-        <h4 className="font-semibold">
+      <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
+        <h4 className="font-semibold lg:w-2/3 w-full">
           Jetzt Newsletter abonnieren – und mehr entdecken.
         </h4>
 
@@ -115,7 +115,7 @@ const Footer = () => {
           Jetzt anmelden
         </button>
 
-        <p className="leading-relaxed font-semibold text-sm w-full">
+        <p className="leading-relaxed font-semibold text-sm w-full lg:w-1/2">
           Die Abmeldung des Newsletters ist jederzeit über den Abmeldelink in
           jeder Mail oder als Anfrage in unserem Kontaktformular möglich.{" "}
           <Link
@@ -125,7 +125,7 @@ const Footer = () => {
             Datenschutz
           </Link>
         </p>
-      </div> */}
+      </div>
 
       {/* Cột 2: Các trang */}
       <div className="footer-column lg:col-span-2 col-span-6">
@@ -136,7 +136,7 @@ const Footer = () => {
             <Link href={`/about-us`}>{t("aboutUs")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
-            <Link href={`/contact`}>{t("contact")}</Link>
+            <Link href={`/contact`}>{t("contactAndAsk")}</Link>
           </li>
           {/* <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/faq`}>FAQ</Link>
@@ -145,6 +145,15 @@ const Footer = () => {
             <Link href={`/impressum`}>{t("imprint")}</Link>
           </li>
         </ul>
+        <div className="lg:mt-4">
+          <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
+            <img
+              src="https://img.idealo.com/badges/336129/05b1de33-5dae-4864-bd06-131f2cfe3ece"
+              loading="lazy"
+              alt="www.idealo.de Logo"
+            />
+          </a>
+        </div>
       </div>
 
       {/* Cột 3: Term & Policy */}
@@ -184,27 +193,85 @@ const Footer = () => {
         </ul>
       </div>
 
-      {/* Cột 5: Company Info */}
-      <div className="footer-column lg:col-span-6 col-span-6">
-        <h4 className="font-semibold mb-3">{t("companyTitle")}</h4>
+      {/* Cột 3: Payment Method */}
+      <div className="footer-column lg:col-span-3 col-span-6 lg:space-y-6">
+        <>
+          <h4 className="font-semibold mb-3">{t("paymentMethod")}</h4>
 
-        <div className="grid grid-cols-2 gap-6 items-start">
-          <ul className="space-y-2 text-black-700 text-sm">
-            <li className="font-bold">Büro </li>
-            <li>Prestige Home GmbH</li>
-            <li>Greifswalder Straße 226, 10405 Berlin</li>
-            <li>{t("phone_number")}: +49 30 814 537 080</li>
-            <li>{t("email")}: info@prestige-home.de</li>
-            <li>{t("vatId")}: DE454714336</li>
-          </ul>
-          <ul className="space-y-2 text-black-700 text-sm">
-            <li className="font-bold">Lager</li>
-            <li>Prestige Home</li>
-            <li>Amm GmbH & Co KG Spedition</li>
-            <li>Hamburger Straße 99</li>
-            <li>90451 Nuremberg</li>
-          </ul>
-        </div>
+          <div className="flex gap-2 mt-2 lg:mt-4 flex-wrap">
+            <Image
+              src="/footer-ggpay.svg"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+            <Image
+              src="/footer-applepay.svg"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+            <Image
+              src="/footer-visa.svg"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+            <Image
+              src="/footer-mastercard.svg"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+            <Image
+              src="/footer-klarna.svg"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+            <Image
+              src="/footer-paypal.svg"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+          </div>
+        </>
+
+        <>
+          <h4 className="font-semibold mb-3">{t("deliveryService")}</h4>
+
+          <div className="flex gap-4 mt-2 lg:mt-4 flex-wrap">
+            <Image
+              src="/dpd-footer.png"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+            <Image
+              src="/amm-footer.webp"
+              width={50}
+              height={50}
+              alt="x"
+              className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
+              unoptimized
+            />
+          </div>
+        </>
       </div>
 
       {/* Cột 4: Social (ngoài, không thêm locale) */}
@@ -277,57 +344,6 @@ const Footer = () => {
               unoptimized
             />
           </Link>
-        </div>
-
-        <div className="flex gap-2 mt-2 lg:mt-4">
-          <Image
-            src="/footer-ggpay.png"
-            width={50}
-            height={50}
-            alt="x"
-            className="w-8 h-8 object-fill hover:scale-110 duration-300 transition-all"
-            unoptimized
-          />
-          <Image
-            src="/footer-applepay.png"
-            width={50}
-            height={50}
-            alt="x"
-            className="w-8 h-8 object-fill hover:scale-110 duration-300 transition-all"
-            unoptimized
-          />
-          <Image
-            src="/footer-visa.png"
-            width={50}
-            height={50}
-            alt="x"
-            className="w-8 h-8 object-fill hover:scale-110 duration-300 transition-all"
-            unoptimized
-          />
-          <Image
-            src="/footer-credit.png"
-            width={50}
-            height={50}
-            alt="x"
-            className="w-8 h-8 object-fill hover:scale-110 duration-300 transition-all"
-            unoptimized
-          />
-          <Image
-            src="/footer-klarna.png"
-            width={50}
-            height={50}
-            alt="x"
-            className="w-8 h-8 object-fill hover:scale-110 duration-300 transition-all"
-            unoptimized
-          />
-          <Image
-            src="/footer-paypal.png"
-            width={50}
-            height={50}
-            alt="x"
-            className="w-8 h-8 object-fill hover:scale-110 duration-300 transition-all"
-            unoptimized
-          />
         </div>
       </div>
     </footer>

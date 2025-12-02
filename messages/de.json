@@ -73,6 +73,7 @@
   "country_required": "Land ist erforderlich",
   "noCountry": "Kein Land gefunden.",
   "sameAsInvoce": "Gleich wie Rechnungsadresse",
+  "contactAndAsk": "Hilfe & Kontakt",
   "recipientName": "Empfängername",
   "invoiceAddress": "Rechnungsadresse",
   "selectVoucher": "Gutschein auswählen",
@@ -336,6 +337,8 @@
   "invalidOTP": "Ungültiger OTP",
   "inStock1": "Lagerbestand",
   "stripeWating": "Bitte versuchen Sie es in ein paar Sekunden erneut",
-      "changePayment": "Bitte wählen Sie eine andere Zahlungsart oder versuchen Sie es in wenigen Sekunden erneut.",
-      "featured_products": "Entdecke unsere Topseller"
+  "changePayment": "Bitte wählen Sie eine andere Zahlungsart oder versuchen Sie es in wenigen Sekunden erneut.",
+  "featured_products": "Entdecke unsere Topseller",
+  "paymentMethod": "Sichere Bezahlung",
+    "deliveryService": "Sicherer Versand"
 }

@@ -39,6 +39,7 @@
     "sofa": "Sofa",
     "furniture": "Furniture",
     "contact": "Contact",
+    "contactAndAsk": "Support & Contact",
     "items": "items",
     "english": "English",
     "german": "German",
@@ -340,5 +341,7 @@
   "inStock1": "Stock availability",
     "stripeWating": "Please try again in a few seconds",
     "changePayment": "Please try a different payment method or try again in a few seconds.",
-    "featured_products": "Featured Products"
+    "featured_products": "Featured Products",
+  "paymentMethods": "Payment Methods",
+  "deliveryService": "Secure Shipping"
 }
