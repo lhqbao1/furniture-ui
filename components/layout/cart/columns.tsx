@@ -146,7 +146,7 @@ export const GetCartColumns = ({
       cell: ({ row }) => {
         const item = row.original;
         return (
-          <div className="flex items-center gap-3 w-60 text-wrap">
+          <div className="flex items-center gap-3 w-80 text-wrap">
             <Image
               src={item.image_url || "/placeholder-product.webp"}
               alt={item.products.name}
@@ -232,13 +232,13 @@ export const GetCartColumns = ({
         return (
           <div className="flex justify-end gap-2">
             <Trash
-              className="text-red-500 cursor-pointer"
+              className="text-red-500 cursor-pointer hover:scale-110 transition-all duration-300"
               onClick={() => onDeleteItem(item)}
               size={20}
             />
             {isCheckout && (
               <Heart
-                className="text-secondary cursor-pointer"
+                className="text-secondary cursor-pointer hover:scale-110 transition-all duration-300"
                 onClick={() => handleAddToWishlist(item.products, item)}
                 size={20}
               />

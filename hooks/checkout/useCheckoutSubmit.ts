@@ -87,7 +87,6 @@ export function useCheckoutSubmit({
         let finalUserId = user?.id;
         let invoiceId = invoiceAddress?.id;
         let shippingId = addresses?.find((a: Address) => a.is_default)?.id;
-        const invoiceCountry = invoiceAddress?.country;
 
         let cartData: CartResponse = [];
         let shippingCostCurrent = 0;
@@ -128,15 +127,16 @@ export function useCheckoutSubmit({
         }
 
         // Invoice
-        if (!invoiceCountry || !invoiceId) {
+        if (!invoiceId) {
           const created = await createInvoice.mutateAsync({
             user_id: finalUserId ?? "",
             recipient_name: `${data.first_name} ${data.last_name}`,
             postal_code: data.invoice_postal_code,
             phone_number: data.phone_number,
             address_line: data.invoice_address_line,
+            additional_address_line: data.invoice_address_additional,
             city: data.invoice_city,
-            country: data.invoice_city,
+            country: data.invoice_country,
             state: data.invoice_city,
           });
           invoiceId = created.id;
@@ -144,7 +144,10 @@ export function useCheckoutSubmit({
           data.invoice_address_line !== invoiceAddress?.address_line ||
           data.invoice_postal_code !== invoiceAddress?.postal_code ||
           data.invoice_city !== invoiceAddress?.city ||
-          data.phone_number !== invoiceAddress?.phone_number
+          data.phone_number !== invoiceAddress?.phone_number ||
+          data.invoice_address_additional !==
+            invoiceAddress?.additional_address_line ||
+          data.invoice_country !== invoiceAddress?.country
         ) {
           const updated = await updateInvoice.mutateAsync({
             addressId: invoiceId,
@@ -154,8 +157,9 @@ export function useCheckoutSubmit({
               postal_code: data.invoice_postal_code,
               phone_number: data.phone_number,
               address_line: data.invoice_address_line,
+              additional_address_line: data.invoice_address_additional,
               city: data.invoice_city,
-              country: data.invoice_city,
+              country: data.invoice_country,
               state: data.invoice_city,
             },
           });
@@ -166,14 +170,16 @@ export function useCheckoutSubmit({
         if (!shippingId) {
           const created = await createShipping.mutateAsync({
             user_id: finalUserId ?? "",
-            recipient_name: `${data.first_name} ${data.last_name}`,
-            postal_code: data.invoice_postal_code,
-            phone_number: data.phone_number,
-            address_line: data.invoice_address_line,
-            city: data.shipping_city,
+            recipient_name: data.shipping_recipient_name
+              ? data.shipping_recipient_name
+              : `${data.first_name} ${data.last_name}`,
+            postal_code: data.shipping_postal_code,
+            phone_number: data.shipping_phone_number ?? "",
+            address_line: data.shipping_address_line,
+            additional_address_line: data.shipping_address_additional,
+            city: data.shipping_country,
             country: data.shipping_city,
             is_default: true,
-            state: data.shipping_city,
           });
           shippingId = created.id;
         }

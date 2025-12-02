@@ -194,11 +194,13 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
 
       if (error) {
         handlePaymentFail(error.message);
+        form.reset();
         return;
       }
 
       if (paymentIntent?.status === "succeeded") {
         handlePaymentSuccess(paymentIntent.id);
+        form.reset();
       }
     } catch {
       handlePaymentFail();
