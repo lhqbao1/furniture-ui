@@ -1,9 +1,8 @@
 "use client";
 import { useSidebar } from "@/components/ui/sidebar";
-import { getCategoriesWithChildren } from "@/features/category/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import { currentCategoryIdAtom } from "@/store/category";
-import { Category, CategoryResponse } from "@/types/categories";
-import { useQuery } from "@tanstack/react-query";
+import { CategoryResponse } from "@/types/categories";
 import { useAtom } from "jotai";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
@@ -26,15 +25,29 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   );
 
   return (
-    <div className="w-full flex justify-center py-6">
-      {!categories ? (
-        <div>loading</div>
+    <div className="w-full flex justify-start py-6">
+      {!categories || categories.length === 0 ? (
+        <div className="w-full flex justify-start">
+          <div className="flex items-center justify-start gap-6 flex-wrap">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton
+                key={i}
+                className="h-6 w-20 rounded-md"
+              />
+            ))}
+          </div>
+        </div>
       ) : (
-        <div className="flex items-center justify-center gap-6 flex-wrap">
+        <div className="flex items-center justify-start gap-6 flex-wrap">
           {categories?.map((item, index) => {
             return (
               <div
-                className="px-3 py-1.5 border rounded-full cursor-pointer"
+                className="
+    cursor-pointer font-medium text-lg relative 
+    after:content-[''] after:absolute after:left-0 after:-bottom-1 
+    after:h-[2px] after:w-0 after:bg-black after:transition-all 
+    after:duration-300 hover:after:w-full
+  "
                 key={index}
                 onClick={() => {
                   if (isMobile) {

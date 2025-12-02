@@ -125,30 +125,7 @@ export default function AppSidebar({
       collapsible="offcanvas"
     >
       <SidebarContent>
-        <SidebarHeader className="flex items-end   lg:items-center">
-          <div className={`flex flex-col gap-0 items-center`}>
-            <Link
-              href={`/`}
-              aria-label="Go to homepage"
-              className="relative w-16 h-16 hidden lg:flex"
-            >
-              <Image
-                src="/new-logo.svg"
-                alt="Go to homepage"
-                fill
-                style={{ objectFit: "contain" }}
-              />
-            </Link>
-            <Link href={"/"}>
-              <div
-                className="hidden lg:flex text-[29px] gap-1"
-                translate="no"
-              >
-                <span className="text-secondary font-bold">Prestige</span>
-                <span className="text-primary font-bold">Home</span>
-              </div>
-            </Link>
-          </div>
+        <SidebarHeader className="flex items-end lg:items-center">
           <SidebarTrigger
             className={`border-none text-[#4D4D4D] relative lg:hidden`}
             isMobile={isPhone ? true : false}

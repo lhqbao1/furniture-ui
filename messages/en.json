@@ -339,5 +339,6 @@
   "invalidOTP": "Invalid OTP",
   "inStock1": "Stock availability",
     "stripeWating": "Please try again in a few seconds",
-    "changePayment": "Please try a different payment method or try again in a few seconds."
+    "changePayment": "Please try a different payment method or try again in a few seconds.",
+    "featured_products": "Featured Products"
 }
