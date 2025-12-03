@@ -61,7 +61,9 @@ export async function GET() {
               .join(", "),
           ),
           escapeCsv(p.final_price.toFixed(2)),
-          escapeCsv(`Delivery in ${p.delivery_time} working days`),
+          escapeCsv(
+            `Lieferung innerhalb von ${p.delivery_time} Werktagen nach Zahlungseingang`,
+          ),
           "NEW",
           escapeCsv(p.number_of_packages ?? 1),
           escapeCsv(p.carrier === "dpd" ? 5.95 : 35.95),

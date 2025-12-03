@@ -1,4 +1,5 @@
 import { api, apiAdmin, apiFlexible } from "@/lib/axios";
+import { AccountFormValues } from "@/lib/schema/account";
 import { Customer, User } from "@/types/user";
 
 export async function getUserById(id: string) {
@@ -11,7 +12,7 @@ export async function getUserByIdAdmin(id: string) {
   return data as Customer;
 }
 
-export async function updateUser(id: string, user: Partial<User>) {
+export async function updateUser(id: string, user: AccountFormValues) {
   const { data } = await api.put(`/user/${id}`, user, {
     withCredentials: true,
   });

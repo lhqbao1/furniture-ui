@@ -26,7 +26,7 @@ export default function CheckoutPaymentUI({
   t,
 }: Props) {
   return (
-    <Card className="mx-auto p-4 shadow-lg">
+    <Card className="mx-auto py-4 border-none shadow-none">
       <CardHeader>
         <div className="font-bold text-base">{t("selectPayment")}</div>
       </CardHeader>

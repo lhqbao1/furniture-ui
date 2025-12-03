@@ -2,8 +2,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/components/shared/footer";
 import Banner from "@/components/shared/banner";
 import "../../globals.css";
-import HeaderClient from "@/components/shared/client-header";
-import AppSidebarServer from "@/components/layout/sidebar/app-sidebar-server";
+import PageHeader from "@/components/shared/header";
 
 export default function MainLayout({
   children,
@@ -11,17 +10,14 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider defaultOpen={true}>
-      <AppSidebarServer />
-      <main className="relative w-full">
-        {/* <StickyIcon /> */}
-        <HeaderClient hasSideBar />
-        <div className="overflow-x-hidden">
-          <Banner height={200} />
-          <div className="container-padding flex-1">{children}</div>
-          <Footer />
-        </div>
-      </main>
-    </SidebarProvider>
+    <main className="relative w-full">
+      {/* <StickyIcon /> */}
+      <PageHeader />
+      <div className="overflow-x-hidden">
+        <Banner height={200} />
+        <div className="container-padding flex-1">{children}</div>
+        <Footer />
+      </div>
+    </main>
   );
 }

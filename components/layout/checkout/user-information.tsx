@@ -43,9 +43,9 @@ function CheckOutUserInformation({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between bg-secondary/10 p-2">
-        <h2 className="text-lg text-black font-semibold ">
-          {t("userInformation")}
+      <div className="flex justify-between bg-secondary/10 px-2 py-3">
+        <h2 className="text-lg text-black font-semibold mb-0">
+          {t("shippingDetails")}
         </h2>
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -82,6 +82,7 @@ function CheckOutUserInformation({
                     </FormItem>
                   </RadioGroup>
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -122,6 +123,45 @@ function CheckOutUserInformation({
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="company_name"
+          render={({ field }) => (
+            <FormItem className="">
+              <FormLabel>
+                {t("companyName")} ({t("optional")})
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tax_id"
+          render={({ field }) => (
+            <FormItem className="">
+              <FormLabel>
+                {t("taxCode")} ({t("optional")})
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="email"
@@ -180,7 +220,9 @@ function CheckOutUserInformation({
           name="invoice_address_additional"
           render={({ field }) => (
             <FormItem className="col-span-2">
-              <FormLabel>{t("addressSupplement")}</FormLabel>
+              <FormLabel>
+                {t("addressSupplement")} ({t("optional")})
+              </FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>

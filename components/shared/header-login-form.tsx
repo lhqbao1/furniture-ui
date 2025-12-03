@@ -16,7 +16,7 @@ import { Loader2, Mail } from "lucide-react";
 import { useLoginOtp, useSendOtp } from "@/features/auth/hook";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSyncLocalCart } from "@/features/cart/hook";
 import { useQueryClient } from "@tanstack/react-query";
 import LoginGoogleButton from "./login-google-button";
@@ -24,6 +24,7 @@ import ResendOtp from "../layout/auth/resend-otp";
 import Link from "next/link";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
+import { useRouter } from "@/src/i18n/navigation";
 interface HeaderLoginFormProps {
   onSuccess?: () => void;
 }
@@ -34,7 +35,8 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
   const queryClient = useQueryClient();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [userId, setUserId] = useAtom(userIdAtom);
-
+  const locale = useLocale();
+  const router = useRouter();
   const formSchema = z.object({
     username: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
     code: z.string().optional().nullable(),
@@ -275,12 +277,18 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
       {/* Sign up link */}
       <div className="text-sm text-center mt-6 space-x-1">
         <span>{t("noAccount")}</span>
-        <Link
-          href={`/sign-up`}
+        {/* <Link
+          href="/sign-up"
+          locale={locale}
           className="font-medium text-secondary hover:underline"
+        ></Link> */}
+        <Button
+          className="font-medium text-secondary hover:underline"
+          variant={"ghost"}
+          onClick={() => router.push("/sign-up", { locale })}
         >
           {t("createAccount")}
-        </Link>
+        </Button>
       </div>
       <LoginGoogleButton />
     </div>

@@ -20,7 +20,6 @@ import BankDialog from "@/components/layout/checkout/bank-dialog";
 import { useCheckoutInit } from "@/hooks/checkout/useCheckoutInit";
 import { useCheckoutSubmit } from "@/hooks/checkout/useCheckoutSubmit";
 import { useCartLocal } from "@/hooks/cart";
-import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import CheckOutUserInformation from "@/components/layout/checkout/user-information";
 import CheckOutShippingAddress from "@/components/layout/checkout/shipping-address";
@@ -54,7 +53,6 @@ const CheckOutInvoiceAddress = dynamic(
 export default function CheckOutFormSection() {
   const t = useTranslations();
   const locale = useLocale();
-  const { open } = useSidebar();
   const form = useFormContext<CreateOrderFormValues>();
 
   // -------------------------------
@@ -87,6 +85,9 @@ export default function CheckOutFormSection() {
       defaults.first_name = user.first_name ?? "";
       defaults.last_name = user.last_name ?? "";
       defaults.email = user.email ?? "";
+      defaults.gender = user.gender;
+      defaults.company_name = user.company_name ?? "";
+      defaults.tax_id = user.tax_id ?? "";
     }
 
     if (invoiceAddress) {
@@ -163,8 +164,7 @@ export default function CheckOutFormSection() {
       {/* Main container */}
       <div
         className={cn(
-          `grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-12 md:px-14 px-4`,
-          open ? "lg:px-32" : "lg:px-52",
+          `grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-12 md:px-14 lg:px-36 px-4`,
         )}
       >
         {/* Left side */}
