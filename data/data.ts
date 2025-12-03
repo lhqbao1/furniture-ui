@@ -3,7 +3,6 @@ import { Collection } from "@/types/collection";
 import { Comment } from "@/types/comment";
 import { Faqs } from "@/types/faqs";
 import { PreOrderProduct, Product } from "@/types/products";
-import { Voucher } from "@/types/voucher";
 import { Bed, Sofa, Table } from "lucide-react";
 import { useTranslations } from "next-intl";
 

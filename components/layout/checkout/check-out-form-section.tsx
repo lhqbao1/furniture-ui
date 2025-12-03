@@ -60,6 +60,16 @@ export default function CheckOutFormSection() {
   const form = useFormContext<CreateOrderFormValues>();
   const [payTrigger, setPayTrigger] = useState<() => Promise<void>>();
   const router = useRouter();
+
+  useEffect(() => {
+    const hasReloaded = sessionStorage.getItem("checkout_reloaded");
+    if (!hasReloaded) {
+      sessionStorage.setItem("checkout_reloaded", "true");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+  }, []);
   // -------------------------------
   // 1️⃣ INIT HOOK (user/cart/address/shipping logic)
   // -------------------------------
