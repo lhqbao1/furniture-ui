@@ -75,7 +75,6 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
   // ============================
   const handlePaymentFail = (msg?: string) => {
     toast.error(msg || t("paymentFailed"));
-    form.reset();
   };
 
   // ============================
@@ -91,6 +90,8 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
   // ============================
   useEffect(() => {
     if (!stripe || !clientSecret) return;
+
+    if (selectedMethod === "card") return;
 
     let pr: PaymentRequest | null = null;
 
@@ -169,7 +170,7 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
   // ============================
   // 🔹 Stripe NOT ready → show loader
   // ============================
-  // if (!stripe) return <Loader2 className="animate-spin" />;
+  if (!stripe) return <Loader2 className="animate-spin" />;
 
   // ============================
   // 🔹 Card payment click
@@ -194,13 +195,11 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
 
       if (error) {
         handlePaymentFail(error.message);
-        form.reset();
         return;
       }
 
       if (paymentIntent?.status === "succeeded") {
         handlePaymentSuccess(paymentIntent.id);
-        form.reset();
       }
     } catch {
       handlePaymentFail();

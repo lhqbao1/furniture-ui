@@ -105,6 +105,11 @@ export function AdminSideBar() {
           url: "/admin/crm/supplier/list",
           icon: CornerDownRight,
         },
+        {
+          title: "Voucher List",
+          url: "/admin/crm/vouchers/list",
+          icon: CornerDownRight,
+        },
       ],
     },
     {
