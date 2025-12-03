@@ -331,7 +331,7 @@
       "giveReview": "bewertung schreiben",
   "reviewRequired": "Bitte geben Sie eine Bewertung und einen Kommentar ein.",
   "companyTitle": "Unternehmensinformationen",
-  "companyName": "Firma",
+  "companyName": "Firmenname",
   "vatId": "USt-IdNr",
   "relatedProduct": "Ähnliche Produkte",
   "invalidOTP": "Ungültiger OTP",
@@ -340,5 +340,6 @@
   "changePayment": "Bitte wählen Sie eine andere Zahlungsart oder versuchen Sie es in wenigen Sekunden erneut.",
   "featured_products": "Entdecke unsere Topseller",
   "paymentMethod": "Sichere Bezahlung",
-    "deliveryService": "Sicherer Versand"
+    "deliveryService": "Sicherer Versand",
+      "optional": "Optional"
 }

@@ -14,6 +14,9 @@ export const CreateOrderSchema = (t: (key: string) => string) =>
 
     first_name: z.string().min(1, { message: t("first_name_required") }),
     last_name: z.string().min(1, { message: t("last_name_required") }),
+    company_name: z.string().optional().nullable(),
+    tax_id: z.string().optional().nullable(),
+
     invoice_address_line: z.string().min(1, { message: t("address_required") }),
     invoice_postal_code: z.string().min(1, { message: t("postal_required") }),
     invoice_city: z.string().min(1, { message: t("city_required") }),
@@ -22,7 +25,7 @@ export const CreateOrderSchema = (t: (key: string) => string) =>
     shipping_address_additional: z.string().optional(),
     shipping_phone_number: z.string().optional().nullable(),
     shipping_recipient_name: z.string().optional().nullable(),
-    gender: z.string().optional().nullable(),
+    gender: z.string().min(1, { message: t("gender_required") }),
     email: z.string().min(1, t("emailRequired")).email(t("invalidEmail")),
     phone_number: z
       .string()

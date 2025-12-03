@@ -335,7 +335,7 @@
   "401Error": "Please log in to continue to {text}.",
   "giveReview": "write a review",
   "reviewRequired": "Please enter rating and comment.",
-  "companyName": "Company",
+  "companyName": "Company Name",
   "vatId": "VAT ID",
   "invalidOTP": "Invalid OTP",
   "inStock1": "Stock availability",
@@ -343,5 +343,6 @@
     "changePayment": "Please try a different payment method or try again in a few seconds.",
     "featured_products": "Featured Products",
   "paymentMethods": "Payment Methods",
-  "deliveryService": "Secure Shipping"
+  "deliveryService": "Secure Shipping",
+  "optional": "Optional"
 }

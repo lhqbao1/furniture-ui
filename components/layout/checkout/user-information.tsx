@@ -82,6 +82,7 @@ function CheckOutUserInformation({
                     </FormItem>
                   </RadioGroup>
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -122,6 +123,45 @@ function CheckOutUserInformation({
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="company_name"
+          render={({ field }) => (
+            <FormItem className="">
+              <FormLabel>
+                {t("companyName")} ({t("optional")})
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tax_id"
+          render={({ field }) => (
+            <FormItem className="">
+              <FormLabel>
+                {t("taxCode")} ({t("optional")})
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="email"
@@ -180,7 +220,9 @@ function CheckOutUserInformation({
           name="invoice_address_additional"
           render={({ field }) => (
             <FormItem className="col-span-2">
-              <FormLabel>{t("addressSupplement")}</FormLabel>
+              <FormLabel>
+                {t("addressSupplement")} ({t("optional")})
+              </FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>

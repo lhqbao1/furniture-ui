@@ -1,11 +1,12 @@
 "use client";
-import { useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currentCategoryIdAtom } from "@/store/category";
 import { CategoryResponse } from "@/types/categories";
 import { useAtom } from "jotai";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
+import CategoriesDrawer from "../header/categories-drawer";
+import { categoryClickedAtom } from "@/store/categories-drawer";
 
 interface ListCategoriesHomeProps {
   categories: CategoryResponse[];
@@ -13,21 +14,18 @@ interface ListCategoriesHomeProps {
 
 const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const {
-    open: sidebarOpen,
-    setOpen,
-    openMobile,
-    setOpenMobile,
-  } = useSidebar();
-
   const [currentCategoryId, setCurrentCategoryId] = useAtom(
     currentCategoryIdAtom,
   );
+  const [categoryClicked, setCategoryClicked] = useAtom(categoryClickedAtom);
 
   return (
-    <div className="w-full flex justify-start py-6">
-      {!categories || categories.length === 0 ? (
-        <div className="w-full flex justify-start">
+    <>
+      {/* Drawer */}
+      <CategoriesDrawer categories={categories} />
+
+      <div className="w-full flex justify-start py-6">
+        {!categories || categories.length === 0 ? (
           <div className="flex items-center justify-start gap-6 flex-wrap">
             {[...Array(6)].map((_, i) => (
               <Skeleton
@@ -36,35 +34,28 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
               />
             ))}
           </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-start gap-6 flex-wrap">
-          {categories?.map((item, index) => {
-            return (
+        ) : (
+          <div className="flex items-center justify-start gap-6 flex-wrap">
+            {categories.map((item) => (
               <div
-                className="
-    cursor-pointer font-medium text-lg relative 
-    after:content-[''] after:absolute after:left-0 after:-bottom-1 
-    after:h-[2px] after:w-0 after:bg-black after:transition-all 
-    after:duration-300 hover:after:w-full
-  "
-                key={index}
+                key={item.id}
+                className="cursor-pointer font-medium text-lg relative 
+                after:content-[''] after:absolute after:left-0 after:-bottom-1 
+                after:h-[2px] after:w-0 after:bg-black after:transition-all 
+                after:duration-300 hover:after:w-full"
+                // onClick
                 onClick={() => {
-                  if (isMobile) {
-                    setOpenMobile(true);
-                  } else {
-                    setOpen(true);
-                  }
                   setCurrentCategoryId(item.id);
+                  setCategoryClicked(true); // đánh dấu là user click
                 }}
               >
                 {item.name}
               </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export const accountSchema = z.object({
   id: z.string(),
@@ -7,18 +7,16 @@ export const accountSchema = z.object({
   gender: z.string().optional(),
   first_name: z.string().min(1, "First name is required").optional(),
   last_name: z.string().min(1, "Last name is required").optional(),
+  company_name: z.string().optional().nullable(),
+  tax_id: z.string().optional().nullable(),
   is_active: z.boolean(),
   avatar_url: z.string().optional().nullable(),
-  date_of_birth: z
-  .string()
-  .optional()
-  .nullable()
-  ,
+  date_of_birth: z.string().optional().nullable(),
   language: z.string().optional(),
   is_notified: z.boolean().optional(),
-})
+});
 
-export type AccountFormValues = z.infer<typeof accountSchema>
+export type AccountFormValues = z.infer<typeof accountSchema>;
 
 export const accountDefaultValues: AccountFormValues = {
   id: "",
@@ -30,5 +28,5 @@ export const accountDefaultValues: AccountFormValues = {
   avatar_url: "",
   language: "en",
   is_notified: false,
-  date_of_birth: ""
-}
+  date_of_birth: "",
+};

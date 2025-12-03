@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, ChevronDownIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
   accountDefaultValues,
   AccountFormValues,
@@ -23,14 +23,6 @@ import {
 import { useUpdateUser } from "@/features/users/hook";
 import { User } from "@/types/user";
 import { useTranslations } from "next-intl";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
@@ -157,6 +149,44 @@ export default function EditUserDialog({
                 <Input
                   type="text"
                   {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="company_name"
+          render={({ field }) => (
+            <FormItem className="col-span-2 lg:col-span-1">
+              <FormLabel>
+                {t("companyName")} ({t("optional")})
+              </FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  value={field.value ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tax_id"
+          render={({ field }) => (
+            <FormItem className="col-span-2 lg:col-span-1">
+              <FormLabel>
+                {t("taxCode")} ({t("optional")})
+              </FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />

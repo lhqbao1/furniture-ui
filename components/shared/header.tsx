@@ -1,8 +1,8 @@
+"use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import ProductSearch from "./product-search";
 import { useLocale, useTranslations } from "next-intl";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ShoppingCart, User, X } from "lucide-react";
 import {
   DropdownMenu,
@@ -21,22 +21,15 @@ import { useCartLocal } from "@/hooks/cart";
 import { useIsPhone } from "@/hooks/use-is-phone";
 import { CartDrawer } from "./cart-drawer";
 import { LoginDrawer } from "./login-drawer";
-import { Button } from "../ui/button";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 import ListCategoriesHome from "../layout/home/list-categories";
-import { getCategoriesWithChildren } from "@/features/category/api";
 import { useGetCategoriesWithChildren } from "@/features/category/hook";
 import Image from "next/image";
 
-interface PageHeaderProps {
-  hasSideBar?: boolean;
-}
-
-const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
+const PageHeader = () => {
   const router = useRouter();
   const t = useTranslations();
-  const isPhone = useIsPhone();
   const [open, setOpen] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const pathName = usePathname();
@@ -229,15 +222,6 @@ const PageHeader = ({ hasSideBar = false }: PageHeaderProps) => {
               />
             )}
           </>
-
-          {hasSideBar ? (
-            <SidebarTrigger
-              className={`border-none text-[#4D4D4D] relative`}
-              isMobile={isPhone ? true : false}
-            />
-          ) : (
-            ""
-          )}
         </div>
       </div>
       <div className="min-h-16 bg-white lg:px-20 hidden lg:block">

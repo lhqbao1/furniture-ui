@@ -108,6 +108,8 @@ export function useCheckoutSubmit({
             last_name: data.last_name,
             email: data.email,
             phone_number: data.phone_number,
+            company_name: data.company_name ?? null,
+            tax_id: data.tax_id ?? null,
           });
 
           finalUserId = newUser.id;
