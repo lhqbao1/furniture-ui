@@ -4,15 +4,15 @@ import { StaticFileResponse } from "@/features/file/api";
 import { VariantOptionResponse } from "./variant";
 
 export interface Category {
-    id: number;
-    name: string;
-    icon: LucideIcon | string;
-};
+  id: number;
+  name: string;
+  icon: LucideIcon | string;
+}
 
 export interface HomeBannerItems {
-    id: number;
-    image: string;
-    name: string
+  id: number;
+  image: string;
+  name: string;
 }
 
 export interface CategoryResponse {
@@ -35,39 +35,37 @@ export interface CategoryResponse {
 export interface CategoryInput {
   name: string;
   img_url?: string;
-  meta_title?: string;
-  meta_description?: string;
-  meta_keywords?: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
   level: number;
   parent_id?: string; // optional
-  code?: string
-  is_econelo: boolean
+  code?: string;
+  is_econelo: boolean;
 }
 
-
 export interface CategoryByIdResponse {
-    in_category: ProductItem[]
-    not_in_category: ProductItem[]
+  in_category: ProductItem[];
+  not_in_category: ProductItem[];
 }
 
 export interface CategoryBySlugResponse {
-  products: ProductItem[]
-  page: number
-  total_pages: number
-  total_items: number
-  page_size: number
-  slug: string
-  code: string
-  level: number,
-  img_url: string,
-  is_econelo: boolean,
-  meta_title: string
-  meta_description: string
-  meta_keywords: string
-  name: string
+  products: ProductItem[];
+  page: number;
+  total_pages: number;
+  total_items: number;
+  page_size: number;
+  slug: string;
+  code: string;
+  level: number;
+  img_url: string;
+  is_econelo: boolean;
+  meta_title: string;
+  meta_description: string;
+  meta_keywords: string;
+  name: string;
 }
-
 
 export type AddOrRemoveProductToCategoryInput = {
-  products: string[]
-}
+  products: string[];
+};

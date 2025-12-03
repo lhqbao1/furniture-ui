@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import dynamic from "next/dynamic";
 import { useTranslations, useLocale } from "next-intl";
 import { Loader2 } from "lucide-react";
-import { Link } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
 
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
@@ -29,6 +29,10 @@ import CheckoutProducts from "./check-out-products";
 import CartTable from "../cart/cart-table";
 import CartLocalTable from "../cart/cart-local-table";
 import StripeLayout from "@/components/shared/stripe/stripe";
+import CheckoutPaymentUI from "@/components/shared/stripe/payment-ui";
+import CheckoutPaymentLogic from "@/components/shared/stripe/payment-logic";
+import StripeProvider from "@/components/shared/stripe/stripe";
+import CardDialog from "@/components/shared/stripe/card-pay-dialog";
 
 // const StripeLayout = dynamic(
 //   () => import("@/components/shared/stripe/stripe"),
@@ -54,7 +58,8 @@ export default function CheckOutFormSection() {
   const t = useTranslations();
   const locale = useLocale();
   const form = useFormContext<CreateOrderFormValues>();
-
+  const [payTrigger, setPayTrigger] = useState<() => Promise<void>>();
+  const router = useRouter();
   // -------------------------------
   // 1️⃣ INIT HOOK (user/cart/address/shipping logic)
   // -------------------------------

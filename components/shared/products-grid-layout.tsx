@@ -207,6 +207,12 @@ const ProductsGridLayout = ({
                     className="w-full h-48 md:h-64 py-0 md:py-2 object-contain mb-2 rounded group-hover:scale-120 duration-500"
                   />
 
+                  {product.stock === 0 && (
+                    <div className="px-3 py-1 text-white bg-red-400 rounded-full absolute top-4 right-4 text-sm">
+                      nicht vorrätig
+                    </div>
+                  )}
+
                   <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
                     <h3
                       className={cn(

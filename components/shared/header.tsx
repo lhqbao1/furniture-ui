@@ -3,7 +3,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import ProductSearch from "./product-search";
 import { useLocale, useTranslations } from "next-intl";
-import { ShoppingCart, User, X } from "lucide-react";
+import {
+  AlignJustify,
+  ListCollapse,
+  ShoppingCart,
+  User,
+  X,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +32,7 @@ import { userIdAtom } from "@/store/auth";
 import ListCategoriesHome from "../layout/home/list-categories";
 import { useGetCategoriesWithChildren } from "@/features/category/hook";
 import Image from "next/image";
+import { expandAllCategoriesAtom } from "@/store/categories-drawer";
 
 const PageHeader = () => {
   const router = useRouter();
@@ -37,6 +44,7 @@ const PageHeader = () => {
   const queryClient = useQueryClient();
 
   const [userId, setUserId] = useAtom(userIdAtom);
+  const [, setExpandAll] = useAtom(expandAllCategoriesAtom);
 
   //Get cart local and server
   const { cart: localCart } = useCartLocal();
@@ -129,7 +137,6 @@ const PageHeader = () => {
           <div className="block lg:hidden">
             <MobileProductSearch />
           </div>
-
           {/*Shopping cart */}
           <div className="lg:hidden">
             <CartDrawer
@@ -159,7 +166,6 @@ const PageHeader = () => {
               )}
             </Link>
           </div>
-
           <>
             {isLoadingUser ? (
               // Loading state
@@ -222,6 +228,12 @@ const PageHeader = () => {
               />
             )}
           </>
+          <AlignJustify
+            className="cursor-pointer hover:scale-110 transition-all duration-300"
+            stroke="#4D4D4D"
+            size={30}
+            onClick={() => setExpandAll(true)}
+          />
         </div>
       </div>
       <div className="min-h-16 bg-white lg:px-20 hidden lg:block">

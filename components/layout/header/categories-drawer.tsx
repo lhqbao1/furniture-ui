@@ -18,7 +18,10 @@ import { CategoryResponse } from "@/types/categories";
 import CategoryItem from "./categories-item";
 import { useTranslations } from "next-intl";
 import AnimatedCollapsibleContent from "./categories-child";
-import { categoryClickedAtom } from "@/store/categories-drawer";
+import {
+  categoryClickedAtom,
+  expandAllCategoriesAtom,
+} from "@/store/categories-drawer";
 
 interface Props {
   categories: CategoryResponse[];
@@ -28,10 +31,31 @@ export default function CategoriesDrawer({ categories }: Props) {
   const t = useTranslations();
 
   const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string[]>([]);
 
-  const [currentCategoryId] = useAtom(currentCategoryIdAtom);
+  const [currentCategoryId, setCurrentCategoryId] = useAtom(
+    currentCategoryIdAtom,
+  );
   const [categoryClicked, setCategoryClicked] = useAtom(categoryClickedAtom);
+  const [expandAllSignal, setExpandAllSignal] = useAtom(
+    expandAllCategoriesAtom,
+  );
+
+  const expandAll = () => {
+    const allIds = categories.map((c) => c.id);
+    setExpanded(allIds);
+
+    setCurrentCategoryId(null); // 🔥 FIX: Xóa ID → không override expand-all
+    setOpen(true);
+    setCategoryClicked(true);
+  };
+
+  useEffect(() => {
+    if (expandAllSignal) {
+      expandAll();
+      setExpandAllSignal(false); // reset trigger
+    }
+  }, [expandAllSignal]);
 
   useEffect(() => {
     // Nếu không phải user click → KHÔNG mở drawer
@@ -39,9 +63,15 @@ export default function CategoriesDrawer({ categories }: Props) {
 
     if (currentCategoryId) {
       setOpen(true);
-      setExpanded(currentCategoryId);
+      setExpanded([currentCategoryId]);
     }
   }, [currentCategoryId, categoryClicked]);
+
+  const closeDrawer = () => {
+    setOpen(false);
+    setCategoryClicked(false); // reset state
+    setExpanded([]);
+  };
 
   return (
     <Drawer
@@ -61,8 +91,14 @@ export default function CategoriesDrawer({ categories }: Props) {
           {categories.map((cate) => (
             <Collapsible
               key={cate.id}
-              open={expanded === cate.id}
-              onOpenChange={(state) => setExpanded(state ? cate.id : null)}
+              open={expanded.includes(cate.id)}
+              onOpenChange={(state) => {
+                if (state) {
+                  setExpanded((prev) => [...prev, cate.id]);
+                } else {
+                  setExpanded((prev) => prev.filter((id) => id !== cate.id));
+                }
+              }}
             >
               <CollapsibleTrigger
                 className="
@@ -76,12 +112,13 @@ export default function CategoriesDrawer({ categories }: Props) {
                 {cate.name}
               </CollapsibleTrigger>
 
-              <AnimatedCollapsibleContent open={expanded === cate.id}>
+              <AnimatedCollapsibleContent open={expanded.includes(cate.id)}>
                 <div className="pl-4 space-y-1 py-2">
                   {cate.children?.map((child) => (
                     <CategoryItem
                       key={child.id}
                       item={child}
+                      onSelect={closeDrawer}
                     />
                   ))}
                 </div>

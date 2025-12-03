@@ -238,7 +238,10 @@ export default function AddCategoryDrawer({
                 <FormItem>
                   <FormLabel>Meta title</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -252,7 +255,10 @@ export default function AddCategoryDrawer({
                 <FormItem>
                   <FormLabel>Meta description</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea
+                      {...field}
+                      value={field.value ?? ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -266,7 +272,10 @@ export default function AddCategoryDrawer({
                 <FormItem>
                   <FormLabel>Meta keywords</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
