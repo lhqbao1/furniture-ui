@@ -1,0 +1,15 @@
+name: Sync Products to Facebook
+
+on:
+  schedule:
+    - cron: "0 14 * * *" # chạy 15:00 giờ Berlin (13:00 UTC)
+  workflow_dispatch: # cho phép chạy thủ công từ GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Next.js API
+        run: |
+          curl -X POST "https://www.prestige-home.de/api/facebook"

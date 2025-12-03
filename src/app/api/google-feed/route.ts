@@ -14,56 +14,21 @@ const escapeXml = (str?: string) =>
     : "";
 
 // Escape CDATA nội dung, tránh lỗi "]]>"
-const escapeCDATA = (str?: string) => (str ? str.replace(/]]>/g, "]]]]><![CDATA[>") : "");
+const escapeCDATA = (str?: string) =>
+  str ? str.replace(/]]>/g, "]]]]><![CDATA[>") : "";
 
 export async function GET() {
   try {
     const products = await getProductsFeed();
 
-    // const allowedSkus = [
-    //   "1202182-198842",
-    //   "1202181-198841",
-    //   "1202251-198952",
-    //   "1199282-195553",
-    //   "1205737-202880",
-    //   "1199308-195579",
-    //   "1199177-195443",
-    //   "1199855-196375",
-    //   "1199860-196380",
-    //   "1199154-195420",
-    //   "1199784-196301",
-    //   "1199731-196247",
-    //   "1199732-196248",
-    //   "1199730-196246",
-    //   "1199315-195586",
-    //   "1199843-196363",
-    //   "1199562-196022",
-    //   "1199283-195554",
-    //   "1199321-195592",
-    //   "1206514-204306",
-    //   "1206518-204310",
-    //   "1206520-204312",
-    //   "1206517-204309",
-    //   "1206521-204314",
-    //   "1199154-195419",
-    //   "1082858-72099",
-    //   "1152638-142245",
-    //   "1152700-142350",
-    //   "1067359-54144",
-    //   "1152640-142247",
-    //   "1152641-142248",
-    //   "1152639-142246"
-    // ];
-
-    const formatName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-')
+    const formatName = (name: string) =>
+      name.trim().toLowerCase().replace(/\s+/g, "-");
     const itemsXml = products
-    .filter(
-      (p) =>
-        p.final_price > 0 &&
-        p.is_active 
+      .filter(
+        (p) => p.final_price > 0 && p.is_active,
         // && allowedSkus.includes(p.sku) // lọc theo sku
-    )
-    .map((p) => {
+      )
+      .map((p) => {
         const categories = p.categories || [];
 
         const colors = p.options
@@ -74,9 +39,21 @@ export async function GET() {
 <item>
   <g:id>${escapeXml(p.id_provider)}</g:id>
   <g:title><![CDATA[${escapeCDATA(p.name.trim())}]]></g:title>
-  <g:description><![CDATA[${escapeCDATA(cleanDescription(p.description))}]]></g:description>
-<g:link>${escapeXml(encodeURI(`https://prestige-home.de/product${p.categories && p.categories.length > 0 ? `/${p.categories[0].slug}` : ''}/${p.id}`))}</g:link>
-<g:image_link>${escapeXml(encodeURI(cleanImageLink(p.static_files[0]?.url)))}</g:image_link>
+  <g:description><![CDATA[${escapeCDATA(
+    cleanDescription(p.description),
+  )}]]></g:description>
+<g:link>${escapeXml(
+          encodeURI(
+            `https://prestige-home.de/product${
+              p.categories && p.categories.length > 0
+                ? `/${p.categories[0].slug}`
+                : ""
+            }/${p.id}`,
+          ),
+        )}</g:link>
+<g:image_link>${escapeXml(
+          encodeURI(cleanImageLink(p.static_files[0]?.url)),
+        )}</g:image_link>
   <g:availability>${p.stock > 0 ? "in_stock" : "out_of_stock"}</g:availability>
   <g:price>${p.final_price.toFixed(2)} EUR</g:price>
   <g:gtin>${escapeXml(p.ean)}</g:gtin>
@@ -89,7 +66,7 @@ export async function GET() {
     <g:service>Standard</g:service>
     <g:price>${p.carrier === "dpd" ? "5.95 EUR" : "35.95 EUR"}</g:price>
   </g:shipping>
-  <g:shipping_label>${p.carrier === 'dpd' ? "DPD": "AMM"}</g:shipping_label>
+  <g:shipping_label>${p.carrier === "dpd" ? "DPD" : "AMM"}</g:shipping_label>
 </item>`;
       })
       .join("\n");
@@ -113,7 +90,7 @@ export async function GET() {
     console.error(err);
     return NextResponse.json(
       { success: false, error: "Failed to generate XML feed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
