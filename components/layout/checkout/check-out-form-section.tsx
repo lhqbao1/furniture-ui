@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -28,11 +28,11 @@ import CheckoutSummary from "./checkout-summary";
 import CheckoutProducts from "./check-out-products";
 import CartTable from "../cart/cart-table";
 import CartLocalTable from "../cart/cart-local-table";
-import StripeLayout from "@/components/shared/stripe/stripe";
 import CheckoutPaymentUI from "@/components/shared/stripe/payment-ui";
 import CheckoutPaymentLogic from "@/components/shared/stripe/payment-logic";
 import StripeProvider from "@/components/shared/stripe/stripe";
 import CardDialog from "@/components/shared/stripe/card-pay-dialog";
+import StripeLayout from "@/components/shared/stripe/stripe-layout";
 
 // const StripeLayout = dynamic(
 //   () => import("@/components/shared/stripe/stripe"),
@@ -86,6 +86,7 @@ export default function CheckOutFormSection() {
     userId,
     userIdLogin,
     setUserIdLogin,
+    totalAmount,
   } = useCheckoutInit();
 
   // -------------------------------
@@ -160,6 +161,35 @@ export default function CheckOutFormSection() {
     setUserIdLogin(verifiedUserId);
   };
 
+  const couponAmount = form.watch("coupon_amount");
+  const voucherAmount = form.watch("voucher_amount");
+
+  const totalEuro = useMemo(() => {
+    const productsTotal =
+      cartItems && cartItems.length > 0
+        ? cartItems
+            .flatMap((g) => g.items)
+            .filter((i) => i.is_active)
+            .reduce((sum, item) => sum + (item.final_price ?? 0), 0)
+        : (localCart ?? [])
+            .filter((i) => i.is_active)
+            .reduce(
+              (sum, item) =>
+                sum + (item.item_price ?? 0) * (item.quantity ?? 1),
+              0,
+            );
+
+    return (
+      productsTotal +
+      (shippingCost ?? 0) -
+      (couponAmount ?? 0) -
+      (voucherAmount ?? 0)
+    );
+  }, [cartItems, localCart, shippingCost, couponAmount, voucherAmount]);
+  // Chuyển sang cents cho Stripe
+  const totalCents = useMemo(() => {
+    return Math.round(totalEuro * 100);
+  }, [totalEuro]);
   return (
     <form
       onSubmit={form.handleSubmit(
@@ -208,20 +238,37 @@ export default function CheckOutFormSection() {
 
           {/* PAYMENT */}
           <div className="space-y-4 py-5 border-y-2">
-            <StripeLayout
-              clientSecret={clientSecret}
-              setClientSecret={setClientSecret}
+            {/* <StripeLayout
+              clientSecret={clientSecret ?? ""}
               total={total}
-              setTotal={setTotal}
               openDialog={openCardDialog}
               setOpenDialog={setOpenCardDialog}
               form={form}
-              userEmail={form.watch("email")}
-              additionalAddress={form.watch("shipping_address_additional")}
-              address={form.watch("shipping_address_line")}
-              city={form.watch("shipping_city")}
-              postalCode={form.watch("shipping_postal_code")}
+              // userEmail={form.watch("email")}
+              // additionalAddress={form.watch("shipping_address_additional")}
+              // address={form.watch("shipping_address_line")}
+              // city={form.watch("shipping_city")}
+              // postalCode={form.watch("shipping_postal_code")}
+            /> */}
+            {/* ALWAYS SHOW PAYMENT OPTIONS */}
+            <CheckoutPaymentUI
+              control={form.control}
+              selectedMethod={form.watch("payment_method")}
+              onChange={(v) => form.setValue("payment_method", v)}
+              t={t}
             />
+            {clientSecret && (
+              <StripeProvider clientSecret={clientSecret}>
+                <StripeLayout
+                  form={form}
+                  clientSecret={clientSecret}
+                  setClientSecret={setClientSecret}
+                  openDialog={openCardDialog}
+                  setOpenDialog={setOpenCardDialog}
+                  total={totalCents}
+                />
+              </StripeProvider>
+            )}
           </div>
 
           {/* TERMS */}
@@ -273,6 +320,7 @@ export default function CheckOutFormSection() {
         email={otpEmail}
         onSuccess={handleOtpSuccess}
       />
+
       <BankDialog
         open={openBankDialog}
         onOpenChange={setOpenBankDialog}

@@ -81,6 +81,7 @@ export function useCheckoutInit() {
 
   const shippingCost = calculateShipping(normalized);
   const hasOtherCarrier = checkShippingType(normalized);
+  const totalAmount = 1;
 
   return {
     user,
@@ -96,5 +97,6 @@ export function useCheckoutInit() {
     setUserId,
     userIdLogin,
     setUserIdLogin,
+    totalAmount,
   };
 }

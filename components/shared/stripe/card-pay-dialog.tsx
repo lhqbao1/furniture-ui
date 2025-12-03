@@ -1,6 +1,5 @@
 "use client";
 
-import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import {
   Dialog,
   DialogContent,
@@ -8,25 +7,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Dispatch, SetStateAction } from "react";
 
 export interface CardDialogProps {
-  /** Dialog có mở hay không */
   open: boolean;
-
-  /** Callback thay đổi trạng thái dialog */
-  onOpenChange?: Dispatch<SetStateAction<boolean>> | ((v: boolean) => void);
-
-  /** Stripe clientSecret để xác nhận thanh toán */
+  onOpenChange: Dispatch<SetStateAction<boolean>> | ((v: boolean) => void);
   clientSecret: string;
-
-  /** Callback khi thanh toán thành công */
   onSuccess: (paymentIntentId: string) => void;
-
-  /** Callback khi thanh toán thất bại */
   onFail: (errorMessage?: string) => void;
 }
 
@@ -42,7 +33,7 @@ export default function CardDialog({
   const t = useTranslations();
 
   const handlePay = async () => {
-    if (!stripe || !elements || !clientSecret) {
+    if (!stripe || !elements) {
       toast.error(t("stripeWating"));
       return;
     }
@@ -53,44 +44,58 @@ export default function CardDialog({
       return;
     }
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-      clientSecret,
-      { payment_method: { card } },
-    );
+    try {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        { payment_method: { card } },
+      );
 
-    if (error) {
-      onFail(error.message);
-      return;
-    }
+      if (error) {
+        onFail(error.message);
+        return;
+      }
 
-    if (paymentIntent?.status === "succeeded") {
-      onSuccess(paymentIntent.id);
+      if (paymentIntent?.status === "succeeded") {
+        onSuccess(paymentIntent.id);
+      } else {
+        onFail("Payment was not completed.");
+      }
+    } catch {
+      onFail("Payment failed. Please try again.");
     }
   };
+
+  const loading = !stripe || !elements;
 
   return (
     <Dialog
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className="lg:max-w-[600px] max-w-11/12">
+      <DialogContent className="lg:max-w-[600px] max-w-11/12 space-y-6">
         <DialogHeader>
           <DialogTitle>{t("enterCardDetails")}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="border rounded-md p-2">
-            <CardElement options={{ hidePostalCode: true }} />
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <Loader2 className="animate-spin" />
           </div>
+        ) : (
+          <>
+            <div className="border rounded-md p-3">
+              <CardElement options={{ hidePostalCode: true }} />
+            </div>
 
-          <Button
-            className="w-full"
-            onClick={handlePay}
-            type="button"
-          >
-            {t("payWithCard")}
-          </Button>
-        </div>
+            <Button
+              className="w-full py-4"
+              type="button"
+              onClick={handlePay}
+            >
+              {t("payWithCard")}
+            </Button>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
