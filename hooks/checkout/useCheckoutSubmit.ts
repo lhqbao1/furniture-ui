@@ -227,7 +227,9 @@ export function useCheckoutSubmit({
         form.reset();
         cleanupNeeded = true;
       } finally {
-        if (cleanupNeeded && localStorage.getItem("userIdGuest")) {
+        const guestId = localStorage.getItem("userIdGuest");
+
+        if (cleanupNeeded && guestId !== null) {
           localStorage.removeItem("userIdGuest");
           localStorage.removeItem("access_token");
         }

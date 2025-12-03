@@ -81,7 +81,7 @@ export default function CheckoutPaymentLogic(props: CheckoutFormProps) {
   // 🔹 Thay đổi phương thức thanh toán → reset clientSecret
   // ============================
   useEffect(() => {
-    setClientSecret(null);
+    // setClientSecret(null);
     setPaymentRequest(null);
   }, [selectedMethod]);
 
