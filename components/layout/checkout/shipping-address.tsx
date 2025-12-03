@@ -151,7 +151,7 @@ function CheckOutShippingAddress({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center bg-secondary/10 p-2">
+      <div className="flex justify-between items-center bg-secondary/10 px-2 py-3">
         <h2 className="text-lg text-black font-semibold mb-0">
           {t("shippingAddress")}
         </h2>

@@ -43,9 +43,9 @@ function CheckOutUserInformation({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between bg-secondary/10 p-2">
-        <h2 className="text-lg text-black font-semibold ">
-          {t("userInformation")}
+      <div className="flex justify-between bg-secondary/10 px-2 py-3">
+        <h2 className="text-lg text-black font-semibold mb-0">
+          {t("shippingDetails")}
         </h2>
       </div>
       <div className="grid grid-cols-2 gap-4">

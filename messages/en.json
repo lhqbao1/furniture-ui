@@ -344,5 +344,6 @@
     "featured_products": "Featured Products",
   "paymentMethods": "Payment Methods",
   "deliveryService": "Secure Shipping",
-  "optional": "Optional"
+  "optional": "Optional",
+  "shippingDetails": "Billing details"
 }

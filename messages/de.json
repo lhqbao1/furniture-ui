@@ -341,5 +341,6 @@
   "featured_products": "Entdecke unsere Topseller",
   "paymentMethod": "Sichere Bezahlung",
     "deliveryService": "Sicherer Versand",
-      "optional": "Optional"
+      "optional": "Optional",
+    "shippingDetails": "Rechnungsdetails"
 }
