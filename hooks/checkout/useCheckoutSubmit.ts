@@ -197,10 +197,32 @@ export function useCheckoutSubmit({
             shippingCostCurrent > 0 ? shippingCostCurrent : shippingCost,
         });
 
-        toast.success(t("orderSuccess"));
+        // toast.success(t("orderSuccess"));
         setCheckoutId(checkout.id);
 
         // Payment flow
+        // if (data.payment_method !== "bank") {
+        //   const payment = await createPayment.mutateAsync({
+        //     checkout_id: checkout.id,
+        //     pay_channel: data.payment_method,
+        //   });
+
+        //   setPaymentId(payment.payment_order_id);
+
+        //   if (data.payment_method === "paypal") {
+        //     router.push(payment.approve_url, { locale });
+        //   } else if (data.payment_method === "card") {
+        //     setOpenCardDialog(true);
+        //   }
+        //   setTotal(payment.amount);
+        //   setClientSecret(payment.clientSecret);
+        // } else {
+        //   setOpenBankDialog(true);
+        // }
+
+        // ===========================
+        // PAYMENT FLOW (Stripe + PayPal + Bank)
+        // ===========================
         if (data.payment_method !== "bank") {
           const payment = await createPayment.mutateAsync({
             checkout_id: checkout.id,
@@ -208,14 +230,30 @@ export function useCheckoutSubmit({
           });
 
           setPaymentId(payment.payment_order_id);
-
-          if (data.payment_method === "paypal") {
-            router.push(payment.approve_url, { locale });
-          } else if (data.payment_method === "card") {
-            setOpenCardDialog(true);
-          }
           setTotal(payment.amount);
           setClientSecret(payment.clientSecret);
+
+          const method = data.payment_method;
+
+          if (method === "paypal") {
+            router.push(payment.approve_url, { locale });
+            return;
+          }
+
+          if (method === "card") {
+            setOpenCardDialog(true);
+            return;
+          }
+
+          // Klarna → auto confirm trong StripeLayout
+          if (method === "klarna") {
+            return;
+          }
+
+          // Apple Pay / Google Pay → auto render PaymentRequestButton
+          if (method === "applepay" || method === "googlepay") {
+            return;
+          }
         } else {
           setOpenBankDialog(true);
         }

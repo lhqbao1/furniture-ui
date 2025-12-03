@@ -134,8 +134,8 @@ function CheckOutUserInformation({
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder=""
                   {...field}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />
@@ -153,8 +153,8 @@ function CheckOutUserInformation({
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder=""
                   {...field}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />
