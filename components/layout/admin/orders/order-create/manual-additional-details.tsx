@@ -83,6 +83,7 @@ export default function ManualAdditionalInformation({
                     <SelectItem value="kaufland">Kaufland</SelectItem>
                     <SelectItem value="netto">Netto</SelectItem>
                     <SelectItem value="freakout">FreakOut</SelectItem>
+                    <SelectItem value="praktiker">Praktiker</SelectItem>
                     <SelectItem value="prestige">Prestige Home</SelectItem>
                   </SelectContent>
                 </Select>

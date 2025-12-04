@@ -494,7 +494,6 @@ import {
   PaymentRequestButtonElement,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import type { PaymentRequest } from "@stripe/stripe-js";
 
@@ -526,7 +525,7 @@ export default function CheckoutPaymentLogic({
 
   useEffect(() => {
     if (!stripe) return;
-
+    console.log("stripe");
     // ======================
     // CLEANUP TRƯỚC KHI TẠO MỚI
     // ======================
@@ -545,6 +544,8 @@ export default function CheckoutPaymentLogic({
       return;
     }
 
+    console.log("payment");
+
     // ======================
     // CREATE NEW PAYMENT REQUEST
     // ======================
@@ -555,6 +556,8 @@ export default function CheckoutPaymentLogic({
       requestPayerEmail: true,
       requestPayerName: true,
     });
+
+    console.log("has payment");
 
     // gán vào ref
     paymentRequestRef.current = pr;

@@ -208,8 +208,8 @@ const ProductsGridLayout = ({
                   />
 
                   {product.stock === 0 && (
-                    <div className="px-3 py-1 text-white bg-red-400 rounded-full absolute top-4 right-4 text-sm">
-                      nicht vorrätig
+                    <div className="px-3 py-1 text-[#29ABE2] bg-[#D4EEF9] rounded-full absolute top-4 right-4 text-sm">
+                      demnächst
                     </div>
                   )}
 
