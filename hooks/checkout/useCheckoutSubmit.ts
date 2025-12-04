@@ -201,24 +201,6 @@ export function useCheckoutSubmit({
         setCheckoutId(checkout.id);
 
         // Payment flow
-        // if (data.payment_method !== "bank") {
-        //   const payment = await createPayment.mutateAsync({
-        //     checkout_id: checkout.id,
-        //     pay_channel: data.payment_method,
-        //   });
-
-        //   setPaymentId(payment.payment_order_id);
-
-        //   if (data.payment_method === "paypal") {
-        //     router.push(payment.approve_url, { locale });
-        //   } else if (data.payment_method === "card") {
-        //     setOpenCardDialog(true);
-        //   }
-        //   setTotal(payment.amount);
-        //   setClientSecret(payment.clientSecret);
-        // } else {
-        //   setOpenBankDialog(true);
-        // }
 
         // ===========================
         // PAYMENT FLOW (Stripe + PayPal + Bank)
