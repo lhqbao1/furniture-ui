@@ -340,9 +340,10 @@
   "changePayment": "Bitte wählen Sie eine andere Zahlungsart oder versuchen Sie es in wenigen Sekunden erneut.",
   "featured_products": "Entdecke unsere Topseller",
   "paymentMethod": "Sichere Bezahlung",
-    "deliveryService": "Sicherer Versand",
-      "optional": "Optional",
-    "shippingDetails": "Rechnungsdetails",
-    "notifyByEmail": "Per E-Mail benachrichtigt werden",
-    "notifyDescription": "Wie könnten wir Ihnen sonst von monatlichen Angeboten und Sonderrabatten erzählen?"
+  "deliveryService": "Sicherer Versand",
+  "optional": "Optional",
+  "shippingDetails": "Rechnungsdetails",
+  "notifyByEmail": "Per E-Mail benachrichtigt werden",
+  "notifyDescription": "Wie könnten wir Ihnen sonst von monatlichen Angeboten und Sonderrabatten mitteilen?",
+  "logOutSuccess": "Erfolgreich abgemeldet"
 }

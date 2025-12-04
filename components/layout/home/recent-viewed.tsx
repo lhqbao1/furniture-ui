@@ -18,7 +18,9 @@ const RecentViewed = ({ products }: RecentViewedProps) => {
       {!products ? (
         <ProductGridSkeleton />
       ) : (
-        <ProductsGridLayout data={products.slice(0, 8)} />
+        <ProductsGridLayout
+          data={products.filter((p) => p.stock > 0).slice(0, 8)}
+        />
       )}
     </div>
   );

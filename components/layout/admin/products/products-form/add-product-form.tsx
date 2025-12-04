@@ -61,7 +61,10 @@ const ProductForm = ({
                 className="w-full space-y-8"
               >
                 {/* DETAILS */}
-                <AccordionItem value="details">
+                <AccordionItem
+                  value="details"
+                  className="border-none"
+                >
                   <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Details
                   </AccordionTrigger>
@@ -86,7 +89,10 @@ const ProductForm = ({
                 </AccordionItem>
 
                 {/* ADDITIONAL */}
-                <AccordionItem value="additional">
+                <AccordionItem
+                  value="additional"
+                  className="border-none"
+                >
                   <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Additional Details
                   </AccordionTrigger>
@@ -107,7 +113,10 @@ const ProductForm = ({
                 </AccordionItem>
 
                 {/* BUNDLE */}
-                <AccordionItem value="component">
+                <AccordionItem
+                  value="component"
+                  className="border-none"
+                >
                   <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Product Bundle
                   </AccordionTrigger>
@@ -128,7 +137,10 @@ const ProductForm = ({
                 </AccordionItem>
 
                 {/* LOGISTIC */}
-                <AccordionItem value="logistic">
+                <AccordionItem
+                  value="logistic"
+                  className="border-none"
+                >
                   <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Logistic
                   </AccordionTrigger>
@@ -149,7 +161,10 @@ const ProductForm = ({
                 </AccordionItem>
 
                 {/* MANUAL */}
-                <AccordionItem value="manual">
+                <AccordionItem
+                  value="manual"
+                  className="border-none"
+                >
                   <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     Document
                   </AccordionTrigger>
@@ -168,7 +183,10 @@ const ProductForm = ({
                 </AccordionItem>
 
                 {/* SEO */}
-                <AccordionItem value="seo">
+                <AccordionItem
+                  value="seo"
+                  className="border-none"
+                >
                   <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
                     SEO
                   </AccordionTrigger>
