@@ -694,7 +694,7 @@ export const listChanel = [
   {
     id: 6,
     name: "praktiker",
-    icon: "praktiker.png",
+    icon: "praktiker.jpg",
   },
   {
     id: 7,

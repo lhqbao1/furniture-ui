@@ -38,3 +38,12 @@ export interface VoucherCategoryItem {
 }
 
 export type VoucherCategoryResponse = VoucherCategoryItem[];
+
+export interface VoucherShippingItem {
+  voucher_id: string;
+  max_shipping_discount: number;
+  shipping_method: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
+}

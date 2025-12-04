@@ -32,6 +32,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { useCreateVoucher, useUpdateVoucher } from "@/features/vouchers/hook";
 
 type AddOrEditVouchersFormProps = {
   submitText?: string;
@@ -49,39 +50,47 @@ export default function AddOrEditVouchersForm({
     defaultValues: voucherValues ? voucherValues : voucherDefaultValues,
   });
 
-  const createVoucherMutation = useCreateSupplier();
-  const editVoucherMutation = useEditSupplier();
+  const createVoucherMutation = useCreateVoucher();
+  const editVoucherMutation = useUpdateVoucher();
 
   async function handleSubmit(values: VoucherFormValues) {
-    // if (voucherValues) {
-    //   editVoucherMutation.mutate(
-    //     {
-    //       id: voucherValues.id,
-    //       input: values,
-    //     },
-    //     {
-    //       onSuccess(data, variables, context) {
-    //         toast.success("Create supplier successful");
-    //         form.reset();
-    //         onClose?.();
-    //       },
-    //       onError(error, variables, context) {
-    //         toast.error("Create supplier fail");
-    //       },
-    //     },
-    //   );
-    // } else {
-    //   createVoucherMutation.mutate(values, {
-    //     onSuccess(data, variables, context) {
-    //       toast.success("Create supplier successful");
-    //       form.reset();
-    //       onClose?.();
-    //     },
-    //     onError(error, variables, context) {
-    //       toast.error("Create supplier fail");
-    //     },
-    //   });
-    // }
+    if (voucherValues) {
+      editVoucherMutation.mutate(
+        {
+          voucher_id: voucherValues.id,
+          input: {
+            discount_value: values.discount_value,
+            end_at: values.end_at,
+            is_active: values.is_active,
+            max_discount: values.max_discount,
+            min_order_value: values.min_order_value,
+            name: values.name,
+            start_at: values.start_at,
+          },
+        },
+        {
+          onSuccess(data, variables, context) {
+            toast.success("Edit voucher successful");
+            form.reset();
+            onClose?.();
+          },
+          onError(error, variables, context) {
+            toast.error("Edit voucher fail");
+          },
+        },
+      );
+    } else {
+      createVoucherMutation.mutate(values, {
+        onSuccess(data, variables, context) {
+          toast.success("Create voucher successful");
+          form.reset();
+          onClose?.();
+        },
+        onError(error, variables, context) {
+          toast.error("Create voucher fail");
+        },
+      });
+    }
   }
 
   return (
@@ -443,7 +452,7 @@ export default function AddOrEditVouchersForm({
           />
 
           {/* User limit usage */}
-          <FormField
+          {/* <FormField
             control={form.control}
             name="user_usage_limit"
             render={({ field }) => (
@@ -472,7 +481,7 @@ export default function AddOrEditVouchersForm({
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
         </div>
 
         {/* Delivery Cost Type */}

@@ -1,6 +1,7 @@
 import { apiAdmin, apiPublic } from "@/lib/axios";
 import { VoucherFormValues, VoucherUpdateValues } from "@/lib/schema/voucher";
 import { ProductItem } from "@/types/products";
+import { Customer } from "@/types/user";
 import {
   VoucherCategoryItem,
   VoucherCategoryResponse,
@@ -8,6 +9,7 @@ import {
   VoucherProductItem,
   VoucherProductResponse,
   VoucherResponse,
+  VoucherShippingItem,
 } from "@/types/voucher";
 
 export interface GetAllVouchersParams {
@@ -20,9 +22,26 @@ export interface AssignVoucherToProduct {
   product_ids: string[];
 }
 
+export interface AssignVoucherToUser {
+  voucher_id: string;
+  user_ids: string[];
+}
+
 export interface AssignVoucherToCategory {
   voucher_id: string;
   category_id: string;
+}
+
+export interface CreateShippingVoucher {
+  voucher_id: string;
+  max_shipping_discount: number;
+  shipping_method: string;
+}
+
+export interface VoucherUsageInput {
+  voucher_id: string;
+  user_id: string;
+  order_id: string;
 }
 
 export async function createVoucher(input: VoucherFormValues) {
@@ -98,4 +117,64 @@ export async function getVoucherProducts(voucher_id: string) {
   });
 
   return data as ProductItem[];
+}
+
+export async function createVoucherUser(input: AssignVoucherToUser) {
+  const { data } = await apiAdmin.post(`/vouchers/user`, input, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data;
+}
+
+export async function getVoucherUsers(voucher_id: string) {
+  const { data } = await apiPublic.get(`/vouchers/user/${voucher_id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data as Customer[];
+}
+
+export async function createVoucherShipping(input: CreateShippingVoucher) {
+  const { data } = await apiAdmin.post(`/vouchers/shipping`, input, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data as VoucherShippingItem;
+}
+
+export async function getVoucherShipping() {
+  const { data } = await apiPublic.get(`/vouchers/shipping`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data as VoucherShippingItem[];
+}
+
+export async function useVoucherApi(input: VoucherUsageInput) {
+  const { data } = await apiPublic.post(`/vouchers/usage`, input, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data as VoucherShippingItem;
 }
