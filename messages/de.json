@@ -342,5 +342,7 @@
   "paymentMethod": "Sichere Bezahlung",
     "deliveryService": "Sicherer Versand",
       "optional": "Optional",
-    "shippingDetails": "Rechnungsdetails"
+    "shippingDetails": "Rechnungsdetails",
+    "notifyByEmail": "Per E-Mail benachrichtigt werden",
+    "notifyDescription": "Wie könnten wir Ihnen sonst von monatlichen Angeboten und Sonderrabatten erzählen?"
 }

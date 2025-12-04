@@ -691,6 +691,16 @@ export const listChanel = [
     name: "wordpress",
     icon: "econelo.png",
   },
+  {
+    id: 6,
+    name: "praktiker",
+    icon: "praktiker.png",
+  },
+  {
+    id: 7,
+    name: "freakout",
+    icon: "freakout.png",
+  },
 ];
 
 export const listDE = [
