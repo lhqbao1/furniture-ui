@@ -17,6 +17,8 @@ export const CHANEL_OPTIONS = [
   { key: "amazon", label: "Amazon" },
   { key: "kaufland", label: "Kaufland" },
   { key: "ebay", label: "Ebay" },
+  { key: "freakout", label: "Freakout" },
+  { key: "praktiker", label: "Praktiker" },
 ];
 
 export default function OrderChanelFilter() {
