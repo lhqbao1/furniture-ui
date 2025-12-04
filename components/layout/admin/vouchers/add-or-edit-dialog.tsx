@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import AddOrEditSupplierForm from "../supplier/add-or-edit-form";
+import AddOrEditVouchersForm from "./add-or-edit-form/add-or-edit-form";
 
 const AddVoucherDialog = () => {
   const [open, setOpen] = useState(false);
@@ -33,7 +33,7 @@ const AddVoucherDialog = () => {
           <DialogHeader>
             <DialogTitle>Add Voucher</DialogTitle>
           </DialogHeader>
-          <AddOrEditSupplierForm onClose={handleClose} />
+          <AddOrEditVouchersForm onClose={handleClose} />
         </DialogContent>
       </form>
     </Dialog>

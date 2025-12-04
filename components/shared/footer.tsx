@@ -13,95 +13,13 @@ const Footer = () => {
       id="footer"
       className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-32 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-14 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl relative"
     >
-      {/* <div className="lg:w-1/2 w-full lg:col-span-12 col-span-6 shadow-[0_4px_20px_rgba(0,177,89,0.15)] flex lg:flex-row flex-col lg:items-center justify-center lg:gap-24 gap-6 mb-6 lg:absolute lg:left-1/2 lg:-translate-x-1/2 top-0 lg:-translate-y-1/2 bg-white px-6 py-4 rounded-tl-2xl rounded-tr-2xl">
-        <div className="flex flex-col gap-2 items-center justify-center">
-          <Link
-            href={
-              "https://www.ebay.de/sch/i.html?item=365962209706&rt=nc&_trksid=p4429486.m3561.l161211&_ssn=prestige.home"
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            prefetch={false}
-          >
-            <Image
-              src={"/ebay.png"}
-              width={80}
-              height={80}
-              alt="ebay"
-              className="object-cover h-7 w-auto"
-            />
-          </Link>
-          <ListStars rating={5} />
-          <div className="text-sm font-semibold">100% 5-Stars</div>
-        </div>
-        <div className="flex flex-col gap-2 items-center justify-center">
-          <Link
-            href={
-              "https://www.amazon.de/s?k=PRESTIGE+HOME+LIVING+OUTDOOR&i=kitchen&language=en&search-type=ss&ref=bl_dp_s_web_0"
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            prefetch={false}
-          >
-            <Image
-              src={"/amazon.png"}
-              width={80}
-              height={80}
-              alt="amazon"
-              className="object-cover h-7 w-auto"
-            />
-          </Link>
-          <ListStars rating={5} />
-          <div className="text-sm font-semibold">100% 5-Stars</div>
-        </div>
-        <div className="flex flex-col gap-2 items-center justify-center">
-          <Link
-            href={"https://www.kaufland.de/shops/Prestige_Home_GmbH/"}
-            target="_blank"
-            rel="noopener noreferrer"
-            prefetch={false}
-          >
-            <Image
-              src={"/kau.png"}
-              width={80}
-              height={80}
-              alt="kaufland"
-              className="object-cover h-7 w-auto"
-            />
-          </Link>
-          <ListStars rating={5} />
-          <div className="text-sm font-semibold">100% 5-Stars</div>
-        </div>
-        <Link
-          href={"https://www.idealo.de/preisvergleich/Shop/336129.html#i"}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            src={"/idealo.jpg"}
-            width={100}
-            height={70}
-            alt=""
-            className="object-cover"
-          />
-        </Link>
-      </div> */}
-
       {/* Cột 1: Newsletter */}
       <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
-        <h4 className="font-semibold lg:w-2/3 w-full">
-          Jetzt Newsletter abonnieren – und mehr entdecken.
-        </h4>
+        <h4 className="">{t("notifyByEmail")}</h4>
 
-        <ul className="list-disc space-y-2 text-black-700 text-sm pl-3">
-          <li>Spare bis zu 70 % bei exklusiven Sales & Design-Angeboten</li>
-          <li>Erfahre als Erste*r von neuen Kollektionen und Trends</li>
-          <li>Erhalte persönliche Einladungen zu Aktionen & Events</li>
-        </ul>
-
-        <h4 className="font-semibold lg:mt-2 mt-1">
-          Inspiration direkt ins Postfach.
-        </h4>
+        <p className="lg:mt-2 mt-1 lg:w-2/3 w-full text-sm">
+          {t("notifyDescription")}
+        </p>
 
         <div className="flex items-center gap-2">
           <Input
@@ -145,12 +63,23 @@ const Footer = () => {
             <Link href={`/impressum`}>{t("imprint")}</Link>
           </li>
         </ul>
-        <div className="lg:mt-4">
+        <div className="lg:mt-4 flex flex-col gap-2">
           <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
             <img
-              src="https://img.idealo.com/badges/336129/05b1de33-5dae-4864-bd06-131f2cfe3ece"
+              src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
               loading="lazy"
-              alt="www.idealo.de Logo"
+              alt="zu www.idealo.de"
+            />
+          </a>
+          <a
+            href="https://www.praktiker.de/marktplatz/prestige-home-5786"
+            rel="nofollow"
+          >
+            <img
+              src="https://www.praktiker.de/marktplatz/images/badges/praktiker_trust_logo_s1s.png"
+              width="120"
+              height="50"
+              alt="Praktiker Trust Logo"
             />
           </a>
         </div>
