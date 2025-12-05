@@ -3,45 +3,62 @@
 import React, { useEffect, useRef, useState } from "react";
 import ImageItem from "./gallery-image-item";
 import { useTranslations } from "next-intl";
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import GallerySkeleton from "./skeleton";
+import { useGetAllProducts } from "@/features/products/hook";
+import { Loader2 } from "lucide-react";
 
 export default function ImageGallery() {
-  const PAGE_SIZE = 20;
-  const [page, setPage] = useState(1);
   const t = useTranslations();
 
-  const { data: productList, isLoading, isError } = useGetProductsSelect();
+  const PAGE_SIZE = 20;
 
-  // Nếu API chưa load thì list rỗng
-  const imageGalleryList = React.useMemo(() => {
-    if (!productList) return [];
+  // page dùng cho API mới
+  const [page, setPage] = useState(1);
 
-    return productList
-      .map((item) => item.static_files?.[0]?.url) // lấy ảnh đầu tiên
-      .filter(Boolean); // bỏ undefined / null
-  }, [productList]);
+  // STATE chứa tất cả ảnh đã load
+  const [imageGalleryList, setImageGalleryList] = useState<string[]>([]);
+
+  // dùng API mới
+  const { data, isLoading, isError, isFetching } = useGetAllProducts({
+    page,
+    page_size: PAGE_SIZE,
+  });
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const visibleImages = imageGalleryList.slice(0, page * PAGE_SIZE);
 
-  /** Infinite Scroll */
+  // 🚀 Khi API trả về data → append vào list
+  useEffect(() => {
+    if (!data) return;
+
+    const newImages =
+      data.items?.map((item) => item.static_files?.[0]?.url)?.filter(Boolean) ??
+      [];
+
+    setImageGalleryList((prev) => [...prev, ...newImages]);
+  }, [data]);
+
+  // 📌 Infinite Scroll
   useEffect(() => {
     const el = loadMoreRef.current;
     if (!el) return;
 
     const obs = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) setPage((p) => p + 1);
+        const lastPage = data?.pagination?.total_pages ?? 1;
+
+        // Khi chạm đáy & còn trang → load tiếp
+        if (entries[0].isIntersecting && page < lastPage && !isFetching) {
+          setPage((p) => p + 1);
+        }
       },
       { threshold: 0.3 },
     );
 
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [data, page, isFetching]);
 
-  /** Columns responsive */
+  /** Responsive columns */
   const getColumns = () =>
     window.innerWidth < 640 ? 2 : window.innerWidth < 1024 ? 3 : 4;
 
@@ -56,9 +73,10 @@ export default function ImageGallery() {
 
   /** Masonry grouping */
   const colArr: string[][] = Array.from({ length: columns }, () => []);
-  visibleImages.forEach((src, i) => colArr[i % columns].push(src));
+  imageGalleryList.forEach((src, i) => colArr[i % columns].push(src));
 
-  if (isLoading || !productList) return <GallerySkeleton />;
+  /** Skeleton state */
+  if (isLoading && page === 1) return <GallerySkeleton />;
 
   return (
     <section className="w-full py-12">
@@ -72,7 +90,7 @@ export default function ImageGallery() {
           >
             {col.map((src, i) => (
               <ImageItem
-                key={i}
+                key={colIndex + "-" + i}
                 src={src}
                 index={i}
               />
@@ -81,10 +99,13 @@ export default function ImageGallery() {
         ))}
       </div>
 
+      {/* Loader trigger */}
       <div
         ref={loadMoreRef}
-        className="h-10"
-      ></div>
+        className="h-10 w-full flex justify-center items-center"
+      >
+        {isFetching && <Loader2 className="animate-spin text-secondary" />}
+      </div>
     </section>
   );
 }
