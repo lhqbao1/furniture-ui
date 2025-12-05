@@ -9,6 +9,7 @@ import {
   createVoucherProduct,
   createVoucherShipping,
   createVoucherUser,
+  deleteVoucher,
   GetAllVouchersParams,
   getVoucherById,
   getVoucherProducts,
@@ -68,6 +69,16 @@ export function useUpdateVoucher() {
         queryKey: ["voucher", variables.voucher_id],
       });
       queryClient.invalidateQueries({ queryKey: ["vouchers"] });
+    },
+  });
+}
+
+export function useDeleteVoucher() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteVoucher(id),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["vouchers"] });
     },
   });
 }

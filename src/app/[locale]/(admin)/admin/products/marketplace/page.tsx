@@ -11,11 +11,7 @@ import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useGetAllProducts } from "@/features/products/hook";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { useRouter } from "@/src/i18n/navigation";
-import {
-  searchProductQueryStringAtom,
-  showAllProductsAtom,
-  sortByStockAtom,
-} from "@/store/product";
+import { sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
