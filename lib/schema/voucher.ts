@@ -32,7 +32,7 @@ export const voucherDefaultValues: VoucherFormValues = {
   start_at: "",
   end_at: "",
   total_usage_limit: 0,
-  user_usage_limit: 0,
+  user_usage_limit: 1,
   is_active: false,
 };
 

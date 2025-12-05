@@ -95,6 +95,11 @@ export async function updateVoucher(
   return data as VoucherItem;
 }
 
+export async function deleteVoucher(id: string) {
+  const { data } = await apiAdmin.delete(`/vouchers/${id}`);
+  return data;
+}
+
 export async function createVoucherProduct(input: AssignVoucherToProduct) {
   const { data } = await apiAdmin.post(`/vouchers/products`, input, {
     headers: {

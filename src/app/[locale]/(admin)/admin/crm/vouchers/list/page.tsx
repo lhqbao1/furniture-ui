@@ -4,15 +4,17 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import AddOrEditSupplierForm from "@/components/layout/admin/supplier/add-or-edit-form";
 import { supplierColumns } from "@/components/layout/admin/supplier/columns";
 import AddVoucherDialog from "@/components/layout/admin/vouchers/add-or-edit-dialog";
+import { voucherColumns } from "@/components/layout/admin/vouchers/columns";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
 import { useGetSuppliers } from "@/features/supplier/hook";
+import { useGetVouchers } from "@/features/vouchers/hook";
 import React, { useState } from "react";
 
 const VoucherList = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
 
-  const { data, isLoading, isError } = useGetSuppliers();
+  const { data, isLoading, isError } = useGetVouchers();
 
   if (isError) return <div>No data</div>;
 
@@ -29,7 +31,7 @@ const VoucherList = () => {
         ) : (
           <ProductTable
             data={data ? data : []}
-            columns={supplierColumns}
+            columns={voucherColumns}
             page={page}
             pageSize={pageSize}
             setPage={setPage}

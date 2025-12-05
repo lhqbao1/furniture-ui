@@ -13,9 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { FileDigit, Loader2 } from "lucide-react";
-import { SupplierInput, SupplierResponse } from "@/types/supplier";
-import { defaultSupplier, supplierSchema } from "@/lib/schema/supplier";
-import { useCreateSupplier, useEditSupplier } from "@/features/supplier/hook";
 import { VoucherItem } from "@/types/voucher";
 import {
   voucherDefaultValues,
@@ -32,13 +29,23 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { useCreateVoucher, useUpdateVoucher } from "@/features/vouchers/hook";
+import {
+  useCreateVoucher,
+  useCreateVoucherShipping,
+  useUpdateVoucher,
+} from "@/features/vouchers/hook";
+import { Switch } from "@/components/ui/switch";
 
 type AddOrEditVouchersFormProps = {
   submitText?: string;
   onClose?: () => void;
   voucherValues?: VoucherItem;
 };
+
+function removeZ(dateString?: string) {
+  if (!dateString) return dateString;
+  return dateString.replace(/Z$/, "");
+}
 
 export default function AddOrEditVouchersForm({
   submitText,
@@ -52,41 +59,51 @@ export default function AddOrEditVouchersForm({
 
   const createVoucherMutation = useCreateVoucher();
   const editVoucherMutation = useUpdateVoucher();
+  const createShippingVoucherMutation = useCreateVoucherShipping();
+
+  const watchType = form.watch("type");
+  const watchDiscountType = form.watch("discount_type");
 
   async function handleSubmit(values: VoucherFormValues) {
+    const payload = {
+      ...values,
+      start_at: removeZ(values.start_at) ?? "",
+      end_at: removeZ(values.end_at) ?? "",
+    };
+
     if (voucherValues) {
       editVoucherMutation.mutate(
         {
           voucher_id: voucherValues.id,
           input: {
-            discount_value: values.discount_value,
-            end_at: values.end_at,
-            is_active: values.is_active,
-            max_discount: values.max_discount,
-            min_order_value: values.min_order_value,
-            name: values.name,
-            start_at: values.start_at,
+            discount_value: payload.discount_value,
+            end_at: payload.end_at ?? "",
+            is_active: payload.is_active,
+            max_discount: payload.max_discount,
+            min_order_value: payload.min_order_value,
+            name: payload.name,
+            start_at: payload.start_at ?? "",
           },
         },
         {
-          onSuccess(data, variables, context) {
+          onSuccess() {
             toast.success("Edit voucher successful");
             form.reset();
             onClose?.();
           },
-          onError(error, variables, context) {
+          onError() {
             toast.error("Edit voucher fail");
           },
         },
       );
     } else {
-      createVoucherMutation.mutate(values, {
-        onSuccess(data, variables, context) {
+      createVoucherMutation.mutate(payload, {
+        onSuccess() {
           toast.success("Create voucher successful");
           form.reset();
           onClose?.();
         },
-        onError(error, variables, context) {
+        onError() {
           toast.error("Create voucher fail");
         },
       });
@@ -106,6 +123,27 @@ export default function AddOrEditVouchersForm({
         )}
         className="space-y-6"
       >
+        <FormField
+          control={form.control}
+          name="is_active"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-start gap-2 w-fit">
+              <div className="space-y-1">
+                <FormLabel>Status</FormLabel>
+              </div>
+
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary"
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         {/* Business name */}
         <FormField
           control={form.control}
@@ -168,7 +206,7 @@ export default function AddOrEditVouchersForm({
                     </FormControl>
                     <FormLabel className="cursor-pointer">Product</FormLabel>
                   </FormItem>
-
+                  {/* 
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
                       <RadioGroupItem value="user_specific" />
@@ -176,13 +214,22 @@ export default function AddOrEditVouchersForm({
                     <FormLabel className="cursor-pointer">
                       User Specific
                     </FormLabel>
-                  </FormItem>
+                  </FormItem> */}
 
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
-                      <RadioGroupItem value="shipping" />
+                      <RadioGroupItem
+                        value="shipping"
+                        disabled={watchDiscountType === "freeship"}
+                      />
                     </FormControl>
-                    <FormLabel className="cursor-pointer">Shipping</FormLabel>
+                    <FormLabel
+                      className={`cursor-pointer ${
+                        watchDiscountType === "freeship" ? "text-gray-300" : ""
+                      }`}
+                    >
+                      Shipping
+                    </FormLabel>
                   </FormItem>
                 </RadioGroup>
               </FormControl>
@@ -228,9 +275,16 @@ export default function AddOrEditVouchersForm({
                   {/* Free Shipping */}
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
-                      <RadioGroupItem value="freeship" />
+                      <RadioGroupItem
+                        value="freeship"
+                        disabled={watchType === "shipping"} // ⛔ không được phép nếu type = shipping
+                      />
                     </FormControl>
-                    <FormLabel className="cursor-pointer">
+                    <FormLabel
+                      className={`cursor-pointer ${
+                        watchType === "shipping" ? "text-gray-300" : ""
+                      }`}
+                    >
                       Free Shipping
                     </FormLabel>
                   </FormItem>
@@ -501,14 +555,14 @@ export default function AddOrEditVouchersForm({
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 </>
               ) : (
-                submitText ?? "Update Supplier"
+                submitText ?? "Update Voucher"
               )
             ) : createVoucherMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               </>
             ) : (
-              submitText ?? "Create Supplier"
+              submitText ?? "Create Voucher"
             )}
           </Button>
         </div>

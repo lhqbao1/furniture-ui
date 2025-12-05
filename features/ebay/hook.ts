@@ -6,8 +6,12 @@ import { toast } from "sonner";
 type SyncErrorResponse = EbaySyncErrorResponse | AuthError | GenericError;
 
 export function useRemoveFormEbay() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (sku: string) => removeFromEbay(sku),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["products"] });
+    },
   });
 }
 
