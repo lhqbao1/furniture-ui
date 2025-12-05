@@ -348,5 +348,6 @@
   "shippingDetails": "Billing details",
   "notifyByEmail": "Stay in the loop with email updates",
   "notifyDescription": "Don’t miss out on monthly offers and exclusive discounts—let us keep you updated!",
-  "logOutSuccess": "Logged out successfully"
+  "logOutSuccess": "Logged out successfully",
+  "imageGallery": "Image Gallery"
 }
