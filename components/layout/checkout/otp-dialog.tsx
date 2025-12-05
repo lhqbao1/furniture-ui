@@ -128,8 +128,8 @@ export function OtpDialog({
           ))}
         </div>
 
-        <p className="text-xs text-gray-500">{t("ifNotEnterOtp")}</p>
-        <p className="text-xs text-gray-500 mb-4">{t("useDifferentEmail")}</p>
+        {/* <p className="text-xs text-gray-500">{t("ifNotEnterOtp")}</p>
+        <p className="text-xs text-gray-500 mb-4">{t("useDifferentEmail")}</p> */}
 
         <Button
           className="w-full bg-secondary/95 hover:bg-secondary"
