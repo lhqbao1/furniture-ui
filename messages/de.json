@@ -345,5 +345,6 @@
   "shippingDetails": "Rechnungsdetails",
   "notifyByEmail": "Per E-Mail benachrichtigt werden",
   "notifyDescription": "Wie könnten wir Ihnen sonst von monatlichen Angeboten und Sonderrabatten mitteilen?",
-  "logOutSuccess": "Erfolgreich abgemeldet"
+  "logOutSuccess": "Erfolgreich abgemeldet",
+    "imageGallery": "Bildergalerie"
 }
