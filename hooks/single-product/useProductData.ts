@@ -6,25 +6,19 @@ import { getProductById } from "@/features/products/api";
 import { getProductGroupDetail } from "@/features/product-group/api";
 
 export function useProductData(
-  productDetailsData: any,
-  parentProductData: any,
-  productId: string
+  productDetailsData?: any,
+  parentProductData?: any,
+  productId?: string,
 ) {
   // Product details
-  const {
-    data: productDetails,
-    isLoading: isLoadingProduct,
-  } = useQuery({
+  const { data: productDetails, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["product", productId],
-    queryFn: () => getProductById(productId),
+    queryFn: () => getProductById(productId ?? ""),
     initialData: productDetailsData,
   });
 
   // Parent product (group)
-  const {
-    data: parentProduct,
-    isLoading: isLoadingParent,
-  } = useQuery({
+  const { data: parentProduct, isLoading: isLoadingParent } = useQuery({
     queryKey: ["product-group-detail", productDetailsData.parent_id],
     queryFn: () => getProductGroupDetail(productDetailsData.parent_id ?? ""),
     enabled: !!productDetailsData.parent_id,

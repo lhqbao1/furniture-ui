@@ -5,30 +5,27 @@ import React from "react";
 import Image from "next/image";
 import ProductImageDialog from "../main-image-dialog";
 import { ProductItem } from "@/types/products";
+import { useImageZoom } from "@/hooks/single-product/useImageZoom";
+import { useSwipeImage } from "@/hooks/single-product/useSwipeImage";
 // ---- CHANGE NOTE ----
 // vẫn reuse dialog gốc của bạn (không thay đổi logic hoặc file name)
 
 interface MainImageProps {
   productDetails: ProductItem;
-  mainImageIndex: number;
-  setMainImageIndex: React.Dispatch<React.SetStateAction<number>>;
-  position: { x: number; y: number };
-  isHover: boolean;
-  setIsHover: (v: boolean) => void;
-  handleZoomImage: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handlers: any; // swipe handlers
 }
 
-export default function MainImage({
-  productDetails,
-  mainImageIndex,
-  setMainImageIndex,
-  position,
-  isHover,
-  setIsHover,
-  handleZoomImage,
-  handlers,
-}: MainImageProps) {
+export default function MainImage({ productDetails }: MainImageProps) {
+  const {
+    mainImageIndex,
+    setMainImageIndex,
+    position,
+    isHover,
+    setIsHover,
+    handleZoomImage,
+  } = useImageZoom();
+
+  const handlers = useSwipeImage(productDetails, setMainImageIndex);
+
   const mainFile =
     productDetails.static_files?.length > 0
       ? productDetails.static_files[mainImageIndex].url
