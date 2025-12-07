@@ -51,7 +51,7 @@ const ListVariant = ({
     setSelectedOptions((prev) => {
       const otherOptions = prev.filter((id) => {
         const isSameVariant = variant.some((g) =>
-          g.options.some((o) => o.id === id && g.variant.id === variantId)
+          g.options.some((o) => o.id === id && g.variant.id === variantId),
         );
         return !isSameVariant;
       });
@@ -60,14 +60,13 @@ const ListVariant = ({
 
     // 🔍 Tìm product khớp trong parentProduct.products
     const matchedProduct = parentProduct.products.find((product) =>
-      product.options?.some((opt) => opt.id === optionId)
+      product.options?.some((opt) => opt.id === optionId),
     );
 
-    // 👉 Nếu tìm thấy thì chuyển hướng
     if (matchedProduct?.url_key) {
-      router.push(`/product/${matchedProduct.url_key}`);
-    } else {
-      toast.error(t("noOption"));
+      setTimeout(() => {
+        router.push(`/product/${matchedProduct.url_key}`);
+      }, 0);
       return;
     }
   };
@@ -84,7 +83,10 @@ const ListVariant = ({
       render={() => (
         <div className="flex flex-col gap-4">
           {variant.map((group) => (
-            <div key={group.variant.id} className="flex flex-col gap-2">
+            <div
+              key={group.variant.id}
+              className="flex flex-col gap-2"
+            >
               <span className="font-semibold text-gray-700">
                 {group.variant.name}
               </span>

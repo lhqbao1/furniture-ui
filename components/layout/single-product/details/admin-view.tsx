@@ -2,7 +2,7 @@
 import { useRouter } from "@/src/i18n/navigation";
 import { Eye } from "lucide-react";
 import { useLocale } from "next-intl";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface AdminViewProps {
   productId: string;
@@ -11,18 +11,20 @@ interface AdminViewProps {
 const AdminView = ({ productId }: AdminViewProps) => {
   const router = useRouter();
   const locale = useLocale();
-  const [adminId, setAdminId] = React.useState<string | null>(
-    localStorage.getItem("admin_access_token"),
-  );
+  const [adminId, setAdminId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("admin_access_token");
+    setAdminId(token);
+  }, []);
+
   return (
     <>
       {adminId && (
         <div
           className="cursor-pointer text-primary"
           onClick={() =>
-            router.push(`/admin/products/${productId}/edit`, {
-              locale,
-            })
+            router.push(`/admin/products/${productId}/edit`, { locale })
           }
         >
           <Eye />

@@ -8,7 +8,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import ProductReviewTab from "./tabs/review";
-import QASection from "./tabs/q&a";
 import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import ProductDetailsProperties from "./tabs/properties/page";
