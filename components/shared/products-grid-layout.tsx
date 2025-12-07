@@ -170,7 +170,10 @@ const ProductsGridLayout = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4">
         {data.map((product, idx) => {
           return (
-            <div className="relative group">
+            <div
+              className="relative group"
+              key={product.id_provider}
+            >
               <div
                 key={product.id}
                 className="relative overflow-hidden z-10"

@@ -20,6 +20,10 @@ import { useTranslations } from "next-intl";
 import ListVariant from "../list-variant";
 import { ProductGroupDetailResponse } from "@/types/product-group";
 import { useProductData } from "@/hooks/single-product/useProductData";
+import { useQuery } from "@tanstack/react-query";
+import { getProductGroupDetail } from "@/features/product-group/api";
+import VariantClientWrapper from "./list-variant-wrapper";
+import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -39,10 +43,16 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
     },
   });
 
-  const { parentProduct } = useProductData(productId);
+  const { data: parentProduct, isLoading: isLoadingParent } = useQuery({
+    queryKey: ["product-group-detail", productDetails.parent_id],
+    queryFn: () => getProductGroupDetail(productDetails.parent_id ?? ""),
+    enabled: !!productDetails.parent_id,
+    // initialData: productDe,
+  });
 
   const { handleSubmitToCart, handleAddWishlist } =
     useAddToCartHandler(productDetails);
+
   return (
     <FormProvider {...form}>
       <form
@@ -52,12 +62,14 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
         )}
         className="space-y-8"
       >
-        {parentProduct && parentProduct?.variants?.length > 0 && (
+        {parentProduct && parentProduct?.variants?.length > 0 ? (
           <ListVariant
             variant={parentProduct.variants}
             currentProduct={productDetails}
             parentProduct={parentProduct}
           />
+        ) : (
+          <ListVariantSkeleton />
         )}
         <div className="flex  flex-row items-end gap-4">
           <div className="lg:basis-1/4 basis-2/5">

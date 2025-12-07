@@ -15,6 +15,7 @@ import getQueryClient from "@/lib/get-query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getReviewByProduct } from "@/features/review/api";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -152,10 +153,9 @@ export default async function Page({
         <div className="lg:w-10/12 w-full">
           {/* ️🔥 CRITICAL FIRST PAINT → PPR ưu tiên render */}
           <ProductDetails
-            parentProductData={parentProduct}
-            productDetailsData={product}
-            productId={product.id}
+            productDetails={product}
             reviews={reviews}
+            parentProduct={parentProduct}
           />
 
           {/* ️🔥 Stream phần không quan trọng */}
@@ -168,7 +168,9 @@ export default async function Page({
         </div>
       </div>
 
-      <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
+      <Suspense>
+        <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
+      </Suspense>
     </HydrationBoundary>
   );
 }
