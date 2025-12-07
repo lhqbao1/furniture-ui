@@ -46,7 +46,7 @@ const Footer = () => {
       </div>
 
       {/* Cột 2: Các trang */}
-      <div className="footer-column lg:col-span-2 col-span-6">
+      <div className="footer-column lg:col-span-2 col-span-6 mb-6 lg:mb-0">
         <h4 className="font-semibold mb-3">{t("pages")}</h4>
         <ul className="space-y-2 text-black-700 text-sm">
           {/* ✅ thêm locale */}
@@ -63,7 +63,7 @@ const Footer = () => {
             <Link href={`/impressum`}>{t("imprint")}</Link>
           </li>
         </ul>
-        <div className="lg:mt-4 flex flex-col gap-2">
+        <div className="lg:mt-4 flex flex-col gap-2 mt-2">
           <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
             <img
               src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
@@ -86,7 +86,7 @@ const Footer = () => {
       </div>
 
       {/* Cột 3: Term & Policy */}
-      <div className="footer-column lg:col-span-3 col-span-6">
+      <div className="footer-column lg:col-span-3 col-span-6 mb-6 lg:mb-0">
         <h4 className="font-semibold mb-3">{t("termPolicy")}</h4>
         <ul className="space-y-2 text-black-700 text-sm">
           {/* ✅ thêm locale */}
@@ -123,7 +123,7 @@ const Footer = () => {
       </div>
 
       {/* Cột 3: Payment Method */}
-      <div className="footer-column lg:col-span-3 col-span-6 lg:space-y-6">
+      <div className="footer-column lg:col-span-3 col-span-6 lg:space-y-6 mb-6 lg:mb-0">
         <>
           <h4 className="font-semibold mb-3">{t("paymentMethod")}</h4>
 
@@ -179,7 +179,7 @@ const Footer = () => {
           </div>
         </>
 
-        <>
+        <div className="mt-6 lg:mt-0">
           <h4 className="font-semibold mb-3">{t("deliveryService")}</h4>
 
           <div className="flex gap-4 mt-2 lg:mt-4 flex-wrap">
@@ -200,11 +200,11 @@ const Footer = () => {
               unoptimized
             />
           </div>
-        </>
+        </div>
       </div>
 
       {/* Cột 4: Social (ngoài, không thêm locale) */}
-      <div className="footer-column lg:col-span-12 col-span-6 flex lg:items-center lg:justify-start lg:flex-col flex-row justify-center">
+      <div className="footer-column lg:col-span-12 col-span-6 flex items-center justify-start flex-col">
         {/* <h4 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h4> */}
         <div className="flex gap-1 mt-2 lg:mt-8">
           {/* <Link
@@ -275,7 +275,7 @@ const Footer = () => {
           </Link>
         </div>
 
-        <div className="text-sm mt-2">
+        <div className="text-sm mt-2 text-center">
           Copyright © 2025 Prestige Home Gmbh. All Rights Reserved.
         </div>
       </div>

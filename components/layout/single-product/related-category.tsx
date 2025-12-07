@@ -1,3 +1,4 @@
+"use client";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { getCategoryById, getCategoryBySlug } from "@/features/category/api";
@@ -21,7 +22,7 @@ const RelatedCategoryProducts = ({
   if (isLoading) return <ProductGridSkeleton />;
   if (!relatedProducts) return;
   return (
-    <div>
+    <div className="mt-6">
       <h3 className="text-center text-secondary text-3xl font-semibold">
         {t("relatedProduct")}
       </h3>
