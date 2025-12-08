@@ -89,13 +89,23 @@ export default function InvoiceTable({
           </span>
           <span>{checkout?.checkouts?.[0]?.user?.company_name}</span>
           <span>
-            {checkout?.checkouts?.[0]?.user?.first_name}{" "}
-            {checkout?.checkouts?.[0]?.user?.last_name}
+            {checkout?.checkouts?.[0]?.invoice_address.recipient_name
+              ? checkout?.checkouts?.[0]?.invoice_address.recipient_name
+              : checkout?.checkouts?.[0]?.user?.first_name +
+                " " +
+                checkout?.checkouts?.[0]?.user?.last_name}
           </span>
           <span>
             {checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
               ? checkout?.checkouts?.[0]?.invoice_address?.address_line
               : checkout?.checkouts?.[0]?.shipping_address?.address_line}
+          </span>
+          <span>
+            {checkout?.checkouts?.[0]?.invoice_address?.additional_address_line?.trim()
+              ? checkout?.checkouts?.[0]?.invoice_address
+                  ?.additional_address_line
+              : checkout?.checkouts?.[0]?.shipping_address
+                  ?.additional_address_line}
           </span>
 
           <span>

@@ -39,6 +39,13 @@ export default function OrderStatusSelector({
         };
       }
 
+      if (current === "preparation_shipping") {
+        return {
+          ...item,
+          active: item.key === "canceled",
+        };
+      }
+
       if (current === "shipped") {
         return {
           ...item,
