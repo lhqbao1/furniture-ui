@@ -7,7 +7,7 @@ export default function WhatsappWidget() {
   const pathname = usePathname();
 
   // Không load trong admin
-  if (pathname.startsWith("/admin")) return null;
+  if (pathname.includes("/admin")) return null;
 
   return (
     <Script

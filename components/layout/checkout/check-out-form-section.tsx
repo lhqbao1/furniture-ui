@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -26,12 +26,8 @@ import CheckOutShippingAddress from "@/components/layout/checkout/shipping-addre
 // import CheckOutInvoiceAddress from "@/components/layout/checkout/invoice-address";
 import CheckoutSummary from "./checkout-summary";
 import CheckoutProducts from "./check-out-products";
-import CartTable from "../cart/cart-table";
-import CartLocalTable from "../cart/cart-local-table";
 import CheckoutPaymentUI from "@/components/shared/stripe/payment-ui";
-import CheckoutPaymentLogic from "@/components/shared/stripe/payment-logic";
 import StripeProvider from "@/components/shared/stripe/stripe";
-import CardDialog from "@/components/shared/stripe/card-pay-dialog";
 import StripeLayout from "@/components/shared/stripe/stripe-layout";
 
 // const StripeLayout = dynamic(
@@ -48,11 +44,6 @@ import StripeLayout from "@/components/shared/stripe/stripe-layout";
 //   () => import("@/components/layout/checkout/shipping-address"),
 //   { ssr: false },
 // );
-
-const CheckOutInvoiceAddress = dynamic(
-  () => import("@/components/layout/checkout/invoice-address"),
-  { ssr: false },
-);
 
 export default function CheckOutFormSection() {
   const t = useTranslations();
@@ -88,45 +79,6 @@ export default function CheckOutFormSection() {
   } = useCheckoutInit();
 
   // -------------------------------
-  // 2️⃣ FORM SETUP
-  // -------------------------------
-
-  // // Pre-fill form values from user/address
-  // useEffect(() => {
-  //   const defaults: Partial<CreateOrderFormValues> = {};
-
-  //   if (user) {
-  //     defaults.first_name = user.first_name ?? "";
-  //     defaults.last_name = user.last_name ?? "";
-  //     defaults.email = user.email ?? "";
-  //     defaults.gender = user.gender;
-  //     defaults.company_name = user.company_name ?? "";
-  //     defaults.tax_id = user.tax_id ?? "";
-  //   }
-
-  //   if (invoiceAddress) {
-  //     defaults.invoice_address_line = invoiceAddress.address_line ?? "";
-  //     defaults.invoice_postal_code = invoiceAddress.postal_code ?? "";
-  //     defaults.invoice_city = invoiceAddress.city ?? "";
-  //     defaults.invoice_address_id = invoiceAddress.id;
-  //   }
-
-  //   if (addresses && addresses.length > 0) {
-  //     const shippingAddress = addresses.find((a) => a.is_default);
-  //     if (shippingAddress) {
-  //       defaults.shipping_address_line = shippingAddress.address_line ?? "";
-  //       defaults.shipping_postal_code = shippingAddress.postal_code ?? "";
-  //       defaults.shipping_city = shippingAddress.city ?? "";
-  //       defaults.shipping_address_id = shippingAddress.id;
-  //       defaults.phone_number = shippingAddress.phone_number ?? "";
-  //     }
-  //   }
-
-  //   if (Object.keys(defaults).length > 0)
-  //     form.reset({ ...form.getValues(), ...defaults });
-  // }, [user, invoiceAddress, addresses]);
-
-  // -------------------------------
   // 3️⃣ SUBMIT HOOK (checkout + payment logic)
   // -------------------------------
   const {
@@ -143,6 +95,8 @@ export default function CheckOutFormSection() {
     setOpenBankDialog,
     setOpenOtpDialog,
     handleSubmit,
+    handleOTP,
+    verifyOtp,
   } = useCheckoutSubmit({
     form,
     user,
@@ -191,7 +145,7 @@ export default function CheckOutFormSection() {
   return (
     <form
       onSubmit={form.handleSubmit(
-        (values) => handleSubmit(values),
+        (values) => handleOTP(values),
         (error) => {
           const firstKey = Object.keys(error)[0] as keyof typeof error;
           const firstMessage = error[firstKey]?.message;
@@ -212,7 +166,7 @@ export default function CheckOutFormSection() {
       >
         {/* Left side */}
         <div className="col-span-1 space-y-4 lg:space-y-12">
-          <CheckOutUserInformation isLogin={!!userIdLogin} />
+          <CheckOutUserInformation isLogin={false} />
           <CheckOutShippingAddress key={`shipping-${userId}`} />
           {/* <CheckOutInvoiceAddress key={`invoice-${userId}`} /> */}
         </div>
@@ -317,6 +271,7 @@ export default function CheckOutFormSection() {
         onOpenChange={setOpenOtpDialog}
         email={otpEmail}
         onSuccess={handleOtpSuccess}
+        verifyOtp={verifyOtp}
       />
 
       <BankDialog
