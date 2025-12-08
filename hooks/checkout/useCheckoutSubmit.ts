@@ -24,10 +24,14 @@ import { mapToSupplierCarts } from "@/hooks/map-cart-to-supplier";
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { CartItem, CartResponse } from "@/types/cart";
 import { Address } from "@/types/address";
-import { useSyncLocalCart } from "@/features/cart/hook";
+import {
+  useSyncLocalCart,
+  useSyncLocalCartCheckOut,
+} from "@/features/cart/hook";
 import { UseFormReturn } from "react-hook-form";
 import { Customer, User } from "@/types/user";
 import { CartItemLocal } from "@/lib/utils/cart";
+import { loginOtp } from "@/features/auth/api";
 
 export function useCheckoutSubmit({
   form,
@@ -62,6 +66,9 @@ export function useCheckoutSubmit({
   const [openBankDialog, setOpenBankDialog] = useState(false);
   const [openOtpDialog, setOpenOtpDialog] = useState(false);
   const [otpEmail, setOtpEmail] = useState("");
+  const [pendingData, setPendingData] = useState<CreateOrderFormValues | null>(
+    null,
+  );
 
   const createCheckOut = useCreateCheckOut();
   const createPayment = useCreatePayment();
@@ -69,7 +76,7 @@ export function useCheckoutSubmit({
   const createInvoice = useCreateInvoiceAddress();
   const updateInvoice = useUpdateInvoiceAddress();
   const createShipping = useCreateAddress();
-  const syncLocalCart = useSyncLocalCart(true);
+  const syncLocalCart = useSyncLocalCartCheckOut();
   const checkEmail = useCheckMailExist();
 
   const submitting =
@@ -79,6 +86,40 @@ export function useCheckoutSubmit({
     createShipping.isPending ||
     createUser.isPending;
 
+  // =====================================================================================
+  // STEP 1 — Submit lần đầu → chỉ check email + mở OTP dialog
+  // =====================================================================================
+  const handleOTP = useCallback(
+    async (data: CreateOrderFormValues) => {
+      try {
+        // Guest → cần OTP
+        if (!user?.id && data.email) {
+          const exists = await checkEmail.mutateAsync(data.email);
+
+          setPendingData(data); // 💾 lưu data
+          setOtpEmail(data.email); // dùng để gửi OTP
+          setOpenOtpDialog(true); // mở dialog
+
+          return; // 🚫 STOP — không chạy logic checkout tiếp
+        }
+
+        // Logged in → bỏ bước OTP → chạy tiếp luôn
+        setPendingData(data);
+        handleSubmit(data);
+      } catch (err) {
+        console.error(err);
+        toast.error(t("orderFail"));
+      }
+    },
+    [user],
+  );
+
+  const verifyOtp = useCallback(() => {
+    if (!pendingData) return;
+    handleSubmit(pendingData); // chạy tiếp phần checkout thật
+    setPendingData(null);
+  }, [pendingData]);
+
   const handleSubmit = useCallback(
     async (data: CreateOrderFormValues) => {
       let cleanupNeeded = false;
@@ -87,22 +128,10 @@ export function useCheckoutSubmit({
         let finalUserId = user?.id;
         let invoiceId = invoiceAddress?.id;
         let shippingId = addresses?.find((a: Address) => a.is_default)?.id;
-
         let cartData: CartResponse = [];
         let shippingCostCurrent = 0;
 
-        // Guest checkout
-        if (data.email && !finalUserId) {
-          const exists = await checkEmail.mutateAsync(data.email);
-
-          if (!exists) {
-            // redirect to OTP
-            setOtpEmail(data.email);
-            setOpenOtpDialog(true);
-            cleanupNeeded = true;
-            return;
-          }
-
+        if (!finalUserId) {
           const newUser = await createUser.mutateAsync({
             first_name: data.first_name,
             last_name: data.last_name,
@@ -117,16 +146,22 @@ export function useCheckoutSubmit({
 
           localStorage.setItem("access_token", newUser.access_token);
           localStorage.setItem("userIdGuest", newUser.id);
-
-          await syncLocalCart.mutateAsync();
-          cartData = await getCartByUserId(newUser.id);
-
-          const normalized = normalizeCartItems(
-            cartData.flatMap((g) => g.items),
-            true,
-          );
-          shippingCostCurrent = calculateShipping(normalized);
         }
+
+        // STEP 2 — Always sync cart after we know finalUserId
+        await syncLocalCart.mutateAsync({
+          isCheckOut: true,
+          user_id: finalUserId,
+        });
+
+        cartData = await getCartByUserId(finalUserId);
+
+        const normalized = normalizeCartItems(
+          cartData.flatMap((g) => g.items),
+          true,
+        );
+
+        const shippingCostFinal = calculateShipping(normalized);
 
         // Invoice
         if (!invoiceId) {
@@ -251,8 +286,8 @@ export function useCheckoutSubmit({
         const guestId = localStorage.getItem("userIdGuest");
 
         if (cleanupNeeded && guestId !== null) {
-          localStorage.removeItem("userIdGuest");
-          localStorage.removeItem("access_token");
+          // localStorage.removeItem("userIdGuest");
+          // localStorage.removeItem("access_token");
         }
       }
     },
@@ -282,6 +317,8 @@ export function useCheckoutSubmit({
     setOpenBankDialog,
     setOpenOtpDialog,
 
+    handleOTP,
     handleSubmit,
+    verifyOtp,
   };
 }

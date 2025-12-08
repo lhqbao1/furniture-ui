@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addToCart,
+  clearCartUser,
   deleteCartItem,
   getCartById,
   getCartItems,
@@ -103,7 +104,7 @@ export function useUpdateCartItemStatus() {
   });
 }
 
-export function useSyncLocalCart(isCheckOut = false) {
+export function useSyncLocalCart(isCheckOut = false, user_id?: string) {
   const qc = useQueryClient();
 
   return useMutation({
@@ -119,24 +120,68 @@ export function useSyncLocalCart(isCheckOut = false) {
       }
 
       // 2️⃣ Nếu là checkout => xóa item cũ trên server
-      // if (isCheckOut) {
-      //   const serverCart: CartResponseItem[] = await getCartItems();
+      if (isCheckOut) {
+        clearCartUser(user_id ?? "");
 
-      //   // Server trả về danh sách theo supplier => flatten tất cả items
-      //   const allServerItems = serverCart.flatMap((cart) => cart.items);
+        const serverCart: CartResponseItem[] = await getCartItems();
 
-      //   // Xác định item nào cần xóa
-      //   const itemsToRemove = allServerItems.filter(
-      //     (i) => !localProductIds.includes(i.products.id),
-      //   );
+        // Server trả về danh sách theo supplier => flatten tất cả items
+        const allServerItems = serverCart.flatMap((cart) => cart.items);
 
-      //   for (const item of itemsToRemove) {
-      //     await deleteCartItem(item.id);
-      //   }
-      // }
+        // Xác định item nào cần xóa
+        const itemsToRemove = allServerItems.filter(
+          (i) => !localProductIds.includes(i.products.id),
+        );
+
+        for (const item of itemsToRemove) {
+          await deleteCartItem(item.id);
+        }
+      }
 
       // 3️⃣ Dọn local cart sau khi sync
       // saveCart([]);
+      return true;
+    },
+
+    onSuccess: () => {
+      qc.refetchQueries({ queryKey: ["cart-items"] });
+    },
+
+    onError: (err: unknown) => {
+      console.error("Error syncing cart:", err);
+      toast.error(
+        "Die Produktmenge im Warenkorb überschreitet den Lagerbestand",
+      );
+    },
+  });
+}
+
+export function useSyncLocalCartCheckOut() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      isCheckOut,
+      user_id,
+    }: {
+      isCheckOut: boolean;
+      user_id?: string;
+    }) => {
+      const localCart: CartItemLocal[] = getCart();
+      if (localCart.length === 0) return;
+
+      const localProductIds = localCart.map((item) => item.product_id);
+
+      // 2️⃣ Nếu là checkout => dọn cart server
+      if (isCheckOut && user_id) {
+        await clearCartUser(user_id);
+      }
+
+      // 1️⃣ Thêm toàn bộ item local lên server
+      for (const item of localCart) {
+        await addToCart(item.product_id, item.quantity);
+      }
+
       return true;
     },
 

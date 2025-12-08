@@ -33,29 +33,30 @@ export function useCheckoutInit() {
 
   const { data: user } = useQuery<User>({
     queryKey: ["user", finalUserId],
-    queryFn: () => getUserById(finalUserId),
+    queryFn: () => getUserById(finalUserId ?? ""),
     enabled: !!finalUserId,
     retry: false,
   });
 
   const { data: addresses } = useQuery({
     queryKey: ["address-by-user", finalUserId],
-    queryFn: () => getAddressByUserId(finalUserId),
+    queryFn: () => getAddressByUserId(finalUserId ?? ""),
     enabled: !!finalUserId,
     retry: false,
   });
 
   const { data: invoiceAddress } = useQuery({
     queryKey: ["invoice-address-by-user", finalUserId],
-    queryFn: () => getInvoiceAddressByUserId(finalUserId),
+    queryFn: () => getInvoiceAddressByUserId(finalUserId ?? ""),
     enabled: !!finalUserId,
     retry: false,
   });
 
   // Cart
   const { cart: localCart } = useCartLocal();
+
   const { data: cartItems, isLoading: isLoadingCart } = useQuery({
-    queryKey: ["cart-items", finalUserId],
+    queryKey: ["cart-items", userIdLogin], // chỉ login user mới có cart server
     queryFn: async () => {
       const response = await getCartItems();
       return [...response].sort((a, b) => {
@@ -68,6 +69,8 @@ export function useCheckoutInit() {
         return latestB - latestA;
       });
     },
+
+    // ⭐ ONLY CALL WHEN REAL LOGIN EXISTS
     enabled: !!finalUserId,
     retry: false,
   });

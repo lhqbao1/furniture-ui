@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { CartItemLocal } from "@/lib/utils/cart";
-import { CartResponse, CartResponseItem } from "@/types/cart";
+import { CartResponseItem } from "@/types/cart";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { useFormContext } from "react-hook-form";

@@ -16,12 +16,14 @@ import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
+import { useCheckoutSubmit } from "@/hooks/checkout/useCheckoutSubmit";
 
 interface OtpDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   email: string;
   onSuccess: (userId: string) => void;
+  verifyOtp: (otpInput: string) => void;
 }
 
 export function OtpDialog({
@@ -29,6 +31,7 @@ export function OtpDialog({
   onOpenChange,
   email,
   onSuccess,
+  verifyOtp,
 }: OtpDialogProps) {
   const [otpValues, setOtpValues] = useState<string[]>([
     "",
@@ -75,12 +78,20 @@ export function OtpDialog({
     loginOtpMutation.mutate(
       { email, code },
       {
-        onSuccess: (data) => {
+        onSuccess: (data, variables) => {
+          // 1) Xác thực OTP OK → gọi verifyOtp() để chạy checkout tiếp
+          verifyOtp(variables.code);
+
+          // 2) Lưu token, id
           localStorage.setItem("access_token", data.access_token);
-          setUserId(data.id);
+          localStorage.setItem("userIdGuest", data.id);
+
+          // 3) Đóng dialog
           toast.success(t("otpDone"));
           onSuccess(data.id);
           onOpenChange(false);
+
+          // 4) Sync local cart
           syncLocalCartMutation.mutate();
         },
         onError: () => {
