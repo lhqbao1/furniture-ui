@@ -119,24 +119,24 @@ export function useSyncLocalCart(isCheckOut = false) {
       }
 
       // 2️⃣ Nếu là checkout => xóa item cũ trên server
-      if (isCheckOut) {
-        const serverCart: CartResponseItem[] = await getCartItems();
+      // if (isCheckOut) {
+      //   const serverCart: CartResponseItem[] = await getCartItems();
 
-        // Server trả về danh sách theo supplier => flatten tất cả items
-        const allServerItems = serverCart.flatMap((cart) => cart.items);
+      //   // Server trả về danh sách theo supplier => flatten tất cả items
+      //   const allServerItems = serverCart.flatMap((cart) => cart.items);
 
-        // Xác định item nào cần xóa
-        const itemsToRemove = allServerItems.filter(
-          (i) => !localProductIds.includes(i.products.id),
-        );
+      //   // Xác định item nào cần xóa
+      //   const itemsToRemove = allServerItems.filter(
+      //     (i) => !localProductIds.includes(i.products.id),
+      //   );
 
-        for (const item of itemsToRemove) {
-          await deleteCartItem(item.id);
-        }
-      }
+      //   for (const item of itemsToRemove) {
+      //     await deleteCartItem(item.id);
+      //   }
+      // }
 
       // 3️⃣ Dọn local cart sau khi sync
-      saveCart([]);
+      // saveCart([]);
       return true;
     },
 
