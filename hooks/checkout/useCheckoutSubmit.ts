@@ -244,7 +244,8 @@ export function useCheckoutSubmit({
       } catch (err) {
         console.error(err);
         toast.error(t("orderFail"));
-        form.reset();
+        setCheckoutId("");
+        // form.reset();
         cleanupNeeded = true;
       } finally {
         const guestId = localStorage.getItem("userIdGuest");

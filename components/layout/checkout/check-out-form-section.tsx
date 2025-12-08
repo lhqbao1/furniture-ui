@@ -58,8 +58,6 @@ export default function CheckOutFormSection() {
   const t = useTranslations();
   const locale = useLocale();
   const form = useFormContext<CreateOrderFormValues>();
-  const [payTrigger, setPayTrigger] = useState<() => Promise<void>>();
-  const router = useRouter();
 
   useEffect(() => {
     const hasReloaded = sessionStorage.getItem("checkout_reloaded");
@@ -93,40 +91,40 @@ export default function CheckOutFormSection() {
   // 2️⃣ FORM SETUP
   // -------------------------------
 
-  // Pre-fill form values from user/address
-  useEffect(() => {
-    const defaults: Partial<CreateOrderFormValues> = {};
+  // // Pre-fill form values from user/address
+  // useEffect(() => {
+  //   const defaults: Partial<CreateOrderFormValues> = {};
 
-    if (user) {
-      defaults.first_name = user.first_name ?? "";
-      defaults.last_name = user.last_name ?? "";
-      defaults.email = user.email ?? "";
-      defaults.gender = user.gender;
-      defaults.company_name = user.company_name ?? "";
-      defaults.tax_id = user.tax_id ?? "";
-    }
+  //   if (user) {
+  //     defaults.first_name = user.first_name ?? "";
+  //     defaults.last_name = user.last_name ?? "";
+  //     defaults.email = user.email ?? "";
+  //     defaults.gender = user.gender;
+  //     defaults.company_name = user.company_name ?? "";
+  //     defaults.tax_id = user.tax_id ?? "";
+  //   }
 
-    if (invoiceAddress) {
-      defaults.invoice_address_line = invoiceAddress.address_line ?? "";
-      defaults.invoice_postal_code = invoiceAddress.postal_code ?? "";
-      defaults.invoice_city = invoiceAddress.city ?? "";
-      defaults.invoice_address_id = invoiceAddress.id;
-    }
+  //   if (invoiceAddress) {
+  //     defaults.invoice_address_line = invoiceAddress.address_line ?? "";
+  //     defaults.invoice_postal_code = invoiceAddress.postal_code ?? "";
+  //     defaults.invoice_city = invoiceAddress.city ?? "";
+  //     defaults.invoice_address_id = invoiceAddress.id;
+  //   }
 
-    if (addresses && addresses.length > 0) {
-      const shippingAddress = addresses.find((a) => a.is_default);
-      if (shippingAddress) {
-        defaults.shipping_address_line = shippingAddress.address_line ?? "";
-        defaults.shipping_postal_code = shippingAddress.postal_code ?? "";
-        defaults.shipping_city = shippingAddress.city ?? "";
-        defaults.shipping_address_id = shippingAddress.id;
-        defaults.phone_number = shippingAddress.phone_number ?? "";
-      }
-    }
+  //   if (addresses && addresses.length > 0) {
+  //     const shippingAddress = addresses.find((a) => a.is_default);
+  //     if (shippingAddress) {
+  //       defaults.shipping_address_line = shippingAddress.address_line ?? "";
+  //       defaults.shipping_postal_code = shippingAddress.postal_code ?? "";
+  //       defaults.shipping_city = shippingAddress.city ?? "";
+  //       defaults.shipping_address_id = shippingAddress.id;
+  //       defaults.phone_number = shippingAddress.phone_number ?? "";
+  //     }
+  //   }
 
-    if (Object.keys(defaults).length > 0)
-      form.reset({ ...form.getValues(), ...defaults });
-  }, [user, invoiceAddress, addresses]);
+  //   if (Object.keys(defaults).length > 0)
+  //     form.reset({ ...form.getValues(), ...defaults });
+  // }, [user, invoiceAddress, addresses]);
 
   // -------------------------------
   // 3️⃣ SUBMIT HOOK (checkout + payment logic)
