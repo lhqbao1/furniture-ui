@@ -31,7 +31,7 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { Customer, User } from "@/types/user";
 import { CartItemLocal } from "@/lib/utils/cart";
-import { loginOtp } from "@/features/auth/api";
+import { loginOtp, sendOtp } from "@/features/auth/api";
 
 export function useCheckoutSubmit({
   form,
@@ -92,18 +92,16 @@ export function useCheckoutSubmit({
   const handleOTP = useCallback(
     async (data: CreateOrderFormValues) => {
       try {
-        // Guest → cần OTP
-        if (!user?.id && data.email) {
-          const exists = await checkEmail.mutateAsync(data.email);
-
-          setPendingData(data); // 💾 lưu data
-          setOtpEmail(data.email); // dùng để gửi OTP
-          setOpenOtpDialog(true); // mở dialog
-
-          return; // 🚫 STOP — không chạy logic checkout tiếp
+        // Guest → luôn gửi OTP mỗi lần submit
+        if (!user?.id) {
+          await sendOtp(data.email); // 🔥 luôn gửi OTP
+          setPendingData(data);
+          setOtpEmail(data.email);
+          setOpenOtpDialog(true);
+          return;
         }
 
-        // Logged in → bỏ bước OTP → chạy tiếp luôn
+        // Logged in → đi thẳng checkout
         setPendingData(data);
         handleSubmit(data);
       } catch (err) {

@@ -18,11 +18,8 @@ import { FormNumberInput } from "../form-number.input";
 import { Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import ListVariant from "../list-variant";
-import { ProductGroupDetailResponse } from "@/types/product-group";
-import { useProductData } from "@/hooks/single-product/useProductData";
 import { useQuery } from "@tanstack/react-query";
 import { getProductGroupDetail } from "@/features/product-group/api";
-import VariantClientWrapper from "./list-variant-wrapper";
 import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
 
 interface AddToCartFieldProps {
@@ -62,15 +59,19 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
         )}
         className="space-y-8"
       >
-        {parentProduct && parentProduct?.variants?.length > 0 ? (
-          <ListVariant
-            variant={parentProduct.variants}
-            currentProduct={productDetails}
-            parentProduct={parentProduct}
-          />
-        ) : (
-          <ListVariantSkeleton />
-        )}
+        {
+          isLoadingParent ? (
+            // chỉ khi đang loading mới skeleton
+            <ListVariantSkeleton />
+          ) : parentProduct && parentProduct.variants?.length > 0 ? (
+            // load xong và có data
+            <ListVariant
+              variant={parentProduct.variants}
+              currentProduct={productDetails}
+              parentProduct={parentProduct}
+            />
+          ) : null // hoặc render message "Không có phiên bản"
+        }
         <div className="flex  flex-row items-end gap-4">
           <div className="lg:basis-1/4 basis-2/5">
             <FormField
