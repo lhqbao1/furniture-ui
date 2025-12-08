@@ -14,7 +14,9 @@ const ListStarsReview = ({ size = 20, reviews }: ListStarsProps) => {
     const sum = reviews.reduce((total, r) => total + (r.rating || 0), 0);
     return Number((sum / reviews.length).toFixed(1));
   }, [reviews]);
+
   if (rating === 0) return;
+
   return (
     <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((item, index) => {

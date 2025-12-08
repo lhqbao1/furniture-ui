@@ -19,9 +19,8 @@ import {
   ProductGroupDetailResponse,
   ProductGroupResponse,
 } from "@/types/product-group";
+import ProductImageWrapper from "./image/product-image-wrapper";
 
-const MemoMainImage = React.memo(MainImage);
-const MemoImageGallery = React.memo(ImageGallery);
 interface ProductDetailsProps {
   reviews: ReviewResponse[];
   productDetails: ProductItem;
@@ -56,10 +55,8 @@ const ProductDetails = ({
         {productDetails ? (
           <div className="flex flex-col gap-8">
             <div className="grid grid-cols-12 xl:gap-16 gap-8">
-              <div className="xl:col-span-6 col-span-12 flex flex-col gap-6 lg:gap-12">
-                <MemoMainImage productDetails={productDetails} />
-
-                <MemoImageGallery productDetails={productDetails} />
+              <div className="xl:col-span-6 col-span-12">
+                <ProductImageWrapper productDetails={productDetails} />
               </div>
 
               <div className="xl:col-span-6 col-span-12 flex flex-col gap-6">

@@ -14,6 +14,8 @@ const OrderDetailUser = ({
   shippingAddress,
   invoiceAddress,
 }: OrderDetailUserProps) => {
+  console.log(invoiceAddress.country);
+
   return (
     <>
       <div className="col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5">
@@ -56,7 +58,7 @@ const OrderDetailUser = ({
               <div>{shippingAddress.postal_code}</div>
               <div>{shippingAddress.city}</div>
             </div>
-            <div>{getCountryName(invoiceAddress.country)}</div>
+            <div>{getCountryName(shippingAddress.country)}</div>
           </div>
         </div>
       </div>

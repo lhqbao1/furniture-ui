@@ -31,6 +31,7 @@ export function ProductImageCarousel({
 
   const handleSelectImage = (index: number) => {
     setMainImageIndex(index);
+    console.log(index);
     if (api) api.scrollTo(index); // 👈 scroll đến item vừa click
   };
 
@@ -43,7 +44,10 @@ export function ProductImageCarousel({
         <CarouselContent className="w-full flex">
           {productDetails.static_files.map(
             (item: StaticFile, index: number) => (
-              <CarouselItem key={index} className="lg:basis-1/4 basis-1/3">
+              <CarouselItem
+                key={index}
+                className="lg:basis-1/4 basis-1/3"
+              >
                 <div
                   className="cursor-pointer"
                   onClick={() => handleSelectImage(index)}
@@ -63,7 +67,7 @@ export function ProductImageCarousel({
                   />
                 </div>
               </CarouselItem>
-            )
+            ),
           )}
         </CarouselContent>
 

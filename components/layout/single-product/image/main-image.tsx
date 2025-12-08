@@ -12,24 +12,31 @@ import { useSwipeImage } from "@/hooks/single-product/useSwipeImage";
 
 interface MainImageProps {
   productDetails: ProductItem;
+  mainImageIndex: number;
+  setMainImageIndex: React.Dispatch<React.SetStateAction<number>>;
+  position: { x: number; y: number };
+  isHover: boolean;
+  setIsHover: (v: boolean) => void;
+  handleZoomImage: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export default function MainImage({ productDetails }: MainImageProps) {
-  const {
-    mainImageIndex,
-    setMainImageIndex,
-    position,
-    isHover,
-    setIsHover,
-    handleZoomImage,
-  } = useImageZoom();
-
+export default function MainImage({
+  productDetails,
+  mainImageIndex,
+  setMainImageIndex,
+  position,
+  isHover,
+  setIsHover,
+  handleZoomImage,
+}: MainImageProps) {
   const handlers = useSwipeImage(productDetails, setMainImageIndex);
 
   const mainFile =
     productDetails.static_files?.length > 0
       ? productDetails.static_files[mainImageIndex].url
       : "/placeholder-product.webp";
+
+  console.log("main", mainImageIndex);
 
   return (
     <ProductImageDialog

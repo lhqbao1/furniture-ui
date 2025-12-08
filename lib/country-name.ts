@@ -6,6 +6,8 @@ export function getCountryName(code: string): string {
       return "Deutschland"; // Nước Đức
     case "AT":
       return "Österreich"; // Nước Áo
+    case "SCHWEIZ":
+      return "Schweiz";
     default:
       return ""; // hoặc return code nếu muốn
   }

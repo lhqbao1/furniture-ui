@@ -203,10 +203,10 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       return (
         <div>
           <div>
-            {row.original.checkouts[0].user.first_name}{" "}
-            {row.original.checkouts[0].user.last_name}
+            {row.original.checkouts[0]?.user?.first_name}{" "}
+            {row.original.checkouts[0]?.user?.last_name}
           </div>
-          <div>{row.original.checkouts[0].user.email}</div>
+          <div>{row.original.checkouts[0]?.user?.email}</div>
         </div>
       );
     },
