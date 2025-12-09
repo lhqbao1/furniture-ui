@@ -6,6 +6,9 @@ import ProductTableSkeleton from "@/components/shared/table-skeleton";
 import { useGetAllCustomers } from "@/features/users/hook";
 import React, { useState } from "react";
 import CustomerListSkeleton from "./skeleton";
+import CustomerToolbar, {
+  ToolbarType,
+} from "@/components/layout/admin/customers/customer-toolbar";
 
 const CustomerListPage = () => {
   const [page, setPage] = useState(1);
@@ -23,6 +26,12 @@ const CustomerListPage = () => {
         <div className="text-3xl text-secondary font-bold text-center">
           Customers List
         </div>
+        <CustomerToolbar
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          setPage={setPage}
+          type={ToolbarType.customer}
+        />
         {isLoading || !data ? (
           <ProductTableSkeleton />
         ) : (

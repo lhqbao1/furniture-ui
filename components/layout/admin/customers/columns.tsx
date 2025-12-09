@@ -18,16 +18,6 @@ function ActionCell({ user }: { user: Customer }) {
   const deleteCustomerMutation = useDeleteCustomer();
   const locale = useLocale();
 
-  const handleDeleteCustomer = () => {
-    deleteCustomerMutation.mutate(user.id, {
-      onSuccess(data, variables, context) {
-        toast.success("Delete customer successfully");
-      },
-      onError(error, variables, context) {
-        toast.error("Delete customer fail");
-      },
-    });
-  };
   return (
     <div className="flex gap-1.5 justify-center">
       <Button
@@ -75,14 +65,17 @@ export const customerColumns: ColumnDef<Customer>[] = [
     },
   },
   {
-    accessorKey: "name",
-    header: "NAME",
+    accessorKey: "first_name",
+    header: "FIRST NAME",
     cell: ({ row }) => {
-      return (
-        <div>
-          {row.original.first_name} {row.original.last_name}
-        </div>
-      );
+      return <div>{row.original.first_name}</div>;
+    },
+  },
+  {
+    accessorKey: "name",
+    header: "LAST NAME",
+    cell: ({ row }) => {
+      return <div>{row.original.last_name}</div>;
     },
   },
   {
