@@ -39,7 +39,7 @@ const ProductCategory = ({
         page,
         page_size: pageSize,
       }),
-    initialData: category, // 👈 lấy từ server render lần đầu
+    initialData: category,
   });
 
   return (
@@ -79,7 +79,7 @@ const ProductCategory = ({
           </div>
         )}
       </div>
-      {categoryData && (
+      {categoryData && categoryData.products.length > 0 && (
         <CustomPagination
           totalPages={categoryData.total_pages}
           page={page}

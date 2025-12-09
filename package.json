@@ -80,6 +80,7 @@
     "react-dom": "19.1.0",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.62.0",
+    "react-markdown": "^10.1.0",
     "react-number-format": "^5.4.4",
     "react-phone-input-2": "^2.15.1",
     "react-quill-new": "^3.6.0",
