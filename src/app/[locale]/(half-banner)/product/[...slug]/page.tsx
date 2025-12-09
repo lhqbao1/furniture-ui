@@ -21,7 +21,6 @@ import { Suspense } from "react";
  * ENABLE PARTIAL PRERENDERING
  * ------------------------------------------------------*/
 export const experimental_ppr = true;
-
 export const revalidate = 3600;
 export const dynamicParams = true;
 
@@ -55,8 +54,19 @@ export async function generateMetadata({
 
   if (!lastSlug) return {};
 
-  const product = await getProductBySlug(lastSlug);
+  let product = null;
+
+  try {
+    product = await getProductBySlug(lastSlug);
+  } catch (err) {
+    console.error("❌ getProductBySlug failed in metadata:", err);
+    return {};
+  }
+
   if (!product) return notFound();
+
+  // SAFE JSON
+  product = JSON.parse(JSON.stringify(product));
 
   const reviews = await getReviewByProduct(product.id);
   const hasReviews = reviews && reviews.length > 0;
@@ -65,7 +75,7 @@ export async function generateMetadata({
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    image: product.static_files?.map((f) => f.url),
+    image: product.static_files?.map((f: StaticFile) => f.url),
     description: product.description,
     sku: product.sku,
     brand: {
@@ -103,7 +113,8 @@ export async function generateMetadata({
       description:
         product.meta_description || product.description?.slice(0, 150),
       url: `https://www.prestige-home.de/de/product/${product.url_key}`,
-      images: product.static_files?.map((f) => ({ url: f.url })) ?? [],
+      images:
+        product.static_files?.map((f: StaticFile) => ({ url: f.url })) ?? [],
     },
     other: {
       "application/ld+json": JSON.stringify(schema),
@@ -124,20 +135,41 @@ export default async function Page({
 
   if (!lastSlug) return notFound();
 
-  // ⚡ Critical data (prerenderable)
-  const product = await getProductBySlug(lastSlug);
+  /* ----------------------------------------------------
+   * 1) GET PRODUCT (wrapped in try/catch to prevent 502 crash)
+   * --------------------------------------------------*/
+  let product: any = null;
+
+  try {
+    product = await getProductBySlug(lastSlug);
+  } catch (err) {
+    console.error("❌ getProductBySlug failed:", err);
+    return notFound(); // ✔ SAFE FALLBACK
+  }
+
   if (!product) return notFound();
 
-  // Non-critical data (will stream after)
-  const reviewsPromise = getReviewByProduct(product.id);
-  const parentPromise = product.parent_id
-    ? getProductGroupDetail(product.parent_id)
-    : null;
+  // ⭐ Convert to JSON to avoid "function passed to client component"
+  product = JSON.parse(JSON.stringify(product));
 
-  const [reviews, parentProduct] = await Promise.all([
-    reviewsPromise,
-    parentPromise,
-  ]);
+  /* ----------------------------------------------------
+   * 2) PARALLEL REQUESTS (SAFE WRAPPED)
+   * --------------------------------------------------*/
+  let reviews = [];
+  let parentProduct = null;
+
+  try {
+    reviews = await getReviewByProduct(product.id);
+    if (product.parent_id) {
+      parentProduct = await getProductGroupDetail(product.parent_id);
+    }
+  } catch (err) {
+    console.error("❌ Error fetching child data:", err);
+  }
+
+  // Convert to JSON (prevent function serialization)
+  reviews = JSON.parse(JSON.stringify(reviews || []));
+  parentProduct = JSON.parse(JSON.stringify(parentProduct || null));
 
   // Hydrate React Query
   const qc = getQueryClient();
@@ -168,9 +200,11 @@ export default async function Page({
         </div>
       </div>
 
-      <Suspense>
-        <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
-      </Suspense>
+      {product.categories?.length > 0 && (
+        <Suspense>
+          <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
+        </Suspense>
+      )}
     </HydrationBoundary>
   );
 }

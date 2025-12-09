@@ -12,6 +12,7 @@ import AddressForm from "./address-form";
 import { useGetInvoiceAddressByUserId } from "@/features/address/hook";
 import { useTranslations } from "next-intl";
 import { COUNTRY_OPTIONS } from "@/data/data";
+import { InvoiceAddressSkeleton } from "./skeleton/invoice-address-skeleton";
 
 interface InvoiceAddressProps {
   userId: string;
@@ -26,7 +27,7 @@ const InvoiceAddress = ({ userId }: InvoiceAddressProps) => {
     isError,
   } = useGetInvoiceAddressByUserId(userId);
 
-  if (isLoading) return <div>Loading addresses...</div>;
+  if (isLoading) return <InvoiceAddressSkeleton />;
   if (isError)
     return <div className="text-red-500">{t("noInvoiceAddress")}</div>;
   if (!address)

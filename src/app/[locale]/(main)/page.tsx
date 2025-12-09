@@ -57,7 +57,7 @@ export default async function HomePage() {
   // ─────────────────────────────────────────────
   // 🚀 CRITICAL DATA (prerender ngay lập tức)
   // ─────────────────────────────────────────────
-  const featuredProducts = await getProductByTag("Featured");
+  const featuredProducts = await getProductByTag("Featured").catch(() => []);
 
   // Save critical data into React Query
   qc.setQueryData(["featured-products"], featuredProducts);
@@ -66,7 +66,7 @@ export default async function HomePage() {
   // ⏳ NON-CRITICAL DATA (stream sau qua Suspense)
   // ─────────────────────────────────────────────
   const categoriesPromise = getCategoriesWithChildren();
-  const trendingPromise = getProductByTag("Trending");
+  const trendingPromise = getProductByTag("Trending").catch(() => []);
   const allProductsPromise = getAllProducts({ page_size: 24 });
 
   const [categories, trendingProducts, allProducts] = await Promise.all([

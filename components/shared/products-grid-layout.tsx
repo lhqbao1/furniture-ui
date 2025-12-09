@@ -211,12 +211,6 @@ const ProductsGridLayout = ({
                       className="w-full h-48 md:h-64 py-0 md:py-2 object-contain mb-2 rounded group-hover:scale-120 duration-500"
                     />
 
-                    {product.stock === 0 && (
-                      <div className="px-3 py-1 text-[#29ABE2] bg-[#D4EEF9] rounded-full absolute top-4 right-4 text-sm">
-                        bald verfügbar
-                      </div>
-                    )}
-
                     <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
                       <h3
                         className={cn(
@@ -313,7 +307,11 @@ const ProductsGridLayout = ({
                   </Button>
                 </div>
               </div>
-
+              {product.stock === 0 && (
+                <div className="px-3 py-1 text-[#29ABE2] bg-[#D4EEF9] rounded-full absolute top-4 z-[100] right-4 text-sm">
+                  bald verfügbar
+                </div>
+              )}
               {product.stock === 0 && (
                 <div
                   className="

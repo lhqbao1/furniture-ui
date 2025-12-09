@@ -18,18 +18,19 @@ import {
 } from "@/hooks/caculate-shipping";
 
 export function useCheckoutInit() {
-  const [userId, setUserId] = useState("");
-  const [userIdLogin, setUserIdLogin] = useState("");
+  const [userLoginId, setUserLoginId] = useState<string>(""); // user đăng nhập thật
+  const [userGuestId, setUserGuestId] = useState<string>(""); // user tạo trong checkout
 
   // Load from localStorage only on client
   useEffect(() => {
-    const storedId = localStorage.getItem("userIdGuest");
-    const storedLogin = localStorage.getItem("userId");
-    if (storedLogin) setUserIdLogin(storedLogin);
-    if (storedId) setUserId(storedId);
+    const loginId = localStorage.getItem("userId"); // user login thật
+    const guestId = localStorage.getItem("userIdGuest"); // user đăng ký trong checkout
+
+    if (loginId) setUserLoginId(loginId);
+    if (guestId) setUserGuestId(guestId);
   }, []);
 
-  const finalUserId = userIdLogin || userId;
+  const finalUserId = userLoginId || userGuestId;
 
   const { data: user } = useQuery<User>({
     queryKey: ["user", finalUserId],
@@ -39,16 +40,16 @@ export function useCheckoutInit() {
   });
 
   const { data: addresses } = useQuery({
-    queryKey: ["address-by-user", userIdLogin],
-    queryFn: () => getAddressByUserId(userIdLogin ?? ""),
-    enabled: !!userIdLogin,
+    queryKey: ["address-by-user", userLoginId],
+    queryFn: () => getAddressByUserId(userLoginId ?? ""),
+    enabled: !!userLoginId,
     retry: false,
   });
 
   const { data: invoiceAddress } = useQuery({
-    queryKey: ["invoice-address-by-user", userIdLogin],
-    queryFn: () => getInvoiceAddressByUserId(userIdLogin ?? ""),
-    enabled: !!userIdLogin,
+    queryKey: ["invoice-address-by-user", userLoginId],
+    queryFn: () => getInvoiceAddressByUserId(userLoginId ?? ""),
+    enabled: !!userLoginId,
     retry: false,
   });
 
@@ -56,7 +57,7 @@ export function useCheckoutInit() {
   const { cart: localCart } = useCartLocal();
 
   const { data: cartItems, isLoading: isLoadingCart } = useQuery({
-    queryKey: ["cart-items", userIdLogin], // chỉ login user mới có cart server
+    queryKey: ["cart-items", userLoginId], // chỉ login user mới có cart server
     queryFn: async () => {
       const response = await getCartItems();
       return [...response].sort((a, b) => {
@@ -96,10 +97,11 @@ export function useCheckoutInit() {
     hasServerCart,
     shippingCost,
     hasOtherCarrier,
-    userId,
-    setUserId,
-    userIdLogin,
-    setUserIdLogin,
+    userGuestId,
+    setUserGuestId,
+    userLoginId,
+    setUserLoginId,
+    finalUserId,
     totalAmount,
   };
 }

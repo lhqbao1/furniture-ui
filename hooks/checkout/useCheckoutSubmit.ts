@@ -33,6 +33,8 @@ import { sendOtp } from "@/features/auth/api";
 export function useCheckoutSubmit({
   form,
   user,
+  userLoginId,
+  userGuestId,
   addresses,
   invoiceAddress,
   cartItems,
@@ -40,6 +42,7 @@ export function useCheckoutSubmit({
   hasServerCart,
   shippingCost,
   locale,
+  currentUserId,
 }: {
   form: UseFormReturn<CreateOrderFormValues>; // form RHF
   user: User | undefined; // user login hoặc guest
@@ -50,6 +53,9 @@ export function useCheckoutSubmit({
   hasServerCart: boolean; // flag cart server hay local
   shippingCost: number; // shipping được tính từ logic
   locale: string; // locale hiện tại
+  userLoginId: string;
+  userGuestId: string;
+  currentUserId: string;
 }) {
   const router = useRouter();
   const t = useTranslations();
@@ -75,6 +81,7 @@ export function useCheckoutSubmit({
   const createShipping = useCreateAddress();
   const syncLocalCart = useSyncLocalCartCheckOut();
   const checkEmail = useCheckMailExist();
+  const isNewGuestUser = !userLoginId && !!userGuestId;
 
   const submitting =
     createCheckOut.isPending ||
@@ -98,7 +105,6 @@ export function useCheckoutSubmit({
           setPendingData(data);
           setOtpEmail(data.email);
           setOpenOtpDialog(true);
-
           return;
         }
 
@@ -148,10 +154,12 @@ export function useCheckoutSubmit({
         }
 
         // STEP 2 — Always sync cart after we know finalUserId
-        await syncLocalCart.mutateAsync({
-          isCheckOut: true,
-          user_id: finalUserId,
-        });
+        if (isNewGuestUser) {
+          await syncLocalCart.mutateAsync({
+            isCheckOut: true,
+            user_id: currentUserId, // userGuestId
+          });
+        }
 
         cartData = await getCartByUserId(finalUserId);
 

@@ -4,7 +4,7 @@ import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { getProductByTag } from "@/features/products/api";
 import { useGetAllProducts } from "@/features/products/hook";
 import { ProductItem } from "@/types/products";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import React from "react";
 
@@ -14,6 +14,7 @@ interface RecentViewedProps {
 
 const RecentViewed = ({ queryKey }: RecentViewedProps) => {
   const t = useTranslations();
+  const queryClient = useQueryClient();
 
   const {
     data: products,
@@ -21,7 +22,10 @@ const RecentViewed = ({ queryKey }: RecentViewedProps) => {
     error,
   } = useQuery<ProductItem[]>({
     queryKey,
-    queryFn: () => getProductByTag("Trending"),
+    queryFn: () => getProductByTag("Trending").catch(() => []),
+    staleTime: 60000, // 1 phút
+    retry: 1, // ⭐ không retry 3 lần
+    initialData: () => queryClient.getQueryData(queryKey),
   });
 
   if (isLoading) return <ProductGridSkeleton />;

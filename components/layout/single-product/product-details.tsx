@@ -5,9 +5,7 @@ import { ReviewResponse } from "@/types/review";
 // Components
 import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import ProductDetailsSkeleton from "@/components/layout/single-product/product-detail-skeleton";
-// Memoized / Dynamic Components
-import MainImage from "./image/main-image";
-import ImageGallery from "./image/image-carousel";
+
 import ProductDetailsLogistic from "./details/logistics";
 import ProductDetailsPrice from "./details/price";
 import AddToCartField from "./details/add-to-cart";
@@ -15,10 +13,7 @@ import AdminView from "./details/admin-view";
 import ListStarsReview from "./details/list-stars-review";
 import { useTranslations } from "next-intl";
 import { ProductItem } from "@/types/products";
-import {
-  ProductGroupDetailResponse,
-  ProductGroupResponse,
-} from "@/types/product-group";
+import { ProductGroupDetailResponse } from "@/types/product-group";
 import ProductImageWrapper from "./image/product-image-wrapper";
 
 interface ProductDetailsProps {
@@ -34,24 +29,34 @@ const ProductDetails = ({
 }: ProductDetailsProps) => {
   const t = useTranslations();
 
-  // Memoized avgRating
+  // ✅ Safely get category info
+  const currentCategory = productDetails.categories?.[0];
+  const hasCategory = !!currentCategory;
 
-  const currentCategory = productDetails.categories[0];
-  const currentCategoryName = currentCategory.children?.length
-    ? currentCategory.children[0].name
-    : currentCategory.name;
-  const currentCategoryLink = currentCategory.children?.length
-    ? `category/${currentCategory.children[0].slug}`
-    : `category/${currentCategory.slug}`;
+  const currentCategoryName = hasCategory
+    ? currentCategory!.children?.length
+      ? currentCategory!.children[0].name
+      : currentCategory!.name
+    : undefined;
+
+  const currentCategoryLink = hasCategory
+    ? currentCategory!.children?.length
+      ? `category/${currentCategory!.children[0].slug}`
+      : `category/${currentCategory!.slug}`
+    : undefined;
 
   return (
     <>
-      <div className="py-3 lg:pt-3 space-y-4">
-        <CustomBreadCrumb
-          isProductPage
-          currentPage={currentCategoryName}
-          currentPageLink={currentCategoryLink}
-        />
+      <div className="py-3 lg:pt-6 space-y-4">
+        {/* ✅ Chỉ render breadcrumb khi có category */}
+        {hasCategory && currentCategoryName && currentCategoryLink && (
+          <CustomBreadCrumb
+            isProductPage
+            currentPage={currentCategoryName}
+            currentPageLink={currentCategoryLink}
+          />
+        )}
+
         {productDetails ? (
           <div className="flex flex-col gap-8">
             <div className="grid grid-cols-12 xl:gap-16 gap-8">
