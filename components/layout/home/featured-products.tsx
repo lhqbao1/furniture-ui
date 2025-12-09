@@ -3,7 +3,7 @@ import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { getProductByTag } from "@/features/products/api";
 import { ProductItem } from "@/types/products";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
@@ -15,14 +15,17 @@ interface FeaturedProductsProps {
 const FeaturedProducts = ({ queryKey }: FeaturedProductsProps) => {
   const t = useTranslations();
   const isPhone = useMediaQuery({ maxWidth: 767 });
-
+  const queryClient = useQueryClient();
   const {
     data: products,
     isLoading,
     error,
   } = useQuery<ProductItem[]>({
     queryKey,
-    queryFn: () => getProductByTag("Featured"),
+    queryFn: () => getProductByTag("Featured").catch(() => []),
+    staleTime: 60000, // 1 phút
+    retry: 1, // ⭐ không retry 3 lần
+    initialData: () => queryClient.getQueryData(queryKey),
   });
 
   if (isLoading) return <ProductGridSkeleton />;

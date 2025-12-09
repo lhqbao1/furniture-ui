@@ -74,11 +74,17 @@ export async function getProductBySlug(product_slug: string) {
     throw error; // lỗi khác thì throw để debug
   }
 }
+
 export async function getProductByTag(tag: string, is_customer = false) {
-  const { data } = await apiPublic.get(`/products/by-tag/${tag}`, {
-    params: { is_customer }, // truyền query param ở đây
-  });
-  return data as ProductItem[];
+  try {
+    const { data } = await apiPublic.get(`/products/by-tag/${tag}`, {
+      params: { is_customer },
+    });
+    return data as ProductItem[];
+  } catch (err) {
+    console.error("API getProductByTag failed:", tag, err);
+    return []; // ⭐ KHÔNG THROW → KHÔNG CRASH SSR
+  }
 }
 
 export async function deleteProduct(id: string) {

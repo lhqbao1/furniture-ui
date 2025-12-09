@@ -17,6 +17,7 @@ import AddressForm from "./address-form";
 import { cn } from "@/lib/utils";
 import { useAddressManager } from "@/hooks/account/useAccountAddress";
 import { COUNTRY_OPTIONS } from "@/data/data";
+import { AddressListSkeleton } from "./skeleton/shipping-address-skeleton";
 
 interface AddressListProps {
   userId: string;
@@ -40,7 +41,7 @@ const AddressList = ({ userId }: AddressListProps) => {
     handleSetDefaultAddress,
   } = useAddressManager(userId);
 
-  if (isLoading) return <div>{t("loading")}...</div>;
+  if (isLoading) return <AddressListSkeleton />;
   if (isError)
     return <div className="text-red-500">{t("noShippingAddress")}</div>;
   if (!addresses || addresses.length === 0)

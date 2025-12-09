@@ -72,10 +72,12 @@ export default function CheckOutFormSection() {
     hasServerCart,
     shippingCost,
     hasOtherCarrier,
-    userId,
-    userIdLogin,
-    setUserIdLogin,
+    userGuestId,
+    userLoginId,
+    setUserGuestId,
+    setUserLoginId,
     totalAmount,
+    finalUserId,
   } = useCheckoutInit();
 
   // -------------------------------
@@ -107,10 +109,13 @@ export default function CheckOutFormSection() {
     hasServerCart,
     shippingCost,
     locale,
+    userLoginId,
+    userGuestId,
+    currentUserId: finalUserId,
   });
 
   const handleOtpSuccess = (verifiedUserId: string) => {
-    setUserIdLogin(verifiedUserId);
+    setUserLoginId(verifiedUserId);
   };
 
   const couponAmount = form.watch("coupon_amount");
@@ -167,7 +172,7 @@ export default function CheckOutFormSection() {
         {/* Left side */}
         <div className="col-span-1 space-y-4 lg:space-y-12">
           <CheckOutUserInformation isLogin={false} />
-          <CheckOutShippingAddress key={`shipping-${userId}`} />
+          <CheckOutShippingAddress key={`shipping-${userLoginId}`} />
           {/* <CheckOutInvoiceAddress key={`invoice-${userId}`} /> */}
         </div>
 
