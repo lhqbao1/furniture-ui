@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLoginOtp } from "@/features/auth/hook";
@@ -16,7 +15,12 @@ import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
-import { useCheckoutSubmit } from "@/hooks/checkout/useCheckoutSubmit";
+
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 interface OtpDialogProps {
   open: boolean;
@@ -41,35 +45,30 @@ export function OtpDialog({
     "",
     "",
   ]);
-  const [userId, setUserId] = useAtom(userIdAtom);
+  const [, setUserId] = useAtom(userIdAtom);
   const loginOtpMutation = useLoginOtp();
   const syncLocalCartMutation = useSyncLocalCart();
   const t = useTranslations();
 
-  const handleChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return; // chỉ cho nhập số
-    const newOtp = [...otpValues];
-    newOtp[index] = value.slice(-1); // chỉ giữ 1 ký tự
-    setOtpValues(newOtp);
+  // -------------- GIỮ NGUYÊN LOGIC CỦA BẠN ----------------
 
-    // Tự focus sang input kế tiếp
-    if (value && index < 5) {
-      const nextInput = document.getElementById(`otp-${index + 1}`);
-      nextInput?.focus();
-    }
+  const updateOtpAt = (index: number, val: string) => {
+    const newOtp = [...otpValues];
+    newOtp[index] = val;
+    setOtpValues(newOtp);
   };
 
-  // ✅ Cho phép dán (paste) toàn bộ mã OTP 1 lần
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  // Copy–paste toàn bộ 6 số
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
     const pasteData = e.clipboardData.getData("Text").trim();
     if (!/^\d{6}$/.test(pasteData)) return;
-    const newOtp = pasteData.split("").slice(0, 6);
-    setOtpValues(newOtp);
+    setOtpValues(pasteData.split(""));
   };
 
   const handleSubmit = () => {
     const code = otpValues.join("");
+
     if (code.length !== 6) {
       toast.error(t("otpRequired"));
       return;
@@ -79,36 +78,54 @@ export function OtpDialog({
       { email, code },
       {
         onSuccess: (data, variables) => {
-          // 1) Xác thực OTP OK → gọi verifyOtp() để chạy checkout tiếp
-          verifyOtp(variables.code);
+          verifyOtp(variables.code); // giữ nguyên logic
 
-          // 2) Lưu token, id
           localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("userIdGuest", data.id);
 
-          // 3) Đóng dialog
           toast.success(t("otpDone"));
           onSuccess(data.id);
           onOpenChange(false);
 
-          // 4) Sync local cart
           syncLocalCartMutation.mutate();
         },
-        onError: () => {
-          toast.error(t("otpError"));
-        },
+        onError: () => toast.error(t("otpError")),
       },
     );
   };
 
-  // ✅ Tự động submit khi nhập đủ 6 số
+  // Auto-submit khi đủ 6 số
   useEffect(() => {
     const code = otpValues.join("");
-    if (code.length === 6) {
-      handleSubmit();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (code.length === 6) handleSubmit();
   }, [otpValues]);
+
+  // ---------------- CUSTOM LOGIC CHO SHADCN INPUT OTP ----------------
+
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  //   const target = e.target as HTMLElement;
+  //   const index = Number(target.getAttribute("data-index"));
+
+  //   // Backspace → xóa và focus ngược lại
+  //   if (e.key === "Backspace") {
+  //     if (otpValues[index] === "" && index > 0) {
+  //       const prev = document.querySelector(
+  //         `[data-index="${index - 1}"]`,
+  //       ) as HTMLElement;
+  //       prev?.focus();
+  //     }
+  //     updateOtpAt(index, "");
+  //   }
+  // };
+
+  const handleChange = (val: string) => {
+    // val = chuỗi gồm 0–6 ký tự
+    const arr = val.split("").slice(0, 6);
+
+    // Giữ lại dạng mảng đủ 6 ký tự
+    const padded = [...arr, "", "", "", "", "", ""].slice(0, 6);
+    setOtpValues(padded);
+  };
 
   return (
     <Dialog
@@ -124,23 +141,28 @@ export function OtpDialog({
           {t("sendedEmail")}
         </p>
 
-        {/* OTP Inputs */}
-        <div className="flex gap-2 justify-center mb-4">
-          {otpValues.map((val, idx) => (
-            <Input
-              key={idx}
-              id={`otp-${idx}`}
-              value={val}
-              onChange={(e) => handleChange(idx, e.target.value)}
-              onPaste={handlePaste}
-              className="w-10 text-center text-lg"
-              maxLength={1}
-            />
-          ))}
+        {/* OTP SHADCN */}
+        <div
+          className="flex justify-center mb-4"
+          onPaste={handlePaste}
+        >
+          <InputOTP
+            maxLength={6}
+            value={otpValues.join("")}
+            onChange={handleChange}
+          >
+            <InputOTPGroup className="gap-2">
+              {otpValues.map((_, idx) => (
+                <InputOTPSlot
+                  key={idx}
+                  index={idx}
+                  data-index={idx}
+                  className="w-10 h-12 text-lg border rounded-md text-center"
+                />
+              ))}
+            </InputOTPGroup>
+          </InputOTP>
         </div>
-
-        {/* <p className="text-xs text-gray-500">{t("ifNotEnterOtp")}</p>
-        <p className="text-xs text-gray-500 mb-4">{t("useDifferentEmail")}</p> */}
 
         <Button
           className="w-full bg-secondary/95 hover:bg-secondary"
