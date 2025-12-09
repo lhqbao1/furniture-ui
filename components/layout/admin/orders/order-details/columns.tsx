@@ -15,6 +15,11 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
     header: () => <div className="text-center w-full">ID</div>,
     cell: ({ row }) => {
       return (
+        // <Link href={`/product/${row.original.products.url_key}`}>
+        //   <div className="text-center">
+        //     #{row.original.products.id_provider}
+        //   </div>
+        // </Link>
         <div className="text-center">#{row.original.products.id_provider}</div>
       );
     },

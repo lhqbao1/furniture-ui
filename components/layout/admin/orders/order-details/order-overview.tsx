@@ -1,5 +1,4 @@
 import { CheckOutMain } from "@/types/checkout";
-import { ArrowRight } from "lucide-react";
 import React from "react";
 import OrderStatusSelector from "./order-status-selector";
 interface OrderDetailOverViewProps {
