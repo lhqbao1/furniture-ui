@@ -1,44 +1,60 @@
-'use client'
-import CustomBreadCrumb from '@/components/shared/breadcrumb'
-import ProductsGridLayout from '@/components/shared/products-grid-layout'
-import React, { useState } from 'react'
-import { ProductGridSkeleton } from '@/components/shared/product-grid-skeleton'
-import { CustomPagination } from '@/components/shared/custom-pagination'
-import { useAtom } from 'jotai'
-import { currentCategoryIdAtom, currentCategoryNameAtom } from '@/store/category'
-import { useTranslations } from 'next-intl'
-import { CategoryBySlugResponse } from '@/types/categories'
-import { useQuery } from '@tanstack/react-query'
-import { getCategoryBySlug } from '@/features/category/api'
+"use client";
+import CustomBreadCrumb from "@/components/shared/breadcrumb";
+import ProductsGridLayout from "@/components/shared/products-grid-layout";
+import React, { useState } from "react";
+import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
+import { CustomPagination } from "@/components/shared/custom-pagination";
+import { useAtom } from "jotai";
+import {
+  currentCategoryIdAtom,
+  currentCategoryNameAtom,
+} from "@/store/category";
+import { useTranslations } from "next-intl";
+import { CategoryBySlugResponse } from "@/types/categories";
+import { useQuery } from "@tanstack/react-query";
+import { getCategoryBySlug } from "@/features/category/api";
 
 interface ProductCategoryProps {
-    categorySlugs: string[]
-    tag?: string
-    category?: CategoryBySlugResponse
+  categorySlugs: string[];
+  tag?: string;
+  category?: CategoryBySlugResponse;
 }
 
-const ProductCategory = ({ categorySlugs, tag, category }: ProductCategoryProps) => {
-    const t = useTranslations()
-    const [page, setPage] = useState(1)
-    const [pageSize, setPageSize] = useState(16)
-    const [currentCategoryName, setCurrentCategoryName] = useAtom(currentCategoryNameAtom)
+const ProductCategory = ({
+  categorySlugs,
+  tag,
+  category,
+}: ProductCategoryProps) => {
+  const t = useTranslations();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(16);
+  const [currentCategoryName, setCurrentCategoryName] = useAtom(
+    currentCategoryNameAtom,
+  );
 
-    const { data: categoryData, isFetching } = useQuery({
-        queryKey: ['category', categorySlugs, page, pageSize],
-        queryFn: () => getCategoryBySlug(categorySlugs[categorySlugs.length - 1], { page, page_size: pageSize }),
-        initialData: category, // 👈 lấy từ server render lần đầu
-    })
+  const { data: categoryData, isFetching } = useQuery({
+    queryKey: ["category", categorySlugs, page, pageSize],
+    queryFn: () =>
+      getCategoryBySlug(categorySlugs[categorySlugs.length - 1], {
+        page,
+        page_size: pageSize,
+      }),
+    initialData: category, // 👈 lấy từ server render lần đầu
+  });
 
-    return (
-        <div className='pt-3 xl:pb-16 pb-6'>
-            <CustomBreadCrumb currentPage={category?.name ?? ''} />
-            <div className=''>
-                <h2 className='section-header'>{category?.name}</h2>
-                <p className='text-center text-xl font-bold mt-2'>{category?.products.length === 0 ? t('emptyCategory') : ''}</p>
-                {!categoryData || isFetching ?
-                    <ProductGridSkeleton length={12} /> :
-                    <div className='filter-section'>
-                        {/* {
+  return (
+    <div className="pt-3 xl:pb-16 pb-6">
+      <CustomBreadCrumb currentPage={category?.name ?? ""} />
+      <div className="">
+        <h2 className="section-header">{category?.name}</h2>
+        <p className="text-center text-xl font-bold mt-2">
+          {category?.products.length === 0 ? t("emptyCategory") : ""}
+        </p>
+        {!categoryData || isFetching ? (
+          <ProductGridSkeleton length={12} />
+        ) : (
+          <div className="filter-section">
+            {/* {
                             categoryData.products.length > 0 &&
                             <Collapsible>
                                 <CollapsibleTrigger asChild>
@@ -54,17 +70,24 @@ const ProductCategory = ({ categorySlugs, tag, category }: ProductCategoryProps)
                                 </CollapsibleContent>
                             </Collapsible>
                         } */}
-                        <div className='pt-10 pb-12'>
-                            <ProductsGridLayout hasBadge data={categoryData.products} />
-                        </div>
-                    </div>
-                }
+            <div className="pt-10 pb-12">
+              <ProductsGridLayout
+                hasBadge
+                data={categoryData.products}
+              />
             </div>
-            {categoryData && categoryData.products.length > 16 &&
-                <CustomPagination totalPages={categoryData.total_pages} page={page} onPageChange={(newPage) => setPage(newPage)} />
-            }
-        </div >
-    )
-}
+          </div>
+        )}
+      </div>
+      {categoryData && (
+        <CustomPagination
+          totalPages={categoryData.total_pages}
+          page={page}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      )}
+    </div>
+  );
+};
 
-export default ProductCategory
+export default ProductCategory;
