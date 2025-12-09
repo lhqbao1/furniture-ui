@@ -25,7 +25,11 @@ import ResendOtp from "../auth/resend-otp";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
-import { preloadCheckout } from "@/lib/reload-checkout";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 interface CartLoginFormProps {
   onSuccess?: () => void;
@@ -63,16 +67,16 @@ export default function CartLoginForm({
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
 
-const handleRedirectToCheckOut = () => {
-  if (!localCart || localCart.length === 0) {
-    toast.error(t("chooseAtLeastCart"));
-    return;
-  }
+  const handleRedirectToCheckOut = () => {
+    if (!localCart || localCart.length === 0) {
+      toast.error(t("chooseAtLeastCart"));
+      return;
+    }
 
-  router.prefetch("/check-out", { locale }); // 🔥 preload đúng cách
+    router.prefetch("/check-out", { locale }); // 🔥 preload đúng cách
 
-  router.push("/check-out");
-};
+    router.push("/check-out");
+  };
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!seePassword) {
@@ -172,7 +176,7 @@ const handleRedirectToCheckOut = () => {
           />
 
           {/* Password */}
-          {seePassword ? (
+          {/* {seePassword ? (
             <FormField
               control={form.control}
               name="code"
@@ -243,6 +247,50 @@ const handleRedirectToCheckOut = () => {
                           autoComplete="one-time-code" // ✅ hỗ trợ autofill OTP (iOS, Android)
                         />
                       ))}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            ""
+          )} */}
+          {seePassword ? (
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="flex justify-center mb-4 w-full">
+                      {/* SHADCN OTP INPUT */}
+                      <InputOTP
+                        maxLength={6}
+                        value={field.value ?? ""}
+                        onChange={(val) => {
+                          field.onChange(val);
+
+                          // tự động submit khi đủ 6 số
+                          if (val.length === 6) {
+                            handleAutoSubmitOtp(val);
+                          }
+                        }}
+                      >
+                        <InputOTPGroup className="gap-2">
+                          {Array.from({ length: 6 }).map((_, idx) => (
+                            <InputOTPSlot
+                              key={idx}
+                              index={idx}
+                              className="
+                                w-10 h-12 text-lg 
+                                flex items-center justify-center 
+                                border rounded-md
+                              "
+                            />
+                          ))}
+                        </InputOTPGroup>
+                      </InputOTP>
                     </div>
                   </FormControl>
                   <FormMessage />

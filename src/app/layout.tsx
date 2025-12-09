@@ -95,13 +95,13 @@ export default function RootLayout({
           strategy="afterInteractive"
           defer
         />
-
-        <WhatsappWidget />
       </head>
 
       <body
         className={`${figtree.variable} ${libre.variable} font-sans antialiased`}
       >
+        <WhatsappWidget />
+
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-WKVQP2QH"

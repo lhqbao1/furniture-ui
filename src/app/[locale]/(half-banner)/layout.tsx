@@ -10,14 +10,16 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="relative w-full">
-      {/* <StickyIcon /> */}
+    <>
       <PageHeader />
-      <div className="overflow-x-hidden">
-        <Banner height={200} />
-        <div className="container-padding flex-1">{children}</div>
-        <Footer />
-      </div>
-    </main>
+      <main className="relative w-full">
+        {/* <StickyIcon /> */}
+        <div className="overflow-x-hidden">
+          <Banner height={200} />
+          <div className="container-padding flex-1">{children}</div>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }
