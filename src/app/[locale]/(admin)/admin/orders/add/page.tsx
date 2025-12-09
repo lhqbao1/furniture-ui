@@ -26,14 +26,6 @@ const ManualCheckOutShippingAddress = dynamic(
   },
 );
 
-// Invoice Address
-const ManualCheckOutInvoiceAddress = dynamic(
-  () => import("@/components/layout/admin/orders/order-create/invoice-address"),
-  {
-    ssr: false,
-  },
-);
-
 // Additional Info
 const ManualAdditionalInformation = dynamic(
   () =>
@@ -133,7 +125,8 @@ export default function CreateCheckoutpage() {
           },
           (errors) => {
             console.log(errors);
-            toast.error(errors.items?.message);
+            const firstError = Object.values(errors)[0]?.message;
+            if (firstError) toast.error(firstError);
           },
         )}
         className="flex flex-col gap-8 pb-12"

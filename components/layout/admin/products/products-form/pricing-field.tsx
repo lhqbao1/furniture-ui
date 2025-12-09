@@ -26,7 +26,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-black font-semibold text-sm">
-                {isDsp ? "Purchase Price" : "Cost"}
+                {isDsp ? "Purchase Price" : "Purchase Cost"}
               </FormLabel>
               <FormControl>
                 <div className="relative flex items-center w-full">
