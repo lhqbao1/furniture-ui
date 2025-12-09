@@ -76,7 +76,7 @@ export default async function HomePage() {
   ]);
 
   // Save into hydration cache
-  qc.setQueryData(["categories-home"], categories);
+  // qc.setQueryData(["categories-home"], categories);
   qc.setQueryData(["trending-products"], trendingProducts);
   qc.setQueryData(["all-products"], allProducts);
 
@@ -90,9 +90,7 @@ export default async function HomePage() {
         <FeaturedProducts queryKey={["featured-products"]} />
 
         {/* STREAMING SECTION */}
-        <Suspense fallback={<div className="mt-8">Loading…</div>}>
-          <RecentViewed queryKey={["trending-products"]} />
-        </Suspense>
+        <RecentViewed queryKey={["trending-products"]} />
       </div>
     </HydrationBoundary>
   );
