@@ -48,11 +48,11 @@ const DeleteDialog = ({ product, isEbay }: DeleteDialogProps) => {
           size="icon"
           onClick={(e) => {
             e.preventDefault();
-            if (isEbay) {
-              console.log(product.marketplace_products);
-              toast.error("You need to remove this product from eBay first");
-              return; // ❌ Không mở dialog
-            }
+            // if (isEbay) {
+            //   console.log(product.marketplace_products);
+            //   toast.error("You need to remove this product from eBay first");
+            //   return; // ❌ Không mở dialog
+            // }
             setOpen(true); // ✅ Mở dialog nếu không phải eBay
           }}
         >

@@ -82,7 +82,7 @@ export default function CategoriesDrawer({ categories }: Props) {
       }}
       direction="left"
     >
-      <DrawerContent className="px-4 py-2">
+      <DrawerContent className="px-4 py-2 overflow-auto">
         <DrawerHeader>
           <DrawerTitle>{t("categories")}</DrawerTitle>
         </DrawerHeader>

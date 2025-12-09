@@ -26,6 +26,8 @@ import { useProductForm } from "./useProductForm";
 import { ProductItem } from "@/types/products";
 import ProductManual from "./product-manual";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "@/src/i18n/navigation";
+import { useLocale } from "next-intl";
 
 const ProductForm = ({
   productValues,
@@ -46,7 +48,8 @@ const ProductForm = ({
     addProductMutation,
     editProductMutation,
   } = useProductForm({ productValues, productValuesClone });
-
+  const router = useRouter();
+  const locale = useLocale();
   const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
   return (
     <div className="lg:pb-20 lg:px-30 pb-12">
@@ -223,6 +226,18 @@ const ProductForm = ({
                   )}
                 </Button>
                 <AdminBackButton />
+                <Button
+                  type="button"
+                  variant={"secondary"}
+                  className="text-lg px-8"
+                  onClick={() =>
+                    router.push(`/product/${productValues?.url_key}`, {
+                      locale,
+                    })
+                  }
+                >
+                  View
+                </Button>
                 <div className="col-span-2 lg:mt-4">
                   <FormField
                     control={form.control}

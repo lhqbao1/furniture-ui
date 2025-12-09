@@ -1005,6 +1005,8 @@ export const STATUS_OPTIONS = [
 export const COUNTRY_OPTIONS = [
   { value: "AT", label: "Austria" },
   { value: "DE", label: "Deutschland" },
+  { value: "CN", label: "China" },
+  { value: "VN", label: "VietNam" },
 
   // { value: "AF", label: "Afghanistan" },
   // { value: "AL", label: "Albanien" },
@@ -1044,7 +1046,6 @@ export const COUNTRY_OPTIONS = [
   // { value: "BF", label: "Burkina Faso" },
   // { value: "BI", label: "Burundi" },
   // { value: "CL", label: "Chile" },
-  // { value: "CN", label: "China" },
   // { value: "CK", label: "Cookinseln" },
   // { value: "CR", label: "Costa Rica" },
   // { value: "CW", label: "Curaçao" },
