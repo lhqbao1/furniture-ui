@@ -1,4 +1,6 @@
 "use client";
+export const ssr = false;
+
 import { orderDetailColumn } from "@/components/layout/admin/orders/order-details/columns";
 import DocumentTable from "@/components/layout/admin/orders/order-details/document/document-table";
 import OrderDeliveryOrder from "@/components/layout/admin/orders/order-details/order-delivery-order";
@@ -19,7 +21,7 @@ import { CartItem } from "@/types/cart";
 import { CheckOutMain } from "@/types/checkout";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import OrderDetailsSkeleton from "./skeleton";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
@@ -44,27 +46,31 @@ const OrderDetails = () => {
   const [pageSize, setPageSize] = useState(10);
   const params = useParams<{ id: string }>(); // type-safe
   const checkoutId = params?.id;
-  // const { data: order, isLoading, isError } = useGetCheckOutByCheckOutId(checkoutId)
+
   const {
     data: order,
     isLoading,
     isError,
   } = useGetMainCheckOutByMainCheckOutId(checkoutId);
 
-  const {
-    data: invoice,
-    isLoading: isLoadingInvoice,
-    isError: isErrorInvoice,
-  } = useQuery({
+  const { data: invoice } = useQuery({
     queryKey: ["invoice-checkout", checkoutId],
     queryFn: () => getInvoiceByCheckOut(checkoutId as string),
     enabled: !!checkoutId,
     retry: false,
   });
 
+  const cartItems = useMemo(() => {
+    if (!order) return [];
+    return extractCartItemsFromMain(order);
+  }, [order]);
+
   if (isLoading) return <OrderDetailsSkeleton />;
   if (isError) return <div>Error loading order</div>;
   if (!order) return <div>Error loading order</div>;
+
+  const createdAt = formatDate(order.created_at);
+  const updatedAt = formatDateTimeString(order.updated_at);
 
   return (
     <div className="space-y-12 pb-20 mt-6">
@@ -72,8 +78,8 @@ const OrderDetails = () => {
       <div className="grid lg:grid-cols-4 grid-cols-2 lg:gap-12 gap-4">
         <OrderDetailOverView
           order={order}
-          created_at={formatDate(order.created_at)}
-          updated_at={formatDateTimeString(order.updated_at.toString())}
+          created_at={createdAt}
+          updated_at={updatedAt}
           status={order.status}
         />
         <OrderDetailUser
@@ -83,13 +89,13 @@ const OrderDetails = () => {
         />
       </div>
       <ProductTable
-        data={extractCartItemsFromMain(order)}
+        data={cartItems}
         columns={orderDetailColumn}
         page={page}
         setPage={setPage}
         pageSize={pageSize}
         setPageSize={setPageSize}
-        totalItems={extractCartItemsFromMain(order).length}
+        totalItems={cartItems.length}
         totalPages={Math.ceil(
           extractCartItemsFromMain(order).length / pageSize,
         )}

@@ -11,13 +11,15 @@ export default function AdminLayout({
 }>) {
   return (
     <Protected>
-      <SidebarProvider defaultOpen={true}>
-        <AdminSideBar />
-        <div className="container-padding lg:pt-8 pt-2 w-full pointer-events-auto">
-          <AdminHeader />
-          {children}
-        </div>
-      </SidebarProvider>
+      <main>
+        <SidebarProvider defaultOpen={true}>
+          <AdminSideBar />
+          <div className="container-padding lg:pt-8 pt-2 w-full pointer-events-auto">
+            <AdminHeader />
+            {children}
+          </div>
+        </SidebarProvider>
+      </main>
     </Protected>
   );
 }
