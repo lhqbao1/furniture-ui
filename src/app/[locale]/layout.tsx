@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     url: "https://www.prestige-home.de",
     images: [
       {
-        url: "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/76021c36-bdea-4461-8451-1ebaf92e47c5_banner1.jpeg",
+        url: "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/home-banner1.webp",
         width: 1200,
         height: 630,
         alt: "Prestige Home",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     ],
   },
   alternates: {
-    canonical: "https://www.prestige-home.de",
+    canonical: "https://www.prestige-home.de/de",
     languages: {
       de: "https://www.prestige-home.de/de",
       en: "https://www.prestige-home.de/en",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
         "@context": "https://schema.org",
         "@type": "Organization",
         name: "Prestige Home",
-        url: "https://www.prestige-home.de",
+        url: "https://www.prestige-home.de/de",
         logo: "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/5c38c322-bafc-4e6f-8d14-0c1ba4b7b8de_invoice-logo.png",
         sameAs: [
           "https://www.facebook.com/profile.php?id=61578621160298",
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: "Prestige Home",
-        url: "https://www.prestige-home.de",
+        url: "https://www.prestige-home.de/de",
         potentialAction: {
           "@type": "SearchAction",
           target: "https://www.prestige-home.de/search?q={search_term_string}",

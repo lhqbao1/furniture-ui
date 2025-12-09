@@ -61,28 +61,28 @@ export const customerColumns: ColumnDef<Customer>[] = [
     accessorKey: "id",
     header: "ID",
     cell: ({ row }) => {
-      return <div>#{row.original.user_code}</div>;
+      return <div>#{row.original.user_code ?? ""}</div>;
     },
   },
   {
     accessorKey: "first_name",
     header: "FIRST NAME",
     cell: ({ row }) => {
-      return <div>{row.original.first_name}</div>;
+      return <div>{row.original.first_name ?? ""}</div>;
     },
   },
   {
     accessorKey: "name",
     header: "LAST NAME",
     cell: ({ row }) => {
-      return <div>{row.original.last_name}</div>;
+      return <div>{row.original.last_name ?? ""}</div>;
     },
   },
   {
     accessorKey: "email",
     header: () => <div className="text-start w-full">EMAIL</div>,
     cell: ({ row }) => {
-      return <div className="text-start">{row.original.email}</div>;
+      return <div className="text-start">{row.original.email ?? ""}</div>;
     },
   },
   {
