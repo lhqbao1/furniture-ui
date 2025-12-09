@@ -6,11 +6,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { currentCategoryIdAtom } from "@/store/category";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
@@ -82,12 +78,12 @@ export default function CategoriesDrawer({ categories }: Props) {
       }}
       direction="left"
     >
-      <DrawerContent className="px-4 py-2 overflow-auto">
+      <DrawerContent className="px-4 py-2">
         <DrawerHeader>
           <DrawerTitle>{t("categories")}</DrawerTitle>
         </DrawerHeader>
 
-        <div className="space-y-2 mt-4">
+        <div className="space-y-2 mt-4 overflow-y-scroll">
           {categories.map((cate) => (
             <Collapsible
               key={cate.id}
@@ -102,12 +98,12 @@ export default function CategoriesDrawer({ categories }: Props) {
             >
               <CollapsibleTrigger
                 className="
-      w-fit text-left font-medium text-lg py-2 cursor-pointer relative
-      after:content-[''] after:absolute after:left-0 after:-bottom-1 
-      after:h-[2px] after:w-0 after:bg-secondary 
-      after:transition-all after:duration-500 
-      hover:after:w-full
-    "
+                  w-fit text-left font-medium text-lg py-2 cursor-pointer relative
+                  after:content-[''] after:absolute after:left-0 after:-bottom-1 
+                  after:h-[2px] after:w-0 after:bg-secondary 
+                  after:transition-all after:duration-500 
+                  hover:after:w-full
+                "
               >
                 {cate.name}
               </CollapsibleTrigger>

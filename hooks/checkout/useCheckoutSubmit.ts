@@ -4,7 +4,7 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "@/src/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useAtom } from "jotai";
 import { checkOutIdAtom, paymentIdAtom } from "@/store/payment";
 import {
@@ -22,16 +22,13 @@ import {
 } from "@/hooks/caculate-shipping";
 import { mapToSupplierCarts } from "@/hooks/map-cart-to-supplier";
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
-import { CartItem, CartResponse } from "@/types/cart";
+import { CartResponse } from "@/types/cart";
 import { Address } from "@/types/address";
-import {
-  useSyncLocalCart,
-  useSyncLocalCartCheckOut,
-} from "@/features/cart/hook";
+import { useSyncLocalCartCheckOut } from "@/features/cart/hook";
 import { UseFormReturn } from "react-hook-form";
-import { Customer, User } from "@/types/user";
+import { User } from "@/types/user";
 import { CartItemLocal } from "@/lib/utils/cart";
-import { loginOtp, sendOtp } from "@/features/auth/api";
+import { sendOtp } from "@/features/auth/api";
 
 export function useCheckoutSubmit({
   form,
@@ -92,16 +89,20 @@ export function useCheckoutSubmit({
   const handleOTP = useCallback(
     async (data: CreateOrderFormValues) => {
       try {
-        // Guest → luôn gửi OTP mỗi lần submit
-        if (!user?.id) {
-          await sendOtp(data.email); // 🔥 luôn gửi OTP
+        const isDifferentEmail = user?.email && user.email !== data.email;
+
+        // Case 1: Guest
+        // Case 2: Logged-in user but email changed
+        if (!user?.id || isDifferentEmail) {
+          await sendOtp(data.email);
           setPendingData(data);
           setOtpEmail(data.email);
           setOpenOtpDialog(true);
+
           return;
         }
 
-        // Logged in → đi thẳng checkout
+        // Case 3: Logged-in user, same email
         setPendingData(data);
         handleSubmit(data);
       } catch (err) {

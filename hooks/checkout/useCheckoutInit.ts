@@ -39,16 +39,16 @@ export function useCheckoutInit() {
   });
 
   const { data: addresses } = useQuery({
-    queryKey: ["address-by-user", finalUserId],
-    queryFn: () => getAddressByUserId(finalUserId ?? ""),
-    enabled: !!finalUserId,
+    queryKey: ["address-by-user", userIdLogin],
+    queryFn: () => getAddressByUserId(userIdLogin ?? ""),
+    enabled: !!userIdLogin,
     retry: false,
   });
 
   const { data: invoiceAddress } = useQuery({
-    queryKey: ["invoice-address-by-user", finalUserId],
-    queryFn: () => getInvoiceAddressByUserId(finalUserId ?? ""),
-    enabled: !!finalUserId,
+    queryKey: ["invoice-address-by-user", userIdLogin],
+    queryFn: () => getInvoiceAddressByUserId(userIdLogin ?? ""),
+    enabled: !!userIdLogin,
     retry: false,
   });
 
