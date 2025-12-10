@@ -80,7 +80,6 @@ export default function ManualAdditionalInformation({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="amazon">Amazon</SelectItem>
-                    <SelectItem value="kaufland">Kaufland</SelectItem>
                     <SelectItem value="netto">Netto</SelectItem>
                     <SelectItem value="freakout">FreakOut</SelectItem>
                     <SelectItem value="praktiker">Praktiker</SelectItem>
