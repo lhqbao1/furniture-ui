@@ -116,7 +116,7 @@ const SelectOrderItems = ({
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent className="w-[600px] p-0">
+          <PopoverContent className="w-[600px] p-0 pointer-events-auto">
             <Command shouldFilter={false}>
               <CommandInput
                 placeholder="Search product..."
