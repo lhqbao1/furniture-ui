@@ -701,6 +701,11 @@ export const listChanel = [
     name: "freakout",
     icon: "freakout.png",
   },
+  {
+    id: 8,
+    name: "netto",
+    icon: "netto-logo.svg",
+  },
 ];
 
 export const listDE = [
