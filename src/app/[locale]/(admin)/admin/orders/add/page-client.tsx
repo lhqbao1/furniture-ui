@@ -77,7 +77,6 @@ export default function CreateCheckoutpage() {
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
     const total_shipping = values.carrier === "spedition" ? 35.95 : 5.95;
-    console.log(values);
     if (
       values.carrier === "spedition" &&
       (!values.phone_number || values.phone_number.trim() === "")
@@ -92,7 +91,9 @@ export default function CreateCheckoutpage() {
         total_shipping: total_shipping,
         email: values.email
           ? values.email
-          : `${values.first_name}${values.last_name}`,
+          : values.first_name || values.last_name
+          ? `${values.first_name ?? ""}${values.last_name ?? ""}`
+          : "a",
         recipient_name: values.recipient_name
           ? values.recipient_name
           : values.first_name + values.last_name,

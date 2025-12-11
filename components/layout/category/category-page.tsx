@@ -79,7 +79,7 @@ const ProductCategory = ({
           </div>
         )}
       </div>
-      {categoryData && categoryData.products.length > 16 && (
+      {categoryData && categoryData.total_items > 16 && (
         <CustomPagination
           totalPages={categoryData.total_pages}
           page={page}

@@ -29,12 +29,11 @@ import { UseFormReturn } from "react-hook-form";
 import { User } from "@/types/user";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { sendOtp } from "@/features/auth/api";
+import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 
 export function useCheckoutSubmit({
   form,
   user,
-  userLoginId,
-  userGuestId,
   addresses,
   invoiceAddress,
   cartItems,
@@ -43,7 +42,6 @@ export function useCheckoutSubmit({
   shippingCost,
   locale,
   currentUserId,
-  setUserLoginId,
 }: {
   form: UseFormReturn<CreateOrderFormValues>; // form RHF
   user: User | undefined; // user login hoặc guest
@@ -54,13 +52,12 @@ export function useCheckoutSubmit({
   hasServerCart: boolean; // flag cart server hay local
   shippingCost: number; // shipping được tính từ logic
   locale: string; // locale hiện tại
-  userLoginId: string;
-  userGuestId: string;
-  setUserLoginId: (user_id: string) => void;
   currentUserId: string;
 }) {
   const router = useRouter();
   const t = useTranslations();
+  const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
+  const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
 
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
   const [checkoutId, setCheckoutId] = useAtom(checkOutIdAtom);
@@ -82,7 +79,6 @@ export function useCheckoutSubmit({
   const updateInvoice = useUpdateInvoiceAddress();
   const createShipping = useCreateAddress();
   const syncLocalCart = useSyncLocalCartCheckOut();
-  const checkEmail = useCheckMailExist();
   const isNewGuestUser = !userLoginId && !!userGuestId;
 
   const submitting =
@@ -153,12 +149,14 @@ export function useCheckoutSubmit({
           cleanupNeeded = true;
 
           localStorage.setItem("access_token", newUser.access_token);
-          localStorage.setItem("userIdGuest", newUser.id);
-          setUserLoginId(newUser.id);
+          setUserGuestId(newUser.id);
+          // setUserLoginId(newUser.id);
         }
 
         // STEP 2 — Always sync cart after we know finalUserId
-        if (isNewGuestUser) {
+        if (!userLoginId) {
+          console.log("hehe");
+          console.log(currentUserId);
           await syncLocalCart.mutateAsync({
             isCheckOut: true,
             user_id: currentUserId, // userGuestId

@@ -64,7 +64,6 @@ export const createInvoiceColumns = ({
       cell: ({ row }) => (
         <div className="max-w-[300px] text-wrap">
           <div>{row.original.products.name}</div>
-          {showEan && <div>#{row.original.products.ean}</div>}
         </div>
       ),
     },
