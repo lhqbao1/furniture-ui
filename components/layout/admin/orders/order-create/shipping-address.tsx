@@ -225,14 +225,14 @@ export default function ManualCheckOutShippingAddress({
             )}
           />
 
-          {/* City */}
+          {/* Postal Code */}
           <FormField
             control={form.control}
-            name="city"
+            name="postal_code"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-black font-semibold text-sm">
-                  City
+                  Postal Code
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -245,14 +245,14 @@ export default function ManualCheckOutShippingAddress({
             )}
           />
 
-          {/* Postal Code */}
+          {/* City */}
           <FormField
             control={form.control}
-            name="postal_code"
+            name="city"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-black font-semibold text-sm">
-                  Postal Code
+                  City
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -294,7 +294,7 @@ export default function ManualCheckOutShippingAddress({
                     </FormControl>
                   </PopoverTrigger>
 
-                  <PopoverContent className="w-full p-0 h-[150px]">
+                  <PopoverContent className="w-full p-0 h-[250px] pointer-events-auto">
                     <Command>
                       <CommandInput placeholder="Search country..." />
                       <CommandList>

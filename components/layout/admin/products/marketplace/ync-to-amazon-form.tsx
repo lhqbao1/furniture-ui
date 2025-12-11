@@ -85,7 +85,7 @@ const SyncToAmazonForm = ({
       max_stock: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,
       )?.max_stock,
-      sku: product.sku,
+      sku: product.id_provider,
       is_active: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,
       )?.is_active,
@@ -128,7 +128,7 @@ const SyncToAmazonForm = ({
       marketplace_offer_id: values.marketplace_offer_id ?? "",
       name: values.name ?? "",
       description: values.description ?? "",
-      sku: values.sku ?? "",
+      sku: product.id_provider ?? "",
       brand: product.brand ? product.brand.name : "",
       handling_time: values.handling_time ?? 0,
     };
@@ -223,7 +223,7 @@ const SyncToAmazonForm = ({
           }
 
           const payload: SyncToAmazonInput = {
-            sku: amazonData?.sku ?? product.sku,
+            sku: amazonData?.sku ?? product.id_provider,
             title: amazonData?.name ?? product.name,
             manufacturer: product.brand ? product.brand.company_name : "",
             description: amazonData?.description ?? product.description,
