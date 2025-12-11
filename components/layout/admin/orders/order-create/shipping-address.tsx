@@ -41,6 +41,7 @@ interface ShippingAddressValues {
   country: string;
   phone: string;
   postal_code: string;
+  email_shipping?: string;
 }
 
 export default function ManualCheckOutShippingAddress({
@@ -64,6 +65,7 @@ export default function ManualCheckOutShippingAddress({
       "invoice_country",
       "invoice_recipient_name",
       "invoice_phone",
+      "email_invoice",
     ],
   });
 
@@ -81,6 +83,7 @@ export default function ManualCheckOutShippingAddress({
       invoice_country,
       invoice_recipient_name,
       invoice_phone,
+      email_invoice,
     ] = JSON.parse(invoiceSnapshot);
 
     form.setValue("address", invoice_address || "");
@@ -90,6 +93,7 @@ export default function ManualCheckOutShippingAddress({
     form.setValue("country", invoice_country || "");
     form.setValue("recipient_name", invoice_recipient_name || "");
     form.setValue("phone", invoice_phone || "");
+    form.setValue("email_shipping", email_invoice || "");
   }, [isSameInvoice, invoiceSnapshot]);
 
   // // 2) Bắt moment toggle để snapshot / restore
@@ -105,6 +109,7 @@ export default function ManualCheckOutShippingAddress({
         country: form.getValues("country"),
         recipient_name: form.getValues("recipient_name"),
         phone: form.getValues("phone"),
+        email_shipping: form.getValues("email_shipping"),
       };
     }
 
@@ -124,6 +129,10 @@ export default function ManualCheckOutShippingAddress({
           shippingSnapshot.current.recipient_name,
         );
         form.setValue("phone", shippingSnapshot.current.phone);
+        form.setValue(
+          "email_shipping",
+          shippingSnapshot.current.email_shipping,
+        );
       }
     }
 
@@ -319,6 +328,23 @@ export default function ManualCheckOutShippingAddress({
                   </PopoverContent>
                 </Popover>
 
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="email_shipping"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email (Optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder=""
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

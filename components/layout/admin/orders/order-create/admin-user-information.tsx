@@ -58,8 +58,14 @@ export function AdminCheckOutUserInformation({
     name: "last_name",
   });
 
+  const email = useWatch({
+    control: form.control,
+    name: "email",
+  });
+
   // Sync invoice_phone = phone_number
   useEffect(() => {
+    form.setValue("email_invoice", email ?? "");
     form.setValue("invoice_phone", phoneNumber ?? "");
     form.setValue(
       "invoice_recipient_name",
@@ -70,9 +76,7 @@ export function AdminCheckOutUserInformation({
   return (
     <div className="space-y-4">
       <div className="flex justify-between bg-secondary/10 p-2">
-        <h2 className="text-lg text-black font-semibold ">
-          {isAdmin ? "User Information" : t("userInformation")}
-        </h2>
+        <h2 className="text-lg text-black font-semibold ">User Information</h2>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
@@ -226,7 +230,7 @@ export function AdminCheckOutUserInformation({
           control={form.control}
           name="invoice_address"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem className="col-span-1">
               <FormLabel>Street and House number</FormLabel>
               <FormControl>
                 <Input
@@ -253,6 +257,42 @@ export function AdminCheckOutUserInformation({
                 <Input
                   {...field}
                   value={field.value ?? ""} // 👈 đảm bảo controlled
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="invoice_postal_code"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{isAdmin ? "Postal Code" : t("postalCode")}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="invoice_city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-black font-semibold text-sm">
+                City
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -313,43 +353,6 @@ export function AdminCheckOutUserInformation({
                   </Command>
                 </PopoverContent>
               </Popover>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="invoice_postal_code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{isAdmin ? "Postal Code" : t("postalCode")}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder=""
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="invoice_city"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-black font-semibold text-sm">
-                City
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder=""
-                  {...field}
-                />
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}

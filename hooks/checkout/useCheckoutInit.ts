@@ -16,19 +16,12 @@ import {
   checkShippingType,
   normalizeCartItems,
 } from "@/hooks/caculate-shipping";
+import { useAtom } from "jotai";
+import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 
 export function useCheckoutInit() {
-  const [userLoginId, setUserLoginId] = useState<string>(""); // user đăng nhập thật
-  const [userGuestId, setUserGuestId] = useState<string>(""); // user tạo trong checkout
-
-  // Load from localStorage only on client
-  useEffect(() => {
-    const loginId = localStorage.getItem("userId"); // user login thật
-    const guestId = localStorage.getItem("userIdGuest"); // user đăng ký trong checkout
-
-    if (loginId) setUserLoginId(loginId);
-    if (guestId) setUserGuestId(guestId);
-  }, []);
+  const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
+  const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
 
   const finalUserId = userLoginId || userGuestId;
 

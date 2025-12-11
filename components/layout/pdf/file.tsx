@@ -167,13 +167,18 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             <Text style={{ fontSize: 8 }}>
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
-            <Text>{invoice.main_checkout.checkouts[0].user.company_name}</Text>
             <Text>
-              {checkout.checkouts[0].invoice_address.recipient_name
+              {invoice.main_checkout.checkouts?.[0]?.user?.company_name ?? ""}
+            </Text>
+
+            <Text>
+              {invoice.main_checkout.checkouts?.[0]?.user?.company_name
+                ? "" // Nếu company_name có → không hiện dòng này
+                : checkout.checkouts?.[0]?.invoice_address?.recipient_name
                 ? checkout.checkouts[0].invoice_address.recipient_name
-                : checkout.checkouts[0].user.last_name +
-                  "" +
-                  checkout.checkouts[0].user.last_name}
+                : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
+                    checkout.checkouts?.[0]?.user?.last_name ?? ""
+                  }`}
             </Text>
             <Text>{checkout.checkouts[0].invoice_address.address_line}</Text>
             <Text>

@@ -109,10 +109,7 @@ export default function CheckOutFormSection() {
     hasServerCart,
     shippingCost,
     locale,
-    userLoginId,
-    userGuestId,
-    currentUserId: finalUserId,
-    setUserLoginId,
+    currentUserId: finalUserId ?? "",
   });
 
   const handleOtpSuccess = (verifiedUserId: string) => {
