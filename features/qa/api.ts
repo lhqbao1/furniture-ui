@@ -18,13 +18,11 @@ export const getQAByProduct = async (product_id: string) => {
     const { data } = await apiPublic.get(`/forum/forum-product/${product_id}`);
     return data as QAResponse[];
   } catch (err: any) {
+    console.log(err);
     if (err?.response?.status === 404) {
       // Trạng thái không có QA -> trả về danh sách rỗng
       return [];
     }
-
-    // Các lỗi khác thì throw ra
-    throw err;
   }
 };
 

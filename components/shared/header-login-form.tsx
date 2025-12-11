@@ -13,7 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Mail } from "lucide-react";
-import { useLoginOtp, useSendOtp } from "@/features/auth/hook";
+import {
+  useCheckMailExist,
+  useLoginOtp,
+  useSendOtp,
+} from "@/features/auth/hook";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -23,7 +27,7 @@ import LoginGoogleButton from "./login-google-button";
 import ResendOtp from "../layout/auth/resend-otp";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
-import { useRouter } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 interface HeaderLoginFormProps {
@@ -53,16 +57,28 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
   const syncLocalCartMutation = useSyncLocalCart();
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
+  const checkMailExistMutation = useCheckMailExist();
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!seePassword) {
-      sendOtpMutation.mutate(values.username, {
+      checkMailExistMutation.mutate(values.username, {
         onSuccess: (data) => {
-          toast.success(t("sendedEmail"));
-          setSeePassword(true);
+          if (data === true) {
+            toast.error(t("emailNotRegistered"));
+          } else {
+            sendOtpMutation.mutate(values.username, {
+              onSuccess: (data) => {
+                toast.success(t("sendedEmail"));
+                setSeePassword(true);
+              },
+              onError(error, variables, context) {
+                toast.error(t("invalidEmail"));
+              },
+            });
+          }
         },
         onError(error, variables, context) {
-          toast.error(t("invalidEmail"));
+          console.log(error);
         },
       });
     } else {
@@ -77,16 +93,13 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
             localStorage.setItem("access_token", token);
             setUserId(data.id);
             localStorage.setItem("userId", data.id);
-
             queryClient.refetchQueries({ queryKey: ["me"], exact: true });
             queryClient.refetchQueries({
               queryKey: ["cart-items", data.id],
               exact: false,
             });
             syncLocalCartMutation.mutate();
-
             toast.success(t("loginSuccess"));
-
             // gọi callback onSuccess nếu được truyền
             if (onSuccess) onSuccess();
           },
@@ -322,18 +335,20 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
       {/* Sign up link */}
       <div className="text-sm text-center mt-6 space-x-1">
         <span>{t("noAccount")}</span>
-        {/* <Link
+        <Link
           href="/sign-up"
           locale={locale}
           className="font-medium text-secondary hover:underline"
-        ></Link> */}
-        <Button
+        >
+          {t("createAccount")}
+        </Link>
+        {/* <Button
           className="font-medium text-secondary hover:underline"
           variant={"ghost"}
           onClick={() => router.push("/sign-up", { locale })}
         >
           {t("createAccount")}
-        </Button>
+        </Button> */}
       </div>
       <LoginGoogleButton />
     </div>

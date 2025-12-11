@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 import { useUploadStaticFile } from "@/features/file/hook";
 
@@ -17,33 +18,60 @@ const ProductManual = () => {
   const uploadFileMutation = useUploadStaticFile();
 
   const pdfFiles = form.watch("pdf_files") || [];
-
+  const [removedFiles, setRemovedFiles] = useState<any[]>([]);
+  // ============================
+  // UPLOAD NEW FILE (Replace old one)
+  // ============================
   const handleUpload = async (files: File[], title: string) => {
-    const newItems: any[] = [];
+    const prevFiles = [...pdfFiles];
+    const existing = prevFiles.find((file) => file.title === title);
 
-    for (const file of files) {
-      // sanitize filename: replace spaces with -
-      const sanitizedName = file.name.replace(/\s+/g, "-");
-
-      // tạo file mới với name đã clean
-      const sanitizedFile = new File([file], sanitizedName, {
-        type: file.type,
-      });
-
-      const formData = new FormData();
-      formData.append("files", sanitizedFile);
-
-      const res = await uploadFileMutation.mutateAsync(formData);
-
-      newItems.push({
-        title,
-        url: res.results[0].url,
-      });
+    // Remove old file (store it to delete later if needed)
+    if (existing) {
+      setRemovedFiles((prev) => [...prev, existing]);
     }
 
-    form.setValue("pdf_files", [...pdfFiles, ...newItems], {
-      shouldValidate: true,
+    const file = files[0];
+    const sanitizedName = file.name.replace(/\s+/g, "-");
+    const sanitizedFile = new File([file], sanitizedName, {
+      type: file.type,
     });
+
+    const formData = new FormData();
+    formData.append("files", sanitizedFile);
+
+    const res = await uploadFileMutation.mutateAsync(formData);
+
+    const newItem = {
+      title,
+      url: res.results[0].url,
+    };
+
+    // Replace file for this section
+    const updated = [...prevFiles.filter((f) => f.title !== title), newItem];
+
+    form.setValue("pdf_files", updated, { shouldValidate: true });
+  };
+
+  // ============================
+  // REMOVE FILE
+  // ============================
+  const removeFile = (title: string) => {
+    const prevFiles = [...pdfFiles];
+    const existing = prevFiles.find((f) => f.title === title);
+
+    if (existing) {
+      setRemovedFiles((prev) => [...prev, existing]);
+    }
+
+    const updated = prevFiles.filter((f) => f.title !== title);
+    form.reset(
+      {
+        ...form.getValues(),
+        pdf_files: updated,
+      },
+      { keepDirty: true, keepTouched: true },
+    );
   };
 
   return (
@@ -59,14 +87,7 @@ const ProductManual = () => {
               (item: any) => item.title === section.label,
             );
 
-            // Label text logic
-            let buttonText = "Upload file(s)";
-            if (filesOfSection.length === 1) {
-              const fileName = filesOfSection[0].url.split("/").pop();
-              buttonText = fileName;
-            } else if (filesOfSection.length > 1) {
-              buttonText = `${filesOfSection.length} files uploaded`;
-            }
+            const currentFile = filesOfSection[0];
 
             return (
               <div
@@ -79,31 +100,48 @@ const ProductManual = () => {
                 <input
                   type="file"
                   accept="application/pdf"
-                  multiple
                   className="hidden"
                   id={`pdf-upload-${section.key}`}
                   onChange={async (e) => {
-                    const files = Array.from(e.target.files || []);
-                    if (files.length > 0) {
-                      await handleUpload(files, section.label);
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      await handleUpload([file], section.label);
                     }
                   }}
                 />
 
-                {/* Upload button */}
-                <label
-                  htmlFor={`pdf-upload-${section.key}`}
-                  className="cursor-pointer flex items-center gap-2 text-sm w-full px-4 py-1.5 border rounded-md bg-white hover:bg-secondary/10 transition truncate"
-                >
-                  {uploadFileMutation.isPending ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <>
-                      <Upload className="w-5 h-5 shrink-0" />
-                      <span className="truncate">{buttonText}</span>
-                    </>
-                  )}
-                </label>
+                {/* If file exists → show label with delete button */}
+                {currentFile ? (
+                  <div className="flex items-center justify-between px-4 py-2 border rounded-md bg-secondary/10 text-sm">
+                    <span className="truncate">
+                      {currentFile.url.split("/").pop()}
+                    </span>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-red-600 hover:text-red-700 hover:bg-transparent p-0"
+                      onClick={() => removeFile(section.label)}
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                ) : (
+                  /* Upload button */
+                  <label
+                    htmlFor={`pdf-upload-${section.key}`}
+                    className="cursor-pointer flex items-center gap-2 text-sm w-full px-4 py-2 border rounded-md bg-white hover:bg-secondary/10 transition truncate"
+                  >
+                    {uploadFileMutation.isPending ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5 shrink-0" />
+                        <span className="truncate">Upload file</span>
+                      </>
+                    )}
+                  </label>
+                )}
               </div>
             );
           })}

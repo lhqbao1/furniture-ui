@@ -350,5 +350,7 @@
   "notifyDescription": "Don’t miss out on monthly offers and exclusive discounts—let us keep you updated!",
   "logOutSuccess": "Logged out successfully",
   "imageGallery": "Image Gallery",
-  "posts": "Posts"
+  "posts": "Posts",
+  "emailNotRegistered": "This email is not registered yet.",
+  "emailAlreadyUsed": "This email address has already been used to create an account."
 }

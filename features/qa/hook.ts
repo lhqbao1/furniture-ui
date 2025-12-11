@@ -8,7 +8,7 @@ export function useGetQAByProduct(product_id: string) {
     queryKey: ["qa", "product", product_id],
     queryFn: () => getQAByProduct(product_id),
     enabled: !!product_id,
-    retry: false,
+    retry: 1,
   });
 }
 

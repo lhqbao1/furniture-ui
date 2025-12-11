@@ -79,7 +79,6 @@ export function useCheckoutSubmit({
   const updateInvoice = useUpdateInvoiceAddress();
   const createShipping = useCreateAddress();
   const syncLocalCart = useSyncLocalCartCheckOut();
-  const isNewGuestUser = !userLoginId && !!userGuestId;
 
   const submitting =
     createCheckOut.isPending ||
@@ -133,8 +132,10 @@ export function useCheckoutSubmit({
         let shippingId = addresses?.find((a: Address) => a.is_default)?.id;
         let cartData: CartResponse = [];
         let shippingCostCurrent = 0;
+        let currentGuestId = null;
+        const isDifferentEmail = user?.email && user.email !== data.email;
 
-        if (!finalUserId) {
+        if (isDifferentEmail) {
           const newUser = await createUser.mutateAsync({
             first_name: data.first_name,
             last_name: data.last_name,
@@ -146,6 +147,7 @@ export function useCheckoutSubmit({
           });
 
           finalUserId = newUser.id;
+          currentGuestId = newUser.id;
           cleanupNeeded = true;
 
           localStorage.setItem("access_token", newUser.access_token);
@@ -155,22 +157,18 @@ export function useCheckoutSubmit({
 
         // STEP 2 — Always sync cart after we know finalUserId
         if (!userLoginId) {
-          console.log("hehe");
-          console.log(currentUserId);
           await syncLocalCart.mutateAsync({
             isCheckOut: true,
-            user_id: currentUserId, // userGuestId
+            user_id: currentGuestId ?? "", // userGuestId
           });
         }
 
-        cartData = await getCartByUserId(finalUserId);
+        cartData = await getCartByUserId(finalUserId ?? "");
 
         const normalized = normalizeCartItems(
           cartData.flatMap((g) => g.items),
           true,
         );
-
-        const shippingCostFinal = calculateShipping(normalized);
 
         // Invoice
         if (!invoiceId) {

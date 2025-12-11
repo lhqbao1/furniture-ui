@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, Loader2 } from "lucide-react";
 import {
+  useCheckMailExist,
   useLogin,
   useLoginOtp,
   useSendOtp,
@@ -78,16 +79,28 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
   const syncLocalCartMutation = useSyncLocalCart();
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
+  const checkMailExistMutation = useCheckMailExist();
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!seePassword && !isAdmin) {
-      sendOtpMutation.mutate(values.username, {
+      checkMailExistMutation.mutate(values.username, {
         onSuccess: (data) => {
-          toast.success(t("sendedEmail"));
-          setSeePassword(true);
+          if (data === true) {
+            toast.error(t("emailNotRegistered"));
+          } else {
+            sendOtpMutation.mutate(values.username, {
+              onSuccess: (data) => {
+                toast.success(t("sendedEmail"));
+                setSeePassword(true);
+              },
+              onError(error, variables, context) {
+                toast.error(t("invalidEmail"));
+              },
+            });
+          }
         },
         onError(error, variables, context) {
-          toast.error(t("invalidEmail"));
+          console.log(error);
         },
       });
     } else if (isAdmin && !seePassword) {

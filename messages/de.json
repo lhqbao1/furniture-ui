@@ -347,5 +347,7 @@
   "notifyDescription": "Wie könnten wir Ihnen sonst von monatlichen Angeboten und Sonderrabatten mitteilen?",
   "logOutSuccess": "Erfolgreich abgemeldet",
     "imageGallery": "Bildergalerie",
-    "posts": "Beiträge"
+    "posts": "Beiträge",
+    "emailNotRegistered": "Diese E-Mail-Adresse ist noch nicht registriert.",
+    "emailAlreadyUsed": "Diese E-Mail-Adresse wurde bereits zur Erstellung eines Kontos verwendet."
 }

@@ -10,7 +10,7 @@ export default function LogoHeader({ t }: { t: any }) {
         alt=""
       />
 
-      <h1 className="text-3xl font-semibold text-secondary text-center lg:block flex flex-col">
+      <h1 className="text-3xl font-semibold text-secondary text-center lg:block flex flex-col space-x-2">
         <span>{t("welcomeTo")}</span>
         <span
           className="text-primary"

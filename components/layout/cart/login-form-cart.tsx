@@ -13,7 +13,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, Key, Loader2, Eye, EyeOff } from "lucide-react";
-import { useLogin, useLoginOtp, useSendOtp } from "@/features/auth/hook";
+import {
+  useCheckMailExist,
+  useLogin,
+  useLoginOtp,
+  useSendOtp,
+} from "@/features/auth/hook";
 import { toast } from "sonner";
 import { useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -66,6 +71,7 @@ export default function CartLoginForm({
   const syncLocalCartMutation = useSyncLocalCart();
   const sendOtpMutation = useSendOtp();
   const submitOtpMutation = useLoginOtp();
+  const checkMailExistMutation = useCheckMailExist();
 
   const handleRedirectToCheckOut = () => {
     if (!localCart || localCart.length === 0) {
@@ -80,13 +86,24 @@ export default function CartLoginForm({
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (!seePassword) {
-      sendOtpMutation.mutate(values.username, {
+      checkMailExistMutation.mutate(values.username, {
         onSuccess: (data) => {
-          toast.success(t("sendedEmail"));
-          setSeePassword(true);
+          if (data === true) {
+            toast.error(t("emailNotRegistered"));
+          } else {
+            sendOtpMutation.mutate(values.username, {
+              onSuccess: (data) => {
+                toast.success(t("sendedEmail"));
+                setSeePassword(true);
+              },
+              onError(error, variables, context) {
+                toast.error(t("invalidEmail"));
+              },
+            });
+          }
         },
         onError(error, variables, context) {
-          toast.error(t("invalidEmail"));
+          console.log(error);
         },
       });
     } else {

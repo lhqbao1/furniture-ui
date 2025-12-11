@@ -169,10 +169,8 @@ export function useSyncLocalCartCheckOut() {
     }) => {
       const localCart: CartItemLocal[] = getCart();
       if (localCart.length === 0) return;
-      console.log(user_id);
       // 2️⃣ Nếu là checkout => dọn cart server
       if (isCheckOut && user_id) {
-        console.log("hehehehe");
         await clearCartUser(user_id);
       }
 

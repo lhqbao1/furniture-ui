@@ -86,9 +86,13 @@ export function OtpDialog({
           toast.success(t("otpDone"));
           // onSuccess(data.id);
           onOpenChange(false);
+          setOtpValues(["", "", "", "", "", ""]);
           // syncLocalCartMutation.mutate();
         },
-        onError: () => toast.error(t("otpError")),
+        onError: () => {
+          setOtpValues(["", "", "", "", "", ""]);
+          toast.error(t("otpError"));
+        },
       },
     );
   };
