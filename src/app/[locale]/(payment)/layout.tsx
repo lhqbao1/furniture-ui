@@ -18,10 +18,11 @@ export default function MainLayout({
       <PageHeader />
       <main className="relative min-h-screen w-full">
         <div className="flex flex-col w-full col-span-5 overflow-x-hidden overflow-y-auto">
-          <div className="flex-1 relative flex flex-col">
+          {/* <div className="flex-1 relative flex flex-col">
             <Banner height={200} />
             <div className="container-padding flex-1">{children}</div>
-          </div>
+          </div> */}
+          <div className="flex-1">{children}</div>
         </div>
       </main>
       <Footer />

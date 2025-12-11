@@ -31,7 +31,7 @@ const CartPageClient = () => {
   });
 
   return (
-    <div className="mt-6 lg:px-0 px-4">
+    <div className="mt-6 lg:px-0 px-4 container-padding">
       <div className="w-full lg:max-w-7xl mx-auto lg:p-6">
         <div className="grid grid-cols-12 xl:gap-16 gap-6">
           {/* Left: Cart Items */}

@@ -168,153 +168,156 @@ const ProductsGridLayout = ({
   return (
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4">
-        {data.map((product, idx) => {
-          return (
-            <div
-              className="relative group"
-              key={product.id_provider}
-            >
+        {data
+          .filter((p) => p.stock > 0)
+          .map((product, idx) => {
+            return (
               <div
-                key={product.id}
-                className="relative overflow-hidden z-10"
-                ref={(el) => {
-                  if (el) cardRefs.current[idx] = el;
-                }}
-                onClick={() => handleAddProductToViewed(product.id)}
-                style={{
-                  borderTop: isMobile
-                    ? undefined
-                    : idx < 4
-                    ? ""
-                    : "1px solid #e0e0e0",
-                  borderRight: isMobile
-                    ? undefined
-                    : idx === 3 || idx === 7
-                    ? ""
-                    : "1px solid #e0e0e0",
-                }}
+                className="relative group"
+                key={product.id_provider}
               >
-                <Link
-                  href={`/product/${product.url_key}`}
-                  passHref
+                <div
+                  key={product.id}
+                  className="relative overflow-hidden z-10"
+                  ref={(el) => {
+                    if (el) cardRefs.current[idx] = el;
+                  }}
+                  onClick={() => handleAddProductToViewed(product.id)}
+                  style={{
+                    borderTop: isMobile
+                      ? undefined
+                      : idx < 4
+                      ? ""
+                      : "1px solid #e0e0e0",
+                    borderRight: isMobile
+                      ? undefined
+                      : idx === 3 || idx === 7
+                      ? ""
+                      : "1px solid #e0e0e0",
+                  }}
                 >
-                  <div className="bg-white p-0 group cursor-pointer z-0 pt-4 lg:px-4 px-2">
-                    <Image
-                      width={200}
-                      height={200}
-                      src={
-                        product.static_files && product.static_files.length > 0
-                          ? product.static_files[0].url
-                          : "/placeholder-product.webp"
-                      }
-                      alt={product.name}
-                      className="w-full h-48 md:h-64 py-0 md:py-2 object-contain mb-2 rounded group-hover:scale-120 duration-500"
-                    />
+                  <Link
+                    href={`/product/${product.url_key}`}
+                    passHref
+                  >
+                    <div className="bg-white p-0 group cursor-pointer z-0 pt-4 lg:px-4 px-2">
+                      <Image
+                        width={200}
+                        height={200}
+                        src={
+                          product.static_files &&
+                          product.static_files.length > 0
+                            ? product.static_files[0].url
+                            : "/placeholder-product.webp"
+                        }
+                        alt={product.name}
+                        className="w-full h-48 md:h-64 py-0 md:py-2 object-contain mb-2 rounded group-hover:scale-120 duration-500"
+                      />
 
-                    <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
-                      <h3
-                        className={cn(
-                          "text-lg text-black text-left line-clamp-2 ",
-                          className
-                            ? className
-                            : "lg:min-h-[60px] min-h-[52px]",
-                        )}
-                      >
-                        {product.name}
-                      </h3>
-                      <div className="flex gap-2 flex-col">
-                        <div className="flex gap-2 items-end">
-                          <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
-                            <div className="text-4xl">
-                              {Math.floor(
-                                product.final_price
-                                  ? product.final_price
-                                  : product.price,
-                              )}
-                            </div>
-                            <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                              ,
-                              {
-                                (
-                                  (product.final_price
-                                    ? product.final_price
-                                    : product.price) % 1
-                                )
-                                  .toFixed(2)
-                                  .split(".")[1]
-                              }
-                            </div>
-                            <div className="text-base font-semibold text-black">
-                              €
-                            </div>
-                          </div>
-                        </div>
-
-                        {product.price &&
-                          product.price > product.final_price && (
-                            <p className="text-base mb-1">
-                              {!product.owner ||
-                              product.owner.business_name === "Prestige Home"
-                                ? t("ogPrice")
-                                : t("ogPriceSupplier")}
-                              : €
-                              {product.price.toLocaleString("de-DE", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </p>
+                      <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
+                        <h3
+                          className={cn(
+                            "text-lg text-black text-left line-clamp-2 ",
+                            className
+                              ? className
+                              : "lg:min-h-[60px] min-h-[52px]",
                           )}
-                        <div className="space-x-2 flex items-center">
-                          <div className="flex gap-0.5">
-                            {[1, 2, 3, 4, 5].map((item) => {
-                              return (
-                                <div key={item}>
-                                  <Star size={18} />
-                                </div>
-                              );
-                            })}
+                        >
+                          {product.name}
+                        </h3>
+                        <div className="flex gap-2 flex-col">
+                          <div className="flex gap-2 items-end">
+                            <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
+                              <div className="text-4xl">
+                                {Math.floor(
+                                  product.final_price
+                                    ? product.final_price
+                                    : product.price,
+                                )}
+                              </div>
+                              <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
+                                ,
+                                {
+                                  (
+                                    (product.final_price
+                                      ? product.final_price
+                                      : product.price) % 1
+                                  )
+                                    .toFixed(2)
+                                    .split(".")[1]
+                                }
+                              </div>
+                              <div className="text-base font-semibold text-black">
+                                €
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-base font-semibold">(0)</p>
+
+                          {product.price &&
+                            product.price > product.final_price && (
+                              <p className="text-base mb-1">
+                                {!product.owner ||
+                                product.owner.business_name === "Prestige Home"
+                                  ? t("ogPrice")
+                                  : t("ogPriceSupplier")}
+                                : €
+                                {product.price.toLocaleString("de-DE", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </p>
+                            )}
+                          <div className="space-x-2 flex items-center">
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((item) => {
+                                return (
+                                  <div key={item}>
+                                    <Star size={18} />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <p className="text-base font-semibold">(0)</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Four lines starting from center of each edge */}
-                    <span className="absolute bottom-0 left-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>
-                    <span className="absolute top-0 left-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
-                    <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
-                    <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
+                      {/* Four lines starting from center of each edge */}
+                      <span className="absolute bottom-0 left-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>
+                      <span className="absolute top-0 left-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
+                      <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
+                      <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
+                    </div>
+                  </Link>
+                  <div className="space-x-3 mt-3 pb-4 lg:px-4 px-2">
+                    <Button
+                      variant={"ghost"}
+                      size={"lg"}
+                      aria-label="Add to cart"
+                      className="has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group"
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      <ShoppingBasket className="size-6 text-white transition-transform duration-200 group-hover:scale-110" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      aria-label="Add to cart"
+                      className="has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200"
+                      onClick={() => handleAddToWishlist(product)}
+                    >
+                      <Heart className="size-6 stroke-current transition-colors duration-200" />
+                    </Button>
                   </div>
-                </Link>
-                <div className="space-x-3 mt-3 pb-4 lg:px-4 px-2">
-                  <Button
-                    variant={"ghost"}
-                    size={"lg"}
-                    aria-label="Add to cart"
-                    className="has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group"
-                    onClick={() => handleAddToCart(product)}
-                  >
-                    <ShoppingBasket className="size-6 text-white transition-transform duration-200 group-hover:scale-110" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    aria-label="Add to cart"
-                    className="has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200"
-                    onClick={() => handleAddToWishlist(product)}
-                  >
-                    <Heart className="size-6 stroke-current transition-colors duration-200" />
-                  </Button>
                 </div>
-              </div>
-              {product.stock === 0 && (
-                <div className="px-3 py-1 text-[#29ABE2] bg-[#D4EEF9] rounded-full absolute top-4 z-[100] right-4 text-sm">
-                  bald verfügbar
-                </div>
-              )}
-              {product.stock === 0 && (
-                <div
-                  className="
+                {product.stock === 0 && (
+                  <div className="px-3 py-1 text-[#29ABE2] bg-[#D4EEF9] rounded-full absolute top-4 z-[100] right-4 text-sm">
+                    bald verfügbar
+                  </div>
+                )}
+                {product.stock === 0 && (
+                  <div
+                    className="
       absolute inset-0 
       backdrop-blur-[2px] 
       bg-white/50 
@@ -322,11 +325,11 @@ const ProductsGridLayout = ({
       group-hover:backdrop-blur-none 
       group-hover:bg-transparent z-20 group-hover:z-0
     "
-                ></div>
-              )}
-            </div>
-          );
-        })}
+                  ></div>
+                )}
+              </div>
+            );
+          })}
       </div>
     </div>
   );

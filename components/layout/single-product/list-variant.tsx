@@ -27,6 +27,10 @@ const ListVariant = ({
   const router = useRouter();
   const t = useTranslations();
 
+  console.log(variant);
+  console.log(parentProduct.variants);
+  console.log(parentProduct.products);
+
   useEffect(() => {
     if (!currentProduct?.options?.length) return;
 
@@ -94,7 +98,6 @@ const ListVariant = ({
               <div className="flex gap-2 flex-wrap">
                 {group.options.map((option) => {
                   const isSelected = selectedOptions.includes(option.id);
-
                   return (
                     <div
                       key={option.id}
