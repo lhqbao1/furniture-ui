@@ -207,7 +207,7 @@ export function AdminCheckOutUserInformation({
           name="phone_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>Phone Number (Optional)</FormLabel>
               <FormControl>
                 <Input
                   type="number"
