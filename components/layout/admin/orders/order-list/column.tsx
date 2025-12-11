@@ -208,7 +208,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
                 {row.original.checkouts[0]?.user?.first_name}{" "}
                 {row.original.checkouts[0]?.user?.last_name}
               </div>
-              <div>{row.original.checkouts[0]?.user?.email}</div>
+              <div>{row.original.checkouts[0]?.user?.email ?? ""}</div>
             </>
           ) : (
             <>
@@ -218,7 +218,9 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
                   : row.original.checkouts[0].invoice_address.recipient_name ??
                     ""}
               </div>
-              <div>{row.original.checkouts[0].invoice_address.email ?? ""}</div>
+              <div>
+                {row.original.checkouts[0]?.invoice_address?.email ?? ""}
+              </div>
             </>
           )}
         </div>
