@@ -36,8 +36,6 @@ export default function MainImage({
       ? productDetails.static_files[mainImageIndex].url
       : "/placeholder-product.webp";
 
-  console.log("main", mainImageIndex);
-
   return (
     <ProductImageDialog
       productDetails={productDetails}

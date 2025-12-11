@@ -98,8 +98,12 @@ export default function AddOrEditVouchersForm({
       );
     } else {
       createVoucherMutation.mutate(payload, {
-        onSuccess() {
+        onSuccess(data, variables) {
           toast.success("Create voucher successful");
+          createShippingVoucherMutation.mutate({
+            max_shipping_discount: variables.discount_value,
+            voucher_id: data.id,
+          });
           form.reset();
           onClose?.();
         },

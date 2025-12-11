@@ -35,7 +35,7 @@ export interface AssignVoucherToCategory {
 export interface CreateShippingVoucher {
   voucher_id: string;
   max_shipping_discount: number;
-  shipping_method: string;
+  shipping_method?: string;
 }
 
 export interface VoucherUsageInput {

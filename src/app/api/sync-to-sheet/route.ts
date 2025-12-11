@@ -11,12 +11,17 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 export async function GET() {
   try {
     // 1️⃣ Xác thực với Google
+    // 1️⃣ Tạo GoogleAuth
     const auth = new google.auth.GoogleAuth({
       credentials: serviceAccount,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
-    const sheets = google.sheets({ version: "v4", auth });
+    // 2️⃣ Truyền GoogleAuth vào Google Sheets API
+    const sheets = google.sheets({
+      version: "v4",
+      auth, // ⭐ FIX CHÍNH Ở ĐÂY
+    });
 
     // 2️⃣ Xoá toàn bộ dữ liệu trừ hàng 1
     await sheets.spreadsheets.values.clear({

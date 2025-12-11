@@ -369,3 +369,15 @@ input[type="number"] {
     opacity: 0;
   }
 }
+
+.blog-content hr {
+  @apply my-5;
+}
+
+.blog-content a {
+  @apply underline text-secondary cursor-pointer font-semibold;
+}
+
+.blog-content strong {
+  @apply text-secondary;
+}
