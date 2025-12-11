@@ -96,7 +96,9 @@ export default function CreateCheckoutpage() {
           : "a",
         recipient_name: values.recipient_name
           ? values.recipient_name
-          : values.first_name + values.last_name,
+          : `${values.first_name ?? ""} ${values.last_name ?? ""}`.trim()
+          ? `${values.first_name ?? ""} ${values.last_name ?? ""}`.trim()
+          : values.company_name ?? "",
         company_name:
           values.company_name?.trim() === "" ? null : values.company_name,
         additional_address:
