@@ -15,6 +15,7 @@ export type User = {
   company_name: string;
   tax_id: string;
   from_marketplace: string;
+  is_real: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -43,6 +44,7 @@ export type Customer = {
   from_marketplace: string;
   is_notified: boolean;
   tax_id: string;
+  is_real: boolean;
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
 };

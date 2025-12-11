@@ -79,15 +79,13 @@ const ProductCategory = ({
           </div>
         )}
       </div>
-      {categoryData &&
-        categoryData.products.length > 0 &&
-        categoryData?.products?.some((p) => p.stock > 0) && (
-          <CustomPagination
-            totalPages={categoryData.total_pages}
-            page={page}
-            onPageChange={setPage}
-          />
-        )}
+      {categoryData && categoryData.products.length > 16 && (
+        <CustomPagination
+          totalPages={categoryData.total_pages}
+          page={page}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 };

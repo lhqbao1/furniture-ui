@@ -30,6 +30,7 @@ export default function SignUpForm() {
       last_name: "",
       phone_number: "",
       gender: "",
+      is_real: true,
     },
   });
 

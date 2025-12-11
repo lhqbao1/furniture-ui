@@ -202,11 +202,25 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     cell: ({ row }) => {
       return (
         <div>
-          <div>
-            {row.original.checkouts[0]?.user?.first_name}{" "}
-            {row.original.checkouts[0]?.user?.last_name}
-          </div>
-          <div>{row.original.checkouts[0]?.user?.email}</div>
+          {row.original.checkouts[0].user.is_real ? (
+            <>
+              <div>
+                {row.original.checkouts[0]?.user?.first_name}{" "}
+                {row.original.checkouts[0]?.user?.last_name}
+              </div>
+              <div>{row.original.checkouts[0]?.user?.email}</div>
+            </>
+          ) : (
+            <>
+              <div>
+                {row.original.from_marketplace === "ebay"
+                  ? "Ebay Customer"
+                  : row.original.checkouts[0].invoice_address.recipient_name ??
+                    ""}
+              </div>
+              <div>{row.original.checkouts[0].invoice_address.email ?? ""}</div>
+            </>
+          )}
         </div>
       );
     },

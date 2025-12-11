@@ -16,6 +16,7 @@ export const ManualCreateOrderSchema = z
     country: z.string().min(1, { message: "Country is required" }),
     recipient_name: z.string().optional().nullable(),
     phone: z.string().min(1, "Phone number is required"),
+    email_shipping: z.string().optional().nullable(),
 
     invoice_address: z.string().min(1, { message: "Address is required" }),
     invoice_city: z.string().min(1, { message: "City is required" }),
@@ -26,6 +27,7 @@ export const ManualCreateOrderSchema = z
     invoice_country: z.string().min(1, { message: "Country is required" }),
     invoice_recipient_name: z.string().optional().nullable(),
     invoice_phone: z.string().min(1, "Phone number is required"),
+    email_invoice: z.string().optional().nullable(),
 
     from_marketplace: z.string().optional().nullable(),
     marketplace_order_id: z.string().optional().nullable(),

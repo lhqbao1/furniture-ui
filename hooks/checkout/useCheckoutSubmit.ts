@@ -43,6 +43,7 @@ export function useCheckoutSubmit({
   shippingCost,
   locale,
   currentUserId,
+  setUserLoginId,
 }: {
   form: UseFormReturn<CreateOrderFormValues>; // form RHF
   user: User | undefined; // user login hoặc guest
@@ -55,6 +56,7 @@ export function useCheckoutSubmit({
   locale: string; // locale hiện tại
   userLoginId: string;
   userGuestId: string;
+  setUserLoginId: (user_id: string) => void;
   currentUserId: string;
 }) {
   const router = useRouter();
@@ -144,6 +146,7 @@ export function useCheckoutSubmit({
             phone_number: data.phone_number,
             company_name: data.company_name ?? null,
             tax_id: data.tax_id ?? null,
+            is_real: false,
           });
 
           finalUserId = newUser.id;
@@ -151,6 +154,7 @@ export function useCheckoutSubmit({
 
           localStorage.setItem("access_token", newUser.access_token);
           localStorage.setItem("userIdGuest", newUser.id);
+          setUserLoginId(newUser.id);
         }
 
         // STEP 2 — Always sync cart after we know finalUserId

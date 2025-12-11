@@ -13,6 +13,7 @@ export const accountSchema = z.object({
   avatar_url: z.string().optional().nullable(),
   date_of_birth: z.string().optional().nullable(),
   language: z.string().optional(),
+  is_real: z.boolean(),
   is_notified: z.boolean().optional(),
 });
 
@@ -28,5 +29,6 @@ export const accountDefaultValues: AccountFormValues = {
   avatar_url: "",
   language: "en",
   is_notified: false,
+  is_real: true,
   date_of_birth: "",
 };

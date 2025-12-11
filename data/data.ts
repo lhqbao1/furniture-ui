@@ -706,6 +706,11 @@ export const listChanel = [
     name: "netto",
     icon: "netto-logo.svg",
   },
+  {
+    id: 9,
+    name: "inprodius",
+    icon: "inprodius.png",
+  },
 ];
 
 export const listDE = [

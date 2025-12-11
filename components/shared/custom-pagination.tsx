@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Pagination,
   PaginationContent,
@@ -8,9 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface CustomPaginationProps {
   page: number;
@@ -23,44 +22,45 @@ export function CustomPagination({
   totalPages,
   onPageChange,
 }: CustomPaginationProps) {
-  const [goPage, setGoPage] = useState("");
-
   const getPageNumbers = () => {
-    const delta = 2;
+    const delta = 2; // số trang hiển thị 2 bên current
     const pages: (number | string)[] = [];
+
+    // Always show first page
+    pages.push(1);
+
     const left = Math.max(2, page - delta);
     const right = Math.min(totalPages - 1, page + delta);
 
-    pages.push(1);
-    if (left > 2) pages.push("...");
+    // Left ellipsis
+    if (left > 2) {
+      pages.push("...");
+    }
 
+    // Middle pages
     for (let i = left; i <= right; i++) {
       pages.push(i);
     }
 
-    if (right < totalPages - 1) pages.push("...");
-    if (totalPages > 1) pages.push(totalPages);
+    // Right ellipsis
+    if (right < totalPages - 1) {
+      pages.push("...");
+    }
+
+    // Always show last page (if > 1)
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
 
     return pages;
   };
 
+  const pages = getPageNumbers();
+
   return (
-    <div className="flex flex-wrap items-center gap-4 w-full justify-center">
+    <div className="flex flex-wrap items-center gap-4 w-full justify-center mt-6">
       <Pagination className="flex flex-wrap justify-center gap-2">
         <PaginationContent>
-          {/* First */}
-          <PaginationItem>
-            <PaginationLink
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                onPageChange(1);
-              }}
-            >
-              ⏮
-            </PaginationLink>
-          </PaginationItem>
-
           {/* Prev */}
           <PaginationItem>
             <PaginationPrevious
@@ -72,8 +72,8 @@ export function CustomPagination({
             />
           </PaginationItem>
 
-          {/* Page numbers */}
-          {getPageNumbers().map((p, i) => (
+          {/* Page Numbers */}
+          {pages.map((p, i) => (
             <PaginationItem key={i}>
               {p === "..." ? (
                 <PaginationEllipsis />
@@ -102,47 +102,8 @@ export function CustomPagination({
               }}
             />
           </PaginationItem>
-
-          {/* Last */}
-          <PaginationItem>
-            <PaginationLink
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                onPageChange(totalPages);
-              }}
-            >
-              ⏭
-            </PaginationLink>
-          </PaginationItem>
         </PaginationContent>
       </Pagination>
-
-      {/* Go to page */}
-      <div className="flex flex-wrap gap-2 justify-center w-full sm:w-auto">
-        <div className="text-sm self-center">Go to</div>
-        <Input
-          type="number"
-          min={1}
-          max={totalPages}
-          value={goPage}
-          onChange={(e) => setGoPage(e.target.value)}
-          className="w-16"
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            const num = Number(goPage);
-            if (num >= 1 && num <= totalPages) {
-              onPageChange(num);
-              setGoPage("");
-            }
-          }}
-        >
-          Page
-        </Button>
-      </div>
     </div>
   );
 }

@@ -23,6 +23,7 @@ import {
   sendOtp,
   sendOtpDSP,
   loginOtpDSP,
+  loginOtpGuest,
 } from "./api";
 import { tokenStore } from "@/lib/token";
 
@@ -153,5 +154,14 @@ export function useLoginOtp() {
       // 🔥 force refresh cart
       await qc.invalidateQueries({ queryKey: ["cart-items"] });
     },
+  });
+}
+
+export function useLoginOtpGuest() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ email, code }: { email: string; code: string }) =>
+      loginOtpGuest(email, code),
   });
 }
