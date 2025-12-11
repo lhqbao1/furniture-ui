@@ -14,23 +14,26 @@ const OrderDetailUser = ({
   shippingAddress,
   invoiceAddress,
 }: OrderDetailUserProps) => {
-  console.log(invoiceAddress.country);
-
   return (
     <>
-      <div className="col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5">
-        <h5 className="font-bold">Customer</h5>
-        <div className="flex items-start gap-2.5">
-          <div className="text-sm">
-            <div>
-              {user.first_name} {user.last_name}
+      {user.is_real ? (
+        <div className="col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5">
+          <h5 className="font-bold">Customer</h5>
+          <div className="flex items-start gap-2.5">
+            <div className="text-sm">
+              <div>
+                {user.first_name} {user.last_name}
+              </div>
+              <div>{user.email}</div>
+              <div>{user.phone_number}</div>
+              {user.tax_id && <div>{user.tax_id}</div>}
             </div>
-            <div>{user.email}</div>
-            <div>{user.phone_number}</div>
-            {user.tax_id && <div>{user.tax_id}</div>}
           </div>
         </div>
-      </div>
+      ) : (
+        ""
+      )}
+
       <div className="col-span-1 py-2 px-3 rounded-sm border space-y-2.5 flex-1">
         <h5 className="font-bold">Invoice address</h5>
         <div className="space-y-2.5">

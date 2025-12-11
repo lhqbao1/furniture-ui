@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useLoginOtp } from "@/features/auth/hook";
+import { useLoginOtp, useLoginOtpGuest } from "@/features/auth/hook";
 import { useSyncLocalCart } from "@/features/cart/hook";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
@@ -46,7 +46,7 @@ export function OtpDialog({
     "",
   ]);
   const [, setUserId] = useAtom(userIdAtom);
-  const loginOtpMutation = useLoginOtp();
+  const loginOtpMutation = useLoginOtpGuest();
   const syncLocalCartMutation = useSyncLocalCart();
   const t = useTranslations();
 
@@ -80,14 +80,13 @@ export function OtpDialog({
         onSuccess: (data, variables) => {
           verifyOtp(variables.code); // giữ nguyên logic
 
-          localStorage.setItem("access_token", data.access_token);
-          localStorage.setItem("userIdGuest", data.id);
+          // localStorage.setItem("access_token", data.access_token);
+          // localStorage.setItem("userIdGuest", data.id);
 
           toast.success(t("otpDone"));
-          onSuccess(data.id);
+          // onSuccess(data.id);
           onOpenChange(false);
-
-          syncLocalCartMutation.mutate();
+          // syncLocalCartMutation.mutate();
         },
         onError: () => toast.error(t("otpError")),
       },

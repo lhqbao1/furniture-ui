@@ -186,7 +186,7 @@ export function AdminCheckOutUserInformation({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Email (Optional)</FormLabel>
               <FormControl>
                 <Input
                   placeholder=""

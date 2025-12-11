@@ -12,6 +12,7 @@ export const getSignUpSchema = (t: any) =>
         message: t("phone_number_invalid"),
       }),
     gender: z.string().min(1, { message: t("gender_required") }),
+    is_real: z.boolean(),
   });
 
 export type SignUpSchema = z.infer<ReturnType<typeof getSignUpSchema>>;

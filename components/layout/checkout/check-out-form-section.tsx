@@ -112,6 +112,7 @@ export default function CheckOutFormSection() {
     userLoginId,
     userGuestId,
     currentUserId: finalUserId,
+    setUserLoginId,
   });
 
   const handleOtpSuccess = (verifiedUserId: string) => {

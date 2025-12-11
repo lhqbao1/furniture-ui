@@ -2,7 +2,7 @@ import { Pagination } from "./pagination";
 import { ProductItem } from "./products";
 
 export interface BlogItem {
-  id: string;
+  blog_id: string;
   title: string;
   content: string; // HTML/Markdown Content
   slug: string;
