@@ -27,7 +27,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import "react-phone-input-2/lib/style.css";
 import { useTranslations } from "next-intl";
-import { City, State } from "country-state-city";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { COUNTRY_OPTIONS } from "@/data/data";
@@ -53,108 +52,6 @@ const ManualCheckOutInvoiceAddress = ({
   const t = useTranslations();
   const [isSameShipping, setIsSameShipping] = useState(true);
   const [open, setOpen] = useState(false);
-  const invoiceSnapshot = useRef<InvoiceAddressValues | null>(null);
-  const prevIsSameShipping = useRef(isSameShipping);
-
-  // Watch shipping fields
-  const shippingAddressLine = useWatch({
-    name: "address",
-    control: form.control,
-  });
-  const shippingPostalCode = useWatch({
-    name: "postal_code",
-    control: form.control,
-  });
-  const shippingCity = useWatch({ name: "city", control: form.control });
-  const shippingAdditionalAddress = useWatch({
-    name: "additional_address",
-    control: form.control,
-  });
-
-  const shippingCountry = useWatch({
-    name: "country",
-    control: form.control,
-  });
-
-  const shippingRecipient = useWatch({
-    name: "recipient_name",
-    control: form.control,
-  });
-
-  const shippingPhone = useWatch({
-    name: "phone",
-    control: form.control,
-  });
-
-  // 1) Sync invoice <- shipping KHI VÀ CHỈ KHI isSameShipping = true
-  useEffect(() => {
-    if (!isSameShipping) return; // ❗ rất quan trọng
-
-    form.setValue("invoice_address", shippingAddressLine);
-    form.setValue("invoice_postal_code", shippingPostalCode);
-    form.setValue("invoice_city", shippingCity);
-    form.setValue("invoice_country", shippingCountry);
-    form.setValue("invoice_additional_address", shippingAdditionalAddress);
-    form.setValue("invoice_recipient_name", shippingRecipient);
-  }, [
-    isSameShipping,
-    shippingAddressLine,
-    shippingPostalCode,
-    shippingCity,
-    shippingAdditionalAddress,
-    shippingCountry,
-    shippingRecipient,
-    form,
-  ]);
-
-  // 2) Bắt moment toggle để snapshot / restore
-  useEffect(() => {
-    // từ false -> true
-    if (isSameShipping && !prevIsSameShipping.current) {
-      // snapshot invoice hiện tại
-      invoiceSnapshot.current = {
-        invoice_address: form.getValues("invoice_address"),
-        invoice_postal_code: form.getValues("invoice_postal_code"),
-        invoice_city: form.getValues("invoice_city"),
-        invoice_additional_address: form.getValues(
-          "invoice_additional_address",
-        ),
-        invoice_country: form.getValues("invoice_country"),
-        invoice_recipient_name: form.getValues("invoice_recipient_name"),
-        invoice_phone: form.getValues("invoice_phone"),
-      };
-    }
-
-    // từ true -> false
-    if (!isSameShipping && prevIsSameShipping.current) {
-      if (invoiceSnapshot.current) {
-        form.setValue(
-          "invoice_address",
-          invoiceSnapshot.current.invoice_address,
-        );
-        form.setValue(
-          "invoice_postal_code",
-          invoiceSnapshot.current.invoice_postal_code,
-        );
-        form.setValue("invoice_city", invoiceSnapshot.current.invoice_city);
-        form.setValue(
-          "invoice_country",
-          invoiceSnapshot.current.invoice_country,
-        );
-        form.setValue(
-          "invoice_additional_address",
-          invoiceSnapshot.current.invoice_additional_address,
-        );
-        form.setValue(
-          "invoice_recipient_name",
-          invoiceSnapshot.current.invoice_recipient_name,
-        );
-        form.setValue("invoice_phone", invoiceSnapshot.current.invoice_phone);
-      }
-    }
-
-    prevIsSameShipping.current = isSameShipping;
-  }, [isSameShipping, form]);
 
   return (
     <div className="space-y-4">
@@ -249,7 +146,7 @@ const ManualCheckOutInvoiceAddress = ({
                     </FormControl>
                   </PopoverTrigger>
 
-                  <PopoverContent className="w-full p-0 h-[150px]">
+                  <PopoverContent className="w-full p-0 h-[250px] pointer-events-auto">
                     <Command>
                       <CommandInput placeholder="Search country..." />
                       <CommandList>
