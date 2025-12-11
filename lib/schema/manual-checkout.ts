@@ -1,11 +1,11 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 
 export const ManualCreateOrderSchema = z
   .object({
     email: z.string().optional().nullable(),
     tax_id: z.string().optional().nullable(),
-    first_name: z.string().min(1, { message: "First name is required" }),
-    last_name: z.string().min(1, { message: "Last name is required" }),
+    first_name: z.string().optional().nullable(),
+    last_name: z.string().optional().nullable(),
     phone_number: z.string().optional().nullable(),
     company_name: z.string().optional().nullable(),
 

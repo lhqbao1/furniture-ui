@@ -169,7 +169,7 @@ export default function CheckOutFormSection() {
       >
         {/* Left side */}
         <div className="col-span-1 space-y-4 lg:space-y-12">
-          <CheckOutUserInformation isLogin={false} />
+          <CheckOutUserInformation />
           <CheckOutShippingAddress key={`shipping-${userLoginId}`} />
           {/* <CheckOutInvoiceAddress key={`invoice-${userId}`} /> */}
         </div>

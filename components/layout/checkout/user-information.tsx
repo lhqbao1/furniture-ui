@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Command,
   CommandEmpty,
@@ -27,19 +27,51 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { COUNTRY_OPTIONS } from "@/data/data";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
+import { getUserById } from "@/features/users/api";
+import { useQuery } from "@tanstack/react-query";
 
 interface CheckOutUserInformationProps {
-  isLogin: boolean;
   userId?: string;
 }
 
-function CheckOutUserInformation({
-  isLogin,
-  userId,
-}: CheckOutUserInformationProps) {
+function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
+  const [userIdLogin, setUserIdLogin] = useAtom(userIdAtom);
   const form = useFormContext();
   const t = useTranslations();
   const [open, setOpen] = useState(false);
+  const isLogin = !!userIdLogin;
+
+  const { data: userData } = useQuery({
+    queryKey: ["user", userIdLogin],
+    queryFn: () => getUserById(userIdLogin ?? ""),
+    enabled: !!userIdLogin,
+    retry: false,
+  });
+
+  // Khi user login → đổ dữ liệu vào form
+  useEffect(() => {
+    if (!userData) return;
+
+    form.reset({
+      first_name: userData.first_name ?? "",
+      last_name: userData.last_name ?? "",
+      email: userData.email ?? "",
+      phone_number: userData.phone_number ?? "",
+      gender: userData.gender ?? "",
+      company_name: userData.company_name ?? "",
+      tax_id: userData.tax_id ?? "",
+
+      // invoice_address_line:
+      //   userData.default_invoice_address?.address_line ?? "",
+      // invoice_address_additional:
+      //   userData.default_invoice_address?.additional_address_line ?? "",
+      // invoice_postal_code: userData.default_invoice_address?.postal_code ?? "",
+      // invoice_city: userData.default_invoice_address?.city ?? "",
+      // invoice_country: userData.default_invoice_address?.country ?? "",
+    });
+  }, [userData]);
 
   return (
     <div className="space-y-4">

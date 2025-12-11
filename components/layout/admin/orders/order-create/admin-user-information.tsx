@@ -122,11 +122,11 @@ export function AdminCheckOutUserInformation({
           name="first_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{isAdmin ? "First Name" : t("firstName")}</FormLabel>
+              <FormLabel>First Name (Optional)</FormLabel>
               <FormControl>
                 <Input
-                  placeholder=""
                   {...field}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />
@@ -139,11 +139,11 @@ export function AdminCheckOutUserInformation({
           name="last_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{isAdmin ? "Last Name" : t("lastName")}</FormLabel>
+              <FormLabel>Last Name (Optional)</FormLabel>
               <FormControl>
                 <Input
-                  placeholder=""
                   {...field}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />
@@ -176,8 +176,8 @@ export function AdminCheckOutUserInformation({
               <FormLabel>Tax ID (Optional)</FormLabel>
               <FormControl>
                 <Input
-                  placeholder=""
                   {...field}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />
@@ -193,8 +193,8 @@ export function AdminCheckOutUserInformation({
               <FormLabel>Email (Optional)</FormLabel>
               <FormControl>
                 <Input
-                  placeholder=""
                   {...field}
+                  value={field.value ?? ""}
                 />
               </FormControl>
               <FormMessage />

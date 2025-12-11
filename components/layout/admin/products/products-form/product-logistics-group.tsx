@@ -308,12 +308,12 @@ const ProductLogisticsGroup = ({
       </div>
 
       {/* --- LOADING SKELETON --- */}
-      {isLoading && (
+      {/* {isLoading && (
         <div className="flex flex-col gap-4 mt-2">
           <PackageSkeleton />
           <PackageSkeleton />
         </div>
-      )}
+      )} */}
 
       {/* --- REAL PACKAGE INPUTS --- */}
       {!isLoading && numberOfPackages > 0 && (

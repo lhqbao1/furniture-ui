@@ -11,24 +11,43 @@ export const submitProduct = async ({
   locale,
   form,
 }: any) => {
+  const latestValues = form.getValues();
+
   const payload = {
-    ...values,
-    weight: values.weight || values.weight === 0 ? values.weight : undefined,
-    delivery_cost:
-      values.delivery_cost || values.delivery_cost === 0
-        ? values.delivery_cost
+    ...latestValues, // 👈 Thay values bằng latestValues
+    weight:
+      latestValues.weight || latestValues.weight === 0
+        ? latestValues.weight
         : undefined,
-    width: values.width || values.width === 0 ? values.width : undefined,
-    height: values.height || values.height === 0 ? values.height : undefined,
-    length: values.length || values.length === 0 ? values.length : undefined,
-    cost: values.cost || values.cost === 0 ? values.cost : undefined,
-    final_price: values.final_price ?? values.price ?? undefined,
-    ...(values.price && { price: values.price }),
-    stock: values.stock ?? 1,
-    is_bundle: values.bundles && values.bundles?.length > 0 ? true : false,
-    tag: values.tag === "" ? undefined : values.tag,
-    is_active: productValuesClone ? false : values.is_active ?? true,
-    brand_id: values.brand_id,
+    delivery_cost:
+      latestValues.delivery_cost || latestValues.delivery_cost === 0
+        ? latestValues.delivery_cost
+        : undefined,
+    width:
+      latestValues.width || latestValues.width === 0
+        ? latestValues.width
+        : undefined,
+    height:
+      latestValues.height || latestValues.height === 0
+        ? latestValues.height
+        : undefined,
+    length:
+      latestValues.length || latestValues.length === 0
+        ? latestValues.length
+        : undefined,
+    cost:
+      latestValues.cost || latestValues.cost === 0
+        ? latestValues.cost
+        : undefined,
+    final_price: latestValues.final_price ?? latestValues.price ?? undefined,
+    ...(latestValues.price && { price: latestValues.price }),
+    stock: latestValues.stock ?? 1,
+    is_bundle:
+      latestValues.bundles && latestValues.bundles?.length > 0 ? true : false,
+    tag: latestValues.tag === "" ? undefined : latestValues.tag,
+    is_active: productValuesClone ? false : latestValues.is_active ?? true,
+    brand_id: latestValues.brand_id,
+    pdf_files: latestValues.pdf_files ?? [],
   };
 
   if (payload.is_econelo) {

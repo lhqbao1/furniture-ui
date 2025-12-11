@@ -39,17 +39,21 @@ export default function SignUpForm() {
 
   const handleSubmit = (values: SignUpSchema) => {
     checkMailMutation.mutate(values.email, {
-      onSuccess() {
-        signUp.mutate(values, {
-          onSuccess() {
-            form.reset();
-            toast.success(t("signUpSuccess"));
-            router.push("/login", { locale });
-          },
-          onError() {
-            toast.error(t("signUpFail"));
-          },
-        });
+      onSuccess(data) {
+        if (data === false) {
+          toast.error(t("emailAlreadyUsed"));
+        } else {
+          signUp.mutate(values, {
+            onSuccess() {
+              form.reset();
+              toast.success(t("signUpSuccess"));
+              router.push("/login", { locale });
+            },
+            onError() {
+              toast.error(t("signUpFail"));
+            },
+          });
+        }
       },
       onError() {
         toast.error(t("useDifferentEmail"));
