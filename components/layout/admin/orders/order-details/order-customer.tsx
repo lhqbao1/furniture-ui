@@ -44,7 +44,7 @@ const OrderDetailUser = ({
               ) : (
                 <div>{invoiceAddress.recipient_name}</div>
               )}
-              {user.tax_id ? user.tax_id : ""}
+              <div>{user.tax_id ? user.tax_id : ""}</div>
               <div>{invoiceAddress.address_line}</div>
               <div>{invoiceAddress.additional_address_line}</div>
               <div className="flex gap-1">
