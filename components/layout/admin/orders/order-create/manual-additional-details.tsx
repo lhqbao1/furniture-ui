@@ -27,26 +27,6 @@ export default function ManualAdditionalInformation({
   isAdmin = false,
 }: ManualAdditionalInformationProps) {
   const form = useFormContext();
-  const country = form.watch("country");
-  const status = form.watch("status")?.toLowerCase();
-
-  // Khi status = paid → set giá trị về null
-  useEffect(() => {
-    if (status === "paid") {
-      form.setValue("payment_term", null);
-    }
-  }, [status, form]);
-
-  useEffect(() => {
-    if (!country) return;
-
-    const TAX_BY_COUNTRY: Record<string, number> = {
-      AT: 20,
-      DE: 19,
-    };
-
-    form.setValue("tax", TAX_BY_COUNTRY[country] ?? 19);
-  }, [country, form]);
 
   return (
     <div className="space-y-4">
@@ -196,6 +176,7 @@ export default function ManualAdditionalInformation({
                         e.target.value === "" ? null : e.target.valueAsNumber,
                       )
                     }
+                    disabled
                   />
                   <span className="absolute left-3 text-gray-500">%</span>
                 </div>

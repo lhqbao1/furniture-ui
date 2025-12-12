@@ -42,14 +42,13 @@ export default function BlogListClient({
     setPagination(data.pagination);
     setLoading(false);
   };
-  console.log(posts);
 
   return (
     <div className="space-y-10">
       {/* GRID POSTS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         {posts.map((post: BlogItem) => (
-          <div key={post.blog_id}>
+          <div key={post.id}>
             <BlogCard post={post} />
           </div>
         ))}

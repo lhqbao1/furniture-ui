@@ -11,6 +11,7 @@
     "bestSeller": "Best Seller",
     "categories": "Categories",
     "viewed": "Viewed",
+    "viewAll": "View All",
     "wishlist": "Wishlist",
     "cart": "Cart",
     "order": "Order",
@@ -352,5 +353,6 @@
   "imageGallery": "Image Gallery",
   "posts": "Posts",
   "emailNotRegistered": "This email is not registered yet.",
-  "emailAlreadyUsed": "This email address has already been used to create an account."
+  "emailAlreadyUsed": "This email address has already been used to create an account.",
+  "blog": "Blog"
 }

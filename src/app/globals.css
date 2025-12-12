@@ -381,3 +381,20 @@ input[type="number"] {
 .blog-content strong {
   @apply text-secondary;
 }
+
+.blog-content img {
+  @apply my-6;
+}
+
+.blog-content ul {
+  @apply list-disc;
+}
+
+.blog-content li {
+  @apply ml-6;
+}
+
+.blog-content h2,
+.blog-content h3 {
+  @apply mt-6 mb-2;
+}

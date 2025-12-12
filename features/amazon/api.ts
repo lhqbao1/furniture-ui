@@ -16,6 +16,12 @@ export type SyncToAmazonInput = {
   width: number;
   length: number;
   depth: number;
+  package_length: number;
+  package_width: number;
+  package_height: number;
+  color: string;
+  unit_count: number;
+  unit_count_type: string;
   asin: string | null;
   stock: number;
   carrier: string;
