@@ -354,5 +354,12 @@
   "posts": "Posts",
   "emailNotRegistered": "This email is not registered yet.",
   "emailAlreadyUsed": "This email address has already been used to create an account.",
-  "blog": "Blog"
+  "blog": "Blog",
+  "agree_agb_required": "You must accept the terms and conditions (AGB).",
+  "agreeTo": "I agree to the",
+  "agb": "Terms & Conditions (AGB)",
+  "and": "and",
+  "widderuf": "Cancellation Policy",
+  "agree_widderuf": "I have read and agree to these terms.",
+    "placeOrder": "Place order"
 }

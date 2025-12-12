@@ -1012,11 +1012,18 @@ export const STATUS_OPTIONS = [
   { key: "exchange", label: "Exchange", active: true, pos: 11 },
 ];
 
-export const COUNTRY_OPTIONS = [
+export const COUNTRY_ORIGIN_OPTIONS = [
   { value: "AT", label: "Austria" },
   { value: "DE", label: "Deutschland" },
   { value: "CN", label: "China" },
   { value: "VN", label: "VietNam" },
+];
+
+export const COUNTRY_OPTIONS = [
+  { value: "AT", label: "Austria" },
+  { value: "DE", label: "Deutschland" },
+  // { value: "CN", label: "China" },
+  // { value: "VN", label: "VietNam" },
 
   // { value: "AF", label: "Afghanistan" },
   // { value: "AL", label: "Albanien" },

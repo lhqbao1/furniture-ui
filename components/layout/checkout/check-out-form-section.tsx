@@ -29,6 +29,8 @@ import CheckoutProducts from "./check-out-products";
 import CheckoutPaymentUI from "@/components/shared/stripe/payment-ui";
 import StripeProvider from "@/components/shared/stripe/stripe";
 import StripeLayout from "@/components/shared/stripe/stripe-layout";
+import AGBDialogTrigger from "../auth/sign-up/agb-dialog";
+import WiderrufDialogTrigger from "../auth/sign-up/widderuf-dialog";
 
 // const StripeLayout = dynamic(
 //   () => import("@/components/shared/stripe/stripe"),
@@ -237,14 +239,9 @@ export default function CheckOutFormSection() {
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <FormLabel className="text-sm flex flex-row">
-                    {t("byPlacing")}
-                    <Link
-                      href={`/agb`}
-                      className="text-secondary underline pl-2"
-                    >
-                      {t("termCondition")}
-                    </Link>
+                  <FormLabel className="text-sm block">
+                    {t("agreeTo")} <AGBDialogTrigger t={t} /> {t("and")}{" "}
+                    <WiderrufDialogTrigger t={t} /> {t("agree_widderuf")}
                   </FormLabel>
                 </div>
               </FormItem>
@@ -252,7 +249,7 @@ export default function CheckOutFormSection() {
           />
 
           {/* CONTINUE BUTTON */}
-          <div className="flex lg:justify-end justify-center">
+          <div className="flex lg:justify-start justify-center mt-2">
             <Button
               type="submit"
               className="text-lg lg:w-1/3 w-1/2 py-6"
@@ -261,7 +258,7 @@ export default function CheckOutFormSection() {
               {submitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                t("continue")
+                t("placeOrder")
               )}
             </Button>
           </div>

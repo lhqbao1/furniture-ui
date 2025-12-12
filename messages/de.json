@@ -88,6 +88,7 @@
   "shipping": "Standardversand",
   "shippingSpedition": "Speditionsversand",
   "continue": "Fortfahren",
+  "placeOrder": "Zahlungspflichtig bestellen",
   "prestigeHome": "Prestige Home",
   "thankYou": "Vielen Dank",
   "orderPlacedMessage": "Wir freuen uns, Ihnen mitzuteilen, dass Ihre Bestellung erfolgreich aufgegeben wurde.",
@@ -350,5 +351,11 @@
   "posts": "Beiträge",
   "emailNotRegistered": "Diese E-Mail-Adresse ist noch nicht registriert.",
   "emailAlreadyUsed": "Diese E-Mail-Adresse wurde bereits zur Erstellung eines Kontos verwendet.",
-  "viewAll": "Alle anzeigen"
+  "viewAll": "Alle anzeigen",
+    "agree_agb_required": "Sie müssen die Allgemeinen Geschäftsbedingungen (AGB) akzeptieren.",
+    "agreeTo": "Ich habe die",
+  "agb": "Allgemeinen Geschäftsbedingungen",
+  "and": "und die",
+  "widderuf": "Widerrufsbelehrung",
+  "agree_widderuf": "gelesen und stimme diesen zu."
 }
