@@ -133,9 +133,8 @@ export function useCheckoutSubmit({
         let cartData: CartResponse = [];
         let shippingCostCurrent = 0;
         let currentGuestId = null;
-        const isDifferentEmail = user?.email && user.email !== data.email;
 
-        if (isDifferentEmail) {
+        if (!userLoginId) {
           const newUser = await createUser.mutateAsync({
             first_name: data.first_name ?? "",
             last_name: data.last_name ?? "",

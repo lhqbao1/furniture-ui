@@ -34,6 +34,21 @@ export default function CheckoutPaymentLogic({
   const t = useTranslations();
   const paymentRequestRef = useRef<PaymentRequest | null>(null);
 
+  const cleanupPaymentRequest = () => {
+    const pr = paymentRequestRef.current;
+    if (!pr) return;
+
+    try {
+      pr.off("paymentmethod");
+      pr.abort?.();
+    } catch (e) {
+      console.warn("PR abort error:", e);
+    }
+
+    paymentRequestRef.current = null;
+    setPaymentRequest(null);
+  };
+
   useEffect(() => {
     console.log("=== EFFECT START ===");
     console.log("Stripe ready:", !!stripe);
@@ -46,6 +61,9 @@ export default function CheckoutPaymentLogic({
       console.log("⛔ Stripe not ready");
       return;
     }
+
+    // ❗ Always clean before recreating
+    cleanupPaymentRequest();
 
     // --- CLEANUP BEFORE RECREATING ---
     if (paymentRequestRef.current) {
@@ -97,6 +115,7 @@ export default function CheckoutPaymentLogic({
         if (error) {
           console.log("❌ confirmCardPayment error:", error);
           ev.complete("fail");
+          cleanupPaymentRequest(); // 🚀 Reset fully
           return onFail(error.message);
         }
 
@@ -119,6 +138,7 @@ export default function CheckoutPaymentLogic({
       } catch (e) {
         console.log("❌ Exception in handler:", e);
         ev.complete("fail");
+        cleanupPaymentRequest(); // 🚀 Reset fully
         onFail("Payment failed");
       }
     };
