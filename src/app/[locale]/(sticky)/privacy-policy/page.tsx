@@ -16,14 +16,14 @@ import React from "react";
 export const revalidate = 3600; // ISR: regenerate mỗi 1h
 
 export const metadata: Metadata = {
-  title: "Datenschutzerklärung | Prestige Home",
+  title: "Datenschutzerklärung",
   description:
     "Lesen Sie die Datenschutzerklärung von Prestige Home – Informationen zum Datenschutz, zur Verarbeitung personenbezogener Daten und zu Ihren Rechten.",
   alternates: {
     canonical: "http://prestige-home.de/de/privacy-policy",
   },
   openGraph: {
-    title: "Datenschutzerklärung | Prestige Home",
+    title: "Datenschutzerklärung",
     description:
       "Transparenz über Datenschutz und Ihre Rechte bei Prestige Home.",
     url: "https://www.prestige-home.de/privacy-policy",

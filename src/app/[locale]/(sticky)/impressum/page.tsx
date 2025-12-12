@@ -17,14 +17,14 @@ export const revalidate = 3600; // ISR: regenerate mỗi 1h
 
 // ✅ Metadata cho SEO + OpenGraph
 export const metadata: Metadata = {
-  title: "Impressum | Prestige Home",
+  title: "Impressum",
   description:
     "Das Impressum von Prestige Home – Rechtliche Angaben, Kontaktdaten und gesetzliche Informationen gemäß deutscher Gesetzgebung.",
   alternates: {
     canonical: "http://prestige-home.de/de/impressum",
   },
   openGraph: {
-    title: "Impressum | Prestige Home",
+    title: "Impressum",
     description:
       "Alle rechtlichen Informationen und Kontaktdaten von Prestige Home finden Sie hier.",
     url: "https://www.prestige-home.de/de/impressum",

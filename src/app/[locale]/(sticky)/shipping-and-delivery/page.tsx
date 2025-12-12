@@ -13,7 +13,7 @@ import Script from "next/script";
 
 // ✅ Metadata SEO
 export const metadata = {
-  title: "Liefer- und Versandbedingungen | Prestige Home",
+  title: "Liefer- und Versandbedingungen",
   description:
     "Informationen zu Versand, Lieferung und Zustellbedingungen von Prestige Home. Erfahren Sie alles über Versandarten, Lieferzeiten und Kosten.",
   alternates: {
@@ -30,7 +30,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Liefer- und Versandbedingungen | Prestige Home",
+    title: "Liefer- und Versandbedingungen",
     description:
       "Versandinformationen und Lieferbedingungen von Prestige Home im Überblick.",
   },

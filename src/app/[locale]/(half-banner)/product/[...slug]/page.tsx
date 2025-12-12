@@ -125,6 +125,11 @@ export async function generateMetadata({
 /* --------------------------------------------------------
  * 3) PAGE (PPR FRIENDLY IMPLEMENTATION)
  * ------------------------------------------------------*/
+
+function toPlain<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data));
+}
+
 export default async function Page({
   params,
 }: {
@@ -167,34 +172,26 @@ export default async function Page({
     console.error("❌ Error fetching child data:", err);
   }
 
-  // Convert to JSON (prevent function serialization)
-  reviews = JSON.parse(JSON.stringify(reviews || []));
-  parentProduct = JSON.parse(JSON.stringify(parentProduct || null));
-
-  // Hydrate React Query
-  const qc = getQueryClient();
-  qc.setQueryData(["product", product.id], product);
-  qc.setQueryData(["reviews", product.id], reviews);
-  if (product.parent_id) {
-    qc.setQueryData(["product-group", product.parent_id], parentProduct);
-  }
+  // Convert to plain JSON
+  const plainProduct = toPlain(product);
+  const plainReviews = toPlain(reviews);
+  const plainParent = toPlain(parentProduct);
 
   return (
-    <HydrationBoundary state={dehydrate(qc)}>
+    <>
       <div className="flex justify-center items-center">
         <div className="lg:w-10/12 w-full">
           {/* ️🔥 CRITICAL FIRST PAINT → PPR ưu tiên render */}
           <ProductDetails
-            productDetails={product}
-            reviews={reviews}
-            parentProduct={parentProduct}
+            productDetails={plainProduct}
+            reviews={plainReviews}
+            parentProduct={plainParent}
           />
 
-          {/* ️🔥 Stream phần không quan trọng */}
           <div className="lg:mt-12 mt-8">
             <ProductDetailsTab
-              reviews={reviews}
-              product={product}
+              reviews={plainReviews}
+              product={plainProduct}
             />
           </div>
         </div>
@@ -205,6 +202,6 @@ export default async function Page({
           <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
         </Suspense>
       )}
-    </HydrationBoundary>
+    </>
   );
 }

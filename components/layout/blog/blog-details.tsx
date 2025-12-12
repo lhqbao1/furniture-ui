@@ -3,6 +3,7 @@ import { Calendar, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
+import BlogBreadcrumb from "./blog-breadcrumb";
 
 export function stripImagesAndHeadings(content: string): string {
   return (
@@ -18,7 +19,18 @@ export default function BlogDetails({ post }: { post: BlogItem }) {
   return (
     <article className="space-y-6">
       <div>
-        {" "}
+        <div className="mt-4">
+          <BlogBreadcrumb
+            parentPage={{
+              link: "/blog",
+              title: "Blog",
+            }}
+            currentPage={{
+              link: post.slug,
+              title: post?.title ?? "",
+            }}
+          />
+        </div>
         {/* Title */}
         <h1 className="text-4xl font-bold">{post.title}</h1>
         {/* Meta info */}

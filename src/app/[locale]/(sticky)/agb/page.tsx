@@ -18,7 +18,7 @@ export const revalidate = 3600;
 
 // ✅ Metadata SEO của Next.js
 export const metadata: Metadata = {
-  title: "Allgemeine Geschäftsbedingungen (AGB) | Prestige Home",
+  title: "Allgemeine Geschäftsbedingungen (AGB)",
   description:
     "Hier finden Sie die allgemeinen Geschäftsbedingungen (AGB) von Prestige Home. Transparente Regeln und faire Konditionen.",
   alternates: {
