@@ -13,7 +13,7 @@ import Script from "next/script";
 
 // ✅ Metadata SEO
 export const metadata = {
-  title: "Widerrufsbelehrung | Prestige Home",
+  title: "Widerrufsbelehrung",
   description:
     "Hier finden Sie die Widerrufsbelehrung (Rücktrittsrecht) von Prestige Home. Erfahren Sie, wie Sie Ihre Bestellung widerrufen können.",
   alternates: {
@@ -30,7 +30,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Widerrufsbelehrung | Prestige Home",
+    title: "Widerrufsbelehrung",
     description:
       "Informationen zum Rücktrittsrecht und Widerruf Ihrer Bestellung bei Prestige Home.",
   },

@@ -13,7 +13,7 @@ import Script from "next/script";
 
 // ✅ Metadata SEO cho trang Payment Terms
 export const metadata = {
-  title: "Zahlungsbedingungen | Prestige Home",
+  title: "Zahlungsbedingungen",
   description:
     "Alle Informationen zu Zahlungsarten, Zahlungsmethoden und Zahlungsbedingungen bei Prestige Home.",
   alternates: {
@@ -30,7 +30,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Zahlungsbedingungen | Prestige Home",
+    title: "Zahlungsbedingungen",
     description:
       "Übersicht aller Zahlungsarten und Zahlungsbedingungen von Prestige Home.",
   },

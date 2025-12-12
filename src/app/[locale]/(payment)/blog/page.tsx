@@ -1,9 +1,12 @@
+import BlogBreadcrumb from "@/components/layout/blog/blog-breadcrumb";
 import BlogListClient from "@/components/layout/blog/blog-list-client";
 import SidebarBlog from "@/components/layout/blog/blog-sidebar";
 import FeaturedPost from "@/components/layout/blog/featured-post";
+import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import { getBlogs, getBlogsByProduct } from "@/features/blog/api";
 import { BlogItem } from "@/types/blog";
 import type { Metadata } from "next";
+import { useTranslations } from "next-intl";
 
 /* PPR */
 export const experimental_ppr = true;
@@ -11,11 +14,11 @@ export const revalidate = 3600;
 
 /* Metadata */
 export const metadata: Metadata = {
-  title: "Blog | Prestige Home",
+  title: "Blog",
   description:
     "Entdecken Sie Artikel über Wohndesign, Einrichtungsideen und Lifestyle-Tipps.",
   openGraph: {
-    title: "Blog | Prestige Home",
+    title: "Blog",
     description:
       "Inspirierende Beiträge über Wohndesign, Einrichtung und Lifestyle.",
     url: "https://www.prestige-home.de/de/blog",
@@ -53,7 +56,13 @@ export default async function BlogPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      <div className="w-10/12 mx-auto px-4 py-16">
+      <div className="w-10/12 mx-auto px-4 pb-16 pt-8">
+        <BlogBreadcrumb
+          currentPage={{
+            link: "/blog",
+            title: "Blog",
+          }}
+        />
         <div className="grid grid-cols-1 lg:grid-cols-12 xl:gap-12 2xl:gap-20">
           {/* MAIN COLUMN */}
           <div className="lg:col-span-8 space-y-20">

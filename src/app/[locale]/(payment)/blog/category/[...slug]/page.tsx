@@ -1,3 +1,4 @@
+import BlogBreadcrumb from "@/components/layout/blog/blog-breadcrumb";
 import BlogListClient from "@/components/layout/blog/blog-list-client";
 import SidebarBlog from "@/components/layout/blog/blog-sidebar";
 import FeaturedPost from "@/components/layout/blog/featured-post";
@@ -22,10 +23,10 @@ export async function generateMetadata({
   const productId = slug[0];
 
   return {
-    title: `Blog Kategorie | Prestige Home`,
+    title: `Blog Kategorie`,
     description: "Entdecken Sie themenbezogene Artikel und Ratgeber.",
     openGraph: {
-      title: "Blog Kategorie | Prestige Home",
+      title: "Blog Kategorie",
       description: "Alle Blogbeiträge zu diesem Produkt.",
       url: `https://www.prestige-home.de/de/blog/category/${productId}`,
     },
@@ -82,6 +83,18 @@ export default async function BlogCategoryPage({ params }: PageProps) {
         <p className="text-secondary">
           {categoryBlogs.pagination.total_items} Beiträge
         </p>
+        <div className="mt-4">
+          <BlogBreadcrumb
+            parentPage={{
+              link: "/blog",
+              title: "Blog",
+            }}
+            currentPage={{
+              link: productSlug,
+              title: productDetails?.name ?? "",
+            }}
+          />
+        </div>
       </div>
 
       <div className="w-10/12 mx-auto px-4 py-16">
