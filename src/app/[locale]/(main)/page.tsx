@@ -37,7 +37,6 @@
 // }
 
 // app/(website)/page.tsx
-import { Suspense } from "react";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 
 import FeaturedProducts from "@/components/layout/home/featured-products";
@@ -48,50 +47,29 @@ import { getProductByTag, getAllProducts } from "@/features/products/api";
 
 import getQueryClient from "@/lib/get-query-client";
 
+function toPlain(data: any) {
+  return JSON.parse(JSON.stringify(data));
+}
+
 export const revalidate = 60;
 export const experimental_ppr = true;
 
 export default async function HomePage() {
-  const qc = getQueryClient();
-
-  // ─────────────────────────────────────────────
-  // 🚀 CRITICAL DATA (prerender ngay lập tức)
-  // ─────────────────────────────────────────────
-  const featuredProducts = await getProductByTag("Featured").catch(() => []);
-
-  // Save critical data into React Query
-  qc.setQueryData(["featured-products"], featuredProducts);
-
-  // ─────────────────────────────────────────────
-  // ⏳ NON-CRITICAL DATA (stream sau qua Suspense)
-  // ─────────────────────────────────────────────
-  const categoriesPromise = getCategoriesWithChildren();
-  const trendingPromise = getProductByTag("Trending").catch(() => []);
-  const allProductsPromise = getAllProducts({ page_size: 24 });
-
-  const [categories, trendingProducts, allProducts] = await Promise.all([
-    categoriesPromise,
-    trendingPromise,
-    allProductsPromise,
+  const [trendingProducts, allProducts] = await Promise.all([
+    getProductByTag("Trending").catch(() => []),
+    getAllProducts({ page_size: 24 }),
   ]);
 
-  // Save into hydration cache
-  // qc.setQueryData(["categories-home"], categories);
-  qc.setQueryData(["trending-products"], trendingProducts);
-  qc.setQueryData(["all-products"], allProducts);
-
   return (
-    <HydrationBoundary state={dehydrate(qc)}>
-      <div
-        id="home"
-        className="w-full"
-      >
-        {/* CRITICAL FIRST PAINT */}
-        <FeaturedProducts queryKey={["featured-products"]} />
+    <div
+      id="home"
+      className="w-full"
+    >
+      {/* CRITICAL FIRST PAINT */}
+      <FeaturedProducts products={allProducts.items} />
 
-        {/* STREAMING SECTION */}
-        <RecentViewed queryKey={["trending-products"]} />
-      </div>
-    </HydrationBoundary>
+      {/* STREAMING SECTION */}
+      <RecentViewed products={trendingProducts} />
+    </div>
   );
 }
