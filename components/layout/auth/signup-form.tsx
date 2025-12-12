@@ -25,6 +25,10 @@ import {
 import { Input } from "@/components/ui/input";
 import GenderSelect from "./sign-up/gender-select";
 import SignUpSignUpOtpDialog from "./sign-up/sign-up-otp-dialog";
+import AGBDialogTrigger from "./sign-up/agb-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import WiderrufPage from "@/src/app/[locale]/(sticky)/cancellation/page";
+import WiderrufDialogTrigger from "./sign-up/widderuf-dialog";
 
 export default function SignUpForm() {
   const t = useTranslations();
@@ -43,6 +47,7 @@ export default function SignUpForm() {
       phone_number: "",
       gender: "",
       is_real: true,
+      agree_agb: false,
     },
   });
 
@@ -154,6 +159,31 @@ export default function SignUpForm() {
               )}
             />
           </>
+
+          {/* Agree AGB */}
+          <FormField
+            control={form.control}
+            name="agree_agb"
+            render={({ field }) => (
+              <FormItem className="flex items-start gap-3 md:col-span-2 col-span-1">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="h-5 w-5"
+                  />
+                </FormControl>
+
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="text-sm block">
+                    {t("agreeTo")} <AGBDialogTrigger t={t} /> {t("and")}
+                    <WiderrufDialogTrigger t={t} /> {t("agree_widderuf")}
+                  </FormLabel>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
 
           <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
             <Button

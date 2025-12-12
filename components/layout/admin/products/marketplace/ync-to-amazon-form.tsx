@@ -40,7 +40,7 @@ import {
 
 import { useSyncToAmazon } from "@/features/amazon/hook";
 import { SyncToAmazonInput } from "@/features/amazon/api";
-import { COUNTRY_OPTIONS } from "@/data/data";
+import { COUNTRY_OPTIONS, COUNTRY_ORIGIN_OPTIONS } from "@/data/data";
 
 interface SyncToAmazonFormProps {
   product: ProductItem;
@@ -362,7 +362,7 @@ const SyncToAmazonForm = ({
                             </SelectTrigger>
 
                             <SelectContent className="max-h-80">
-                              {COUNTRY_OPTIONS.map((c) => (
+                              {COUNTRY_ORIGIN_OPTIONS.map((c) => (
                                 <SelectItem
                                   key={c.value}
                                   value={c.value}

@@ -137,8 +137,8 @@ export function useCheckoutSubmit({
 
         if (isDifferentEmail) {
           const newUser = await createUser.mutateAsync({
-            first_name: data.first_name,
-            last_name: data.last_name,
+            first_name: data.first_name ?? "",
+            last_name: data.last_name ?? "",
             email: data.email,
             phone_number: data.phone_number,
             company_name: data.company_name ?? null,
@@ -174,7 +174,10 @@ export function useCheckoutSubmit({
         if (!invoiceId) {
           const created = await createInvoice.mutateAsync({
             user_id: finalUserId ?? "",
-            recipient_name: `${data.first_name} ${data.last_name}`,
+            recipient_name:
+              data.company_name?.trim() ||
+              `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
+            email: data.email ?? "",
             postal_code: data.invoice_postal_code,
             phone_number: data.phone_number,
             address_line: data.invoice_address_line,
@@ -197,7 +200,10 @@ export function useCheckoutSubmit({
             addressId: invoiceId,
             address: {
               user_id: finalUserId ?? "",
-              recipient_name: `${data.first_name} ${data.last_name}`,
+              recipient_name:
+                data.company_name?.trim() ||
+                `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
+              email: data.email ?? "",
               postal_code: data.invoice_postal_code,
               phone_number: data.phone_number,
               address_line: data.invoice_address_line,
@@ -214,9 +220,10 @@ export function useCheckoutSubmit({
         if (!shippingId) {
           const created = await createShipping.mutateAsync({
             user_id: finalUserId ?? "",
-            recipient_name: data.shipping_recipient_name
-              ? data.shipping_recipient_name
-              : `${data.first_name} ${data.last_name}`,
+            recipient_name:
+              data.company_name?.trim() ||
+              `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
+            email: data.email ?? "",
             postal_code: data.shipping_postal_code,
             phone_number: data.shipping_phone_number ?? "",
             address_line: data.shipping_address_line,

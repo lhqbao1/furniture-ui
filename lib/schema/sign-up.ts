@@ -13,6 +13,9 @@ export const getSignUpSchema = (t: any) =>
       }),
     gender: z.string().min(1, { message: t("gender_required") }),
     is_real: z.boolean(),
+    agree_agb: z.boolean().refine((val) => val === true, {
+      message: t("agree_agb_required"),
+    }),
   });
 
 export type SignUpSchema = z.infer<ReturnType<typeof getSignUpSchema>>;

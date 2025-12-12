@@ -5,10 +5,8 @@ import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import dynamic from "next/dynamic";
 import { useTranslations, useLocale } from "next-intl";
 import { Loader2 } from "lucide-react";
-import { Link, useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
 
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
@@ -19,7 +17,6 @@ import BankDialog from "@/components/layout/checkout/bank-dialog";
 // 🟢 New Hooks (logic đã tách ra)
 import { useCheckoutInit } from "@/hooks/checkout/useCheckoutInit";
 import { useCheckoutSubmit } from "@/hooks/checkout/useCheckoutSubmit";
-import { useCartLocal } from "@/hooks/cart";
 import { cn } from "@/lib/utils";
 import CheckOutUserInformation from "@/components/layout/checkout/user-information";
 import CheckOutShippingAddress from "@/components/layout/checkout/shipping-address";
@@ -29,21 +26,8 @@ import CheckoutProducts from "./check-out-products";
 import CheckoutPaymentUI from "@/components/shared/stripe/payment-ui";
 import StripeProvider from "@/components/shared/stripe/stripe";
 import StripeLayout from "@/components/shared/stripe/stripe-layout";
-
-// const StripeLayout = dynamic(
-//   () => import("@/components/shared/stripe/stripe"),
-//   { ssr: false },
-// );
-
-// const CheckOutUserInformation = dynamic(
-//   () => import("@/components/layout/checkout/user-information"),
-//   { ssr: false },
-// );
-
-// const CheckOutShippingAddress = dynamic(
-//   () => import("@/components/layout/checkout/shipping-address"),
-//   { ssr: false },
-// );
+import AGBDialogTrigger from "../auth/sign-up/agb-dialog";
+import WiderrufDialogTrigger from "../auth/sign-up/widderuf-dialog";
 
 export default function CheckOutFormSection() {
   const t = useTranslations();
@@ -141,10 +125,12 @@ export default function CheckOutFormSection() {
       (voucherAmount ?? 0)
     );
   }, [cartItems, localCart, shippingCost, couponAmount, voucherAmount]);
+
   // Chuyển sang cents cho Stripe
   const totalCents = useMemo(() => {
     return Math.round(totalEuro * 100);
   }, [totalEuro]);
+
   return (
     <form
       onSubmit={form.handleSubmit(
@@ -237,14 +223,9 @@ export default function CheckOutFormSection() {
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <FormLabel className="text-sm flex flex-row">
-                    {t("byPlacing")}
-                    <Link
-                      href={`/agb`}
-                      className="text-secondary underline pl-2"
-                    >
-                      {t("termCondition")}
-                    </Link>
+                  <FormLabel className="text-sm block">
+                    {t("agreeTo")} <AGBDialogTrigger t={t} /> {t("and")}{" "}
+                    <WiderrufDialogTrigger t={t} /> {t("agree_widderuf")}
                   </FormLabel>
                 </div>
               </FormItem>
@@ -252,7 +233,7 @@ export default function CheckOutFormSection() {
           />
 
           {/* CONTINUE BUTTON */}
-          <div className="flex lg:justify-end justify-center">
+          <div className="flex lg:justify-start justify-center mt-2">
             <Button
               type="submit"
               className="text-lg lg:w-1/3 w-1/2 py-6"
@@ -261,7 +242,7 @@ export default function CheckOutFormSection() {
               {submitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                t("continue")
+                t("placeOrder")
               )}
             </Button>
           </div>
