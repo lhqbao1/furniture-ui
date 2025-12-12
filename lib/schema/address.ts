@@ -12,6 +12,7 @@ export const addressSchema = z.object({
   address_line: z.string().min(1, "Address line is required"),
   additional_address_line: z.string().optional().nullable(),
   is_default: z.boolean().optional(),
+  email: z.string().optional().nullable(),
 });
 
 export type AddressFormValues = z.infer<typeof addressSchema>;

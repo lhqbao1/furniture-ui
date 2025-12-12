@@ -5,10 +5,8 @@ import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import dynamic from "next/dynamic";
 import { useTranslations, useLocale } from "next-intl";
 import { Loader2 } from "lucide-react";
-import { Link, useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
 
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
@@ -19,7 +17,6 @@ import BankDialog from "@/components/layout/checkout/bank-dialog";
 // 🟢 New Hooks (logic đã tách ra)
 import { useCheckoutInit } from "@/hooks/checkout/useCheckoutInit";
 import { useCheckoutSubmit } from "@/hooks/checkout/useCheckoutSubmit";
-import { useCartLocal } from "@/hooks/cart";
 import { cn } from "@/lib/utils";
 import CheckOutUserInformation from "@/components/layout/checkout/user-information";
 import CheckOutShippingAddress from "@/components/layout/checkout/shipping-address";
@@ -31,21 +28,6 @@ import StripeProvider from "@/components/shared/stripe/stripe";
 import StripeLayout from "@/components/shared/stripe/stripe-layout";
 import AGBDialogTrigger from "../auth/sign-up/agb-dialog";
 import WiderrufDialogTrigger from "../auth/sign-up/widderuf-dialog";
-
-// const StripeLayout = dynamic(
-//   () => import("@/components/shared/stripe/stripe"),
-//   { ssr: false },
-// );
-
-// const CheckOutUserInformation = dynamic(
-//   () => import("@/components/layout/checkout/user-information"),
-//   { ssr: false },
-// );
-
-// const CheckOutShippingAddress = dynamic(
-//   () => import("@/components/layout/checkout/shipping-address"),
-//   { ssr: false },
-// );
 
 export default function CheckOutFormSection() {
   const t = useTranslations();
@@ -143,10 +125,12 @@ export default function CheckOutFormSection() {
       (voucherAmount ?? 0)
     );
   }, [cartItems, localCart, shippingCost, couponAmount, voucherAmount]);
+
   // Chuyển sang cents cho Stripe
   const totalCents = useMemo(() => {
     return Math.round(totalEuro * 100);
   }, [totalEuro]);
+
   return (
     <form
       onSubmit={form.handleSubmit(

@@ -361,5 +361,6 @@
   "and": "and",
   "widderuf": "Cancellation Policy",
   "agree_widderuf": "I have read and agree to these terms.",
-    "placeOrder": "Place order"
+  "placeOrder": "Place order",
+  "tax_id_required_when_company": "A tax ID is required when a company name is provided."
 }
