@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import { AdminCheckOutUserInformation } from "@/components/layout/admin/orders/o
 import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/order-create/shipping-address";
 import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
 import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
+import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreate";
 
 // Shipping Address
 // const ManualCheckOutShippingAddress = dynamic(
@@ -67,13 +68,15 @@ interface SelectedProduct {
 export default function CreateCheckoutpage() {
   const t = useTranslations();
   const createOrderManualMutation = useCreateCheckOutManual();
-
   const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);
+  const [disabledFields, setDisabledFields] = useState<string[]>([]);
 
   const form = useForm<ManualCreateOrderFormValues>({
     resolver: zodResolver(ManualCreateOrderSchema),
     defaultValues: manualCheckoutDefaultValues,
   });
+
+  useManualCheckoutLogic(form, setDisabledFields);
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
     const total_shipping = values.carrier === "spedition" ? 35.95 : 5.95;
@@ -89,11 +92,7 @@ export default function CreateCheckoutpage() {
       {
         ...values,
         total_shipping: total_shipping,
-        email: values.email
-          ? values.email
-          : values.first_name || values.last_name
-          ? `${values.first_name ?? ""}${values.last_name ?? ""}`
-          : "a",
+        email: values.email ?? "",
         company_name:
           values.company_name?.trim() === "" ? null : values.company_name,
         additional_address:
@@ -147,7 +146,10 @@ export default function CreateCheckoutpage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* User information and address */}
           <div className="col-span-1 space-y-4 lg:space-y-12">
-            <AdminCheckOutUserInformation isAdmin />
+            <AdminCheckOutUserInformation
+              isAdmin
+              disabledFields={disabledFields}
+            />
             <ManualCheckOutShippingAddress isAdmin />
             {/* <ManualCheckOutInvoiceAddress isAdmin /> */}
           </div>

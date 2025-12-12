@@ -7,6 +7,8 @@ import React from "react";
 import { useMediaQuery } from "react-responsive";
 import CategoriesDrawer from "../header/categories-drawer";
 import { categoryClickedAtom } from "@/store/categories-drawer";
+import { useRouter } from "@/src/i18n/navigation";
+import { useLocale } from "next-intl";
 
 interface ListCategoriesHomeProps {
   categories: CategoryResponse[];
@@ -14,6 +16,8 @@ interface ListCategoriesHomeProps {
 
 const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const router = useRouter();
+  const locale = useLocale();
   const [currentCategoryId, setCurrentCategoryId] = useAtom(
     currentCategoryIdAtom,
   );
@@ -52,6 +56,15 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                 {item.name}
               </div>
             ))}
+            <div
+              className="cursor-pointer font-medium text-lg relative 
+                after:content-[''] after:absolute after:left-0 after:-bottom-1 
+                after:h-[2px] after:w-0 after:bg-black after:transition-all 
+                after:duration-300 hover:after:w-full"
+              onClick={() => router.push("/blog", { locale })}
+            >
+              Blog
+            </div>
           </div>
         )}
       </div>

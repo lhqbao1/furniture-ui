@@ -346,8 +346,9 @@
   "notifyByEmail": "Per E-Mail benachrichtigt werden",
   "notifyDescription": "Wie könnten wir Ihnen sonst von monatlichen Angeboten und Sonderrabatten mitteilen?",
   "logOutSuccess": "Erfolgreich abgemeldet",
-    "imageGallery": "Bildergalerie",
-    "posts": "Beiträge",
-    "emailNotRegistered": "Diese E-Mail-Adresse ist noch nicht registriert.",
-    "emailAlreadyUsed": "Diese E-Mail-Adresse wurde bereits zur Erstellung eines Kontos verwendet."
+  "imageGallery": "Bildergalerie",
+  "posts": "Beiträge",
+  "emailNotRegistered": "Diese E-Mail-Adresse ist noch nicht registriert.",
+  "emailAlreadyUsed": "Diese E-Mail-Adresse wurde bereits zur Erstellung eines Kontos verwendet.",
+  "viewAll": "Alle anzeigen"
 }

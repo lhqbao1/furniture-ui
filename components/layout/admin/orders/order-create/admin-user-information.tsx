@@ -32,12 +32,14 @@ interface AdminCheckOutUserInformationProps {
   userId?: string;
   setUserId?: (id: string) => void;
   isAdmin?: boolean;
+  disabledFields: string[];
 }
 
 export function AdminCheckOutUserInformation({
   userId,
   setUserId,
   isAdmin = false,
+  disabledFields,
 }: AdminCheckOutUserInformationProps) {
   const form = useFormContext();
   const t = useTranslations();
@@ -161,6 +163,7 @@ export function AdminCheckOutUserInformation({
                 <Input
                   {...field}
                   value={field.value ?? ""} // 👈 đảm bảo controlled
+                  disabled={disabledFields.includes("company_name")}
                 />
               </FormControl>
               <FormMessage />
@@ -178,6 +181,7 @@ export function AdminCheckOutUserInformation({
                 <Input
                   {...field}
                   value={field.value ?? ""}
+                  disabled={disabledFields.includes("tax_id")}
                 />
               </FormControl>
               <FormMessage />
@@ -236,6 +240,7 @@ export function AdminCheckOutUserInformation({
                 <Input
                   placeholder=""
                   {...field}
+                  disabled={disabledFields.includes("invoice_address")}
                 />
               </FormControl>
               <FormMessage />
@@ -269,11 +274,12 @@ export function AdminCheckOutUserInformation({
           name="invoice_postal_code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{isAdmin ? "Postal Code" : t("postalCode")}</FormLabel>
+              <FormLabel>Postal Code</FormLabel>
               <FormControl>
                 <Input
                   placeholder=""
                   {...field}
+                  disabled={disabledFields.includes("invoice_postal_code")}
                 />
               </FormControl>
               <FormMessage />
@@ -293,6 +299,7 @@ export function AdminCheckOutUserInformation({
                 <Input
                   placeholder=""
                   {...field}
+                  disabled={disabledFields.includes("invoice_city")}
                 />
               </FormControl>
               <FormMessage />
@@ -303,59 +310,66 @@ export function AdminCheckOutUserInformation({
         <FormField
           control={form.control}
           name="invoice_country"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="text-black font-semibold text-sm">
-                Country
-              </FormLabel>
+          render={({ field }) => {
+            const isDisabled = disabledFields.includes("invoice_country"); // hoặc logic của bạn
 
-              <Popover
-                open={open}
-                onOpenChange={setOpen}
-              >
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className="w-full justify-between"
-                      onClick={() => setOpen(!open)}
-                    >
-                      {field.value
-                        ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
-                            ?.label
-                        : "Select country"}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
+            return (
+              <FormItem className="flex flex-col">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Country
+                </FormLabel>
 
-                <PopoverContent className="w-full p-0 h-[150px]">
-                  <Command>
-                    <CommandInput placeholder="Search country..." />
-                    <CommandList>
-                      <CommandEmpty>No country found.</CommandEmpty>
-                      <CommandGroup>
-                        {COUNTRY_OPTIONS.map((c) => (
-                          <CommandItem
-                            key={c.value}
-                            value={c.label}
-                            onSelect={() => {
-                              field.onChange(c.value);
-                              setOpen(false); // 🔥 đóng popover sau khi chọn
-                            }}
-                            className="cursor-pointer"
-                          >
-                            {c.label}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
+                <Popover
+                  open={isDisabled ? false : open} // ❌ Không cho mở nếu disabled
+                  onOpenChange={(val) => !isDisabled && setOpen(val)}
+                >
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between"
+                        disabled={isDisabled} // 🔥 Disable UI
+                      >
+                        {field.value
+                          ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
+                              ?.label
+                          : "Select country"}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+
+                  {!isDisabled /* ❗ Không render popover khi disabled */ && (
+                    <PopoverContent className="w-full p-0 h-[250px] pointer-events-auto">
+                      <Command>
+                        <CommandInput placeholder="Search country..." />
+                        <CommandList>
+                          <CommandEmpty>No country found.</CommandEmpty>
+                          <CommandGroup>
+                            {COUNTRY_OPTIONS.map((c) => (
+                              <CommandItem
+                                key={c.value}
+                                value={c.label}
+                                onSelect={() => {
+                                  field.onChange(c.value);
+                                  setOpen(false);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                {c.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  )}
+                </Popover>
+
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
       </div>
     </div>

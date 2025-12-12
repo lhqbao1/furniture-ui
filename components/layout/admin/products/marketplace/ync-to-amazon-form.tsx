@@ -221,6 +221,13 @@ const SyncToAmazonForm = ({
             toast.error("brand is missing");
             return;
           }
+          if (
+            product.packages.length === 0 ||
+            product.number_of_packages === 0
+          ) {
+            toast.error("Packages number is missing");
+            return;
+          }
 
           const payload: SyncToAmazonInput = {
             sku: amazonData?.sku ?? product.id_provider,
@@ -237,6 +244,18 @@ const SyncToAmazonForm = ({
             height: product.height,
             width: product.width,
             length: product.length,
+            package_length: Math.max(
+              ...product.packages.map((p) => p.length ?? 0),
+            ),
+            package_height: Math.max(
+              ...product.packages.map((p) => p.height ?? 0),
+            ),
+            package_width: Math.max(
+              ...product.packages.map((p) => p.width ?? 0),
+            ),
+            color: product.color ?? "",
+            unit_count: Number(product.amount_unit ?? 0),
+            unit_count_type: product.unit,
             depth: 0,
             asin: null,
             stock: product.stock,
