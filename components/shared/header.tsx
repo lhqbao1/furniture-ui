@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import ProductSearch from "./product-search";
 import { AlignJustify } from "lucide-react";
