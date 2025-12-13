@@ -32,8 +32,6 @@ import WiderrufDialogTrigger from "./sign-up/widderuf-dialog";
 
 export default function SignUpForm() {
   const t = useTranslations();
-  const router = useRouter();
-  const locale = useLocale();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const schema = getSignUpSchema(t);

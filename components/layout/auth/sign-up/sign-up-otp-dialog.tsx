@@ -44,7 +44,6 @@ export default function SignUpSignUpOtpDialog({
     "",
     "",
   ]);
-  const loginOtpMutation = useLoginOtpGuest();
   const checkOtpMutation = useLoginOtpGuest();
   const signUp = useSignUp();
 
@@ -161,9 +160,9 @@ export default function SignUpSignUpOtpDialog({
         <Button
           className="w-full bg-secondary/95 hover:bg-secondary"
           onClick={handleSubmit}
-          disabled={loginOtpMutation.isPending}
+          disabled={checkOtpMutation.isPending}
         >
-          {loginOtpMutation.isPending ? (
+          {checkOtpMutation.isPending ? (
             <Loader2 className="animate-spin" />
           ) : (
             <div>{t("verifyOTP")}</div>

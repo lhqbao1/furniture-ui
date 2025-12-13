@@ -43,6 +43,7 @@ export default function CheckOutFormSection() {
       }, 500);
     }
   }, []);
+
   // -------------------------------
   // 1️⃣ INIT HOOK (user/cart/address/shipping logic)
   // -------------------------------
@@ -179,18 +180,6 @@ export default function CheckOutFormSection() {
 
           {/* PAYMENT */}
           <div className="space-y-4 py-5 border-y-2">
-            {/* <StripeLayout
-              clientSecret={clientSecret ?? ""}
-              total={total}
-              openDialog={openCardDialog}
-              setOpenDialog={setOpenCardDialog}
-              form={form}
-              // userEmail={form.watch("email")}
-              // additionalAddress={form.watch("shipping_address_additional")}
-              // address={form.watch("shipping_address_line")}
-              // city={form.watch("shipping_city")}
-              // postalCode={form.watch("shipping_postal_code")}
-            /> */}
             {/* ALWAYS SHOW PAYMENT OPTIONS */}
             <CheckoutPaymentUI
               control={form.control}
