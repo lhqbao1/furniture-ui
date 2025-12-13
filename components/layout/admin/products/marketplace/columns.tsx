@@ -31,11 +31,6 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
     product.categories.length === 0;
 
   const handleToggleStatus = () => {
-    if (hasMarketplace) {
-      toast.error("This product is currently on marketplace");
-      return;
-    }
-
     if (isIncomplete && product.is_active === false) {
       toast.error("Product information is incomplete");
       return;
