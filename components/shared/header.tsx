@@ -13,12 +13,17 @@ import HeaderLogo from "../layout/header/header-logo";
 import HeaderCartIcon from "../layout/header/header-cart-icon";
 import HeaderUserLogin from "../layout/header/header-user-login";
 import { getCategoriesWithChildren } from "@/features/category/api";
+import { useGetCategoriesWithChildren } from "@/features/category/hook";
 
-const PageHeader = async () => {
+const PageHeader = () => {
   const [openCart, setOpenCart] = useState(false);
   const [, setExpandAll] = useAtom(expandAllCategoriesAtom);
 
-  const categories = await getCategoriesWithChildren().catch(() => []);
+  const {
+    data: categories,
+    isLoading,
+    isError,
+  } = useGetCategoriesWithChildren();
 
   return (
     <header className="home-banner-top__content sticky top-0 overflow-hidden z-50 bg-white shadow-secondary/10 shadow-xl">
