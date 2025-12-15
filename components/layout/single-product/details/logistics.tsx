@@ -12,10 +12,77 @@ interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
 }
 
+function getLatestInventory(inventory: any[]) {
+  if (!inventory || inventory.length === 0) return null;
+
+  return inventory.reduce((latest, item) => {
+    if (!latest) return item;
+    return new Date(item.date_received) > new Date(latest.date_received)
+      ? item
+      : latest;
+  }, null);
+}
+
+function getMaxDeliveryDays(deliveryTime?: string): number | null {
+  if (!deliveryTime) return null;
+
+  const parts = deliveryTime
+    .split("-")
+    .map((d) => Number(d.trim()))
+    .filter((d) => !isNaN(d));
+
+  if (parts.length === 0) return null;
+
+  return Math.max(...parts);
+}
+
+function addDays(date: Date, days: number) {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+function formatDateDE(date: Date) {
+  return date.toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 const ProductDetailsLogistic = ({
   productDetails,
 }: ProductDetailsLogisticProps) => {
   const t = useTranslations();
+  console.log(productDetails.inventory);
+
+  const maxDeliveryDays = React.useMemo(
+    () => getMaxDeliveryDays(productDetails.delivery_time),
+    [productDetails.delivery_time],
+  );
+
+  const latestInventory = React.useMemo(
+    () => getLatestInventory(productDetails.inventory),
+    [productDetails.inventory],
+  );
+
+  const estimatedDeliveryDate = React.useMemo(() => {
+    if (!maxDeliveryDays) return null;
+
+    // ✅ CASE 1: hết hàng nhưng có incoming inventory
+    if (productDetails.stock === 0 && latestInventory) {
+      return addDays(new Date(latestInventory.date_received), maxDeliveryDays);
+    }
+
+    // ✅ CASE 2: còn hàng → tính từ hôm nay
+    if (productDetails.stock > 0) {
+      return addDays(new Date(), maxDeliveryDays);
+    }
+
+    // ❌ CASE 3: stock = 0 & không inventory → không có date
+    return null;
+  }, [productDetails.stock, latestInventory, maxDeliveryDays]);
+
   return (
     <div className="space-y-2">
       {/* <div>{t("includeVatAndShipping")}</div> */}
@@ -88,6 +155,17 @@ const ProductDetailsLogistic = ({
                 })
               : t("updating")}
           </p>
+          {/* <p className="font-bold">
+            {estimatedDeliveryDate
+              ? t("deliveryDate", {
+                  date: formatDateDE(estimatedDeliveryDate),
+                })
+              : productDetails.delivery_time
+              ? t("deliveryTime", {
+                  days: productDetails.delivery_time,
+                })
+              : t("updating")}
+          </p> */}
           <ul className="space-y-1 text-gray-600 text-sm">
             {productDetails.carrier === "amm" && (
               <>

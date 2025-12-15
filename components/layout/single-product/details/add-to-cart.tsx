@@ -99,9 +99,10 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             <Button
               className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
               type="submit"
-              disabled={productDetails.stock > 0 ? false : true}
+              // disabled={productDetails.stock > 0 ? false : true}
             >
-              {productDetails.stock > 0 ? t("addToCart") : t("outStock")}
+              {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
+              {t("addToCart")}
             </Button>
 
             <div

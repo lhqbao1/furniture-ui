@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   cancelExchangeOrder,
   cancelOrder,
+  changeOrderReturnStatus,
   createCheckOut,
   createDeliveryOrder,
   createManualCheckOut,
@@ -149,6 +150,27 @@ export function useReturnOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (main_checkout_id: string) => returnOrder(main_checkout_id),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables],
+      });
+    },
+  });
+}
+
+export function useChangeOrderReturnStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      status,
+    }: {
+      main_checkout_id: string;
+      status: string;
+    }) => changeOrderReturnStatus(main_checkout_id, status),
     onSuccess: (data, variables) => {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });

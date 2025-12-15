@@ -44,6 +44,13 @@ export interface VoucherUsageInput {
   order_id: string;
 }
 
+export interface GetVoucherForCheckoutInput {
+  product_ids: string[];
+  user_id: string | null;
+  carrier?: string;
+  order_value: number;
+}
+
 export async function createVoucher(input: VoucherFormValues) {
   const { data } = await apiAdmin.post(`/vouchers/`, input, {
     headers: {
@@ -71,7 +78,7 @@ export async function getVouchers(params?: GetAllVouchersParams) {
 }
 
 export async function getVoucherById(voucher_id: string) {
-  const { data } = await apiPublic.get(`/vouchers/${voucher_id}`, {
+  const { data } = await apiPublic.get(`/vouchers/details/${voucher_id}`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -84,7 +91,37 @@ export async function updateVoucher(
   voucher_id: string,
   input: VoucherUpdateValues,
 ) {
-  const { data } = await apiAdmin.put(`/vouchers/${voucher_id}`, input, {
+  const { data } = await apiAdmin.put(
+    `/vouchers/details/${voucher_id}`,
+    input,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    },
+  );
+
+  return data as VoucherItem;
+}
+
+export async function removeProductAssignVoucher(
+  input: AssignVoucherToProduct,
+) {
+  const { data } = await apiAdmin.put("/vouchers/delete-products", input, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data as VoucherItem;
+}
+
+export async function removeUserAssignVoucher(input: AssignVoucherToUser) {
+  const { data } = await apiAdmin.put("/vouchers/delete-users", input, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
@@ -182,4 +219,14 @@ export async function useVoucherApi(input: VoucherUsageInput) {
   });
 
   return data as VoucherShippingItem;
+}
+
+export async function getVoucherForCheckout(input: GetVoucherForCheckoutInput) {
+  const { data } = await apiPublic.post("/vouchers/checkout", input, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data as VoucherItem[];
 }

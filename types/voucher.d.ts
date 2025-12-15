@@ -11,6 +11,7 @@ export interface VoucherItem {
   total_usage_limit: number;
   user_usage_limit: number;
   is_active: boolean;
+  carrier: string[];
 
   id: string;
   created_at: string; // ISO date

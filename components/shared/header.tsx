@@ -12,7 +12,6 @@ import { expandAllCategoriesAtom } from "@/store/categories-drawer";
 import HeaderLogo from "../layout/header/header-logo";
 import HeaderCartIcon from "../layout/header/header-cart-icon";
 import HeaderUserLogin from "../layout/header/header-user-login";
-import { getCategoriesWithChildren } from "@/features/category/api";
 import { useGetCategoriesWithChildren } from "@/features/category/hook";
 
 const PageHeader = () => {

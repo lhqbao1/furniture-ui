@@ -1004,12 +1004,76 @@ export const STATUS_OPTIONS = [
     pos: 5,
   },
   { key: "ds_informed", label: "DS informed", active: true, pos: 6 },
-  { key: "shipped", label: "Dispatched", active: true, pos: 7 },
-  { key: "completed", label: "Dispatched", active: true, pos: 0 },
+  {
+    key: "dispatched",
+    label: "Dispatched",
+    statuses: ["shipped", "completed"],
+    active: true,
+    pos: 7,
+  },
+  // { key: "completed", label: "Dispatched", active: true, pos: 0 },
   { key: "cancel_request", label: "Cancel requested", active: true, pos: 8 },
   { key: "canceled", label: "Canceled", active: true, pos: 9 },
   { key: "return", label: "Return", active: true, pos: 10 },
   { key: "exchange", label: "Exchange", active: true, pos: 11 },
+  { key: "canceled_no_stock", label: "Cancel no stock", active: true, pos: 12 },
+  {
+    key: "items_are_checked",
+    label: "Items are checked",
+    active: true,
+    pos: 13,
+  },
+  {
+    key: "waiting_for_return",
+    label: "Waiting for return",
+    active: true,
+    pos: 14,
+  },
+  {
+    key: "warranty_initiated",
+    label: "Warranty initiated",
+    active: true,
+    pos: 15,
+  },
+  {
+    key: "exchange_initiated",
+    label: "Exchange initiated",
+    active: true,
+    pos: 16,
+  },
+  {
+    key: "credit_note_created",
+    label: "Credit note created",
+    active: true,
+    pos: 17,
+  },
+];
+
+export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
+  completed: ["return"],
+  preparation_shipping: ["canceled"],
+  shipped: ["exchange"],
+  pending: ["paid", "canceled"],
+  paid: ["canceled", "canceled_no_stock"],
+  return: ["items_are_checked"],
+  items_are_checked: ["waiting_for_return"],
+  waiting_for_return: ["warranty_initiated", "exchange_initiated"],
+  exchange_initiated: ["credit_note_created"],
+  warranty_initiated: ["credit_note_created"],
+};
+
+export const VOUCHER_TYPE = [
+  { value: "product", label: "Product" },
+  { value: "order", label: "Order" },
+  { value: "user_specific", label: "User" },
+  { value: "shipping", label: "Shipping" },
+];
+
+export const VOUCHER_TYPES = [
+  { value: "product" },
+  { value: "order" },
+  { value: "user_specific" },
+  { value: "shipping" },
 ];
 
 export const COUNTRY_ORIGIN_OPTIONS = [

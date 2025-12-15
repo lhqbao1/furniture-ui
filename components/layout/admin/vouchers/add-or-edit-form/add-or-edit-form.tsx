@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,27 @@ export default function AddOrEditVouchersForm({
 
   const watchType = form.watch("type");
   const watchDiscountType = form.watch("discount_type");
+  const watchCarrier = form.watch("shipping_method");
+
+  useEffect(() => {
+    if (watchType === "shipping" && watchDiscountType === "freeship") {
+      if (watchCarrier === "dpd") {
+        form.setValue("discount_value", 5.95);
+        form.setValue("max_discount", 5.95);
+      }
+
+      if (watchCarrier === "spedition") {
+        form.setValue("discount_value", 35.95);
+        form.setValue("max_discount", 35.95);
+      }
+    }
+  }, [watchType, watchDiscountType, watchCarrier, form]);
+
+  useEffect(() => {
+    if (watchType !== "shipping") {
+      form.setValue("shipping_method", null);
+    }
+  }, [watchType, form]);
 
   async function handleSubmit(values: VoucherFormValues) {
     const payload = {
@@ -83,6 +104,8 @@ export default function AddOrEditVouchersForm({
             min_order_value: payload.min_order_value,
             name: payload.name,
             start_at: payload.start_at ?? "",
+            total_usage_limit: payload.total_usage_limit,
+            user_usage_limit: payload.user_usage_limit,
           },
         },
         {
@@ -100,10 +123,13 @@ export default function AddOrEditVouchersForm({
       createVoucherMutation.mutate(payload, {
         onSuccess(data, variables) {
           toast.success("Create voucher successful");
-          createShippingVoucherMutation.mutate({
-            max_shipping_discount: variables.discount_value,
-            voucher_id: data.id,
-          });
+          if (variables.type === "shipping") {
+            createShippingVoucherMutation.mutate({
+              max_shipping_discount: variables.discount_value,
+              voucher_id: data.id,
+              shipping_method: variables.shipping_method ?? "",
+            });
+          }
           form.reset();
           onClose?.();
         },
@@ -127,6 +153,7 @@ export default function AddOrEditVouchersForm({
         )}
         className="space-y-6"
       >
+        {/* Voucher status */}
         <FormField
           control={form.control}
           name="is_active"
@@ -148,7 +175,7 @@ export default function AddOrEditVouchersForm({
             </FormItem>
           )}
         />
-        {/* Business name */}
+        {/* Voucher Code */}
         <FormField
           control={form.control}
           name="code"
@@ -166,7 +193,7 @@ export default function AddOrEditVouchersForm({
           )}
         />
 
-        {/* VAT ID */}
+        {/* Voucher Name */}
         <FormField
           control={form.control}
           name="name"
@@ -184,6 +211,7 @@ export default function AddOrEditVouchersForm({
           )}
         />
 
+        {/* Voucher Type */}
         <FormField
           control={form.control}
           name="type"
@@ -199,38 +227,32 @@ export default function AddOrEditVouchersForm({
                 >
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
-                      <RadioGroupItem value="order" />
-                    </FormControl>
-                    <FormLabel className="cursor-pointer">Order</FormLabel>
-                  </FormItem>
-
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
                       <RadioGroupItem value="product" />
                     </FormControl>
                     <FormLabel className="cursor-pointer">Product</FormLabel>
                   </FormItem>
-                  {/* 
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
                       <RadioGroupItem value="user_specific" />
                     </FormControl>
-                    <FormLabel className="cursor-pointer">
-                      User Specific
-                    </FormLabel>
-                  </FormItem> */}
-
+                    <FormLabel className="cursor-pointer">User</FormLabel>
+                  </FormItem>
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
                       <RadioGroupItem
                         value="shipping"
-                        disabled={watchDiscountType === "freeship"}
+                        // disabled={watchDiscountType === "freeship"}
                       />
                     </FormControl>
                     <FormLabel
-                      className={`cursor-pointer ${
-                        watchDiscountType === "freeship" ? "text-gray-300" : ""
-                      }`}
+                      // className={`cursor-pointer
+                      //   ${
+                      //     watchDiscountType === "freeship"
+                      //       ? "text-gray-300"
+                      //       : ""
+                      //   }
+                      // `}
+                      className="curosr-pointer"
                     >
                       Shipping
                     </FormLabel>
@@ -243,6 +265,7 @@ export default function AddOrEditVouchersForm({
           )}
         />
 
+        {/* Voucher Discount Type */}
         <FormField
           control={form.control}
           name="discount_type"
@@ -275,33 +298,60 @@ export default function AddOrEditVouchersForm({
                       Fixed Amount
                     </FormLabel>
                   </FormItem>
-
-                  {/* Free Shipping */}
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <RadioGroupItem
-                        value="freeship"
-                        disabled={watchType === "shipping"} // ⛔ không được phép nếu type = shipping
-                      />
-                    </FormControl>
-                    <FormLabel
-                      className={`cursor-pointer ${
-                        watchType === "shipping" ? "text-gray-300" : ""
-                      }`}
-                    >
-                      Free Shipping
-                    </FormLabel>
-                  </FormItem>
                 </RadioGroup>
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {watchType === "shipping" && (
+          <FormField
+            control={form.control}
+            name="shipping_method"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>Carrier</FormLabel>
+
+                <FormControl>
+                  <RadioGroup
+                    value={field.value ?? ""}
+                    onValueChange={field.onChange}
+                    className="flex gap-6"
+                  >
+                    <FormItem className="flex items-center gap-2">
+                      <FormControl>
+                        <RadioGroupItem value="dpd" />
+                      </FormControl>
+                      <FormLabel className="cursor-pointer">DPD</FormLabel>
+                    </FormItem>
+
+                    <FormItem className="flex items-center gap-2">
+                      <FormControl>
+                        <RadioGroupItem value="spedition" />
+                      </FormControl>
+                      <FormLabel className="cursor-pointer">
+                        Spedition
+                      </FormLabel>
+                    </FormItem>
+
+                    <FormItem className="flex items-center gap-2">
+                      <FormControl>
+                        <RadioGroupItem value="all" />
+                      </FormControl>
+                      <FormLabel className="cursor-pointer">All</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         <div className="grid grid-cols-3 gap-2">
-          {/* Discount Value */}
+          {/* Voucher Discount Value */}
           <FormField
             control={form.control}
             name="discount_value"
@@ -322,6 +372,10 @@ export default function AddOrEditVouchersForm({
                           e.target.value === "" ? null : e.target.valueAsNumber,
                         )
                       }
+                      disabled={
+                        watchDiscountType === "freeship" &&
+                        watchType === "shipping"
+                      }
                     />
                     <span className="absolute left-3 text-gray-500">€</span>
                   </div>
@@ -337,7 +391,7 @@ export default function AddOrEditVouchersForm({
             name="max_discount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Max Discount</FormLabel>
+                <FormLabel>Max Discount (Optional)</FormLabel>
                 <FormControl>
                   <div className="relative flex items-center w-full">
                     <Input
@@ -352,6 +406,10 @@ export default function AddOrEditVouchersForm({
                           e.target.value === "" ? null : e.target.valueAsNumber,
                         )
                       }
+                      disabled={
+                        watchDiscountType === "freeship" &&
+                        watchType === "shipping"
+                      }
                     />
                     <span className="absolute left-3 text-gray-500">€</span>
                   </div>
@@ -361,13 +419,13 @@ export default function AddOrEditVouchersForm({
             )}
           />
 
-          {/* Discount Value */}
+          {/*Min Order Value */}
           <FormField
             control={form.control}
             name="min_order_value"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Min Order Value</FormLabel>
+                <FormLabel>Min Order Value (Optional)</FormLabel>
                 <FormControl>
                   <div className="relative flex items-center w-full">
                     <Input
@@ -393,6 +451,7 @@ export default function AddOrEditVouchersForm({
         </div>
 
         <div className="grid grid-cols-2 gap-4">
+          {/* Voucher Start Date */}
           <FormField
             control={form.control}
             name="start_at"
@@ -434,12 +493,13 @@ export default function AddOrEditVouchersForm({
             )}
           />
 
+          {/* Voucher Expired Date */}
           <FormField
             control={form.control}
             name="end_at"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
+                <FormLabel>Expired Date</FormLabel>
 
                 <Popover>
                   <PopoverTrigger asChild>
