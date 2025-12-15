@@ -362,5 +362,10 @@
   "widderuf": "Cancellation Policy",
   "agree_widderuf": "I have read and agree to these terms.",
   "placeOrder": "Place order",
-  "tax_id_required_when_company": "A tax ID is required when a company name is provided."
+  "tax_id_required_when_company": "A tax ID is required when a company name is provided.",
+  "product_discount": "Product discount",
+  "order_discount": "Order discount",
+  "user_discount": "User discount",
+  "shipping_discount": "Shipping discount",
+  "deliveryDate": "Estimated delivery on {date}"
 }

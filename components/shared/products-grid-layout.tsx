@@ -169,7 +169,7 @@ const ProductsGridLayout = ({
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4">
         {data
-          .filter((p) => p.stock > 0)
+          // .filter((p) => p.stock > 0)
           .map((product, idx) => {
             return (
               <div
@@ -310,15 +310,15 @@ const ProductsGridLayout = ({
                     </Button>
                   </div>
                 </div>
-                {product.stock === 0 && (
-                  <div className="px-3 py-1 text-[#29ABE2] bg-[#D4EEF9] rounded-full absolute top-4 z-[100] right-4 text-sm">
+                {/* {product.stock === 0 && (
+                  <div className="px-3 py-1 text-[#29ABE2] bg-[#D4EEF9] rounded-full absolute top-4 z-30 right-4 text-sm">
                     bald verfügbar
                   </div>
-                )}
-                {product.stock === 0 && (
+                )} */}
+                {/* {product.stock === 0 && (
                   <div
                     className="
-      absolute inset-0 
+      absolute inset-0  
       backdrop-blur-[2px] 
       bg-white/50 
       transition-all duration-300 
@@ -326,7 +326,7 @@ const ProductsGridLayout = ({
       group-hover:bg-transparent z-20 group-hover:z-0
     "
                   ></div>
-                )}
+                )} */}
               </div>
             );
           })}

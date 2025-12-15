@@ -34,7 +34,7 @@ const Footer = () => {
           <ListStars rating={5} />
           <div className="text-sm font-semibold">100% 5-Stars</div>
         </div>
-        <div className="flex flex-col gap-2 items-center justify-center">
+        {/* <div className="flex flex-col gap-2 items-center justify-center">
           <Link
             href={
               "https://www.amazon.de/s?k=PRESTIGE+HOME+LIVING+OUTDOOR&i=kitchen&language=en&search-type=ss&ref=bl_dp_s_web_0"
@@ -53,7 +53,7 @@ const Footer = () => {
           </Link>
           <ListStars rating={5} />
           <div className="text-sm font-semibold">100% 5-Stars</div>
-        </div>
+        </div> */}
         <div className="flex flex-col gap-2 items-center justify-center">
           <Link
             href={"https://www.kaufland.de/shops/Prestige_Home_GmbH/"}

@@ -8,7 +8,7 @@ import {
 import ReturnConfirmDialog from "./dialog/return-confirm-dialog";
 import CancelConfirmDialog from "./dialog/canceled-confirm-dialog";
 import { CheckOutMain } from "@/types/checkout";
-import { STATUS_OPTIONS } from "@/data/data";
+import { STATUS_ACTIVE_RULES, STATUS_OPTIONS } from "@/data/data";
 import PaidConfirmDialog from "./dialog/paid-comfirm-dialog";
 import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
 
@@ -25,51 +25,20 @@ export default function OrderStatusSelector({
   const [openPaid, setOpenPaid] = React.useState(false);
   const [openExchange, setOpenExchange] = React.useState(false);
 
-  // compute items to show in dropdown:
-  // if current status is completed -> only show "return" option
   const options = React.useMemo(() => {
     const current = String(status).toLowerCase();
+    const allowedKeys = STATUS_ACTIVE_RULES[current] ?? [];
 
     return STATUS_OPTIONS.map((item) => {
-      // Khi status là completed → chỉ return được phép active
-      if (current === "completed") {
-        return {
-          ...item,
-          active: item.key === "return",
-        };
-      }
+      // nếu item đại diện cho nhiều status (dispatched)
+      const isCurrent =
+        item.statuses?.includes(current) || item.key === current;
 
-      if (current === "preparation_shipping") {
-        return {
-          ...item,
-          active: item.key === "canceled",
-        };
-      }
-
-      if (current === "shipped") {
-        return {
-          ...item,
-          active: item.key === "exchange",
-        };
-      }
-
-      if (current === "pending") {
-        return {
-          ...item,
-          active: item.key === "paid" || item.key === "canceled",
-        };
-      }
-
-      // Khi status là paid → chỉ canceled active
-      if (current === "paid") {
-        return {
-          ...item,
-          active: item.key === "canceled",
-        };
-      }
-
-      // Các trạng thái khác → tất cả active
-      return { ...item, active: false };
+      return {
+        ...item,
+        active: allowedKeys.includes(item.key),
+        current: isCurrent, // optional: để highlight step hiện tại
+      };
     });
   }, [status]);
 

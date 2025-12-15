@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Drawer,
   DrawerTrigger,
@@ -21,7 +21,11 @@ import {
 } from "@/components/ui/tooltip";
 
 import { useGetProductsSelect } from "@/features/product-group/hook";
-import { useAssignVoucherToProduct } from "@/features/vouchers/hook";
+import {
+  useAssignVoucherToProduct,
+  useGetVoucherProducts,
+  useRemoveProductAssignVoucher,
+} from "@/features/vouchers/hook";
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -35,10 +39,23 @@ const AssignVoucherToProducts = ({ voucher_id, voucher_code }: AssignProps) => {
     all_products: false,
   });
 
+  const {
+    data: selectedProductsServer,
+    isLoading: isLoadingSelectedProducts,
+    isError: isErrorSelectedProducts,
+  } = useGetVoucherProducts(voucher_id);
+
   const assignMutation = useAssignVoucherToProduct();
+  const removeProductsFromVoucher = useRemoveProductAssignVoucher();
 
   const [search, setSearch] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (selectedProductsServer?.length) {
+      setSelectedProducts(selectedProductsServer.map((p) => p.id));
+    }
+  }, [selectedProductsServer]);
 
   /** 🔍 FILTER PRODUCTS BY SEARCH */
   const filtered = useMemo(() => {
@@ -56,10 +73,11 @@ const AssignVoucherToProducts = ({ voucher_id, voucher_code }: AssignProps) => {
     });
   }, [filtered, selectedProducts]);
 
-  /** ✔ Toggle select */
-  const toggleProduct = (id: string) => {
+  const toggleProduct = (productId: string) => {
     setSelectedProducts((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId],
     );
   };
 
@@ -79,6 +97,10 @@ const AssignVoucherToProducts = ({ voucher_id, voucher_code }: AssignProps) => {
         },
       },
     );
+  };
+
+  const handleAddProduct = (productId: string) => {
+    setSelectedProducts((prev) => [...prev, productId]);
   };
 
   return (
@@ -141,7 +163,7 @@ const AssignVoucherToProducts = ({ voucher_id, voucher_code }: AssignProps) => {
               <div
                 key={product.id}
                 className="flex items-center justify-between border rounded-lg px-3 py-2 hover:bg-gray-50 cursor-pointer"
-                onClick={() => toggleProduct(product.id)} // 🔥 Click cả div sẽ toggle
+                onClick={() => toggleProduct(product.id)}
               >
                 <div className="flex justify-center items-center gap-2">
                   <Image
@@ -161,7 +183,7 @@ const AssignVoucherToProducts = ({ voucher_id, voucher_code }: AssignProps) => {
                 <Checkbox
                   checked={checked}
                   onCheckedChange={() => toggleProduct(product.id)}
-                  onClick={(e) => e.stopPropagation()} // ❗ Ngăn div click event
+                  onClick={(e) => e.stopPropagation()}
                 />
               </div>
             );

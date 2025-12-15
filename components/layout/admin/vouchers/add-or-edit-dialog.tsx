@@ -41,7 +41,7 @@ const AddVoucherDialog = ({
             <Button
               variant="ghost"
               size="icon"
-              title="Edit Inventory Data"
+              title="Edit Voucher"
               className="hover:bg-amber-50 hover:border-primary hover:border"
             >
               <Pencil className="w-4 h-4 text-primary" />

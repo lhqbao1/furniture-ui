@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect } from "react";
 import { Calendar } from "lucide-react";
 
 interface ManualAdditionalInformationProps {

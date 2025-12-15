@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Drawer,
   DrawerTrigger,
@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FastForward, Loader2, UserPlus } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -20,12 +20,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import {
-  useAssignVoucherToProduct,
   useAssignVoucherToUser,
+  useGetVoucherUsers,
 } from "@/features/vouchers/hook";
-import Image from "next/image";
 import { toast } from "sonner";
 import { useGetAllCustomers } from "@/features/users/hook";
 
@@ -37,22 +35,38 @@ interface AssignProps {
 const AssignVoucherToUsers = ({ voucher_id, voucher_code }: AssignProps) => {
   const { data: listUsers = [], isLoading } = useGetAllCustomers();
 
+  const { data: selectedUsersServer } = useGetVoucherUsers(voucher_id);
+
   const assignMutation = useAssignVoucherToUser();
 
   const [search, setSearch] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
+  /* 🔄 Sync server → local */
+  useEffect(() => {
+    if (selectedUsersServer) {
+      setSelectedUsers(selectedUsersServer.map((u) => u.id));
+    }
+  }, [selectedUsersServer]);
+
+  /* 🔍 Filter */
   const filtered = useMemo(() => {
     const keyword = search.toLowerCase();
 
     return listUsers.filter((u) => {
       const first = u.first_name?.toLowerCase() ?? "";
       const last = u.last_name?.toLowerCase() ?? "";
-      return first.includes(keyword) || last.includes(keyword);
+      const email = u.email?.toLowerCase() ?? "";
+
+      return (
+        first.includes(keyword) ||
+        last.includes(keyword) ||
+        email.includes(keyword)
+      );
     });
   }, [search, listUsers]);
 
-  /** 🔄 When product is selected → move to top */
+  /* 🔄 Selected users → move to top */
   const sortedUsers = useMemo(() => {
     return [...filtered].sort((a, b) => {
       const aSelected = selectedUsers.includes(a.id);
@@ -61,14 +75,14 @@ const AssignVoucherToUsers = ({ voucher_id, voucher_code }: AssignProps) => {
     });
   }, [filtered, selectedUsers]);
 
-  /** ✔ Toggle select */
+  /* ✔ Toggle local only */
   const toggleUser = (id: string) => {
     setSelectedUsers((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
-  /** ✔ Confirm assign */
+  /* ✔ Confirm – single mutation */
   const handleConfirm = () => {
     assignMutation.mutate(
       {
@@ -77,10 +91,10 @@ const AssignVoucherToUsers = ({ voucher_id, voucher_code }: AssignProps) => {
       },
       {
         onSuccess() {
-          toast.success("Assigned successfully!");
+          toast.success("Updated voucher users successfully!");
         },
         onError() {
-          toast.error("Failed to assign!");
+          toast.error("Update voucher users failed!");
         },
       },
     );

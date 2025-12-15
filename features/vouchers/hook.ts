@@ -12,10 +12,14 @@ import {
   deleteVoucher,
   GetAllVouchersParams,
   getVoucherById,
+  getVoucherForCheckout,
+  GetVoucherForCheckoutInput,
   getVoucherProducts,
   getVouchers,
   getVoucherShipping,
   getVoucherUsers,
+  removeProductAssignVoucher,
+  removeUserAssignVoucher,
   updateVoucher,
   useVoucherApi,
   VoucherUsageInput,
@@ -69,6 +73,49 @@ export function useUpdateVoucher() {
         queryKey: ["voucher", variables.voucher_id],
       });
       queryClient.invalidateQueries({ queryKey: ["vouchers"] });
+    },
+  });
+}
+
+export function useRemoveProductAssignVoucher() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: AssignVoucherToProduct) =>
+      removeProductAssignVoucher(input),
+
+    onSuccess: (_, variables) => {
+      // invalidate voucher detail nếu có voucher_id
+      if ("voucher_id" in variables) {
+        queryClient.invalidateQueries({
+          queryKey: ["voucher", variables.voucher_id],
+        });
+      }
+
+      // invalidate list vouchers
+      queryClient.invalidateQueries({
+        queryKey: ["vouchers"],
+      });
+    },
+  });
+}
+
+export function useRemoveUserAssignVoucher() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: AssignVoucherToUser) => removeUserAssignVoucher(input),
+
+    onSuccess: (_, variables) => {
+      if ("voucher_id" in variables) {
+        queryClient.invalidateQueries({
+          queryKey: ["voucher", variables.voucher_id],
+        });
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: ["vouchers"],
+      });
     },
   });
 }
@@ -165,5 +212,20 @@ export function useGetVoucherShipping() {
 export function useUseVoucher() {
   return useMutation({
     mutationFn: (input: VoucherUsageInput) => useVoucherApi(input),
+  });
+}
+
+export function useGetVoucherForCheckout(
+  input: GetVoucherForCheckoutInput,
+  enabled: boolean = true,
+) {
+  return useQuery({
+    queryKey: ["vouchers", "checkout", input],
+    queryFn: () => getVoucherForCheckout(input),
+    enabled:
+      enabled &&
+      !!input.user_id &&
+      input.product_ids.length > 0 &&
+      input.order_value > 0,
   });
 }
