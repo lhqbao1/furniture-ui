@@ -24,3 +24,11 @@ export const InventoryCreateSchema = z.object({
 });
 
 export type InventoryCreateValues = z.infer<typeof InventoryCreateSchema>;
+
+export const inventoryCreateDefaultValues: InventoryCreateValues = {
+  product_id: "",
+  incoming_stock: 0, // số lượng nhập
+  date_received: "", // string date (ISO hoặc yyyy-mm-dd)
+  cost_received: 0, // giá nhập
+  total_cost: 0, // tổng giá
+};

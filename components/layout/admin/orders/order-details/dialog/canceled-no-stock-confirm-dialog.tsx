@@ -13,7 +13,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useCancelOrder } from "@/features/checkout/hook";
+import {
+  useCancelNoStockOrder,
+  useCancelOrder,
+} from "@/features/checkout/hook";
 
 interface ReturnConfirmDialogProps {
   id: string;
@@ -22,16 +25,16 @@ interface ReturnConfirmDialogProps {
   onClose: () => void;
 }
 
-const CancelConfirmDialog = ({
+const CancelNoStockConfirmDialog = ({
   id,
   status,
   open,
   onClose,
 }: ReturnConfirmDialogProps) => {
-  const cancelOrderMutation = useCancelOrder();
+  const cancelNoStockOrderMutation = useCancelNoStockOrder();
 
   const handleCancel = () => {
-    cancelOrderMutation.mutate(id, {
+    cancelNoStockOrderMutation.mutate(id, {
       onSuccess(data, variables, context) {
         toast.success("Cancel order successfully");
         onClose();
@@ -47,23 +50,6 @@ const CancelConfirmDialog = ({
       open={open}
       onOpenChange={onClose}
     >
-      {/* <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="px-0 py-0"
-          onClick={(e) => {
-            e.preventDefault();
-            if (status.toLocaleLowerCase() !== "paid") {
-              toast.error("Can not cancel this order due to its status");
-            } else {
-              onClose();
-            }
-          }}
-        >
-          <X className="size-4 text-red-500" />
-        </Button>
-      </DialogTrigger> */}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Cancel Order</DialogTitle>
@@ -77,7 +63,7 @@ const CancelConfirmDialog = ({
             <Button
               type="button"
               className="bg-gray-400 text-white hover:bg-gray-500"
-              disabled={cancelOrderMutation.isPending}
+              disabled={cancelNoStockOrderMutation.isPending}
             >
               Cancel
             </Button>
@@ -87,9 +73,9 @@ const CancelConfirmDialog = ({
             onClick={handleCancel}
             hasEffect
             variant="secondary"
-            disabled={cancelOrderMutation.isPending}
+            disabled={cancelNoStockOrderMutation.isPending}
           >
-            {cancelOrderMutation.isPending ? (
+            {cancelNoStockOrderMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               "Confirm"
@@ -101,4 +87,4 @@ const CancelConfirmDialog = ({
   );
 };
 
-export default CancelConfirmDialog;
+export default CancelNoStockConfirmDialog;

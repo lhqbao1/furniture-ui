@@ -97,7 +97,7 @@ const ActionCellChild = ({
       )}
 
       {/* Expand button */}
-      <Button
+      {/* <Button
         variant={"ghost"}
         type="button"
         onClick={() =>
@@ -110,7 +110,7 @@ const ActionCellChild = ({
         ) : (
           <ChevronRight className="size-4 text-gray-600" />
         )}
-      </Button>
+      </Button> */}
     </div>
   );
 };

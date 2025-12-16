@@ -3,7 +3,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CopyCheck, Eye, Loader2, Pencil, Plus } from "lucide-react";
 import { ProductItem } from "@/types/products";
 import { useLocale } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
@@ -16,8 +15,10 @@ import {
 } from "@/components/ui/hover-card";
 import { formatDate } from "@/lib/date-formated";
 import { formatIOSDate } from "@/lib/ios-to-num";
-import AddOrEditInventoryDialog from "./dialog/add-or-edit-inventory";
+import AddOrEditInventoryDialog from "./dialog/add-inventory-dialog";
 import ProductInventoryDeleteDialog from "./dialog/delete-dialog";
+import { Pencil, Trash } from "lucide-react";
+import EditInventoryDialog from "./dialog/edit-inventory-dialog";
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -116,7 +117,7 @@ export const getInventoryColumns = (
     accessorKey: "available",
     header: ({}) => <div className="text-center uppercase">Available</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.stock}</div>;
+      return <div className="text-center">{row.original.stock} pcs.</div>;
     },
   },
 
@@ -124,41 +125,62 @@ export const getInventoryColumns = (
     accessorKey: "reserved",
     header: ({}) => <div className="text-center uppercase">Reserved</div>,
     cell: ({ row }) => {
-      return <div className="text-center">Updating</div>;
+      return (
+        <div className="text-center">{row.original.result_stock} pcs.</div>
+      );
     },
   },
 
   {
     accessorKey: "incomming",
     header: () => (
-      <div className="text-center uppercase">Incoming stock/date/cost</div>
+      <div className="text-center uppercase">Incoming stock / date / cost</div>
     ),
     cell: ({ row }) => {
       const inventoryData = row.original.inventory;
+
+      if (!inventoryData || inventoryData.length === 0) {
+        return <div className="text-center">Updating</div>;
+      }
+
       return (
-        <div className="text-center">
-          {inventoryData && inventoryData.length > 0
-            ? inventoryData.map((item, index) => {
-                return (
-                  <div className="flex justify-center items-center divide-x divide-gray-300">
-                    <span className="px-2">{item.incoming_stock} pcs</span>
-                    <span className="px-2">
-                      {formatIOSDate(item.date_received)}
-                    </span>
-                    <span className="px-2">
-                      €
-                      {(row.original.cost * item.incoming_stock).toLocaleString(
-                        "de-DE",
-                        {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        },
-                      )}
-                    </span>
-                  </div>
-                );
-              })
-            : "Updating"}
+        <div className="flex flex-col gap-2 items-center">
+          {inventoryData.map((item) => (
+            <div
+              key={item.id}
+              className="w-full flex flex-row-reverse items-center justify-end gap-1"
+            >
+              {/* INFO */}
+              <div className="flex justify-center items-center divide-x divide-gray-300 text-sm">
+                <span className="px-2">{item.incoming_stock} pcs</span>
+                <span className="px-2">
+                  {formatIOSDate(item.date_received)}
+                </span>
+                <span className="px-2">
+                  €
+                  {(row.original.cost * item.incoming_stock).toLocaleString(
+                    "de-DE",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    },
+                  )}
+                </span>
+              </div>
+
+              {/* ACTIONS */}
+              <div className="flex gap-2">
+                <EditInventoryDialog
+                  cost={row.original.cost}
+                  productId={row.original.id}
+                  stock={row.original.stock}
+                  inventoryData={item}
+                />
+
+                <ProductInventoryDeleteDialog id={item.id} />
+              </div>
+            </div>
+          ))}
         </div>
       );
     },

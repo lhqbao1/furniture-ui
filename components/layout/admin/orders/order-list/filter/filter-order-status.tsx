@@ -11,24 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-
-export const STATUS_OPTIONS = [
-  { key: "pending", label: "Waiting for payment", active: true, pos: 2 },
-  { key: "paid", label: "Payment received", active: true, pos: 3 },
-  { key: "tock_reserved", label: "Stock reserved", active: true, pos: 4 },
-  {
-    key: "preparation_shipping",
-    label: "Preparing",
-    active: true,
-    pos: 5,
-  },
-  { key: "ds_informed", label: "DS informed", active: true, pos: 6 },
-  { key: "shipped", label: "Dispatched", active: true, pos: 7 },
-  { key: "completed", label: "Completed", active: true, pos: 0 },
-  { key: "cancel_request", label: "Cancel requested", active: true, pos: 8 },
-  { key: "canceled", label: "Canceled", active: true, pos: 9 },
-  { key: "return", label: "Return", active: true, pos: 10 },
-];
+import { STATUS_OPTIONS } from "@/data/data";
 
 export default function OrderStatusFilter() {
   const router = useRouter();

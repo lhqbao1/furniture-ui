@@ -7,7 +7,7 @@ export interface GetAllProductsParams {
   page_size?: number;
   all_products?: string;
   search?: string;
-  is_inventory?: boolean;
+  is_inventory?: string;
   sort_by_stock?: string;
 }
 

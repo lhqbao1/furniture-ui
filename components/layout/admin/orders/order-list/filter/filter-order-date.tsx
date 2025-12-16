@@ -2,14 +2,6 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { SingleDatePicker } from "@/components/shared/single-date-picker";
 
