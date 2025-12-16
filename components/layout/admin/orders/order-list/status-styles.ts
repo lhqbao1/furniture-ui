@@ -113,3 +113,26 @@ export function getStatusStyle(raw: string) {
       return { text: key, bg: "bg-gray-200", color: "text-gray-700" };
   }
 }
+
+export function getShippingStatusStyle(raw: string) {
+  const key = raw.toLowerCase();
+
+  switch (key) {
+    case "pending":
+      return {
+        text: "waiting for shipping",
+        bg: "bg-[#D4EEF9]",
+        color: "text-[#29ABE2]",
+      };
+
+    case "shipped":
+      return {
+        text: "stock reserved",
+        bg: "bg-[#dcfce7]",
+        color: "text-[#22c55e]",
+      };
+
+    default:
+      return { text: key, bg: "bg-gray-200", color: "text-gray-700" };
+  }
+}

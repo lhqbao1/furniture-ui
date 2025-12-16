@@ -64,7 +64,8 @@ export default function CreateOrderPageClient() {
       {
         ...values,
         total_shipping: total_shipping,
-        email: values.email ?? "",
+        email:
+          values.email && values.email?.length > 0 ? values.email : "guest",
         company_name:
           values.company_name?.trim() === "" ? null : values.company_name,
         additional_address:
