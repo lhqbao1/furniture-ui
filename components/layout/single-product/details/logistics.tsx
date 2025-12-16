@@ -23,7 +23,9 @@ function getLatestInventory(inventory: any[]) {
   }, null);
 }
 
-function getMaxDeliveryDays(deliveryTime?: string): number | null {
+function getDeliveryDayRange(
+  deliveryTime?: string,
+): { min: number; max: number } | null {
   if (!deliveryTime) return null;
 
   const parts = deliveryTime
@@ -31,15 +33,18 @@ function getMaxDeliveryDays(deliveryTime?: string): number | null {
     .map((d) => Number(d.trim()))
     .filter((d) => !isNaN(d));
 
-  if (parts.length === 0) return null;
+  if (parts.length === 1) {
+    return { min: parts[0], max: parts[0] };
+  }
 
-  return Math.max(...parts);
-}
+  if (parts.length >= 2) {
+    return {
+      min: Math.min(...parts),
+      max: Math.max(...parts),
+    };
+  }
 
-function addDays(date: Date, days: number) {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
+  return null;
 }
 
 function formatDateDE(date: Date) {
@@ -50,38 +55,61 @@ function formatDateDE(date: Date) {
   });
 }
 
+function addBusinessDays(startDate: Date, businessDays: number) {
+  const result = new Date(startDate);
+  let addedDays = 0;
+
+  while (addedDays < businessDays) {
+    result.setDate(result.getDate() + 1);
+
+    const day = result.getDay();
+    // 0 = Sunday, 6 = Saturday → bỏ qua
+    if (day !== 0 && day !== 6) {
+      addedDays++;
+    }
+  }
+
+  return result;
+}
+
 const ProductDetailsLogistic = ({
   productDetails,
 }: ProductDetailsLogisticProps) => {
   const t = useTranslations();
-  console.log(productDetails.inventory);
-
-  const maxDeliveryDays = React.useMemo(
-    () => getMaxDeliveryDays(productDetails.delivery_time),
-    [productDetails.delivery_time],
-  );
 
   const latestInventory = React.useMemo(
     () => getLatestInventory(productDetails.inventory),
     [productDetails.inventory],
   );
 
-  const estimatedDeliveryDate = React.useMemo(() => {
-    if (!maxDeliveryDays) return null;
+  const deliveryDayRange = React.useMemo(
+    () => getDeliveryDayRange(productDetails.delivery_time),
+    [productDetails.delivery_time],
+  );
 
-    // ✅ CASE 1: hết hàng nhưng có incoming inventory
+  const estimatedDeliveryRange = React.useMemo(() => {
+    if (!deliveryDayRange) return null;
+
+    let startDate: Date | null = null;
+
+    // CASE 1: hết hàng + có inventory
     if (productDetails.stock === 0 && latestInventory) {
-      return addDays(new Date(latestInventory.date_received), maxDeliveryDays);
+      startDate = new Date(latestInventory.date_received);
     }
 
-    // ✅ CASE 2: còn hàng → tính từ hôm nay
+    // CASE 2: còn hàng
     if (productDetails.stock > 0) {
-      return addDays(new Date(), maxDeliveryDays);
+      startDate = new Date();
     }
 
-    // ❌ CASE 3: stock = 0 & không inventory → không có date
-    return null;
-  }, [productDetails.stock, latestInventory, maxDeliveryDays]);
+    // CASE 3: stock = 0 & không inventory
+    if (!startDate) return null;
+
+    return {
+      from: addBusinessDays(startDate, deliveryDayRange.min),
+      to: addBusinessDays(startDate, deliveryDayRange.max),
+    };
+  }, [deliveryDayRange, productDetails.stock, latestInventory]);
 
   return (
     <div className="space-y-2">
@@ -149,23 +177,18 @@ const ProductDetailsLogistic = ({
         <Clock size={30} />
         <div>
           <p className="font-bold">
-            {productDetails.delivery_time
-              ? t("deliveryTime", {
-                  days: productDetails.delivery_time,
-                })
-              : t("updating")}
-          </p>
-          {/* <p className="font-bold">
-            {estimatedDeliveryDate
-              ? t("deliveryDate", {
-                  date: formatDateDE(estimatedDeliveryDate),
+            {estimatedDeliveryRange
+              ? t("deliveryDateRange", {
+                  from: formatDateDE(estimatedDeliveryRange.from),
+                  to: formatDateDE(estimatedDeliveryRange.to),
                 })
               : productDetails.delivery_time
               ? t("deliveryTime", {
                   days: productDetails.delivery_time,
                 })
               : t("updating")}
-          </p> */}
+          </p>
+
           <ul className="space-y-1 text-gray-600 text-sm">
             {productDetails.carrier === "amm" && (
               <>

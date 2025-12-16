@@ -363,5 +363,6 @@
       "order_discount": "Bestellrabatt",
       "user_discount": "Benutzerrabatt",
       "shipping_discount": "Versandrabatt",
-      "deliveryDate": "Voraussichtliche Lieferung am {date}"
+      "deliveryDate": "Voraussichtliche Lieferung am {date}",
+      "deliveryDateRange": "Voraussichtliche Lieferung {from} – {to}"
 }
