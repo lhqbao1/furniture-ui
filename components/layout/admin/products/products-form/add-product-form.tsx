@@ -40,6 +40,10 @@ const ProductForm = ({
   isPending?: boolean;
   productValuesClone?: Partial<ProductItem>;
 }) => {
+  const router = useRouter();
+  const locale = useLocale();
+  const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
+
   const {
     form,
     onSubmit: handleSubmit,
@@ -48,9 +52,7 @@ const ProductForm = ({
     addProductMutation,
     editProductMutation,
   } = useProductForm({ productValues, productValuesClone });
-  const router = useRouter();
-  const locale = useLocale();
-  const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
+
   return (
     <div className="lg:pb-20 lg:px-30 pb-12">
       <Form {...form}>
