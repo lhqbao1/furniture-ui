@@ -11,10 +11,12 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useRouter } from "@/src/i18n/navigation";
 import { CartItem } from "@/types/cart";
 import { CheckOut } from "@/types/checkout";
 import { ColumnDef } from "@tanstack/react-table";
 import { ChevronDown, ChevronRight, Eye } from "lucide-react";
+import { useLocale } from "next-intl";
 
 const ActionCellChild = ({
   items,
@@ -34,7 +36,8 @@ const ActionCellChild = ({
   status?: string;
 }) => {
   const isExpanded = expandedRowId === currentRowId;
-
+  const router = useRouter();
+  const locale = useLocale();
   return (
     <div className="flex justify-center items-center gap-2">
       {/* Eye Icon */}
@@ -69,6 +72,17 @@ const ActionCellChild = ({
           </DialogContent>
         </Dialog>
       )}
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="hover:bg-amber-50"
+        onClick={() =>
+          router.push(`/dsp/admin/orders/${checkoutId}`, { locale })
+        }
+      >
+        <Eye className="w-4 h-4 text-amber-500" />
+      </Button>
 
       <ViewFileChildDialog
         checkoutId={checkoutId}

@@ -9,7 +9,10 @@ import OrderDetailOverView from "@/components/layout/admin/orders/order-details/
 import OrderDetailUser from "@/components/layout/admin/orders/order-details/order-customer";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import AdminBackButton from "@/components/shared/admin-back-button";
-import { useGetMainCheckOutByMainCheckOutId } from "@/features/checkout/hook";
+import {
+  useGetCheckOutByCheckOutId,
+  useGetMainCheckOutByMainCheckOutId,
+} from "@/features/checkout/hook";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { calculateVAT } from "@/lib/caculate-vat";
 import { formatDate, formatDateTimeString } from "@/lib/date-formated";
@@ -18,7 +21,9 @@ import { CheckOutMain } from "@/types/checkout";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
-import OrderDetailsSkeleton from "./skeleton";
+import SupplierOrderDetailsSkeleton from "@/components/layout/dsp/admin/order/order-details/skeleton";
+import OrderOverviewSupplier from "@/components/layout/dsp/admin/order/order-details/order-overview";
+import OrderDetailsShipmentSupplier from "@/components/layout/dsp/admin/order/order-details/order-shipment";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   if (!checkOutMain?.checkouts) return [];
@@ -37,7 +42,7 @@ function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   );
 }
 
-const OrderDetails = () => {
+const SupplierOrderDetails = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const params = useParams<{ id: string }>(); // type-safe
@@ -47,21 +52,16 @@ const OrderDetails = () => {
     data: order,
     isLoading,
     isError,
-  } = useGetMainCheckOutByMainCheckOutId(checkoutId);
+  } = useGetCheckOutByCheckOutId(checkoutId);
 
-  const { data: invoice } = useQuery({
-    queryKey: ["invoice-checkout", checkoutId],
-    queryFn: () => getInvoiceByCheckOut(checkoutId as string),
-    enabled: !!checkoutId,
-    retry: false,
-  });
+  console.log(order);
 
-  const cartItems = useMemo(() => {
-    if (!order) return [];
-    return extractCartItemsFromMain(order);
-  }, [order]);
+  //   const cartItems = useMemo(() => {
+  //     if (!order) return [];
+  //     return extractCartItemsFromMain(order);
+  //   }, [order]);
 
-  if (isLoading) return <OrderDetailsSkeleton />;
+  if (isLoading) return <SupplierOrderDetailsSkeleton />;
   if (isError) return <div>Error loading order</div>;
   if (!order) return <div>Error loading order</div>;
 
@@ -71,20 +71,16 @@ const OrderDetails = () => {
   return (
     <div className="space-y-12 pb-20 mt-6">
       <AdminBackButton />
-      <div className="grid lg:grid-cols-4 grid-cols-2 lg:gap-12 gap-4">
-        <OrderDetailOverView
-          order={order}
-          created_at={createdAt}
-          updated_at={updatedAt}
-          status={order.status}
-        />
-        <OrderDetailUser
-          user={order.checkouts[0].user}
-          shippingAddress={order.checkouts[0].shipping_address}
-          invoiceAddress={order.checkouts[0].invoice_address}
-        />
+      <div className="grid lg:grid-cols-12 grid-cols-2 lg:gap-12 gap-4 items-stretch">
+        <div className="col-span-4 h-full">
+          <OrderOverviewSupplier order={order} />
+        </div>
+
+        <div className="col-span-8 h-full">
+          <OrderDetailsShipmentSupplier order={order} />
+        </div>
       </div>
-      <ProductTable
+      {/* <ProductTable
         data={cartItems}
         columns={orderDetailColumn}
         page={page}
@@ -98,15 +94,14 @@ const OrderDetails = () => {
         hasPagination={false}
         hasCount={false}
         hasHeaderBackGround
-      />
-      <div className="flex justify-between w-full">
+      /> */}
+      {/* <div className="flex justify-between w-full">
         {order.status !== "Pending" ? (
           <div className="flex gap-12">
             <DocumentTable
               order={order}
               invoiceCode={invoice?.invoice_code}
             />
-            {/* <DocumentTable /> */}
           </div>
         ) : (
           ""
@@ -128,9 +123,9 @@ const OrderDetails = () => {
           is_Ebay={order.from_marketplace === "ebay" ? true : false}
         />
       </div>
-      <OrderDeliveryOrder data={order.checkouts} />
+      <OrderDeliveryOrder data={order.checkouts} /> */}
     </div>
   );
 };
 
-export default OrderDetails;
+export default SupplierOrderDetails;
