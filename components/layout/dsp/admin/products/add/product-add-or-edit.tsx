@@ -1,16 +1,11 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import z from "zod";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import "react-quill-new/dist/quill.snow.css";
 import { Loader2 } from "lucide-react";
 import { ProductItem } from "@/types/products";
 import { toast } from "sonner";
-import { CategoryResponse } from "@/types/categories";
-import { useEditProduct } from "@/features/products/hook";
 import {
   Accordion,
   AccordionContent,
@@ -23,12 +18,7 @@ import { useLocale } from "next-intl";
 import ProductDetailInputs from "@/components/layout/admin/products/products-form/fisrt-group";
 import ProductAdditionalInputs from "@/components/layout/admin/products/products-form/product-additional-group";
 import ProductLogisticsGroup from "@/components/layout/admin/products/products-form/product-logistics-group";
-import { useAddProductDSP } from "@/features/dsp/products/hook";
-import {
-  addProductDSPSchema,
-  defaultValuesDSP,
-  ProductInputDSP,
-} from "@/lib/schema/dsp/product";
+import { defaultValuesDSP, ProductInputDSP } from "@/lib/schema/dsp/product";
 import { useProductFormDSP } from "./useProductForm";
 
 interface AddProductFormDSPProps {
@@ -51,8 +41,6 @@ const ProductFormDSP = ({
   const {
     form,
     onSubmit: handleSubmit,
-    isLoadingSEO,
-    setIsLoadingSEO,
     addProductMutation,
     editProductMutation,
   } = useProductFormDSP({ productValues, productValuesClone });
@@ -157,7 +145,6 @@ const ProductFormDSP = ({
                   }`}
                   type="submit"
                   hasEffect
-                  disabled={isLoadingSEO}
                 >
                   {addProductMutation.isPending ||
                   editProductMutation.isPending ? (
@@ -172,7 +159,6 @@ const ProductFormDSP = ({
                   variant={"outline"}
                   className="cursor-pointer text-black text-lg px-8 basis-1/2"
                   type="button"
-                  hasEffect
                   onClick={() => router.back()}
                 >
                   Back
