@@ -21,7 +21,7 @@ import {
 import { ProductTable } from "../../products/products-list/product-table";
 import { cartSupplierColumn } from "@/components/layout/cart/columns";
 import ViewFileChildDialog from "@/components/layout/packaging-dialog/packaging-dialog-chil";
-import { getStatusStyle } from "./status-styles";
+import { getShippingStatusStyle, getStatusStyle } from "./status-styles";
 import CancelExchangeDialog from "../order-details/dialog/cancel-exchange-dialog";
 
 const ActionCell = ({
@@ -633,106 +633,6 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
         currentRowId={row.id}
         status={row.original.status}
-      />
-    ),
-  },
-];
-
-export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
-  {
-    accessorKey: "id",
-    header: "DELIVERY ORDER ID",
-    cell: ({ row }) => {
-      return <div>#{row.original.checkout_code}</div>;
-    },
-  },
-  {
-    accessorKey: "customer",
-    header: "CUSTOMER",
-    cell: ({ row }) => {
-      return (
-        <div>
-          <div>
-            {row.original.user.first_name} {row.original.user.last_name}
-          </div>
-          <div>{row.original.user.email}</div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "channel",
-    header: () => <div className="text-center w-full">CHANNEL</div>,
-    cell: ({ row }) => {
-      const currentChanel = row.original.from_marketplace;
-      const channelLogo =
-        listChanel.find((ch) => ch.name === currentChanel)?.icon ||
-        "new-logo.svg";
-      return (
-        <div className="h-12 relative">
-          <Image
-            src={`/${channelLogo}`}
-            alt="icon"
-            fill
-            className="object-contain p-2"
-            unoptimized
-          />
-        </div>
-        // <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
-      );
-    },
-  },
-  {
-    accessorKey: "created_at",
-    header: () => <div className="text-center w-full">DATE CREATED</div>,
-    cell: ({ row }) => {
-      let iso = row.original.created_at.toString();
-
-      // 👉 Nếu backend không gửi Z, mình thêm vào để JS parse đúng UTC
-      if (!iso.endsWith("Z")) {
-        iso += "Z";
-      }
-
-      const date = new Date(iso);
-
-      const time = date.toLocaleString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Europe/Berlin", // giờ Berlin
-      });
-
-      const day = date.toLocaleString("en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        timeZone: "Europe/Berlin",
-      });
-
-      return (
-        <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
-          <span>{day}</span>
-          <span>{time}</span>
-        </div>
-      );
-    },
-  },
-
-  {
-    accessorKey: "status",
-    header: () => <div className="text-center w-full">STATUS</div>,
-    cell: ({ row }) => (
-      <div className="text-center lowercase">{row.original.status}</div>
-    ),
-  },
-  {
-    id: "actions",
-    header: () => <div className="text-center w-full">ACTIONS</div>,
-    cell: ({ row }) => (
-      <ActionCellChild
-        checkoutId={row.original.id}
-        items={row.original.cart.items}
-        isSupplier
       />
     ),
   },

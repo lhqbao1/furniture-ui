@@ -364,8 +364,6 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
     product.static_files.length === 0 ||
     !product.name ||
     !product.final_price ||
-    !product.cost ||
-    !product.delivery_cost ||
     !product.brand ||
     !product.delivery_time ||
     !product.carrier ||
