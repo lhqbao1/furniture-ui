@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-export const submitProduct = async ({
+export const submitProductDSP = async ({
   values,
   productValues,
   productValuesClone,
@@ -49,13 +49,6 @@ export const submitProduct = async ({
     pdf_files: latestValues.pdf_files ?? [],
   };
 
-  if (payload.is_econelo) {
-    if (!payload.price || !payload.final_price) {
-      toast.error("Econelo products need both price and sale price");
-      return;
-    }
-  }
-
   if (productValuesClone) {
     const { marketplace_products, ...cleanPayload } = payload;
 
@@ -71,7 +64,7 @@ export const submitProduct = async ({
       onSuccess: () => {
         toast.success("Product add successfully");
         form.reset();
-        router.push("/admin/products/list", { locale });
+        router.push("/dsp/admin/products/list", { locale });
       },
       onError: () => {
         toast.error(
@@ -87,10 +80,12 @@ export const submitProduct = async ({
       { id: productValues.id ?? "", input: payload },
       {
         onSuccess: () => {
-          toast.success("Updated product successfully");
+          toast.success("Product updated successfully");
+          router.push("/dsp/admin/products/list", { locale });
+          router.refresh();
         },
         onError: () => {
-          toast.error("Updated product fail");
+          toast.error("Failed to update product");
         },
       },
     );

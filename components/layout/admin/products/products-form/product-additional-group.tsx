@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { COLORS, tags } from "@/data/data";
 import {
   Popover,
   PopoverContent,
@@ -35,10 +34,15 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import countries from "world-countries";
-import { ColorSelect } from "./form-input/color-seclect";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-const ProductAdditionalInputs = () => {
+interface ProductAdditionalInputsProps {
+  isDSP?: boolean;
+}
+
+const ProductAdditionalInputs = ({
+  isDSP = false,
+}: ProductAdditionalInputsProps) => {
   const form = useFormContext();
 
   const unit = [
@@ -415,45 +419,47 @@ const ProductAdditionalInputs = () => {
         />
       </div>
 
-      <div>
-        <FormField
-          control={form.control}
-          name="is_fsc"
-          render={({ field }) => (
-            <FormItem className="flex flex-col space-y-3">
-              <FormLabel className="text-black font-semibold text-sm">
-                Is FSC?
-              </FormLabel>
+      {!isDSP && (
+        <div>
+          <FormField
+            control={form.control}
+            name="is_fsc"
+            render={({ field }) => (
+              <FormItem className="flex flex-col space-y-3">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Is FSC?
+                </FormLabel>
 
-              <FormControl>
-                <RadioGroup
-                  onValueChange={(val) => {
-                    field.onChange(val === "true");
-                  }}
-                  value={field.value ? "true" : "false"}
-                  className="flex gap-6"
-                >
-                  <FormItem className="flex items-center space-x-2">
-                    <FormControl>
-                      <RadioGroupItem value="true" />
-                    </FormControl>
-                    <FormLabel className="font-normal">True</FormLabel>
-                  </FormItem>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={(val) => {
+                      field.onChange(val === "true");
+                    }}
+                    value={field.value ? "true" : "false"}
+                    className="flex gap-6"
+                  >
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <RadioGroupItem value="true" />
+                      </FormControl>
+                      <FormLabel className="font-normal">True</FormLabel>
+                    </FormItem>
 
-                  <FormItem className="flex items-center space-x-2">
-                    <FormControl>
-                      <RadioGroupItem value="false" />
-                    </FormControl>
-                    <FormLabel className="font-normal">False</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <RadioGroupItem value="false" />
+                      </FormControl>
+                      <FormLabel className="font-normal">False</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };
