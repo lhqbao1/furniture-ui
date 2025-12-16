@@ -16,7 +16,7 @@ import { userIdAtom } from "@/store/auth";
 import { CartResponseItem } from "@/types/cart";
 import { useAtom } from "jotai";
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import ProductVoucher from "./checkout-voucher";
 import { voucherIdAtom } from "@/store/voucher";
@@ -37,7 +37,7 @@ const CheckoutSummary = ({
   const form = useFormContext();
   const t = useTranslations();
   const [userId, setUserId] = useAtom(userIdAtom);
-  const [voucherId, setVoucherId] = useAtom(voucherIdAtom);
+  const [voucherId, setVoucherId] = useState<string | null>(null);
 
   const voucherAmount = useWatch({
     control: form.control,
@@ -95,13 +95,12 @@ const CheckoutSummary = ({
   );
 
   const { data: selectedVoucher, isLoading: isLoadingVoucher } =
-    useGetVoucherById(voucherId);
+    useGetVoucherById(voucherId ?? "");
 
   React.useEffect(() => {
     if (!selectedVoucher) return;
 
     const currentValue = form.getValues("voucher_amount");
-    console.log(currentValue);
     let nextValue = 0;
 
     /**
@@ -251,7 +250,14 @@ const CheckoutSummary = ({
           {/* discount */}
           <div className="grid grid-cols-5">
             <span className="col-span-3 text-right">{t("discount")}</span>
-            <span className="text-right col-span-2">€0</span>
+            <span className="text-right col-span-2">
+              €
+              {voucherAmount
+                ? voucherAmount.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                  })
+                : 0}
+            </span>
           </div>
 
           {/* TOTAL */}

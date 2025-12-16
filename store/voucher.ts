@@ -1,3 +1,3 @@
 import { atomWithStorage } from "jotai/utils";
 
-export const voucherIdAtom = atomWithStorage<string>("voucher_id", "");
+export const voucherIdAtom = atomWithStorage<string | null>("voucher_id", null);

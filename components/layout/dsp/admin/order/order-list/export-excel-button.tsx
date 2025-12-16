@@ -22,7 +22,7 @@ export default function ExportExcelButton({ data }: { data: CheckOut[] }) {
       ship_to_country: clean(p.shipping_address.country),
       ship_to_postal_code: clean(p.shipping_address.postal_code),
       ship_to_city: clean(p.shipping_address.city),
-      status: clean(p.status),
+      status: clean(p.shipment.status),
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);

@@ -14,6 +14,7 @@ const ProductVoucher = ({
   item,
 }: ProductVoucherProps) => {
   const t = useTranslations();
+
   return (
     <div
       onClick={onSelect}

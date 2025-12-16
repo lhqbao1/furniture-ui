@@ -31,6 +31,7 @@ const DSPOrderList = () => {
         />
       ) : (
         <ProductTable
+          hasHeaderBackGround
           data={data ? data.items : []}
           columns={orderChildSupplierColumns}
           page={page}
@@ -40,6 +41,9 @@ const DSPOrderList = () => {
           totalItems={data?.pagination.total_items ?? 0}
           totalPages={data?.pagination.total_pages ?? 0}
           hasBackground
+          hasExpanded
+          hasPagination={false}
+          hasCount={false}
         />
       )}
     </div>
