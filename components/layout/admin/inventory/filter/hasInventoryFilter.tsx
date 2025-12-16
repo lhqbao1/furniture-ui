@@ -38,7 +38,7 @@ export default function ProductHasInventoryFilter() {
 
   return (
     <div className="flex flex-col gap-3">
-      <Label className="font-medium">Product Status</Label>
+      <Label className="font-medium">Has Inventory</Label>
 
       <RadioGroup
         value={value}

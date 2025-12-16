@@ -21,6 +21,8 @@ import ListVariant from "../list-variant";
 import { useQuery } from "@tanstack/react-query";
 import { getProductGroupDetail } from "@/features/product-group/api";
 import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
+import { Input } from "@/components/ui/input";
+import { FormQuantityInput } from "./quantity-input";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -81,12 +83,11 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                 <FormItem>
                   <FormLabel>{t("quantity")}</FormLabel>
                   <FormControl>
-                    <FormNumberInput
-                      {...field}
-                      min={productDetails.stock === 0 ? 0 : 1}
-                      max={productDetails.stock}
-                      stepper={1}
-                      placeholder={productDetails.stock === 0 ? "0" : "1"}
+                    <FormQuantityInput
+                      value={field.value ?? 1}
+                      onChange={field.onChange}
+                      min={1}
+                      max={productDetails.stock || undefined}
                     />
                   </FormControl>
                   <FormMessage />

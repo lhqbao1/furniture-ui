@@ -197,6 +197,7 @@ export type ProductItem = {
   brand: BrandResponse;
 
   delivery_multiple: boolean;
+  return_cost: number;
   materials: string;
   color: string;
   number_of_packages: number;
