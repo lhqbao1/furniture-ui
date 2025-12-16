@@ -24,6 +24,7 @@ export default function OrderStatusSelector({
   const [openCancel, setOpenCancel] = React.useState(false);
   const [openPaid, setOpenPaid] = React.useState(false);
   const [openExchange, setOpenExchange] = React.useState(false);
+  const [openCancelNoStock, setOpenCancelNoStock] = React.useState(false);
 
   const options = React.useMemo(() => {
     const current = String(status).toLowerCase();
@@ -54,6 +55,8 @@ export default function OrderStatusSelector({
       setOpenPaid(true);
     } else if (val === "exchange") {
       setOpenExchange(true);
+    } else if (val === "canceled_no_stock") {
+      setOpenCancelNoStock(true);
     }
   };
 
@@ -121,6 +124,18 @@ export default function OrderStatusSelector({
           open={openCancel}
           onClose={() => {
             setOpenCancel(false);
+            setValue(status.toLocaleLowerCase());
+          }}
+        />
+      )}
+
+      {openCancelNoStock && (
+        <CancelConfirmDialog
+          id={order.id}
+          status={status}
+          open={openCancelNoStock}
+          onClose={() => {
+            setOpenCancelNoStock(false);
             setValue(status.toLocaleLowerCase());
           }}
         />

@@ -11,10 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash } from "lucide-react";
 import { toast } from "sonner";
-import { Customer } from "@/types/user";
-import { useDeleteCustomer } from "@/features/users/hook";
+import { useDeleteInventory } from "@/features/products/inventory/hook";
 
 interface ProductInventoryDeleteDialogProps {
   id: string;
@@ -23,17 +22,17 @@ interface ProductInventoryDeleteDialogProps {
 const ProductInventoryDeleteDialog = ({
   id,
 }: ProductInventoryDeleteDialogProps) => {
-  const deleteCustomerMutation = useDeleteCustomer();
+  const deleteInventoryMutation = useDeleteInventory();
   const [open, setOpen] = useState(false);
 
   const handleDelete = () => {
-    deleteCustomerMutation.mutate(id ?? "", {
+    deleteInventoryMutation.mutate(id, {
       onSuccess(data, variables, context) {
-        toast.success("Delete customer successfully");
+        toast.success("Delete inventory data successfully");
         setOpen(false);
       },
       onError(error, variables, context) {
-        toast.error("Delete customer fail");
+        toast.error("Delete inventory data fail");
         setOpen(false);
       },
     });
@@ -44,23 +43,21 @@ const ProductInventoryDeleteDialog = ({
       onOpenChange={setOpen}
     >
       <DialogTrigger asChild>
+        {/* 🗑 DELETE */}
         <Button
-          variant="ghost"
           size="icon"
-          onClick={(e) => {
-            e.preventDefault();
-            setOpen(true);
-          }}
+          variant="ghost"
+          className="hover:bg-red-50 hover:border-red-600 hover:border"
         >
-          <Trash2 className="size-4 text-red-500" />
+          <Trash className="w-4 h-4 text-red-600" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Delete Customer</DialogTitle>
+          <DialogTitle>Delete Inventory Data</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this customer? This action cannot be
-            undone.
+            Are you sure you want to delete this inventory Data? This action
+            cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-start">
@@ -68,7 +65,7 @@ const ProductInventoryDeleteDialog = ({
             <Button
               type="button"
               className="bg-gray-400 text-white hover:bg-gray-500"
-              disabled={deleteCustomerMutation.isPending}
+              disabled={deleteInventoryMutation.isPending}
             >
               Cancel
             </Button>
@@ -78,9 +75,9 @@ const ProductInventoryDeleteDialog = ({
             onClick={handleDelete}
             hasEffect
             variant="secondary"
-            disabled={deleteCustomerMutation.isPending}
+            disabled={deleteInventoryMutation.isPending}
           >
-            {deleteCustomerMutation.isPending ? (
+            {deleteInventoryMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               "Delete"

@@ -35,7 +35,7 @@ import {
 import React from "react";
 import { toast } from "sonner";
 
-interface AddOrEditInventoryDialogProps {
+interface EditInventoryDialogProps {
   productId: string;
   cost: number; // 👈 thêm
   stock: number; // 👈 thêm
@@ -46,7 +46,7 @@ interface AddOrEditInventoryDialogProps {
     date_received: string;
     cost_received: number;
     total_cost: number;
-  }[];
+  };
 }
 
 function toIsoWithoutZ(date: Date) {
@@ -58,26 +58,24 @@ function fromDateInputToIsoNoZ(value: string) {
   return d.toISOString().replace(/Z$/, "");
 }
 
-export default function AddOrEditInventoryDialog({
+export default function EditInventoryDialog({
   productId,
   cost,
   stock,
-  inventoryData = [],
-}: AddOrEditInventoryDialogProps) {
-  const isEdit = inventoryData.length > 0;
-  const editItem = inventoryData[0];
+  inventoryData,
+}: EditInventoryDialogProps) {
   const [open, setOpen] = React.useState(false);
 
   const form = useForm<InventoryCreateValues>({
     resolver: zodResolver(InventoryCreateSchema),
     defaultValues: {
       product_id: productId,
-      incoming_stock: editItem?.incoming_stock ?? 0,
-      date_received: editItem?.date_received
-        ? editItem.date_received.replace(/Z$/, "") // bỏ Z nếu có
+      incoming_stock: inventoryData?.incoming_stock,
+      date_received: inventoryData?.date_received
+        ? inventoryData.date_received.replace(/Z$/, "") // bỏ Z nếu có
         : toIsoWithoutZ(new Date()),
-      cost_received: editItem?.cost_received ?? 0,
-      total_cost: editItem?.total_cost ?? 0,
+      cost_received: inventoryData?.cost_received,
+      total_cost: inventoryData?.total_cost,
     },
   });
 
@@ -90,12 +88,9 @@ export default function AddOrEditInventoryDialog({
     form.setValue("cost_received", calculated);
   }, [incomingStock, cost, form]);
 
-  const createInventoryDataMutation = useCreateInventory();
   const editInventoryDataMutation = useUpdateInventory();
 
-  const loading = isEdit
-    ? editInventoryDataMutation.isPending
-    : createInventoryDataMutation.isPending;
+  const loading = editInventoryDataMutation.isPending;
 
   const onSubmit = (values: InventoryCreateValues) => {
     const totalCost = stock * cost;
@@ -106,39 +101,21 @@ export default function AddOrEditInventoryDialog({
       total_cost: totalCost,
     };
 
-    if (isEdit && editItem?.id) {
-      editInventoryDataMutation.mutate(
-        {
-          id: editItem.id,
-          payload,
+    editInventoryDataMutation.mutate(
+      {
+        id: inventoryData?.id ?? "",
+        payload: payload,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Create inventory data successfully");
+          setOpen(false);
         },
-        {
-          onSuccess: () => {
-            toast.success("Inventory updated successfully");
-            setOpen(false);
-          },
-          onError: () => {
-            toast.error("Failed to update inventory");
-          },
+        onError: () => {
+          toast.error("Create inventory data failed");
         },
-      );
-    } else {
-      createInventoryDataMutation.mutate(
-        {
-          ...payload,
-          product_id: productId,
-        },
-        {
-          onSuccess: () => {
-            toast.success("Inventory created successfully");
-            setOpen(false);
-          },
-          onError: () => {
-            toast.error("Failed to create inventory");
-          },
-        },
-      );
-    }
+      },
+    );
   };
 
   return (
@@ -148,33 +125,20 @@ export default function AddOrEditInventoryDialog({
     >
       {/* Trigger */}
       <DialogTrigger asChild>
-        {isEdit ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            title="Edit Inventory Data"
-            className="hover:bg-amber-50 hover:border-primary hover:border"
-          >
-            <Pencil className="w-4 h-4 text-primary" />
-          </Button>
-        ) : (
-          <Button
-            variant="ghost"
-            size="icon"
-            title="Add Inventory Data"
-            className="hover:bg-green-50 hover:border-green-400 hover:border"
-          >
-            <Plus className="w-4 h-4 text-green-400" />
-          </Button>
-        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Edit Inventory Data"
+          className="hover:bg-amber-50 hover:border-primary hover:border"
+        >
+          <Pencil className="w-4 h-4 text-primary" />
+        </Button>
       </DialogTrigger>
 
       {/* Dialog Content */}
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Edit Inventory" : "Add Inventory"}
-          </DialogTitle>
+          <DialogTitle>Edit Inventory</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -265,9 +229,7 @@ export default function AddOrEditInventoryDialog({
               disabled={loading}
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              <span className={loading ? "opacity-50" : ""}>
-                {isEdit ? "Save Changes" : "Add Inventory"}
-              </span>
+              <span className={loading ? "opacity-50" : ""}>Save Changes</span>
             </Button>
           </form>
         </Form>

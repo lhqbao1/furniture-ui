@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
+import InventoryFilterForm from "./filter-form";
 
 export enum ToolbarType {
   product = "product",
@@ -145,7 +146,7 @@ export default function InventoryTableToolbar({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
       <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
         {/* <DropdownMenu>
@@ -230,20 +231,19 @@ export default function InventoryTableToolbar({
           </DropdownMenuContent>
         </DropdownMenu> */}
 
-        {/* <DropdownMenu>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
+              variant="outline"
               className="flex items-center gap-1"
             >
-              View <ChevronDown className="h-4 w-4" />
+              Filter <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Compact</DropdownMenuItem>
-            <DropdownMenuItem>Comfortable</DropdownMenuItem>
+          <DropdownMenuContent className="w-[800px] px-8 py-4">
+            <InventoryFilterForm />
           </DropdownMenuContent>
-        </DropdownMenu> */}
+        </DropdownMenu>
 
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -260,48 +260,7 @@ export default function InventoryTableToolbar({
             <DropdownMenuItem>Price</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu> */}
-
-        {/* {addButtonText && (
-          <Button
-            className="bg-primary hover:bg-primary font-semibold"
-            onClick={() => {
-              if (addButtonUrl) {
-                router.push(addButtonUrl, { locale });
-              } else if (isAddButtonModal) {
-                setOpenAddModal(true);
-              }
-            }}
-          >
-            {addButtonText}
-          </Button>
-        )} */}
       </div>
-      {/* <Button
-        variant={"secondary"}
-        onClick={() => handleDownloadZip()}
-      >
-        Download images
-      </Button>
-
-      {isAddButtonModal && (
-        <Dialog
-          open={openAddModal}
-          onOpenChange={setOpenAddModal}
-        >
-          <DialogContent className="w-1/3">
-            <DialogHeader>
-              <DialogTitle>{addButtonText}</DialogTitle>
-            </DialogHeader>
-            {addButtonModalContent &&
-              React.cloneElement(
-                addButtonModalContent as React.ReactElement<{
-                  onClose?: () => void;
-                }>,
-                { onClose: () => setOpenAddModal(false) },
-              )}
-          </DialogContent>
-        </Dialog>
-      )} */}
     </div>
   );
 }

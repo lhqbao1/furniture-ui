@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { VoucherItem } from "@/types/voucher";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -63,9 +64,12 @@ const ProductVoucher = ({
 
       {/* footer */}
       <div className="flex justify-between items-center">
-        <button className="bg-black text-white text-xs px-3 py-1 rounded-full">
+        <Button
+          type="button"
+          className="bg-black text-white hover:bg-secondary text-xs px-3 py-1 rounded-full"
+        >
           {t("applyCode")}
-        </button>
+        </Button>
         <span className="font-bold text-xs">{item.code}</span>
       </div>
     </div>

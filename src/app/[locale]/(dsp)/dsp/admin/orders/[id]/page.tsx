@@ -24,23 +24,7 @@ import React, { useMemo, useState } from "react";
 import SupplierOrderDetailsSkeleton from "@/components/layout/dsp/admin/order/order-details/skeleton";
 import OrderOverviewSupplier from "@/components/layout/dsp/admin/order/order-details/order-overview";
 import OrderDetailsShipmentSupplier from "@/components/layout/dsp/admin/order/order-details/order-shipment";
-
-function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
-  if (!checkOutMain?.checkouts) return [];
-
-  return (
-    checkOutMain.checkouts
-      // lọc bỏ exchange + cancel_exchange
-      .filter((checkout) => {
-        const status = checkout.status?.toLowerCase();
-        return status !== "exchange" && status !== "cancel_exchange";
-      })
-      // sau đó mới lấy cart items
-      .flatMap((checkout) =>
-        checkout.cart.items.flatMap((cartGroup) => cartGroup),
-      )
-  );
-}
+import { orderDetailItemColumnSupplier } from "@/components/layout/dsp/admin/order/order-details/order-details-items-columns";
 
 const SupplierOrderDetails = () => {
   const [page, setPage] = useState(1);
@@ -54,13 +38,6 @@ const SupplierOrderDetails = () => {
     isError,
   } = useGetCheckOutByCheckOutId(checkoutId);
 
-  console.log(order);
-
-  //   const cartItems = useMemo(() => {
-  //     if (!order) return [];
-  //     return extractCartItemsFromMain(order);
-  //   }, [order]);
-
   if (isLoading) return <SupplierOrderDetailsSkeleton />;
   if (isError) return <div>Error loading order</div>;
   if (!order) return <div>Error loading order</div>;
@@ -70,7 +47,12 @@ const SupplierOrderDetails = () => {
 
   return (
     <div className="space-y-12 pb-20 mt-6">
-      <AdminBackButton />
+      <div>
+        <AdminBackButton />
+        <div className="text-center text-3xl text-secondary font-semibold">
+          Order Details
+        </div>
+      </div>
       <div className="grid lg:grid-cols-12 grid-cols-2 lg:gap-12 gap-4 items-stretch">
         <div className="col-span-4 h-full">
           <OrderOverviewSupplier order={order} />
@@ -80,21 +62,20 @@ const SupplierOrderDetails = () => {
           <OrderDetailsShipmentSupplier order={order} />
         </div>
       </div>
-      {/* <ProductTable
-        data={cartItems}
-        columns={orderDetailColumn}
+
+      <ProductTable
+        data={order.cart.items}
+        columns={orderDetailItemColumnSupplier(order)}
         page={page}
         setPage={setPage}
         pageSize={pageSize}
         setPageSize={setPageSize}
-        totalItems={cartItems.length}
-        totalPages={Math.ceil(
-          extractCartItemsFromMain(order).length / pageSize,
-        )}
+        totalItems={order.cart.items.length}
+        totalPages={1}
         hasPagination={false}
         hasCount={false}
         hasHeaderBackGround
-      /> */}
+      />
       {/* <div className="flex justify-between w-full">
         {order.status !== "Pending" ? (
           <div className="flex gap-12">

@@ -1051,9 +1051,9 @@ export const STATUS_OPTIONS = [
 
 export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   completed: ["return"],
-  preparation_shipping: ["canceled"],
+  preparation_shipping: ["canceled", "canceled_no_stock"],
   shipped: ["exchange"],
-  pending: ["paid", "canceled"],
+  pending: ["paid", "canceled", "canceled_no_stock"],
   paid: ["canceled", "canceled_no_stock"],
   return: ["items_are_checked"],
   items_are_checked: ["waiting_for_return"],

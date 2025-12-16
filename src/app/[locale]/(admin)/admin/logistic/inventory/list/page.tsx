@@ -1,10 +1,10 @@
 "use client";
 import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
-import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductTableSkeleton from "@/components/shared/table-skeleton";
 import { useGetAllProducts } from "@/features/products/hook";
+import { useProductInventoryFilters } from "@/hooks/admin/inventory/useInventoryFilter";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { sortByStockAtom } from "@/store/product";
@@ -17,10 +17,9 @@ const AdminInventoryList = () => {
   const [pageSize, setPageSize] = useState(50);
   const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
 
-  const router = useRouter();
   const searchParams = useSearchParams();
-
-  const filters = useProductListFilters();
+  const router = useRouter();
+  const filters = useProductInventoryFilters();
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
@@ -41,17 +40,36 @@ const AdminInventoryList = () => {
     page_size: pageSize,
     all_products: filters.all_products,
     search: filters.search,
-    sort_by_stock: filters.sort_by_stock,
-    is_inventory: false,
+    is_inventory: filters.is_inventory,
   });
 
   if (isError) return <div>No data</div>;
 
+  const sortedItems = React.useMemo(() => {
+    if (!data?.items) return [];
+
+    return [...data.items].sort((a, b) => {
+      const aHasInventory =
+        Array.isArray(a.inventory) && a.inventory.length > 0;
+      const bHasInventory =
+        Array.isArray(b.inventory) && b.inventory.length > 0;
+
+      // a có inventory, b không → a lên trước
+      if (aHasInventory && !bHasInventory) return -1;
+
+      // b có inventory, a không → b lên trước
+      if (!aHasInventory && bHasInventory) return 1;
+
+      // cả hai giống nhau → giữ nguyên thứ tự
+      return 0;
+    });
+  }, [data?.items]);
   return (
     <div className="space-y-6 pb-12">
       <div className="text-3xl text-secondary font-bold text-center">
         Inventory
       </div>
+
       <InventoryTableToolbar
         pageSize={pageSize}
         setPageSize={setPageSize}
@@ -64,7 +82,7 @@ const AdminInventoryList = () => {
         <ProductTableSkeleton />
       ) : (
         <ProductTable
-          data={data ? data.items : []}
+          data={sortedItems}
           columns={getInventoryColumns(setSortByStock)}
           page={page}
           pageSize={pageSize}

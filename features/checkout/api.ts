@@ -176,6 +176,13 @@ export async function cancelOrder(main_checkout_id: string) {
   return data;
 }
 
+export async function cancelNoStockOrder(main_checkout_id: string) {
+  const { data } = await apiAdmin.put(
+    `/checkout/caceled-no-stock/${main_checkout_id}`,
+  );
+  return data;
+}
+
 export async function createDeliveryOrder(
   main_checkout_id: string,
   payload: DeliveryOrderPayload,
