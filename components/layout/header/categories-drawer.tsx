@@ -83,7 +83,7 @@ export default function CategoriesDrawer({ categories }: Props) {
           <DrawerTitle>{t("categories")}</DrawerTitle>
         </DrawerHeader>
 
-        <div className="space-y-2 mt-4 overflow-y-scroll">
+        <div className="space-y-2 mt-4 overflow-y-auto">
           {categories.map((cate) => (
             <Collapsible
               key={cate.id}
