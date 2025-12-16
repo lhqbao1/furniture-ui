@@ -280,7 +280,7 @@ const SyncToEbayForm = ({
               price: kauflandData?.final_price ?? product.final_price,
               stock: product.stock,
               carrier: product.carrier,
-              sku: product.sku,
+              sku: product.id_provider,
               product_id: product.id,
               ...(kauflandData?.min_stock !== undefined && {
                 min_stock: kauflandData.min_stock,

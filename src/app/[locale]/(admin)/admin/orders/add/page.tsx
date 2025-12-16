@@ -1,5 +1,5 @@
-import PageWrapper from "./page-wrapper";
+import CreateOrderPageClient from "./page-client";
 
 export default function Page() {
-  return <PageWrapper />;
+  return <CreateOrderPageClient />;
 }

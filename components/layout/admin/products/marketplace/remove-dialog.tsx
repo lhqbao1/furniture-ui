@@ -17,6 +17,7 @@ import { useDeleteSupplier } from "@/features/supplier/hook";
 import { MarketplaceProduct, ProductItem } from "@/types/products";
 import { useRemoveFormEbay } from "@/features/ebay/hook";
 import { useRemoveFormKaufland } from "@/features/kaufland/hook";
+import { useRemoveFromAmazon } from "@/features/amazon/hook";
 
 interface RemoveFromMarketplaceDialogProps {
   marketplace: string;
@@ -33,6 +34,7 @@ const RemoveFromMarketplaceDialog = ({
 
   const removeFromEbayMutation = useRemoveFormEbay();
   const removeFromKauflandMutation = useRemoveFormKaufland();
+  const removeFromAmazonMutation = useRemoveFromAmazon();
 
   const handleRemove = () => {
     if (marketplace === "ebay" && marketplaceProduct) {
@@ -42,7 +44,7 @@ const RemoveFromMarketplaceDialog = ({
           setOpen(false);
         },
         onError: () => {
-          toast.error("Failed to remove from eBay");
+          toast.error("Removed from Ebay failed");
           setOpen(false);
         },
       });
@@ -56,11 +58,22 @@ const RemoveFromMarketplaceDialog = ({
             setOpen(false);
           },
           onError: () => {
-            toast.error("Failed to remove from Kaufland");
+            toast.error("Removed from Kaufland failed");
             setOpen(false);
           },
         },
       );
+    } else if (marketplace === "amazon" && marketplaceProduct) {
+      removeFromAmazonMutation.mutate(product.sku, {
+        onSuccess: () => {
+          toast.success("Removed from Amazon successfully");
+          setOpen(false);
+        },
+        onError: () => {
+          toast.error("Removed from Amazon failed");
+          setOpen(false);
+        },
+      });
     }
   };
   return (
