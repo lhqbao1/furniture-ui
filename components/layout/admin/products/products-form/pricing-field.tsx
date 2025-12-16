@@ -86,6 +86,40 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
         />
       </div>
 
+      {isDsp && (
+        <FormField
+          control={form.control}
+          name="return_cost"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel className="text-black font-semibold text-sm">
+                Return cost
+              </FormLabel>
+              <FormControl>
+                <div className="relative flex items-center w-full">
+                  <Input
+                    {...field}
+                    type="number"
+                    // min={0}
+                    className="pl-7"
+                    step="0.01" // hoặc "any" để cho phép mọi số thập phân
+                    inputMode="decimal" // hint cho bàn phím mobile
+                    value={field.value ?? ""} // tránh uncontrolled / NaN
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === "" ? null : e.target.valueAsNumber,
+                      )
+                    }
+                  />
+                  <span className="absolute left-3 text-gray-500">€</span>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
+
       {isDsp ? (
         ""
       ) : (

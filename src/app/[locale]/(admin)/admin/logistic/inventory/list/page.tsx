@@ -45,25 +45,25 @@ const AdminInventoryList = () => {
 
   if (isError) return <div>No data</div>;
 
-  const sortedItems = React.useMemo(() => {
-    if (!data?.items) return [];
+  // const sortedItems = React.useMemo(() => {
+  //   if (!data?.items) return [];
 
-    return [...data.items].sort((a, b) => {
-      const aHasInventory =
-        Array.isArray(a.inventory) && a.inventory.length > 0;
-      const bHasInventory =
-        Array.isArray(b.inventory) && b.inventory.length > 0;
+  //   return [...data.items].sort((a, b) => {
+  //     const aHasInventory =
+  //       Array.isArray(a.inventory) && a.inventory.length > 0;
+  //     const bHasInventory =
+  //       Array.isArray(b.inventory) && b.inventory.length > 0;
 
-      // a có inventory, b không → a lên trước
-      if (aHasInventory && !bHasInventory) return -1;
+  //     // a có inventory, b không → a lên trước
+  //     if (aHasInventory && !bHasInventory) return -1;
 
-      // b có inventory, a không → b lên trước
-      if (!aHasInventory && bHasInventory) return 1;
+  //     // b có inventory, a không → b lên trước
+  //     if (!aHasInventory && bHasInventory) return 1;
 
-      // cả hai giống nhau → giữ nguyên thứ tự
-      return 0;
-    });
-  }, [data?.items]);
+  //     // cả hai giống nhau → giữ nguyên thứ tự
+  //     return 0;
+  //   });
+  // }, [data?.items]);
   return (
     <div className="space-y-6 pb-12">
       <div className="text-3xl text-secondary font-bold text-center">
@@ -82,7 +82,7 @@ const AdminInventoryList = () => {
         <ProductTableSkeleton />
       ) : (
         <ProductTable
-          data={sortedItems}
+          data={data?.items ?? []}
           columns={getInventoryColumns(setSortByStock)}
           page={page}
           pageSize={pageSize}
