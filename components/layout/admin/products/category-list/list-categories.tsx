@@ -42,19 +42,6 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
     selectedCategoryNameAtom,
   );
 
-  const deleteCategoryMutation = useDeleteCategory();
-
-  const handleDeleteCategory = (id: string) => {
-    deleteCategoryMutation.mutate(id, {
-      onSuccess() {
-        toast.success("Delete category successful");
-      },
-      onError() {
-        toast.error("Delete category fail");
-      },
-    });
-  };
-
   const hasChildren = category.children && category.children.length > 0;
   const isSelectable = !hasChildren;
 
@@ -146,7 +133,9 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
               stroke="#00B159"
               size={18}
             />
-            {category.name}
+            <span>
+              {category.name} ({category.code})
+            </span>
           </div>
           <div className="flex gap-2 col-span-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
             <DeleteDialog categoryId={category.id} />
