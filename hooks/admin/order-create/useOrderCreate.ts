@@ -13,7 +13,7 @@ export function useManualCheckoutLogic(
   const PRESET_BY_MARKETPLACE: Record<string, any> = {
     netto: {
       company_name: "NeS GmbH",
-      tax_id: "811205180",
+      tax_id: "DE811205180",
       invoice_address: "Industriepark Ponholz 1",
       invoice_city: "Maxhütte-Haidhof",
       invoice_postal_code: "93142",
@@ -29,7 +29,7 @@ export function useManualCheckoutLogic(
     },
     inprodius: {
       company_name: "Inprodius Solutions GmbH",
-      tax_id: "815533652",
+      tax_id: "DE815533652",
       invoice_address: "Lange Wende 41-43",
       invoice_city: "Soest",
       invoice_postal_code: "59494",
