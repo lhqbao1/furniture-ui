@@ -50,9 +50,7 @@ export async function syncToAmazon(input: SyncToAmazonInput) {
   return response.data;
 }
 
-// export async function removeFromAmazon(offer_id: string) {
-//   const { data } = await apiAdmin.delete(
-//     `/kaufland/products/delete/${offer_id}`,
-//   );
-//   return data;
-// }
+export async function removeFromAmazon(sku: string) {
+  const { data } = await apiAdmin.delete(`/amz/listing/item/${sku}`);
+  return data;
+}

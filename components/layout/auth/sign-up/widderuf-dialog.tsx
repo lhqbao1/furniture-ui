@@ -7,14 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  getPolicyItemsByVersion,
-  getPolicyVersion,
-} from "@/features/policy/api";
-import {
-  useGetPolicyItemsByVersion,
-  useGetPolicyVersion,
-} from "@/features/policy/hook";
+import { getPolicyItemsByVersion } from "@/features/policy/api";
+import { useGetPolicyVersion } from "@/features/policy/hook";
 import { useQuery } from "@tanstack/react-query";
 
 export default function WiderrufDialogTrigger({ t }: { t: any }) {
@@ -54,7 +48,6 @@ export default function WiderrufDialogTrigger({ t }: { t: any }) {
             ? policyList.legal_policies
                 .filter((l) => l.name.includes("Widerruf"))
                 .map((item, index) => {
-                  console.log(item);
                   return (
                     <div
                       key={item.id}

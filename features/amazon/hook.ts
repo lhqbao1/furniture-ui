@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-import { syncToAmazon, SyncToAmazonInput } from "./api";
+import { removeFromAmazon, syncToAmazon, SyncToAmazonInput } from "./api";
 
 type SyncErrorResponse = AmazonError | AuthError | GenericError;
 
@@ -58,6 +58,16 @@ export function useSyncToAmazon() {
       }
 
       toast.error(message, { id: toastId });
+    },
+  });
+}
+
+export function useRemoveFromAmazon() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (sku: string) => removeFromAmazon(sku),
+    onSuccess(data, variables, context) {
+      qc.invalidateQueries({ queryKey: ["products"] });
     },
   });
 }

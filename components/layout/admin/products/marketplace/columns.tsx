@@ -141,7 +141,7 @@ function SyncToMarketplace({
       )}
 
       {/* Nếu đang active => nút Remove */}
-      {isActive && marketplace !== "amazon" && (
+      {isActive && (
         <RemoveFromMarketplaceDialog
           marketplace={marketplace}
           marketplaceProduct={marketplaceProduct}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -21,34 +21,6 @@ import ManualAdditionalInformation from "@/components/layout/admin/orders/order-
 import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
 import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreate";
 
-// Shipping Address
-// const ManualCheckOutShippingAddress = dynamic(
-//   () =>
-//     import("@/components/layout/admin/orders/order-create/shipping-address"),
-//   {
-//     ssr: false,
-//   },
-// );
-
-// // Additional Info
-// const ManualAdditionalInformation = dynamic(
-//   () =>
-//     import(
-//       "@/components/layout/admin/orders/order-create/manual-additional-details"
-//     ),
-//   {
-//     ssr: false,
-//   },
-// );
-
-// // Select Products
-// const SelectOrderItems = dynamic(
-//   () => import("@/components/layout/admin/orders/order-create/select-product"),
-//   {
-//     ssr: false,
-//   },
-// );
-
 export interface CartItem {
   id: number;
   name: string;
@@ -65,7 +37,7 @@ interface SelectedProduct {
   final_price: number;
 }
 
-export default function CreateCheckoutpage() {
+export default function CreateOrderPageClient() {
   const t = useTranslations();
   const createOrderManualMutation = useCreateCheckOutManual();
   const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);

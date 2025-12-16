@@ -367,5 +367,6 @@
   "order_discount": "Order discount",
   "user_discount": "User discount",
   "shipping_discount": "Shipping discount",
-  "deliveryDate": "Estimated delivery on {date}"
+  "deliveryDate": "Estimated delivery on {date}",
+    "deliveryDateRange": "Estimated delivery {from} – {to}"
 }
