@@ -222,10 +222,6 @@ export function useGetVoucherForCheckout(
   return useQuery({
     queryKey: ["vouchers", "checkout", input],
     queryFn: () => getVoucherForCheckout(input),
-    enabled:
-      enabled &&
-      !!input.user_id &&
-      input.product_ids.length > 0 &&
-      input.order_value > 0,
+    enabled: enabled && input.product_ids.length > 0 && input.order_value > 0,
   });
 }

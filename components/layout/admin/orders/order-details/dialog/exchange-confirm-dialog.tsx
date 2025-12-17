@@ -212,7 +212,7 @@ const ExchangeConfirmDialog = ({
 
           <SelectContent>
             <SelectItem value="dpd">DPD</SelectItem>
-            <SelectItem value="spedition">Spedition</SelectItem>
+            <SelectItem value="amm">Spedition</SelectItem>
           </SelectContent>
         </Select>
         {/* Danh sách sản phẩm đã chọn */}

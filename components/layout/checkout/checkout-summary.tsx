@@ -78,8 +78,8 @@ const CheckoutSummary = ({
     );
   }, [cartItems, localCart]);
 
-  const carrier = React.useMemo<"dpd" | "spedition" | undefined>(() => {
-    if (shippingCost === 35.95) return "spedition";
+  const carrier = React.useMemo<"dpd" | "amm" | undefined>(() => {
+    if (shippingCost === 35.95) return "amm";
     if (shippingCost === 5.95) return "dpd";
     return undefined;
   }, [shippingCost]);

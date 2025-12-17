@@ -1,6 +1,8 @@
 import { BrandResponse } from "./brand";
 import { CategoryResponse } from "./categories";
+import { CheckOutMain } from "./checkout";
 import { Pagination } from "./pagination";
+import { Customer } from "./user";
 import { VariantOptionResponse } from "./variant";
 
 export interface Product {
@@ -142,6 +144,16 @@ export interface InventoryItem {
   updated_at: string; // ISO datetime
 }
 
+export interface ProductStockLog {
+  id: string;
+  product_id: string;
+  quantity: string;
+  user: Customer;
+  main_checkout: CheckOutMain;
+  created_at: string; // ISO datetime
+  updated_at: string; // ISO datetime
+}
+
 export type ProductItem = {
   name: string;
   description: string;
@@ -215,6 +227,7 @@ export type ProductItem = {
   note: string | null;
 
   inventory: InventoryItem[];
+  log_stocks: ProductStockLog[];
 };
 
 export type ProductResponse = {

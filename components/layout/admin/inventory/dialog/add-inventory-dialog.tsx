@@ -31,9 +31,12 @@ import {
 import {
   useCreateInventory,
   useUpdateInventory,
+  useUpdateStockProduct,
 } from "@/features/products/inventory/hook";
 import React from "react";
 import { toast } from "sonner";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
 
 interface AddOrEditInventoryDialogProps {
   productId: string;
@@ -67,6 +70,7 @@ export default function AddOrEditInventoryDialog({
   const isEdit = inventoryData.length > 0;
   // const editItem = inventoryData[0];
   const [open, setOpen] = React.useState(false);
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const form = useForm<InventoryCreateValues>({
     resolver: zodResolver(InventoryCreateSchema),
@@ -92,6 +96,7 @@ export default function AddOrEditInventoryDialog({
   }, [incomingStock, cost, form]);
 
   const createInventoryDataMutation = useCreateInventory();
+  const captureProductStockMutation = useUpdateStockProduct();
   // const editInventoryDataMutation = useUpdateInventory();
 
   const loading = createInventoryDataMutation.isPending;
@@ -114,6 +119,13 @@ export default function AddOrEditInventoryDialog({
         onSuccess: () => {
           toast.success("Inventory created successfully");
           setOpen(false);
+          captureProductStockMutation.mutate({
+            payload: {
+              product_id: productId,
+              quantity: payload.incoming_stock,
+              user_id: userId ?? "",
+            },
+          });
         },
         onError: () => {
           toast.error("Failed to create inventory");

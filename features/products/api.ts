@@ -75,10 +75,14 @@ export async function getProductBySlug(product_slug: string) {
   }
 }
 
-export async function getProductByTag(tag: string, is_customer = false) {
+export async function getProductByTag(
+  tag: string,
+  is_customer = false,
+  is_econelo = false,
+) {
   try {
     const { data } = await apiPublic.get(`/products/by-tag/${tag}`, {
-      params: { is_customer },
+      params: { is_customer, is_econelo },
     });
     return data as ProductItem[];
   } catch (err) {

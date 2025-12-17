@@ -71,10 +71,14 @@ export function useGetProductById(id: string) {
   });
 }
 
-export function useGetProductByTag(tag: string, is_customer = false) {
+export function useGetProductByTag(
+  tag: string,
+  is_customer = false,
+  is_econelo = false,
+) {
   return useQuery({
-    queryKey: ["product-by-tag", tag, is_customer],
-    queryFn: () => getProductByTag(tag, is_customer),
+    queryKey: ["product-by-tag", tag, is_customer, is_econelo],
+    queryFn: () => getProductByTag(tag, is_customer, is_econelo),
     enabled: !!tag, // chỉ gọi khi tag có giá trị
     retry: false,
   });
