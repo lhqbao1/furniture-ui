@@ -52,19 +52,39 @@ export default function WhatsAppChatBox() {
     <>
       {/* ICON FLOAT */}
       {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className="
-            fixed bottom-6 right-6 z-[1000]
-            w-14 h-14 rounded-full
-            bg-[#25D366] text-white
-            flex items-center justify-center
-            shadow-xl
-            hover:scale-105 transition-all cursor-pointer duration-300
-          "
-        >
-          <MessageCircle size={26} />
-        </button>
+        <div className="fixed bottom-6 right-6 z-[1000] flex items-center gap-3">
+          {/* BUBBLE */}
+          <div
+            className="
+        relative
+        bg-white text-sm text-gray-800
+        px-4 py-2 rounded-md
+        shadow-lg border
+        whitespace-nowrap
+        whatsapp-bubble
+      "
+          >
+            {t("whatsapp_greeting")}
+          </div>
+
+          {/* ICON */}
+          <button
+            onClick={() => setOpen(true)}
+            className="
+        w-14 h-14 rounded-full
+        flex items-center justify-center
+        hover:scale-105 transition-all duration-300
+      "
+          >
+            <Image
+              src="/whatsapp-logo.png"
+              width={56}
+              height={56}
+              alt="WhatsApp"
+              className="rounded-full"
+            />
+          </button>
+        </div>
       )}
 
       {/* CHAT BOX */}

@@ -5,6 +5,19 @@ import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { ProductItem } from "@/types/products";
 
+function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
+  const range = XLSX.utils.decode_range(worksheet["!ref"]!);
+  for (let r = range.s.r + 1; r <= range.e.r; r++) {
+    columns.forEach((c) => {
+      const addr = `${c}${r + 1}`;
+      if (worksheet[addr]) {
+        worksheet[addr].t = "s"; // string
+        worksheet[addr].z = "@"; // TEXT format (QUAN TRỌNG)
+      }
+    });
+  }
+}
+
 export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
   const handleExport = () => {
     // Hàm xử lý giá trị null / undefined / "None"
@@ -61,13 +74,36 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
         log_weight: clean(
           p.packages?.reduce((sum, pkg) => sum + (pkg.weight || 0), 0),
         ),
-        document: clean(
-          p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
+        benutzerhandbuch: clean(
+          p.pdf_files
+            ?.filter((f) =>
+              f?.title?.toLowerCase?.().includes("benutzerhandbuch"),
+            )
+            .map((f) => f.url.replaceAll(" ", "%20"))
+            .join("|"),
+        ),
+        sicherheit_information: clean(
+          p.pdf_files
+            ?.filter((f) => f?.title?.toLowerCase?.().includes("sicherheit"))
+            .map((f) => f.url.replaceAll(" ", "%20"))
+            .join("|"),
+        ),
+        aufbauanleitung: clean(
+          p.pdf_files
+            ?.filter((f) =>
+              f?.title?.toLowerCase?.().includes("aufbauanleitung"),
+            )
+            .map((f) => f.url.replaceAll(" ", "%20"))
+            .join("|"),
         ),
         product_link: `https://www.prestige-home.de/de/product/${p.url_key}`,
       }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+    // Ép TEXT cho các cột đã chốt
+    forceTextColumns(worksheet, ["A", "B", "G", "K", "N"]);
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
 
