@@ -72,7 +72,7 @@ export default function AddOrEditVouchersForm({
         form.setValue("max_discount", 5.95);
       }
 
-      if (watchCarrier === "spedition") {
+      if (watchCarrier === "amm") {
         form.setValue("discount_value", 35.95);
         form.setValue("max_discount", 35.95);
       }
@@ -328,7 +328,7 @@ export default function AddOrEditVouchersForm({
 
                     <FormItem className="flex items-center gap-2">
                       <FormControl>
-                        <RadioGroupItem value="spedition" />
+                        <RadioGroupItem value="amm" />
                       </FormControl>
                       <FormLabel className="cursor-pointer">
                         Spedition

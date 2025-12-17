@@ -51,9 +51,9 @@ export default function CreateOrderPageClient() {
   useManualCheckoutLogic(form, setDisabledFields);
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
-    const total_shipping = values.carrier === "spedition" ? 35.95 : 5.95;
+    const total_shipping = values.carrier === "amm" ? 35.95 : 5.95;
     if (
-      values.carrier === "spedition" &&
+      values.carrier === "amm" &&
       (!values.phone_number || values.phone_number.trim() === "")
     ) {
       toast.error("Phone number is required for SPEDITION carrier");

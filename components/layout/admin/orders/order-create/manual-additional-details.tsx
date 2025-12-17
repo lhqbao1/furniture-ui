@@ -117,7 +117,7 @@ export default function ManualAdditionalInformation({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="dpd">DPD</SelectItem>
-                    <SelectItem value="spedition">Spedition</SelectItem>
+                    <SelectItem value="amm">Spedition</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

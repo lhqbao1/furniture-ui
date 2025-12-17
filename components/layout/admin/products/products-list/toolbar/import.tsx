@@ -68,10 +68,12 @@ const ImportDialog = ({
       return;
     }
 
+    const toastId = toast.loading("Importing products, please wait...");
+
     const formData = new FormData();
     formData.append("file", file);
 
-    if (supplierId || supplierId !== null) {
+    if (supplierId !== null) {
       importProductForSupplierMutation.mutate(
         {
           file: formData,
@@ -79,32 +81,37 @@ const ImportDialog = ({
         },
         {
           onSuccess: () => {
+            toast.success("Import products successful", {
+              id: toastId,
+            });
             setIsImporting(true);
-            toast.success("Import products successful");
             setOpen(false);
           },
           onError: () => {
-            toast.error("Import products fail");
+            toast.error("Import products failed", {
+              id: toastId,
+            });
             setIsImporting(false);
-            setOpen(false);
           },
         },
       );
     } else {
       importProductMutation.mutate(formData, {
         onSuccess: () => {
+          toast.success("Import products successful", {
+            id: toastId,
+          });
           setIsImporting(true);
-          toast.success("Import products successful");
           setOpen(false);
         },
         onError: () => {
-          toast.error("Import products fail");
+          toast.error("Import products failed", {
+            id: toastId,
+          });
           setIsImporting(false);
-          setOpen(false);
         },
       });
     }
-    setIsImporting(true);
   };
 
   return (
