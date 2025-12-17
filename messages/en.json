@@ -370,5 +370,13 @@
   "user_discount": "User discount",
   "shipping_discount": "Shipping discount",
   "deliveryDate": "Estimated delivery on {date}",
-    "deliveryDateRange": "Estimated delivery {from} – {to}"
+  "deliveryDateRange": "Estimated delivery {from} – {to}",
+  "voucher": {
+      "shipping": "Free shipping will be applied at checkout",
+      "user_specific": "This voucher is exclusively available for you",
+      "product": "This discount applies to selected products",
+      "order": "This voucher will be applied to your order",
+      "fixed": "Get €{value}",
+      "percent": "Get {value}%"
+  }
 }

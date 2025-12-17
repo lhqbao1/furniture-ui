@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useAtom } from "jotai";
+import { whatsappBubbleVisibleAtom } from "@/store/whatsapp-bubble";
 
 const STORAGE_KEY = "whatsapp-chat-open";
 
@@ -15,6 +17,12 @@ export default function WhatsAppChatBox() {
   const t = useTranslations();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [bubbleVisible, setBubbleVisible] = useAtom(whatsappBubbleVisibleAtom);
+
+  const currentUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${pathname}`
+      : pathname;
 
   /* 🔹 ALWAYS call hooks first */
   useEffect(() => {
@@ -43,47 +51,60 @@ export default function WhatsAppChatBox() {
   const handleSend = () => {
     if (!message.trim()) return;
 
-    const encodedMessage = encodeURIComponent(message);
+    const fullMessage = `${message}\n\nPage: ${currentUrl}`;
+
+    const encodedMessage = encodeURIComponent(fullMessage);
     const url = `https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`;
+
     window.open(url, "_blank");
   };
 
   return (
     <>
-      {/* ICON FLOAT */}
+      {/* ICON – LUÔN HIỆN KHI CHƯA OPEN */}
       {!open && (
-        <div className="fixed bottom-6 right-6 z-[1000] flex items-center gap-3">
-          {/* BUBBLE */}
-          <div
-            className="
-        relative
-        bg-white text-sm text-gray-800
-        px-4 py-2 rounded-md
-        shadow-lg border
-        whitespace-nowrap
-        whatsapp-bubble
-      "
-          >
-            {t("whatsapp_greeting")}
-          </div>
+        <button
+          onClick={() => {
+            setOpen(true);
+            setBubbleVisible(false); // mở chat → ẩn bubble luôn
+          }}
+          className="
+      fixed bottom-6 right-6 z-[1000]
+      w-14 h-14 rounded-full
+      flex items-center justify-center
+      hover:scale-105 transition-all duration-300 cursor-pointer
+    "
+        >
+          <Image
+            src="/whatsapp-logo.png"
+            width={56}
+            height={56}
+            alt="WhatsApp"
+            className="rounded-full"
+          />
+        </button>
+      )}
 
-          {/* ICON */}
-          <button
-            onClick={() => setOpen(true)}
-            className="
-        w-14 h-14 rounded-full
-        flex items-center justify-center
-        hover:scale-105 transition-all duration-300
-      "
-          >
-            <Image
-              src="/whatsapp-logo.png"
-              width={56}
-              height={56}
-              alt="WhatsApp"
-              className="rounded-full"
-            />
-          </button>
+      {/* BUBBLE – CÓ THỂ TẮT */}
+      {!open && bubbleVisible && (
+        <div className="fixed bottom-6 right-[88px] z-[1000]">
+          <div className="relative bg-white text-sm px-4 py-2 rounded-md shadow-lg border whatsapp-bubble">
+            {t("whatsapp_greeting")}
+
+            {/* Nút tắt bubble */}
+            <button
+              onClick={() => setBubbleVisible(false)}
+              className="
+          absolute -top-2 -right-2
+          w-5 h-5 rounded-full
+          bg-gray-200 text-gray-600
+          text-xs flex items-center justify-center
+          hover:bg-gray-300
+        "
+            >
+              ×
+            </button>
+          </div>
         </div>
       )}
 
@@ -140,8 +161,8 @@ export default function WhatsAppChatBox() {
             ref={textareaRef}
             className="
               w-full mt-2 rounded-lg border
-              p-2 text-sm resize-none ring-gray-500/35 ring-2
-              outline-none focus:ring-2 focus:ring-green-400
+              p-2 text-sm resize-none ring-gray-500/35 ring-1
+              outline-none focus:ring-1 focus:ring-green-400 bg-white
             "
             rows={3}
             placeholder={t("whatsapp_placeholder")}
