@@ -1,8 +1,8 @@
 "use client";
 import { customerColumns } from "@/components/layout/admin/customers/columns";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import AdminBackButton from "@/components/shared/admin-back-button";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllCustomers } from "@/features/users/hook";
 import React, { useState } from "react";
 import CustomerListSkeleton from "./skeleton";

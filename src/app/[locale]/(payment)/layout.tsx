@@ -1,7 +1,7 @@
 import Footer from "@/components/shared/footer";
 import "../../globals.css";
 import Banner from "@/components/shared/banner";
-import PageHeader from "@/components/shared/header";
+import PageHeader from "@/components/layout/header/header";
 import { loadStripe } from "@stripe/stripe-js";
 
 export default function MainLayout({

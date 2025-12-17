@@ -3,7 +3,7 @@
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import TableToolbar from "@/components/layout/admin/products/products-list/toolbar";
 import { productColumnsDSP } from "@/components/layout/dsp/admin/products/list/columns";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllProductsDSP } from "@/features/dsp/products/hook";
 import {
   searchProductQueryStringAtom,
@@ -16,7 +16,7 @@ const ProductListDSP = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [searchQuery, setSearchQuery] = useAtom<string>(
-    searchProductQueryStringAtom
+    searchProductQueryStringAtom,
   );
 
   const [showAll, setShowAll] = useAtom(showAllProductsAtom);

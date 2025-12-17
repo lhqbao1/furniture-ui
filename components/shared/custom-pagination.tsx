@@ -9,7 +9,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useState } from "react";
 
 interface CustomPaginationProps {
   page: number;

@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 import "../../globals.css";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AdminSideBar } from "@/components/shared/admin-sidebar";
+import { AdminSideBar } from "@/components/layout/admin/admin-sidebar";
 import Protected from "@/components/layout/auth/protected";
-import AdminHeader from "@/components/shared/admin-header";
+import AdminHeader from "@/components/layout/admin/admin-header";
 
 export default function ClientAdminLayout({
   children,

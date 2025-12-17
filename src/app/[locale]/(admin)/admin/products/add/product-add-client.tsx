@@ -1,6 +1,6 @@
 "use client";
 import ProductForm from "@/components/layout/admin/products/products-form/add-product-form";
-import AdminBackButton from "@/components/shared/admin-back-button";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import { useAddProduct } from "@/features/products/hook";
 import { ProductInput } from "@/lib/schema/product";
 import React, { useEffect } from "react";

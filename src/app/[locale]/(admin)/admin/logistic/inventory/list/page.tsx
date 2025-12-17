@@ -2,7 +2,7 @@
 import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllProducts } from "@/features/products/hook";
 import { useProductInventoryFilters } from "@/hooks/admin/inventory/useInventoryFilter";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";

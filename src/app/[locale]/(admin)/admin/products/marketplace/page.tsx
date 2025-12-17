@@ -5,8 +5,8 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
-import AdminBackButton from "@/components/shared/admin-back-button";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useGetAllProducts } from "@/features/products/hook";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
@@ -14,7 +14,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const ProductMarketplace = () => {
   const router = useRouter();
@@ -83,6 +83,7 @@ const ProductMarketplace = () => {
             totalItems={data?.pagination.total_items ?? 0}
             totalPages={data?.pagination.total_pages ?? 0}
             hasHeaderBackGround
+            isSticky
           />
         )}
       </div>

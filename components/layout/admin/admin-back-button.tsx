@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { useRouter } from "@/src/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
 

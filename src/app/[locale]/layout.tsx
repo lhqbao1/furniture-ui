@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import "../globals.css";
 import { routing } from "@/src/i18n/routing";
 import type { Metadata } from "next";
+import WhatsAppChatBox from "@/components/shared/whatsapp-box-chat";
 
 type Props = {
   children: React.ReactNode;
@@ -92,6 +93,9 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   return (
-    <NextIntlClientProvider locale={locale}>{children}</NextIntlClientProvider>
+    <NextIntlClientProvider locale={locale}>
+      <WhatsAppChatBox />
+      {children}
+    </NextIntlClientProvider>
   );
 }

@@ -165,6 +165,8 @@ function AddProductMarketplace({ product }: { product: ProductItem }) {
   );
 }
 
+const MARKETPLACE_ORDER = ["kaufland", "ebay", "amazon"];
+
 export const baseColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,
 ): ColumnDef<ProductItem>[] => [
@@ -339,11 +341,21 @@ export const productMarketplaceColumns = (
   };
 
   // Các cột động theo marketplace thực tế
-  const dynamicMarketplaceColumns: ColumnDef<ProductItem>[] = marketplaces.map(
-    (marketplace) => ({
+  const dynamicMarketplaceColumns: ColumnDef<ProductItem>[] = [...marketplaces]
+    .sort((a, b) => {
+      const indexA = MARKETPLACE_ORDER.indexOf(a.toLowerCase());
+      const indexB = MARKETPLACE_ORDER.indexOf(b.toLowerCase());
+
+      // marketplace không nằm trong list → đẩy xuống cuối
+      return (
+        (indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA) -
+        (indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB)
+      );
+    })
+    .map((marketplace) => ({
       id: marketplace,
       header: () => {
-        const key = marketplace?.toLowerCase();
+        const key = marketplace.toLowerCase();
 
         const icons: Record<string, string> = {
           amazon: "/amazon.png",
@@ -351,7 +363,6 @@ export const productMarketplaceColumns = (
           ebay: "/ebay.png",
         };
 
-        // nếu có icon → hiển thị icon, không thì text
         const iconSrc = icons[key];
 
         return (
@@ -377,33 +388,25 @@ export const productMarketplaceColumns = (
         );
 
         return (
-          <div
-            className={`flex justify-center text-center text-sm font-medium 
-                            }`}
-          >
+          <div className="flex justify-center text-center text-sm font-medium">
             {hasMarketplace ? (
               product.is_active ? (
-                // ✅ Có marketplace + active → hiển thị nút Sync
                 <SyncToMarketplace
                   product={product}
                   marketplace={marketplace}
                 />
               ) : (
-                // ✅ Có marketplace + inactive → hiển thị nút Remove
-                <div className="text-center">Product is inactive</div>
+                <div>Product is inactive</div>
               )
             ) : !product.is_active ? (
-              // ❌ Không có marketplace + inactive
-              <div className="text-center">Product is inactive</div>
+              <div>Product is inactive</div>
             ) : (
-              // ❌ Không có marketplace + active
-              <div className="text-center">No {marketplace} data</div>
+              <div>No {marketplace} data</div>
             )}
           </div>
         );
       },
-    }),
-  );
+    }));
 
   return [
     ...baseColumns(setSortByStock), // ✅ gọi hàm để lấy array

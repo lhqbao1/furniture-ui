@@ -21,7 +21,7 @@ import ProductAdditionalInputs from "./product-additional-group";
 import ProductLogisticsGroup from "./product-logistics-group";
 import ProductSEOGroup from "./product-seo-group";
 import SelectBundleComponent from "../bundle/select-bundle";
-import AdminBackButton from "@/components/shared/admin-back-button";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import { useProductForm } from "./useProductForm";
 import { ProductItem } from "@/types/products";
 import ProductManual from "./product-manual";
