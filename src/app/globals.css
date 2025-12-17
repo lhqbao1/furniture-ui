@@ -398,3 +398,17 @@ input[type="number"] {
 .blog-content h3 {
   @apply mt-6 mb-2;
 }
+
+.whatsapp-bubble::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 0 0 12px 0;
+  transform: translateY(-50%) rotate(45deg);
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.05);
+}
