@@ -23,12 +23,12 @@ import { useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSyncLocalCart } from "@/features/cart/hook";
 import { useQueryClient } from "@tanstack/react-query";
-import LoginGoogleButton from "./login-google-button";
-import ResendOtp from "../layout/auth/resend-otp";
+import LoginGoogleButton from "../../shared/login-google-button";
+import ResendOtp from "../auth/resend-otp";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 import { Link, useRouter } from "@/src/i18n/navigation";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../ui/input-otp";
 
 interface HeaderLoginFormProps {
   onSuccess?: () => void;

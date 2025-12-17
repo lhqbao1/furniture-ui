@@ -5,7 +5,7 @@ import AddOrEditSupplierForm from "@/components/layout/admin/supplier/add-or-edi
 import { supplierColumns } from "@/components/layout/admin/supplier/columns";
 import AddVoucherDialog from "@/components/layout/admin/vouchers/add-or-edit-dialog";
 import { voucherColumns } from "@/components/layout/admin/vouchers/columns";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetSuppliers } from "@/features/supplier/hook";
 import { useGetVouchers } from "@/features/vouchers/hook";
 import React, { useState } from "react";

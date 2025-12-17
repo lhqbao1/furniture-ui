@@ -1,5 +1,7 @@
 {
     "greeting": "Hello",
+    "whatsapp_greeting": "Hi 👋 How can we help you today?",
+    "whatsapp_placeholder": "Type your message…",
     "welcome": "Welcome to Prestige Home",
     "welcomeTo": "Welcome to",
     "slogan": "The place you can find unique and trendy products",

@@ -1,6 +1,6 @@
 "use client";
 import ProductFormDSP from "@/components/layout/dsp/admin/products/add/product-add-or-edit";
-import AdminBackButton from "@/components/shared/admin-back-button";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import { useAddProductDSP } from "@/features/dsp/products/hook";
 import { ProductInputDSP } from "@/lib/schema/dsp/product";
 import React, { useEffect } from "react";

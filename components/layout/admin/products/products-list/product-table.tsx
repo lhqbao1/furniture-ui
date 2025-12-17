@@ -42,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   hasCount?: boolean;
   hasHeaderBackGround?: boolean;
   renderRowSubComponent?: (row: any) => React.ReactNode;
+  isSticky?: boolean;
 }
 
 export function ProductTable<TData, TValue>({
@@ -63,6 +64,7 @@ export function ProductTable<TData, TValue>({
   is_delivery_multiple = false,
   hasCount = true,
   hasHeaderBackGround = false,
+  isSticky = false,
   renderRowSubComponent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -114,17 +116,22 @@ export function ProductTable<TData, TValue>({
     <div className="flex flex-col gap-4">
       {hasCount ? <p>{totalItems} items found</p> : ""}
 
-      <div className="rounded-md border w-full overflow-x-auto">
-        <Table>
-          <TableHeader>
+      <div className="rounded-md border w-full">
+        <Table className="relative overflow-auto">
+          <TableHeader className={`${isSticky ? "sticky top-0 z-20" : ""}`}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={`${
-                      hasHeaderBackGround ? "bg-secondary/10" : ""
-                    }`}
+                    className={`
+                        ${
+                          hasHeaderBackGround
+                            ? "bg-secondary/10"
+                            : "bg-background"
+                        }
+                        
+                      `}
                   >
                     {header.isPlaceholder
                       ? null
@@ -190,31 +197,6 @@ export function ProductTable<TData, TValue>({
                                                     }
                                                     `}
                           >
-                            {/* <div className="p-4 text-sm">
-                              <ProductTable<CartItem, unknown>
-                                data={transformCartItems(
-                                  (row.original as CheckOut).cart.items,
-                                )}
-                                columns={getDeliveryOrderColumns({
-                                  is_multiple_delivery: (
-                                    row.original as CheckOut
-                                  ).supplier
-                                    ? (row.original as CheckOut).supplier
-                                        .delivery_multiple
-                                    : false,
-                                })}
-                                page={1}
-                                pageSize={5}
-                                setPage={() => {}}
-                                setPageSize={() => {}}
-                                hasPagination={false}
-                                totalItems={
-                                  (row.original as CheckOut).cart.items.length
-                                }
-                                totalPages={1}
-                                hasCount={false}
-                              />
-                            </div> */}
                             <div className="p-4 text-sm">
                               {/* USE renderRowSubComponent IF provided */}
                               {typeof renderRowSubComponent === "function" ? (

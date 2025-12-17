@@ -4,7 +4,7 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import AddSupplierDialog from "@/components/layout/admin/supplier/add-or-edit-dialog";
 import AddOrEditSupplierForm from "@/components/layout/admin/supplier/add-or-edit-form";
 import { supplierColumns } from "@/components/layout/admin/supplier/columns";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetSuppliers } from "@/features/supplier/hook";
 import React, { useState } from "react";
 

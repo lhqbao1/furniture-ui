@@ -8,7 +8,7 @@ import OrderSummary from "@/components/layout/admin/orders/order-details/order-s
 import OrderDetailOverView from "@/components/layout/admin/orders/order-details/order-overview";
 import OrderDetailUser from "@/components/layout/admin/orders/order-details/order-customer";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import AdminBackButton from "@/components/shared/admin-back-button";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import { useGetMainCheckOutByMainCheckOutId } from "@/features/checkout/hook";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { calculateVAT } from "@/lib/caculate-vat";

@@ -1,6 +1,6 @@
 import Banner from "@/components/shared/banner";
 import "../../globals.css";
-import PageHeader from "@/components/shared/header";
+import PageHeader from "@/components/layout/header/header";
 import Footer from "@/components/shared/footer";
 
 export default function MainLayout({

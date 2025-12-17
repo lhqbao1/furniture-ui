@@ -1,17 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import ProductSearch from "./product-search";
+import ProductSearch from "../../shared/product-search";
 import { AlignJustify } from "lucide-react";
 
-import MobileProductSearch from "./mobile-product-search";
+import MobileProductSearch from "../../shared/mobile-product-search";
 
-import { CartDrawer } from "./cart-drawer";
+import { CartDrawer } from "../cart/cart-drawer";
 import { useAtom } from "jotai";
-import ListCategoriesHome from "../layout/home/list-categories";
+import ListCategoriesHome from "../home/list-categories";
 import { expandAllCategoriesAtom } from "@/store/categories-drawer";
-import HeaderLogo from "../layout/header/header-logo";
-import HeaderCartIcon from "../layout/header/header-cart-icon";
-import HeaderUserLogin from "../layout/header/header-user-login";
+import HeaderLogo from "./header-logo";
+import HeaderCartIcon from "./header-cart-icon";
+import HeaderUserLogin from "./header-user-login";
 import { useGetCategoriesWithChildren } from "@/features/category/hook";
 
 const PageHeader = () => {

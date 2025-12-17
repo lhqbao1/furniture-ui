@@ -7,9 +7,9 @@ import ProductStatistic from "@/components/layout/admin/products/products-list/s
 import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
-import AdminBackButton from "@/components/shared/admin-back-button";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import {
   useGetCheckOutMain,
   useGetCheckOutStatistic,

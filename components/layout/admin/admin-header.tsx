@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { SidebarTrigger } from "../ui/sidebar";
+import { SidebarTrigger } from "../../ui/sidebar";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 

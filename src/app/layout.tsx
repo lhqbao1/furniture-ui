@@ -4,7 +4,6 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import QueryProvider from "@/lib/query-provider";
-import WhatsappWidget from "@/components/shared/whatsapp-widget";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -100,8 +99,6 @@ export default function RootLayout({
       <body
         className={`${figtree.variable} ${libre.variable} font-sans antialiased`}
       >
-        <WhatsappWidget />
-
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-WKVQP2QH"

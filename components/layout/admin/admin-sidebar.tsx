@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";

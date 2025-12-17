@@ -3,7 +3,7 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import ExportExcelButton from "@/components/layout/admin/products/products-list/toolbar/export-button";
 import { orderChildSupplierColumns } from "@/components/layout/dsp/admin/order/order-list/columns";
 import ExportCheckOutButton from "@/components/layout/dsp/admin/order/order-list/export-excel-button";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { useGetCheckOutSupplier } from "@/features/checkout/hook";
 import React, { useState } from "react";

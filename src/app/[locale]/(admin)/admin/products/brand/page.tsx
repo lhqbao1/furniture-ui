@@ -3,8 +3,8 @@ import AddBrandDialog from "@/components/layout/admin/products/brand/add-brand-d
 import AddBrandForm from "@/components/layout/admin/products/brand/add-brand-form";
 import { brandColumns } from "@/components/layout/admin/products/brand/columns";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import AdminBackButton from "@/components/shared/admin-back-button";
-import ProductTableSkeleton from "@/components/shared/table-skeleton";
+import AdminBackButton from "@/components/layout/admin/admin-back-button";
+import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { useGetBrands } from "@/features/brand/hook";
 import React, { useState } from "react";

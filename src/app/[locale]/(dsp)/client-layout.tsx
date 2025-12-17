@@ -5,7 +5,7 @@ import "../../globals.css";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import DSPProtected from "@/components/layout/auth/dsp-protected";
-import { DSPAdminSidebar } from "@/components/shared/dsp-sidebar";
+import { DSPAdminSidebar } from "@/components/layout/dsp/admin/dsp-sidebar";
 
 export default function ClientSupplierAdminLayout({
   children,
