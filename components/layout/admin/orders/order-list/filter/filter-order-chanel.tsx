@@ -19,6 +19,8 @@ export const CHANEL_OPTIONS = [
   { key: "ebay", label: "Ebay" },
   { key: "freakout", label: "Freakout" },
   { key: "praktiker", label: "Praktiker" },
+  { key: "netto", label: "Netto" },
+  { key: "inprodius", label: "Inprodius" },
 ];
 
 export default function OrderChanelFilter() {
