@@ -46,10 +46,10 @@ export function useAddToCartHandler(productDetails: any) {
 
       const totalQuantity = (existingItem?.quantity || 0) + values.quantity;
 
-      if (totalQuantity > productDetails.stock) {
-        toast.error(t("notEnoughStock"));
-        return;
-      }
+      // if (totalQuantity > productDetails.stock) {
+      //   toast.error(t("notEnoughStock"));
+      //   return;
+      // }
 
       addToCartLocal(
         {
@@ -87,10 +87,10 @@ export function useAddToCartHandler(productDetails: any) {
         onError: (error) => {
           const { status, message } = HandleApiError(error, t);
 
-          if (status === 400) {
-            toast.error(t("notEnoughStock"));
-            return;
-          }
+          // if (status === 400) {
+          //   toast.error(t("notEnoughStock"));
+          //   return;
+          // }
 
           toast.error(message);
 

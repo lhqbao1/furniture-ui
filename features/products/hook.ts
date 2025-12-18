@@ -27,6 +27,7 @@ export function useGetAllProducts({
   search,
   sort_by_stock,
   is_inventory,
+  is_econelo,
 }: GetAllProductsParams = {}) {
   return useQuery({
     queryKey: [
@@ -37,7 +38,8 @@ export function useGetAllProducts({
       search,
       sort_by_stock,
       is_inventory,
-    ], // queryKey thay đổi khi page/page_size thay đổi
+      is_econelo,
+    ],
     queryFn: () =>
       getAllProducts({
         page,
@@ -46,6 +48,7 @@ export function useGetAllProducts({
         search,
         sort_by_stock,
         is_inventory,
+        is_econelo,
       }),
     // placeholderData: keepPreviousData,
     retry: false,

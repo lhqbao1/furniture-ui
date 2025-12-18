@@ -52,10 +52,16 @@ export default function MobileProductSearch() {
         direction="left"
       >
         <DrawerTrigger asChild>
-          <Search
-            stroke="#4D4D4D"
-            size={30}
-          />
+          <button
+            type="button"
+            aria-label={t("searchProduct")}
+            className="p-1"
+          >
+            <Search
+              stroke="#4D4D4D"
+              size={30}
+            />
+          </button>
         </DrawerTrigger>
         <DrawerContent className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500">
           <DrawerTitle className="border-b-2 p-4 flex justify-between">
@@ -76,15 +82,16 @@ export default function MobileProductSearch() {
                 value={query}
                 onValueChange={setQuery}
                 autoFocus
+                className="border-b-0"
               />
             </div>
-            <CommandList className="flex-1 overflow-auto">
+            <CommandList className="flex-1 overflow-auto pt-2">
               {isLoading && <CommandEmpty>{t("loading")}...</CommandEmpty>}
               {!isLoading && results.length === 0 && (
                 <CommandEmpty>{t("noResult")}</CommandEmpty>
               )}
               {results.length > 0 && (
-                <CommandGroup heading="Products">
+                <CommandGroup>
                   {results.map((product: ProductItem) => (
                     <CommandItem
                       key={product.id}

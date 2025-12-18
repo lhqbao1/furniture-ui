@@ -53,8 +53,8 @@ export default function CustomBreadCrumb({
         )}
 
         {/* CURRENT PAGE */}
+        {!parentPage && <BreadcrumbSeparator />}
         <BreadcrumbItem>
-          {!parentPage && <BreadcrumbSeparator />}
           <BreadcrumbPage>{currentPage.title}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>

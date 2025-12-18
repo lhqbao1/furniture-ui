@@ -374,5 +374,18 @@
       "order": "Dieser Gutschein wird auf Ihre Bestellung angewendet",
       "fixed": "{value}€ Rabatt",
       "percent": "{value}% Rabatt"
-  }
+  },
+  "quickContact": "Direkter Kontakt",
+  "hero_title": "Qualitätslösungen für Wohn- und Außenbereiche",
+  "hero_sub": "Premium Design. Zeitloser Komfort. Für Wohn- und Außenbereiche.",
+  "view_bestseller": "Bestseller ansehen",
+  "newsletter_voucher": {
+    "title": "Jetzt 5% Gutschein sichern*",
+    "description": "Abonnieren Sie unseren kostenlosen Newsletter und erhalten Sie attraktive Gutscheine und Angebote per E-Mail vor allen anderen. Zusätzlich erhalten Sie einen exklusiven 5% Willkommensgutschein!",
+    "emailPlaceholder": "Ihre E-Mail-Adresse",
+    "cta": "Jetzt registrieren",
+    "legal": "* Jederzeit abbestellbar. Gutscheincode im Warenkorb oder im letzten Schritt des Bestellprozesses eingeben. Gültig 6 Wochen nach Newsletter-Anmeldung.",
+    "showMore": "Mehr anzeigen"
+  },
+  "recentSearch": "Letzte Suchen"
 }

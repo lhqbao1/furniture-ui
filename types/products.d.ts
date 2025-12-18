@@ -4,6 +4,7 @@ import { CheckOutMain } from "./checkout";
 import { Pagination } from "./pagination";
 import { Customer } from "./user";
 import { VariantOptionResponse } from "./variant";
+import { VoucherItem } from "./voucher";
 
 export interface Product {
   id: number;
@@ -228,6 +229,7 @@ export type ProductItem = {
 
   inventory: InventoryItem[];
   log_stocks: ProductStockLog[];
+  vouchers: VoucherItem[];
 };
 
 export type ProductResponse = {

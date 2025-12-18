@@ -74,7 +74,7 @@ const Footer = () => {
         </div>
       </div>
       {/* Cột 1: Newsletter */}
-      <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
+      {/* <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
         <h4 className="">{t("notifyByEmail")}</h4>
 
         <p className="lg:mt-2 mt-1 lg:w-2/3 w-full text-sm">
@@ -103,7 +103,7 @@ const Footer = () => {
             Datenschutz
           </Link>
         </p>
-      </div>
+      </div> */}
 
       {/* Cột 2: Các trang */}
       <div className="footer-column lg:col-span-2 col-span-6 mb-6 lg:mb-0">
@@ -180,6 +180,27 @@ const Footer = () => {
             </Link>
           </li>
         </ul>
+      </div>
+
+      <div className="footer-column lg:col-span-4 col-span-6">
+        <h4 className="font-semibold mb-3">{t("companyTitle")}</h4>
+
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <ul className="space-y-2 text-black-700 text-sm">
+            <li className="font-bold">Büro </li>
+            <li>Prestige Home GmbH</li>
+            <li>Greifswalder Straße 226, 10405 Berlin</li>
+            <li>{t("phone_number")}: 004368110327073</li>
+            <li>{t("email")}: info@prestige-home.de</li>
+          </ul>
+          <ul className="space-y-2 text-black-700 text-sm">
+            <li className="font-bold">Lager</li>
+            <li>Prestige Home</li>
+            <li>Amm GmbH & Co KG Spedition</li>
+            <li>Hamburger Straße 99</li>
+            <li>90451 Nuremberg</li>
+          </ul>
+        </div>
       </div>
 
       {/* Cột 3: Payment Method */}

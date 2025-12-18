@@ -1,69 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import BlogCard from "./blog-card-item";
 import BlogCardSkeleton from "./blog-card-skeleton";
-import { BlogItem } from "@/types/blog";
+import { getBlogs } from "@/features/blog/api";
+import { Loader2 } from "lucide-react";
+import { startTransition, useMemo } from "react";
 
-export default function BlogListClient({
-  initialPosts,
-  initialPagination,
-}: {
-  initialPosts: BlogItem[];
-  initialPagination: {
-    page: number;
-    page_size: number;
-    total_pages: number;
-    total_items: number;
-  };
-}) {
-  const [posts, setPosts] = useState(initialPosts);
-  const [pagination, setPagination] = useState(initialPagination);
+export default function BlogListClient({ initialData }: { initialData: any }) {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["blogs"],
+      initialPageParam: 1, // 🔥 BẮT BUỘC
+      queryFn: ({ pageParam }) => getBlogs({ page: pageParam }),
 
-  const [loading, setLoading] = useState(false);
+      getNextPageParam: (lastPage) => {
+        const { page, total_pages } = lastPage.pagination;
+        return page < total_pages ? page + 1 : undefined;
+      },
 
-  const hasMore = pagination.page < pagination.total_pages;
+      initialData, // 👈 phải đúng shape
+    });
 
-  const loadMore = async () => {
-    if (!hasMore) return;
+  const posts = useMemo(
+    () => data?.pages.flatMap((p) => p.items) ?? [],
+    [data],
+  );
 
-    setLoading(true);
-
-    const nextPage = pagination.page + 1;
-
-    const res = await fetch(
-      `/api/blog?page=${nextPage}&page_size=${pagination.page_size}`,
-      { cache: "no-store" },
-    );
-    const data = await res.json();
-
-    setPosts((prev) => [...prev, ...data.items]);
-
-    setPagination(data.pagination);
-    setLoading(false);
+  const handleLoadMore = () => {
+    startTransition(() => {
+      fetchNextPage();
+    });
   };
 
   return (
     <div className="space-y-10">
       {/* GRID POSTS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {posts.map((post: BlogItem) => (
-          <div key={post.id}>
-            <BlogCard post={post} />
-          </div>
+        {posts.map((post) => (
+          <BlogCard
+            key={post.id}
+            post={post}
+          />
         ))}
 
-        {loading && [...Array(3)].map((_, i) => <BlogCardSkeleton key={i} />)}
+        {isFetchingNextPage &&
+          [...Array(3)].map((_, i) => <BlogCardSkeleton key={i} />)}
       </div>
 
-      {hasMore && (
+      {hasNextPage && (
         <div className="text-center">
           <button
-            onClick={loadMore}
-            disabled={loading}
-            className="border rounded-md py-2 px-6 hover:bg-gray-100 transition"
+            onClick={handleLoadMore}
+            disabled={isFetchingNextPage}
+            className="inline-flex items-center gap-2 border rounded-md py-2 px-6 hover:bg-gray-100 transition disabled:opacity-60 cursor-pointer"
           >
-            {loading ? "Lädt..." : "Mehr laden"}
+            {isFetchingNextPage ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Lädt...
+              </>
+            ) : (
+              "Mehr laden"
+            )}
           </button>
         </div>
       )}

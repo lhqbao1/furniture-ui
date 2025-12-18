@@ -2,11 +2,9 @@ import BlogBreadcrumb from "@/components/layout/blog/blog-breadcrumb";
 import BlogListClient from "@/components/layout/blog/blog-list-client";
 import SidebarBlog from "@/components/layout/blog/blog-sidebar";
 import FeaturedPost from "@/components/layout/blog/featured-post";
-import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import { getBlogs, getBlogsByProduct } from "@/features/blog/api";
 import { BlogItem } from "@/types/blog";
 import type { Metadata } from "next";
-import { useTranslations } from "next-intl";
 
 /* PPR */
 export const experimental_ppr = true;
@@ -27,12 +25,16 @@ export const metadata: Metadata = {
 
 export default async function BlogPage() {
   // Chạy song song để nhanh hơn
-  const mainData = await getBlogs();
+  const mainData = await getBlogs({
+    pageSize: 16,
+  });
   const sideBarData = await getBlogsByProduct();
 
   const featured = mainData.items[0];
-  const others = mainData.items.slice(1);
-
+  const listData = {
+    ...mainData,
+    items: mainData.items.slice(1),
+  };
   /* Schema.org */
   const schema = {
     "@context": "https://schema.org",
@@ -68,8 +70,10 @@ export default async function BlogPage() {
           <div className="lg:col-span-8 space-y-20">
             <FeaturedPost post={featured} />
             <BlogListClient
-              initialPosts={others}
-              initialPagination={mainData.pagination}
+              initialData={{
+                pages: [listData],
+                pageParams: [1],
+              }}
             />
           </div>
 

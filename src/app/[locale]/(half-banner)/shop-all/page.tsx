@@ -1,68 +1,77 @@
 "use client";
+
 import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
-import { SlidersHorizontal } from "lucide-react";
-import React, { useState } from "react";
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import FilterSection from "@/components/layout/single-product/filter-section";
-import { useGetAllProducts } from "@/features/products/hook";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { CustomPagination } from "@/components/shared/custom-pagination";
+import { useGetAllProducts } from "@/features/products/hook";
 import { useTranslations } from "next-intl";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 export default function ShopAllPage() {
   const t = useTranslations();
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(40);
-  const {
-    data: products,
-    isLoading,
-    isError,
-  } = useGetAllProducts({ page, page_size: pageSize });
-  if (!products || isLoading) return <ProductGridSkeleton length={12} />;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // 🔹 1. LẤY PARAMS TỪ URL
+  const search = searchParams.get("search") ?? undefined;
+  const pageFromUrl = Number(searchParams.get("page")) || 1;
+  const pageSizeFromUrl = Number(searchParams.get("page_size")) || 40;
+
+  // 🔹 2. STATE (sync với URL)
+  const [page, setPage] = useState(pageFromUrl);
+  const [pageSize, setPageSize] = useState(pageSizeFromUrl);
+
+  // 🔹 3. SYNC khi back / reload
+  useEffect(() => {
+    setPage(pageFromUrl);
+    setPageSize(pageSizeFromUrl);
+  }, [pageFromUrl, pageSizeFromUrl]);
+
+  // 🔹 4. QUERY
+  const { data, isLoading, isError } = useGetAllProducts({
+    page,
+    page_size: pageSize,
+    search,
+    is_econelo: false,
+  });
+
+  // 🔹 5. UPDATE URL khi đổi page
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  if (isLoading || !data) {
+    return <ProductGridSkeleton length={12} />;
+  }
+
+  if (isError) {
+    return <div className="text-center py-10">Something went wrong</div>;
+  }
 
   return (
     <div className="pt-3 xl:pb-16 pb-6">
-      <CustomBreadCrumb currentPage="Shop All" />
-      <div className="">
-        <h2 className="section-header">{t("shopAll")}</h2>
-        {isLoading || isError || !products ? (
-          <ProductGridSkeleton length={12} />
-        ) : (
-          <div className="filter-section">
-            <Collapsible>
-              {/* Trigger */}
-              <CollapsibleTrigger asChild>
-                <div className="flex justify-end cursor-pointer mb-2 lg:ml-30">
-                  <div className="rounded-full border-primary border w-fit flex gap-1 items-center px-2 py-1">
-                    <SlidersHorizontal className="text-primary" />
-                    <p className="text-lg">Filter</p>
-                  </div>
-                </div>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <FilterSection />
-              </CollapsibleContent>
-            </Collapsible>
-            {/*Products section */}
-            <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
-              <ProductsGridLayout
-                hasBadge
-                data={products.items}
-              />
-            </div>
-          </div>
-        )}
+      {/* <CustomBreadCrumb currentPage={t("shopAll")} />
+
+      <h2 className="section-header">{t("shopAll")}</h2> */}
+
+      <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
+        <ProductsGridLayout
+          hasBadge
+          data={data.items}
+        />
       </div>
-      <CustomPagination
-        totalPages={products.pagination.total_pages}
-        page={page}
-        onPageChange={setPage}
-      />
+
+      {data.pagination.total_pages > 1 && (
+        <CustomPagination
+          totalPages={data.pagination.total_pages}
+          page={page}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 }

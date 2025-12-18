@@ -19,7 +19,7 @@ const VoucherSection = ({ vouchers }: VoucherSectionProps) => {
   };
 
   return (
-    <section>
+    <section className="bg-secondary/5 md:py-16 py-6">
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {vouchers.slice(0, 4).map((item, index) => {
@@ -34,6 +34,7 @@ const VoucherSection = ({ vouchers }: VoucherSectionProps) => {
                   item.discount_value,
                 )}
                 footerText="Thank you for your payment."
+                id={item.id}
               />
             );
           })}
