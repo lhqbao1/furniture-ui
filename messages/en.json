@@ -378,5 +378,18 @@
       "order": "This voucher will be applied to your order",
       "fixed": "Get €{value}",
       "percent": "Get {value}%"
-  }
+  },
+  "quickContact": "Quick contact",
+  "hero_title": "Quality Solutions for Living & Outdoor Spaces",
+  "hero_sub": "Premium design. Timeless comfort. For living and outdoor spaces.",
+  "view_bestseller": "View bestsellers",
+  "newsletter_voucher": {
+    "title": "Get your 5% discount voucher now*",
+    "description": "Subscribe to our free newsletter and receive attractive coupons and offers by email before anyone else. Plus, you’ll get an exclusive 5% welcome voucher from us!",
+    "emailPlaceholder": "Your email address",
+    "cta": "Register now",
+    "legal": "* Unsubscribe at any time. Enter the voucher code in your shopping cart or during the final step of the order process. Valid for 6 weeks after newsletter registration.",
+    "showMore": "Show more"
+  },
+  "recentSearch": "Recent Search"
 }

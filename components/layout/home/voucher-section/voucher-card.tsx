@@ -5,6 +5,8 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { useAtom } from "jotai";
+import { currentVoucherAtom, lastVoucherAtom } from "@/store/voucher";
 
 export type VoucherType = "shipping" | "user_specific" | "product" | "order";
 
@@ -14,6 +16,7 @@ interface TransactionCardProps {
   subtitle: string;
   footerText: string;
   highlightText: string;
+  id: string;
 }
 
 const STATUS_CONFIG = {
@@ -73,9 +76,13 @@ export default function TransactionCard({
   subtitle,
   footerText,
   highlightText,
+  id,
 }: TransactionCardProps) {
   const cfg = STATUS_CONFIG[status];
   const t = useTranslations();
+  const [currentVoucher, setCurrentVoucher] = useAtom(currentVoucherAtom);
+  const [lastVoucher, setLastVoucher] = useAtom(lastVoucherAtom);
+
   return (
     <div
       className={cn(
@@ -84,13 +91,51 @@ export default function TransactionCard({
       )}
     >
       {/* Badge */}
+      {/* <div
+        className={cn(
+          "absolute -top-3 left-6 w-8 h-8 rounded-full flex items-center justify-center",
+          cfg.badgeBg,
+        )}
+      >
+        {currentVoucher === id ? (
+          <Check
+            className="text-white"
+            size={16}
+          />
+        ) : (
+          cfg.icon
+        )}
+      </div> */}
       <div
         className={cn(
           "absolute -top-3 left-6 w-8 h-8 rounded-full flex items-center justify-center",
           cfg.badgeBg,
         )}
       >
-        {cfg.icon}
+        <span
+          className={cn(
+            "absolute transition-all duration-200",
+            currentVoucher === id
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-75",
+          )}
+        >
+          <Check
+            className="text-white"
+            size={16}
+          />
+        </span>
+
+        <span
+          className={cn(
+            "absolute transition-all duration-200",
+            currentVoucher === id
+              ? "opacity-0 scale-75"
+              : "opacity-100 scale-100",
+          )}
+        >
+          {cfg.icon}
+        </span>
       </div>
 
       {/* Header */}
@@ -120,8 +165,13 @@ export default function TransactionCard({
       </div>
 
       <Button
+        type="button"
         className="mt-4"
         variant={"secondary"}
+        onClick={() => {
+          setCurrentVoucher(id);
+          setLastVoucher(null);
+        }}
       >
         {t("exploreNow")}
       </Button>

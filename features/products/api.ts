@@ -9,6 +9,7 @@ export interface GetAllProductsParams {
   search?: string;
   is_inventory?: string;
   sort_by_stock?: string;
+  is_econelo?: boolean;
 }
 
 interface SEOInput {
@@ -47,6 +48,9 @@ export async function getAllProducts(params?: GetAllProductsParams) {
         is_inventory: params.is_inventory,
       }),
       ...(params?.sort_by_stock && { sort_by_stock: params.sort_by_stock }),
+      ...(params?.is_econelo !== undefined && {
+        is_econelo: params.is_econelo,
+      }),
     },
   });
 

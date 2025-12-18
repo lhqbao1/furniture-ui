@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   useGetVoucherById,
   useGetVoucherForCheckout,
+  useGetVoucherProducts,
 } from "@/features/vouchers/hook";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { userIdAtom } from "@/store/auth";
@@ -19,7 +20,7 @@ import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import ProductVoucher from "./checkout-voucher";
-import { voucherIdAtom } from "@/store/voucher";
+import { currentVoucherAtom } from "@/store/voucher";
 
 interface CheckoutSummaryProps {
   cartItems: CartResponseItem[];
@@ -37,7 +38,39 @@ const CheckoutSummary = ({
   const form = useFormContext();
   const t = useTranslations();
   const [userId, setUserId] = useAtom(userIdAtom);
-  const [voucherId, setVoucherId] = useState<string | null>(null);
+  const [currentVoucher, setCurrentVoucher] = useAtom(currentVoucherAtom);
+  const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
+
+  const { data: listValidProducts } = useGetVoucherProducts(voucherId ?? "");
+
+  const validProductIdSet = React.useMemo<Set<string>>(() => {
+    return new Set(listValidProducts?.map((p) => p.id) ?? []);
+  }, [listValidProducts]);
+
+  const productSubtotalForVoucher = React.useMemo(() => {
+    if (validProductIdSet.size === 0) return 0;
+
+    // ✅ Logged-in cart
+    if (cartItems && cartItems.length > 0) {
+      return cartItems
+        .flatMap((g) => g.items)
+        .filter(
+          (i) =>
+            i.is_active &&
+            i.products?.id &&
+            validProductIdSet.has(i.products.id),
+        )
+        .reduce((sum, i) => sum + (i.final_price ?? 0), 0);
+    }
+
+    // ✅ Local cart
+    return (
+      localCart
+        ?.filter((i) => i.is_active && validProductIdSet.has(i.product_id))
+        .reduce((sum, i) => sum + (i.item_price ?? 0) * (i.quantity ?? 1), 0) ??
+      0
+    );
+  }, [validProductIdSet, cartItems, localCart]);
 
   const voucherAmount = useWatch({
     control: form.control,
@@ -48,8 +81,6 @@ const CheckoutSummary = ({
     control: form.control,
     name: "coupon_amount",
   });
-
-  const currentVoucherAmount = form.getValues("voucher_amount");
 
   const productIds = React.useMemo(() => {
     if (cartItems && cartItems.length > 0) {
@@ -97,79 +128,82 @@ const CheckoutSummary = ({
   const { data: selectedVoucher, isLoading: isLoadingVoucher } =
     useGetVoucherById(voucherId ?? "");
 
+  const isProductVoucherReady =
+    selectedVoucher?.type !== "product" ||
+    (listValidProducts && listValidProducts.length >= 0);
+
   React.useEffect(() => {
     if (!selectedVoucher) return;
 
-    const currentValue = form.getValues("voucher_amount");
+    // ⛔ Product voucher nhưng chưa load products → STOP
+    if (selectedVoucher.type === "product" && !listValidProducts) {
+      return;
+    }
+
     let nextValue = 0;
+    const currentValue = form.getValues("voucher_amount");
 
     /**
      * 1️⃣ PRODUCT voucher
-     * - áp dụng trên orderValue (hoặc subtotal product)
      */
     if (selectedVoucher.type === "product") {
-      if (selectedVoucher.discount_type === "percent") {
-        nextValue = (orderValue * selectedVoucher.discount_value) / 100;
-      }
-
-      if (selectedVoucher.discount_type === "fixed") {
+      if (productSubtotalForVoucher <= 0) {
+        nextValue = 0;
+      } else if (selectedVoucher.discount_type === "percent") {
+        nextValue =
+          (productSubtotalForVoucher * selectedVoucher.discount_value) / 100;
+      } else {
         nextValue = selectedVoucher.discount_value;
       }
     }
 
     /**
-     * 2️⃣ USER SPECIFIC voucher
-     * - logic giống order (thường vậy)
+     * 2️⃣ USER SPECIFIC
      */
     if (selectedVoucher.type === "user_specific") {
-      if (selectedVoucher.discount_type === "percent") {
-        nextValue = (orderValue * selectedVoucher.discount_value) / 100;
-      }
-
-      if (selectedVoucher.discount_type === "fixed") {
-        nextValue = selectedVoucher.discount_value;
-      }
+      nextValue =
+        selectedVoucher.discount_type === "percent"
+          ? (orderValue * selectedVoucher.discount_value) / 100
+          : selectedVoucher.discount_value;
     }
 
     /**
-     * 3️⃣ SHIPPING voucher
+     * 3️⃣ SHIPPING
      */
     if (selectedVoucher.type === "shipping") {
-      if (selectedVoucher.discount_type === "percent") {
-        nextValue = shippingCost;
-        console.log(nextValue);
-      }
-
-      if (selectedVoucher.discount_type === "fixed") {
-        nextValue = selectedVoucher.discount_value;
-        console.log(nextValue);
-      }
+      nextValue =
+        selectedVoucher.discount_type === "percent"
+          ? shippingCost
+          : selectedVoucher.discount_value;
     }
 
     /**
-     * 4️⃣ Respect max_discount (RẤT QUAN TRỌNG)
+     * 4️⃣ max_discount
      */
     if (
-      selectedVoucher.max_discount != null && // khác null & undefined
-      selectedVoucher.max_discount > 0 && // loại bỏ 0
+      selectedVoucher.max_discount &&
       nextValue > selectedVoucher.max_discount
     ) {
       nextValue = selectedVoucher.max_discount;
     }
 
     /**
-     * 5️⃣ SET VALUE – CHỈ KHI THAY ĐỔI
+     * 5️⃣ SET VALUE
      */
-    if (!currentValue || currentValue !== nextValue) {
-      console.log("hehe", nextValue);
+    if (currentValue !== nextValue) {
       form.setValue("voucher_amount", nextValue, {
         shouldDirty: false,
         shouldTouch: false,
         shouldValidate: false,
       });
     }
-  }, [selectedVoucher, orderValue, shippingCost]); // ✅ KHÔNG đưa form vào deps
-
+  }, [
+    selectedVoucher,
+    orderValue,
+    shippingCost,
+    productSubtotalForVoucher, // 🔥 BẮT BUỘC
+    listValidProducts, // 🔥 BẮT BUỘC
+  ]);
   React.useEffect(() => {
     if (!voucherId) {
       const current = form.getValues("voucher_amount");
@@ -185,6 +219,21 @@ const CheckoutSummary = ({
 
   return (
     <>
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-2">
+        {listVouchers && listVouchers.length > 0
+          ? listVouchers.map((item, index) => {
+              return (
+                <ProductVoucher
+                  key={item.id}
+                  item={item}
+                  isSelected={voucherId === item.id}
+                  onSelect={(id) => setVoucherId(id)}
+                  isLoadingVoucher={isLoadingVoucher}
+                />
+              );
+            })
+          : null}
+      </div>
       {/* TOTAL + NOTE */}
       <div className="grid grid-cols-2 gap-6 items-start">
         {/* NOTE */}
@@ -284,21 +333,6 @@ const CheckoutSummary = ({
             </span>
           </div>
         </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-2">
-        {listVouchers && listVouchers.length > 0
-          ? listVouchers.map((item, index) => {
-              return (
-                <ProductVoucher
-                  item={item}
-                  key={item.id}
-                  isSelected={voucherId === item.id}
-                  onSelect={() => setVoucherId(item.id)}
-                />
-              );
-            })
-          : null}
       </div>
     </>
   );

@@ -1,3 +1,5 @@
+import CategorySection from "@/components/layout/home/category-section";
+import NewsletterVoucherSection from "@/components/layout/home/contact-voucher-section";
 import FeaturedProducts from "@/components/layout/home/featured-products";
 import RecentViewed from "@/components/layout/home/recent-viewed";
 import VoucherSection from "@/components/layout/home/voucher-section/voucher-section";
@@ -11,8 +13,11 @@ export const experimental_ppr = true;
 export default async function HomePage() {
   const [trendingProducts, allProducts, voucherList] = await Promise.all([
     getProductByTag("Trending").catch(() => []),
-    getAllProducts({ page_size: 24 }),
-    getVouchers(),
+    getAllProducts({ page_size: 24 }).catch(() => ({
+      items: [],
+      total: 0,
+    })),
+    getVouchers().catch(() => []),
   ]);
 
   return (
@@ -20,12 +25,23 @@ export default async function HomePage() {
       id="home"
       className="w-full"
     >
-      {/* <VoucherSection vouchers={voucherList} /> */}
       {/* CRITICAL FIRST PAINT */}
       <FeaturedProducts products={allProducts.items} />
 
-      {/* STREAMING SECTION */}
+      {/* <VoucherSection vouchers={voucherList} /> */}
+
       <RecentViewed products={trendingProducts} />
+
+      <NewsletterVoucherSection />
+      <CategorySection slug="sofas" />
+
+      <CategorySection slug="matratzen" />
+      <CategorySection slug="gartenmoebel" />
+      <CategorySection slug="zaeune-sichtschutz" />
+      <CategorySection slug="elektrowerkzeuge" />
+      <CategorySection slug="bodenbelaege" />
+
+      {/* STREAMING SECTION */}
     </div>
   );
 }

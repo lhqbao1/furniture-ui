@@ -23,23 +23,24 @@ const WishList = () => {
       ) ?? 0;
 
   return (
-    <div className="pt-3 xl:pb-16 pb-6 space-y-4">
-      <CustomBreadCrumb currentPage="wishlist" />
-      <h1 className="text-secondary text-5xl font-bold text-center">
-        {t("wishlist")}
-      </h1>
+    <div className="mt-6 lg:px-0 px-4 container-padding">
+      <div className="w-full lg:max-w-7xl mx-auto lg:p-6">
+        <h1 className="text-secondary text-5xl font-bold text-center">
+          {t("wishlist")}
+        </h1>
 
-      {isLoading || isError || !wishlist ? (
-        <ProductTableSkeleton />
-      ) : (
-        <WishlistTable
-          wishlist={wishlist}
-          localQuantities={localQuantities}
-          setLocalQuantities={setLocalQuantities}
-          total={total}
-          currentTable={t("wishlistProducts")}
-        />
-      )}
+        {isLoading || isError || !wishlist ? (
+          <ProductTableSkeleton />
+        ) : (
+          <WishlistTable
+            wishlist={wishlist}
+            localQuantities={localQuantities}
+            setLocalQuantities={setLocalQuantities}
+            total={total}
+            currentTable={t("wishlistProducts")}
+          />
+        )}
+      </div>
     </div>
   );
 };
