@@ -36,7 +36,7 @@ import {
 import React from "react";
 import { toast } from "sonner";
 import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
+import { adminIdAtom, userIdAtom } from "@/store/auth";
 
 interface EditInventoryDialogProps {
   productId: string;
@@ -68,7 +68,7 @@ export default function EditInventoryDialog({
   inventoryData,
 }: EditInventoryDialogProps) {
   const [open, setOpen] = React.useState(false);
-  const [userId, setUserId] = useAtom(userIdAtom);
+  const [userId, setUserId] = useAtom(adminIdAtom);
 
   const form = useForm<InventoryCreateValues>({
     resolver: zodResolver(InventoryCreateSchema),

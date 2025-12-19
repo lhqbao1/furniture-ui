@@ -64,10 +64,12 @@ const SaleFixedIcon = () => {
       // 🔁 remove voucher
       setCurrentVoucher(null);
       setLastVoucher(null);
+      setVisible(false);
     } else {
       // ✅ apply voucher
       setCurrentVoucher(VOUCHER_ID);
       setLastVoucher(null);
+      setVisible(false);
     }
   };
 

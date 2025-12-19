@@ -395,5 +395,13 @@
   "errorMessage": "Oops! Something went wrong. Please try again",
 "invalidEmail": "Please enter a valid email address"
   },
-  "recentSearch": "Recent Search"
+  "recentSearch": "Recent Search",
+  "checking": "Checking...",
+  "voucherApplied": "Voucher applied successfully",
+  "invalidVoucher": "This voucher code is not valid",
+  "subtotal": "Subtotal",
+  "totalWithTax": "Total incl. VAT",
+   "securePayment": "Secure payment",
+    "extendedReturn": "Extended return period until 31/01/2026",
+    "easyDelivery": "Easy and hassle-free delivery"
 }

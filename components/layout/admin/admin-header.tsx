@@ -2,10 +2,10 @@
 import React from "react";
 import { SidebarTrigger } from "../../ui/sidebar";
 import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
+import { adminIdAtom } from "@/store/auth";
 
 const AdminHeader = () => {
-  const [userId, setUserId] = useAtom(userIdAtom);
+  const [userId, setUserId] = useAtom(adminIdAtom);
 
   return (
     <div className="flex gap-4 items-center">

@@ -14,12 +14,9 @@ import {
 } from "@/features/address/hook";
 import { useCreateCheckOut } from "@/features/checkout/hook";
 import { useCreatePayment } from "@/features/payment/hook";
-import { useCheckMailExist, useSignUpGuess } from "@/features/auth/hook";
+import { useSignUpGuess } from "@/features/auth/hook";
 import { getCartByUserId } from "@/features/cart/api";
-import {
-  normalizeCartItems,
-  calculateShipping,
-} from "@/hooks/caculate-shipping";
+import { normalizeCartItems } from "@/hooks/caculate-shipping";
 import { mapToSupplierCarts } from "@/hooks/map-cart-to-supplier";
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { CartResponse } from "@/types/cart";

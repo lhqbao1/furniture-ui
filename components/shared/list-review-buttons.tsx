@@ -46,6 +46,13 @@ const IconList = ({ currentProduct }: IconListProps) => {
             delivery_time: currentProduct.delivery_time
               ? currentProduct.delivery_time
               : "",
+            brand_name: currentProduct.brand.company_name,
+            length: currentProduct.length,
+            width: currentProduct.width,
+            height: currentProduct.height,
+            color: currentProduct.color,
+            inventory: currentProduct.inventory,
+            url_key: currentProduct.url_key,
           },
         },
         {

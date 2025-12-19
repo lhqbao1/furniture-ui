@@ -125,3 +125,8 @@ export async function generateSEO(input: SEOInput) {
   );
   return data as SEOResponse;
 }
+
+export async function getAllKeywords() {
+  const { data } = await apiPublic.get("/products/get-all-key-work");
+  return data as string[];
+}

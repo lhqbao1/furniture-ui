@@ -41,7 +41,14 @@ export default function ShopAllPage() {
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
+
     router.push(`?${params.toString()}`, { scroll: false });
+
+    // ✅ scroll smooth lên đầu
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   if (isLoading || !data) {
@@ -54,10 +61,6 @@ export default function ShopAllPage() {
 
   return (
     <div className="pt-3 xl:pb-16 pb-6">
-      {/* <CustomBreadCrumb currentPage={t("shopAll")} />
-
-      <h2 className="section-header">{t("shopAll")}</h2> */}
-
       <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
         <ProductsGridLayout
           hasBadge

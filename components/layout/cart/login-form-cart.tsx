@@ -49,7 +49,6 @@ export default function CartLoginForm({
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const queryClient = useQueryClient();
   const [userId, setUserId] = useAtom(userIdAtom);
 
@@ -116,7 +115,6 @@ export default function CartLoginForm({
           onSuccess: (data) => {
             const token = data.access_token;
             localStorage.setItem("access_token", token);
-            localStorage.setItem("userId", data.id);
             setUserId(data.id);
             syncLocalCartMutation.mutate();
 
@@ -145,7 +143,6 @@ export default function CartLoginForm({
         onSuccess: (data) => {
           const token = data.access_token;
           localStorage.setItem("access_token", token);
-          localStorage.setItem("userId", data.id);
           setUserId(data.id);
           syncLocalCartMutation.mutate();
           queryClient.invalidateQueries({

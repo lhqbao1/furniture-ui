@@ -12,7 +12,7 @@ interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
 }
 
-function getLatestInventory(inventory: any[]) {
+export function getLatestInventory(inventory: any[]) {
   if (!inventory || inventory.length === 0) return null;
 
   return inventory.reduce((latest, item) => {
@@ -23,7 +23,7 @@ function getLatestInventory(inventory: any[]) {
   }, null);
 }
 
-function getDeliveryDayRange(
+export function getDeliveryDayRange(
   deliveryTime?: string,
 ): { min: number; max: number } | null {
   if (!deliveryTime) return null;
@@ -47,7 +47,7 @@ function getDeliveryDayRange(
   return null;
 }
 
-function formatDateDE(date: Date) {
+export function formatDateDE(date: Date) {
   return date.toLocaleDateString("de-DE", {
     day: "2-digit",
     month: "2-digit",
@@ -55,7 +55,7 @@ function formatDateDE(date: Date) {
   });
 }
 
-function addBusinessDays(startDate: Date, businessDays: number) {
+export function addBusinessDays(startDate: Date, businessDays: number) {
   const result = new Date(startDate);
   let addedDays = 0;
 

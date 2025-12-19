@@ -47,16 +47,9 @@ export function OtpDialog({
   ]);
   const [, setUserId] = useAtom(userIdAtom);
   const loginOtpMutation = useLoginOtpGuest();
-  const syncLocalCartMutation = useSyncLocalCart();
   const t = useTranslations();
 
   // -------------- GIỮ NGUYÊN LOGIC CỦA BẠN ----------------
-
-  const updateOtpAt = (index: number, val: string) => {
-    const newOtp = [...otpValues];
-    newOtp[index] = val;
-    setOtpValues(newOtp);
-  };
 
   // Copy–paste toàn bộ 6 số
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -79,9 +72,6 @@ export function OtpDialog({
       {
         onSuccess: (data, variables) => {
           verifyOtp(variables.code); // giữ nguyên logic
-
-          // localStorage.setItem("access_token", data.access_token);
-          // localStorage.setItem("userIdGuest", data.id);
 
           toast.success(t("otpDone"));
           // onSuccess(data.id);

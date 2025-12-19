@@ -1,23 +1,6 @@
 "use client";
-import Image from "next/image";
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
+import React from "react";
 import { ProductItem } from "@/types/products";
-import { useMediaQuery } from "react-responsive";
-import { useAddViewedProduct } from "@/features/viewed/hook";
-import { useLocale, useTranslations } from "next-intl";
-import { Link, useRouter } from "@/src/i18n/navigation";
-import { Heart, ShoppingBasket, Star } from "lucide-react";
-import { Button } from "../ui/button";
-import { useAddToCart } from "@/features/cart/hook";
-import { useAddToWishList } from "@/features/wishlist/hook";
-import { useCartLocal } from "@/hooks/cart";
-import { toast } from "sonner";
-import { HandleApiError } from "@/lib/api-helper";
-import { CartItemLocal } from "@/lib/utils/cart";
-import { cn } from "@/lib/utils";
-import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
 import ProductCard from "./product-grid-card";
 
 interface ProductsGridLayoutProps {
