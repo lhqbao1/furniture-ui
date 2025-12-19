@@ -20,6 +20,7 @@ import {
   getVoucherUsers,
   removeProductAssignVoucher,
   removeUserAssignVoucher,
+  sendVoucherViaEmail,
   updateVoucher,
   useVoucherApi,
   VoucherUsageInput,
@@ -223,5 +224,15 @@ export function useGetVoucherForCheckout(
     queryKey: ["vouchers", "checkout", input],
     queryFn: () => getVoucherForCheckout(input),
     enabled: enabled && input.product_ids.length > 0 && input.order_value > 0,
+  });
+}
+
+export function useSendVoucherViaEmail() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (email: string) => sendVoucherViaEmail(email),
+    onSuccess: (res) => {
+      // qc.invalidateQueries({ queryKey: ["vouchers"] });
+    },
   });
 }

@@ -230,3 +230,16 @@ export async function getVoucherForCheckout(input: GetVoucherForCheckoutInput) {
 
   return data as VoucherItem[];
 }
+
+export async function sendVoucherViaEmail(email: string) {
+  const { data } = await apiAdmin.post(
+    "/vouchers/send-email-voucher",
+    null, // ✅ không có body
+    {
+      params: { email }, // ✅ query string
+      withCredentials: true,
+    },
+  );
+
+  return data;
+}

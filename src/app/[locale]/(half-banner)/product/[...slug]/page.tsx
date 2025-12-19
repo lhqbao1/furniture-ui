@@ -1,8 +1,4 @@
-import {
-  getProductBySlug,
-  getProductsFeed,
-  getProductById,
-} from "@/features/products/api";
+import { getProductBySlug, getProductsFeed } from "@/features/products/api";
 import { getProductGroupDetail } from "@/features/product-group/api";
 import type { Metadata } from "next";
 import { StaticFile } from "@/types/products";
@@ -11,8 +7,6 @@ import ProductDetails from "@/components/layout/single-product/product-details";
 import { ProductDetailsTab } from "@/components/layout/single-product/product-tab";
 import RelatedCategoryProducts from "@/components/layout/single-product/related-category";
 
-import getQueryClient from "@/lib/get-query-client";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getReviewByProduct } from "@/features/review/api";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -94,6 +88,31 @@ export async function generateMetadata({
     },
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.prestige-home.de/de",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: product.categories?.[0]?.name ?? "Produkte",
+        item: `https://www.prestige-home.de/de/category/${product.categories?.[0]?.slug}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.name,
+        item: `https://www.prestige-home.de/de/product/${product.url_key}`,
+      },
+    ],
+  };
+
   if (hasReviews) {
     const ratingValue =
       reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length;
@@ -117,7 +136,7 @@ export async function generateMetadata({
         product.static_files?.map((f: StaticFile) => ({ url: f.url })) ?? [],
     },
     other: {
-      "application/ld+json": JSON.stringify(schema),
+      "application/ld+json": JSON.stringify([schema, breadcrumbSchema]),
     },
   };
 }
