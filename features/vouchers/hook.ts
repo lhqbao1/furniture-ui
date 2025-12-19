@@ -11,6 +11,7 @@ import {
   createVoucherUser,
   deleteVoucher,
   GetAllVouchersParams,
+  getVoucherByCode,
   getVoucherById,
   getVoucherForCheckout,
   GetVoucherForCheckoutInput,
@@ -234,5 +235,14 @@ export function useSendVoucherViaEmail() {
     onSuccess: (res) => {
       // qc.invalidateQueries({ queryKey: ["vouchers"] });
     },
+  });
+}
+
+export function useGetVoucherByCode(code: string) {
+  return useQuery({
+    queryKey: ["voucher-by-code", code],
+    queryFn: () => getVoucherByCode(code),
+    enabled: !!code,
+    retry: false,
   });
 }

@@ -64,6 +64,13 @@ export default function ProductSearch({
           delivery_time: productDetails.delivery_time
             ? productDetails.delivery_time
             : "",
+          brand_name: productDetails.brand.company_name,
+          length: productDetails.length,
+          width: productDetails.width,
+          height: productDetails.height,
+          color: productDetails.color,
+          inventory: productDetails.inventory,
+          url_key: productDetails.url_key,
         },
       },
       {

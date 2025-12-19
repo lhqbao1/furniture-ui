@@ -51,6 +51,12 @@ export interface GetVoucherForCheckoutInput {
   order_value: number;
 }
 
+interface CreateVoucherUsagePayload {
+  voucher_ids: string[];
+  user_id: string;
+  order_id: string;
+}
+
 export async function createVoucher(input: VoucherFormValues) {
   const { data } = await apiAdmin.post(`/vouchers/`, input, {
     headers: {
@@ -201,7 +207,6 @@ export async function getVoucherShipping() {
   const { data } = await apiPublic.get(`/vouchers/shipping`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
     },
     withCredentials: true,
   });
@@ -213,7 +218,6 @@ export async function useVoucherApi(input: VoucherUsageInput) {
   const { data } = await apiPublic.post(`/vouchers/usage`, input, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
     },
     withCredentials: true,
   });
@@ -242,4 +246,17 @@ export async function sendVoucherViaEmail(email: string) {
   );
 
   return data;
+}
+
+export async function createVoucherUsage(payload: CreateVoucherUsagePayload) {
+  const { data } = await apiAdmin.post("/vouchers/usage", payload, {
+    withCredentials: true,
+  });
+
+  return data;
+}
+
+export async function getVoucherByCode(code: string) {
+  const { data } = await apiPublic.get(`/vouchers/get-voucher-by-code/${code}`);
+  return data as VoucherItem;
 }

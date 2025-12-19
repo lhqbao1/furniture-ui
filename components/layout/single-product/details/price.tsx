@@ -1,3 +1,4 @@
+import ProductPricingField from "@/components/shared/product-pricing-field";
 import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -10,31 +11,7 @@ const ProductDetailsPrice = ({ productDetails }: ProductDetailsPriceProps) => {
   const t = useTranslations();
   return (
     <div className="space-y-2">
-      <div className="flex gap-2 items-end">
-        <div className="inline-flex items-end justify-start w-fit gap-6 font-bold text-gray-900 relative">
-          <div className="text-4xl">
-            {Math.floor(
-              productDetails.final_price
-                ? productDetails.final_price
-                : productDetails.price,
-            )}
-          </div>
-          <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-            ,
-            {
-              (
-                (productDetails.final_price
-                  ? productDetails.final_price
-                  : productDetails.price) % 1
-              )
-                .toFixed(2)
-                .split(".")[1]
-            }
-          </div>
-          <div className="text-base font-semibold text-black">€</div>
-        </div>
-        <div>(inkl. MwSt.)</div>
-      </div>
+      <ProductPricingField product={productDetails} />
 
       {productDetails.price &&
         productDetails.price > productDetails.final_price && (

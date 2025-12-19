@@ -1,5 +1,7 @@
 // utils/cart.ts
 
+import { InventoryItem } from "@/types/products";
+
 export type CartItemLocal = {
   id?: string;
   product_id: string;
@@ -13,6 +15,13 @@ export type CartItemLocal = {
   carrier: string;
   id_provider?: string;
   delivery_time?: string;
+  brand_name?: string;
+  length?: number;
+  width?: number;
+  height?: number;
+  color?: string;
+  inventory: InventoryItem[];
+  url_key: string;
 };
 
 const CART_KEY = "guest_cart";

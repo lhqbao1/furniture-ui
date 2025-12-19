@@ -2,6 +2,7 @@
 import { atomWithStorage } from "jotai/utils";
 
 export const userIdAtom = atomWithStorage<string | null>("user_id", null);
+
 export const userIdGuestAtom = atomWithStorage<string | null>(
   "userIdGuest",
   null,
@@ -9,6 +10,11 @@ export const userIdGuestAtom = atomWithStorage<string | null>(
 
 export const adminIdAtom = atomWithStorage<string | null>(
   "admin_user_id",
+  null,
+);
+
+export const supplierIdAtom = atomWithStorage<string | null>(
+  "supplier_id",
   null,
 );
 

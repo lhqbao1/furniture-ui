@@ -36,7 +36,7 @@ import {
 import React from "react";
 import { toast } from "sonner";
 import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
+import { adminIdAtom, userIdAtom } from "@/store/auth";
 
 interface AddOrEditInventoryDialogProps {
   productId: string;
@@ -70,7 +70,7 @@ export default function AddOrEditInventoryDialog({
   const isEdit = inventoryData.length > 0;
   // const editItem = inventoryData[0];
   const [open, setOpen] = React.useState(false);
-  const [userId, setUserId] = useAtom(userIdAtom);
+  const [userId, setUserId] = useAtom(adminIdAtom);
 
   const form = useForm<InventoryCreateValues>({
     resolver: zodResolver(InventoryCreateSchema),

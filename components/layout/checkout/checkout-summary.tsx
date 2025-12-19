@@ -21,6 +21,10 @@ import React, { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import ProductVoucher from "./checkout-voucher";
 import { currentVoucherAtom } from "@/store/voucher";
+import { BadgePercent } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import VoucherApply from "./voucher-apply";
 
 interface CheckoutSummaryProps {
   cartItems: CartResponseItem[];
@@ -128,10 +132,6 @@ const CheckoutSummary = ({
   const { data: selectedVoucher, isLoading: isLoadingVoucher } =
     useGetVoucherById(voucherId ?? "");
 
-  const isProductVoucherReady =
-    selectedVoucher?.type !== "product" ||
-    (listValidProducts && listValidProducts.length >= 0);
-
   React.useEffect(() => {
     if (!selectedVoucher) return;
 
@@ -219,20 +219,26 @@ const CheckoutSummary = ({
 
   return (
     <>
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-2">
-        {listVouchers && listVouchers.length > 0
-          ? listVouchers.map((item, index) => {
-              return (
-                <ProductVoucher
-                  key={item.id}
-                  item={item}
-                  isSelected={voucherId === item.id}
-                  onSelect={(id) => setVoucherId(id)}
-                  isLoadingVoucher={isLoadingVoucher}
-                />
-              );
-            })
-          : null}
+      <div className="space-y-4">
+        <VoucherApply
+          voucherId={voucherId}
+          setVoucherId={setVoucherId}
+        />
+        {/* <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-2">
+          {listVouchers && listVouchers.length > 0
+            ? listVouchers.map((item, index) => {
+                return (
+                  <ProductVoucher
+                    key={item.id}
+                    item={item}
+                    isSelected={voucherId === item.id}
+                    onSelect={(id) => setVoucherId(id)}
+                    isLoadingVoucher={isLoadingVoucher}
+                  />
+                );
+              })
+            : null}
+        </div> */}
       </div>
       {/* TOTAL + NOTE */}
       <div className="grid grid-cols-2 gap-6 items-start">

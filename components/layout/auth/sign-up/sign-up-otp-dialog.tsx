@@ -9,12 +9,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useLoginOtp, useLoginOtpGuest, useSignUp } from "@/features/auth/hook";
-import { useSyncLocalCart } from "@/features/cart/hook";
+import { useLoginOtpGuest, useSignUp } from "@/features/auth/hook";
 import { useLocale, useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
-import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
 
 import {
   InputOTP,

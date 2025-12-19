@@ -9,11 +9,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { useCartLocal } from "@/hooks/cart";
 import { CartItemLocal } from "@/lib/utils/cart";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
+import { ProductItem } from "@/types/products";
 
-export function useAddToCartHandler(productDetails: any) {
+export function useAddToCartHandler(productDetails: ProductItem) {
   const createCartMutation = useAddToCart();
   const addProductToWishlistMutation = useAddToWishList();
   const t = useTranslations();
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const { addToCartLocal, cart } = useCartLocal();
   const router = useRouter();
@@ -34,9 +38,6 @@ export function useAddToCartHandler(productDetails: any) {
 
   const handleSubmitToCart = (values: any) => {
     if (!productDetails) return;
-
-    const userId =
-      typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
     // LOCAL CART
     if (!userId) {
@@ -68,6 +69,13 @@ export function useAddToCartHandler(productDetails: any) {
             carrier: productDetails.carrier ?? "amm",
             id_provider: productDetails.id_provider ?? "",
             delivery_time: productDetails.delivery_time ?? "",
+            brand_name: productDetails.brand.company_name,
+            length: productDetails.length,
+            width: productDetails.width,
+            height: productDetails.height,
+            color: productDetails.color,
+            inventory: productDetails.inventory,
+            url_key: productDetails.url_key,
           },
         },
         {

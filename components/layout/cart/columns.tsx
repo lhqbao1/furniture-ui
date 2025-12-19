@@ -32,7 +32,6 @@ export const GetCartColumns = ({
   const t = useTranslations();
   const isMobile = useIsMobile();
   const addToWishlistMutation = useAddToWishList();
-  const removeItemFromCartMutation = useDeleteCartItem();
 
   const handleAddToWishlist = (
     currentProduct: ProductItem,

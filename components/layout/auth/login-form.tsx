@@ -29,7 +29,7 @@ import { useSyncLocalCart } from "@/features/cart/hook";
 import LoginGoogleButton from "@/components/shared/login-google-button";
 import ResendOtp from "./resend-otp";
 import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
+import { adminIdAtom, userIdAtom } from "@/store/auth";
 
 interface LoginFormProps {
   isAdmin?: boolean;
@@ -37,6 +37,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ isAdmin = false }: LoginFormProps) {
   const [userId, setUserId] = useAtom(userIdAtom);
+  const [adminUserId, setAdminUserId] = useAtom(adminIdAtom);
   const [seePassword, setSeePassword] = useState(false);
   const router = useRouter();
   const locale = useLocale();
@@ -130,8 +131,6 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
             syncLocalCartMutation.mutate();
 
-            // Có thể lưu userId nếu cần
-            // setUserId(data.id)
             toast.success(t("loginSuccess"));
           },
           onError(error, variables, context) {
@@ -151,10 +150,9 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
             router.push("/admin/orders/list", { locale });
-            setUserId(data.id);
+            setAdminUserId(data.id);
 
             // Có thể lưu userId nếu cần
-            // setUserId(data.id)
             toast.success(t("loginSuccess"));
           },
           onError(error, variables, context) {
@@ -198,7 +196,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
           onSuccess: (data) => {
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
-            setUserId(data.id);
+            setAdminUserId(data.id);
             router.push("/admin/orders/list", { locale });
             toast.success(t("loginSuccess"));
           },
