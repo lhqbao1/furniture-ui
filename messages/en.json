@@ -389,7 +389,11 @@
     "emailPlaceholder": "Your email address",
     "cta": "Register now",
     "legal": "* Unsubscribe at any time. Enter the voucher code in your shopping cart or during the final step of the order process. Valid for 6 weeks after newsletter registration.",
-    "showMore": "Show more"
+    "showMore": "Show more",
+    "sending": "Sending your voucher...",
+  "successMessage": "Your voucher has been sent to {email}",
+  "errorMessage": "Oops! Something went wrong. Please try again",
+"invalidEmail": "Please enter a valid email address"
   },
   "recentSearch": "Recent Search"
 }

@@ -38,30 +38,6 @@ const VoucherSection = ({ vouchers }: VoucherSectionProps) => {
               />
             );
           })}
-          {/*           
-          <TransactionCard
-            status="failed"
-            title="Transaction failed"
-            subtitle="Your transaction could not be completed"
-            highlightText="Get €100"
-            footerText="Please try again later."
-          />
-
-          <TransactionCard
-            status="processing"
-            title="Transaction in progress"
-            subtitle="Please wait, processing payment"
-            highlightText="Get €100"
-            footerText="We are handling your transaction."
-          />
-
-          <TransactionCard
-            status="pending"
-            title="Transaction pending"
-            subtitle="Awaiting confirmation"
-            highlightText="Get €100"
-            footerText="We will notify you once ready."
-          /> */}
         </div>
       </div>
     </section>

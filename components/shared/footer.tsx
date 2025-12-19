@@ -3,7 +3,6 @@ import React from "react";
 import Image from "next/image";
 import { Link } from "@/src/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { Input } from "../ui/input";
 import ListStars from "./list-stars";
 
 const Footer = () => {

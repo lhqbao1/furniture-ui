@@ -38,9 +38,6 @@ export default async function HomePage() {
       <CategorySection slug="matratzen" />
       <CategorySection slug="gartenmoebel" />
       <CategorySection slug="zaeune-sichtschutz" />
-      <CategorySection slug="elektrowerkzeuge" />
-      <CategorySection slug="bodenbelaege" />
-
       {/* STREAMING SECTION */}
     </div>
   );

@@ -78,6 +78,25 @@ export async function generateMetadata({
       },
     };
 
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://www.prestige-home.de/de",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: category.name,
+          item: `https://www.prestige-home.de/de/category/${category.slug}`,
+        },
+      ],
+    };
+
     return {
       title: category.meta_title || category.name,
       description: category.meta_description || "",
@@ -92,7 +111,10 @@ export async function generateMetadata({
         images: category.img_url ?? "",
       },
       other: {
-        "application/ld+json": JSON.stringify(categorySchema),
+        "application/ld+json": JSON.stringify([
+          categorySchema,
+          breadcrumbSchema,
+        ]),
       },
     };
   } catch {

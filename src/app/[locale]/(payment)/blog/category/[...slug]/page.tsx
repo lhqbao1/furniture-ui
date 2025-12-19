@@ -51,7 +51,10 @@ export default async function BlogCategoryPage({ params }: PageProps) {
   const sidebarData = await getBlogsByProduct();
 
   const featured = categoryBlogs.items[0];
-  const listPosts = categoryBlogs.items.slice(1);
+  const listData = {
+    ...categoryBlogs,
+    items: categoryBlogs.items.slice(1),
+  };
 
   /* SCHEMA: CollectionPage + ItemList */
   const schema = {
@@ -71,11 +74,32 @@ export default async function BlogCategoryPage({ params }: PageProps) {
     },
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.prestige-home.de/de",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog Category",
+        item: `https://www.prestige-home.de/de/blog/category/${productSlug}`,
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([schema, breadcrumbSchema]),
+        }}
       />
 
       <div className="bg-gray-50 min-h-[300px] flex items-center justify-center flex-col">
@@ -103,10 +127,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-20">
             {featured && <FeaturedPost post={featured} />}
 
-            <BlogListClient
-              initialPosts={listPosts}
-              initialPagination={categoryBlogs.pagination}
-            />
+            <BlogListClient initialData={listData} />
           </div>
 
           {/* SIDEBAR */}

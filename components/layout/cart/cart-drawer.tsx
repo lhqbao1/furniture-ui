@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Drawer,
   DrawerTrigger,
@@ -15,13 +16,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { ShoppingCart, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
-export interface CartDrawerProps {
-  openCart: boolean;
-  setOpenCart: (open: boolean) => void;
-}
+export function CartDrawer() {
+  const [openCart, setOpenCart] = useState(false);
 
-export function CartDrawer({ openCart, setOpenCart }: CartDrawerProps) {
   const t = useTranslations();
   const [userId] = useAtom(userIdAtom);
   const { cart: localCart } = useCartLocal();

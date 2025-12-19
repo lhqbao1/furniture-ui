@@ -17,11 +17,52 @@ const libre = Libre_Caslon_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Prestige Home",
-  description: "Prestige Home",
+  metadataBase: new URL("https://www.prestige-home.de"),
+  title: {
+    default: "Prestige Home – Elektromobilität & Lifestyle",
+    template: "%s | Prestige Home",
+  },
+  description:
+    "Premium E-Scooter, E-Bikes und Elektrofahrzeuge von Prestige Home – Qualität, Design und Nachhaltigkeit vereint.",
   icons: {
     icon: "/favicon.ico",
     apple: "/favicon.ico",
+  },
+  other: {
+    "application/ld+json": JSON.stringify([
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Prestige Home",
+        url: "https://www.prestige-home.de",
+        logo: "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/5c38c322-bafc-4e6f-8d14-0c1ba4b7b8de_invoice-logo.png",
+        sameAs: [
+          "https://www.facebook.com/profile.php?id=61578621160298",
+          "https://www.instagram.com/prestige_home_gmbh/",
+          "https://x.com/prestihome_de",
+          "https://www.linkedin.com/company/prestige-home-gmbh/",
+          "https://www.pinterest.com/prestigehomegmbh/",
+        ],
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: "+49 1520 6576540",
+          contactType: "Customer Service",
+          areaServed: "DE",
+          availableLanguage: ["German", "English"],
+        },
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Prestige Home",
+        url: "https://www.prestige-home.de",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: "https://www.prestige-home.de/search?q={search_term_string}",
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ]),
   },
 };
 

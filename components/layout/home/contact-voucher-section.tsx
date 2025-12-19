@@ -3,9 +3,35 @@
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useSendVoucherViaEmail } from "@/features/vouchers/hook";
+import { toast } from "sonner";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function NewsletterVoucherSection() {
   const t = useTranslations("newsletter_voucher");
+  const sendVoucherMutation = useSendVoucherViaEmail();
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // ✅ validate email
+    if (!EMAIL_REGEX.test(email)) {
+      toast.error(t("invalidEmail"));
+      return;
+    }
+
+    sendVoucherMutation.mutate(email, {
+      onSuccess: () => {
+        toast.success(t("successMessage", { email }));
+        setEmail("");
+      },
+      onError: (error: any) => {
+        toast.error(error?.message ?? t("errorMessage"));
+      },
+    });
+  };
 
   return (
     <section className="w-full md:py-6 xl:py-10 py-4 bg-gray-50">
@@ -25,18 +51,25 @@ export default function NewsletterVoucherSection() {
 
         {/* RIGHT – FORM */}
         <div className="lg:col-span-5">
-          <form className="flex w-full max-w-xl mx-auto lg:ml-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full max-w-xl mx-auto lg:ml-auto"
+          >
             <Input
-              type="email"
+              type="text"
               placeholder={t("emailPlaceholder")}
               className="rounded-none border-r-0 bg-white focus:ring-0"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={sendVoucherMutation.isPending}
               required
             />
             <Button
               type="submit"
               className="rounded-none bg-orange-600 hover:bg-orange-700 text-white px-6"
+              disabled={sendVoucherMutation.isPending}
             >
-              {t("cta")}
+              {sendVoucherMutation.isPending ? t("sending") : t("cta")}
             </Button>
           </form>
 
