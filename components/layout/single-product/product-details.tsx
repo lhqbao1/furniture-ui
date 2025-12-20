@@ -66,7 +66,10 @@ const ProductDetails = ({
               <div className="xl:col-span-6 col-span-12 flex flex-col gap-6">
                 <AdminView productId={productDetails.id} />
                 <div>
-                  <h2 className="lg:text-3xl text-xl font-semibold text-black/70">
+                  <p className="uppercase text-sm cursor-pointer text-black/50 font-bold">
+                    {productDetails.brand.name}
+                  </p>
+                  <h2 className="lg:text-3xl text-xl font-semibold text-black">
                     {productDetails.name}
                   </h2>
                   <div>
