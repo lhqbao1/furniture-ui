@@ -69,11 +69,6 @@ export const brandColumns: ColumnDef<BrandResponse>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => <div>{row.original.id}</div>,
-  },
-  {
     accessorKey: "img_url",
     header: "IMAGE",
     cell: ({ row }) => {
@@ -116,6 +111,11 @@ export const brandColumns: ColumnDef<BrandResponse>[] = [
     accessorKey: "company_address",
     header: "COMPANY ADDRESS",
     cell: ({ row }) => <div>{row.original.company_address}</div>,
+  },
+  {
+    accessorKey: "phone",
+    header: "PHONE NUMBER",
+    cell: ({ row }) => <div>{row.original.company_phone}</div>,
   },
   {
     id: "actions",
