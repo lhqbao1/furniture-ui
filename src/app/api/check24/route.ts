@@ -5,13 +5,17 @@ import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
 // Escape CSV value
 const escapeCsv = (value?: string | number) => {
   if (value === undefined || value === null) return "";
-  const str = String(value).replace(/"/g, '""'); // escape dấu "
-  return /,|"/.test(str) ? `"${str}"` : str;
+  const str = String(value).replace(/"/g, '""');
+  return `"${str}"`; // ALWAYS quote → safest
 };
 
 export async function GET() {
   try {
     const products = await getProductsFeed();
+
+    const formatEuro = (value: number) => value.toFixed(2).replace(".", ",");
+
+    const html = (value: string) => `<span>${value}</span>`;
 
     // Header CSV
     const headers = [
@@ -19,6 +23,7 @@ export async function GET() {
       "offer_id",
       "name",
       "description",
+      "deeplink",
       "brand",
       "color",
       "size",
@@ -49,6 +54,7 @@ export async function GET() {
       "manufacturer_city",
       "manufacturer_country",
       "manufacturer_email",
+      "manufacturer_phone_number",
     ];
 
     const rows = products
@@ -61,9 +67,10 @@ export async function GET() {
           escapeCsv(p.ean),
           escapeCsv(p.id_provider),
           escapeCsv(p.name),
-          escapeCsv(cleanDescription(p.description)),
+          escapeCsv(html(cleanDescription(p.description))),
+          escapeCsv(`https://www.prestige-home.de/de/product/${p.url_key}`),
           escapeCsv(p.brand.name ?? ""),
-          escapeCsv(p.color),
+          escapeCsv(p.color.toUpperCase()),
           escapeCsv(size),
           escapeCsv(p.height),
           escapeCsv(p.width),
@@ -80,26 +87,38 @@ export async function GET() {
           escapeCsv(p.static_files.length > 7 ? p.static_files[7].url : ""),
           escapeCsv(p.static_files.length > 8 ? p.static_files[8].url : ""),
           escapeCsv(p.static_files.length > 9 ? p.static_files[9].url : ""),
-          escapeCsv("1 pieces"),
+          escapeCsv(
+            p.bundles?.length
+              ? p.bundles.map((item) => item.bundle_item.name).join(", ")
+              : p.name,
+          ),
           escapeCsv(p.stock ?? ""),
-          escapeCsv(p.final_price.toFixed(2)),
-          escapeCsv(`${p.delivery_time} Werktage`),
+          escapeCsv(html(`${formatEuro(p.final_price)} €`)),
+          escapeCsv(html(`${p.delivery_time} Werktage`)),
           escapeCsv(p.carrier === "dpd" ? "Paket" : "Spedition"),
-          escapeCsv(p.carrier === "dpd" ? 5.95 : 35.95),
+          escapeCsv(
+            html(
+              p.carrier === "dpd"
+                ? `${formatEuro(5.95)} €`
+                : `${formatEuro(35.95)} €`,
+            ),
+          ),
           escapeCsv(p.brand.name ?? ""),
           escapeCsv(p.brand.company_address ?? ""),
           escapeCsv(p.brand.company_postal_code ?? ""),
           escapeCsv(p.brand.company_city ?? ""),
           escapeCsv(p.brand.company_country ?? ""),
           escapeCsv(p.brand.company_email ?? ""),
+          escapeCsv(p.brand.company_phone ?? ""),
         ].join(",");
       });
 
-    const csv = [headers.join(","), ...rows].join("\n");
+    const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
 
     return new Response(csv, {
       headers: {
-        "Content-Type": "text/plain", // trình duyệt sẽ hiển thị trực tiếp
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": "attachment; filename=product-feed.csv",
       },
     });
   } catch (err) {
