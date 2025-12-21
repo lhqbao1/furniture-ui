@@ -1,3 +1,4 @@
+import AnimatedCarousel from "@/components/layout/home/3d-carousel";
 import CategorySection from "@/components/layout/home/category-section";
 import NewsletterVoucherSection from "@/components/layout/home/contact-voucher-section";
 import FeaturedProducts from "@/components/layout/home/featured-products";
@@ -34,6 +35,8 @@ export default async function HomePage() {
 
       <NewsletterVoucherSection />
       <CategorySection slug="sofas" />
+
+      {/* <AnimatedCarousel /> */}
 
       <CategorySection slug="matratzen" />
       <CategorySection slug="gartenmoebel" />
