@@ -46,7 +46,7 @@ export default function WhatsAppChatBox() {
   /* 🔹 AFTER all hooks */
   if (!mounted || pathname.includes("/admin")) return null;
 
-  const PHONE_NUMBER = "84889835259";
+  const PHONE_NUMBER = "+4915901742990";
 
   const handleSend = () => {
     if (!message.trim()) return;
