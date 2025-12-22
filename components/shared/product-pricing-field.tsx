@@ -81,7 +81,7 @@ const ProductPricingField = ({ product }: ProductPricingFieldProps) => {
   }, [matchedVoucher]);
 
   return (
-    <div className="flex gap-2 items-end">
+    <div className="flex md:flex-row flex-col-reverse gap-2 md:items-end justify-start">
       <div className="inline-flex items-end justify-start w-fit gap-2 font-bold text-gray-900 relative">
         {/* <div className="text-4xl">
                         {Math.floor(priceAfterVoucher ? priceAfterVoucher : 0)}
@@ -127,7 +127,7 @@ const ProductPricingField = ({ product }: ProductPricingFieldProps) => {
       <div
         ref={voucherRef}
         className={cn(
-          "bg-primary/90 rounded-sm text-xs uppercase text-white py-1 px-2.5 whitespace-nowrap",
+          "bg-primary/90 rounded-sm text-xs uppercase text-white py-1 px-2.5 whitespace-nowrap w-fit",
         )}
       >
         {matchedVoucher

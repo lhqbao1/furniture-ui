@@ -10,6 +10,7 @@ import RelatedCategoryProducts from "@/components/layout/single-product/related-
 import { getReviewByProduct } from "@/features/review/api";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -206,6 +207,8 @@ export default async function Page({
             reviews={plainReviews}
             parentProduct={plainParent}
           />
+
+          {/* <ComparePriceSection product={plainProduct} /> */}
 
           <div className="lg:mt-12 mt-8">
             <ProductDetailsTab

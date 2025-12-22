@@ -7,7 +7,7 @@ export async function generateStaticParams() {
   const keywords = await getAllKeywords();
 
   return keywords.map((keyword) => ({
-    keyword: slugify(keyword),
+    keyword: slugify(keyword.keywork),
   }));
 }
 
@@ -20,12 +20,23 @@ export async function generateMetadata({
 }: {
   params: PageParams;
 }): Promise<Metadata> {
-  const keyword = decodeURIComponent(params.keyword);
-  const readable = keyword.replaceAll("-", " ");
+  const keywords = await getAllKeywords();
+
+  const rawKeyword = decodeURIComponent(params.keyword);
+  const readable = rawKeyword.replaceAll("-", " ");
+
+  // 🔍 tìm keyword tương ứng
+  const matchedKeyword = keywords.find(
+    (k) => k.keywork.toLowerCase() === rawKeyword.toLowerCase(),
+  );
+
+  const description =
+    matchedKeyword?.description ??
+    `Buy ${readable} online at Prestige Home. Discover high-quality furniture and home accessories with fast delivery.`;
 
   return {
     title: `${readable} kaufen online | Prestige Home`,
-    description: `Entdecken Sie ${readable} zu besten Preisen bei Prestige Home`,
+    description,
     robots: {
       index: true,
       follow: true,
@@ -40,22 +51,37 @@ export default async function ShopKeywordPage({
 }: {
   params: PageParams;
 }) {
-  const keyword = decodeURIComponent(params.keyword);
-  const searchText = keyword.replaceAll("-", " ");
+  const keywordSlug = decodeURIComponent(params.keyword);
+  const searchText = keywordSlug.replaceAll("-", " ");
 
-  // 👉 fetch FIRST PAGE on server (SEO)
-  const data = await getAllProducts({
-    search: searchText,
-    page: 1,
-  });
+  // 🔹 fetch song song (tối ưu)
+  const [products, keywords] = await Promise.all([
+    getAllProducts({
+      search: searchText,
+      page: 1,
+    }),
+    getAllKeywords(),
+  ]);
+
+  // 🔍 tìm keyword tương ứng
+  const matchedKeyword = keywords.find(
+    (k) => k.keywork.toLowerCase() === keywordSlug.toLowerCase(),
+  );
+
+  console.log(keywordSlug);
 
   return (
     <div className="pt-3 xl:pt-6 xl:pb-16 pb-6">
       <h1 className="text-center text-secondary capitalize">{searchText}</h1>
 
+      <div className="mt-4 max-w-4xl mx-auto text-gray-700 leading-relaxed">
+        {" "}
+        {matchedKeyword?.body_description}
+      </div>
+
       {/* Client handles pagination */}
       <ShopKeywordClient
-        initialData={data}
+        initialData={products}
         searchText={searchText}
       />
     </div>

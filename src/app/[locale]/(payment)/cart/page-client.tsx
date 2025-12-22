@@ -53,7 +53,7 @@ const CartPageClient = () => {
   const shippingCost = calculateShipping(normalized);
 
   return (
-    <div className="mt-6 lg:px-0 px-4 container-padding overflow-auto">
+    <div className="mt-6 md:pb-0 pb-6 lg:px-0 px-4 container-padding overflow-auto">
       <div className="w-full lg:max-w-7xl mx-auto lg:p-6">
         <div className="grid grid-cols-12 lg:gap-16 gap-6">
           {/* Left: Cart Items */}

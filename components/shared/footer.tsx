@@ -123,6 +123,19 @@ const Footer = () => {
           </li>
         </ul>
         <div className="lg:mt-4 flex flex-col gap-2 mt-2">
+          <a
+            href="https://geizhals.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src="/geizhals.jpg"
+              width={120}
+              height={60}
+              alt="Geizhals Preisvergleich"
+              priority
+            />
+          </a>
           <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
             <img
               src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
@@ -189,7 +202,7 @@ const Footer = () => {
             <li className="font-bold">Büro </li>
             <li>Prestige Home GmbH</li>
             <li>Greifswalder Straße 226, 10405 Berlin</li>
-            <li>{t("phone_number")}: 004368110327073</li>
+            <li>{t("phone_number")}: +49 30 814 537 080</li>
             <li>{t("email")}: info@prestige-home.de</li>
           </ul>
           <ul className="space-y-2 text-black-700 text-sm">

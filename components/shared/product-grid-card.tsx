@@ -27,12 +27,14 @@ interface ProductCardProps {
   product: ProductItem;
   className?: string;
   idx: number;
+  isSmall?: boolean;
 }
 
 export default function ProductCard({
   product,
   className,
   idx,
+  isSmall,
 }: ProductCardProps) {
   const cardRefs = useRef<HTMLDivElement[]>([]);
   const t = useTranslations();

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   FormControl,
   FormField,
@@ -20,6 +21,15 @@ import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 
 interface ProductLogisticsGroupProps {
   isDSP?: boolean;
+}
+
+function isValidPackage(pkg: any) {
+  return (
+    pkg?.length != null &&
+    pkg?.width != null &&
+    pkg?.height != null &&
+    pkg?.weight != null
+  );
 }
 
 const ProductLogisticsGroup = ({
@@ -79,33 +89,26 @@ const ProductLogisticsGroup = ({
   }, [bundleItems, form]);
 
   useEffect(() => {
-    // Nếu chưa nhập hoặc nhập < 1 → clear toàn bộ packages
-    if (!numberOfPackages || numberOfPackages < 1) {
-      form.setValue("packages", []);
-      return;
-    }
+    const packages = form.getValues("packages") || [];
 
-    // Nếu ít hơn thì thêm
-    if (fields.length < numberOfPackages) {
-      const diff = numberOfPackages - fields.length;
-      for (let i = 0; i < diff; i++) {
-        append({
-          length: null,
-          height: null,
-          width: null,
-          weight: null,
-        });
-      }
-    }
+    const validCount = packages.filter(isValidPackage).length;
 
-    // Nếu nhiều hơn thì xóa bớt
-    if (fields.length > numberOfPackages) {
-      const diff = fields.length - numberOfPackages;
-      for (let i = 0; i < diff; i++) {
-        remove(fields.length - 1 - i);
-      }
+    form.setValue("number_of_packages", validCount, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [fields, form]);
+
+  useEffect(() => {
+    if (!bundleItems?.length && fields.length === 0) {
+      append({
+        length: null,
+        height: null,
+        width: null,
+        weight: null,
+      });
     }
-  }, [numberOfPackages, fields.length]);
+  }, [fields.length, bundleItems, append]);
 
   return (
     <div className="space-y-6">
@@ -219,7 +222,7 @@ const ProductLogisticsGroup = ({
                       e.target.value === "" ? null : e.target.valueAsNumber,
                     )
                   }
-                  disabled={bundleItems?.length > 0} // ✅ disable nếu có bundleItems
+                  disabled={true} // ✅ disable nếu có bundleItems
                 />
               </FormControl>
               {bundleItems?.length > 0 && (
@@ -245,6 +248,7 @@ const ProductLogisticsGroup = ({
               </FormLabel>
               <FormControl>
                 <Input
+                  type="text"
                   className="col-span-4"
                   placeholder=""
                   min={0}
@@ -316,10 +320,29 @@ const ProductLogisticsGroup = ({
       )} */}
 
       {/* --- REAL PACKAGE INPUTS --- */}
-      {!isLoading && numberOfPackages > 0 && (
+      {fields.length > 0 && (
         <div>
-          <div className="col-span-2 text-sm text-black font-semibold">
-            Packaging (cm)
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-black font-semibold">
+              Packaging (cm)
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                append({
+                  length: null,
+                  height: null,
+                  width: null,
+                  weight: null,
+                });
+              }}
+              disabled={bundleItems?.length > 0}
+              className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              <span className="text-lg leading-none">+</span>
+              Add package
+            </button>
           </div>
 
           <div className="flex flex-col gap-4 mt-2">
@@ -328,8 +351,21 @@ const ProductLogisticsGroup = ({
                 key={pkg.id}
                 className="flex flex-col w-full border p-3 rounded-2xl shadow-sm"
               >
-                <div className="font-semibold text-sm mb-2 text-gray-700">
-                  Package #{index + 1}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="font-semibold text-sm text-gray-700">
+                    Package #{index + 1}
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={() => remove(index)}
+                    disabled={bundleItems?.length > 0}
+                    className="text-xs"
+                    size={"icon"}
+                    variant={"red"}
+                  >
+                    X
+                  </Button>
                 </div>
 
                 <div className="grid lg:grid-cols-4 grid-cols-2 gap-3 w-full">
@@ -339,29 +375,32 @@ const ProductLogisticsGroup = ({
                       control={control}
                       name={`packages.${index}.${key}`}
                       render={({ field }) => (
-                        <FormItem className="flex flex-col-reverse items-center flex-1">
-                          <FormControl>
-                            <Input
-                              type="number"
-                              placeholder=""
-                              min={0}
-                              step="0.01"
-                              inputMode="decimal"
-                              {...field}
-                              value={field.value ?? ""}
-                              onChange={(e) =>
-                                field.onChange(
-                                  e.target.value === ""
-                                    ? null
-                                    : e.target.valueAsNumber,
-                                )
-                              }
-                              disabled={bundleItems?.length > 0}
-                            />
-                          </FormControl>
-                          <FormLabel className="text-black font-semibold text-sm capitalize">
-                            {key}
-                          </FormLabel>
+                        <FormItem className="flex-1 flex flex-col">
+                          <div className="flex flex-col-reverse items-center ">
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder=""
+                                min={0}
+                                step="0.01"
+                                inputMode="decimal"
+                                {...field}
+                                value={field.value ?? ""}
+                                onChange={(e) =>
+                                  field.onChange(
+                                    e.target.value === ""
+                                      ? null
+                                      : e.target.valueAsNumber,
+                                  )
+                                }
+                                disabled={bundleItems?.length > 0}
+                              />
+                            </FormControl>
+                            <FormLabel className="text-black font-semibold text-sm capitalize">
+                              {key}
+                            </FormLabel>
+                          </div>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />

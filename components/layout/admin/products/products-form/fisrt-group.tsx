@@ -48,6 +48,8 @@ const ProductDetailInputs = ({
   const form = useFormContext();
   const bundles = form.watch("bundles");
   const listImages = form.watch("static_files");
+  const stock = form.watch("stock");
+  const result_stock = form.watch("result_stock");
 
   function sanitizeFolderName(name: string) {
     return name
@@ -246,27 +248,41 @@ const ProductDetailInputs = ({
         <FormField
           control={form.control}
           name="stock"
-          render={({ field }) => (
-            <FormItem className="flex flex-col w-full">
-              <FormLabel className="text-black font-semibold text-sm">
-                Stock
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  disabled={bundles && bundles.length > 0}
-                  value={field.value ?? ""}
-                  onChange={(e) =>
-                    field.onChange(
-                      e.target.value === "" ? null : e.target.valueAsNumber,
-                    )
-                  }
-                />
-              </FormControl>
-              <FormMessage></FormMessage>
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const computedStock =
+              typeof stock === "number" && typeof result_stock === "number"
+                ? stock - (result_stock ?? 0)
+                : "";
+
+            return (
+              <FormItem className="flex flex-col w-full">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Stock
+                </FormLabel>
+
+                <FormControl>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    disabled={!isDSP}
+                    value={isDSP ? field.value ?? "" : computedStock}
+                    onChange={
+                      isDSP
+                        ? (e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? null
+                                : e.target.valueAsNumber,
+                            )
+                        : undefined
+                    }
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
       </div>
 

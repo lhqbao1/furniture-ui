@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CopyCheck, Eye, Loader2, Pencil } from "lucide-react";
+import { CopyCheck, Eye, Pencil } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useState } from "react";
@@ -674,7 +674,9 @@ export const getProductColumns = (
       );
     },
     cell: ({ row }) => (
-      <div className="text-center">{row.original.stock} pcs.</div>
+      <div className="text-center">
+        {row.original.stock - (row.original.result_stock ?? 0)} pcs.
+      </div>
     ),
     enableSorting: true,
   },

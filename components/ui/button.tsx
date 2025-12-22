@@ -19,6 +19,7 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        red: "bg-red-50 text-white shadow-xs hover:bg-red-100 border border-red-600 text-red-600",
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -31,7 +32,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 function Button({
@@ -77,7 +78,7 @@ function Button({
       onClick={handleClick}
       className={cn(
         hasEffect && "relative overflow-hidden", // chỉ thêm khi cần effect
-        buttonVariants({ variant, size, className })
+        buttonVariants({ variant, size, className }),
       )}
       {...props}
     />

@@ -2,6 +2,17 @@ import { atom } from "jotai";
 
 export const searchHistoryAtom = atom<string[]>([]);
 
+export const removeSearchHistoryAtom = atom(
+  null,
+  (get, set, keyword: string) => {
+    const current = get(searchHistoryAtom);
+    set(
+      searchHistoryAtom,
+      current.filter((item) => item !== keyword),
+    );
+  },
+);
+
 export const addSearchKeywordAtom = atom(null, (get, set, keyword: string) => {
   const trimmed = keyword.trim();
   if (!trimmed) return;

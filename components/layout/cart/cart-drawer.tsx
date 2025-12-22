@@ -55,7 +55,7 @@ export function CartDrawer() {
         </div>
       </DrawerTrigger>
 
-      <DrawerContent className="w-full h-full px-4 flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500 overflow-y-scroll">
+      <DrawerContent className="w-full h-full px-4 flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full data-[vaul-drawer-direction=left]:sm:max-w-full duration-500 overflow-y-scroll">
         <DrawerTitle className="border-b-2 p-4 flex justify-between">
           <div className="uppercase font-bold text-xl">{t("cart")}</div>
           <DrawerClose>

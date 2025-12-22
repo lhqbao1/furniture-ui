@@ -1,5 +1,22 @@
 import { toast } from "sonner";
 
+function cleanPackages(packages?: any[]) {
+  if (!Array.isArray(packages)) return undefined;
+
+  return packages
+    .filter((pkg) =>
+      ["length", "width", "height", "weight"].every(
+        (key) => pkg[key] !== null && pkg[key] !== undefined,
+      ),
+    )
+    .map((pkg) => ({
+      length: pkg.length,
+      width: pkg.width,
+      height: pkg.height,
+      weight: pkg.weight,
+    }));
+}
+
 export const submitProduct = async ({
   values,
   productValues,
@@ -12,8 +29,14 @@ export const submitProduct = async ({
 }: any) => {
   const latestValues = form.getValues();
 
+  const cleanedPackages = cleanPackages(latestValues.packages);
+
   const payload = {
     ...latestValues, // 👈 Thay values bằng latestValues
+    packages:
+      cleanedPackages && cleanedPackages.length > 0
+        ? cleanedPackages
+        : undefined, // 👈 không gửi nếu rỗng
     weight:
       latestValues.weight || latestValues.weight === 0
         ? latestValues.weight

@@ -61,3 +61,12 @@ export async function getBlogDetailsBySlug(blog_slug: string) {
     throw error; // lỗi khác thì throw để debug
   }
 }
+
+export async function getAllBlogSlug() {
+  try {
+    const { data } = await apiPublic.get("/blog/all-slug");
+    return data;
+  } catch (err) {
+    throw err;
+  }
+}
