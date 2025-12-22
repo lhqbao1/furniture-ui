@@ -22,7 +22,9 @@ import {
 import { addBusinessDays } from "date-fns";
 import { InventoryItem } from "@/types/products";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
+import { useAddToWishList } from "@/features/wishlist/hook";
+import { HandleApiError } from "@/lib/api-helper";
 
 interface CartItemProps {
   cartServer?: CartItem;
@@ -51,6 +53,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   const [userId, setUserId] = useAtom(userIdAtom);
   const t = useTranslations();
   const locale = useLocale();
+  const router = useRouter();
   /* -------------------------------------------------
    * Normalize data (server cart | local cart)
    * -------------------------------------------------*/
@@ -100,7 +103,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   const { removeItem } = useCartLocal();
   const updateCartItemQuantityMutation = useUpdateCartItemQuantity();
   const deleteCartItemMutation = useDeleteCartItem();
-
+  const addToWishlistMutation = useAddToWishList();
   const onUpdateQuantity = (item: CartTableItem, newQuantity: number) => {
     if (newQuantity < 1) return;
     if (item.stock && newQuantity > item.stock) return;
@@ -205,6 +208,23 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     };
   }, [deliveryDayRange, item.stock, latestInventory]);
 
+  const handleAddToWishlist = (id: string) => {
+    if (!id) return;
+    addToWishlistMutation.mutate(
+      { productId: id ?? "", quantity: 1 },
+      {
+        onSuccess(data, variables, context) {
+          toast.success("Added to wishlist");
+        },
+        onError(error, variables, context) {
+          const { status, message } = HandleApiError(error, t);
+          toast.error(message);
+          if (status === 401) router.push("/login", { locale });
+        },
+      },
+    );
+  };
+
   /* -------------------------------------------------
    * UI
    * -------------------------------------------------*/
@@ -243,23 +263,28 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
             {item.brand && <p className="text-black">{item.brand}</p>}
 
             {item.deliveryText && (
-              <p className="text-red-600 mt-6">
-                {estimatedDeliveryRange
-                  ? t("deliveryDateRange", {
+              <p className="text-secondary mt-6">
+                {estimatedDeliveryRange ? (
+                  <>
+                    {t.rich("deliveryDateRange", {
                       from: formatDateDE(estimatedDeliveryRange.from),
                       to: formatDateDE(estimatedDeliveryRange.to),
-                    })
-                  : item.deliveryText
-                  ? t("deliveryTime", {
-                      days: item.deliveryText,
-                    })
-                  : t("updating")}
+                      b: (chunks) => <strong>{chunks}</strong>,
+                    })}
+                  </>
+                ) : item.deliveryText ? (
+                  t("deliveryTime", {
+                    days: item.deliveryText,
+                  })
+                ) : (
+                  t("updating")
+                )}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-end justify-between mt-6">
+        <div className="flex md:flex-row flex-col-reverse md:items-end items-start justify-between mt-6">
           {/* QUANTITY */}
           <div className="flex items-center gap-3 mt-2">
             <span className="text-sm">Anzahl:</span>
@@ -277,11 +302,12 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
               <Heart
                 size={18}
                 className="
-      transition
-      text-muted-foreground
-      group-hover:text-secondary
-      group-hover:fill-secondary
-    "
+                  transition
+                  text-muted-foreground
+                  group-hover:text-secondary
+                  group-hover:fill-secondary
+                "
+                onClick={() => handleAddToWishlist(item.id)}
               />
             </button>
           </div>

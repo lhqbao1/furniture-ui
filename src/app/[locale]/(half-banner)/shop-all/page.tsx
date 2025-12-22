@@ -1,6 +1,5 @@
 "use client";
 
-import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { CustomPagination } from "@/components/shared/custom-pagination";
@@ -8,11 +7,14 @@ import { useGetAllProducts } from "@/features/products/hook";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { useAtomValue } from "jotai";
+import { searchHistoryAtom } from "@/store/search";
 
 export default function ShopAllPage() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const history = useAtomValue(searchHistoryAtom);
 
   // 🔹 1. LẤY PARAMS TỪ URL
   const search = searchParams.get("search") ?? undefined;

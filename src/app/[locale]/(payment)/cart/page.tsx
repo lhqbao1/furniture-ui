@@ -1,18 +1,17 @@
-import React from 'react'
-import CartPageClient from './page-client'
+import React from "react";
+import CartPageClient from "./page-client";
+import { Metadata } from "next";
 
-export const metadata = {
-    robots: {
-        index: false,
-        follow: false,
-        nocache: true,
-    },
-}
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
 
 const CartPage = () => {
-    return (
-        <CartPageClient />
-    )
-}
+  return <CartPageClient />;
+};
 
-export default CartPage
+export default CartPage;

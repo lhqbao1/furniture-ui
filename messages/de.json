@@ -366,7 +366,7 @@
       "user_discount": "Benutzerrabatt",
       "shipping_discount": "Versandrabatt",
       "deliveryDate": "Voraussichtliche Lieferung am {date}",
-      "deliveryDateRange": "Voraussichtliche Lieferung {from} – {to}",
+      "deliveryDateRange": "Lieferung zwischen <b>{from}</b> und <b>{to}</b>",
   "voucher": {
       "shipping": "Kostenloser Versand wird beim Checkout angewendet",
       "user_specific": "Dieser Gutschein ist exklusiv für Sie verfügbar",
