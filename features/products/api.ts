@@ -169,3 +169,23 @@ export async function getAllKeywords() {
   const { data } = await apiPublic.get("/products/get-all-key-work");
   return data as string[];
 }
+
+export async function getAllColor(is_econelo?: boolean) {
+  const { data } = await apiPublic.get("/products/get-all-color", {
+    params: {
+      ...(is_econelo !== undefined && { is_econelo }),
+    },
+  });
+
+  return data as string[];
+}
+
+export async function getAllMaterials(is_econelo?: boolean) {
+  const { data } = await apiPublic.get("/products/get-all-material", {
+    params: {
+      ...(is_econelo !== undefined && { is_econelo }),
+    },
+  });
+
+  return data as string[];
+}

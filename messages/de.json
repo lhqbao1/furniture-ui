@@ -246,6 +246,7 @@
   "delivery": "Lieferung",
   "updating": "Aktualisierung",
   "deliveryTime": "in {days} Werktagen",
+  "deliveryTimeFilter": "{days} Werktagen",
   "qaSearch": "Zuerst suchen. 90 % der Fragen wurden bereits beantwortet.",
   "emptyCategory": "Das ist eine leere Kategorie",
   "customRequest": "SONDERANFRAGE",
@@ -398,7 +399,10 @@
   "subtotal": "Zwischensumme",
   "totalWithTax": "Gesamtsumme inkl. MwSt.",
   "securePayment": "Sichere Zahlung",
-    "extendedReturn": "Verlängerte Rückgabefrist bis zum 31.01.2026",
-    "easyDelivery": "Bequeme und unkomplizierte Lieferung",
-     "continueWithGoogle": "Mit Google fortfahren"
+  "extendedReturn": "Verlängerte Rückgabefrist bis zum 31.01.2026",
+  "easyDelivery": "Bequeme und unkomplizierte Lieferung",
+  "continueWithGoogle": "Mit Google fortfahren",
+  "brand": "Marke",
+  "showMore": "Mehr anzeigen",
+  "showLess": "Weniger anzeigen"
 }

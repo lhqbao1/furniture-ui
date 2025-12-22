@@ -291,6 +291,7 @@
     "choose_payment_method": "You need to choose at least one payment method",
     "must_accept_terms": "You must accept the terms and conditions",
     "estimated_delivery": "Estimated Delivery Time",
+    "deliveryTimeFilter": "{days} days",
     "feedback": "Feedback",
     "business_days": "business days",
     "NotFound": {
@@ -401,8 +402,11 @@
   "invalidVoucher": "This voucher code is not valid",
   "subtotal": "Subtotal",
   "totalWithTax": "Total incl. VAT",
-   "securePayment": "Secure payment",
-    "extendedReturn": "Extended return period until 31/01/2026",
-    "easyDelivery": "Easy and hassle-free delivery",
-    "continueWithGoogle": "Continue with Google"
+  "securePayment": "Secure payment",
+  "extendedReturn": "Extended return period until 31/01/2026",
+  "easyDelivery": "Easy and hassle-free delivery",
+  "continueWithGoogle": "Continue with Google",
+  "brand": "Brand",
+  "showMore": "Show more",
+  "showLess": "Show less"
 }

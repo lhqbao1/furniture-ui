@@ -12,7 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import { searchHistoryAtom } from "@/store/search";
-import { BrandCheckbox } from "./checkbox";
+import ShopAllFilterSection from "@/components/layout/shop-all/shop-all-filter-section";
 
 export default function ShopAllPage() {
   const t = useTranslations();
@@ -25,6 +25,7 @@ export default function ShopAllPage() {
   const pageFromUrl = Number(searchParams.get("page")) || 1;
   const pageSizeFromUrl = Number(searchParams.get("page_size")) || 40;
   const rawBrand = searchParams.get("brand") ?? undefined;
+  const categories = searchParams.get("categories") ?? undefined;
 
   const brand = rawBrand !== null ? rawBrand?.replace(/\+/g, " ") : undefined;
   // console.log(brand);
@@ -44,6 +45,8 @@ export default function ShopAllPage() {
     page_size: pageSize,
     query,
     is_econelo: false,
+    brand: brand,
+    categories: categories,
   });
 
   // 🔹 5. UPDATE URL khi đổi page
@@ -60,33 +63,34 @@ export default function ShopAllPage() {
     });
   };
 
-  if (isLoading || !data) {
-    return <ProductGridSkeleton length={12} />;
-  }
-
   if (isError) {
     return <div className="text-center py-10">Something went wrong</div>;
   }
 
   return (
     <div className="pt-3 xl:pb-16 pb-6">
-      <div>
-        <BrandCheckbox />
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-2">
+          <ShopAllFilterSection />
+        </div>
+        {isLoading || !data ? (
+          <ProductGridSkeleton length={12} />
+        ) : (
+          <div className="lg:pt-10 md:pt-3 pt-0 pb-12 col-span-10">
+            <ProductsGridLayout
+              hasBadge
+              data={data.items}
+            />
+            {data.pagination.total_pages > 1 && (
+              <CustomPagination
+                totalPages={data.pagination.total_pages}
+                page={page}
+                onPageChange={handlePageChange}
+              />
+            )}
+          </div>
+        )}
       </div>
-      <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
-        <ProductsGridLayout
-          hasBadge
-          data={data.items}
-        />
-      </div>
-
-      {data.pagination.total_pages > 1 && (
-        <CustomPagination
-          totalPages={data.pagination.total_pages}
-          page={page}
-          onPageChange={handlePageChange}
-        />
-      )}
     </div>
   );
 }

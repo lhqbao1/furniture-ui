@@ -9,6 +9,8 @@ import {
   deleteProduct,
   editProduct,
   generateSEO,
+  getAllColor,
+  getAllMaterials,
   getAllProducts,
   GetAllProductsParams,
   getProductById,
@@ -134,5 +136,21 @@ export function useGenerateSEO() {
     // onSuccess: (res) => {
     //   qc.invalidateQueries({ queryKey: ["products"] })
     // },
+  });
+}
+
+export function useGetAllColor(is_econelo?: boolean) {
+  return useQuery({
+    queryKey: ["colors", is_econelo],
+    queryFn: () => getAllColor(is_econelo),
+    staleTime: 1000 * 60 * 30, // 30 phút
+  });
+}
+
+export function useGetAllMaterials(is_econelo?: boolean) {
+  return useQuery({
+    queryKey: ["materials", is_econelo],
+    queryFn: () => getAllMaterials(is_econelo),
+    staleTime: 1000 * 60 * 30,
   });
 }
