@@ -340,8 +340,14 @@ export const productMarketplaceColumns = (
     },
   };
 
+  const safeMarketplaces = Array.isArray(marketplaces)
+    ? marketplaces.filter(
+        (m): m is string => typeof m === "string" && m.trim().length > 0,
+      )
+    : [];
+
   // Các cột động theo marketplace thực tế
-  const dynamicMarketplaceColumns: ColumnDef<ProductItem>[] = [...marketplaces]
+  const dynamicMarketplaceColumns: ColumnDef<ProductItem>[] = safeMarketplaces
     .sort((a, b) => {
       const indexA = MARKETPLACE_ORDER.indexOf(a.toLowerCase());
       const indexB = MARKETPLACE_ORDER.indexOf(b.toLowerCase());
