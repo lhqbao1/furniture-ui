@@ -67,7 +67,7 @@ const ProductDetails = ({
                 <AdminView productId={productDetails.id} />
                 <div>
                   <p className="uppercase text-sm cursor-pointer text-black/50 font-bold">
-                    {productDetails.brand.name}
+                    {productDetails.brand ? productDetails.brand.name : ""}
                   </p>
                   <h2 className="lg:text-3xl text-xl font-semibold text-black">
                     {productDetails.name}
