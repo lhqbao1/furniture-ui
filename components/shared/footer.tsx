@@ -141,6 +141,19 @@ const Footer = () => {
               alt="Praktiker Trust Logo"
             />
           </a>
+          <a
+            href="https://geizhals.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src="/geizhals.jpg"
+              width={120}
+              height={60}
+              alt="Geizhals Preisvergleich"
+              priority
+            />
+          </a>
         </div>
       </div>
 

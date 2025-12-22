@@ -399,5 +399,6 @@
   "totalWithTax": "Gesamtsumme inkl. MwSt.",
   "securePayment": "Sichere Zahlung",
     "extendedReturn": "Verlängerte Rückgabefrist bis zum 31.01.2026",
-    "easyDelivery": "Bequeme und unkomplizierte Lieferung"
+    "easyDelivery": "Bequeme und unkomplizierte Lieferung",
+     "continueWithGoogle": "Mit Google fortfahren"
 }

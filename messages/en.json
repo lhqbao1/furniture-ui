@@ -403,5 +403,6 @@
   "totalWithTax": "Total incl. VAT",
    "securePayment": "Secure payment",
     "extendedReturn": "Extended return period until 31/01/2026",
-    "easyDelivery": "Easy and hassle-free delivery"
+    "easyDelivery": "Easy and hassle-free delivery",
+    "continueWithGoogle": "Continue with Google"
 }

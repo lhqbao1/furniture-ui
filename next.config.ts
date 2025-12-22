@@ -29,6 +29,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "pxjiuyvomonmptmmkglv.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "gzhls.at",
+      },
     ],
     minimumCacheTTL: 2678400, // 31 ngày
     formats: ["image/webp"],
