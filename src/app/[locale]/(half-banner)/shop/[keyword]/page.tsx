@@ -68,8 +68,6 @@ export default async function ShopKeywordPage({
     (k) => k.keywork.toLowerCase() === keywordSlug.toLowerCase(),
   );
 
-  console.log(keywordSlug);
-
   return (
     <div className="pt-3 xl:pt-6 xl:pb-16 pb-6">
       <h1 className="text-center text-secondary capitalize">{searchText}</h1>

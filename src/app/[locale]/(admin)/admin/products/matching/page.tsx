@@ -10,6 +10,7 @@ import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
+import { getMatchingPriceColumn } from "@/components/layout/admin/products/matching-price/column";
 
 const ProductList = () => {
   const [page, setPage] = useState(1);
@@ -43,12 +44,19 @@ const ProductList = () => {
     sort_by_stock: filters.sort_by_stock,
   });
 
-  const { data: exportData } = useGetProductsSelect({
-    is_customer: false,
-    all_products: false,
-  });
-
   if (isError) return <div>No data</div>;
+
+  const sortedData = React.useMemo(() => {
+    if (!data?.items) return [];
+
+    return [...data.items].sort((a, b) => {
+      const aHasMarketplace = (a.marketplace_products?.length ?? 0) > 0;
+      const bHasMarketplace = (b.marketplace_products?.length ?? 0) > 0;
+
+      // true > false → đưa lên trước
+      return Number(bHasMarketplace) - Number(aHasMarketplace);
+    });
+  }, [data?.items]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -60,8 +68,8 @@ const ProductList = () => {
         <ProductTableSkeleton />
       ) : (
         <ProductTable
-          data={data ? data.items : []}
-          columns={getProductColumns(setSortByStock)}
+          data={sortedData}
+          columns={getMatchingPriceColumn(setSortByStock)}
           page={page}
           pageSize={pageSize}
           setPage={handlePageChange}
