@@ -1,5 +1,6 @@
 import { api, apiAdmin, apiPublic } from "@/lib/axios";
 import { ProductInput } from "@/lib/schema/product";
+import { KeywordResponse } from "@/types/keyword";
 import { ProductItem, ProductResponse } from "@/types/products";
 import qs from "qs";
 
@@ -178,7 +179,7 @@ export async function generateSEO(input: SEOInput) {
 
 export async function getAllKeywords() {
   const { data } = await apiPublic.get("/products/get-all-key-work");
-  return data as string[];
+  return data as KeywordResponse[];
 }
 
 export async function getAllColor(is_econelo?: boolean) {
