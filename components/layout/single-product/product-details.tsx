@@ -32,16 +32,14 @@ const ProductDetails = ({
   const currentCategory = productDetails.categories?.[0];
   const hasCategory = !!currentCategory;
 
-  const currentCategoryName = hasCategory
-    ? currentCategory!.children?.length
-      ? currentCategory!.children[0].name
-      : currentCategory!.name
-    : undefined;
+  const firstChild = currentCategory?.children?.[0];
 
-  const currentCategoryLink = hasCategory
-    ? currentCategory!.children?.length
-      ? `category/${currentCategory!.children[0].slug}`
-      : `category/${currentCategory!.slug}`
+  const currentCategoryName = firstChild?.name ?? currentCategory?.name;
+
+  const currentCategoryLink = firstChild?.slug
+    ? `category/${firstChild.slug}`
+    : currentCategory?.slug
+    ? `category/${currentCategory.slug}`
     : undefined;
 
   return (
@@ -67,7 +65,7 @@ const ProductDetails = ({
                 <AdminView productId={productDetails.id} />
                 <div>
                   <p className="uppercase text-sm cursor-pointer text-black/50 font-bold">
-                    {productDetails.brand.name}
+                    {productDetails.brand ? productDetails.brand.name : ""}
                   </p>
                   <h2 className="lg:text-3xl text-xl font-semibold text-black">
                     {productDetails.name}

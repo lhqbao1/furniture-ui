@@ -370,7 +370,7 @@
   "user_discount": "User discount",
   "shipping_discount": "Shipping discount",
   "deliveryDate": "Estimated delivery on {date}",
-  "deliveryDateRange": "Estimated delivery {from} – {to}",
+  "deliveryDateRange": "Estimated delivery <b>{from}</b> - <b>{to}</b>",
   "voucher": {
       "shipping": "Free shipping will be applied at checkout",
       "user_specific": "This voucher is exclusively available for you",

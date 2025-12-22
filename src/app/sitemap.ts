@@ -1,4 +1,5 @@
 import { apiPublic } from "@/lib/axios";
+import { BlogItem } from "@/types/blog";
 import { CategoryResponse } from "@/types/categories";
 import { ProductItem } from "@/types/products";
 import { MetadataRoute } from "next";
@@ -113,5 +114,47 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticUrls, ...categoryUrls, ...productUrls];
+  // URL động cho blogs
+  let blogs: BlogItem[] = [];
+  try {
+    const res = await apiPublic.get("/blog/all", {
+      params: {
+        page_size: 100,
+      },
+    });
+    blogs = res.data.items;
+  } catch (e) {
+    blogs = [];
+  }
+
+  const blogUrls: MetadataRoute.Sitemap = blogs.map((p: BlogItem) => ({
+    url: `https://www.prestige-home.de/de/blog/${p.slug}`,
+    lastModified: new Date(p.created_at || new Date()),
+    changeFrequency: "daily",
+    priority: 0.6,
+  }));
+
+  // URL động cho landing page
+  let keywords: string[] = [];
+  try {
+    const res = await apiPublic.get("/products/get-all-key-work");
+    keywords = res.data;
+  } catch (e) {
+    blogs = [];
+  }
+
+  const keywordUrls: MetadataRoute.Sitemap = keywords.map((p: string) => ({
+    url: `https://www.prestige-home.de/de/shop/${p}`,
+    lastModified: new Date(new Date()),
+    changeFrequency: "daily",
+    priority: 0.6,
+  }));
+
+  return [
+    ...staticUrls,
+    ...categoryUrls,
+    ...productUrls,
+    ...blogUrls,
+    ...keywordUrls,
+  ];
 }
