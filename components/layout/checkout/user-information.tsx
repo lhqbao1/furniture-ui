@@ -224,7 +224,7 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
                   type="number"
                   placeholder=""
                   {...field}
-                  disabled={isLogin}
+                  // disabled={isLogin}
                 />
               </FormControl>
               <FormMessage />
