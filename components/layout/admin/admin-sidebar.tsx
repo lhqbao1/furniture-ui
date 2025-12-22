@@ -59,6 +59,11 @@ export function AdminSideBar() {
           url: "/admin/products/marketplace",
           icon: CornerDownRight,
         },
+        {
+          title: "Price Matching",
+          url: "/admin/products/matching",
+          icon: CornerDownRight,
+        },
       ],
     },
     {

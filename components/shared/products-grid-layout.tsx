@@ -7,15 +7,17 @@ interface ProductsGridLayoutProps {
   hasBadge?: boolean;
   hasPagination?: boolean;
   data: ProductItem[];
+  isSmall?: boolean;
 }
 
 const ProductsGridLayout = ({
   hasBadge,
   hasPagination = false,
   data,
+  isSmall,
 }: ProductsGridLayoutProps) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4">
+    <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4">
       {data
         // .filter((p) => p.stock > 0)
         .map((product, idx) => {
@@ -24,6 +26,7 @@ const ProductsGridLayout = ({
               idx={idx}
               product={product}
               key={product.id}
+              className={isSmall ? "lg:min-h-[80px] min-h-[52px]" : ""}
             />
           );
         })}

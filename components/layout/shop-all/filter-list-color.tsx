@@ -73,7 +73,7 @@ const FilterListColors = () => {
   const shouldCollapse = uniqueColors.length > INITIAL_VISIBLE;
 
   return (
-    <div className="pl-2 pt-2">
+    <div className=" pt-2">
       {/* LIST */}
       <div
         className={`
@@ -85,7 +85,7 @@ const FilterListColors = () => {
           }
         `}
       >
-        <div className="space-y-3">
+        <div className="space-y-3 p-2">
           {uniqueColors.map((item, index) => {
             const checked = selectedColors.includes(item);
             const colorStyle = getColorStyle(item);

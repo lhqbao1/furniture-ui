@@ -65,12 +65,17 @@ export function useGetAllProducts({
 
 export function useProductsAlgoliaSearch(params?: GetProductsSearchParams) {
   return useQuery<ProductResponse>({
-    queryKey: ["products-algolia-search", params],
+    queryKey: [
+      "products-algolia-search",
+      params?.page,
+      params?.page_size,
+      params?.query,
+      params?.brand,
+      params?.categoriesKey, // 👈 STRING
+      params?.brandsKey, // 👈 STRING
+    ],
     queryFn: () => getProductsAlgoliaSearch(params),
     enabled: !!params, // không gọi khi params chưa sẵn sàng
-    staleTime: 60 * 1000, // 1 phút
-    gcTime: 5 * 60 * 1000, // cache 5 phút (react-query v5)
-    retry: 1,
   });
 }
 
