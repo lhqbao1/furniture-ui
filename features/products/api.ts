@@ -10,7 +10,23 @@ export interface GetAllProductsParams {
   is_inventory?: string;
   sort_by_stock?: string;
   is_econelo?: boolean;
+  brand?: string;
 }
+
+export type GetProductsSearchParams = {
+  query?: string;
+  page?: number;
+  page_size?: number;
+  is_active?: boolean;
+  brand?: string;
+  categories?: string;
+  color?: string;
+  materials?: string;
+  delivery_time?: string;
+  price_min?: number;
+  price_max?: number;
+  is_econelo?: boolean;
+};
 
 interface SEOInput {
   title: string;
@@ -50,7 +66,30 @@ export async function getAllProducts(params?: GetAllProductsParams) {
       ...(params?.sort_by_stock && { sort_by_stock: params.sort_by_stock }),
       ...(params?.is_econelo !== undefined && {
         is_econelo: params.is_econelo,
+        brand: params.brand,
       }),
+    },
+  });
+
+  return data as ProductResponse;
+}
+
+export async function getProductsAlgoliaSearch(
+  params?: GetProductsSearchParams,
+) {
+  const { data } = await apiPublic.get("/products/algolia/search", {
+    params: {
+      ...(params?.query && { query: params.query }),
+      ...(params?.page && { page: params.page }),
+      ...(params?.page_size && { page_size: params.page_size }),
+      ...(params?.is_active !== undefined && { is_active: params.is_active }),
+      ...(params?.brand && { brand: params.brand }),
+      ...(params?.categories && { categories: params.categories }),
+      ...(params?.color && { color: params.color }),
+      ...(params?.materials && { materials: params.materials }),
+      ...(params?.delivery_time && { delivery_time: params.delivery_time }),
+      ...(params?.price_min !== undefined && { price_min: params.price_min }),
+      ...(params?.price_max !== undefined && { price_max: params.price_max }),
     },
   });
 

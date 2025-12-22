@@ -13,8 +13,11 @@ import {
   GetAllProductsParams,
   getProductById,
   getProductByTag,
+  getProductsAlgoliaSearch,
+  GetProductsSearchParams,
 } from "./api";
 import { ProductInput } from "@/lib/schema/product";
+import { ProductItem, ProductResponse } from "@/types/products";
 interface SEOInput {
   title: string;
   description: string;
@@ -28,6 +31,7 @@ export function useGetAllProducts({
   sort_by_stock,
   is_inventory,
   is_econelo,
+  brand,
 }: GetAllProductsParams = {}) {
   return useQuery({
     queryKey: [
@@ -39,6 +43,7 @@ export function useGetAllProducts({
       sort_by_stock,
       is_inventory,
       is_econelo,
+      brand,
     ],
     queryFn: () =>
       getAllProducts({
@@ -49,9 +54,21 @@ export function useGetAllProducts({
         sort_by_stock,
         is_inventory,
         is_econelo,
+        brand,
       }),
     // placeholderData: keepPreviousData,
     retry: false,
+  });
+}
+
+export function useProductsAlgoliaSearch(params?: GetProductsSearchParams) {
+  return useQuery<ProductResponse>({
+    queryKey: ["products-algolia-search", params],
+    queryFn: () => getProductsAlgoliaSearch(params),
+    enabled: !!params, // không gọi khi params chưa sẵn sàng
+    staleTime: 60 * 1000, // 1 phút
+    gcTime: 5 * 60 * 1000, // cache 5 phút (react-query v5)
+    retry: 1,
   });
 }
 

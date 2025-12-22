@@ -123,6 +123,19 @@ const Footer = () => {
           </li>
         </ul>
         <div className="lg:mt-4 flex flex-col gap-2 mt-2">
+          <a
+            href="https://geizhals.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src="/geizhals.jpg"
+              width={120}
+              height={60}
+              alt="Geizhals Preisvergleich"
+              priority
+            />
+          </a>
           <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
             <img
               src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
@@ -139,19 +152,6 @@ const Footer = () => {
               width="120"
               height="50"
               alt="Praktiker Trust Logo"
-            />
-          </a>
-          <a
-            href="https://geizhals.de"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/geizhals.jpg"
-              width={120}
-              height={60}
-              alt="Geizhals Preisvergleich"
-              priority
             />
           </a>
         </div>

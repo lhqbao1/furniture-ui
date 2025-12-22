@@ -177,16 +177,21 @@ const ProductDetailsLogistic = ({
         <Clock size={30} />
         <div>
           <p className="font-bold">
-            {estimatedDeliveryRange
-              ? t("deliveryDateRange", {
+            {estimatedDeliveryRange ? (
+              <>
+                {t.rich("deliveryDateRange", {
                   from: formatDateDE(estimatedDeliveryRange.from),
                   to: formatDateDE(estimatedDeliveryRange.to),
-                })
-              : productDetails.delivery_time
-              ? t("deliveryTime", {
-                  days: productDetails.delivery_time,
-                })
-              : t("updating")}
+                  b: (chunks) => <strong>{chunks}</strong>,
+                })}
+              </>
+            ) : productDetails.delivery_time ? (
+              t("deliveryTime", {
+                days: productDetails.delivery_time,
+              })
+            ) : (
+              t("updating")
+            )}
           </p>
 
           <ul className="space-y-1 text-gray-600 text-sm">

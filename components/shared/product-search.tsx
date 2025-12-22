@@ -22,6 +22,7 @@ import { ProductManual } from "../layout/pdf/manual-invoice";
 import { useGetAllProducts } from "@/features/products/hook";
 import { useAtomValue, useSetAtom } from "jotai";
 import { addSearchKeywordAtom, searchHistoryAtom } from "@/store/search";
+import { useGetProductsSelect } from "@/features/product-group/hook";
 
 export default function ProductSearch({
   height,
@@ -92,12 +93,12 @@ export default function ProductSearch({
     return () => clearTimeout(timeout);
   }, [query]);
 
-  const { data: products, isLoading } = useGetAllProducts({
+  const { data: products, isLoading } = useGetProductsSelect({
     search: debouncedQuery,
-    all_products: "false",
-    page_size: 20,
+    all_products: false,
+    is_econelo: false,
   });
-  const results = products?.items ?? [];
+  const results = products ?? [];
 
   // Tính toán vị trí dropdown
   const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>(

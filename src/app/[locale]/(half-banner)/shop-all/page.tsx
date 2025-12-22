@@ -3,12 +3,16 @@
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { CustomPagination } from "@/components/shared/custom-pagination";
-import { useGetAllProducts } from "@/features/products/hook";
+import {
+  useGetAllProducts,
+  useProductsAlgoliaSearch,
+} from "@/features/products/hook";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import { searchHistoryAtom } from "@/store/search";
+import { BrandCheckbox } from "./checkbox";
 
 export default function ShopAllPage() {
   const t = useTranslations();
@@ -17,10 +21,13 @@ export default function ShopAllPage() {
   const history = useAtomValue(searchHistoryAtom);
 
   // 🔹 1. LẤY PARAMS TỪ URL
-  const search = searchParams.get("search") ?? undefined;
+  const query = searchParams.get("search") ?? undefined;
   const pageFromUrl = Number(searchParams.get("page")) || 1;
   const pageSizeFromUrl = Number(searchParams.get("page_size")) || 40;
+  const rawBrand = searchParams.get("brand") ?? undefined;
 
+  const brand = rawBrand !== null ? rawBrand?.replace(/\+/g, " ") : undefined;
+  // console.log(brand);
   // 🔹 2. STATE (sync với URL)
   const [page, setPage] = useState(pageFromUrl);
   const [pageSize, setPageSize] = useState(pageSizeFromUrl);
@@ -32,10 +39,10 @@ export default function ShopAllPage() {
   }, [pageFromUrl, pageSizeFromUrl]);
 
   // 🔹 4. QUERY
-  const { data, isLoading, isError } = useGetAllProducts({
+  const { data, isLoading, isError } = useProductsAlgoliaSearch({
     page,
     page_size: pageSize,
-    search,
+    query,
     is_econelo: false,
   });
 
@@ -63,6 +70,9 @@ export default function ShopAllPage() {
 
   return (
     <div className="pt-3 xl:pb-16 pb-6">
+      <div>
+        <BrandCheckbox />
+      </div>
       <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
         <ProductsGridLayout
           hasBadge

@@ -28,6 +28,19 @@ import ProductManual from "./product-manual";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
+import { toast } from "sonner";
+
+function getFirstErrorMessage(errors: any): string | undefined {
+  for (const key in errors) {
+    const err = errors[key];
+    if (err?.message) return err.message;
+    if (typeof err === "object") {
+      const nested = getFirstErrorMessage(err);
+      if (nested) return nested;
+    }
+  }
+  return undefined;
+}
 
 const ProductForm = ({
   productValues,
@@ -56,7 +69,17 @@ const ProductForm = ({
   return (
     <div className="lg:pb-20 lg:px-30 pb-12">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <form
+          onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+            const message = getFirstErrorMessage(errors);
+
+            toast.error("Form validation error", {
+              description:
+                message ?? "Please fix the highlighted fields and try again.",
+            });
+          })}
+        >
+          {" "}
           <div className="lg:grid-cols-12 lg:grid flex flex-col-reverse lg:gap-24 w-full">
             <div className="lg:col-span-9 flex flex-col gap-4">
               <Accordion
