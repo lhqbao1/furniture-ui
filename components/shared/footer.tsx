@@ -136,13 +136,13 @@ const Footer = () => {
               priority
             />
           </a>
-          <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
+          {/* <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
             <img
               src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
               loading="lazy"
               alt="zu www.idealo.de"
             />
-          </a>
+          </a> */}
           <a
             href="https://www.praktiker.de/marktplatz/prestige-home-5786"
             rel="nofollow"

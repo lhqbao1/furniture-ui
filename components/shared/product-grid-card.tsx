@@ -228,7 +228,7 @@ export default function ProductCard({
                 </p>
               )}
 
-              <div className="space-x-2 flex items-center">
+              {/* <div className="space-x-2 flex items-center">
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map((item) => {
                     return (
@@ -239,7 +239,7 @@ export default function ProductCard({
                   })}
                 </div>
                 <p className="text-base font-semibold">(0)</p>
-              </div>
+              </div> */}
             </div>
           </div>
 

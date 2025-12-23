@@ -8,7 +8,7 @@ const HeaderLogo = () => {
       <Link
         href={`/`}
         aria-label="Go to homepage"
-        className="relative w-16 h-16 flex"
+        className="relative lg:w-16 lg:h-16 h-10 w-10 flex"
       >
         <Image
           src="/new-logo.svg"
