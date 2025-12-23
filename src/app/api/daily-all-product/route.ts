@@ -88,6 +88,7 @@ export async function GET() {
     // 4️⃣ Header
     const header = [
       [
+        "status",
         "id",
         "title",
         "description",
