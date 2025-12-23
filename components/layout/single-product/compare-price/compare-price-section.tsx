@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ProductItem } from "@/types/products";
+import ComparePriceCard from "./compare-price-card";
 
 interface ComparePriceSectionProps {
   product: ProductItem;
@@ -22,20 +23,22 @@ const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>Price comparation</AccordionTrigger>
-          <AccordionContent className="grid grid-cols-4 gap-8">
+          <AccordionContent className="grid grid-cols-4 gap-8 overflow-visible mt-12">
             {product.marketplace_products.length > 0
               ? product.marketplace_products.map((item, index) => {
                   return (
-                    <div
-                      key={index}
-                      className="flex flex-col"
-                    >
-                      <span>{item.marketplace}</span>
-                      <span>{item.final_price}</span>
-                    </div>
+                    <ComparePriceCard
+                      isMarketplace
+                      product={product}
+                      marketplacePrice={item.final_price}
+                    />
                   );
                 })
               : ""}
+
+            {product.marketplace_products.length > 0 && (
+              <ComparePriceCard product={product} />
+            )}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

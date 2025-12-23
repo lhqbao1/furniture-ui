@@ -208,7 +208,7 @@ export default async function Page({
             parentProduct={plainParent}
           />
 
-          {/* <ComparePriceSection product={plainProduct} /> */}
+          <ComparePriceSection product={plainProduct} />
 
           <div className="lg:mt-12 mt-8">
             <ProductDetailsTab
