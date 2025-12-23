@@ -15,6 +15,13 @@ import { useEditProduct } from "@/features/products/hook";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useSyncToEbay } from "@/features/ebay/hook";
+import { useSyncToKaufland } from "@/features/kaufland/hook";
+import { useSyncToAmazon } from "@/features/amazon/hook";
+import { syncToKauflandInput } from "@/features/kaufland/api";
+import { syncToEbayInput } from "@/features/ebay/api";
+import { stripHtmlRegex } from "@/hooks/simplifyHtml";
+import { SyncToAmazonInput } from "@/features/amazon/api";
 
 function EdittbalePriceCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.final_price);
@@ -107,6 +114,10 @@ function EditMarketplacePriceField({
   product: ProductItem;
   marketplace: string;
 }) {
+  const syncToEbayMutation = useSyncToEbay();
+  const syncToKauflandMutation = useSyncToKaufland();
+  const syncToAmazonMutation = useSyncToAmazon();
+
   const marketplaceKey = marketplace.toLowerCase();
 
   const marketplaceProduct = product.marketplace_products?.find(
@@ -161,6 +172,121 @@ function EditMarketplacePriceField({
         onSuccess(data, variables, context) {
           toast.success(`Update ${marketplace} price successful`);
           setEditing(false);
+          const kauflandPayload: syncToKauflandInput = {
+            ean: product.ean,
+            title: marketplaceProduct?.name ?? product.name,
+            description: marketplaceProduct?.description ?? product.description,
+            image_urls:
+              product.static_files?.map((f) => f.url.replace(/\s+/g, "%20")) ??
+              [],
+            price: marketplaceProduct?.final_price ?? product.final_price,
+            stock: product.stock,
+            carrier: product.carrier,
+            sku: product.id_provider,
+            product_id: product.id,
+            ...(marketplaceProduct?.min_stock !== undefined && {
+              min_stock: marketplaceProduct.min_stock,
+            }),
+            ...(marketplaceProduct?.max_stock !== undefined && {
+              max_stock: marketplaceProduct.max_stock,
+            }),
+            marketplace_offer_id: marketplaceProduct?.marketplace_offer_id,
+            brand: {
+              address: product.brand.company_address,
+              email: product.brand.company_email,
+              name: product.brand.company_name,
+              phone: product.brand.company_phone,
+            },
+            handling_time: marketplaceProduct?.handling_time ?? 0,
+          };
+
+          const ebayPayload: syncToEbayInput = {
+            price: marketplaceProduct?.final_price ?? product.final_price,
+            sku: product.id_provider,
+            stock: product.stock,
+            tax: product.tax ? product.tax : null,
+            product: {
+              description: stripHtmlRegex(
+                marketplaceProduct?.description ?? product.description,
+              ),
+              title: marketplaceProduct?.name ?? product.name,
+              imageUrls:
+                product.static_files?.map((file) =>
+                  file.url.replace(/\s+/g, "%20"),
+                ) ?? [],
+              ean: product.ean ? [product.ean] : [],
+            },
+            carrier: product.carrier,
+            brand: product.brand ? product.brand.name : "",
+            ...(marketplaceProduct?.min_stock !== undefined && {
+              min_stock: marketplaceProduct.min_stock,
+            }),
+            ...(marketplaceProduct?.max_stock !== undefined && {
+              max_stock: marketplaceProduct.max_stock,
+            }),
+            manufacturer: {
+              name: product.brand.company_name,
+              address: product.brand.company_address,
+              city: product.brand.company_city,
+              country: product.brand.company_country,
+              email: product.brand.company_email,
+              postal_code: product.brand.company_postal_code,
+              phone: product.brand.company_phone,
+            },
+            documents:
+              product.pdf_files && product.pdf_files.length > 0
+                ? product.pdf_files
+                : null,
+          };
+
+          const amazonPayload: SyncToAmazonInput = {
+            sku: marketplaceProduct?.sku ?? product.id_provider,
+            title: marketplaceProduct?.name ?? product.name,
+            manufacturer: product.brand ? product.brand.company_name : "",
+            description: marketplaceProduct?.description ?? product.description,
+            price: marketplaceProduct?.final_price ?? product.final_price,
+            ean: product.ean,
+            part_number: product.sku,
+            is_fragile: false,
+            number_of_items: Number(product.amount_unit) || 0,
+            included_components: product.name,
+            weight: product.weight,
+            height: product.height,
+            width: product.width,
+            length: product.length,
+            package_length: Math.max(
+              ...product.packages.map((p) => p.length ?? 0),
+            ),
+            package_height: Math.max(
+              ...product.packages.map((p) => p.height ?? 0),
+            ),
+            package_width: Math.max(
+              ...product.packages.map((p) => p.width ?? 0),
+            ),
+            color: product.color ?? "",
+            unit_count: Number(product.amount_unit ?? 0),
+            unit_count_type: product.unit,
+            depth: 0,
+            asin: null,
+            stock: product.stock,
+            carrier: product.carrier,
+            brand: product.brand ? product.brand.name : "",
+            images: product.static_files?.map((f) => f.url) ?? [],
+            model_number: product.sku,
+            size: `${product.length}x${product.width}x${product.height}`,
+            country_of_origin: marketplaceProduct?.country_of_origin ?? "",
+            min_stock: marketplaceProduct?.min_stock ?? 0,
+            max_stock: marketplaceProduct?.max_stock ?? 10,
+            handling_time: marketplaceProduct?.handling_time ?? 0,
+          };
+
+          if (marketplaceKey === "kaufland") {
+            syncToKauflandMutation.mutate(kauflandPayload);
+          } else if (marketplaceKey === "ebay") {
+            syncToEbayMutation.mutate(ebayPayload);
+          } else if (marketplaceKey === "amazon") {
+            syncToAmazonMutation.mutate(amazonPayload);
+          }
         },
         onError(error, variables, context) {
           toast.error(`Update ${marketplace} price failed`);
@@ -196,12 +322,17 @@ function EditMarketplacePriceField({
           className="cursor-pointer"
           onClick={() => setEditing(true)}
         >
-          {marketplaceProduct?.final_price != null
-            ? marketplaceProduct.final_price.toLocaleString("de-DE", {
+          {marketplaceProduct?.final_price != null ? (
+            <>
+              €
+              {marketplaceProduct.final_price.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })
-            : "—"}
+              })}
+            </>
+          ) : (
+            "—"
+          )}
         </div>
       )}
     </div>
