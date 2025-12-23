@@ -71,11 +71,8 @@ export function LoginDrawer({
             <CartLoginForm
               onSuccess={() => {
                 setOpenLogin(false);
-                const uid = localStorage.getItem("user_id");
-                setUserId(uid); // cập nhật state
                 queryClient.refetchQueries({ queryKey: ["me"] });
                 queryClient.refetchQueries({ queryKey: ["cart-items"] });
-                router.push("/check-out", { locale });
               }}
               onError={() => {
                 setOpenLogin(false);
@@ -85,8 +82,6 @@ export function LoginDrawer({
           ) : (
             <HeaderLoginForm
               onSuccess={() => {
-                const uid = localStorage.getItem("user_id");
-                setUserId(uid); // cập nhật state
                 queryClient.refetchQueries({ queryKey: ["me"] });
                 queryClient.refetchQueries({ queryKey: ["cart-items"] });
                 setOpenLogin(false);

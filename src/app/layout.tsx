@@ -122,11 +122,11 @@ export default function RootLayout({
                     `}
         </Script>
 
-        <Script
+        {/* <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
           async
-        />
+        /> */}
         <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"

@@ -143,6 +143,7 @@ export default function CartLoginForm({
         onSuccess: (data) => {
           const token = data.access_token;
           localStorage.setItem("access_token", token);
+
           setUserId(data.id);
           syncLocalCartMutation.mutate();
           queryClient.invalidateQueries({

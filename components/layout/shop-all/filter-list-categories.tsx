@@ -46,7 +46,12 @@ const FilterListCategories = () => {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  if (isLoading) return <FilterSection />;
+  if (isLoading)
+    return (
+      <div className="pr-4">
+        <FilterSection />
+      </div>
+    );
   if (isError) return <div>Error loading categories</div>;
 
   return (

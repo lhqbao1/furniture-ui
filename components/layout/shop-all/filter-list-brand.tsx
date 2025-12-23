@@ -38,7 +38,12 @@ const FilterListBrands = () => {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  if (isLoading || !listBrands) return <FilterSection />;
+  if (isLoading || !listBrands)
+    return (
+      <div className="pr-4">
+        <FilterSection />
+      </div>
+    );
   if (isError) return <div>Error loading brand</div>;
 
   return (

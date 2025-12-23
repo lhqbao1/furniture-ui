@@ -7,19 +7,17 @@ import {
   useGetAllProducts,
   useProductsAlgoliaSearch,
 } from "@/features/products/hook";
-import { useTranslations } from "next-intl";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useEffect, useState } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
-import { removeSearchHistoryAtom, searchHistoryAtom } from "@/store/search";
 import ShopAllFilterSection from "@/components/layout/shop-all/shop-all-filter-section";
+import { useRouter } from "@/src/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function ShopAllPage() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const history = useAtomValue(searchHistoryAtom);
-  const removeHistory = useSetAtom(removeSearchHistoryAtom);
+  const locale = useLocale();
 
   // 🔹 1. LẤY PARAMS TỪ URL
   const query = searchParams.get("search") ?? undefined;
@@ -79,13 +77,9 @@ export default function ShopAllPage() {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
 
-    router.push(`?${params.toString()}`, { scroll: false });
+    router.push(`/shop-all?${params.toString()}`, { scroll: false });
 
-    // ✅ scroll smooth lên đầu
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (isError) {

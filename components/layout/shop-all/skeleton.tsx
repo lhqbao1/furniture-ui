@@ -7,10 +7,10 @@ const FilterSection = () => {
           className="flex items-center gap-2"
         >
           {/* Fake checkbox */}
-          <div className="h-5 w-5 rounded-sm border border-gray-300 bg-gray-200 animate-pulse" />
+          <div className="h-5 w-5 rounded-sm border border-gray-100 bg-gray-100 animate-pulse" />
 
           {/* Fake text */}
-          <div className="h-5 w-full rounded bg-gray-200 animate-pulse" />
+          <div className="h-5 w-full rounded bg-gray-100 animate-pulse" />
         </div>
       ))}
     </div>
