@@ -23,7 +23,7 @@ import { useGetAllProducts } from "@/features/products/hook";
 import { useAtomValue, useSetAtom } from "jotai";
 import { addSearchKeywordAtom, searchHistoryAtom } from "@/store/search";
 import { useGetProductsSelect } from "@/features/product-group/hook";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export default function ProductSearch({
   height,
@@ -39,6 +39,7 @@ export default function ProductSearch({
   const locale = useLocale();
   const pathname = usePathname();
   const isShopAllPage = pathname.includes("shop-all");
+  const searchParams = useSearchParams();
 
   const [query, setQuery] = React.useState("");
   const [debouncedQuery, setDebouncedQuery] = React.useState("");
@@ -112,15 +113,22 @@ export default function ProductSearch({
     if (!isShopAllPage) return;
 
     const value = debouncedQuery.trim();
+    const params = new URLSearchParams(searchParams.toString());
 
-    router.replace(
-      {
-        pathname: "/shop-all",
-        query: value ? { search: value } : {},
-      },
-      { locale },
-    );
-  }, [debouncedQuery, isShopAllPage, locale, router]);
+    console.log(params);
+
+    const current = params.get("search") ?? "";
+
+    if (current === value) return;
+
+    if (value) {
+      params.set("search", value);
+    } else {
+      params.delete("search");
+    }
+
+    router.replace(`/shop-all?${params.toString()}`, { locale });
+  }, [debouncedQuery]);
 
   React.useEffect(() => {
     if (open && inputRef.current) {

@@ -396,14 +396,10 @@ export const productMarketplaceColumns = (
         return (
           <div className="flex justify-center text-center text-sm font-medium">
             {hasMarketplace ? (
-              product.is_active ? (
-                <SyncToMarketplace
-                  product={product}
-                  marketplace={marketplace}
-                />
-              ) : (
-                <div>Product is inactive</div>
-              )
+              <SyncToMarketplace
+                product={product}
+                marketplace={marketplace}
+              />
             ) : !product.is_active ? (
               <div>Product is inactive</div>
             ) : (

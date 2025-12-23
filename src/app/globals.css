@@ -342,6 +342,16 @@ input[type="number"] {
   margin-left: 48px;
 }
 
+.product-descriptions p {
+  margin-bottom: 10px;
+  line-height: 25px !important;
+  font-size: 16px !important;
+}
+
+.product-descriptions span {
+  line-height: 25px;
+}
+
 .animate-slideDown {
   animation: slideDown 250ms ease-out;
 }

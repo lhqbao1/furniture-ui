@@ -50,10 +50,11 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
     retry: false,
   });
 
+  console.log(userData);
+
   // Khi user login → đổ dữ liệu vào form
   useEffect(() => {
     if (!userData) return;
-
     form.reset({
       first_name: userData.first_name ?? "",
       last_name: userData.last_name ?? "",

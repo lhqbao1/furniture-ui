@@ -132,7 +132,7 @@ export default function HeaderLoginForm({ onSuccess }: HeaderLoginFormProps) {
           toast.success(t("loginSuccess"));
 
           // gọi callback onSuccess nếu được truyền
-          if (onSuccess) onSuccess();
+          // if (onSuccess) onSuccess();
         },
         onError(error) {
           toast.error(t("invalidCredentials"));

@@ -26,11 +26,6 @@ const ListVariant = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const router = useRouter();
   const t = useTranslations();
-
-  console.log(variant);
-  console.log(parentProduct.variants);
-  console.log(parentProduct.products);
-
   useEffect(() => {
     if (!currentProduct?.options?.length) return;
 
