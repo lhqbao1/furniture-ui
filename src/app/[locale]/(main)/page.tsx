@@ -24,7 +24,7 @@ export default async function HomePage() {
   return (
     <div
       id="home"
-      className="w-full"
+      className="w-full min-h-[200vh]"
     >
       {/* CRITICAL FIRST PAINT */}
       <FeaturedProducts products={allProducts.items} />

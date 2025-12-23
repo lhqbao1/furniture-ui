@@ -45,7 +45,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider locale={locale}>
-      <WhatsAppChatBox />
+      {/* <WhatsAppChatBox /> */}
       <SaleFixedIcon />
       {children}
     </NextIntlClientProvider>

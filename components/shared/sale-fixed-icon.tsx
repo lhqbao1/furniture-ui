@@ -81,7 +81,7 @@ const SaleFixedIcon = () => {
   return (
     <div
       ref={boxRef}
-      className="fixed bottom-24 right-6 z-[1000] cursor-pointer pointer-events-auto"
+      className="fixed bottom-36 right-6 z-[1000] cursor-pointer pointer-events-auto sm:block hidden"
     >
       <div className="relative">
         {/* Close button */}
