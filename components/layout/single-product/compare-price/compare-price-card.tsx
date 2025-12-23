@@ -100,7 +100,7 @@ const ComparePriceCard = ({
       </div>
 
       {isMarketplace ? (
-        <div className="absolute top-0 right-1/2 -translate-y-1/2 translate-x-1/2 z-[1000]">
+        <div className="absolute top-0 right-1/2 -translate-y-1/2 translate-x-1/2 z-20">
           <Image
             src={MARKETPLACE_ICON_MAP[marketplace ?? 0] ?? "/default.png"}
             alt={marketplace ?? ""}
@@ -110,7 +110,7 @@ const ComparePriceCard = ({
           />
         </div>
       ) : (
-        <div className="absolute -top-2 right-1/2 -translate-y-1/2 translate-x-1/2 z-[1000]">
+        <div className="absolute -top-2 right-1/2 -translate-y-1/2 translate-x-1/2 z-20">
           <Image
             src={"/invoice-logo.png"}
             height={20}
