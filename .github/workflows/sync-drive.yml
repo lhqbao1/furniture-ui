@@ -1,0 +1,15 @@
+name: Daily Product Feed Export
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC mỗi ngày
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call export API
+        run: |
+          curl -X GET https://www.prestige-home.de/api/daily-all-product

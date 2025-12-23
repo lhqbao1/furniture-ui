@@ -35,7 +35,7 @@ export async function getAllProductsSelect({
   search,
   is_customer = false,
   all_products = false,
-  is_econelo = true,
+  is_econelo,
 }: {
   search?: string;
   is_customer?: boolean;
@@ -46,7 +46,8 @@ export async function getAllProductsSelect({
     params: {
       ...(search ? { search } : {}),
       is_customer,
-      all_products,
+      ...(all_products ? { all_products } : {}),
+      ...(is_econelo ? { is_econelo } : {}),
       is_econelo,
     },
     headers: {
