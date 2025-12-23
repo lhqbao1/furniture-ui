@@ -7,6 +7,9 @@ import VoucherSection from "@/components/layout/home/voucher-section/voucher-sec
 
 import { getProductByTag, getAllProducts } from "@/features/products/api";
 import { getVouchers } from "@/features/vouchers/api";
+import { Suspense } from "react";
+import Loading from "../(payment)/blog/loading";
+// import Loading from "./loading";
 
 export const revalidate = 60;
 export const experimental_ppr = true;

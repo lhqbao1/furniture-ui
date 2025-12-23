@@ -225,7 +225,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
   };
 
   return (
-    <div className="text-right flex justify-end">
+    <div className="flex justify-center">
       {editing ? (
         <Input
           type="number"
@@ -261,7 +261,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
           {product.final_price ? (
             <div className="text-right">€{product.final_price?.toFixed(2)}</div>
           ) : (
-            <div className="text-right">updating</div>
+            <div className="text-center">—</div>
           )}
         </div>
       )}
@@ -618,7 +618,15 @@ export const getProductColumns = (
     accessorKey: "ean",
     header: ({}) => <div className="text-center">EAN</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.ean}</div>;
+      return (
+        <div className="text-center">
+          {row.original.ean ? (
+            row.original.ean
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      );
     },
   },
   {
@@ -638,9 +646,13 @@ export const getProductColumns = (
     cell: ({ row }) => {
       return (
         <div className="flex flex-col gap-1 items-center">
-          {row.original.categories.map((item, indx) => {
-            return <div key={item.id}>{item.name}</div>;
-          })}
+          {row.original.categories.length > 0 ? (
+            row.original.categories.map((item, indx) => {
+              return <div key={item.id}>{item.name}</div>;
+            })
+          ) : (
+            <div className="text-center">—</div>
+          )}
         </div>
       );
     },
@@ -695,43 +707,45 @@ export const getProductColumns = (
   },
   {
     accessorKey: "cost",
-    header: () => <div className="text-right">COST</div>,
+    header: () => <div className="text-center">COST</div>,
     cell: ({ row }) => (
-      <div className="text-right">
+      <>
         {row.original.cost ? (
-          <span>€{row.original.cost.toFixed(2)}</span>
+          <div className="text-right">€{row.original.cost.toFixed(2)}</div>
         ) : (
-          <div className="text-right">updating</div>
+          <div className="text-center">—</div>
         )}
-      </div>
+      </>
     ),
   },
   {
     accessorKey: "shipping_cost",
-    header: () => <div className="text-right">DELIVERY COST</div>,
+    header: () => <div className="text-center">DELIVERY COST</div>,
     cell: ({ row }) => (
-      <div className="text-right">
+      <>
         {row.original.delivery_cost ? (
-          <>€{row.original.delivery_cost?.toFixed(2)}</>
+          <div className="text-right">
+            €{row.original.delivery_cost?.toFixed(2)}
+          </div>
         ) : (
-          <div className="text-right">updating</div>
+          <div className="text-center">—</div>
         )}
-      </div>
+      </>
     ),
   },
   {
     accessorKey: "final_price",
-    header: () => <div className="text-right">FINAL PRICE</div>,
+    header: () => <div className="text-center">FINAL PRICE</div>,
     cell: ({ row }) => <EdittbalePriceCell product={row.original} />,
   },
   {
     id: "margin",
-    header: () => <div className="text-right">MARGIN</div>,
+    header: () => <div className="text-center">MARGIN</div>,
     cell: ({ row }) => {
       const { final_price, cost, tax } = row.original;
       const taxRate = parseFloat(tax) / 100;
       if (!final_price || !cost || final_price <= 0)
-        return <div className="text-right">updating</div>;
+        return <div className="text-center">—</div>;
 
       const margin = (1 / (1 + taxRate) - cost / final_price) * 100;
       return <div className="text-right">{margin.toFixed(1)}%</div>;
@@ -762,7 +776,7 @@ export const getProductColumns = (
               className="object-fill"
             />
           ) : (
-            <div>updating</div>
+            <div className="text-center">—</div>
           )}
         </div>
       );
