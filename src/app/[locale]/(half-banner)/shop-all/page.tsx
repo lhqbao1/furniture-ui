@@ -50,24 +50,6 @@ export default function ShopAllPage() {
   const [page, setPage] = useState(pageFromUrl);
   const [pageSize, setPageSize] = useState(pageSizeFromUrl);
 
-  const handleRemoveHistory = (item: string) => {
-    removeHistory(item);
-
-    // ✅ Nếu item đang bị xóa chính là search hiện tại
-    if (item === query) {
-      const params = new URLSearchParams(searchParams.toString());
-
-      params.delete("search");
-      params.delete("page"); // optional: reset page về 1
-
-      const newQuery = params.toString();
-
-      router.replace(newQuery ? `?${newQuery}` : "/shop-all", {
-        scroll: false,
-      });
-    }
-  };
-
   // 🔹 3. SYNC khi back / reload
   useEffect(() => {
     setPage(pageFromUrl);
