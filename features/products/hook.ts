@@ -74,8 +74,13 @@ export function useProductsAlgoliaSearch(params?: GetProductsSearchParams) {
       params?.page_size,
       params?.query,
       params?.brand,
+      params?.brandsKey,
       params?.categoriesKey, // 👈 STRING
       params?.brandsKey, // 👈 STRING
+      params?.color,
+      params?.colorsKey,
+      params?.materials,
+      params?.materialsKey,
     ],
     queryFn: () => getProductsAlgoliaSearch(params),
     enabled: !!params, // không gọi khi params chưa sẵn sàng

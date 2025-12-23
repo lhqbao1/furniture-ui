@@ -208,7 +208,9 @@ export default async function Page({
             parentProduct={plainParent}
           />
 
-          <ComparePriceSection product={plainProduct} />
+          {plainProduct && plainProduct.marketplace_products.length > 0 && (
+            <ComparePriceSection product={plainProduct} />
+          )}
 
           <div className="lg:mt-12 mt-8">
             <ProductDetailsTab
