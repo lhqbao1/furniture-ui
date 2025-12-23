@@ -16,7 +16,9 @@ export default function MainLayout({
         {/* <StickyIcon /> */}
         <div className="overflow-x-hidden">
           <Banner height={200} />
-          <div className="container-padding flex-1">{children}</div>
+          <div className="container-padding flex-1 min-h-screen">
+            {children}
+          </div>
         </div>
       </main>
       <Footer />

@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import { Search } from "lucide-react";
+import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
+import { usePathname, useSearchParams } from "next/navigation";
+import { createPortal } from "react-dom";
+
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
-import { ProductItem } from "@/types/products";
-import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
 import {
   Command,
   CommandList,
@@ -14,133 +16,108 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
-import { createPortal } from "react-dom";
+
 import { Link, useRouter } from "@/src/i18n/navigation";
-import { useCartLocal } from "@/hooks/cart";
-import { toast } from "sonner";
-import { ProductManual } from "../layout/pdf/manual-invoice";
-import { useGetAllProducts } from "@/features/products/hook";
+import { ProductItem } from "@/types/products";
+import { useProductsAlgoliaSearch } from "@/features/products/hook";
 import { useAtomValue, useSetAtom } from "jotai";
 import { addSearchKeywordAtom, searchHistoryAtom } from "@/store/search";
-import { useGetProductsSelect } from "@/features/product-group/hook";
-import { usePathname, useSearchParams } from "next/navigation";
+
+/* ---------------------------------- */
 
 export default function ProductSearch({
   height,
   isAdmin = false,
-  setListProducts,
 }: {
   height?: boolean;
   isAdmin?: boolean;
-  setListProducts?: React.Dispatch<React.SetStateAction<ProductManual[]>>;
 }) {
   const t = useTranslations();
-  const router = useRouter();
   const locale = useLocale();
+  const router = useRouter();
   const pathname = usePathname();
-  const isShopAllPage = pathname.includes("shop-all");
   const searchParams = useSearchParams();
 
-  const [query, setQuery] = React.useState("");
-  const [debouncedQuery, setDebouncedQuery] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-  const addSearchKeyword = useSetAtom(addSearchKeywordAtom);
-  const history = useAtomValue(searchHistoryAtom);
+  const isShopAllPage = pathname.includes("shop-all");
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  /* ---------------- STATE ---------------- */
+
+  const searchFromUrl = searchParams.get("search") ?? "";
+
+  const [query, setQuery] = React.useState(searchFromUrl);
+  const [debouncedQuery, setDebouncedQuery] = React.useState(searchFromUrl);
+  const [open, setOpen] = React.useState(false);
+
+  const history = useAtomValue(searchHistoryAtom);
+  const addSearchKeyword = useSetAtom(addSearchKeywordAtom);
+
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
-  const { addToCartLocal } = useCartLocal();
-
-  const handleAddToCartLocal = (productDetails: ProductItem) => {
-    addToCartLocal(
-      {
-        item: {
-          product_id: productDetails.id ?? "",
-          quantity: 1,
-          is_active: true,
-          item_price: productDetails.final_price,
-          final_price: productDetails.final_price,
-          img_url: productDetails.static_files[0].url,
-          product_name: productDetails.name,
-          stock: productDetails.stock,
-          carrier: productDetails.carrier ? productDetails.carrier : "amm",
-          delivery_time: productDetails.delivery_time
-            ? productDetails.delivery_time
-            : "",
-          brand_name: productDetails.brand.company_name,
-          length: productDetails.length,
-          width: productDetails.width,
-          height: productDetails.height,
-          color: productDetails.color,
-          inventory: productDetails.inventory,
-          url_key: productDetails.url_key,
-        },
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success(t("addToCartSuccess"));
-        },
-        onError(error, variables, context) {
-          toast.error(t("addToCartFail"));
-        },
-      },
-    );
-  };
-
-  // debounce query
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 400);
-    return () => clearTimeout(timeout);
-  }, [query]);
-
-  const { data: products, isLoading } = useGetProductsSelect({
-    search: debouncedQuery,
-    all_products: false,
-    is_econelo: false,
-  });
-  const results = products ?? [];
-
-  // Tính toán vị trí dropdown
-  const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>(
-    {},
-  );
+  /* ----------- SYNC URL → STATE (ONLY shop-all) ----------- */
 
   React.useEffect(() => {
     if (!isShopAllPage) return;
 
-    const value = debouncedQuery.trim();
+    setQuery(searchFromUrl);
+    setDebouncedQuery(searchFromUrl);
+  }, [searchFromUrl, isShopAllPage]);
+
+  /* ---------------- DEBOUNCE ---------------- */
+
+  React.useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+    }, 400);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  /* ---------------- FETCH ---------------- */
+
+  const { data, isLoading } = useProductsAlgoliaSearch({
+    query: debouncedQuery,
+    is_econelo: false,
+  });
+
+  const results = data?.items ?? [];
+
+  /* ----------- SYNC STATE → URL (shop-all only) ----------- */
+
+  React.useEffect(() => {
+    if (!isShopAllPage) return;
+
     const params = new URLSearchParams(searchParams.toString());
-
-    console.log(params);
-
     const current = params.get("search") ?? "";
 
-    if (current === value) return;
+    if (current === debouncedQuery) return;
 
-    if (value) {
-      params.set("search", value);
+    if (debouncedQuery) {
+      params.set("search", debouncedQuery);
     } else {
       params.delete("search");
     }
 
     router.replace(`/shop-all?${params.toString()}`, { locale });
-  }, [debouncedQuery]);
+  }, [debouncedQuery, isShopAllPage]);
+
+  /* ---------------- DROPDOWN ---------------- */
+
+  const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>(
+    {},
+  );
 
   React.useEffect(() => {
-    if (open && inputRef.current) {
-      const rect = inputRef.current.getBoundingClientRect();
-      setDropdownStyle({
-        position: "fixed",
-        top: rect.bottom + 4, // 4px cách input
-        left: rect.left,
-        width: rect.width,
-        zIndex: 9999,
-      });
-    }
+    if (!open || !inputRef.current) return;
+
+    const rect = inputRef.current.getBoundingClientRect();
+    setDropdownStyle({
+      position: "fixed",
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 9999,
+    });
   }, [open, query]);
 
   React.useEffect(() => {
@@ -154,83 +131,78 @@ export default function ProductSearch({
         setOpen(false);
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  React.useEffect(() => {
-    if (query.trim()) {
-      setOpen(true);
+  /* ---------------- ENTER SEARCH ---------------- */
+
+  function handleSubmit() {
+    const value = query.trim();
+    if (!value) return;
+
+    addSearchKeyword(value);
+    setOpen(false);
+
+    if (!isShopAllPage) {
+      router.push(
+        { pathname: "/shop-all", query: { search: value } },
+        { locale },
+      );
     }
-  }, [query]);
+  }
+
+  /* ---------------- RENDER ---------------- */
 
   return (
     <div
       ref={containerRef}
-      className="flex justify-center items-center gap-2 relative"
+      className="relative flex items-center justify-center gap-2"
     >
       <div
         className={cn(
-          "w-3/4 relative flex flex-col",
-          height ? "mr-0" : "",
-          isAdmin ? "w-full" : "w-3/4",
+          "relative flex w-3/4 flex-col",
+          height && "mr-0",
+          isAdmin && "w-full",
         )}
       >
         <div className="relative flex">
           <Input
-            type="text"
-            placeholder={`${t("search")}...`}
-            className="w-full xl:h-12 h-10 pl-4 rounded-full border bg-white ring-0"
+            ref={inputRef}
             value={query}
+            placeholder={`${t("search")}...`}
+            className="h-10 w-full rounded-full border bg-white pl-4 xl:h-12"
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setOpen(true)}
-            onClick={() => setOpen(true)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-
-                const value = query.trim();
-                if (!value) return;
-
-                setOpen(false);
-                addSearchKeyword(value);
-
-                if (!isShopAllPage) {
-                  router.push(
-                    {
-                      pathname: "/shop-all",
-                      query: { search: value },
-                    },
-                    { locale },
-                  );
-                }
+                handleSubmit();
               }
             }}
-            ref={inputRef}
           />
+
           <Search
-            size={24}
-            className="absolute right-4 xl:top-3 top-2"
-            stroke="black"
+            size={22}
+            className="absolute right-4 top-2.5 text-black xl:top-3"
           />
         </div>
       </div>
 
-      {/* Dropdown render ra body */}
+      {/* ---------------- DROPDOWN ---------------- */}
       {open &&
-        // query &&
         createPortal(
           <div
-            style={dropdownStyle}
             ref={dropdownRef}
-            className="bg-white shadow rounded-md z-50"
+            style={dropdownStyle}
+            className="z-50 rounded-md bg-white shadow"
           >
             <Command
               shouldFilter={false}
-              className="max-h-[300px] overflow-y-auto z-50"
+              className="max-h-[300px]"
             >
               <CommandList>
-                {/* 🔁 SEARCH HISTORY */}
                 {!query && history.length > 0 && (
                   <CommandGroup heading={t("recentSearch")}>
                     {history.map((item) => (
@@ -243,106 +215,49 @@ export default function ProductSearch({
                         }}
                       >
                         <Search className="mr-2 h-4 w-4 text-gray-400" />
-                        <span>{item}</span>
+                        {item}
                       </CommandItem>
                     ))}
                   </CommandGroup>
                 )}
 
-                {/* 🔍 SEARCH RESULT */}
                 {query && (
                   <>
                     <CommandEmpty>
-                      {isLoading ? `${t("loading")}...` : `${t("noResult")}`}
+                      {isLoading ? `${t("loading")}...` : t("noResult")}
                     </CommandEmpty>
 
                     {results.length > 0 && (
                       <CommandGroup>
-                        {results.map((product: ProductItem) => {
-                          return (
-                            <CommandItem
-                              asChild
-                              key={product.id}
-                              value={product.name}
+                        {results.map((p: ProductItem) => (
+                          <CommandItem
+                            key={p.id}
+                            value={p.name}
+                            asChild
+                          >
+                            <Link
+                              href={`/product/${p.url_key}`}
+                              locale={locale}
+                              className="flex w-full items-center gap-3"
+                              onClick={() => {
+                                setOpen(false);
+                                setQuery("");
+                              }}
                             >
-                              {isAdmin ? (
-                                <div
-                                  className="flex justify-between items-center w-full cursor-pointer"
-                                  onClick={() => {
-                                    const newProduct: ProductManual = {
-                                      name: product.name,
-                                      id_provider: product.id_provider ?? "",
-                                      price: product.final_price ?? 0,
-                                      quantity: 1,
-                                      final_price: product.final_price ?? 0,
-                                    };
-
-                                    setListProducts?.((prev) => [
-                                      ...prev,
-                                      newProduct,
-                                    ]);
-                                    setQuery("");
-                                    handleAddToCartLocal(product);
-                                    setOpen(false);
-                                  }}
-                                >
-                                  <div className="flex gap-3 flex-1 items-center">
-                                    <Image
-                                      src={
-                                        product.static_files.length > 0
-                                          ? product.static_files[0].url
-                                          : "/placeholder-product.webp"
-                                      }
-                                      height={50}
-                                      width={50}
-                                      alt=""
-                                      className="h-12 w-12"
-                                      unoptimized
-                                    />
-                                    <div className="font-semibold">
-                                      {product.name}
-                                    </div>
-                                  </div>
-                                  <div className="text-[#666666]">
-                                    {product.id_provider}
-                                  </div>
-                                </div>
-                              ) : (
-                                <Link
-                                  href={`/product/${product.url_key}`}
-                                  locale={locale}
-                                  passHref
-                                  className="flex justify-between items-center w-full cursor-pointer"
-                                  onClick={() => {
-                                    setQuery("");
-                                    setOpen(false);
-                                  }}
-                                >
-                                  <div className="flex gap-3 flex-1 items-center">
-                                    <Image
-                                      src={
-                                        product.static_files.length > 0
-                                          ? product.static_files[0].url
-                                          : "/placeholder-product.webp"
-                                      }
-                                      height={50}
-                                      width={50}
-                                      alt=""
-                                      className="h-12 w-12"
-                                      unoptimized
-                                    />
-                                    <div className="font-semibold">
-                                      {product.name}
-                                    </div>
-                                  </div>
-                                  <div className="text-[#666666]">
-                                    {product.id_provider}
-                                  </div>
-                                </Link>
-                              )}
-                            </CommandItem>
-                          );
-                        })}
+                              <Image
+                                src={
+                                  p.static_files[0]?.url ??
+                                  "/placeholder-product.webp"
+                                }
+                                width={48}
+                                height={48}
+                                alt=""
+                                unoptimized
+                              />
+                              <span className="font-medium">{p.name}</span>
+                            </Link>
+                          </CommandItem>
+                        ))}
                       </CommandGroup>
                     )}
                   </>
