@@ -8,7 +8,6 @@ import { useGetAllProducts } from "@/features/products/hook";
 import { sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { getMatchingPriceColumn } from "@/components/layout/admin/products/matching-price/column";
 
@@ -42,7 +41,7 @@ const ProductList = () => {
     all_products: "false",
     // search: filters.search,
     sort_by_stock: "asc",
-    sort_by_marketplace: "asc",
+    sort_by_marketplace: "desc",
   });
 
   if (isError) return <div>No data</div>;

@@ -31,6 +31,7 @@ const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
                       isMarketplace
                       product={product}
                       marketplacePrice={item.final_price}
+                      marketplace={item.marketplace}
                     />
                   );
                 })
