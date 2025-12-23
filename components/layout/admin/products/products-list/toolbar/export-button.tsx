@@ -25,7 +25,7 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
       val === null || val === undefined || val === "None" ? "" : val;
 
     const exportData = data
-      .filter((p) => p.is_active === true)
+      // .filter((p) => p.is_active === true)
       .map((p) => ({
         id: clean(p.id_provider),
         ean: clean(p.ean),

@@ -48,8 +48,9 @@ const ProductList = () => {
 
   const { data: exportData } = useGetProductsSelect({
     is_customer: false,
-    all_products: false,
   });
+
+  console.log(exportData);
 
   if (isError) return <div>No data</div>;
 
