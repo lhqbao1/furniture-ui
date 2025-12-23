@@ -31,7 +31,7 @@ const Footer = () => {
             />
           </Link>
           <ListStars rating={5} />
-          <div className="text-sm font-semibold">100% 5-Stars</div>
+          <div className="text-sm font-semibold">96% 5-Stars</div>
         </div>
         {/* <div className="flex flex-col gap-2 items-center justify-center">
           <Link
