@@ -472,7 +472,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
       </Button>
 
       {/* </Link> */}
-      <DeleteDialog
+      {/* <DeleteDialog
         product={product}
         isEbay={
           product.marketplace_products.find((i) => i.marketplace === "ebay")
@@ -480,7 +480,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
             ? true
             : false
         }
-      />
+      /> */}
       <Link
         href={`/product/${product.url_key}`}
         target="_blank"

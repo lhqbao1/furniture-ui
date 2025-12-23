@@ -28,6 +28,10 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
 
+  const isHigher = product.marketplace_products.find(
+    (i) => i.final_price < product.final_price,
+  );
+
   const handleEditProductPrice = () => {
     EditProductMutation.mutate(
       {
@@ -63,7 +67,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
   };
 
   return (
-    <div className="text-right flex justify-end">
+    <div className="text-center flex justify-center">
       {editing ? (
         <Input
           type="number"
@@ -97,7 +101,13 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
           onClick={() => setEditing(true)}
         >
           {product.final_price ? (
-            <div className="text-right">€{product.final_price?.toFixed(2)}</div>
+            <div
+              className={`text-center ${
+                isHigher ? "text-red-600" : "text-secondary"
+              }`}
+            >
+              €{product.final_price?.toFixed(2)}
+            </div>
           ) : (
             <div className="text-right">updating</div>
           )}
@@ -296,7 +306,7 @@ function EditMarketplacePriceField({
   };
 
   return (
-    <div className="text-right flex justify-end">
+    <div className="text-center flex justify-center">
       {editing ? (
         <Input
           type="number"
@@ -342,28 +352,6 @@ function EditMarketplacePriceField({
 export const getMatchingPriceColumn = (
   setSortByStock: (val?: "asc" | "desc") => void,
 ): ColumnDef<ProductItem>[] => [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "static_files",
     header: "IMAGE",
@@ -431,41 +419,60 @@ export const getMatchingPriceColumn = (
     ),
     enableSorting: true,
   },
-  {
-    accessorKey: "cost",
-    header: () => <div className="text-right">COST</div>,
-    cell: ({ row }) => (
-      <div className="text-right">
-        {row.original.cost ? (
-          <span>
-            €
-            {row.original.cost.toLocaleString("de-DE", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </span>
-        ) : (
-          <div className="text-right">updating</div>
-        )}
-      </div>
-    ),
-  },
+  // {
+  //   accessorKey: "cost",
+  //   header: () => <div className="text-right">COST</div>,
+  //   cell: ({ row }) => (
+  //     <div className="text-right">
+  //       {row.original.cost ? (
+  //         <span>
+  //           €
+  //           {row.original.cost.toLocaleString("de-DE", {
+  //             minimumFractionDigits: 2,
+  //             maximumFractionDigits: 2,
+  //           })}
+  //         </span>
+  //       ) : (
+  //         <div className="text-right">updating</div>
+  //       )}
+  //     </div>
+  //   ),
+  // },
   {
     accessorKey: "final_price",
-    header: () => <div className="text-right">FINAL PRICE</div>,
+    header: () => (
+      <div className="flex justify-center">
+        <Image
+          src={"/invoice-logo.png"}
+          width={40}
+          height={40}
+          alt="prestige-home"
+        />
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-right">
+      <div className="text-center">
         {row.original.final_price ? (
           <EdittbalePriceCell product={row.original} />
         ) : (
-          <div className="text-right">updating</div>
+          <div className="text-center">-</div>
         )}
       </div>
     ),
   },
   {
     accessorKey: "kaufland_price",
-    header: () => <div className="text-right">KAUFLAND PRICE</div>,
+    header: () => (
+      <div className="flex justify-center">
+        <Image
+          src={"/kau.png"}
+          width={50}
+          height={80}
+          alt="kaufland"
+          className="w-20 h-auto object-contain"
+        />
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-right">
         <EditMarketplacePriceField
@@ -477,7 +484,17 @@ export const getMatchingPriceColumn = (
   },
   {
     accessorKey: "amazon_price",
-    header: () => <div className="text-right">AMAZON PRICE</div>,
+    header: () => (
+      <div className="flex justify-center">
+        <Image
+          src={"/amazon.png"}
+          width={50}
+          height={50}
+          alt="amazon"
+          className="w-16 h-auto object-contain"
+        />
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-right">
         <EditMarketplacePriceField
@@ -489,7 +506,16 @@ export const getMatchingPriceColumn = (
   },
   {
     accessorKey: "ebay_price",
-    header: () => <div className="text-right">EBAY PRICE</div>,
+    header: () => (
+      <div className="flex justify-center">
+        <Image
+          src={"/ebay.png"}
+          width={50}
+          height={50}
+          alt="ebay"
+        />
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-right">
         <EditMarketplacePriceField
@@ -500,19 +526,19 @@ export const getMatchingPriceColumn = (
     ),
   },
 
-  {
-    id: "margin",
-    header: () => <div className="text-right">MARGIN</div>,
-    cell: ({ row }) => {
-      const { final_price, cost, tax } = row.original;
-      const taxRate = parseFloat(tax) / 100;
-      if (!final_price || !cost || final_price <= 0)
-        return <div className="text-right">updating</div>;
+  // {
+  //   id: "margin",
+  //   header: () => <div className="text-right">MARGIN</div>,
+  //   cell: ({ row }) => {
+  //     const { final_price, cost, tax } = row.original;
+  //     const taxRate = parseFloat(tax) / 100;
+  //     if (!final_price || !cost || final_price <= 0)
+  //       return <div className="text-right">updating</div>;
 
-      const margin = (1 / (1 + taxRate) - cost / final_price) * 100;
-      return <div className="text-right">{margin.toFixed(1)}%</div>;
-    },
-  },
+  //     const margin = (1 / (1 + taxRate) - cost / final_price) * 100;
+  //     return <div className="text-right">{margin.toFixed(1)}%</div>;
+  //   },
+  // },
 
   //   {
   //     id: "actions",

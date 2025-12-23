@@ -39,9 +39,10 @@ const ProductList = () => {
   const { data, isLoading, isError } = useGetAllProducts({
     page,
     page_size: pageSize,
-    all_products: filters.all_products,
-    search: filters.search,
-    sort_by_stock: filters.sort_by_stock,
+    all_products: "false",
+    // search: filters.search,
+    sort_by_stock: "asc",
+    sort_by_marketplace: "asc",
   });
 
   if (isError) return <div>No data</div>;
@@ -61,7 +62,7 @@ const ProductList = () => {
   return (
     <div className="space-y-6 pb-12">
       <div className="text-3xl text-secondary font-bold text-center">
-        Product Matching
+        Price Benchmark
       </div>
 
       {isLoading ? (

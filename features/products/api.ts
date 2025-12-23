@@ -13,6 +13,7 @@ export interface GetAllProductsParams {
   sort_by_stock?: string;
   is_econelo?: boolean;
   brand?: string;
+  sort_by_marketplace?: string;
 }
 
 export type GetProductsSearchParams = {
@@ -71,6 +72,10 @@ export async function getAllProducts(params?: GetAllProductsParams) {
         is_inventory: params.is_inventory,
       }),
       ...(params?.sort_by_stock && { sort_by_stock: params.sort_by_stock }),
+      ...(params?.sort_by_marketplace && {
+        sort_by_marketplace: params.sort_by_marketplace,
+      }),
+
       ...(params?.is_econelo !== undefined && {
         is_econelo: params.is_econelo,
         brand: params.brand,
