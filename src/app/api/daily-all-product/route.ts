@@ -17,6 +17,12 @@ export async function GET() {
       ],
     });
 
+    console.log(
+      "HAS SERVICE ACCOUNT:",
+      !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
+    );
+    console.log("HAS FOLDER ID:", !!process.env.GOOGLE_DRIVE_FOLDER_ID);
+
     const sheets = google.sheets({ version: "v4", auth });
     const drive = google.drive({ version: "v3", auth });
 
@@ -35,11 +41,15 @@ export async function GET() {
 
     const spreadsheetId = spreadsheet.data.spreadsheetId!;
 
-    // 2️⃣ Move file vào folder
+    const file = await drive.files.get({
+      fileId: spreadsheetId,
+      fields: "parents",
+    });
+
     await drive.files.update({
       fileId: spreadsheetId,
       addParents: FOLDER_ID,
-      removeParents: "root",
+      removeParents: file.data.parents?.join(","),
     });
 
     // 3️⃣ Get products
@@ -120,8 +130,15 @@ export async function GET() {
       fileName,
       count: rows.length,
     });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ success: false }, { status: 500 });
+  } catch (err: any) {
+    console.error("🔥 EXPORT ERROR:", err?.message || err);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: err?.message || "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }
