@@ -25,10 +25,10 @@ const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
         defaultValue="item-1"
       >
         <AccordionItem value="item-1">
-          <AccordionTrigger className="text-xl font-bold text-gray-600">
+          <AccordionTrigger className="md:text-xl text-sm font-medium md:font-bold md:text-gray-600 text-black">
             {t("price_compare")}
           </AccordionTrigger>
-          <AccordionContent className="grid grid-cols-4 gap-8 overflow-visible mt-12">
+          <AccordionContent className="grid xl:grid-cols-4 grid-cols-2 gap-8 overflow-visible mt-12">
             {product.marketplace_products.length > 0
               ? product.marketplace_products.map((item, index) => {
                   return (
@@ -37,6 +37,7 @@ const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
                       product={product}
                       marketplacePrice={item.final_price}
                       marketplace={item.marketplace}
+                      key={item.marketplace_offer_id}
                     />
                   );
                 })
