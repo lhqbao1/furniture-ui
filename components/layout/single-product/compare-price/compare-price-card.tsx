@@ -9,6 +9,12 @@ import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import React from "react";
 
+const MARKETPLACE_ICON_MAP: Record<string, string> = {
+  kaufland: "/kaufland-seeklogo.png",
+  amazon: "/amazon.png",
+  ebay: "/ebay.png",
+};
+
 interface ComparePriceCardProps {
   product: ProductItem;
   isMarketplace?: boolean;
@@ -25,6 +31,7 @@ const ComparePriceCard = ({
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
+
   return (
     <div
       className="relative group"
@@ -77,7 +84,7 @@ const ComparePriceCard = ({
           <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
           <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
         </div>
-        {isMarketplace && (
+        {/* {isMarketplace && (
           <div className="space-x-3 mt-3 pb-4 lg:px-4 px-2">
             <Button
               type="button"
@@ -89,24 +96,25 @@ const ComparePriceCard = ({
               <Eye className="size-6 text-white transition-transform duration-200 group-hover:scale-110" />
             </Button>
           </div>
-        )}
+        )} */}
       </div>
 
       {isMarketplace ? (
         <div className="absolute top-0 right-1/2 -translate-y-1/2 translate-x-1/2 z-[1000]">
           <Image
-            src={"/kau.png"}
-            height={100}
+            src={MARKETPLACE_ICON_MAP[marketplace ?? 0] ?? "/default.png"}
+            alt={marketplace ?? ""}
             width={200}
-            alt=""
+            height={200}
+            className="w-24 h-auto object-cover"
           />
         </div>
       ) : (
         <div className="absolute -top-2 right-1/2 -translate-y-1/2 translate-x-1/2 z-[1000]">
           <Image
             src={"/invoice-logo.png"}
-            height={40}
-            width={80}
+            height={20}
+            width={60}
             alt=""
           />
         </div>
