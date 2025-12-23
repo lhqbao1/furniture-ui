@@ -44,12 +44,14 @@ export async function GET() {
     const file = await drive.files.get({
       fileId: spreadsheetId,
       fields: "parents",
+      supportsAllDrives: true,
     });
 
     await drive.files.update({
       fileId: spreadsheetId,
       addParents: FOLDER_ID,
       removeParents: file.data.parents?.join(","),
+      supportsAllDrives: true,
     });
 
     // 3️⃣ Get products
