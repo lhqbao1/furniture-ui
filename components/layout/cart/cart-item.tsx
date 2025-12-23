@@ -137,7 +137,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     }
 
     if (newQuantity > item.products.stock) {
-      toast.error("Vượt quá số lượng tồn kho");
+      toast.error(t("notEnoughStock"));
       return;
     }
 
@@ -200,11 +200,11 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     }
 
     // CASE 3: stock = 0 & không inventory
-    if (!startDate) return null;
+    // if (!startDate) return null;
 
     return {
-      from: addBusinessDays(startDate, deliveryDayRange.min),
-      to: addBusinessDays(startDate, deliveryDayRange.max),
+      from: addBusinessDays(startDate ?? new Date(), deliveryDayRange.min),
+      to: addBusinessDays(startDate ?? new Date(), deliveryDayRange.max),
     };
   }, [deliveryDayRange, item.stock, latestInventory]);
 

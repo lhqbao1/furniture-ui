@@ -49,7 +49,7 @@ const CartTable = ({
   setLocalQuantities,
 }: CartTableProps) => {
   const [localStatuses, setLocalStatuses] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
   const t = useTranslations();
   const updateCartItemQuantityMutation = useUpdateCartItemQuantity();
@@ -67,10 +67,10 @@ const CartTable = ({
         {
           onSuccess: () => console.log("✅ Cập nhật thành công"),
           onError: () => console.log("❌ Cập nhật thất bại"),
-        }
+        },
       );
     }, 400),
-    []
+    [],
   );
 
   const handleToggleSelect = (item: CartItem, is_active: boolean) => {
@@ -86,13 +86,13 @@ const CartTable = ({
       {
         onSuccess: () => console.log("✅ Toggle thành công"),
         onError: () => console.log("❌ Toggle thất bại"),
-      }
+      },
     );
   };
 
   const handleUpdateCartItemQuantity = (
     item: CartItem,
-    newQuantity: number
+    newQuantity: number,
   ) => {
     if (newQuantity <= 0) {
       deleteCartItemMutation.mutate(item.id, {
@@ -103,7 +103,7 @@ const CartTable = ({
     }
 
     if (newQuantity > item.products.stock) {
-      toast.error("Vượt quá số lượng tồn kho");
+      toast.error(t("notEnoughStock"));
       return;
     }
 
@@ -129,7 +129,7 @@ const CartTable = ({
 
   const flattenedItems = useMemo(
     () => cart?.flatMap((cartItem) => cartItem.items),
-    [cart]
+    [cart],
   );
 
   const table = useReactTable({
@@ -166,7 +166,7 @@ const CartTable = ({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -188,7 +188,7 @@ const CartTable = ({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}
