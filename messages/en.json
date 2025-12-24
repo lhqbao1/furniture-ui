@@ -409,5 +409,14 @@
   "brand": "Brand",
   "showMore": "Show more",
   "showLess": "Show less",
-  "price_compare": "Price comparison"
+  "price_compare": "Price comparison",
+  "best_price": "Best price",
+  "requestOffer": "Request offer",
+  "requestTitle": "Request a better offer",
+  "contactDesc": "Leave your email and message. Our team will contact you shortly.",
+  "sendRequest": "Send request",
+  "defaultOfferMessage": "Hi, I'm interested in {product}. Is there a better offer or voucher available?",
+  "contactTitle": "Request a better offer",
+  "messageSent": "Request sent successfully",
+  "messageSendFail": "Failed to send request"
 }

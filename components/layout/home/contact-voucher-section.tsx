@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSendVoucherViaEmail } from "@/features/vouchers/hook";
 import { toast } from "sonner";
+import { useUploadContactForm } from "@/features/contact/hook";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function NewsletterVoucherSection() {
   const t = useTranslations("newsletter_voucher");
-  const sendVoucherMutation = useSendVoucherViaEmail();
+  const tAll = useTranslations();
+  const sendContactMutation = useUploadContactForm();
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,28 +24,30 @@ export default function NewsletterVoucherSection() {
       return;
     }
 
-    sendVoucherMutation.mutate(email, {
-      onSuccess: () => {
-        toast.success(t("successMessage", { email }));
-        setEmail("");
+    sendContactMutation.mutate(
+      {
+        email,
+        message: "Welcome Voucher",
+        subject: "Request Voucher",
+        type: "voucher5",
       },
-      onError: (error: any) => {
-        toast.error(error?.message ?? t("errorMessage"));
+      {
+        onSuccess() {
+          toast.success(tAll("messageSent", { default: "Request sent" }));
+          setEmail("");
+        },
+        onError() {
+          toast.error(
+            tAll("messageSendFail", { default: "Failed to send request" }),
+          );
+        },
       },
-    });
+    );
   };
 
   return (
     <section className="w-full md:py-6 xl:py-10 py-4 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center md:space-y-0 space-y-4">
-        {/* LEFT – BADGE */}
-        <div className="lg:col-span-2 flex justify-center lg:justify-start">
-          <div className="text-2xl font-bold border px-4 py-2 bg-white">
-            5% Gutschein*
-          </div>
-        </div>
-
-        {/* CENTER – TEXT */}
         <div className="lg:col-span-5 text-center lg:text-left space-y-2">
           <h3 className="font-semibold text-lg">{t("title")}</h3>
           <p className="text-sm text-gray-700">{t("description")}</p>
@@ -61,27 +65,27 @@ export default function NewsletterVoucherSection() {
               className="rounded-none border-r-0 bg-white focus:ring-0"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={sendVoucherMutation.isPending}
+              disabled={sendContactMutation.isPending}
               required
             />
             <Button
               type="submit"
               className="rounded-none bg-orange-600 hover:bg-orange-700 text-white px-6"
-              disabled={sendVoucherMutation.isPending}
+              disabled={sendContactMutation.isPending}
             >
-              {sendVoucherMutation.isPending ? t("sending") : t("cta")}
+              {sendContactMutation.isPending ? t("sending") : t("cta")}
             </Button>
           </form>
 
           {/* LEGAL */}
           <p className="text-xs text-gray-500 mt-2">
             {t("legal")}{" "}
-            <button
+            {/* <button
               type="button"
               className="underline hover:text-gray-700"
             >
               {t("showMore")}
-            </button>
+            </button> */}
           </p>
         </div>
       </div>

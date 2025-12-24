@@ -1,13 +1,21 @@
 "use client";
 import ProductPricingField from "@/components/shared/product-pricing-field";
 import { Button } from "@/components/ui/button";
+import { useAddToCart } from "@/features/cart/hook";
+import { useCartLocal } from "@/hooks/cart";
+import { HandleApiError } from "@/lib/api-helper";
 import { cn } from "@/lib/utils";
+import { CartItemLocal } from "@/lib/utils/cart";
 import { Link, useRouter } from "@/src/i18n/navigation";
+import { userIdAtom } from "@/store/auth";
 import { ProductItem } from "@/types/products";
+import { useAtom } from "jotai";
 import { Eye } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import React from "react";
+import { toast } from "sonner";
+import RequestOfferDialog from "./request-offer-dialog";
 
 const MARKETPLACE_ICON_MAP: Record<string, string> = {
   kaufland: "/kaufland-seeklogo.png",
@@ -20,6 +28,10 @@ interface ComparePriceCardProps {
   isMarketplace?: boolean;
   marketplacePrice?: number;
   marketplace?: string;
+  className?: string;
+  priceClassName?: string;
+  isProductCheapest?: boolean;
+  isProduct?: boolean;
 }
 
 const ComparePriceCard = ({
@@ -27,10 +39,96 @@ const ComparePriceCard = ({
   isMarketplace,
   marketplacePrice,
   marketplace,
+  className,
+  priceClassName,
+  isProductCheapest,
+  isProduct,
 }: ComparePriceCardProps) => {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
+  const [userId, setUserId] = useAtom(userIdAtom);
+  const { addToCartLocal, cart } = useCartLocal();
+  const createCartMutation = useAddToCart();
+
+  const handleAddToCart = (values: any) => {
+    if (!product) return;
+
+    // LOCAL CART
+    if (!userId) {
+      const existingItem = cart.find(
+        (item: CartItemLocal) => item.product_id === product.id,
+      );
+
+      const totalQuantity = (existingItem?.quantity || 0) + values.quantity;
+      const totalIncomingStock =
+        product.inventory?.reduce(
+          (sum, inv) => sum + (inv.incoming_stock ?? 0),
+          0,
+        ) ?? 0;
+
+      if (totalQuantity > product.stock + totalIncomingStock) {
+        toast.error(t("notEnoughStock"));
+        return;
+      }
+
+      addToCartLocal(
+        {
+          item: {
+            product_id: product.id,
+            quantity: values.quantity,
+            is_active: true,
+            item_price: product.final_price,
+            final_price: product.final_price,
+            img_url:
+              product.static_files.length > 0
+                ? product.static_files[0].url
+                : "",
+            product_name: product.name,
+            stock: product.stock,
+            carrier: product.carrier ?? "amm",
+            id_provider: product.id_provider ?? "",
+            delivery_time: product.delivery_time ?? "",
+            brand_name: product.brand.name,
+            length: product.length,
+            width: product.width,
+            height: product.height,
+            color: product.color,
+            inventory: product.inventory,
+            url_key: product.url_key,
+          },
+        },
+        {
+          onSuccess: () => toast.success(t("addToCartSuccess")),
+          onError: () => toast.error(t("addToCartFail")),
+        },
+      );
+
+      return;
+    }
+
+    // SERVER CART
+    createCartMutation.mutate(
+      { productId: product.id, quantity: values.quantity },
+      {
+        onSuccess: () => toast.success(t("addToCartSuccess")),
+        onError: (error) => {
+          const { status, message } = HandleApiError(error, t);
+
+          // if (status === 400) {
+          //   toast.error(t("notEnoughStock"));
+          //   return;
+          // }
+
+          toast.error(message);
+
+          if (status === 401) {
+            router.push("/login", { locale });
+          }
+        },
+      },
+    );
+  };
 
   return (
     <div
@@ -39,7 +137,7 @@ const ComparePriceCard = ({
     >
       <div
         key={product.id}
-        className="relative z-10 h-full border boder-[#e0e0e0]"
+        className={cn("relative z-10 h-full border boder-[#e0e0e0]", className)}
       >
         <div className="bg-white p-0 group z-0 pt-8 lg:px-4 px-2">
           <Image
@@ -65,15 +163,57 @@ const ComparePriceCard = ({
 
             <div className="space-y-2">
               {/* <ProductPricingField product={product} /> */}
-              <div className="text-2xl">
-                {(marketplacePrice
-                  ? marketplacePrice
-                  : product.final_price
-                ).toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                €
+              {isProductCheapest && (
+                <div
+                  className="
+                  absolute top-3 right-3
+                  rounded-md
+                  bg-green-500 text-white
+                  text-xs font-semibold
+                  px-3 py-1
+                  shadow-md
+                  z-10 pointer-events-none
+                  flex gap-1 items-center
+                "
+                >
+                  {t("best_price")}
+                  <Image
+                    src={"/award.png"}
+                    width={15}
+                    height={15}
+                    alt=""
+                  />
+                </div>
+              )}
+
+              <div className="flex justify-between items-center">
+                <div className={cn("text-2xl", priceClassName)}>
+                  {(marketplacePrice
+                    ? marketplacePrice
+                    : product.final_price
+                  ).toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  €
+                </div>
+
+                {isProduct && isProductCheapest && (
+                  <Button
+                    className="rounded-md lg:px-4 mr-1 text-center justify-center text-sm"
+                    type="button"
+                    onClick={() => handleAddToCart(product.id)}
+                  >
+                    {t("addToCart")}
+                  </Button>
+                )}
+
+                {isProduct && !isProductCheapest && (
+                  <RequestOfferDialog
+                    productName={product.name}
+                    productUrl={`/product/${product.url_key}`}
+                  />
+                )}
               </div>
             </div>
           </div>

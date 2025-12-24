@@ -66,7 +66,7 @@ const ProductDetails = ({
               <div className="xl:col-span-6 col-span-12 flex flex-col gap-6">
                 <AdminView productId={productDetails.id} />
                 <div>
-                  <ProductBrand product={productDetails} />
+                  <ProductBrand brand={productDetails.brand.name} />
                   <h2 className="lg:text-3xl text-xl font-semibold text-black">
                     {productDetails.name}
                   </h2>

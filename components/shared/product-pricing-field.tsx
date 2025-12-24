@@ -82,7 +82,7 @@ const ProductPricingField = ({ product }: ProductPricingFieldProps) => {
 
   return (
     <div className="flex md:flex-row flex-col-reverse gap-2 md:items-end justify-start">
-      <div className="inline-flex items-end justify-start w-fit gap-2 font-bold text-gray-900 relative">
+      <div className="">
         {/* <div className="text-4xl">
                         {Math.floor(priceAfterVoucher ? priceAfterVoucher : 0)}
                       </div>
@@ -98,29 +98,31 @@ const ProductPricingField = ({ product }: ProductPricingFieldProps) => {
                             .split(".")[1]
                         }
                       </div> */}
-        {shouldAnimate ? (
-          <CountUp
-            from={prevPrice}
-            to={priceAfterVoucher}
-            duration={0.8}
-            className="text-3xl"
-            startWhen={shouldAnimate}
-            onEnd={() => {
-              if (matchedVoucher) {
-                setLastVoucher(matchedVoucher.id);
-              }
-            }}
-          />
-        ) : (
-          <div className="text-3xl">
-            {priceAfterVoucher.toLocaleString("de-DE", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </div>
-        )}
-
-        <div className="text-base font-semibold text-black">€</div>
+        <div className="inline-flex items-end justify-start w-fit gap-2 font-bold text-gray-900 relative">
+          {shouldAnimate ? (
+            <CountUp
+              from={prevPrice}
+              to={priceAfterVoucher}
+              duration={0.8}
+              className="text-3xl"
+              startWhen={shouldAnimate}
+              onEnd={() => {
+                if (matchedVoucher) {
+                  setLastVoucher(matchedVoucher.id);
+                }
+              }}
+            />
+          ) : (
+            <div className="text-3xl">
+              {priceAfterVoucher.toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </div>
+          )}
+          <div className="text-base font-semibold text-black">€</div>
+        </div>
+        <p className="font-light text-sm">zzgl. Versandkosten</p>
       </div>
 
       {/* 🎯 VOUCHER */}

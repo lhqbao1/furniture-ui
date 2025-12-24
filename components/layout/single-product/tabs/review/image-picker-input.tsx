@@ -321,7 +321,7 @@ function ImagePickerInput<T extends FieldValues>({
               items={items.map((i) => i.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="w-full h-[144px] flex flex-wrap gap-4">
+              <div className="w-full h-fit flex flex-wrap gap-4">
                 {items.map((it, idx) => (
                   <div
                     key={it.id}

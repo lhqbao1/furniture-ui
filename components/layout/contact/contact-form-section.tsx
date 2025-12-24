@@ -72,6 +72,7 @@ const ContactFormSection = () => {
       {
         ...cleanedValues,
         order_id: contactOrderId,
+        type: "order",
       },
       {
         onSuccess() {

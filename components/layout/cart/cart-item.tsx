@@ -9,7 +9,7 @@ import {
   useUpdateCartItemQuantity,
 } from "@/features/cart/hook";
 import { toast } from "sonner";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { debounce } from "lodash";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
@@ -25,6 +25,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useAddToWishList } from "@/features/wishlist/hook";
 import { HandleApiError } from "@/lib/api-helper";
+import ProductBrand from "../single-product/product-brand";
 
 interface CartItemProps {
   cartServer?: CartItem;
@@ -47,6 +48,7 @@ type CartItemUI = {
   stock: number;
   inventory: InventoryItem[];
   url_key: string;
+  id_provider?: string;
 };
 
 const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
@@ -75,6 +77,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         stock: cartServer.products.stock,
         inventory: cartServer.products.inventory,
         url_key: cartServer.products.url_key,
+        id_provider: cartServer.products.id_provider,
       }
     : localProducts
     ? {
@@ -94,12 +97,13 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         stock: localProducts.stock,
         inventory: localProducts.inventory,
         url_key: localProducts.url_key,
+        id_provider: localProducts.id_provider,
       }
     : null;
 
   if (!item) return null;
 
-  const [uiQuantity, setUiQuantity] = React.useState(item.quantity);
+  const [uiQuantity, setUiQuantity] = useState<number>(item.quantity ?? 1);
   React.useEffect(() => {
     setUiQuantity(item.quantity);
   }, [item.quantity]);
@@ -289,6 +293,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
       <div className="w-full">
         <div className="flex flex-col justify-between">
           <div>
+            {item.brand && <ProductBrand brand={item.brand} />}
             <Link
               href={`/product/${item.url_key}`}
               locale={locale}
@@ -297,15 +302,9 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
               {item.name}
             </Link>
 
-            <p className="text-black">
-              {item.length && `L ${item.length}`}
-              {" x "}
-              {item.width && `W ${item.width}`}
-              {" x "}
-              {item.height && `H ${item.height}`}
-            </p>
-
-            {item.brand && <p className="text-black">{item.brand}</p>}
+            <div>
+              {t("itemNumber")}: {item.id_provider}
+            </div>
 
             {item.deliveryText && (
               <p className="text-secondary mt-6">
@@ -334,7 +333,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
           <div className="flex items-center gap-3 mt-2">
             <span className="text-sm">Anzahl:</span>
             <QuantityControl
-              quantity={uiQuantity}
+              quantity={uiQuantity ?? 0}
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
               isLoading={false} // ❌ KHÔNG block UI
