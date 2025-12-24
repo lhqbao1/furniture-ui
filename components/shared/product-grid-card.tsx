@@ -22,6 +22,7 @@ import { useMediaQuery } from "react-responsive";
 import { usePrevious } from "@uidotdev/usehooks";
 import CountUp from "../CountUp";
 import ProductPricingField from "./product-pricing-field";
+import ProductBrand from "../layout/single-product/product-brand";
 
 interface ProductCardProps {
   product: ProductItem;
@@ -203,6 +204,7 @@ export default function ProductCard({
           </Link>
 
           <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
+            <ProductBrand brand={product.brand.name} />
             <Link
               href={`/product/${product.url_key}`}
               locale={locale}
