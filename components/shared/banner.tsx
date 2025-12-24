@@ -40,13 +40,14 @@ const Banner = ({ height = 600, isHome = false }: BannerProps) => {
     >
       {/* Background image */}
       <Image
-        src="/home-banner11.webp"
+        src="/home.jpg"
         alt="Banner"
         fill
         priority
         fetchPriority="high"
-        sizes="(min-width: 1024px) 100vw"
+        // sizes="(min-width: 1024px) 100vw"
         className="object-cover"
+        unoptimized
       />
     </div>
   );

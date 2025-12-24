@@ -52,6 +52,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     <IntlClientProviderWithAuth
       locale={locale}
       messages={messages} // ✅ BẮT BUỘC
+      timeZone="Europe/Berlin"
     >
       <TawkChat />
       {/* <SaleFixedIcon /> */}
