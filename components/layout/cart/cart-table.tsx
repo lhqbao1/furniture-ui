@@ -29,7 +29,6 @@ import {
 import { GetCartColumns } from "./columns";
 import { useTranslations } from "next-intl";
 import { useIsPhone } from "@/hooks/use-is-phone";
-import { useMe } from "@/features/auth/hook";
 
 interface CartTableProps {
   cart?: CartResponse;
@@ -49,7 +48,7 @@ const CartTable = ({
   setLocalQuantities,
 }: CartTableProps) => {
   const [localStatuses, setLocalStatuses] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
   const t = useTranslations();
   const updateCartItemQuantityMutation = useUpdateCartItemQuantity();
@@ -67,10 +66,10 @@ const CartTable = ({
         {
           onSuccess: () => console.log("✅ Cập nhật thành công"),
           onError: () => console.log("❌ Cập nhật thất bại"),
-        }
+        },
       );
     }, 400),
-    []
+    [],
   );
 
   const handleToggleSelect = (item: CartItem, is_active: boolean) => {
@@ -86,13 +85,13 @@ const CartTable = ({
       {
         onSuccess: () => console.log("✅ Toggle thành công"),
         onError: () => console.log("❌ Toggle thất bại"),
-      }
+      },
     );
   };
 
   const handleUpdateCartItemQuantity = (
     item: CartItem,
-    newQuantity: number
+    newQuantity: number,
   ) => {
     if (newQuantity <= 0) {
       deleteCartItemMutation.mutate(item.id, {
@@ -102,8 +101,14 @@ const CartTable = ({
       return;
     }
 
-    if (newQuantity > item.products.stock) {
-      toast.error("Vượt quá số lượng tồn kho");
+    const totalIncomingStock =
+      item.products.inventory?.reduce(
+        (sum, inv) => sum + (inv.incoming_stock ?? 0),
+        0,
+      ) ?? 0;
+
+    if (newQuantity > item.products.stock + totalIncomingStock) {
+      toast.error(t("notEnoughStock"));
       return;
     }
 
@@ -129,7 +134,7 @@ const CartTable = ({
 
   const flattenedItems = useMemo(
     () => cart?.flatMap((cartItem) => cartItem.items),
-    [cart]
+    [cart],
   );
 
   const table = useReactTable({
@@ -166,7 +171,7 @@ const CartTable = ({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -188,7 +193,7 @@ const CartTable = ({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}

@@ -1,12 +1,13 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BadgePercent, Lock, RotateCcw, Truck } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CartResponse } from "@/types/cart";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useAtom } from "jotai";
+import { authHydratedAtom, userIdAtom } from "@/store/auth";
+import CartSummarySkeleton from "./skeleton/cart-summary-price-skeleton";
 
 interface CartSummaryProps {
   total?: number;
@@ -14,6 +15,9 @@ interface CartSummaryProps {
   onCheckout?: () => void;
   cart?: CartResponse;
   shipping: number;
+  isLoadingCart?: boolean;
+  userId?: string;
+  authHydrated?: boolean;
 }
 
 const CartSummary = ({
@@ -22,6 +26,9 @@ const CartSummary = ({
   onCheckout,
   cart,
   shipping,
+  isLoadingCart,
+  userId,
+  authHydrated,
 }: CartSummaryProps) => {
   const t = useTranslations();
 
@@ -30,27 +37,31 @@ const CartSummary = ({
       <h3 className="text-3xl font-normal">Bestellübersicht</h3>
 
       <div className="pb-10 border-b mt-18">
-        <div className="space-y-2 text-base">
-          {/* Subtotal */}
-          <div className="flex justify-between">
-            <span className="text-gray-700">{t("subtotal")}</span>
-            <span>{total.toFixed(2)} €</span>
-          </div>
+        {!authHydrated || (userId && isLoadingCart) ? (
+          <CartSummarySkeleton />
+        ) : (
+          <div className="space-y-2 text-base">
+            {/* Subtotal */}
+            <div className="flex justify-between">
+              <span className="text-gray-700">{t("subtotal")}</span>
+              <span>{total.toFixed(2)} €</span>
+            </div>
 
-          {/* Shipping */}
-          <div className="flex justify-between">
-            <span className="text-secondary underline cursor-pointer">
-              {t("shipping")}
-            </span>
-            <span>{shipping.toFixed(2)} €</span>
-          </div>
+            {/* Shipping */}
+            <div className="flex justify-between">
+              <span className="text-secondary underline cursor-pointer">
+                {t("shipping")}
+              </span>
+              <span>{shipping.toFixed(2)} €</span>
+            </div>
 
-          {/* Total */}
-          <div className="flex justify-between font-semibold text-base">
-            <span>{t("totalWithTax")}</span>
-            <span>{(total + shipping).toFixed(2)} €</span>
+            {/* Total */}
+            <div className="flex justify-between font-semibold text-base">
+              <span>{t("totalWithTax")}</span>
+              <span>{(total + shipping).toFixed(2)} €</span>
+            </div>
           </div>
-        </div>
+        )}
 
         <Button
           onClick={onCheckout}

@@ -19,7 +19,7 @@ QuantityControlProps) => {
         type="button"
         onClick={onDecrease}
         className="px-3 py-1 hover:bg-gray-100 disabled:opacity-40 cursor-pointer"
-        disabled={isLoading}
+        // disabled={isLoading}
       >
         −
       </button>
@@ -35,7 +35,7 @@ QuantityControlProps) => {
         type="button"
         onClick={onIncrease}
         className="px-3 py-1 hover:bg-gray-100 cursor-pointer"
-        disabled={isLoading}
+        // disabled={isLoading}
       >
         +
       </button>

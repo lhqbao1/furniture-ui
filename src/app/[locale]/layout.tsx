@@ -6,6 +6,8 @@ import type { Metadata } from "next";
 import WhatsAppChatBox from "@/components/shared/whatsapp-box-chat";
 import SaleFixedIcon from "@/components/shared/sale-fixed-icon";
 import TawkChat from "@/components/shared/tawk";
+import IntlClientProviderWithAuth from "./intlProviderWithAuth";
+import { getMessages } from "next-intl/server";
 
 type Props = {
   children: React.ReactNode;
@@ -44,11 +46,16 @@ export default async function LocaleLayout({ children, params }: Props) {
     notFound();
   }
 
+  const messages = await getMessages();
+
   return (
-    <NextIntlClientProvider locale={locale}>
-      {/* <WhatsAppChatBox /> */ <TawkChat />}
+    <IntlClientProviderWithAuth
+      locale={locale}
+      messages={messages} // ✅ BẮT BUỘC
+    >
+      <TawkChat />
       <SaleFixedIcon />
       {children}
-    </NextIntlClientProvider>
+    </IntlClientProviderWithAuth>
   );
 }

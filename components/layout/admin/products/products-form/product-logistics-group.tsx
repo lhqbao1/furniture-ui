@@ -41,6 +41,11 @@ const ProductLogisticsGroup = ({
   const carriers = [
     { id: "amm", logo: "/amm.jpeg" },
     { id: "dpd", logo: "/dpd.jpeg" },
+    { id: "dhl", logo: "/dhl.png" },
+    { id: "gls", logo: "/gls.png" },
+    { id: "ups", logo: "/ups.png" },
+    { id: "hermes", logo: "/hermes.png" },
+    { id: "fexed", logo: "/fedex.png" },
   ];
 
   const DSPcarriers = [

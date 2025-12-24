@@ -3,12 +3,11 @@ import CategorySection from "@/components/layout/home/category-section";
 import NewsletterVoucherSection from "@/components/layout/home/contact-voucher-section";
 import FeaturedProducts from "@/components/layout/home/featured-products";
 import RecentViewed from "@/components/layout/home/recent-viewed";
-import VoucherSection from "@/components/layout/home/voucher-section/voucher-section";
 
 import { getProductByTag, getAllProducts } from "@/features/products/api";
 import { getVouchers } from "@/features/vouchers/api";
 import { Suspense } from "react";
-import Loading from "../(payment)/blog/loading";
+import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 // import Loading from "./loading";
 
 export const revalidate = 60;
@@ -33,17 +32,29 @@ export default async function HomePage() {
       <FeaturedProducts products={allProducts.items} />
 
       {/* <VoucherSection vouchers={voucherList} /> */}
-
-      <RecentViewed products={trendingProducts} />
-
-      <NewsletterVoucherSection />
-      <CategorySection slug="sofas" />
+      <Suspense fallback={<ProductGridSkeleton length={4} />}>
+        <RecentViewed products={trendingProducts} />
+      </Suspense>
+      <Suspense fallback={<ProductGridSkeleton length={4} />}>
+        {" "}
+        <NewsletterVoucherSection />
+      </Suspense>
+      <Suspense fallback={<ProductGridSkeleton length={4} />}>
+        {" "}
+        <CategorySection slug="sofas" />
+      </Suspense>
+      <Suspense fallback={<ProductGridSkeleton length={4} />}>
+        <CategorySection slug="matratzen" />
+      </Suspense>
+      <Suspense fallback={<ProductGridSkeleton length={4} />}>
+        <CategorySection slug="gartenmoebel" />
+      </Suspense>
+      <Suspense fallback={<ProductGridSkeleton length={4} />}>
+        <CategorySection slug="zaeune-sichtschutz" />
+      </Suspense>
 
       {/* <AnimatedCarousel /> */}
 
-      <CategorySection slug="matratzen" />
-      <CategorySection slug="gartenmoebel" />
-      <CategorySection slug="zaeune-sichtschutz" />
       {/* STREAMING SECTION */}
     </div>
   );

@@ -11,6 +11,7 @@ import { getReviewByProduct } from "@/features/review/api";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
+import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -222,7 +223,7 @@ export default async function Page({
       </div>
 
       {product.categories?.length > 0 && (
-        <Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
         </Suspense>
       )}

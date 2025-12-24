@@ -46,11 +46,16 @@ export function useAddToCartHandler(productDetails: ProductItem) {
       );
 
       const totalQuantity = (existingItem?.quantity || 0) + values.quantity;
+      const totalIncomingStock =
+        productDetails.inventory?.reduce(
+          (sum, inv) => sum + (inv.incoming_stock ?? 0),
+          0,
+        ) ?? 0;
 
-      // if (totalQuantity > productDetails.stock) {
-      //   toast.error(t("notEnoughStock"));
-      //   return;
-      // }
+      if (totalQuantity > productDetails.stock + totalIncomingStock) {
+        toast.error(t("notEnoughStock"));
+        return;
+      }
 
       addToCartLocal(
         {

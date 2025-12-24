@@ -110,6 +110,9 @@ const Footer = () => {
         <ul className="space-y-2 text-black-700 text-sm">
           {/* ✅ thêm locale */}
           <li className="hover:pl-2 transition-all duration-500">
+            <Link href={`/faq`}>FAQ</Link>
+          </li>
+          <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/about-us`}>{t("aboutUs")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
@@ -129,7 +132,7 @@ const Footer = () => {
             rel="noopener noreferrer"
           >
             <Image
-              src="/geizhals.jpg"
+              src="https://gzhls.at/b/brands/geizhals_logo_official.svg"
               width={120}
               height={60}
               alt="Geizhals Preisvergleich"

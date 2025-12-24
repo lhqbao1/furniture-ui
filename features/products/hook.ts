@@ -74,6 +74,7 @@ export function useProductsAlgoliaSearch(params?: GetProductsSearchParams) {
       params?.page_size,
       params?.query,
       params?.brand,
+      params?.is_active,
       params?.brandsKey,
       params?.categoriesKey, // 👈 STRING
       params?.brandsKey, // 👈 STRING
