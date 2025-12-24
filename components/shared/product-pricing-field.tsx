@@ -10,9 +10,13 @@ import gsap from "gsap";
 
 interface ProductPricingFieldProps {
   product: ProductItem;
+  isProductDetails?: boolean;
 }
 
-const ProductPricingField = ({ product }: ProductPricingFieldProps) => {
+const ProductPricingField = ({
+  product,
+  isProductDetails,
+}: ProductPricingFieldProps) => {
   const [currentVoucher] = useAtom(currentVoucherAtom);
   const [lastVoucher, setLastVoucher] = useAtom(lastVoucherAtom);
 
@@ -122,7 +126,9 @@ const ProductPricingField = ({ product }: ProductPricingFieldProps) => {
           )}
           <div className="text-base font-semibold text-black">€</div>
         </div>
-        <p className="font-light text-sm">zzgl. Versandkosten</p>
+        {!isProductDetails && (
+          <p className="font-light text-sm">zzgl. Versandkosten</p>
+        )}
       </div>
 
       {/* 🎯 VOUCHER */}

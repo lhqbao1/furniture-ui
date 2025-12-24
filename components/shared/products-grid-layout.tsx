@@ -8,6 +8,7 @@ interface ProductsGridLayoutProps {
   hasPagination?: boolean;
   data: ProductItem[];
   isSmall?: boolean;
+  isProductDetails?: boolean;
 }
 
 const ProductsGridLayout = ({
@@ -15,6 +16,7 @@ const ProductsGridLayout = ({
   hasPagination = false,
   data,
   isSmall,
+  isProductDetails,
 }: ProductsGridLayoutProps) => {
   return (
     <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4">
@@ -27,6 +29,7 @@ const ProductsGridLayout = ({
               product={product}
               key={product.id}
               className={isSmall ? "lg:min-h-[80px] min-h-[52px]" : ""}
+              isProductDetails={isProductDetails}
             />
           );
         })}

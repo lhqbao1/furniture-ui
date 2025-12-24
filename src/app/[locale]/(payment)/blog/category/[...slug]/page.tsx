@@ -52,8 +52,13 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 
   const featured = categoryBlogs.items[0];
   const listData = {
-    ...categoryBlogs,
-    items: categoryBlogs.items.slice(1),
+    pages: [
+      {
+        ...categoryBlogs,
+        items: categoryBlogs.items.slice(1), // bỏ featured
+      },
+    ],
+    pageParams: [1],
   };
 
   /* SCHEMA: CollectionPage + ItemList */
@@ -127,7 +132,10 @@ export default async function BlogCategoryPage({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-20">
             {featured && <FeaturedPost post={featured} />}
 
-            <BlogListClient initialData={listData} />
+            <BlogListClient
+              initialData={listData}
+              productSlug={productDetails?.url_key ?? ""}
+            />
           </div>
 
           {/* SIDEBAR */}

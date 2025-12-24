@@ -1082,7 +1082,15 @@ export const COUNTRY_ORIGIN_OPTIONS = [
   { value: "CN", label: "China" },
   { value: "VN", label: "VietNam" },
 ];
-
+export const CARRIERS = [
+  { id: "amm", logo: "/amm.jpeg" },
+  { id: "dpd", logo: "/dpd.jpeg" },
+  { id: "dhl", logo: "/dhl.png" },
+  { id: "gls", logo: "/gls.png" },
+  { id: "ups", logo: "/ups.png" },
+  { id: "hermes", logo: "/hermes.png" },
+  { id: "fedex", logo: "/fedex.png" },
+] as const;
 export const COUNTRY_OPTIONS = [
   { value: "AT", label: "Austria" },
   { value: "DE", label: "Deutschland" },

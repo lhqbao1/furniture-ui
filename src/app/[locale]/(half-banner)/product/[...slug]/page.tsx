@@ -12,6 +12,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
+import { getBlogsByProductSlug } from "@/features/blog/api";
+import RelatedBlogs from "@/components/layout/single-product/related-blogs";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -183,12 +185,33 @@ export default async function Page({
    * --------------------------------------------------*/
   let reviews = [];
   let parentProduct = null;
+  let relatedBlogs = null;
 
   try {
-    reviews = await getReviewByProduct(product.id);
+    const promises: Promise<any>[] = [getReviewByProduct(product.id)];
+
     if (product.parent_id) {
-      parentProduct = await getProductGroupDetail(product.parent_id);
+      promises.push(getProductGroupDetail(product.parent_id));
     }
+
+    if (product.slug || product.url_key) {
+      promises.push(
+        getBlogsByProductSlug({
+          product_slug: product.slug ?? product.url_key,
+          page: 1,
+          page_size: 4,
+        }),
+      );
+    }
+
+    const results = await Promise.allSettled(promises);
+
+    reviews = results[0].status === "fulfilled" ? results[0].value : [];
+
+    parentProduct =
+      results[1]?.status === "fulfilled" ? results[1].value : null;
+
+    relatedBlogs = results[2]?.status === "fulfilled" ? results[2].value : null;
   } catch (err) {
     console.error("❌ Error fetching child data:", err);
   }
@@ -197,6 +220,7 @@ export default async function Page({
   const plainProduct = toPlain(product);
   const plainReviews = toPlain(reviews);
   const plainParent = toPlain(parentProduct);
+  const plainBlogs = toPlain(relatedBlogs);
 
   return (
     <>
@@ -226,6 +250,17 @@ export default async function Page({
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
         </Suspense>
+      )}
+
+      {plainBlogs?.items?.length > 0 && (
+        <div className="lg:mt-16 mt-10 pb-4">
+          <Suspense fallback={<ProductGridSkeleton length={4} />}>
+            <RelatedBlogs
+              blogs={plainBlogs.items}
+              slug={product.url_key}
+            />
+          </Suspense>
+        </div>
       )}
     </>
   );

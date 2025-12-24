@@ -29,6 +29,7 @@ import {
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
+import { getCarrierLogo } from "@/lib/getCarrierImage";
 
 function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
@@ -763,33 +764,28 @@ export const getProductColumns = (
     id: "carrier",
     header: () => <div className="text-center">CARRIER</div>,
     cell: ({ row }) => {
-      const carrier = row.original.carrier?.toLowerCase();
-
-      let image: string | null = null;
-      if (carrier === "amm") {
-        image = "/amm.jpeg";
-      } else if (carrier === "dpd") {
-        image = "/dpd.jpeg";
-      }
+      const carrier = row.original.carrier;
+      const logo = getCarrierLogo(carrier);
 
       return (
         <div className="flex items-center justify-center">
-          {image ? (
+          {logo ? (
             <Image
-              src={image}
+              src={logo}
               alt={carrier}
               width={60}
               height={60}
               unoptimized
-              className="object-fill"
+              className="object-contain"
             />
           ) : (
-            <div className="text-center">—</div>
+            <span className="text-muted-foreground">—</span>
           )}
         </div>
       );
     },
   },
+
   {
     id: "actions",
     header: "ACTION",

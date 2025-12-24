@@ -3,16 +3,29 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import BlogCard from "./blog-card-item";
 import BlogCardSkeleton from "./blog-card-skeleton";
-import { getBlogs } from "@/features/blog/api";
+import { getBlogs, getBlogsByProductSlug } from "@/features/blog/api";
 import { Loader2 } from "lucide-react";
 import { startTransition, useMemo } from "react";
 
-export default function BlogListClient({ initialData }: { initialData: any }) {
+export default function BlogListClient({
+  initialData,
+  productSlug,
+}: {
+  initialData: any;
+  productSlug?: string;
+}) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ["blogs"],
+      queryKey: productSlug ? ["blogs-product-slug", productSlug] : ["blogs"],
       initialPageParam: 1, // 🔥 BẮT BUỘC
-      queryFn: ({ pageParam }) => getBlogs({ page: pageParam }),
+      queryFn: ({ pageParam }) =>
+        productSlug
+          ? getBlogsByProductSlug({
+              product_slug: productSlug,
+              page: pageParam,
+              page_size: 16,
+            })
+          : getBlogs({ page: pageParam }),
 
       getNextPageParam: (lastPage) => {
         const { page, total_pages } = lastPage.pagination;
@@ -22,10 +35,10 @@ export default function BlogListClient({ initialData }: { initialData: any }) {
       initialData, // 👈 phải đúng shape
     });
 
-  const posts = useMemo(
-    () => data?.pages.flatMap((p) => p.items) ?? [],
-    [data],
-  );
+  const posts = useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flatMap((p) => p.items ?? []);
+  }, [data]);
 
   const handleLoadMore = () => {
     startTransition(() => {
@@ -37,9 +50,9 @@ export default function BlogListClient({ initialData }: { initialData: any }) {
     <div className="space-y-10">
       {/* GRID POSTS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <BlogCard
-            key={post.id}
+            key={post.blog_id ?? index}
             post={post}
           />
         ))}

@@ -15,7 +15,7 @@ export default function SidebarBlog({
       <h3 className="text-xl font-semibold">Neueste Artikel</h3>
 
       <div className="space-y-5">
-        {items.slice(0, 5).map((post) => {
+        {items.slice(0, 10).map((post) => {
           return (
             <div
               className="flex gap-4"

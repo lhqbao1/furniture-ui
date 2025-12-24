@@ -7,6 +7,7 @@ export interface BlogItem {
   content: string; // HTML/Markdown Content
   slug: string;
   created_at: string;
+  blog_id: string;
 }
 
 export interface BlogByProductResponse {

@@ -32,7 +32,7 @@ const RelatedCategoryProducts = ({
       </h3>
       <ProductsGridLayout
         data={relatedProducts.products.slice(0, 4)}
-        className="lg:min-h-[52px] min-h-[48px]"
+        // className="lg:min-h-[52px] min-h-[48px]"
       />
       <Button
         variant={"secondary"}
