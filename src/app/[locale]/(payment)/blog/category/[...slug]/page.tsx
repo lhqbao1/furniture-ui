@@ -52,8 +52,13 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 
   const featured = categoryBlogs.items[0];
   const listData = {
-    ...categoryBlogs,
-    items: categoryBlogs.items.slice(1),
+    pages: [
+      {
+        ...categoryBlogs,
+        items: categoryBlogs.items.slice(1), // bỏ featured
+      },
+    ],
+    pageParams: [1],
   };
 
   /* SCHEMA: CollectionPage + ItemList */

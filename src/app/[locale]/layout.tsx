@@ -54,7 +54,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       messages={messages} // ✅ BẮT BUỘC
     >
       <TawkChat />
-      <SaleFixedIcon />
+      {/* <SaleFixedIcon /> */}
       {children}
     </IntlClientProviderWithAuth>
   );

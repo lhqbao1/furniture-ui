@@ -22,10 +22,10 @@ export default function BlogListClient({ initialData }: { initialData: any }) {
       initialData, // 👈 phải đúng shape
     });
 
-  const posts = useMemo(
-    () => data?.pages.flatMap((p) => p.items) ?? [],
-    [data],
-  );
+  const posts = useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flatMap((p) => p.items ?? []);
+  }, [data]);
 
   const handleLoadMore = () => {
     startTransition(() => {
