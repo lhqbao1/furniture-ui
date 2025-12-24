@@ -59,6 +59,7 @@ export default function ShopAllPage() {
     page,
     page_size: pageSize,
     query,
+    is_active: true,
     is_econelo: false,
     brand: brands,
     categories, // 👈 gửi array cho API

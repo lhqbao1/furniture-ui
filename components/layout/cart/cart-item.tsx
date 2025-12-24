@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart, Loader2, Trash, Trash2 } from "lucide-react";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { CartItem } from "@/types/cart";
 import { useCartLocal } from "@/hooks/cart";
@@ -99,11 +99,16 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
 
   if (!item) return null;
 
+  const [uiQuantity, setUiQuantity] = React.useState(item.quantity);
+  React.useEffect(() => {
+    setUiQuantity(item.quantity);
+  }, [item.quantity]);
   const { updateQuantity } = useCartLocal();
   const { removeItem } = useCartLocal();
   const updateCartItemQuantityMutation = useUpdateCartItemQuantity();
   const deleteCartItemMutation = useDeleteCartItem();
   const addToWishlistMutation = useAddToWishList();
+
   const onUpdateQuantity = (item: CartTableItem, newQuantity: number) => {
     if (newQuantity < 1) return;
     if (item.stock && newQuantity > item.stock) return;
@@ -111,17 +116,19 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   };
 
   // ✅ debounce API update
-  const debouncedUpdate = useCallback(
+  const debouncedUpdate = React.useCallback(
     debounce((itemId: string, quantity: number) => {
       updateCartItemQuantityMutation.mutate(
         { cartItemId: itemId, quantity },
         {
-          onSuccess: () => console.log("✅ Cập nhật thành công"),
-          onError: () => console.log("❌ Cập nhật thất bại"),
+          onError: () => {
+            toast.error(t("updateCartFail"));
+            setUiQuantity(item.quantity); // 🔁 rollback
+          },
         },
       );
-    }, 400),
-    [],
+    }, 500),
+    [item.quantity],
   );
 
   const handleUpdateCartItemQuantity = (
@@ -129,14 +136,17 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     newQuantity: number,
   ) => {
     if (newQuantity <= 0) {
-      deleteCartItemMutation.mutate(item.id, {
-        onSuccess: () => console.log("✅ Xóa thành công"),
-        onError: () => console.log("❌ Xóa thất bại"),
-      });
+      handleRemoveCartItemServer(item.id);
       return;
     }
 
-    if (newQuantity > item.products.stock) {
+    const totalIncomingStock =
+      item.products.inventory?.reduce(
+        (sum, inv) => sum + (inv.incoming_stock ?? 0),
+        0,
+      ) ?? 0;
+
+    if (newQuantity > item.products.stock + totalIncomingStock) {
       toast.error(t("notEnoughStock"));
       return;
     }
@@ -144,22 +154,57 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     debouncedUpdate(item.id, newQuantity);
   };
 
+  const handleRemoveCartItemServer = (id: string) => {
+    deleteCartItemMutation.mutate(id, {
+      onSuccess(data, variables, context) {
+        toast.success(t("removeItemCartSuccess"));
+      },
+      onError(error, variables, context) {
+        toast.error(t("removeItemCartFail"));
+      },
+    });
+  };
+
+  const handleRemove = (id: string) => {
+    if (userId && cartServer) {
+      handleRemoveCartItemServer(id);
+    } else if (localProducts) {
+      removeItem(id, {
+        onSuccess(data, variables, context) {
+          toast.success(t("removeItemCartSuccess"));
+        },
+        onError(error, variables, context) {
+          toast.error(t("removeItemCartFail"));
+        },
+      }); // ✅ remove local
+    }
+  };
+
   const handleIncrease = () => {
-    const newQty = item.quantity + 1;
+    const newQty = uiQuantity + 1; // ✅ ĐÚNG
+
+    setUiQuantity(newQty); // ✅ UI update ngay
 
     if (userId && cartServer) {
-      handleUpdateCartItemQuantity(cartServer, newQty);
+      debouncedUpdate(cartServer.id, newQty);
     } else if (localProducts) {
       onUpdateQuantity(localProducts as any, newQty);
     }
   };
 
   const handleDecrease = () => {
-    const newQty = item.quantity - 1;
+    const newQty = uiQuantity - 1; // ✅ ĐÚNG
+
+    if (newQty <= 0) {
+      handleRemove(item.id);
+      return;
+    }
+
+    setUiQuantity(newQty);
 
     // 👉 CART SERVER
     if (userId && cartServer) {
-      handleUpdateCartItemQuantity(cartServer, newQty);
+      debouncedUpdate(cartServer.id, newQty);
       return;
     }
 
@@ -247,7 +292,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
             <Link
               href={`/product/${item.url_key}`}
               locale={locale}
-              className="font-semibold leading-snug text-black"
+              className="font-semibold leading-snug text-black hover:text-secondary transition-all duration-150"
             >
               {item.name}
             </Link>
@@ -289,32 +334,48 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
           <div className="flex items-center gap-3 mt-2">
             <span className="text-sm">Anzahl:</span>
             <QuantityControl
-              quantity={item.quantity}
+              quantity={uiQuantity}
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
-              // stock={item.stock}
-              isLoading={updateCartItemQuantityMutation.isPending}
+              isLoading={false} // ❌ KHÔNG block UI
             />
-            <button
-              className="cursor-pointer group"
-              aria-label="Add to wishlist"
-            >
-              <Heart
-                size={18}
-                className="
+            <div className="space-x-2">
+              <button
+                className="cursor-pointer group"
+                aria-label="Add to wishlist"
+              >
+                <Heart
+                  size={18}
+                  className="
                   transition
                   text-muted-foreground
                   group-hover:text-secondary
                   group-hover:fill-secondary
                 "
-                onClick={() => handleAddToWishlist(item.id)}
-              />
-            </button>
+                  onClick={() => handleAddToWishlist(item.id)}
+                />
+              </button>
+              <button
+                className="cursor-pointer group"
+                aria-label="Add to wishlist"
+              >
+                <Trash
+                  size={18}
+                  className="
+                  transition
+                  text-muted-foreground
+                  group-hover:text-red-600
+                  group-hover:fill-red-600
+                "
+                  onClick={() => handleRemove(item.id)}
+                />
+              </button>
+            </div>
           </div>
           {/* RIGHT */}
           <div className="flex flex-col items-end justify-between">
             {/* PRICE */}
-            <div className="text-lg font-semibold">
+            {/* <div className="text-lg font-semibold">
               {updateCartItemQuantityMutation.isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (
@@ -326,6 +387,13 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
                   €
                 </>
               )}
+            </div> */}
+            <div className="text-lg font-semibold">
+              {(item.price * uiQuantity).toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              €
             </div>
           </div>
         </div>

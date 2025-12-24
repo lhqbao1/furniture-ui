@@ -29,7 +29,6 @@ import {
 import { GetCartColumns } from "./columns";
 import { useTranslations } from "next-intl";
 import { useIsPhone } from "@/hooks/use-is-phone";
-import { useMe } from "@/features/auth/hook";
 
 interface CartTableProps {
   cart?: CartResponse;
@@ -102,7 +101,13 @@ const CartTable = ({
       return;
     }
 
-    if (newQuantity > item.products.stock) {
+    const totalIncomingStock =
+      item.products.inventory?.reduce(
+        (sum, inv) => sum + (inv.incoming_stock ?? 0),
+        0,
+      ) ?? 0;
+
+    if (newQuantity > item.products.stock + totalIncomingStock) {
       toast.error(t("notEnoughStock"));
       return;
     }

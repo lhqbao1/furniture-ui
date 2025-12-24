@@ -268,7 +268,7 @@ export default function RichEditor({
   const extensions = [
     TextStyleKit,
     StarterKit,
-    FixedFont,
+    // FixedFont,
     KeepHtmlPaste,
     Link.configure({
       openOnClick: false,
@@ -299,7 +299,7 @@ export default function RichEditor({
 
   const editor = useEditor({
     extensions: extensions,
-    content: value || "<p></p>",
+    content: value || "<div></div>",
     editable: !disabled,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
@@ -364,9 +364,16 @@ export default function RichEditor({
           disabled={disabled}
           editor={editor}
           className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
-               [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline font-sans
-               [&_*]:font-sans [&_*]:text-inherit [&_*]:bg-transparent
-                "
+              [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline font-sans
+              [&_*]:bg-transparent [&_p]:font-sans
+              [&_span]:font-sans
+              [&_h1]:font-sans
+              [&_h2]:font-sans
+              [&_h3]:font-sans
+              [&_h4]:font-sans
+              [&_h5]:font-sans
+              [&_h6]:font-sans
+              "
         />
       )}
     </div>

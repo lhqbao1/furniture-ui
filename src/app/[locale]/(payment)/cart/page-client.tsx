@@ -7,7 +7,7 @@ import CartLocalTable from "@/components/layout/cart/cart-local-table";
 
 import { CartActions, useCartData } from "@/hooks/cart/useCart";
 import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
+import { authHydratedAtom, userIdAtom } from "@/store/auth";
 import CartItemCard from "@/components/layout/cart/cart-item";
 import { CartItem, CartResponseItem } from "@/types/cart";
 import { useTranslations } from "next-intl";
@@ -15,6 +15,8 @@ import {
   calculateShipping,
   normalizeCartItems,
 } from "@/hooks/caculate-shipping";
+import CartTitleSkeleton from "@/components/layout/cart/skeleton/cart-page-heading-skeleton";
+import CartItemSkeleton from "@/components/layout/cart/skeleton/cart-item-card-skeleton";
 
 function flattenCartItems(carts: CartResponseItem[]): CartItem[] {
   return carts.flatMap((cart) => cart.items);
@@ -23,6 +25,8 @@ function flattenCartItems(carts: CartResponseItem[]): CartItem[] {
 const CartPageClient = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [userId, setUserId] = useAtom(userIdAtom);
+  const [authHydrated] = useAtom(authHydratedAtom);
+
   const t = useTranslations();
   const {
     cart,
@@ -58,60 +62,40 @@ const CartPageClient = () => {
         <div className="grid grid-cols-12 lg:gap-16 gap-6">
           {/* Left: Cart Items */}
           <div className="col-span-12 md:col-span-7">
-            <h3 className="text-3xl font-normal">
-              Warenkorb{" "}
-              <span className="mb-6 capitalize">
-                (
-                {userId ? (
-                  <>
-                    {cart
-                      ? cart.reduce((acc, group) => acc + group.items.length, 0)
-                      : 0}{" "}
-                  </>
-                ) : (
-                  localCart.length
-                )}{" "}
-                <span className="capitablize">{t("items")}</span>)
-              </span>
-            </h3>
+            {/* CART TITLE */}
+            {!authHydrated || (userId && isLoadingCart) ? (
+              <CartTitleSkeleton />
+            ) : (
+              <h3 className="text-3xl font-normal">
+                Warenkorb{" "}
+                <span className="mb-6 capitalize">
+                  (
+                  {userId
+                    ? cart?.reduce((acc, g) => acc + g.items.length, 0) ?? 0
+                    : localCart.length}{" "}
+                  <span className="capitalize">{t("items")}</span>)
+                </span>
+              </h3>
+            )}
+
             <div className="mt-12">
-              {
-                userId
-                  ? flatItems.map((items, index) => {
-                      return (
-                        <CartItemCard
-                          cartServer={items}
-                          key={items.id}
-                        />
-                      );
-                    })
-                  : localCart.map((item, index) => {
-                      return (
-                        <CartItemCard
-                          localProducts={item}
-                          key={item.product_id}
-                        />
-                      );
-                    })
-                // <CartTable
-                //   isLoadingCart={isLoadingCart}
-                //   cart={cart ?? []}
-                //   localQuantities={localQuantities}
-                //   setLocalQuantities={setLocalQuantities}
-                //   isCheckout={false}
-                // />
-                // <CartLocalTable
-                //   data={localCart}
-                //   onToggleItem={(product_id, is_active) =>
-                //     updateStatus({ product_id, is_active })
-                //   }
-                //   onToggleAll={(is_active) => {
-                //     localCart.forEach((item) =>
-                //       updateStatus({ product_id: item.product_id, is_active }),
-                //     );
-                //   }}
-                // />
-              }
+              {!authHydrated || (userId && isLoadingCart) ? (
+                <CartItemSkeleton count={2} />
+              ) : userId ? (
+                flatItems.map((item) => (
+                  <CartItemCard
+                    cartServer={item}
+                    key={item.id}
+                  />
+                ))
+              ) : (
+                localCart.map((item) => (
+                  <CartItemCard
+                    localProducts={item}
+                    key={item.product_id}
+                  />
+                ))
+              )}
             </div>
           </div>
 
@@ -122,6 +106,8 @@ const CartPageClient = () => {
               onCheckout={proceedToCheckout}
               cart={cart}
               shipping={shippingCost}
+              userId={userId ?? ""}
+              authHydrated={authHydrated}
             />
           </div>
         </div>

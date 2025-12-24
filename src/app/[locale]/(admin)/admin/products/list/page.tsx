@@ -50,8 +50,6 @@ const ProductList = () => {
     is_customer: false,
   });
 
-  console.log(exportData);
-
   if (isError) return <div>No data</div>;
 
   return (

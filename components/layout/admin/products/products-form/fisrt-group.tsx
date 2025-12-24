@@ -254,6 +254,7 @@ const ProductDetailInputs = ({
                 ? stock - (result_stock ?? 0)
                 : "";
 
+            console.log(stock);
             return (
               <FormItem className="flex flex-col w-full">
                 <FormLabel className="text-black font-semibold text-sm">
@@ -265,7 +266,7 @@ const ProductDetailInputs = ({
                     type="number"
                     inputMode="decimal"
                     disabled={!isDSP}
-                    value={isDSP ? field.value ?? "" : computedStock}
+                    value={isDSP ? field.value ?? "" : field.value}
                     onChange={
                       isDSP
                         ? (e) =>

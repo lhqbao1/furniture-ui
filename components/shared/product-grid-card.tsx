@@ -61,10 +61,18 @@ export default function ProductCard({
         (item: CartItemLocal) => item.product_id === currentProduct.id,
       );
       const totalQuantity = (existingItem?.quantity || 0) + 1;
-      // if (totalQuantity > currentProduct.stock) {
-      //   toast.error(t("notEnoughStock"));
-      //   return;
-      // }
+
+      const totalIncomingStock =
+        currentProduct.inventory?.reduce(
+          (sum, inv) => sum + (inv.incoming_stock ?? 0),
+          0,
+        ) ?? 0;
+
+      if (totalQuantity > currentProduct.stock + totalIncomingStock) {
+        toast.error(t("notEnoughStock"));
+        return;
+      }
+
       addToCartLocal(
         {
           item: {

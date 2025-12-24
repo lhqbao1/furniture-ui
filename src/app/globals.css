@@ -286,7 +286,7 @@ input[type="number"] {
 
 /* custom class */
 .section-header {
-  @apply text-secondary text-5xl font-bold text-center capitalize;
+  @apply text-secondary text-4xl lg:text-5xl font-bold text-center capitalize;
 }
 
 .react-tel-input .flag-dropdown {
