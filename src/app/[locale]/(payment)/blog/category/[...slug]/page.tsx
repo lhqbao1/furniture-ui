@@ -132,7 +132,10 @@ export default async function BlogCategoryPage({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-20">
             {featured && <FeaturedPost post={featured} />}
 
-            <BlogListClient initialData={listData} />
+            <BlogListClient
+              initialData={listData}
+              productSlug={productDetails?.url_key ?? ""}
+            />
           </div>
 
           {/* SIDEBAR */}
