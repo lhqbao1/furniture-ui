@@ -94,7 +94,7 @@ export default function ProductCard({
             delivery_time: currentProduct.delivery_time
               ? currentProduct.delivery_time
               : "",
-            brand_name: currentProduct.brand.company_name,
+            brand_name: currentProduct.brand.name,
             length: currentProduct.length,
             width: currentProduct.width,
             height: currentProduct.height,

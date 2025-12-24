@@ -16,6 +16,25 @@ interface ComparePriceSectionProps {
 
 const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
   const t = useTranslations();
+
+  const hasMarketplace = product.marketplace_products.length > 0;
+
+  // 🔹 Lấy giá thấp nhất từ marketplace
+  const minMarketplacePrice = hasMarketplace
+    ? Math.min(
+        ...product.marketplace_products
+          .map((item) => item.final_price)
+          .filter((price): price is number => typeof price === "number"),
+      )
+    : null;
+
+  // 🔹 Check product có rẻ nhất không
+  const isProductCheapest =
+    hasMarketplace &&
+    typeof product.final_price === "number" &&
+    minMarketplacePrice !== null &&
+    product.final_price <= minMarketplacePrice;
+
   return (
     <section className="mt-12">
       <Accordion
@@ -28,23 +47,29 @@ const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
           <AccordionTrigger className="md:text-xl text-sm font-medium md:font-bold md:text-gray-600 text-black">
             {t("price_compare")}
           </AccordionTrigger>
-          <AccordionContent className="grid xl:grid-cols-4 grid-cols-2 gap-8 overflow-visible mt-12">
-            {product.marketplace_products.length > 0
-              ? product.marketplace_products.map((item, index) => {
-                  return (
-                    <ComparePriceCard
-                      isMarketplace
-                      product={product}
-                      marketplacePrice={item.final_price}
-                      marketplace={item.marketplace}
-                      key={item.marketplace_offer_id}
-                    />
-                  );
-                })
-              : ""}
 
-            {product.marketplace_products.length > 0 && (
-              <ComparePriceCard product={product} />
+          <AccordionContent className="grid xl:grid-cols-4 grid-cols-2 gap-8 overflow-visible mt-12">
+            {/* Marketplace prices */}
+            {hasMarketplace &&
+              product.marketplace_products.map((item) => (
+                <ComparePriceCard
+                  key={item.marketplace_offer_id}
+                  isMarketplace
+                  product={product}
+                  marketplacePrice={item.final_price}
+                  marketplace={item.marketplace}
+                />
+              ))}
+
+            {/* Product price */}
+            {hasMarketplace && (
+              <ComparePriceCard
+                product={product}
+                className={isProductCheapest ? "border-secondary" : ""}
+                priceClassName={isProductCheapest ? "text-secondary" : ""}
+                isProductCheapest={isProductCheapest}
+                isProduct={true}
+              />
             )}
           </AccordionContent>
         </AccordionItem>

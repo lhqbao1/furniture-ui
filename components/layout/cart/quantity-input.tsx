@@ -26,7 +26,7 @@ QuantityControlProps) => {
 
       <input
         type="number"
-        value={quantity}
+        value={quantity ?? 0}
         readOnly
         className="w-10 text-center border-x focus:outline-none bg-white"
       />

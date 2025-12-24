@@ -74,7 +74,7 @@ export function useAddToCartHandler(productDetails: ProductItem) {
             carrier: productDetails.carrier ?? "amm",
             id_provider: productDetails.id_provider ?? "",
             delivery_time: productDetails.delivery_time ?? "",
-            brand_name: productDetails.brand.company_name,
+            brand_name: productDetails.brand.name,
             length: productDetails.length,
             width: productDetails.width,
             height: productDetails.height,

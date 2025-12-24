@@ -46,7 +46,6 @@ const AssignVoucherToProducts = ({ voucher_id, voucher_code }: AssignProps) => {
   } = useGetVoucherProducts(voucher_id);
 
   const assignMutation = useAssignVoucherToProduct();
-  const removeProductsFromVoucher = useRemoveProductAssignVoucher();
 
   const [search, setSearch] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -167,7 +166,11 @@ const AssignVoucherToProducts = ({ voucher_id, voucher_code }: AssignProps) => {
               >
                 <div className="flex justify-center items-center gap-2">
                   <Image
-                    src={product.static_files[0].url}
+                    src={
+                      product.static_files.length > 0
+                        ? product.static_files[0].url
+                        : ""
+                    }
                     height={50}
                     width={50}
                     alt=""

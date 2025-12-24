@@ -405,5 +405,14 @@
   "brand": "Marke",
   "showMore": "Mehr anzeigen",
   "showLess": "Weniger anzeigen",
-  "price_compare": "Preisvergleich"
+  "price_compare": "Preisvergleich",
+  "best_price": "Bester Preis",
+  "requestOffer": "Angebot anfragen",
+  "requestTitle": "Besseres Angebot anfragen",
+  "contactDesc": "Hinterlassen Sie Ihre E-Mail und Nachricht. Unser Team meldet sich schnellstmöglich.",
+  "sendRequest": "Anfrage senden",
+  "defaultOfferMessage": "Hallo, ich interessiere mich für {product}. Gibt es ein besseres Angebot oder einen Gutschein?",
+  "contactTitle": "Besseres Angebot anfragen",
+  "messageSent": "Anfrage erfolgreich gesendet",
+  "messageSendFail": "Anfrage konnte nicht gesendet werden"
 }

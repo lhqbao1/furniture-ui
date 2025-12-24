@@ -5,30 +5,30 @@ import { useLocale } from "next-intl";
 import React from "react";
 
 interface ProductBrandProps {
-  product: ProductItem;
+  brand: string;
 }
 
-const ProductBrand = ({ product }: ProductBrandProps) => {
+const ProductBrand = ({ brand }: ProductBrandProps) => {
   const router = useRouter();
   const locale = useLocale();
   return (
     <p
       className="uppercase text-sm cursor-pointer text-black/50 font-bold hover:text-secondary"
       onClick={() => {
-        if (!product.brand?.name) return;
+        if (!brand) return;
 
         router.push(
           {
             pathname: "/shop-all",
             query: {
-              brand: product.brand.name,
+              brand: brand,
             },
           },
           { locale },
         );
       }}
     >
-      {product.brand?.name}
+      {brand}
     </p>
   );
 };

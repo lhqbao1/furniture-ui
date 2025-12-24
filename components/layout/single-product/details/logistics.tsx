@@ -225,10 +225,10 @@ const ProductDetailsLogistic = ({
               </>
             )}
 
-            <li className="flex items-start gap-2">
+            {/* <li className="flex items-start gap-2">
               <span className="text-base leading-5">•</span>
               <span className="text-base">Versand aus Deutschland</span>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
