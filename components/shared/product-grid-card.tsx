@@ -29,6 +29,7 @@ interface ProductCardProps {
   className?: string;
   idx: number;
   isSmall?: boolean;
+  isProductDetails?: boolean;
 }
 
 export default function ProductCard({
@@ -36,6 +37,7 @@ export default function ProductCard({
   className,
   idx,
   isSmall,
+  isProductDetails,
 }: ProductCardProps) {
   const cardRefs = useRef<HTMLDivElement[]>([]);
   const t = useTranslations();
@@ -222,7 +224,10 @@ export default function ProductCard({
             </Link>
 
             <div className="space-y-2">
-              <ProductPricingField product={product} />
+              <ProductPricingField
+                product={product}
+                isProductDetails={isProductDetails}
+              />
 
               {product.price && product.price > product.final_price && (
                 <p className="text-base mb-1">

@@ -76,7 +76,10 @@ const ProductDetails = ({
                 </div>
                 <ListStarsReview reviews={reviews} />
 
-                <ProductDetailsPrice productDetails={productDetails} />
+                <ProductDetailsPrice
+                  productDetails={productDetails}
+                  isProductDetails={true}
+                />
 
                 <ProductDetailsLogistic productDetails={productDetails} />
                 <AddToCartField

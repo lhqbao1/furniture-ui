@@ -222,8 +222,6 @@ export default async function Page({
   const plainParent = toPlain(parentProduct);
   const plainBlogs = toPlain(relatedBlogs);
 
-  console.log(plainBlogs);
-
   return (
     <>
       <div className="flex justify-center items-center">

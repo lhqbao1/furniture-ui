@@ -1,3 +1,4 @@
+import { getCountryLabelDE } from "@/components/shared/getCountryNameDe";
 import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -82,13 +83,13 @@ const ProductDetailsProperties = ({
         </div>
         <div className="px-4 space-y-1">
           <div>{product.brand.company_name}</div>
-          <div>{product.brand.company_email}</div>
-          <div>{product.brand.company_phone}</div>
           <div>{product.brand.company_address}</div>
           <div>
-            {product.brand.company_city}, {product.brand.company_postal_code}
+            {product.brand.company_postal_code} {product.brand.company_city}
           </div>
-          <div>{product.brand.company_country}</div>
+          <div>{getCountryLabelDE(product.brand?.company_country)}</div>
+          <div>{product.brand.company_email}</div>
+          <div>{product.brand.company_phone}</div>
         </div>
       </div>
     </div>
