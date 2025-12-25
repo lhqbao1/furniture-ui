@@ -72,7 +72,7 @@ transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
   `}
           style={{
             transformOrigin: `${position.x}% ${position.y}%`,
-            transform: isHover ? "scale(1.5)" : "scale(1)",
+            transform: isHover ? "scale(1.55)" : "scale(1)",
           }}
         />
 
