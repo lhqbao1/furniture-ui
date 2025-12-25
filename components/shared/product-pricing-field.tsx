@@ -102,25 +102,30 @@ const ProductPricingField = ({
         />
       ) : (
         <div className="flex justify-start gap-4 items-end">
-          <div className="text-xl md:text-2xl lg:text-3xl flex font-semibold">
+          <div className="text-sm md:text-2xl lg:text-3xl flex items-end font-semibold pt-1 md:mt-0">
             {priceAfterVoucher.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
-            <div className="text-base font-semibold text-black">€</div>
+            <div className="text-sm md:text-base font-semibold text-black">
+              €
+            </div>
           </div>
-          {product.price && product.price > product.final_price && (
-            <p className="text-xs md:text-base">
-              {!product.owner || product.owner.business_name === "Prestige Home"
-                ? t("ogPrice")
-                : t("ogPriceSupplier")}
-              : €
-              {product.price.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </p>
-          )}
+          {!isProductDetails &&
+            product.price &&
+            product.price > product.final_price && (
+              <p className="text-[10px] md:text-base min-h-0 mb-0.5">
+                {!product.owner ||
+                product.owner.business_name === "Prestige Home"
+                  ? t("ogPrice")
+                  : t("ogPriceSupplier")}
+                : €
+                {product.price.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+            )}
         </div>
       )}
 

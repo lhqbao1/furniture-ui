@@ -103,11 +103,11 @@ const ProductDetailsLogistic = ({
     }
 
     // CASE 3: stock = 0 & không inventory
-    if (!startDate) return null;
+    // if (!startDate) return null;
 
     return {
-      from: addBusinessDays(startDate, deliveryDayRange.min),
-      to: addBusinessDays(startDate, deliveryDayRange.max),
+      from: addBusinessDays(startDate ?? new Date(), deliveryDayRange.min),
+      to: addBusinessDays(startDate ?? new Date(), deliveryDayRange.max),
     };
   }, [deliveryDayRange, productDetails.stock, latestInventory]);
 

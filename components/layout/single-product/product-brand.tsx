@@ -13,7 +13,7 @@ const ProductBrand = ({ brand }: ProductBrandProps) => {
   const locale = useLocale();
   return (
     <p
-      className="uppercase text-sm cursor-pointer text-black/50 font-bold hover:text-secondary"
+      className="uppercase text-xs md:text-sm cursor-pointer text-black/50 font-bold hover:text-secondary"
       onClick={() => {
         if (!brand) return;
 

@@ -241,8 +241,8 @@ export default function ProductCard({
             >
               <h3
                 className={cn(
-                  "text-base md:text-lg text-black text-left line-clamp-2 ",
-                  className ? className : "lg:min-h-[60px] min-h-[48px]",
+                  "text-xs md:text-lg text-black text-left line-clamp-2 ",
+                  className ? className : "lg:min-h-[60px] min-h-[32px]",
                 )}
               >
                 {product.name}
@@ -276,19 +276,19 @@ export default function ProductCard({
           <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
           <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span> */}
         </div>
-        <div className="flex gap-1 items-center mt-3 pb-4">
+        <div className="flex gap-1 items-center mt-0 md:mt-0 lg:mt-0 pb-4">
           <Button
             type="button"
             variant={"ghost"}
             size={"lg"}
             aria-label="Add to cart"
-            className="has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group"
+            className="md:has-[>svg]:px-2.5 lg:has-[>svg]:px-3 has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group h-8 md:h-10 lg:h-12"
             onClick={() => {
               handleAddToCart(product);
               setOpen(true);
             }}
           >
-            <ShoppingBasket className="size-6 text-white transition-transform duration-200 group-hover:scale-110" />
+            <ShoppingBasket className="size-4 md:size-6 text-white transition-transform duration-200 group-hover:scale-110" />
           </Button>
           <div className="md:block hidden">
             <CartDrawer
@@ -301,10 +301,10 @@ export default function ProductCard({
             variant="ghost"
             size="lg"
             aria-label="Add to cart"
-            className="has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200"
+            className="md:has-[>svg]:px-3 has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200 h-8 md:h-10 lg:h-12"
             onClick={() => handleAddToWishlist(product)}
           >
-            <Heart className="size-6 stroke-current transition-colors duration-200" />
+            <Heart className="size-4 md:size-6 stroke-current transition-colors duration-200" />
           </Button>
         </div>
       </div>
