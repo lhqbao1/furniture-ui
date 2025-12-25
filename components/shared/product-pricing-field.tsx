@@ -101,7 +101,7 @@ const ProductPricingField = ({
           }}
         />
       ) : (
-        <div className="flex justify-start gap-4 items-end">
+        <div className="flex lg:flex-row flex-col lg:justify-start lg:gap-4 lg:items-end items-start">
           <div className="text-sm md:text-2xl lg:text-3xl flex items-end font-semibold pt-1 md:mt-0">
             {priceAfterVoucher.toLocaleString("de-DE", {
               minimumFractionDigits: 2,

@@ -94,7 +94,7 @@ export default function ShopAllPage() {
           <ShopAllFilterSection />
         </div>
 
-        <div className="pt-0 pb-12  col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
+        <div className="pt-0 pb-12 lg:w-[90%] md:w-[95%] xl:w-[90%] w-full mx-auto col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
           {isLoading || !data ? (
             <ProductGridSkeleton length={12} />
           ) : (

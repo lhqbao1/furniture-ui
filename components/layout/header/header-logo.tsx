@@ -4,29 +4,38 @@ import React from "react";
 
 const HeaderLogo = () => {
   return (
-    <div className={`flex flex-row gap-2 items-center`}>
-      <Link
-        href={`/`}
-        aria-label="Go to homepage"
-        className="relative lg:w-16 lg:h-16 h-10 w-10 flex"
-      >
-        <Image
-          src="/new-logo.svg"
-          alt="Go to homepage"
-          fill
-          style={{ objectFit: "contain" }}
-        />
-      </Link>
-      <Link href={"/"}>
-        <div
-          className="hidden lg:flex text-[29px] gap-1"
-          translate="no"
+    <>
+      <div className={`flex-row gap-2 items-center flex md:hidden`}>
+        <Link
+          href={`/`}
+          aria-label="Go to homepage"
+          className="relative lg:w-16 lg:h-16 h-10 w-10 flex"
         >
-          <span className="text-secondary font-bold">Prestige</span>
-          <span className="text-primary font-bold">Home</span>
-        </div>
-      </Link>
-    </div>
+          <Image
+            src="/new-logo.svg"
+            alt="Go to homepage"
+            fill
+            style={{ objectFit: "contain" }}
+          />
+        </Link>
+        <Link href={"/"}>
+          <div
+            className="hidden lg:flex text-[29px] gap-1"
+            translate="no"
+          >
+            <span className="text-secondary font-bold">Prestige</span>
+            <span className="text-primary font-bold">Home</span>
+          </div>
+        </Link>
+      </div>
+      <Image
+        src={"/chirsmast-logo.jpg"}
+        height={200}
+        width={200}
+        alt=""
+        className="md:block hidden h-16 w-auto object-cover"
+      />
+    </>
   );
 };
 
