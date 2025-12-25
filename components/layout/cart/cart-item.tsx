@@ -274,6 +274,9 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     );
   };
 
+  console.log(uiQuantity);
+  console.log(item.price);
+
   /* -------------------------------------------------
    * UI
    * -------------------------------------------------*/

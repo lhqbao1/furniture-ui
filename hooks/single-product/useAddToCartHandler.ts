@@ -13,6 +13,8 @@ import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 import { ProductItem } from "@/types/products";
 
+interface AddToCartProps {}
+
 export function useAddToCartHandler(productDetails: ProductItem) {
   const createCartMutation = useAddToCart();
   const addProductToWishlistMutation = useAddToWishList();

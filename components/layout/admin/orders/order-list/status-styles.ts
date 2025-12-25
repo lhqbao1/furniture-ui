@@ -118,6 +118,12 @@ export function getShippingStatusStyle(raw: string) {
   const key = raw.toLowerCase();
 
   switch (key) {
+    case "paid":
+      return {
+        text: "Waiting for shipping",
+        bg: "bg-[#D4EEF9]",
+        color: "text-[#29ABE2]",
+      };
     case "pending":
       return {
         text: "waiting for shipping",

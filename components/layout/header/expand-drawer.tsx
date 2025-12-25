@@ -12,7 +12,10 @@ const ExpandDrawer = () => {
       className="cursor-pointer hover:scale-110 transition-all duration-300"
       stroke="#4D4D4D"
       size={30}
-      onClick={() => setExpandAll(true)}
+      onClick={() => {
+        setExpandAll(true);
+        console.log("hehe");
+      }}
     />
   );
 };

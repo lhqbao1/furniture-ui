@@ -117,7 +117,7 @@ const ProductPricingField = ({
               }}
             />
           ) : (
-            <div className="text-3xl">
+            <div className="text-xl md:text-2xl lg:text-3xl">
               {priceAfterVoucher.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
@@ -127,28 +127,11 @@ const ProductPricingField = ({
           <div className="text-base font-semibold text-black">€</div>
         </div>
         {!isProductDetails && (
-          <p className="font-light text-sm">zzgl. Versandkosten</p>
+          <p className="font-light text-xs md:text-sm">zzgl. Versandkosten</p>
         )}
       </div>
 
       {/* 🎯 VOUCHER */}
-      <div
-        ref={voucherRef}
-        className={cn(
-          "bg-primary/90 rounded-sm text-xs uppercase text-white py-1 px-2.5 whitespace-nowrap w-fit",
-        )}
-      >
-        {matchedVoucher
-          ? matchedVoucher.discount_type === "fixed"
-            ? `${
-                matchedVoucher.code
-              }: €${matchedVoucher.discount_value.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}`
-            : `${matchedVoucher.code}: -${matchedVoucher.discount_value}%`
-          : "Andere Produkte"}
-      </div>
     </div>
   );
 };

@@ -1,4 +1,9 @@
 import { getShippingStatusStyle } from "@/components/layout/admin/orders/order-list/status-styles";
+import {
+  formatDate,
+  formatDateString,
+  formatDateTimeString,
+} from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
 import { CheckOut } from "@/types/checkout";
 import { ColumnDef } from "@tanstack/react-table";
@@ -54,7 +59,15 @@ export function orderDetailItemColumnSupplier(
       header: () => (
         <div className="text-center w-full">Planned Delivery Date</div>
       ),
-      cell: ({ row }) => <div className="text-right"></div>,
+      cell: ({ row }) => (
+        <div className="text-center">
+          {order.shipment ? (
+            formatDateString(order.shipment.shipper_date)
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      ),
     },
 
     {

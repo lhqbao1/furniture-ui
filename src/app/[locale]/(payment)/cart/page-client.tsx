@@ -17,6 +17,9 @@ import {
 } from "@/hooks/caculate-shipping";
 import CartTitleSkeleton from "@/components/layout/cart/skeleton/cart-page-heading-skeleton";
 import CartItemSkeleton from "@/components/layout/cart/skeleton/cart-item-card-skeleton";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "@/src/i18n/navigation";
 
 function flattenCartItems(carts: CartResponseItem[]): CartItem[] {
   return carts.flatMap((cart) => cart.items);
@@ -26,7 +29,7 @@ const CartPageClient = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [userId, setUserId] = useAtom(userIdAtom);
   const [authHydrated] = useAtom(authHydratedAtom);
-
+  const router = useRouter();
   const t = useTranslations();
   const {
     cart,
@@ -58,6 +61,13 @@ const CartPageClient = () => {
 
   return (
     <div className="mt-6 md:pb-0 pb-6 lg:px-0 px-4 container-padding overflow-auto">
+      <Button
+        variant={"outline"}
+        className="mb-2"
+        onClick={() => router.back()}
+      >
+        {t("back")} <ArrowLeft />
+      </Button>
       <div className="w-full lg:max-w-7xl mx-auto lg:p-6">
         <div className="grid grid-cols-12 lg:gap-16 gap-6">
           {/* Left: Cart Items */}
@@ -78,7 +88,7 @@ const CartPageClient = () => {
               </h3>
             )}
 
-            <div className="mt-12">
+            <div className="mt-2 md:mt-8 lg:mt-12">
               {!authHydrated || (userId && isLoadingCart) ? (
                 <CartItemSkeleton count={2} />
               ) : userId ? (

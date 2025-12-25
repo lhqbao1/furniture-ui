@@ -155,7 +155,7 @@ const ComparePriceCard = ({
           <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
             <h3
               className={cn(
-                "text-lg text-black text-left line-clamp-2 lg:min-h-[80px] min-h-[52px]",
+                "md:text-lg text-base text-black text-left line-clamp-2 lg:min-h-[80px] min-h-[48px]",
               )}
             >
               {product.name}
@@ -186,8 +186,8 @@ const ComparePriceCard = ({
                 </div>
               )}
 
-              <div className="flex justify-between items-center">
-                <div className={cn("text-2xl", priceClassName)}>
+              <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center gap-2">
+                <div className={cn("text-xl md:text-2xl", priceClassName)}>
                   {(marketplacePrice
                     ? marketplacePrice
                     : product.final_price

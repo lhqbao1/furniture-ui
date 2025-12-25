@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ProductItem } from "@/types/products";
 import { Heart, ShoppingBasket, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import { usePrevious } from "@uidotdev/usehooks";
 import CountUp from "../CountUp";
 import ProductPricingField from "./product-pricing-field";
 import ProductBrand from "../layout/single-product/product-brand";
+import CartDrawer from "./cart-drawer";
 
 interface ProductCardProps {
   product: ProductItem;
@@ -42,6 +43,7 @@ export default function ProductCard({
   const cardRefs = useRef<HTMLDivElement[]>([]);
   const t = useTranslations();
   const isMobile = useMediaQuery({ maxWidth: 650 });
+  const [open, setOpen] = useState(false);
 
   const router = useRouter();
   const locale = useLocale();
@@ -215,8 +217,8 @@ export default function ProductCard({
             >
               <h3
                 className={cn(
-                  "text-lg text-black text-left line-clamp-2 ",
-                  className ? className : "lg:min-h-[60px] min-h-[52px]",
+                  "text-base md:text-lg text-black text-left line-clamp-2 ",
+                  className ? className : "lg:min-h-[60px] min-h-[48px]",
                 )}
               >
                 {product.name}
@@ -230,7 +232,7 @@ export default function ProductCard({
               />
 
               {product.price && product.price > product.final_price && (
-                <p className="text-base mb-1">
+                <p className="text-sm md:text-base mb-1">
                   {!product.owner ||
                   product.owner.business_name === "Prestige Home"
                     ? t("ogPrice")
@@ -264,17 +266,26 @@ export default function ProductCard({
           <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
           <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
         </div>
-        <div className="space-x-3 mt-3 pb-4 lg:px-4 px-2">
+        <div className="flex gap-1 items-center mt-3 pb-4 lg:px-4 px-2">
           <Button
             type="button"
             variant={"ghost"}
             size={"lg"}
             aria-label="Add to cart"
             className="has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group"
-            onClick={() => handleAddToCart(product)}
+            onClick={() => {
+              handleAddToCart(product);
+              setOpen(true);
+            }}
           >
             <ShoppingBasket className="size-6 text-white transition-transform duration-200 group-hover:scale-110" />
           </Button>
+          <div className="md:block hidden">
+            <CartDrawer
+              open={open}
+              onOpenChange={setOpen}
+            />
+          </div>
           <Button
             type="button"
             variant="ghost"

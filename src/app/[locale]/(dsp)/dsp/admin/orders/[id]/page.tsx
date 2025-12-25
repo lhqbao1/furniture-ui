@@ -1,30 +1,17 @@
 "use client";
 export const ssr = false;
-
-import { orderDetailColumn } from "@/components/layout/admin/orders/order-details/columns";
-import DocumentTable from "@/components/layout/admin/orders/order-details/document/document-table";
-import OrderDeliveryOrder from "@/components/layout/admin/orders/order-details/order-delivery-order";
-import OrderSummary from "@/components/layout/admin/orders/order-details/order-summary";
-import OrderDetailOverView from "@/components/layout/admin/orders/order-details/order-overview";
-import OrderDetailUser from "@/components/layout/admin/orders/order-details/order-customer";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import AdminBackButton from "@/components/layout/admin/admin-back-button";
-import {
-  useGetCheckOutByCheckOutId,
-  useGetMainCheckOutByMainCheckOutId,
-} from "@/features/checkout/hook";
-import { getInvoiceByCheckOut } from "@/features/invoice/api";
-import { calculateVAT } from "@/lib/caculate-vat";
+import { useGetCheckOutByCheckOutId } from "@/features/checkout/hook";
+
 import { formatDate, formatDateTimeString } from "@/lib/date-formated";
-import { CartItem } from "@/types/cart";
-import { CheckOutMain } from "@/types/checkout";
-import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import SupplierOrderDetailsSkeleton from "@/components/layout/dsp/admin/order/order-details/skeleton";
 import OrderOverviewSupplier from "@/components/layout/dsp/admin/order/order-details/order-overview";
 import OrderDetailsShipmentSupplier from "@/components/layout/dsp/admin/order/order-details/order-shipment";
 import { orderDetailItemColumnSupplier } from "@/components/layout/dsp/admin/order/order-details/order-details-items-columns";
+import ShipmentInput from "@/components/layout/dsp/admin/order/order-details/shipment-input";
 
 const SupplierOrderDetails = () => {
   const [page, setPage] = useState(1);
@@ -61,6 +48,12 @@ const SupplierOrderDetails = () => {
         <div className="col-span-8 h-full">
           <OrderDetailsShipmentSupplier order={order} />
         </div>
+
+        {!order.shipment && (
+          <div className="col-span-4">
+            <ShipmentInput checkoutId={order.id} />
+          </div>
+        )}
       </div>
 
       <ProductTable

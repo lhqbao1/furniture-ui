@@ -418,5 +418,7 @@
   "defaultOfferMessage": "Hi, I'm interested in {product}. Is there a better offer or voucher available?",
   "contactTitle": "Request a better offer",
   "messageSent": "Request sent successfully",
-  "messageSendFail": "Failed to send request"
+  "messageSendFail": "Failed to send request",
+  "productPrice": "Product price",
+  "buyNow": "Buy now"
 }

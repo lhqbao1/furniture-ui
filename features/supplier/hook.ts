@@ -1,7 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createSupplier, deleteSupplier, editSupplier, getSupplier } from "./api";
+import {
+  createSupplier,
+  deleteSupplier,
+  editSupplier,
+  getSupplier,
+  sendSupplierTracking,
+  SendTrackingInput,
+} from "./api";
 import { SupplierInput } from "@/types/supplier";
-
+interface SendTrackingVariables {
+  checkoutId: string;
+  payload: SendTrackingInput;
+}
 // --- GET ALL BRANDS ---
 export function useGetSuppliers() {
   return useQuery({
@@ -45,3 +55,9 @@ export function useDeleteSupplier() {
   });
 }
 
+export const useSendSupplierTracking = () => {
+  return useMutation({
+    mutationFn: ({ checkoutId, payload }: SendTrackingVariables) =>
+      sendSupplierTracking(checkoutId, payload),
+  });
+};

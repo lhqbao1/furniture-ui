@@ -18,7 +18,7 @@ import { ShoppingCart, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-export function CartDrawer() {
+export function CartDrawerMobile() {
   const [openCart, setOpenCart] = useState(false);
 
   const t = useTranslations();
@@ -33,6 +33,7 @@ export function CartDrawer() {
   const displayedCart = userId
     ? cart?.reduce((count, group) => count + group.items.length, 0) ?? 0
     : localCart.length;
+
   return (
     <Drawer
       open={openCart}
@@ -57,7 +58,7 @@ export function CartDrawer() {
 
       <DrawerContent className="w-full h-full px-4 flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full data-[vaul-drawer-direction=left]:sm:max-w-full duration-500 overflow-y-scroll">
         <DrawerTitle className="border-b-2 p-4 flex justify-between">
-          <div className="uppercase font-bold text-xl">{t("cart")}</div>
+          {/* <div className="uppercase font-bold text-xl">{t("cart")}</div> */}
           <DrawerClose>
             <X />
           </DrawerClose>
