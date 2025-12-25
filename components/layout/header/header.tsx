@@ -3,7 +3,7 @@ import ProductSearch from "../../shared/product-search";
 
 import MobileProductSearch from "../../shared/mobile-product-search";
 
-import { CartDrawer } from "../cart/cart-drawer";
+import { CartDrawerMobile } from "../cart/cart-drawer";
 import ListCategoriesHome from "../home/list-categories";
 import HeaderLogo from "./header-logo";
 import HeaderCartIcon from "./header-cart-icon";
@@ -29,7 +29,7 @@ const PageHeader = async () => {
           </div>
           {/*Shopping cart */}
           <div className="lg:hidden">
-            <CartDrawer />
+            <CartDrawerMobile />
           </div>
           <div className="hidden lg:block relative">
             <HeaderCartIcon />

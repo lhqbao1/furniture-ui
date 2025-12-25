@@ -28,6 +28,21 @@ export function formatDateTimeString(dateString: any) {
   });
 }
 
+export function formatDateString(dateString: any) {
+  if (!dateString) return "";
+
+  // Nếu backend trả chuỗi không có Z → thêm Z để parse đúng UTC.
+  const normalized = dateString.endsWith("Z") ? dateString : dateString + "Z";
+
+  const date = new Date(normalized);
+
+  return date.toLocaleString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 // utils/date.ts
 export function formatDate(dateString: Date) {
   return new Date(dateString).toLocaleString("en-US", {

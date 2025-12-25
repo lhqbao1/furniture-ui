@@ -414,5 +414,7 @@
   "defaultOfferMessage": "Hallo, ich interessiere mich für {product}. Gibt es ein besseres Angebot oder einen Gutschein?",
   "contactTitle": "Besseres Angebot anfragen",
   "messageSent": "Anfrage erfolgreich gesendet",
-  "messageSendFail": "Anfrage konnte nicht gesendet werden"
+  "messageSendFail": "Anfrage konnte nicht gesendet werden",
+  "productPrice": "Produktpreis",
+  "buyNow": "Jetzt kaufen"
 }

@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCategoryBySlug } from "@/features/category/api";
 import ProductCategory from "@/components/layout/category/category-page";
+import { getCategoryCached } from "@/features/category/api-server";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
 }
 export const revalidate = 3600;
+export const dynamic = "force-static";
 
 export async function generateMetadata({
   params,
@@ -16,7 +18,7 @@ export async function generateMetadata({
   const lastSlug = slugArray[slugArray.length - 1];
 
   try {
-    const category = await getCategoryBySlug(lastSlug);
+    const category = await getCategoryCached(lastSlug);
 
     if (!category) throw new Error("Not found");
 
@@ -133,7 +135,7 @@ export default async function Page({ params }: PageProps) {
     : [resolvedParams.slug];
   const lastSlug = slugArray[slugArray.length - 1];
 
-  const category = await getCategoryBySlug(lastSlug).catch(() => null);
+  const category = await getCategoryCached(lastSlug);
   if (!category) return notFound();
 
   return (

@@ -67,7 +67,7 @@ const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
                 hasLoading
               />
             ) : (
-              <div className="grid xl:grid-cols-4 grid-cols-2 gap-8 w-full">
+              <div className="grid xl:grid-cols-4 grid-cols-2 gap-y-12 gap-x-4 md:gap-x-8 md:gap-y-8 w-full">
                 {/* Marketplace prices */}
                 {hasMarketplace &&
                   product.marketplace_products.map((item) => (

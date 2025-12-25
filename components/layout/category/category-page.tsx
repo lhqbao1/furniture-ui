@@ -31,7 +31,6 @@ const ProductCategory = ({
   const [currentCategoryName, setCurrentCategoryName] = useAtom(
     currentCategoryNameAtom,
   );
-
   const { data: categoryData, isFetching } = useQuery({
     queryKey: ["category", categorySlugs, page, pageSize],
     queryFn: () =>
@@ -39,7 +38,12 @@ const ProductCategory = ({
         page,
         page_size: pageSize,
       }),
-    initialData: category,
+
+    // ✅ giữ data cũ khi refetch
+    placeholderData: (prev) => prev,
+
+    // ❌ tắt refetch khi focus
+    refetchOnWindowFocus: false,
   });
 
   return (
@@ -50,30 +54,14 @@ const ProductCategory = ({
         <p className="text-center text-xl font-bold mt-2">
           {category?.products.length === 0 ? t("emptyCategory") : ""}
         </p>
-        {!categoryData || isFetching ? (
+        {!categoryData && isFetching ? (
           <ProductGridSkeleton length={12} />
         ) : (
           <div className="filter-section">
-            {/* {
-                            categoryData.products.length > 0 &&
-                            <Collapsible>
-                                <CollapsibleTrigger asChild>
-                                    <div className='flex justify-end cursor-pointer mb-2 lg:mr-30'>
-                                        <div className='rounded-full border-primary border w-fit flex gap-1 items-center px-2 py-1'>
-                                            <SlidersHorizontal className='text-primary' />
-                                            <p className='text-lg'>Filter</p>
-                                        </div>
-                                    </div>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent>
-                                    <FilterSection />
-                                </CollapsibleContent>
-                            </Collapsible>
-                        } */}
             <div className="pt-10 pb-12">
               <ProductsGridLayout
                 hasBadge
-                data={categoryData.products}
+                data={categoryData?.products ?? []}
               />
             </div>
           </div>

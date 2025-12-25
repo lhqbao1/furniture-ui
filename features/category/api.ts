@@ -7,6 +7,7 @@ import {
   CategoryResponse,
 } from "@/types/categories";
 import { ProductItem } from "@/types/products";
+import { cache } from "react";
 
 export interface GetCategoryParams {
   product_name?: string;
