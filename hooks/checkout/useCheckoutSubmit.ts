@@ -224,8 +224,8 @@ export function useCheckoutSubmit({
             phone_number: data.shipping_phone_number ?? "",
             address_line: data.shipping_address_line,
             additional_address_line: data.shipping_address_additional,
-            city: data.shipping_country,
-            country: data.shipping_city,
+            city: data.shipping_city,
+            country: data.shipping_country,
             is_default: true,
           });
           shippingId = created.id;

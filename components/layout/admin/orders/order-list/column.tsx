@@ -203,19 +203,20 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       return (
         <div>
           <div>
-            {row.original.checkouts[0].user.company_name ? (
-              row.original.checkouts[0].user.company_name
+            {row.original.checkouts[0]?.user &&
+            row.original.checkouts[0]?.user.company_name ? (
+              row.original.checkouts[0]?.user.company_name
             ) : (
               <div>
                 {row.original.from_marketplace === "ebay"
-                  ? row.original.checkouts[0].shipping_address.recipient_name
-                  : row.original.checkouts[0].invoice_address.recipient_name ??
+                  ? row.original.checkouts[0]?.shipping_address.recipient_name
+                  : row.original.checkouts[0]?.invoice_address.recipient_name ??
                     ""}
               </div>
             )}
           </div>
           <div>
-            {row.original.checkouts[0].user.is_real ? (
+            {row.original.checkouts[0]?.user.is_real ? (
               <div>{row.original.checkouts[0]?.user?.email ?? ""}</div>
             ) : (
               <>

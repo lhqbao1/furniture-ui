@@ -224,19 +224,6 @@ const ComparePriceCard = ({
           <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
           <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
         </div>
-        {/* {isMarketplace && (
-          <div className="space-x-3 mt-3 pb-4 lg:px-4 px-2">
-            <Button
-              type="button"
-              variant={"ghost"}
-              size={"lg"}
-              aria-label="Add to cart"
-              className="has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group"
-            >
-              <Eye className="size-6 text-white transition-transform duration-200 group-hover:scale-110" />
-            </Button>
-          </div>
-        )} */}
       </div>
 
       {isMarketplace ? (

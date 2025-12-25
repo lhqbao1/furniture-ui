@@ -14,7 +14,7 @@ import { getCategoriesWithChildren } from "@/features/category/api";
 const PageHeader = async () => {
   const categories = await getCategoriesWithChildren();
   return (
-    <header className="home-banner-top__content sticky top-0 overflow-hidden z-50 bg-white shadow-secondary/10 shadow-xl">
+    <header className="home-banner-top__content sticky top-0 z-50 bg-white shadow-secondary/10 shadow-xl">
       <div className=" flex flex-row gap-4 w-full py-4 items-center px-4 lg:flex lg:items-center lg:justify-end lg:px-20 lg:py-3 lg:gap-6 border-b">
         <HeaderLogo />
         {/*Product search desktop */}
