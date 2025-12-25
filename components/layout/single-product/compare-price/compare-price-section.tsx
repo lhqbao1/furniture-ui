@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -9,6 +9,7 @@ import {
 import { ProductItem } from "@/types/products";
 import ComparePriceCard from "./compare-price-card";
 import { useTranslations } from "next-intl";
+import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 
 interface ComparePriceSectionProps {
   product: ProductItem;
@@ -16,8 +17,18 @@ interface ComparePriceSectionProps {
 
 const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
   const t = useTranslations();
+  const [showContent, setShowContent] = useState(false);
 
   const hasMarketplace = product.marketplace_products.length > 0;
+
+  // 🔹 Delay render 1.5s
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowContent(true);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // 🔹 Lấy giá thấp nhất từ marketplace
   const minMarketplacePrice = hasMarketplace
@@ -48,28 +59,38 @@ const ComparePriceSection = ({ product }: ComparePriceSectionProps) => {
             {t("price_compare")}
           </AccordionTrigger>
 
-          <AccordionContent className="grid xl:grid-cols-4 grid-cols-2 gap-8 overflow-visible mt-12">
-            {/* Marketplace prices */}
-            {hasMarketplace &&
-              product.marketplace_products.map((item) => (
-                <ComparePriceCard
-                  key={item.marketplace_offer_id}
-                  isMarketplace
-                  product={product}
-                  marketplacePrice={item.final_price}
-                  marketplace={item.marketplace}
-                />
-              ))}
-
-            {/* Product price */}
-            {hasMarketplace && (
-              <ComparePriceCard
-                product={product}
-                className={isProductCheapest ? "border-secondary" : ""}
-                priceClassName={isProductCheapest ? "text-secondary" : ""}
-                isProductCheapest={isProductCheapest}
-                isProduct={true}
+          <AccordionContent className="mt-12">
+            {!showContent ? (
+              // ✅ Skeleton fallback
+              <ProductGridSkeleton
+                length={4}
+                hasLoading
               />
+            ) : (
+              <div className="grid xl:grid-cols-4 grid-cols-2 gap-8 w-full">
+                {/* Marketplace prices */}
+                {hasMarketplace &&
+                  product.marketplace_products.map((item) => (
+                    <ComparePriceCard
+                      key={item.marketplace_offer_id}
+                      isMarketplace
+                      product={product}
+                      marketplacePrice={item.final_price}
+                      marketplace={item.marketplace}
+                    />
+                  ))}
+
+                {/* Product price */}
+                {hasMarketplace && (
+                  <ComparePriceCard
+                    product={product}
+                    className={isProductCheapest ? "border-secondary" : ""}
+                    priceClassName={isProductCheapest ? "text-secondary" : ""}
+                    isProductCheapest={isProductCheapest}
+                    isProduct
+                  />
+                )}
+              </div>
             )}
           </AccordionContent>
         </AccordionItem>

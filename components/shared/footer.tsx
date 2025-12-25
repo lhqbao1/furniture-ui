@@ -124,6 +124,9 @@ const Footer = () => {
           <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/impressum`}>{t("imprint")}</Link>
           </li>
+          <li className="hover:pl-2 transition-all duration-500">
+            <Link href={`/blog`}>Blog</Link>
+          </li>
         </ul>
         <div className="lg:mt-4 flex flex-col gap-2 mt-2">
           <a

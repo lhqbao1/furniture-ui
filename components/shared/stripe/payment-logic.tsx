@@ -552,7 +552,7 @@ export default function CheckoutPaymentLogic({
     const pr = stripe.paymentRequest({
       country: "DE",
       currency,
-      total: { label: "Econelo", amount: total },
+      total: { label: "Prestige Home", amount: total },
       requestPayerEmail: true,
       requestPayerName: true,
     });
@@ -562,10 +562,17 @@ export default function CheckoutPaymentLogic({
     // gán vào ref
     paymentRequestRef.current = pr;
 
+    console.log(pr);
+
     // CHECK SUPPORT
     pr.canMakePayment().then((res) => {
-      if (res) setPaymentRequest(pr);
-      else {
+      console.log("canMakePayment result:", res);
+
+      if (res && (res.applePay || res.googlePay || res.browser)) {
+        setPaymentRequest(pr);
+        console.log("support");
+      } else {
+        console.log("no support");
         setPaymentRequest(null);
       }
     });

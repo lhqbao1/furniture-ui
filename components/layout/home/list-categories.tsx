@@ -1,14 +1,23 @@
 "use client";
+
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@/components/ui/navigation-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currentCategoryIdAtom } from "@/store/category";
+import { categoryClickedAtom } from "@/store/categories-drawer";
 import { CategoryResponse } from "@/types/categories";
 import { useAtom } from "jotai";
-import React from "react";
+import { useLocale } from "next-intl";
+import { useRouter } from "@/src/i18n/navigation";
 import { useMediaQuery } from "react-responsive";
 import CategoriesDrawer from "../header/categories-drawer";
-import { categoryClickedAtom } from "@/store/categories-drawer";
-import { useRouter } from "@/src/i18n/navigation";
-import { useLocale } from "next-intl";
 
 interface ListCategoriesHomeProps {
   categories: CategoryResponse[];
@@ -18,57 +27,74 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const router = useRouter();
   const locale = useLocale();
-  const [currentCategoryId, setCurrentCategoryId] = useAtom(
-    currentCategoryIdAtom,
-  );
-  const [categoryClicked, setCategoryClicked] = useAtom(categoryClickedAtom);
+
+  const [, setCurrentCategoryId] = useAtom(currentCategoryIdAtom);
+  const [, setCategoryClicked] = useAtom(categoryClickedAtom);
+
+  if (isMobile) {
+    return <CategoriesDrawer categories={categories} />;
+  }
 
   return (
-    <>
-      {/* Drawer */}
-      <CategoriesDrawer categories={categories} />
+    <div className="w-full flex justify-center py-6 relative">
+      {!categories || categories.length === 0 ? (
+        <div className="flex gap-6 flex-wrap">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton
+              key={i}
+              className="h-6 w-20 rounded-md"
+            />
+          ))}
+        </div>
+      ) : (
+        <NavigationMenu viewport={isMobile}>
+          <NavigationMenuList className="gap-6">
+            {categories.map((category) => (
+              <NavigationMenuItem key={category.id}>
+                <NavigationMenuTrigger
+                  className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer"
+                  onClick={() => {
+                    setCurrentCategoryId(category.id);
+                    setCategoryClicked(true);
+                  }}
+                >
+                  {category.name}
+                </NavigationMenuTrigger>
 
-      <div className="w-full flex justify-start py-6">
-        {!categories || categories.length === 0 ? (
-          <div className="flex items-center justify-start gap-6 flex-wrap">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton
-                key={i}
-                className="h-6 w-20 rounded-md"
-              />
+                {category.children?.length > 0 && (
+                  <NavigationMenuContent className="rounded-sm border-none ring-0">
+                    <div className="min-w-[200px]">
+                      {category.children.map((child) => (
+                        <NavigationMenuLink
+                          key={child.id}
+                          onClick={() => {
+                            setCurrentCategoryId(child.id);
+                            setCategoryClicked(true);
+                            router.push(`/category/${child.slug}`, { locale });
+                          }}
+                          className="
+                          relative cursor-pointer px-2 py-2 text-sm
+                          after:content-['']
+                          after:absolute after:left-0 after:bottom-0
+                          after:h-[2px] after:w-full
+                          after:origin-left after:scale-x-0
+                          after:bg-secondary
+                          after:transition-transform after:duration-300 after:ease-out
+                          hover:after:scale-x-100 hover:bg-transparent w-fit
+                        "
+                        >
+                          {child.name}
+                        </NavigationMenuLink>
+                      ))}
+                    </div>
+                  </NavigationMenuContent>
+                )}
+              </NavigationMenuItem>
             ))}
-          </div>
-        ) : (
-          <div className="flex items-center justify-start gap-6 flex-wrap">
-            {categories.map((item) => (
-              <div
-                key={item.id}
-                className="cursor-pointer font-medium text-lg relative 
-                after:content-[''] after:absolute after:left-0 after:-bottom-1 
-                after:h-[2px] after:w-0 after:bg-black after:transition-all 
-                after:duration-300 hover:after:w-full"
-                // onClick
-                onClick={() => {
-                  setCurrentCategoryId(item.id);
-                  setCategoryClicked(true); // đánh dấu là user click
-                }}
-              >
-                {item.name}
-              </div>
-            ))}
-            <div
-              className="cursor-pointer font-medium text-lg relative 
-                after:content-[''] after:absolute after:left-0 after:-bottom-1 
-                after:h-[2px] after:w-0 after:bg-black after:transition-all 
-                after:duration-300 hover:after:w-full"
-              onClick={() => router.push("/blog", { locale })}
-            >
-              Blog
-            </div>
-          </div>
-        )}
-      </div>
-    </>
+          </NavigationMenuList>
+        </NavigationMenu>
+      )}
+    </div>
   );
 };
 

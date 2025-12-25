@@ -115,7 +115,7 @@ export default function RequestOfferDialog({
         <Button
           className="rounded-md lg:px-4 mr-1 text-sm"
           type="button"
-          variant="outline"
+          // variant="outline"
         >
           {t("requestOffer")}
         </Button>
@@ -155,6 +155,7 @@ export default function RequestOfferDialog({
           <Button
             className="w-full"
             onClick={handleSubmit}
+            // variant={"secondary"}
             disabled={!!emailError || !email || sendContactMutation.isPending}
           >
             {t("send")}

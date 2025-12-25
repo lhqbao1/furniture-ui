@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { ProductItem } from "@/types/products";
+import { Loader2 } from "lucide-react";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -118,10 +119,15 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
 
   return (
     <Button
-      variant={"ghost"}
+      variant={"outline"}
       onClick={handleExport}
+      disabled={!data || data.length === 0}
     >
-      Export Excel
+      {data.length === 0 ? (
+        <Loader2 className="animate-spin" />
+      ) : (
+        " Export Excel"
+      )}
     </Button>
   );
 }
