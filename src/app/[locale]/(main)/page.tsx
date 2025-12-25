@@ -26,32 +26,34 @@ export default async function HomePage() {
   return (
     <div
       id="home"
-      className="w-full min-h-[200vh]"
+      className="w-full min-h-[200vh] flex flex-col items-center"
     >
-      {/* CRITICAL FIRST PAINT */}
-      <FeaturedProducts products={allProducts.items} />
-
-      {/* <VoucherSection vouchers={voucherList} /> */}
-      <Suspense fallback={<ProductGridSkeleton length={4} />}>
-        <RecentViewed products={trendingProducts} />
-      </Suspense>
-      <Suspense fallback={<ProductGridSkeleton length={4} />}>
+      <div className="md:w-[95%] xl:w-3/4 w-[95%]">
         {" "}
-        <NewsletterVoucherSection />
-      </Suspense>
-      <Suspense fallback={<ProductGridSkeleton length={4} />}>
-        {" "}
-        <CategorySection slug="sofas" />
-      </Suspense>
-      <Suspense fallback={<ProductGridSkeleton length={4} />}>
-        <CategorySection slug="matratzen" />
-      </Suspense>
-      <Suspense fallback={<ProductGridSkeleton length={4} />}>
-        <CategorySection slug="gartenmoebel" />
-      </Suspense>
-      <Suspense fallback={<ProductGridSkeleton length={4} />}>
-        <CategorySection slug="zaeune-sichtschutz" />
-      </Suspense>
+        {/* CRITICAL FIRST PAINT */}
+        <FeaturedProducts products={allProducts.items} />
+        {/* <VoucherSection vouchers={voucherList} /> */}
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          <RecentViewed products={trendingProducts} />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          {" "}
+          <NewsletterVoucherSection />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          {" "}
+          <CategorySection slug="sofas" />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          <CategorySection slug="matratzen" />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          <CategorySection slug="gartenmoebel" />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          <CategorySection slug="zaeune-sichtschutz" />
+        </Suspense>
+      </div>
 
       {/* <AnimatedCarousel /> */}
 

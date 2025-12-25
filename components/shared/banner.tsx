@@ -35,8 +35,8 @@ const Banner = ({ height = 600, isHome = false }: BannerProps) => {
 
   return (
     <div
-      className="relative w-full flex-shrink-0 z-0 hidden lg:block"
-      style={{ height }}
+      className="relative w-full flex-shrink-0 z-0 h-[200px] lg:h-[300px] 2xl:h-[600px] block"
+      // style={{ height }}
     >
       {/* Background image */}
       <Image

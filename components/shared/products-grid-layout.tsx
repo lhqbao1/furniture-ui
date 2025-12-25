@@ -19,7 +19,7 @@ const ProductsGridLayout = ({
   isProductDetails,
 }: ProductsGridLayoutProps) => {
   return (
-    <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-0 sm:gap-0 sm:mt-6 mt-4">
+    <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 sm:mt-6 mt-4 gap-8">
       {data
         // .filter((p) => p.stock > 0)
         .map((product, idx) => {

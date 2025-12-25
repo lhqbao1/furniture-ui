@@ -51,14 +51,19 @@ const ProductCategory = ({
       <CustomBreadCrumb currentPage={category?.name ?? ""} />
       <div className="">
         <h2 className="section-header">{category?.name}</h2>
-        <p className="text-center text-xl font-bold mt-2">
-          {category?.products.length === 0 ? t("emptyCategory") : ""}
-        </p>
+        {category?.products.length === 0 ? (
+          <p className="text-center text-xl font-bold mt-2">
+            {t("emptyCategory")}
+          </p>
+        ) : (
+          ""
+        )}
+
         {!categoryData && isFetching ? (
           <ProductGridSkeleton length={12} />
         ) : (
           <div className="filter-section">
-            <div className="pt-10 pb-12">
+            <div className="pt-2 md:pt-6 lg:pt-10 pb-12">
               <ProductsGridLayout
                 hasBadge
                 data={categoryData?.products ?? []}
