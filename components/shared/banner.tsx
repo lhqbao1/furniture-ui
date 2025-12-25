@@ -10,7 +10,7 @@ interface BannerProps {
   isHome?: boolean;
 }
 
-const Banner = ({ height = 600, isHome = false }: BannerProps) => {
+const Banner = ({ height, isHome = false }: BannerProps) => {
   const [isSticky, setIsSticky] = useState(false);
   const t = useTranslations();
   const router = useRouter();
@@ -18,7 +18,7 @@ const Banner = ({ height = 600, isHome = false }: BannerProps) => {
 
   useEffect(() => {
     let last = 0;
-    const threshold = height;
+    const threshold = height ?? 0;
 
     const handleScroll = () => {
       const now = performance.now();
