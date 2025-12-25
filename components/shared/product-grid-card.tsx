@@ -171,14 +171,16 @@ export default function ProductCard({
           if (el) cardRefs.current[idx] = el;
         }}
         onClick={() => handleAddProductToViewed(product.id)}
-        style={{
-          borderTop: isMobile ? undefined : idx < 4 ? "" : "1px solid #e0e0e0",
-          borderRight: isMobile
-            ? undefined
-            : idx === 3 || idx === 7
-            ? ""
-            : "1px solid #e0e0e0",
-        }}
+        style={
+          {
+            // borderTop: isMobile ? undefined : idx < 4 ? "" : "1px solid #e0e0e0",
+            // borderRight: isMobile
+            //   ? undefined
+            //   : idx === 3 || idx === 7
+            //   ? ""
+            //   : "1px solid #e0e0e0",
+          }
+        }
       >
         {/* <Link
           href={`/product/${product.url_key}`}
@@ -187,27 +189,49 @@ export default function ProductCard({
         >
         
         </Link> */}
-        <div className="bg-white p-0 group z-0 pt-4 lg:px-4 px-2">
+        <div className="bg-white p-0 group z-0">
           <Link
             href={`/product/${product.url_key}`}
             locale={locale}
             passHref
             className="cursor-pointer"
           >
-            <Image
-              width={200}
-              height={200}
-              src={
-                product.static_files && product.static_files.length > 0
-                  ? product.static_files[0].url
-                  : "/placeholder-product.webp"
-              }
-              alt={product.name}
-              className="w-full h-48 md:h-64 py-0 md:py-2 object-contain mb-2 rounded group-hover:scale-120 duration-500"
-            />
+            <div className="relative w-full h-52 md:h-72 mb-2 overflow-hidden rounded group">
+              {/* Image 1 */}
+              <Image
+                src={
+                  product.static_files?.[0]?.url || "/placeholder-product.webp"
+                }
+                alt={product.name}
+                fill
+                className="
+      object-fill
+      transition-all duration-500 ease-in-out
+      group-hover:-translate-x-6
+      group-hover:opacity-0
+    "
+              />
+
+              {/* Image 2 */}
+              {product.static_files?.[1]?.url && (
+                <Image
+                  src={product.static_files[1].url}
+                  alt={product.name}
+                  fill
+                  className="
+        object-fill
+        absolute inset-0
+        translate-x-6 opacity-0
+        transition-all duration-500 ease-in-out
+        group-hover:translate-x-0
+        group-hover:opacity-100
+      "
+                />
+              )}
+            </div>
           </Link>
 
-          <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-1">
+          <div className="product-details py-2 mt-0 md:mt-4 xl:mt-4 flex flex-col gap-1">
             <ProductBrand brand={product.brand.name} />
             <Link
               href={`/product/${product.url_key}`}
@@ -217,33 +241,19 @@ export default function ProductCard({
             >
               <h3
                 className={cn(
-                  "text-base md:text-lg text-black text-left line-clamp-2 ",
-                  className ? className : "lg:min-h-[60px] min-h-[48px]",
+                  "text-xs md:text-lg text-black text-left line-clamp-2 ",
+                  className ? className : "lg:min-h-[60px] min-h-[32px]",
                 )}
               >
                 {product.name}
               </h3>
             </Link>
 
-            <div className="space-y-2">
+            <>
               <ProductPricingField
                 product={product}
                 isProductDetails={isProductDetails}
               />
-
-              {product.price && product.price > product.final_price && (
-                <p className="text-sm md:text-base mb-1">
-                  {!product.owner ||
-                  product.owner.business_name === "Prestige Home"
-                    ? t("ogPrice")
-                    : t("ogPriceSupplier")}
-                  : €
-                  {product.price.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              )}
 
               {/* <div className="space-x-2 flex items-center">
                 <div className="flex gap-0.5">
@@ -257,28 +267,28 @@ export default function ProductCard({
                 </div>
                 <p className="text-base font-semibold">(0)</p>
               </div> */}
-            </div>
+            </>
           </div>
 
           {/* Four lines starting from center of each edge */}
-          <span className="absolute bottom-0 left-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>
+          {/* <span className="absolute bottom-0 left-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300 group-hover:scale-x-100"></span>
           <span className="absolute top-0 left-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
           <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
-          <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
+          <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span> */}
         </div>
-        <div className="flex gap-1 items-center mt-3 pb-4 lg:px-4 px-2">
+        <div className="flex gap-1 items-center mt-0 md:mt-0 lg:mt-0 pb-4">
           <Button
             type="button"
             variant={"ghost"}
             size={"lg"}
             aria-label="Add to cart"
-            className="has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group"
+            className="md:has-[>svg]:px-2.5 lg:has-[>svg]:px-3 has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group h-8 md:h-10 lg:h-12"
             onClick={() => {
               handleAddToCart(product);
               setOpen(true);
             }}
           >
-            <ShoppingBasket className="size-6 text-white transition-transform duration-200 group-hover:scale-110" />
+            <ShoppingBasket className="size-4 md:size-6 text-white transition-transform duration-200 group-hover:scale-110" />
           </Button>
           <div className="md:block hidden">
             <CartDrawer
@@ -291,10 +301,10 @@ export default function ProductCard({
             variant="ghost"
             size="lg"
             aria-label="Add to cart"
-            className="has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200"
+            className="md:has-[>svg]:px-3 has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200 h-8 md:h-10 lg:h-12"
             onClick={() => handleAddToWishlist(product)}
           >
-            <Heart className="size-6 stroke-current transition-colors duration-200" />
+            <Heart className="size-4 md:size-6 stroke-current transition-colors duration-200" />
           </Button>
         </div>
       </div>

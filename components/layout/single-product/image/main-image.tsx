@@ -1,14 +1,11 @@
 // sections/MainImage.tsx
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import ProductImageDialog from "../main-image-dialog";
 import { ProductItem } from "@/types/products";
-import { useImageZoom } from "@/hooks/single-product/useImageZoom";
 import { useSwipeImage } from "@/hooks/single-product/useSwipeImage";
-// ---- CHANGE NOTE ----
-// vẫn reuse dialog gốc của bạn (không thay đổi logic hoặc file name)
 
 interface MainImageProps {
   productDetails: ProductItem;
@@ -29,7 +26,19 @@ export default function MainImage({
   setIsHover,
   handleZoomImage,
 }: MainImageProps) {
-  const handlers = useSwipeImage(productDetails, setMainImageIndex);
+  const [direction, setDirection] = useState<"left" | "right" | null>(null);
+
+  const handlers = useSwipeImage(
+    productDetails,
+    setMainImageIndex,
+    setDirection,
+  );
+
+  useEffect(() => {
+    if (!direction) return;
+    const timeout = setTimeout(() => setDirection(null), 300);
+    return () => clearTimeout(timeout);
+  }, [direction]);
 
   const mainFile =
     productDetails.static_files?.length > 0
@@ -55,7 +64,12 @@ export default function MainImage({
           height={300}
           alt={productDetails.name}
           priority
-          className="transition-transform duration-300 lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer rounded-xs"
+          className={`
+transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
+    lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer rounded-xs
+    ${direction === "left" ? "opacity-0 -translate-x-6" : ""}
+    ${direction === "right" ? "opacity-0 translate-x-6" : ""}
+  `}
           style={{
             transformOrigin: `${position.x}% ${position.y}%`,
             transform: isHover ? "scale(1.5)" : "scale(1)",

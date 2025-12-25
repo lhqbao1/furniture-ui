@@ -24,6 +24,7 @@ import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
 import { Input } from "@/components/ui/input";
 import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
+import { getTotalIncomingStock } from "@/lib/calculate-inventory";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -99,14 +100,29 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             </div>
 
             <div className="flex gap-1 lg:basis-2/5 basis-3/5 relative">
-              <Button
-                className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
-                type="submit"
-                // disabled={productDetails.stock > 0 ? false : true}
-              >
-                {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
-                {t("addToCart")}
-              </Button>
+              {productDetails.stock > 0 ||
+              (productDetails.stock === 0 &&
+                getTotalIncomingStock(productDetails.inventory) > 0) ? (
+                <Button
+                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
+                  type="submit"
+
+                  // disabled={productDetails.stock > 0 ? false : true}
+                >
+                  {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
+                  {t("addToCart")}
+                </Button>
+              ) : (
+                <Button
+                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] bg-gray-500 text-white cursor-not-allowed"
+                  type="submit"
+                  disabled
+                  // disabled={productDetails.stock > 0 ? false : true}
+                >
+                  {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
+                  {t("addToCart")}
+                </Button>
+              )}
 
               <div
                 onClick={(e) => {

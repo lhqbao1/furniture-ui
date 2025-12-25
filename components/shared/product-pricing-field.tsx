@@ -7,6 +7,7 @@ import CountUp from "../CountUp";
 import { usePrevious } from "@uidotdev/usehooks";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
+import { useTranslations } from "next-intl";
 
 interface ProductPricingFieldProps {
   product: ProductItem;
@@ -19,7 +20,7 @@ const ProductPricingField = ({
 }: ProductPricingFieldProps) => {
   const [currentVoucher] = useAtom(currentVoucherAtom);
   const [lastVoucher, setLastVoucher] = useAtom(lastVoucherAtom);
-
+  const t = useTranslations();
   const voucherRef = useRef<HTMLDivElement | null>(null);
   // ✅ check voucher match
   const matchedVoucher = product.vouchers?.find((v) => v.id === currentVoucher);
@@ -85,54 +86,53 @@ const ProductPricingField = ({
   }, [matchedVoucher]);
 
   return (
-    <div className="flex md:flex-row flex-col-reverse gap-2 md:items-end justify-start">
-      <div className="">
-        {/* <div className="text-4xl">
-                        {Math.floor(priceAfterVoucher ? priceAfterVoucher : 0)}
-                      </div>
-                      <div className="text-base font-bold text-gray-700 absolute top-0 right-2.5">
-                        ,
-                        {
-                          (
-                            (priceAfterVoucher
-                              ? priceAfterVoucher
-                              : product.price) % 1
-                          )
-                            .toFixed(2)
-                            .split(".")[1]
-                        }
-                      </div> */}
-        <div className="inline-flex items-end justify-start w-fit gap-2 font-bold text-gray-900 relative">
-          {shouldAnimate ? (
-            <CountUp
-              from={prevPrice}
-              to={priceAfterVoucher}
-              duration={0.8}
-              className="text-3xl"
-              startWhen={shouldAnimate}
-              onEnd={() => {
-                if (matchedVoucher) {
-                  setLastVoucher(matchedVoucher.id);
-                }
-              }}
-            />
-          ) : (
-            <div className="text-xl md:text-2xl lg:text-3xl">
-              {priceAfterVoucher.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+    <>
+      {shouldAnimate ? (
+        <CountUp
+          from={prevPrice}
+          to={priceAfterVoucher}
+          duration={0.8}
+          className="text-3xl"
+          startWhen={shouldAnimate}
+          onEnd={() => {
+            if (matchedVoucher) {
+              setLastVoucher(matchedVoucher.id);
+            }
+          }}
+        />
+      ) : (
+        <div className="flex justify-start gap-4 items-end">
+          <div className="text-sm md:text-2xl lg:text-3xl flex items-end font-semibold pt-1 md:mt-0">
+            {priceAfterVoucher.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+            <div className="text-sm md:text-base font-semibold text-black">
+              €
             </div>
-          )}
-          <div className="text-base font-semibold text-black">€</div>
+          </div>
+          {!isProductDetails &&
+            product.price &&
+            product.price > product.final_price && (
+              <p className="text-[10px] md:text-base min-h-0 mb-0.5">
+                {!product.owner ||
+                product.owner.business_name === "Prestige Home"
+                  ? t("ogPrice")
+                  : t("ogPriceSupplier")}
+                : €
+                {product.price.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+            )}
         </div>
-        {!isProductDetails && (
-          <p className="font-light text-xs md:text-sm">zzgl. Versandkosten</p>
-        )}
-      </div>
+      )}
 
-      {/* 🎯 VOUCHER */}
-    </div>
+      {!isProductDetails && (
+        <p className="font-light text-xs md:text-sm">zzgl. Versandkosten</p>
+      )}
+    </>
   );
 };
 
