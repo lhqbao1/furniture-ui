@@ -99,7 +99,7 @@ export default function MobileStickyCart({
           </Button> */}
           <Button
             type="button"
-            className="px-4 bg-primary/80 hover:bg-primary text-white w-full h-full uppercase text-lg"
+            className="px-4 bg-primary hover:bg-primary/90 text-white w-full h-full uppercase text-lg"
             onClick={() => {
               onAddToCart?.(); // ✅ gọi hàm
               router.push("/cart", { locale });

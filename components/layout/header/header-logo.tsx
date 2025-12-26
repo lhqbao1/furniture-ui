@@ -30,7 +30,7 @@ const HeaderLogo = () => {
       </div>
       <Link href={"/"}>
         <Image
-          src={"/chirsmast-logo-2.jpg"}
+          src={"/logo-noel.svg"}
           height={200}
           width={200}
           alt=""

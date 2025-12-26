@@ -248,13 +248,17 @@ export default async function Page({
       </div>
 
       {product.categories?.length > 0 && (
-        <Suspense fallback={<ProductGridSkeleton length={4} />}>
-          <RelatedCategoryProducts categorySlug={product.categories[0].slug} />
-        </Suspense>
+        <div className="md:w-[95%] xl:w-3/4 w-[95%] mx-auto">
+          <Suspense fallback={<ProductGridSkeleton length={4} />}>
+            <RelatedCategoryProducts
+              categorySlug={product.categories[0].slug}
+            />
+          </Suspense>
+        </div>
       )}
 
       {plainBlogs?.items?.length > 0 && (
-        <div className="lg:mt-16 mt-10 pb-4">
+        <div className="lg:mt-16 mt-10 pb-4 md:w-[95%] xl:w-3/4 w-[95%] mx-auto">
           <Suspense fallback={<ProductGridSkeleton length={4} />}>
             <RelatedBlogs
               blogs={plainBlogs.items}

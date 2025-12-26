@@ -88,10 +88,12 @@ export default function ShopAllPage() {
   }
 
   return (
-    <div className="pt-3 xl:pb-16 pb-6">
+    <div className="pt-3 xl:pb-16 pb-6 relative">
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-2 md:block md:col-span-4 lg:col-span-3 xl:col-span-2 hidden">
-          <ShopAllFilterSection />
+          <div className="sticky top-48 max-h-[calc(100vh-6rem)] pr-2 overflow-y-auto">
+            <ShopAllFilterSection />
+          </div>
         </div>
 
         <div className="pt-0 pb-12 lg:w-[90%] md:w-[95%] xl:w-[90%] w-full mx-auto col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
