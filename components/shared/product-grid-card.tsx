@@ -205,7 +205,7 @@ export default function ProductCard({
                 alt={product.name}
                 fill
                 className="
-      object-fill
+      object-contain
       transition-all duration-500 ease-in-out
       group-hover:-translate-x-6
       group-hover:opacity-0
@@ -219,7 +219,7 @@ export default function ProductCard({
                   alt={product.name}
                   fill
                   className="
-        object-fill
+        object-contain
         absolute inset-0
         translate-x-6 opacity-0
         transition-all duration-500 ease-in-out

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NO_FOCUS } from "@/lib/constant";
 
 interface FormQuantityInputProps {
   value: number;
@@ -42,7 +43,10 @@ export function FormQuantityInputMobile({
         size="icon"
         onClick={handleDecrement}
         disabled={value <= min}
-        className="absolute left-1 top-1/2 -translate-y-1/2 h-full w-8 rounded-tr-none rounded-br-none rounded-tl-full rounded-bl-full border-r"
+        className={cn(
+          "absolute left-1 top-1/2 -translate-y-1/2 h-full w-8 rounded-tr-none rounded-br-none rounded-tl-full rounded-bl-full border-r",
+          NO_FOCUS,
+        )}
       >
         <Minus size={14} />
       </Button>
@@ -83,7 +87,10 @@ export function FormQuantityInputMobile({
         size="icon"
         onClick={handleIncrement}
         disabled={max !== undefined && value >= max}
-        className="absolute right-1 top-1/2 -translate-y-1/2 h-full w-8 rounded-tr-full rounded-br-full rounded-tl-none rounded-bl-none border-l"
+        className={cn(
+          "absolute right-1 top-1/2 -translate-y-1/2 h-full w-8 rounded-tr-full rounded-br-full rounded-tl-none rounded-bl-none border-l",
+          NO_FOCUS,
+        )}
       >
         <Plus size={14} />
       </Button>

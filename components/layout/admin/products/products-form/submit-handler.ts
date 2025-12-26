@@ -72,12 +72,12 @@ export const submitProduct = async ({
     pdf_files: latestValues.pdf_files ?? [],
   };
 
-  if (payload.is_econelo) {
-    if (!payload.price || !payload.final_price) {
-      toast.error("Econelo products need both price and sale price");
-      return;
-    }
-  }
+  // if (payload.is_econelo) {
+  //   if (!payload.price || !payload.final_price) {
+  //     toast.error("Econelo products need both price and sale price");
+  //     return;
+  //   }
+  // }
 
   if (productValuesClone) {
     const { marketplace_products, ...cleanPayload } = payload;
