@@ -46,7 +46,6 @@ const CheckoutSummary = ({
   const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
 
   const { data: listValidProducts } = useGetVoucherProducts(voucherId ?? "");
-
   const validProductIdSet = React.useMemo<Set<string>>(() => {
     return new Set(listValidProducts?.map((p) => p.id) ?? []);
   }, [listValidProducts]);
