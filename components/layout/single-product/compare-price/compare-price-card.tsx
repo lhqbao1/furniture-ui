@@ -16,6 +16,7 @@ import Image from "next/image";
 import React from "react";
 import { toast } from "sonner";
 import RequestOfferDialog from "./request-offer-dialog";
+import { hasRequestedVoucherAtom } from "@/store/voucher";
 
 const MARKETPLACE_ICON_MAP: Record<string, string> = {
   kaufland: "/kaufland-seeklogo.png",

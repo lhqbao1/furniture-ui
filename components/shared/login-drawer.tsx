@@ -13,6 +13,7 @@ import HeaderLoginForm from "../layout/header/header-login-form";
 import { useQueryClient } from "@tanstack/react-query";
 import CartLoginForm from "../layout/cart/login-form-cart";
 import { useRouter } from "@/src/i18n/navigation";
+import { useMediaQuery } from "react-responsive";
 
 export interface LoginDrawerProps {
   openLogin: boolean;
@@ -31,6 +32,7 @@ export function LoginDrawer({
   const queryClient = useQueryClient();
   const router = useRouter();
   const locale = useLocale();
+  const isMobile = useMediaQuery({ maxWidth: 676 });
 
   return (
     <Drawer
@@ -46,7 +48,7 @@ export function LoginDrawer({
             <User
               className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
               stroke="#4D4D4D"
-              size={20}
+              size={isMobile ? 20 : 30}
             />
           </div>
         </DrawerTrigger>

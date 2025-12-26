@@ -61,14 +61,14 @@ const CartPageClient = () => {
 
   return (
     <div className="mt-6 md:pb-0 pb-6 lg:px-0 px-4 container-padding overflow-auto">
-      <Button
-        variant={"outline"}
-        className="mb-2"
-        onClick={() => router.back()}
-      >
-        {t("back")} <ArrowLeft />
-      </Button>
       <div className="w-full lg:max-w-7xl mx-auto lg:p-6">
+        <Button
+          variant={"outline"}
+          className="mb-2 lg:hidden"
+          onClick={() => router.back()}
+        >
+          {t("back")} <ArrowLeft />
+        </Button>
         <div className="grid grid-cols-12 lg:gap-16 gap-6">
           {/* Left: Cart Items */}
           <div className="col-span-12 md:col-span-7">
