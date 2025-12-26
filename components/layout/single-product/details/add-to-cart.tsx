@@ -11,7 +11,7 @@ import { useAddToCartHandler } from "@/hooks/single-product/useAddToCartHandler"
 import { cartFormSchema } from "@/lib/schema/cart";
 import { ProductItem } from "@/types/products";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import z from "zod";
 import { FormNumberInput } from "../form-number.input";
@@ -25,6 +25,8 @@ import { Input } from "@/components/ui/input";
 import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
 import { getTotalIncomingStock } from "@/lib/calculate-inventory";
+import { useAtom } from "jotai";
+import { openPriceComparisionAtom } from "@/store/price-comparision";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -33,6 +35,9 @@ interface AddToCartFieldProps {
 
 const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   const t = useTranslations();
+  const [openPriceComparision, setOpenPriceComparsion] = useAtom(
+    openPriceComparisionAtom,
+  );
   // Form setup
   const form = useForm<z.infer<typeof cartFormSchema>>({
     resolver: zodResolver(cartFormSchema),
@@ -54,6 +59,12 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   const { handleSubmitToCart, handleAddWishlist } =
     useAddToCartHandler(productDetails);
 
+  const maxStock = useMemo(() => {
+    return (
+      productDetails.stock + getTotalIncomingStock(productDetails.inventory)
+    );
+  }, [productDetails.stock, productDetails.inventory]);
+
   return (
     <>
       <FormProvider {...form}>
@@ -62,7 +73,6 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             (values) => handleSubmitToCart(values),
             (e) => console.error("Please check the form for errors", e),
           )}
-          className="space-y-8"
         >
           {
             isLoadingParent ? (
@@ -77,7 +87,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
               />
             ) : null // hoặc render message "Không có phiên bản"
           }
-          <div className="flex  flex-row items-end gap-4">
+          <div className="flex  flex-row items-end gap-4 mt-6">
             <div className="lg:basis-1/4 basis-2/5">
               <FormField
                 control={form.control}
@@ -90,7 +100,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                         value={field.value ?? 1}
                         onChange={field.onChange}
                         min={1}
-                        max={productDetails.stock || undefined}
+                        max={maxStock}
                       />
                     </FormControl>
                     <FormMessage />
@@ -143,9 +153,17 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             }
             price={productDetails.final_price}
             oldPrice={productDetails.price}
+            maxStock={maxStock}
           />
         </form>
       </FormProvider>
+      <Button
+        variant={"secondary"}
+        onClick={() => setOpenPriceComparsion(!openPriceComparision)}
+        className="w-fit text-lg font-semibold px-6 py-2"
+      >
+        {t("priceComparison")}
+      </Button>
     </>
   );
 };

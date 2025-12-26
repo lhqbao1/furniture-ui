@@ -5,21 +5,41 @@ import { ShoppingBag, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
+import { useFormContext, useWatch } from "react-hook-form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FormQuantityInput } from "./details/quantity-input";
+import { FormQuantityInputMobile } from "./details/quantity-input-mobile";
 
 interface MobileStickyCartProps {
   price: number;
   oldPrice?: number;
   onAddToCart?: () => void;
+  maxStock: number;
 }
 
 export default function MobileStickyCart({
   price,
   oldPrice,
   onAddToCart,
+  maxStock,
 }: MobileStickyCartProps) {
   const t = useTranslations();
   const router = useRouter();
   const locale = useLocale();
+  const form = useFormContext();
+
+  const quantity = useWatch({
+    control: form.control,
+    name: "quantity",
+    defaultValue: 1,
+  });
+
   return (
     <div
       className={cn(
@@ -27,36 +47,48 @@ export default function MobileStickyCart({
         "md:hidden",
       )}
     >
-      <div className="px-4 py-3">
+      <div className="px-4 py-3 flex gap-3">
         {/* Price */}
-        <div className="flex justify-between">
-          <span className="text-sm text-muted-foreground">
-            {t("productPrice")}
-          </span>
-
-          <div className="flex items-center gap-2">
-            {oldPrice && (
-              <span className="text-sm line-through text-gray-400">
-                €
-                {oldPrice.toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </span>
-            )}
-            <span className="text-lg font-semibold text-secondary">
+        <div className="">
+          {oldPrice && (
+            <div className="text-sm line-through text-gray-400">
               €
-              {price.toLocaleString("de-DE", {
+              {(oldPrice * quantity).toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
-            </span>
+            </div>
+          )}
+          <div className="text-lg font-semibold text-secondary">
+            €
+            {(price * quantity).toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </div>
         </div>
 
+        <FormField
+          control={form.control}
+          name="quantity"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <FormQuantityInputMobile
+                  value={field.value ?? 1}
+                  onChange={field.onChange}
+                  min={1}
+                  max={maxStock}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Actions */}
-        <div className="flex items-center justify-end gap-2">
-          <Button
+        <div className="flex items-center justify-end gap-2 flex-1">
+          {/* <Button
             className="h-10 px-4 text-black"
             onClick={onAddToCart}
             variant={"outline"}
@@ -64,16 +96,15 @@ export default function MobileStickyCart({
           >
             <ShoppingCart className="mr-1 h-4 w-4" />
             {t("addToCart")}
-          </Button>
+          </Button> */}
           <Button
             type="button"
-            className="h-10 px-4 bg-secondary/80 hover:bg-secondary text-white"
+            className="px-4 bg-primary/80 hover:bg-primary text-white w-full h-full uppercase text-lg"
             onClick={() => {
               onAddToCart?.(); // ✅ gọi hàm
               router.push("/cart", { locale });
             }}
           >
-            <ShoppingBag className="mr-1 h-4 w-4" />
             {t("buyNow")}
           </Button>
         </div>

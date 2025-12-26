@@ -238,7 +238,7 @@ export default async function Page({
             <ComparePriceSection product={plainProduct} />
           )}
 
-          <div className="lg:mt-12 mt-8">
+          <div className="lg:mt-12 mt-0">
             <ProductDetailsTab
               reviews={plainReviews}
               product={plainProduct}

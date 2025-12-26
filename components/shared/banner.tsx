@@ -1,24 +1,25 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "@/src/i18n/navigation";
+import { usePathname } from "next/navigation";
+import { useMediaQuery } from "react-responsive";
 
 interface BannerProps {
   height?: number;
   isHome?: boolean;
 }
 
-const Banner = ({ height = 600, isHome = false }: BannerProps) => {
+const Banner = ({ height, isHome = false }: BannerProps) => {
   const [isSticky, setIsSticky] = useState(false);
-  const t = useTranslations();
-  const router = useRouter();
-  const locale = useLocale();
+  const pathname = usePathname();
+  const isMobile = useMediaQuery({ maxWidth: 640 });
+
+  // 👉 Điều kiện ẩn banner
+  const hideBanner = isMobile && pathname.includes("/product");
 
   useEffect(() => {
     let last = 0;
-    const threshold = height;
+    const threshold = height ?? 0;
 
     const handleScroll = () => {
       const now = performance.now();
@@ -32,6 +33,8 @@ const Banner = ({ height = 600, isHome = false }: BannerProps) => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [height]);
+
+  if (hideBanner) return null;
 
   return (
     <div

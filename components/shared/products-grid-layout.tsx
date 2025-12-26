@@ -28,7 +28,7 @@ const ProductsGridLayout = ({
               idx={idx}
               product={product}
               key={product.id}
-              className={isSmall ? "lg:min-h-[80px] min-h-[52px]" : ""}
+              className={isSmall ? "" : ""}
               isProductDetails={isProductDetails}
             />
           );

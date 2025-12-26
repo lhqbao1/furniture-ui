@@ -420,5 +420,6 @@
   "messageSent": "Request sent successfully",
   "messageSendFail": "Failed to send request",
   "productPrice": "Price",
-  "buyNow": "Buy now"
+  "buyNow": "Buy now",
+  "priceComparison": "Price comparison"
 }

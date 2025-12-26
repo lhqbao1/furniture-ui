@@ -196,7 +196,7 @@ export default function ProductCard({
             passHref
             className="cursor-pointer"
           >
-            <div className="relative w-full h-52 md:h-72 mb-2 overflow-hidden rounded group">
+            <div className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group">
               {/* Image 1 */}
               <Image
                 src={
@@ -242,7 +242,7 @@ export default function ProductCard({
               <h3
                 className={cn(
                   "text-xs md:text-lg text-black text-left line-clamp-2 ",
-                  className ? className : "lg:min-h-[60px] min-h-[32px]",
+                  className ? className : "",
                 )}
               >
                 {product.name}
@@ -301,7 +301,7 @@ export default function ProductCard({
             variant="ghost"
             size="lg"
             aria-label="Add to cart"
-            className="md:has-[>svg]:px-3 has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200 h-8 md:h-10 lg:h-12"
+            className="md:has-[>svg]:px-3 lg:has-[>svg]:px-3 has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200 h-8 md:h-10 lg:h-12"
             onClick={() => handleAddToWishlist(product)}
           >
             <Heart className="size-4 md:size-6 stroke-current transition-colors duration-200" />
