@@ -14,7 +14,6 @@ const ExpandDrawer = () => {
       size={30}
       onClick={() => {
         setExpandAll(true);
-        console.log("hehe");
       }}
     />
   );

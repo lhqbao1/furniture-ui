@@ -28,13 +28,15 @@ const HeaderLogo = () => {
           </div>
         </Link>
       </div>
-      <Image
-        src={"/chirsmast-logo.jpg"}
-        height={200}
-        width={200}
-        alt=""
-        className="md:block hidden h-16 w-auto object-cover"
-      />
+      <Link href={"/"}>
+        <Image
+          src={"/chirsmast-logo-2.jpg"}
+          height={200}
+          width={200}
+          alt=""
+          className="md:block hidden h-16 w-auto object-cover cursor-pointer"
+        />
+      </Link>
     </>
   );
 };

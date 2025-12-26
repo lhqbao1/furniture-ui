@@ -14,8 +14,8 @@ import { currentCategoryIdAtom } from "@/store/category";
 import { categoryClickedAtom } from "@/store/categories-drawer";
 import { CategoryResponse } from "@/types/categories";
 import { useAtom } from "jotai";
-import { useLocale } from "next-intl";
-import { useRouter } from "@/src/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, useRouter } from "@/src/i18n/navigation";
 import { useMediaQuery } from "react-responsive";
 import CategoriesDrawer from "../header/categories-drawer";
 
@@ -27,6 +27,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations();
 
   const [, setCurrentCategoryId] = useAtom(currentCategoryIdAtom);
   const [, setCategoryClicked] = useAtom(categoryClickedAtom);
@@ -91,9 +92,18 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                 )}
               </NavigationMenuItem>
             ))}
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                asChild
+                className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2 py-1 focus:bg-transparent"
+              >
+                <Link href="/shop-all">{t("shopAll")}</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       )}
+      <CategoriesDrawer categories={categories} />
     </div>
   );
 };

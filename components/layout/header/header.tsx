@@ -10,6 +10,7 @@ import HeaderCartIcon from "./header-cart-icon";
 import HeaderUserLogin from "./header-user-login";
 import ExpandDrawer from "./expand-drawer";
 import { getCategoriesWithChildren } from "@/features/category/api";
+import CategoriesDrawer from "./categories-drawer";
 
 const PageHeader = async () => {
   const categories = await getCategoriesWithChildren();

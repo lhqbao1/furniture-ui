@@ -102,7 +102,12 @@ const ProductPricingField = ({
         />
       ) : (
         <div className="flex lg:flex-row flex-col lg:justify-start lg:gap-4 lg:items-end items-start">
-          <div className="text-sm md:text-2xl lg:text-3xl flex items-end font-semibold pt-1 md:mt-0">
+          <div
+            className={cn(
+              `text-sm md:text-2xl lg:text-3xl flex items-end font-semibold pt-1 md:mt-0`,
+              isProductDetails ? "text-3xl" : "",
+            )}
+          >
             {priceAfterVoucher.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

@@ -1,4 +1,3 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/components/shared/footer";
 import Banner from "@/components/shared/banner";
 import "../../globals.css";

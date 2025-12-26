@@ -64,9 +64,9 @@ export function ProductDetailsTab({
     // render accordion
     return (
       <Accordion
-        type="single"
-        collapsible
+        type="multiple"
         className="space-y-2"
+        defaultValue={["description"]}
       >
         {sections.map((section) => (
           <AccordionItem

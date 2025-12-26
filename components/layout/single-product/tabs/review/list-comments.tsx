@@ -136,9 +136,9 @@ const ListComments = ({
                 )}
               </div>
             ))}
-            <div className="py-6 text-center">
-              {/* <Button hasEffect className='rounded-full font-bold'>{t('loadMore')}</Button> */}
-            </div>
+            {/* <div className="py-6 text-center"> */}
+            {/* <Button hasEffect className='rounded-full font-bold'>{t('loadMore')}</Button> */}
+            {/* </div> */}
             {/* <CustomPagination /> */}
           </div>
         </CollapsibleContent>

@@ -242,7 +242,7 @@ export default function ProductCard({
               <h3
                 className={cn(
                   "text-xs md:text-lg text-black text-left line-clamp-2 ",
-                  className ? className : "lg:min-h-[60px] min-h-[32px]",
+                  className ? className : "",
                 )}
               >
                 {product.name}
