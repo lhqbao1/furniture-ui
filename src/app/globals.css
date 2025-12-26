@@ -409,6 +409,15 @@ input[type="number"] {
   @apply mt-6 mb-2;
 }
 
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge cũ */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
 /* .whatsapp-bubble::after {
   content: "";
   position: absolute;

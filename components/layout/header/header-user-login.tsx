@@ -17,6 +17,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
 import { LoginDrawer } from "@/components/shared/login-drawer";
+import { useMediaQuery } from "react-responsive";
 
 const HeaderUserLogin = () => {
   const [userId, setUserId] = useAtom(userIdAtom);
@@ -26,6 +27,7 @@ const HeaderUserLogin = () => {
   const pathName = usePathname();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const isMobile = useMediaQuery({ maxWidth: 676 });
 
   const {
     data: user,
@@ -62,7 +64,7 @@ const HeaderUserLogin = () => {
         // Loading state
         <User
           stroke="#4D4D4D"
-          size={24}
+          size={isMobile ? 20 : 30}
           className="animate-pulse opacity-50"
         />
       ) : user ? (
@@ -73,7 +75,7 @@ const HeaderUserLogin = () => {
               <User
                 className="cursor-pointer hover:scale-110 transition-all duration-300"
                 stroke="#4D4D4D"
-                size={30}
+                size={isMobile ? 20 : 30}
               />
             </DropdownMenuTrigger>
 

@@ -5,7 +5,7 @@ import React from "react";
 const HeaderLogo = () => {
   return (
     <>
-      <div className={`flex-row gap-2 items-center flex md:hidden`}>
+      {/* <div className={`flex-row gap-2 items-center hidden`}>
         <Link
           href={`/`}
           aria-label="Go to homepage"
@@ -27,14 +27,17 @@ const HeaderLogo = () => {
             <span className="text-primary font-bold">Home</span>
           </div>
         </Link>
-      </div>
-      <Link href={"/"}>
+      </div> */}
+      <Link
+        href={"/"}
+        className="h-full w-full lg:w-auto"
+      >
         <Image
-          src={"/logo-noel.svg"}
+          src={"/logo-noel-1.svg"}
           height={200}
           width={200}
           alt=""
-          className="md:block hidden h-16 w-auto object-cover cursor-pointer"
+          className="block xl:h-16 xl:w-auto h-12 w-auto object-contain cursor-pointer "
         />
       </Link>
     </>

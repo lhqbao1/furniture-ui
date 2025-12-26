@@ -16,7 +16,7 @@ const PageHeader = async () => {
   const categories = await getCategoriesWithChildren();
   return (
     <header className="home-banner-top__content sticky top-0 z-50 bg-white shadow-secondary/10 shadow-xl">
-      <div className=" flex flex-row gap-4 w-full py-4 items-center px-4 lg:flex lg:items-center lg:justify-end lg:px-20 lg:py-3 lg:gap-6 border-b">
+      <div className=" flex flex-row gap-4 w-full py-3 items-center px-4 lg:items-center lg:justify-end lg:px-20 lg:py-3 lg:gap-6 border-b">
         <HeaderLogo />
         {/*Product search desktop */}
         <div className="hidden lg:block flex-1">
@@ -25,9 +25,7 @@ const PageHeader = async () => {
 
         <div className="flex h-full items-center justify-end w-full lg:w-fit gap-3 lg:items-end lg:gap-6">
           {/*Mobile Search */}
-          <div className="block lg:hidden">
-            <MobileProductSearch />
-          </div>
+          <MobileProductSearch />
           {/*Shopping cart */}
           <div className="lg:hidden">
             <CartDrawerMobile />

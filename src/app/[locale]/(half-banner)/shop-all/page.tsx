@@ -91,7 +91,7 @@ export default function ShopAllPage() {
     <div className="pt-3 xl:pb-16 pb-6 relative">
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-2 md:block md:col-span-4 lg:col-span-3 xl:col-span-2 hidden">
-          <div className="sticky top-48 max-h-[calc(100vh-6rem)] pr-2 overflow-y-auto">
+          <div className="sticky top-48 max-h-[calc(100vh-6rem)] pr-2 overflow-y-auto no-scrollbar">
             <ShopAllFilterSection />
           </div>
         </div>

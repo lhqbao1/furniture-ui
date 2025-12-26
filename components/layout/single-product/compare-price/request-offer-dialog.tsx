@@ -18,6 +18,8 @@ import {
   useUploadContactForm,
 } from "@/features/contact/hook";
 import { toast } from "sonner";
+import { useAtom } from "jotai";
+import { hasRequestedVoucherAtom } from "@/store/voucher";
 
 interface RequestOfferDialogProps {
   productName?: string;
@@ -33,7 +35,9 @@ export default function RequestOfferDialog({
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState<string | null>(null);
-
+  const [hasRequestedVoucher, setHasRequestedVoucher] = useAtom(
+    hasRequestedVoucherAtom,
+  );
   const emailInputRef = React.useRef<HTMLInputElement>(null);
   const sendContactMutation = useUploadContactForm();
 
@@ -69,6 +73,7 @@ export default function RequestOfferDialog({
   }, [open, defaultMessage]);
 
   const handleSubmit = () => {
+    console.log(hasRequestedVoucher);
     // 🔴 validate
     if (!email) {
       setEmailError(t("emailRequired", { default: "Email is required" }));
@@ -96,6 +101,7 @@ export default function RequestOfferDialog({
           toast.success(t("messageSent", { default: "Request sent" }));
           setOpen(false);
           setEmail("");
+          setHasRequestedVoucher(true);
         },
         onError() {
           toast.error(
@@ -113,8 +119,11 @@ export default function RequestOfferDialog({
     >
       <DialogTrigger asChild>
         <Button
-          className="rounded-md lg:px-4 mr-1 text-sm"
+          className={`rounded-md lg:px-4 mr-1 text-sm ${
+            hasRequestedVoucher && "bg-gray-500 text-white"
+          }`}
           type="button"
+          disabled={hasRequestedVoucher}
           // variant="outline"
         >
           {t("requestOffer")}

@@ -254,7 +254,6 @@ const ProductDetailInputs = ({
                 ? stock - (result_stock ?? 0)
                 : "";
 
-            console.log(stock);
             return (
               <FormItem className="flex flex-col w-full">
                 <FormLabel className="text-black font-semibold text-sm">
