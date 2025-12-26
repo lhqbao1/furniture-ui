@@ -8,6 +8,10 @@ import Image from "next/image";
 import { useAtom } from "jotai";
 import { authHydratedAtom, userIdAtom } from "@/store/auth";
 import CartSummarySkeleton from "./skeleton/cart-summary-price-skeleton";
+import VoucherApply from "../checkout/voucher-apply";
+import { useState } from "react";
+import { currentVoucherAtom } from "@/store/voucher";
+import { VoucherItem } from "@/types/voucher";
 
 interface CartSummaryProps {
   total?: number;
@@ -31,6 +35,9 @@ const CartSummary = ({
   authHydrated,
 }: CartSummaryProps) => {
   const t = useTranslations();
+  const [currentVoucher, setCurrentVoucher] = useAtom(currentVoucherAtom);
+  const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
+  const [discountAmount, setDiscountAmout] = useState<VoucherItem>();
 
   return (
     <div className="border-0 shadow-none sticky top-6">
@@ -49,11 +56,17 @@ const CartSummary = ({
 
             {/* Shipping */}
             <div className="flex justify-between">
-              <span className="text-secondary underline cursor-pointer">
-                {t("shipping")}
-              </span>
+              <span className="text-gray-700">{t("shipping")}</span>
               <span>{shipping.toFixed(2)} €</span>
             </div>
+
+            {/* Shipping */}
+            {/* <div className="flex justify-between">
+              <span className="text-secondary underline cursor-pointer">
+                {t("discount")}
+              </span>
+              <span>{shipping.toFixed(2)} €</span>
+            </div> */}
 
             {/* Total */}
             <div className="flex justify-between font-semibold text-base">
@@ -100,6 +113,14 @@ const CartSummary = ({
           <Truck className="w-5 h-5 text-gray-700" />
           <span className="text-gray-500">{t("easyDelivery")}</span>
         </div>
+      </div>
+
+      <div className="py-10 space-y-4 border-b">
+        {/* Secure payment */}
+        <VoucherApply
+          voucherId={voucherId}
+          setVoucherId={setVoucherId}
+        />
       </div>
 
       <div className="pt-10">

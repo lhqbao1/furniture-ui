@@ -86,17 +86,17 @@ const CheckoutSummary = ({
     name: "coupon_amount",
   });
 
-  const productIds = React.useMemo(() => {
-    if (cartItems && cartItems.length > 0) {
-      return cartItems
-        .flatMap((g) => g.items)
-        .filter((i) => i.is_active)
-        .map((i) => i.products?.id) // ✅ lấy từ products
-        .filter(Boolean); // ✅ bỏ undefined
-    }
+  // const productIds = React.useMemo(() => {
+  //   if (cartItems && cartItems.length > 0) {
+  //     return cartItems
+  //       .flatMap((g) => g.items)
+  //       .filter((i) => i.is_active)
+  //       .map((i) => i.products?.id) // ✅ lấy từ products
+  //       .filter(Boolean); // ✅ bỏ undefined
+  //   }
 
-    return localCart?.filter((i) => i.is_active).map((i) => i.product_id) ?? [];
-  }, [cartItems, localCart]);
+  //   return localCart?.filter((i) => i.is_active).map((i) => i.product_id) ?? [];
+  // }, [cartItems, localCart]);
 
   const orderValue = React.useMemo(() => {
     if (cartItems && cartItems.length > 0) {
@@ -113,24 +113,24 @@ const CheckoutSummary = ({
     );
   }, [cartItems, localCart]);
 
-  const carrier = React.useMemo<"dpd" | "amm" | undefined>(() => {
-    if (shippingCost === 35.95) return "amm";
-    if (shippingCost === 5.95) return "dpd";
-    return undefined;
-  }, [shippingCost]);
+  // const carrier = React.useMemo<"dpd" | "amm" | undefined>(() => {
+  //   if (shippingCost === 35.95) return "amm";
+  //   if (shippingCost === 5.95) return "dpd";
+  //   return undefined;
+  // }, [shippingCost]);
 
-  const { data: listVouchers, isLoading } = useGetVoucherForCheckout(
-    {
-      product_ids: productIds,
-      user_id: userId,
-      carrier,
-      order_value: orderValue,
-    },
-    true,
-  );
+  // const { data: listVouchers, isLoading } = useGetVoucherForCheckout(
+  //   {
+  //     product_ids: productIds,
+  //     user_id: userId,
+  //     carrier,
+  //     order_value: orderValue,
+  //   },
+  //   true,
+  // );
 
   const { data: selectedVoucher, isLoading: isLoadingVoucher } =
-    useGetVoucherById(voucherId ?? "");
+    useGetVoucherById(currentVoucher ?? "");
 
   React.useEffect(() => {
     if (!selectedVoucher) return;

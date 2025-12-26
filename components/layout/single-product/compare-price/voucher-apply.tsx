@@ -18,7 +18,7 @@ interface VoucherApplyProps {
   setDiscountAmount?: (discountAmount: VoucherItem | null) => void;
 }
 
-const VoucherApply = ({
+const VoucherApplyComapre = ({
   voucherId,
   setVoucherId,
   discountAmount,
@@ -58,9 +58,7 @@ const VoucherApply = ({
   };
 
   return (
-    <div className="flex items-center gap-2 md:w-1/3 w-full">
-      <BadgePercent className="w-5 h-5 text-muted-foreground" />
-
+    <div className="flex items-center gap-2 w-full">
       <Input
         placeholder={t("applyCoupons")}
         className="flex-1"
@@ -81,4 +79,4 @@ const VoucherApply = ({
   );
 };
 
-export default VoucherApply;
+export default VoucherApplyComapre;

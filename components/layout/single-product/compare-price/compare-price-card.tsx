@@ -17,6 +17,8 @@ import React from "react";
 import { toast } from "sonner";
 import RequestOfferDialog from "./request-offer-dialog";
 import { hasRequestedVoucherAtom } from "@/store/voucher";
+import VoucherApply from "../../checkout/voucher-apply";
+import VoucherApplyComapre from "./voucher-apply";
 
 const MARKETPLACE_ICON_MAP: Record<string, string> = {
   kaufland: "/kaufland-seeklogo.png",
@@ -51,6 +53,9 @@ const ComparePriceCard = ({
   const [userId, setUserId] = useAtom(userIdAtom);
   const { addToCartLocal, cart } = useCartLocal();
   const createCartMutation = useAddToCart();
+  const [hasRequestedVoucher, setHasRequestedVoucher] = useAtom(
+    hasRequestedVoucherAtom,
+  );
 
   const handleAddToCart = (values: any) => {
     if (!product) return;
@@ -209,11 +214,20 @@ const ComparePriceCard = ({
                   </Button>
                 )}
 
-                {isProduct && !isProductCheapest && (
-                  <RequestOfferDialog
-                    productName={product.name}
-                    productUrl={`/product/${product.url_key}`}
-                  />
+                {isProduct &&
+                  !isProductCheapest &&
+                  hasRequestedVoucher === false && (
+                    <RequestOfferDialog
+                      productName={product.name}
+                      productUrl={`/product/${product.url_key}`}
+                    />
+                  )}
+
+                {isProduct && !isProductCheapest && hasRequestedVoucher && (
+                  <div className="w-full flex-1">
+                    {""}
+                    <VoucherApplyComapre />
+                  </div>
                 )}
               </div>
             </div>
