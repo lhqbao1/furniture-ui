@@ -46,7 +46,7 @@ export function LoginDrawer({
             <User
               className="cursor-pointer hover:scale-110 transition-all duration-300 relative"
               stroke="#4D4D4D"
-              size={30}
+              size={20}
             />
           </div>
         </DrawerTrigger>

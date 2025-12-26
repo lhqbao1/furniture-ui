@@ -87,14 +87,13 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
               />
             ) : null // hoặc render message "Không có phiên bản"
           }
-          <div className="flex  flex-row items-end gap-4 mt-6">
-            <div className="lg:basis-1/4 basis-2/5">
+          <div className="flex flex-row items-start gap-4 mt-6">
+            <div className="lg:basis-1/4 basis-2/5 space-y-2">
               <FormField
                 control={form.control}
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("quantity")}</FormLabel>
                     <FormControl>
                       <FormQuantityInput
                         value={field.value ?? 1}
@@ -107,14 +106,24 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                   </FormItem>
                 )}
               />
+              <div className="w-full flex justify-end">
+                <div
+                  onClick={(e) => {
+                    handleAddWishlist();
+                  }}
+                  className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white border-gray-600 border hover:border-secondary transition-all duration-300 hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
+                >
+                  <Heart />
+                </div>
+              </div>
             </div>
 
-            <div className="flex gap-1 lg:basis-2/5 basis-3/5 relative">
+            <div className="space-y-2 lg:basis-2/5 basis-3/5 relative">
               {productDetails.stock > 0 ||
               (productDetails.stock === 0 &&
                 getTotalIncomingStock(productDetails.inventory) > 0) ? (
                 <Button
-                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px]"
+                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
                   type="submit"
 
                   // disabled={productDetails.stock > 0 ? false : true}
@@ -124,7 +133,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                 </Button>
               ) : (
                 <Button
-                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] bg-gray-500 text-white cursor-not-allowed"
+                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base w-full lg:min-h-[40px] lg:h-fit !h-[40px] bg-gray-500 text-white cursor-not-allowed"
                   type="submit"
                   disabled
                   // disabled={productDetails.stock > 0 ? false : true}
@@ -134,14 +143,13 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                 </Button>
               )}
 
-              <div
-                onClick={(e) => {
-                  handleAddWishlist();
-                }}
-                className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white border-secondary border  hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
+              <Button
+                variant={"secondary"}
+                onClick={() => setOpenPriceComparsion(!openPriceComparision)}
+                className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
               >
-                <Heart />
-              </div>
+                {t("priceComparison")}
+              </Button>
             </div>
           </div>
 
@@ -157,13 +165,6 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
           />
         </form>
       </FormProvider>
-      <Button
-        variant={"secondary"}
-        onClick={() => setOpenPriceComparsion(!openPriceComparision)}
-        className="w-fit text-lg font-semibold px-6 py-2"
-      >
-        {t("priceComparison")}
-      </Button>
     </>
   );
 };

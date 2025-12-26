@@ -45,23 +45,22 @@ export default function MobileProductSearch() {
   const results = products ?? [];
 
   return (
-    <div className="block md:hidden">
+    <div className="lg:hidden">
       <Drawer
         open={open}
         onOpenChange={setOpen}
         direction="left"
       >
         <DrawerTrigger asChild>
-          <button
-            type="button"
+          <div
             aria-label={t("searchProduct")}
-            className="p-1"
+            className=""
           >
             <Search
               stroke="#4D4D4D"
-              size={30}
+              size={20}
             />
-          </button>
+          </div>
         </DrawerTrigger>
         <DrawerContent className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500">
           <DrawerTitle className="border-b-2 p-4 flex justify-between">

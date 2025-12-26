@@ -11,7 +11,7 @@ const ExpandDrawer = () => {
     <AlignJustify
       className="cursor-pointer hover:scale-110 transition-all duration-300"
       stroke="#4D4D4D"
-      size={30}
+      size={20}
       onClick={() => {
         setExpandAll(true);
       }}

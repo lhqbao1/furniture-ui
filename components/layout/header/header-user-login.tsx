@@ -62,7 +62,7 @@ const HeaderUserLogin = () => {
         // Loading state
         <User
           stroke="#4D4D4D"
-          size={24}
+          size={20}
           className="animate-pulse opacity-50"
         />
       ) : user ? (
@@ -73,7 +73,7 @@ const HeaderUserLogin = () => {
               <User
                 className="cursor-pointer hover:scale-110 transition-all duration-300"
                 stroke="#4D4D4D"
-                size={30}
+                size={20}
               />
             </DropdownMenuTrigger>
 

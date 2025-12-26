@@ -63,7 +63,7 @@ export const submitProduct = async ({
         : undefined,
     final_price: latestValues.final_price ?? latestValues.price ?? undefined,
     ...(latestValues.price && { price: latestValues.price }),
-    stock: latestValues.stock ?? 1,
+    stock: latestValues.stock ?? 0,
     is_bundle:
       latestValues.bundles && latestValues.bundles?.length > 0 ? true : false,
     tag: latestValues.tag === "" ? undefined : latestValues.tag,
