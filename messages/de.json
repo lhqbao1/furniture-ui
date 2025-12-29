@@ -321,8 +321,9 @@
   "justAsk": "Fragen Sie einfach!",
   "shippingPolicy": "Liefer- und Versandbedingungen",
     "paymentTerms": "Zahlungsbedingungen",
-    "resendOtp": "OTP erneut senden",
+    
   "resendOtpDes": "Senden Sie den OTP-Code erneut an Ihre E-Mail/Ihre Telefonnummer",
+  "resendOtp": "OTP erneut senden",
   "resendIn": "Erneut senden in",
   "shippingCost": "zzgl. {shippingCost} Versand",
   "ogPrice": "Vorher",

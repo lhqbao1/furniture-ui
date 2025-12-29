@@ -13,7 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { FormQuantityInput } from "./details/quantity-input";
 import { FormQuantityInputMobile } from "./details/quantity-input-mobile";
 
 interface MobileStickyCartProps {
@@ -47,9 +46,9 @@ export default function MobileStickyCart({
         "md:hidden",
       )}
     >
-      <div className="px-4 py-3 flex gap-3">
+      <div className="px-4 py-3">
         {/* Price */}
-        <div className="">
+        <div className="flex gap-2 items-center justify-end">
           {oldPrice && (
             <div className="text-sm line-through text-gray-400">
               €
@@ -67,28 +66,28 @@ export default function MobileStickyCart({
             })}
           </div>
         </div>
+        <div className="flex gap-3 justify-end">
+          <FormField
+            control={form.control}
+            name="quantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <FormQuantityInputMobile
+                    value={field.value ?? 1}
+                    onChange={field.onChange}
+                    min={1}
+                    max={maxStock}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="quantity"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <FormQuantityInputMobile
-                  value={field.value ?? 1}
-                  onChange={field.onChange}
-                  min={1}
-                  max={maxStock}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-2 flex-1">
-          {/* <Button
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2 flex-1">
+            {/* <Button
             className="h-10 px-4 text-black"
             onClick={onAddToCart}
             variant={"outline"}
@@ -97,16 +96,17 @@ export default function MobileStickyCart({
             <ShoppingCart className="mr-1 h-4 w-4" />
             {t("addToCart")}
           </Button> */}
-          <Button
-            type="button"
-            className="px-4 bg-primary hover:bg-primary/90 text-white w-full h-full uppercase text-lg"
-            onClick={() => {
-              onAddToCart?.(); // ✅ gọi hàm
-              router.push("/cart", { locale });
-            }}
-          >
-            {t("buyNow")}
-          </Button>
+            <Button
+              type="button"
+              className="px-4 bg-primary hover:bg-primary/90 text-white w-full h-full uppercase text-lg"
+              onClick={() => {
+                onAddToCart?.(); // ✅ gọi hàm
+                router.push("/cart", { locale });
+              }}
+            >
+              {t("buyNow")}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

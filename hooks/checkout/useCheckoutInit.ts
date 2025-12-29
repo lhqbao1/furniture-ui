@@ -1,7 +1,6 @@
 // hooks/checkout/useCheckoutInit.ts
 "use client";
 
-import { useEffect, useState } from "react";
 import { useCartLocal } from "@/hooks/cart";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@/types/user";
