@@ -17,6 +17,11 @@ export interface Product {
   tag: Tag;
 }
 
+export interface ProductFAQ {
+  question: string;
+  answer: string;
+}
+
 export interface Tag {
   name: string;
   color: string;
@@ -230,6 +235,8 @@ export type ProductItem = {
   inventory: InventoryItem[];
   log_stocks: ProductStockLog[];
   vouchers: VoucherItem[];
+
+  faqs: ProductFAQ[];
 };
 
 export type ProductResponse = {

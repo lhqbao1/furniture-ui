@@ -129,6 +129,7 @@ const SelectBundleComponent = ({
       width: item.width,
       height: item.height,
       weight: item.weight,
+      cost: item.product.cost,
     }));
     setValue("bundles", bundles);
   }, [listProducts, setValue]);

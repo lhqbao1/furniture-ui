@@ -431,3 +431,71 @@ input[type="number"] {
   transform: translateY(-50%) rotate(45deg);
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.05);
 } */
+
+.faq-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 14px;
+}
+
+.faq-markdown thead th {
+  background: #f3f4f6;
+  color: #111;
+  font-weight: 600;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.faq-markdown tbody td {
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  vertical-align: top;
+  color: #444;
+}
+
+.faq-markdown tbody tr:hover {
+  background: #fafafa;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .faq-markdown {
+    overflow-x: auto;
+  }
+
+  .faq-markdown table {
+    min-width: 500px;
+  }
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #999;
+  animation: typing 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes typing {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+}

@@ -20,7 +20,6 @@ import { useCheckoutSubmit } from "@/hooks/checkout/useCheckoutSubmit";
 import { cn } from "@/lib/utils";
 import CheckOutUserInformation from "@/components/layout/checkout/user-information";
 import CheckOutShippingAddress from "@/components/layout/checkout/shipping-address";
-// import CheckOutInvoiceAddress from "@/components/layout/checkout/invoice-address";
 import CheckoutSummary from "./checkout-summary";
 import CheckoutProducts from "./check-out-products";
 import CheckoutPaymentUI from "@/components/shared/stripe/payment-ui";

@@ -124,7 +124,10 @@ const bundleSchema = z.object({
   width: z.number().optional().nullable(),
   height: z.number().optional().nullable(),
   weight: z.number().optional().nullable(),
+  cost: z.number().optional().nullable(),
 });
+
+export type BundleInput = z.infer<typeof bundleSchema>;
 
 const pdfFileSchema = z.object({
   title: z.string().min(1),
