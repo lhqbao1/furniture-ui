@@ -35,6 +35,7 @@ export function ProductDetailsTab({
         <ProductDescription
           description={product.description}
           productId={product.id}
+          question={product.faqs}
         />
       ),
     },

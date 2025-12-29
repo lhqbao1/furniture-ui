@@ -133,6 +133,7 @@ const Footer = () => {
             href="https://geizhals.de"
             target="_blank"
             rel="noopener noreferrer"
+            className="w-fit"
           >
             <Image
               src="https://gzhls.at/b/brands/geizhals_logo_official.svg"
@@ -142,14 +143,17 @@ const Footer = () => {
               priority
             />
           </a>
-          <a href="https://www.idealo.de/preisvergleich/Shop/336129.html#i">
+          <a
+            href="https://www.idealo.de/preisvergleich/Shop/336129.html#i"
+            className="w-fit"
+          >
             <img
               src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
               loading="lazy"
               alt="zu www.idealo.de"
             />
           </a>
-          <a
+          {/* <a
             href="https://www.praktiker.de/marktplatz/prestige-home-5786"
             rel="nofollow"
           >
@@ -159,12 +163,13 @@ const Footer = () => {
               height="50"
               alt="Praktiker Trust Logo"
             />
-          </a>
+          </a> */}
           <a
             href="/file/FSC.pdf"
             target="_blank"
             rel="nofollow noopener noreferrer"
             aria-label="Open FSC Certificate PDF"
+            className="w-fit"
           >
             <Image
               src="/fsc-footer.jpg"

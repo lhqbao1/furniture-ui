@@ -31,6 +31,7 @@ import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 import { getUserById } from "@/features/users/api";
 import { useQuery } from "@tanstack/react-query";
+import { getInvoiceAddressByUserId } from "@/features/address/api";
 
 interface CheckOutUserInformationProps {
   userId?: string;
@@ -50,6 +51,14 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
     retry: false,
   });
 
+  const { data: invoiceAddress } = useQuery({
+    queryKey: ["invoice-address-by-user", userIdLogin],
+    queryFn: () => getInvoiceAddressByUserId(userIdLogin ?? ""),
+    retry: false,
+    enabled: !!userIdLogin,
+  });
+
+  console.log(invoiceAddress);
   console.log(userData);
 
   // Khi user login → đổ dữ liệu vào form
@@ -64,14 +73,17 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
       company_name: userData.company_name ?? "",
       tax_id: userData.tax_id ?? "",
 
-      // invoice_address_line:
-      //   userData.default_invoice_address?.address_line ?? "",
-      // invoice_address_additional:
-      //   userData.default_invoice_address?.additional_address_line ?? "",
-      // invoice_postal_code: userData.default_invoice_address?.postal_code ?? "",
-      // invoice_city: userData.default_invoice_address?.city ?? "",
-      // invoice_country: userData.default_invoice_address?.country ?? "",
+      invoice_address_line: invoiceAddress?.address_line ?? "",
+      invoice_address_additional: invoiceAddress?.additional_address_line ?? "",
+      invoice_postal_code: invoiceAddress?.postal_code ?? "",
+      invoice_city: invoiceAddress?.city ?? "",
+      invoice_country: invoiceAddress?.country ?? "",
     });
+
+    // if(!invoiceAddress) return;
+    // form.reset({
+
+    // })
   }, [userData]);
 
   return (

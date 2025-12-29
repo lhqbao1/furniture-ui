@@ -90,7 +90,7 @@ export default function RootLayout({
 
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17706586126"
-          async
+          strategy="lazyOnload"
         />
 
         {/* <Script
@@ -229,32 +229,13 @@ export default function RootLayout({
                         });
                     `}
         </Script> */}
-        <Script
-          id="google-ads-conversion-safe"
-          strategy="afterInteractive"
-        >
-          {`
-    try {
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-          gtag('event', 'conversion', {
-            'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
-            'transaction_id': ''
-          });
-        }, { timeout: 3000 });
-      }
-    } catch (e) {
-      console.warn('Ads conversion blocked safely', e);
-    }
-  `}
-        </Script>
 
         {/* Usercentrics Autoblocker */}
-        <Script
+        {/* <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
           strategy="beforeInteractive"
-        />
+        /> */}
 
         {/* Usercentrics CMP */}
         <Script

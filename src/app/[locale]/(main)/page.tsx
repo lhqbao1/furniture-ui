@@ -18,7 +18,7 @@ export default async function HomePage() {
       is_econelo: false,
       is_customer: true,
     }).catch(() => []),
-    getProductByTag("New", {
+    getProductByTag("Best Seller", {
       is_econelo: false,
       is_customer: true,
     }).catch(() => []),
@@ -33,14 +33,18 @@ export default async function HomePage() {
       <div className="md:w-[95%] xl:w-3/4 w-[95%]">
         {" "}
         {/* CRITICAL FIRST PAINT */}
-        <FeaturedProducts products={allProducts} />
+        {/* <RecentViewed products={trendingProducts} /> */}
         {/* <VoucherSection vouchers={voucherList} /> */}
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
-          <RecentViewed products={trendingProducts} />
+          <FeaturedProducts products={allProducts} />
         </Suspense>
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           {" "}
           <NewsletterVoucherSection />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          {" "}
+          <CategorySection slug="spielzeug" />
         </Suspense>
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           {" "}
