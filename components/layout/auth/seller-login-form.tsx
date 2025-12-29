@@ -20,10 +20,12 @@ import { useRef, useState } from "react";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
+import { sellerIdAtom, userIdAtom } from "@/store/auth";
 
 export default function SellerLoginForm() {
   const [userId, setUserId] = useAtom(userIdAtom);
+  const [sellerId, setSellerId] = useAtom(sellerIdAtom);
+
   const [seePassword, setSeePassword] = useState(false);
   const router = useRouter();
   const locale = useLocale();
@@ -68,7 +70,7 @@ export default function SellerLoginForm() {
             const token = data.access_token;
             localStorage.setItem("dsp_access_token", token);
             router.push("/dsp/admin", { locale });
-            setUserId(data.id);
+            setSellerId(data.id);
 
             // Có thể lưu userId nếu cần
             // setUserId(data.id)
@@ -96,7 +98,7 @@ export default function SellerLoginForm() {
           const token = data.access_token;
           localStorage.setItem("dsp_access_token", token);
           router.push("/dsp/admin", { locale });
-          setUserId(data.id);
+          setSellerId(data.id);
 
           // Có thể lưu userId nếu cần
           // setUserId(data.id)
