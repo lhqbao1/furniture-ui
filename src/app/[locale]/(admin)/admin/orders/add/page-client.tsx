@@ -54,7 +54,7 @@ export default function CreateOrderPageClient() {
     const total_shipping = values.carrier === "amm" ? 35.95 : 5.95;
     if (
       values.carrier === "amm" &&
-      (!values.phone_number || values.phone_number.trim() === "")
+      (!values.phone || values.phone.trim() === "")
     ) {
       toast.error("Phone number is required for SPEDITION carrier");
       return;
