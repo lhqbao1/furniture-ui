@@ -37,7 +37,7 @@ const PageHeader = async () => {
           <ExpandDrawer />
         </div>
       </div>
-      <div className="min-h-16 bg-white lg:px-20 hidden lg:block">
+      <div className="min-h-16 bg-white xl:px-20 hidden lg:block">
         <ListCategoriesHome categories={categories ?? []} />
       </div>
     </header>

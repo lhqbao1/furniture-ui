@@ -131,8 +131,6 @@ const ComparePriceCard = ({
     );
   };
 
-  console.log(dialogStep);
-
   return (
     <div
       className="relative group"
@@ -225,7 +223,7 @@ const ComparePriceCard = ({
                     type="button"
                     onClick={() => handleAddToCart(product.id)}
                   >
-                    {t("addToCart")}
+                    {t("buyNow")}
                   </Button>
                 )}
 

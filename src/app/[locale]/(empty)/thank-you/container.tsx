@@ -17,6 +17,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { userIdAtom } from "@/store/auth";
+import { useUseVoucher } from "@/features/vouchers/hook";
+import { currentVoucherAtom } from "@/store/voucher";
 
 const OrderPlaced = () => {
   const router = useRouter();
@@ -30,10 +32,13 @@ const OrderPlaced = () => {
   const [userId, setUserId] = useAtom(userIdAtom);
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
+  const [voucherId, setVoucherId] = useAtom(currentVoucherAtom);
 
   const capturePaymentMutation = useCapturePayment();
   const uploadStaticFileMutation = useUploadStaticFile();
   const sendMailMutation = useSendMail();
+  const useVoucherMutation = useUseVoucher();
+
   const t = useTranslations();
 
   useEffect(() => {

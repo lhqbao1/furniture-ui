@@ -49,7 +49,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
         </div>
       ) : (
         <NavigationMenu viewport={isMobile}>
-          <NavigationMenuList className="gap-6">
+          <NavigationMenuList className="gap-6 w-[90%] xl:w-full flex-wrap mx-auto">
             {categories.map((category) => (
               <NavigationMenuItem key={category.id}>
                 <NavigationMenuTrigger

@@ -151,7 +151,7 @@ export default function CheckOutFormSection() {
       {/* Main container */}
       <div
         className={cn(
-          `grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-12 md:px-14 lg:px-36 px-4`,
+          `grid grid-cols-1 xl:grid-cols-3 gap-0 xl:gap-12 md:px-14 xl:px-36 px-4`,
         )}
       >
         {/* Left side */}
