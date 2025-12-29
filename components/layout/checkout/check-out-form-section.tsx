@@ -225,7 +225,7 @@ export default function CheckOutFormSection() {
           <div className="flex lg:justify-start justify-center mt-2">
             <Button
               type="submit"
-              className="text-lg lg:w-1/3 w-1/2 py-6"
+              className="lg:text-lg text-base w-fu lg:w-1/3 md:w-1/2 py-6"
               disabled={submitting}
             >
               {submitting ? (
