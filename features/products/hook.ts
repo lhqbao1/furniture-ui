@@ -24,7 +24,10 @@ interface SEOInput {
   title: string;
   description: string;
 }
-
+interface GetProductByTagParams {
+  is_customer?: boolean;
+  is_econelo?: boolean;
+}
 export function useGetAllProducts({
   page,
   page_size,
@@ -109,13 +112,13 @@ export function useGetProductById(id: string) {
 
 export function useGetProductByTag(
   tag: string,
-  is_customer = false,
-  is_econelo = false,
+  params?: GetProductByTagParams,
 ) {
   return useQuery({
-    queryKey: ["product-by-tag", tag, is_customer, is_econelo],
-    queryFn: () => getProductByTag(tag, is_customer, is_econelo),
-    enabled: !!tag, // chỉ gọi khi tag có giá trị
+    queryKey: ["product-by-tag", tag, JSON.stringify(params ?? {})],
+    queryFn: () => getProductByTag(tag, params),
+    enabled: Boolean(tag),
+    staleTime: 1000 * 60 * 5,
     retry: false,
   });
 }
