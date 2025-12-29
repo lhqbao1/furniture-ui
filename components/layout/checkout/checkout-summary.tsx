@@ -41,7 +41,6 @@ const CheckoutSummary = ({
 }: CheckoutSummaryProps) => {
   const form = useFormContext();
   const t = useTranslations();
-  const [userId, setUserId] = useAtom(userIdAtom);
   const [currentVoucher, setCurrentVoucher] = useAtom(currentVoucherAtom);
   const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
 

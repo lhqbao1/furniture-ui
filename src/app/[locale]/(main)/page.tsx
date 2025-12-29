@@ -15,11 +15,14 @@ export const experimental_ppr = true;
 
 export default async function HomePage() {
   const [trendingProducts, allProducts, voucherList] = await Promise.all([
-    getProductByTag("Trending").catch(() => []),
-    getAllProducts({ page_size: 24 }).catch(() => ({
-      items: [],
-      total: 0,
-    })),
+    getProductByTag("Trending", {
+      is_econelo: false,
+      is_customer: true,
+    }).catch(() => []),
+    getProductByTag("New", {
+      is_econelo: false,
+      is_customer: true,
+    }).catch(() => []),
     getVouchers().catch(() => []),
   ]);
 
@@ -31,7 +34,7 @@ export default async function HomePage() {
       <div className="md:w-[95%] xl:w-3/4 w-[95%]">
         {" "}
         {/* CRITICAL FIRST PAINT */}
-        <FeaturedProducts products={allProducts.items} />
+        <FeaturedProducts products={allProducts} />
         {/* <VoucherSection vouchers={voucherList} /> */}
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <RecentViewed products={trendingProducts} />

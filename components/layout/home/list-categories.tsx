@@ -54,10 +54,10 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
               <NavigationMenuItem key={category.id}>
                 <NavigationMenuTrigger
                   className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer"
-                  onClick={() => {
-                    setCurrentCategoryId(category.id);
-                    setCategoryClicked(true);
-                  }}
+                  // onClick={() => {
+                  //   setCurrentCategoryId(category.id);
+                  //   setCategoryClicked(true);
+                  // }}
                 >
                   {category.name}
                 </NavigationMenuTrigger>
@@ -69,8 +69,8 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                         <NavigationMenuLink
                           key={child.id}
                           onClick={() => {
-                            setCurrentCategoryId(child.id);
-                            setCategoryClicked(true);
+                            // setCurrentCategoryId(child.id);
+                            // setCategoryClicked(true);
                             router.push(`/category/${child.slug}`, { locale });
                           }}
                           className="

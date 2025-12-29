@@ -19,7 +19,7 @@ import {
 } from "@/features/contact/hook";
 import { toast } from "sonner";
 import { useAtom } from "jotai";
-import { hasRequestedVoucherAtom } from "@/store/voucher";
+import { hasRequestedVoucherAtom, voucherDialogAtom } from "@/store/voucher";
 
 interface RequestOfferDialogProps {
   productName?: string;
@@ -38,6 +38,8 @@ export default function RequestOfferDialog({
   const [hasRequestedVoucher, setHasRequestedVoucher] = useAtom(
     hasRequestedVoucherAtom,
   );
+  const [dialogStep, setDialogStep] = useAtom(voucherDialogAtom);
+
   const emailInputRef = React.useRef<HTMLInputElement>(null);
   const sendContactMutation = useUploadContactForm();
 
@@ -73,7 +75,6 @@ export default function RequestOfferDialog({
   }, [open, defaultMessage]);
 
   const handleSubmit = () => {
-    console.log(hasRequestedVoucher);
     // 🔴 validate
     if (!email) {
       setEmailError(t("emailRequired", { default: "Email is required" }));
@@ -98,10 +99,10 @@ export default function RequestOfferDialog({
       },
       {
         onSuccess() {
-          toast.success(t("messageSent", { default: "Request sent" }));
-          setOpen(false);
-          setEmail("");
+          toast.success(t("messageSent"));
+          setDialogStep("apply");
           setHasRequestedVoucher(true);
+          console.log(dialogStep);
         },
         onError() {
           toast.error(
@@ -114,26 +115,39 @@ export default function RequestOfferDialog({
 
   return (
     <Dialog
-      open={open}
-      onOpenChange={setOpen}
+      open={dialogStep === "request"}
+      onOpenChange={(open) => {
+        if (!open) setDialogStep("none");
+      }}
     >
       <DialogTrigger asChild>
-        <Button
-          className={`rounded-md lg:px-4 mr-1 text-sm ${
-            hasRequestedVoucher && "bg-gray-500 text-white"
-          }`}
-          type="button"
-          disabled={hasRequestedVoucher}
-          // variant="outline"
-        >
-          {t("requestOffer")}
-        </Button>
+        <DialogTrigger asChild>
+          <Button
+            onClick={() => setDialogStep("request")}
+            className={`rounded-md lg:px-4 mr-1 text-sm ${
+              hasRequestedVoucher ? "bg-gray-500 text-white" : ""
+            }`}
+          >
+            {t("requestOffer")}
+          </Button>
+        </DialogTrigger>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("contactTitle")}</DialogTitle>
-          <DialogDescription>{t("contactDesc")}</DialogDescription>
+          <DialogDescription>
+            <div>
+              Wir sind stets bemüht, Ihnen die bestmögliche Qualität zum
+              bestmöglichen Preis anzubieten.
+            </div>
+            <div>
+              {" "}
+              Gerne senden wir Ihnen einen exklusiven Gutschein zu. 10 % Rabatt,
+              maximal 50 EUR.
+            </div>
+            <div>Bitte geben Sie Ihre E-Mail-Adresse ein.</div>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
@@ -153,12 +167,12 @@ export default function RequestOfferDialog({
           </div>
 
           {/* MESSAGE */}
-          <Textarea
+          {/* <Textarea
             rows={5}
             placeholder={t("message")}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-          />
+          /> */}
 
           {/* SUBMIT */}
           <Button

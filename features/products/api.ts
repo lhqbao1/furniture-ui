@@ -48,6 +48,11 @@ interface SEOResponse {
   meta_keywords: string;
 }
 
+interface GetProductByTagParams {
+  is_customer?: boolean;
+  is_econelo?: boolean;
+}
+
 export async function CreateProduct(input: ProductInput) {
   const { data } = await apiAdmin.post("/products/", input, {
     headers: {
@@ -137,17 +142,16 @@ export async function getProductBySlug(product_slug: string) {
 
 export async function getProductByTag(
   tag: string,
-  is_customer = false,
-  is_econelo = false,
+  params?: GetProductByTagParams,
 ) {
   try {
     const { data } = await apiPublic.get(`/products/by-tag/${tag}`, {
-      params: { is_customer, is_econelo },
+      params,
     });
     return data as ProductItem[];
   } catch (err) {
     console.error("API getProductByTag failed:", tag, err);
-    return []; // ⭐ KHÔNG THROW → KHÔNG CRASH SSR
+    return [];
   }
 }
 

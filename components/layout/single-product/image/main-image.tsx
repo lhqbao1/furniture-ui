@@ -65,11 +65,11 @@ export default function MainImage({
           alt={productDetails.name}
           priority
           className={`
-transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-    lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer rounded-xs
-    ${direction === "left" ? "opacity-0 -translate-x-6" : ""}
-    ${direction === "right" ? "opacity-0 translate-x-6" : ""}
-  `}
+            transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
+            lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer rounded-xs
+            ${direction === "left" ? "-translate-x-6" : ""}
+            ${direction === "right" ? "translate-x-6" : ""}
+          `}
           style={{
             transformOrigin: `${position.x}% ${position.y}%`,
             transform: isHover ? "scale(1.55)" : "scale(1)",

@@ -3,6 +3,7 @@ import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 export const userIdAtom = atomWithStorage<string | null>("user_id", null);
+export const sellerIdAtom = atomWithStorage<string | null>("seller_id", null);
 
 export const authHydratedAtom = atom(false);
 

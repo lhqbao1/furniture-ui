@@ -5,6 +5,9 @@ import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { ProductItem } from "@/types/products";
 import { Loader2 } from "lucide-react";
+import { useGetProductsSelect } from "@/features/product-group/hook";
+import { useQuery } from "@tanstack/react-query";
+import { getAllProductsSelect } from "@/features/product-group/api";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -19,8 +22,22 @@ function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   }
 }
 
-export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
-  const handleExport = () => {
+export default function ExportExcelButton() {
+  const { data, isFetching, refetch } = useQuery({
+    queryKey: ["all-products"],
+    queryFn: () =>
+      getAllProductsSelect({
+        all_products: true,
+      }),
+    enabled: false, // ❌ không auto call
+  });
+
+  const handleExport = async () => {
+    const res = await refetch(); // 🔥 gọi API tại đây
+    const data = res.data;
+
+    if (!data || data.length === 0) return;
+
     // Hàm xử lý giá trị null / undefined / "None"
     const clean = (val: any) =>
       val === null || val === undefined || val === "None" ? "" : val;
@@ -119,15 +136,11 @@ export default function ExportExcelButton({ data }: { data: ProductItem[] }) {
 
   return (
     <Button
-      variant={"outline"}
+      variant="outline"
       onClick={handleExport}
-      disabled={!data || data.length === 0}
+      disabled={isFetching}
     >
-      {data.length === 0 ? (
-        <Loader2 className="animate-spin" />
-      ) : (
-        " Export Excel"
-      )}
+      {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
     </Button>
   );
 }

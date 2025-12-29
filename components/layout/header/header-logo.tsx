@@ -37,7 +37,7 @@ const HeaderLogo = () => {
           height={200}
           width={200}
           alt=""
-          className="block xl:h-16 xl:w-auto h-12 w-auto object-contain cursor-pointer "
+          className="block xl:h-16 xl:w-auto h-10 w-auto object-contain cursor-pointer "
         />
       </Link>
     </>

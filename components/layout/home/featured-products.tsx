@@ -17,8 +17,6 @@ const FeaturedProducts = ({ products }: FeaturedProductsProps) => {
   const isPhone = useMediaQuery({ maxWidth: 767 });
   const [mounted, setMounted] = useState(false);
 
-  console.log(products);
-
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -28,8 +26,6 @@ const FeaturedProducts = ({ products }: FeaturedProductsProps) => {
     () => products.filter((item) => item.is_active),
     [products],
   );
-
-  console.log(filteredProducts);
 
   if (!mounted) {
     return (
