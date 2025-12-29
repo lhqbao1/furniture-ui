@@ -255,14 +255,39 @@ export default function RootLayout({
           async
         /> */}
 
-        {/* <Script
-          id="usercentrics-cmp"
-          src="https://web.cmp.usercentrics.eu/ui/loader.js"
-          data-settings-id="RlDaintBne_uoh"
-          async
+        <Script
+          id="usercentrics-safe"
           strategy="afterInteractive"
-          defer
-        /> */}
+        >
+          {`
+    (function () {
+      try {
+        const run = () => {
+          if (window.__usercentricsLoaded) return;
+          window.__usercentricsLoaded = true;
+
+          const script = document.createElement('script');
+          script.src = 'https://web.cmp.usercentrics.eu/ui/loader.js';
+          script.async = true;
+          script.defer = true;
+          script.setAttribute('data-settings-id', 'RlDaintBne_uoh');
+
+          if (document.body) {
+            document.body.appendChild(script);
+          }
+        };
+
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(run, { timeout: 3000 });
+        } else {
+          setTimeout(run, 2000);
+        }
+      } catch (e) {
+        console.warn('Usercentrics blocked safely', e);
+      }
+    })();
+  `}
+        </Script>
       </head>
 
       <body
@@ -287,9 +312,7 @@ export default function RootLayout({
         </noscript>
 
         <RuntimeErrorLogger />
-        <ClientBoundary>
-          <QueryProvider>{children}</QueryProvider>
-        </ClientBoundary>
+        <QueryProvider>{children}</QueryProvider>
 
         <Toaster
           expand
