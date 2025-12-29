@@ -9,7 +9,6 @@ import { CartActions, useCartData } from "@/hooks/cart/useCart";
 import { useAtom } from "jotai";
 import { authHydratedAtom, userIdAtom } from "@/store/auth";
 import CartItemCard from "@/components/layout/cart/cart-item";
-import { CartItem, CartResponseItem } from "@/types/cart";
 import { useTranslations } from "next-intl";
 import {
   calculateShipping,
@@ -20,10 +19,7 @@ import CartItemSkeleton from "@/components/layout/cart/skeleton/cart-item-card-s
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "@/src/i18n/navigation";
-
-function flattenCartItems(carts: CartResponseItem[]): CartItem[] {
-  return carts.flatMap((cart) => cart.items);
-}
+import { flattenCartItems } from "@/hooks/cart/flattenCart";
 
 const CartPageClient = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -48,16 +44,22 @@ const CartPageClient = () => {
     setIsLoginOpen,
   });
 
-  const flatItems = flattenCartItems(cart ?? []);
-
+  const flatItems = React.useMemo(() => {
+    return flattenCartItems(cart ?? []);
+  }, [cart]);
   const hasServerCart = Array.isArray(cart) && cart.length > 0;
 
-  const normalized = normalizeCartItems(
-    hasServerCart ? cart.flatMap((g) => g.items) : localCart,
-    hasServerCart,
-  );
+  const normalized = React.useMemo(() => {
+    const items = hasServerCart
+      ? cart?.flatMap((g) => g.items) ?? []
+      : localCart;
 
-  const shippingCost = calculateShipping(normalized);
+    return normalizeCartItems(items, hasServerCart);
+  }, [cart, localCart, hasServerCart]);
+
+  const shippingCost = React.useMemo(() => {
+    return calculateShipping(normalized);
+  }, [normalized]);
 
   return (
     <div className="mt-6 md:pb-0 pb-6 lg:px-0 px-4 container-padding overflow-auto">

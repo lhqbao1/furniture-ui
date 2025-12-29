@@ -27,7 +27,6 @@ const HeaderUserLogin = () => {
   const pathName = usePathname();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const isMobile = useMediaQuery({ maxWidth: 676 });
 
   const {
     data: user,
@@ -64,8 +63,7 @@ const HeaderUserLogin = () => {
         // Loading state
         <User
           stroke="#4D4D4D"
-          size={isMobile ? 20 : 30}
-          className="animate-pulse opacity-50"
+          className="animate-pulse opacity-50 w-[20px] h-[20px] md:w-[30px] md:h-[30px]"
         />
       ) : user ? (
         // Logged in -> dropdown
@@ -73,9 +71,8 @@ const HeaderUserLogin = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <User
-                className="cursor-pointer hover:scale-110 transition-all duration-300"
+                className="cursor-pointer hover:scale-110 transition-all duration-300 w-[20px] h-[20px] md:w-[30px] md:h-[30px]"
                 stroke="#4D4D4D"
-                size={isMobile ? 20 : 30}
               />
             </DropdownMenuTrigger>
 
