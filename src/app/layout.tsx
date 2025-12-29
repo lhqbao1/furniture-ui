@@ -77,6 +77,18 @@ export default function RootLayout({
     <html lang="de">
       <head>
         <Script
+          id="gtag-stub"
+          strategy="beforeInteractive"
+        >
+          {`
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+  `}
+        </Script>
+
+        <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17706586126"
           async
         />
@@ -93,15 +105,13 @@ export default function RootLayout({
                     `}
         </Script> */}
         <Script
-          id="gtag-safe"
+          id="gtag-init-safe"
           strategy="afterInteractive"
         >
           {`
     (function () {
       try {
         const run = () => {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'AW-17706586126');
         };
@@ -112,7 +122,34 @@ export default function RootLayout({
           setTimeout(run, 1500);
         }
       } catch (e) {
-        console.warn('gtag blocked safely', e);
+        console.warn('gtag init failed safely', e);
+      }
+    })();
+  `}
+        </Script>
+
+        <Script
+          id="google-ads-conversion-safe"
+          strategy="afterInteractive"
+        >
+          {`
+    (function () {
+      try {
+        const run = () => {
+          if (!window.gtag) return;
+          gtag('event', 'conversion', {
+            'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
+            'transaction_id': ''
+          });
+        };
+
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(run, { timeout: 3000 });
+        } else {
+          setTimeout(run, 2000);
+        }
+      } catch (e) {
+        console.warn('Ads conversion failed safely', e);
       }
     })();
   `}
