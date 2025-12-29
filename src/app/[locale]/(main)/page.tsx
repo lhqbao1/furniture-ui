@@ -14,11 +14,11 @@ export const experimental_ppr = true;
 
 export default async function HomePage() {
   const [trendingProducts, allProducts, voucherList] = await Promise.all([
-    getProductByTag("Trending", {
+    getProductByTag("TRENDING", {
       is_econelo: false,
       is_customer: true,
     }).catch(() => []),
-    getProductByTag("Best Seller", {
+    getProductByTag("BEST_SELLER", {
       is_econelo: false,
       is_customer: true,
     }).catch(() => []),
