@@ -58,7 +58,7 @@ const VoucherApply = ({
   };
 
   return (
-    <div className="flex items-center gap-2 md:w-1/3 w-full">
+    <div className="flex items-center gap-2 md:w-1/2 lg:w-1/3 w-full">
       <BadgePercent className="w-5 h-5 text-muted-foreground" />
 
       <Input

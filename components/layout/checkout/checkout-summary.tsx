@@ -217,26 +217,11 @@ const CheckoutSummary = ({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4 flex justify-end xl:mb-8">
         <VoucherApply
           voucherId={voucherId}
           setVoucherId={setVoucherId}
         />
-        {/* <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-2">
-          {listVouchers && listVouchers.length > 0
-            ? listVouchers.map((item, index) => {
-                return (
-                  <ProductVoucher
-                    key={item.id}
-                    item={item}
-                    isSelected={voucherId === item.id}
-                    onSelect={(id) => setVoucherId(id)}
-                    isLoadingVoucher={isLoadingVoucher}
-                  />
-                );
-              })
-            : null}
-        </div> */}
       </div>
       {/* TOTAL + NOTE */}
       <div className="grid grid-cols-2 gap-6 items-start">
