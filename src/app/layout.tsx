@@ -249,20 +249,20 @@ export default function RootLayout({
   `}
         </Script>
 
-        {/* <Script
+        {/* Usercentrics Autoblocker */}
+        <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
-          async
-        /> */}
+          strategy="beforeInteractive"
+        />
 
-        {/* <Script
+        {/* Usercentrics CMP */}
+        <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="RlDaintBne_uoh"
-          async
           strategy="afterInteractive"
-          defer
-        /> */}
+        />
       </head>
 
       <body
@@ -287,9 +287,7 @@ export default function RootLayout({
         </noscript>
 
         <RuntimeErrorLogger />
-        <ClientBoundary>
-          <QueryProvider>{children}</QueryProvider>
-        </ClientBoundary>
+        <QueryProvider>{children}</QueryProvider>
 
         <Toaster
           expand

@@ -78,7 +78,7 @@ export const createInvoiceColumns = ({
       accessorKey: "vat",
       header: "MwSt.",
       cell: ({ row }) => {
-        return <div>{tax}%</div>;
+        return <div>{row.original.products.tax}</div>;
       },
     },
     {

@@ -160,6 +160,20 @@ const Footer = () => {
               alt="Praktiker Trust Logo"
             />
           </a>
+          <a
+            href="/file/FSC.pdf"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            aria-label="Open FSC Certificate PDF"
+          >
+            <Image
+              src="/fsc-footer.jpg"
+              width={120}
+              height={40}
+              alt="FSC Certificate"
+              priority
+            />
+          </a>
         </div>
       </div>
 
