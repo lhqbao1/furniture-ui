@@ -76,6 +76,7 @@ export default function CreateOrderPageClient() {
           values.invoice_additional_address?.trim() === ""
             ? null
             : values.invoice_additional_address,
+        tax: 0,
       },
       {
         onSuccess(data, variables, context) {

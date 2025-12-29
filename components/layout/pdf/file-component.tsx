@@ -11,8 +11,9 @@ import { useMemo } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { InvoicePDF } from "./file";
 import { Button } from "@/components/ui/button";
-import { calculateVAT } from "@/lib/caculate-vat";
 import { getCountryName } from "@/lib/country-name";
+import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
+import { calculateShippingCost } from "@/hooks/caculate-shipping";
 
 interface InvoiceTableProps {
   checkoutId: string;
@@ -183,7 +184,11 @@ export default function InvoiceTable({
         <div className="flex gap-0 justify-end">
           <div className="mr-6">Versandkosten (brutto)</div>
           <div className="w-[100px] text-right">
-            {(invoice?.total_shipping ?? 0)?.toLocaleString("de-DE", {
+            {calculateShippingCost(
+              invoice?.main_checkout.checkouts
+                .flatMap((c) => c.cart)
+                .flatMap((c) => c.items) ?? [],
+            ).gross?.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -199,12 +204,12 @@ export default function InvoiceTable({
         <div className="flex gap-0 justify-end">
           <div className="mr-6">MwSt.</div>
           <div className="w-[100px] text-right">
-            {calculateVAT({
-              items: invoice?.total_amount_item,
-              shipping: invoice?.total_shipping,
-              discount: invoice?.voucher_amount,
-              taxPercent: checkout?.tax ?? 19,
-            }).toLocaleString("de-DE", {
+            {calculateOrderTaxWithDiscount(
+              invoice?.main_checkout.checkouts
+                .flatMap((c) => c.cart)
+                .flatMap((c) => c.items) ?? [],
+              invoice?.voucher_amount,
+            ).totalVat.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}

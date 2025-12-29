@@ -96,7 +96,7 @@ export default function ManualAdditionalInformation({
           )}
         />
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="carrier"
           render={({ field }) => (
@@ -124,7 +124,7 @@ export default function ManualAdditionalInformation({
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
         <FormField
           control={form.control}
@@ -152,7 +152,7 @@ export default function ManualAdditionalInformation({
             </FormItem>
           )}
         />
-
+        {/* 
         <FormField
           control={form.control}
           name="tax"
@@ -183,7 +183,7 @@ export default function ManualAdditionalInformation({
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
         <FormField
           control={form.control}
@@ -204,7 +204,9 @@ export default function ManualAdditionalInformation({
                     value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value === "" ? null : e.target.valueAsNumber,
+                        e.target.value === ""
+                          ? undefined
+                          : e.target.valueAsNumber,
                       )
                     }
                   />

@@ -12,7 +12,6 @@ import {
 import { Font } from "@react-pdf/renderer";
 import { useMemo } from "react";
 import { FooterSection } from "./file-footer";
-import { calculateVAT } from "@/lib/caculate-vat";
 import { getCountryName } from "@/lib/country-name";
 
 Font.register({
@@ -451,7 +450,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   fontWeight: "bold",
                 }}
               >
-                {calculateVAT({
+                {/* {calculateVAT({
                   items: invoice?.total_amount_item,
                   shipping: invoice?.total_shipping,
                   discount: invoice?.voucher_amount,
@@ -459,7 +458,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 }).toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                })}
+                })} */}
                 €
               </Text>
             </View>

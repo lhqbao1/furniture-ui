@@ -249,45 +249,20 @@ export default function RootLayout({
   `}
         </Script>
 
-        {/* <Script
+        {/* Usercentrics Autoblocker */}
+        <Script
           id="usercentrics-autoblocker"
           src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
-          async
-        /> */}
+          strategy="beforeInteractive"
+        />
 
+        {/* Usercentrics CMP */}
         <Script
-          id="usercentrics-safe"
+          id="usercentrics-cmp"
+          src="https://web.cmp.usercentrics.eu/ui/loader.js"
+          data-settings-id="RlDaintBne_uoh"
           strategy="afterInteractive"
-        >
-          {`
-    (function () {
-      try {
-        const run = () => {
-          if (window.__usercentricsLoaded) return;
-          window.__usercentricsLoaded = true;
-
-          const script = document.createElement('script');
-          script.src = 'https://web.cmp.usercentrics.eu/ui/loader.js';
-          script.async = true;
-          script.defer = true;
-          script.setAttribute('data-settings-id', 'RlDaintBne_uoh');
-
-          if (document.body) {
-            document.body.appendChild(script);
-          }
-        };
-
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(run, { timeout: 3000 });
-        } else {
-          setTimeout(run, 2000);
-        }
-      } catch (e) {
-        console.warn('Usercentrics blocked safely', e);
-      }
-    })();
-  `}
-        </Script>
+        />
       </head>
 
       <body
