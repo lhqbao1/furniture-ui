@@ -181,7 +181,6 @@ const ProductLogisticsGroup = ({
                     if (val === "Deselect") field.onChange(null);
                     else field.onChange(val);
                   }}
-                  defaultValue={deliveryTimes[deliveryTimes.length - 1]}
                 >
                   <SelectTrigger className="border col-span-4 font-light">
                     <SelectValue placeholder="Select delivery time" />

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { currentVoucherAtom } from "@/store/voucher";
+import { currentVoucherAtom, voucherDialogAtom } from "@/store/voucher";
 import { useAtom } from "jotai";
 import { BadgePercent } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -26,6 +26,7 @@ const VoucherApplyComapre = ({
 }: VoucherApplyProps) => {
   const t = useTranslations();
   const [, setCurrentVoucher] = useAtom(currentVoucherAtom);
+  const [dialogStep, setDialogStep] = useAtom(voucherDialogAtom);
 
   const [code, setCode] = useState("");
   const [submitCode, setSubmitCode] = useState<string | null>(null);
@@ -40,6 +41,7 @@ const VoucherApplyComapre = ({
       setVoucherId?.(data.id);
       if (setDiscountAmount) setDiscountAmount(data);
       toast.success(t("voucherApplied"));
+      setDialogStep("success");
     }
   }, [data]);
 

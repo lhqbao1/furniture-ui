@@ -1,5 +1,5 @@
 import { ProductItem } from "@/types/products";
-import { Clock, Info, Truck } from "lucide-react";
+import { Clock, Info, Truck, Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
 import {
@@ -159,24 +159,27 @@ const ProductDetailsLogistic = ({
         {t("inStock1")}: {productDetails.stock} Stück
       </div> */}
 
-      <div className="flex flex-row gap-4 items-start py-1.5 lg:py-3">
-        <Truck size={30} />
-        <div>
-          <p className="font-bold">
-            {t("shippingCost", {
-              shippingCost:
-                productDetails.carrier === "amm" ? "35,95€" : "5,95€",
-            })}{" "}
-            inkl. MwSt.
-          </p>
-          <p className="text-gray-600">14-Tage-Rückgaberecht</p>
-        </div>
+      <div className="flex flex-row gap-4 items-center">
+        <Truck size={25} />
+        <span className="text-gray-800 font-medium text-sm">
+          {t("shippingCost", {
+            shippingCost: productDetails.carrier === "amm" ? "35,95€" : "5,95€",
+          })}{" "}
+          inkl. MwSt.
+        </span>
       </div>
 
-      <div className="flex flex-row gap-4 items-start  py-1.5 lg:py-3">
-        <Clock size={30} />
+      <div className="flex flex-row gap-4 items-center">
+        <Undo2 size={25} />
+        <span className="text-gray-800 font-medium text-sm">
+          14-Tage-Rückgaberecht
+        </span>
+      </div>
+
+      <div className="flex flex-row gap-4 items-center">
+        <Clock size={25} />
         <div>
-          <p className="font-bold">
+          <span className="text-gray-800 font-medium text-sm">
             {estimatedDeliveryRange ? (
               <>
                 {t.rich("deliveryDateRange", {
@@ -192,7 +195,7 @@ const ProductDetailsLogistic = ({
             ) : (
               t("updating")
             )}
-          </p>
+          </span>
 
           <ul className="space-y-1 text-gray-600 text-sm">
             {productDetails.carrier === "amm" && (

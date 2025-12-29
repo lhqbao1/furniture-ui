@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { useAtom } from "jotai";
 import { openPriceComparisionAtom } from "@/store/price-comparision";
+import { ApplyVoucherDialog } from "./apply-voucher-dialog";
 
 interface ComparePriceSectionProps {
   product: ProductItem;
@@ -100,6 +101,7 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
                       isProduct
                     />
                   )}
+                  <ApplyVoucherDialog />
                 </div>
               ))}
           </AccordionContent>

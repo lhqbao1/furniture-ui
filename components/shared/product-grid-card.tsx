@@ -196,19 +196,20 @@ export default function ProductCard({
             passHref
             className="cursor-pointer"
           >
-            <div className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group">
+            <div className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group flex items-center">
               {/* Image 1 */}
               <Image
                 src={
                   product.static_files?.[0]?.url || "/placeholder-product.webp"
                 }
                 alt={product.name}
-                fill
+                width={800} // số bất kỳ > 0
+                height={800}
                 className="
       object-contain
       transition-all duration-500 ease-in-out
       group-hover:-translate-x-6
-      group-hover:opacity-0
+      group-hover:opacity-0 rounded-xl
     "
               />
 
@@ -217,10 +218,11 @@ export default function ProductCard({
                 <Image
                   src={product.static_files[1].url}
                   alt={product.name}
-                  fill
+                  width={800} // số bất kỳ > 0
+                  height={800}
                   className="
         object-contain
-        absolute inset-0
+        absolute rounded-xl
         translate-x-6 opacity-0
         transition-all duration-500 ease-in-out
         group-hover:translate-x-0

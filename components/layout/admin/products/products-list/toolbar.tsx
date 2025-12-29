@@ -175,7 +175,7 @@ export default function TableToolbar({
 
         <div className="flex gap-2 text-sm font-medium">
           {/* <Button variant="ghost" className="">Export</Button> */}
-          <ExportExcelButton data={exportData ?? []} />
+          <ExportExcelButton />
           <ImportDialog
             setIsImporting={setIsImporting}
             isSupplier

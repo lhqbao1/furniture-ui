@@ -16,9 +16,10 @@ import Image from "next/image";
 import React from "react";
 import { toast } from "sonner";
 import RequestOfferDialog from "./request-offer-dialog";
-import { hasRequestedVoucherAtom } from "@/store/voucher";
+import { hasRequestedVoucherAtom, voucherDialogAtom } from "@/store/voucher";
 import VoucherApply from "../../checkout/voucher-apply";
 import VoucherApplyComapre from "./voucher-apply";
+import CountUp from "@/components/CountUp";
 
 const MARKETPLACE_ICON_MAP: Record<string, string> = {
   kaufland: "/kaufland-seeklogo.png",
@@ -56,6 +57,7 @@ const ComparePriceCard = ({
   const [hasRequestedVoucher, setHasRequestedVoucher] = useAtom(
     hasRequestedVoucherAtom,
   );
+  const [dialogStep, setDialogStep] = useAtom(voucherDialogAtom);
 
   const handleAddToCart = (values: any) => {
     if (!product) return;
@@ -120,14 +122,7 @@ const ComparePriceCard = ({
         onSuccess: () => toast.success(t("addToCartSuccess")),
         onError: (error) => {
           const { status, message } = HandleApiError(error, t);
-
-          // if (status === 400) {
-          //   toast.error(t("notEnoughStock"));
-          //   return;
-          // }
-
           toast.error(message);
-
           if (status === 401) {
             router.push("/login", { locale });
           }
@@ -135,6 +130,8 @@ const ComparePriceCard = ({
       },
     );
   };
+
+  console.log(dialogStep);
 
   return (
     <div
@@ -193,16 +190,34 @@ const ComparePriceCard = ({
               )}
 
               <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center gap-2">
-                <div className={cn("text-xl md:text-2xl", priceClassName)}>
-                  {(marketplacePrice
-                    ? marketplacePrice
-                    : product.final_price
-                  ).toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                  €
-                </div>
+                {isProduct && dialogStep === "success" ? (
+                  <>
+                    <CountUp
+                      from={product.final_price}
+                      to={product.final_price - 10}
+                      duration={0.8}
+                      className="text-3xl"
+                      startWhen={dialogStep === "success"}
+                      // onEnd={() => {
+                      //   if (matchedVoucher) {
+                      //     setLastVoucher(matchedVoucher.id);
+                      //   }
+                      // }}
+                    />
+                    €
+                  </>
+                ) : (
+                  <div className={cn("text-xl md:text-2xl", priceClassName)}>
+                    {(marketplacePrice
+                      ? marketplacePrice
+                      : product.final_price
+                    ).toLocaleString("de-DE", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    €
+                  </div>
+                )}
 
                 {isProduct && isProductCheapest && (
                   <Button
@@ -222,13 +237,6 @@ const ComparePriceCard = ({
                       productUrl={`/product/${product.url_key}`}
                     />
                   )}
-
-                {isProduct && !isProductCheapest && hasRequestedVoucher && (
-                  <div className="w-full flex-1">
-                    {""}
-                    <VoucherApplyComapre />
-                  </div>
-                )}
               </div>
             </div>
           </div>

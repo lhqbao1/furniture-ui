@@ -143,14 +143,16 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                 </Button>
               )}
 
-              <Button
-                type="button"
-                variant={"secondary"}
-                onClick={() => setOpenPriceComparsion(!openPriceComparision)}
-                className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
-              >
-                {t("priceComparison")}
-              </Button>
+              {productDetails.marketplace_products.length > 0 && (
+                <Button
+                  type="button"
+                  variant={"secondary"}
+                  onClick={() => setOpenPriceComparsion(!openPriceComparision)}
+                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
+                >
+                  {t("priceComparison")}
+                </Button>
+              )}
             </div>
           </div>
 

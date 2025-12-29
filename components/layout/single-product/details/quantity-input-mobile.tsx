@@ -73,7 +73,7 @@ export function FormQuantityInputMobile({
         className="
           h-full
           text-center 
-          px-10 
+          px-10
           appearance-none 
           [&::-webkit-inner-spin-button]:appearance-none
           [&::-webkit-outer-spin-button]:appearance-none
