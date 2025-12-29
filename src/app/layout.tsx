@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import QueryProvider from "@/lib/query-provider";
+import RuntimeErrorLogger from "@/components/shared/error/runtime-error-logger";
+import ClientBoundary from "@/components/shared/error/client-boundary";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -159,7 +161,10 @@ export default function RootLayout({
           />
         </noscript>
 
-        <QueryProvider>{children}</QueryProvider>
+        <RuntimeErrorLogger />
+        <ClientBoundary>
+          <QueryProvider>{children}</QueryProvider>
+        </ClientBoundary>
 
         <Toaster
           expand
