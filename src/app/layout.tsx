@@ -128,14 +128,14 @@ export default function RootLayout({
           async
         /> */}
 
-        <Script
+        {/* <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="RlDaintBne_uoh"
           async
           strategy="afterInteractive"
           defer
-        />
+        /> */}
       </head>
 
       <body

@@ -10,7 +10,6 @@ import HeaderCartIcon from "./header-cart-icon";
 import HeaderUserLogin from "./header-user-login";
 import ExpandDrawer from "./expand-drawer";
 import { getCategoriesWithChildren } from "@/features/category/api";
-import CategoriesDrawer from "./categories-drawer";
 
 const PageHeader = async () => {
   const categories = await getCategoriesWithChildren();
@@ -37,7 +36,7 @@ const PageHeader = async () => {
           <ExpandDrawer />
         </div>
       </div>
-      <div className="min-h-16 bg-white lg:px-20 hidden lg:block">
+      <div className="min-h-16 bg-white xl:px-20 hidden lg:block">
         <ListCategoriesHome categories={categories ?? []} />
       </div>
     </header>

@@ -44,8 +44,7 @@ export function CartDrawerMobile() {
         <div className="relative">
           <ShoppingCart
             stroke="#4D4D4D"
-            size={20}
-            className="hover:scale-110 transition-all duration-300"
+            className="hover:scale-110 transition-all duration-300 w-[20px] h-[20px] md:w-[30px] md:h-[30px]"
           />
           {displayedCart && displayedCart > 0 ? (
             <span className="absolute -top-1.5 -right-1 flex size-3">

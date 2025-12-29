@@ -8,7 +8,6 @@ import { getProductByTag, getAllProducts } from "@/features/products/api";
 import { getVouchers } from "@/features/vouchers/api";
 import { Suspense } from "react";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
-// import Loading from "./loading";
 
 export const revalidate = 60;
 export const experimental_ppr = true;

@@ -5,6 +5,11 @@ import React, { useState } from "react";
 import CartTable from "../cart/cart-table";
 import CartLocalTable from "../cart/cart-local-table";
 import { useCartLocal } from "@/hooks/cart";
+import { useMediaQuery } from "react-responsive";
+import { useAtom } from "jotai";
+import { userIdAtom } from "@/store/auth";
+import { flattenCartItems } from "@/hooks/cart/flattenCart";
+import CartItemCard from "../cart/cart-item";
 
 interface CheckoutProductsProps {
   cartItems: CartResponseItem[];
@@ -20,12 +25,32 @@ const CheckoutProducts = ({
   const [localQuantities, setLocalQuantities] = useState<
     Record<string, number>
   >({});
+  const [userId, setUserId] = useAtom(userIdAtom);
+
+  const isTabletSmall = useMediaQuery({ maxWidth: 1023 });
+  const flatItems = flattenCartItems(cartItems ?? []);
 
   const { updateStatus } = useCartLocal();
 
   return (
     <>
-      {cartItems && cartItems.length > 0 ? (
+      {isTabletSmall ? (
+        userId ? (
+          flatItems.map((item) => (
+            <CartItemCard
+              cartServer={item}
+              key={item.id}
+            />
+          ))
+        ) : (
+          localCart.map((item) => (
+            <CartItemCard
+              localProducts={item}
+              key={item.product_id}
+            />
+          ))
+        )
+      ) : cartItems && cartItems.length > 0 ? (
         <CartTable
           isLoadingCart={isLoadingCart}
           cart={

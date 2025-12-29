@@ -93,7 +93,7 @@ const OrderList = () => {
     <div className="space-y-6">
       <AdminBackButton />
       <div className="space-y-6 pb-30">
-        {isLoadingStatistic || !statistic ? (
+        {/* {isLoadingStatistic || !statistic ? (
           <ProductStatisticSkeleton />
         ) : (
           <ProductStatistic
@@ -104,7 +104,7 @@ const OrderList = () => {
             setFromDate={setFromDate}
             setEndDate={setEndDate}
           />
-        )}
+        )} */}
         <div className="text-3xl text-secondary font-bold text-center">
           Order List
         </div>

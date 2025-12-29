@@ -27,6 +27,7 @@ import { User } from "@/types/user";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { sendOtp } from "@/features/auth/api";
 import { userIdAtom, userIdGuestAtom } from "@/store/auth";
+import { currentVoucherAtom } from "@/store/voucher";
 
 export function useCheckoutSubmit({
   form,
@@ -58,6 +59,7 @@ export function useCheckoutSubmit({
 
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
   const [checkoutId, setCheckoutId] = useAtom(checkOutIdAtom);
+  const [voucherId, setVoucherId] = useAtom(currentVoucherAtom);
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
@@ -244,7 +246,7 @@ export function useCheckoutSubmit({
 
         // toast.success(t("orderSuccess"));
         setCheckoutId(checkout.id);
-
+        setVoucherId(null);
         // Payment flow
 
         // ===========================
