@@ -22,51 +22,57 @@ export function ProductFAQSection({ question }: ProductFAQProps) {
   if (!question?.length) return null;
 
   return (
-    <Accordion
-      type="single"
-      collapsible
-      className="w-full space-y-4"
-      onValueChange={(value) => {
-        if (!value) return;
+    <>
+      <div className="text-2xl text-primary font-semibold">
+        Check with Real AI:{" "}
+        <span className="text-3xl text-black font-medium">Chat GPT</span>
+      </div>
+      <Accordion
+        type="single"
+        collapsible
+        className="w-full space-y-4"
+        onValueChange={(value) => {
+          if (!value) return;
 
-        setLoadingKey(value);
-        setTimeout(() => {
-          setLoadingKey(null);
-        }, 2000);
-      }}
-    >
-      {question.map((item) => {
-        const isLoading = loadingKey === item.question;
+          setLoadingKey(value);
+          setTimeout(() => {
+            setLoadingKey(null);
+          }, 2000);
+        }}
+      >
+        {question.map((item) => {
+          const isLoading = loadingKey === item.question;
 
-        return (
-          <AccordionItem
-            value={item.question}
-            key={item.question}
-            className="border rounded-sm px-2"
-          >
-            <AccordionTrigger className="py-2 flex gap-4 items-center">
-              <p className="text-xl text-secondary font-bold">Q</p>
-              <p className="text-base">{item.question}</p>
-            </AccordionTrigger>
+          return (
+            <AccordionItem
+              value={item.question}
+              key={item.question}
+              className="border rounded-sm px-2"
+            >
+              <AccordionTrigger className="py-2 flex gap-4 items-center">
+                <p className="text-xl text-secondary font-bold">Q</p>
+                <p className="text-base">{item.question}</p>
+              </AccordionTrigger>
 
-            <AccordionContent>
-              <div className="flex gap-4 pt-3">
-                <p className="text-xl text-primary font-bold">A</p>
+              <AccordionContent>
+                <div className="flex gap-4 pt-3">
+                  <p className="text-xl text-primary font-bold">A</p>
 
-                {isLoading ? (
-                  <TypingLoader />
-                ) : (
-                  <div className="faq-markdown">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {item.answer}
-                    </ReactMarkdown>
-                  </div>
-                )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        );
-      })}
-    </Accordion>
+                  {isLoading ? (
+                    <TypingLoader />
+                  ) : (
+                    <div className="faq-markdown">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {item.answer}
+                      </ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
+    </>
   );
 }

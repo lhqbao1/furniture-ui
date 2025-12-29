@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext, UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -9,6 +9,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ProductBundles } from "@/types/products";
+import { useEffect } from "react";
+import { useWatch } from "react-hook-form";
+import { BundleInput, ProductInput } from "@/lib/schema/product";
 
 interface ProductPricingFieldsProps {
   isDsp?: boolean;
@@ -16,6 +20,33 @@ interface ProductPricingFieldsProps {
 
 export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
   const form = useFormContext();
+
+  // ✅ Lấy bundles trực tiếp từ form
+
+  const bundles = useWatch({
+    control: form.control,
+    name: "bundles",
+  });
+
+  useEffect(() => {
+    if (!bundles || bundles.length === 0) return;
+
+    const totalBundleCost = bundles.reduce(
+      (sum: number, bundle: BundleInput) => {
+        const cost = Number(bundle?.cost ?? 0);
+        const qty = Number(bundle.quantity ?? 0);
+        return sum + cost * qty;
+      },
+      0,
+    );
+
+    form.setValue("cost", Number(totalBundleCost.toFixed(2)), {
+      shouldValidate: true,
+      shouldDirty: false,
+    });
+  }, [bundles, form]);
+
+  const isBundle = !!bundles?.length;
 
   return (
     <div className="grid grid-cols-12 gap-6">
@@ -42,6 +73,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                         e.target.value === "" ? null : e.target.valueAsNumber,
                       )
                     }
+                    disabled={!!bundles?.length} //khóa khi là bundle
                   />
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
