@@ -81,7 +81,7 @@ export default function RootLayout({
           async
         />
 
-        <Script
+        {/* <Script
           id="gtag-base"
           strategy="afterInteractive"
         >
@@ -91,10 +91,35 @@ export default function RootLayout({
             gtag('js', new Date());
             gtag('config', 'AW-17706586126');
                     `}
+        </Script> */}
+        <Script
+          id="gtag-safe"
+          strategy="afterInteractive"
+        >
+          {`
+    (function () {
+      try {
+        const run = () => {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'AW-17706586126');
+        };
+
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(run, { timeout: 3000 });
+        } else {
+          setTimeout(run, 1500);
+        }
+      } catch (e) {
+        console.warn('gtag blocked safely', e);
+      }
+    })();
+  `}
         </Script>
 
         {/* Facebook Pixel */}
-        <Script
+        {/* <Script
           id="fb-pixel"
           strategy="afterInteractive"
         >
@@ -110,9 +135,53 @@ export default function RootLayout({
             fbq('init', '1625686318416498');
             fbq('track', 'PageView');
           `}
+        </Script> */}
+        <Script
+          id="fb-pixel-safe"
+          strategy="afterInteractive"
+        >
+          {`
+    (function () {
+      try {
+        const run = () => {
+          if (window.fbq) return;
+
+          const fbq = function () {
+            fbq.callMethod
+              ? fbq.callMethod.apply(fbq, arguments)
+              : fbq.queue.push(arguments);
+          };
+
+          fbq.queue = [];
+          fbq.loaded = true;
+          fbq.version = '2.0';
+          window.fbq = fbq;
+
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+
+          if (document.body) {
+            document.body.appendChild(script);
+          }
+
+          fbq('init', '1625686318416498');
+          fbq('track', 'PageView');
+        };
+
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(run, { timeout: 3000 });
+        } else {
+          setTimeout(run, 1500);
+        }
+      } catch (e) {
+        console.warn('FB Pixel blocked safely', e);
+      }
+    })();
+  `}
         </Script>
 
-        <Script
+        {/* <Script
           id="google-ads-conversion"
           strategy="afterInteractive"
         >
@@ -122,6 +191,25 @@ export default function RootLayout({
                         'transaction_id': ''
                         });
                     `}
+        </Script> */}
+        <Script
+          id="google-ads-conversion-safe"
+          strategy="afterInteractive"
+        >
+          {`
+    try {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          gtag('event', 'conversion', {
+            'send_to': 'AW-17548008377/U6FbCPzkkqEbELm3xa9B',
+            'transaction_id': ''
+          });
+        }, { timeout: 3000 });
+      }
+    } catch (e) {
+      console.warn('Ads conversion blocked safely', e);
+    }
+  `}
         </Script>
 
         {/* <Script
