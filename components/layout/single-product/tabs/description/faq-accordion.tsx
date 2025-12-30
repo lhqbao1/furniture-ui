@@ -98,39 +98,42 @@ export function ProductFAQSection({ question }: ProductFAQProps) {
                 value={item.question}
                 className="border-none"
               >
-                <AccordionTrigger
-                  onClick={(e) => {
-                    e.preventDefault(); // 🚫 chặn toggle mặc định
+                <div className="w-2/3 ml-auto">
+                  <AccordionTrigger
+                    hasIcon={false}
+                    onClick={(e) => {
+                      e.preventDefault(); // 🚫 chặn toggle mặc định
 
-                    const isOpen = openKeys.includes(item.question);
+                      const isOpen = openKeys.includes(item.question);
 
-                    setActiveKey(item.question);
+                      setActiveKey(item.question);
 
-                    // ✅ CHỈ KHI MỞ LẦN ĐẦU
-                    if (!isOpen) {
-                      setOpenKeys((prev) => [...prev, item.question]);
+                      // ✅ CHỈ KHI MỞ LẦN ĐẦU
+                      if (!isOpen) {
+                        setOpenKeys((prev) => [...prev, item.question]);
 
-                      setLoadingKey(item.question);
-                      setTimeout(() => {
-                        setLoadingKey(null);
-                      }, 2000);
-                    }
+                        setLoadingKey(item.question);
+                        setTimeout(() => {
+                          setLoadingKey(null);
+                        }, 2000);
+                      }
 
-                    // ✅ LUÔN scroll khi click
-                    requestAnimationFrame(() => {
-                      scrollToItem(item.question);
-                    });
-                  }}
-                  className={clsx(
-                    "py-3 px-4 rounded-md border transition-all",
-                    "flex gap-4 items-center text-left",
-                    activeKey === item.question
-                      ? "bg-secondary text-white border-secondary"
-                      : "bg-white text-secondary border-secondary",
-                  )}
-                >
-                  <p className="text-base font-medium">{item.question}</p>
-                </AccordionTrigger>
+                      // ✅ LUÔN scroll khi click
+                      requestAnimationFrame(() => {
+                        scrollToItem(item.question);
+                      });
+                    }}
+                    className={clsx(
+                      "py-3 px-4 rounded-md border transition-all",
+                      "flex gap-4 items-center text-left",
+                      activeKey === item.question
+                        ? "bg-secondary text-white border-secondary"
+                        : "bg-white text-secondary border-secondary",
+                    )}
+                  >
+                    <p className="text-base font-medium">{item.question}</p>
+                  </AccordionTrigger>
+                </div>
 
                 <AccordionContent className="mt-3">
                   <div className="pl-2">
