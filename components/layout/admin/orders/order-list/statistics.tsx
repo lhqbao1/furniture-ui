@@ -12,7 +12,7 @@ function formatDate(date: Date) {
   )}`;
 }
 
-interface ProductStatisticProps {
+interface OrderStatisticProps {
   statistic?: Statistic[];
   isOrder?: boolean;
   fromDate?: string;
@@ -21,16 +21,16 @@ interface ProductStatisticProps {
   setEndDate?: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-const OrderStatistics = ({
+const OrderStatistic = ({
   statistic,
   isOrder,
   fromDate,
   setFromDate,
   endDate,
   setEndDate,
-}: ProductStatisticProps) => {
+}: OrderStatisticProps) => {
   return (
-    <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
+    <div className="grid lg:grid-cols-3 grid-cols-2 gap-4">
       {(statistic ?? []).map((item, idx) => (
         <div
           key={idx}
@@ -86,4 +86,4 @@ const OrderStatistics = ({
   );
 };
 
-export default OrderStatistics;
+export default OrderStatistic;

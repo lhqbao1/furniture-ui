@@ -1,5 +1,6 @@
 "use client";
 import OrderDateFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-date";
+import OrderStatistic from "@/components/layout/admin/orders/order-list/statistics";
 import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import { useGetCheckOutStatistic } from "@/features/checkout/hook";
@@ -66,7 +67,7 @@ const AdminPage = () => {
       {isLoadingStatistic || !statistic ? (
         <ProductStatisticSkeleton />
       ) : (
-        <ProductStatistic
+        <OrderStatistic
           statistic={mergedStatistic}
           isOrder
           fromDate={fromDate}
