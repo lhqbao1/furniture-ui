@@ -8,6 +8,7 @@ import {
   getCheckOutByCheckOutId,
   getMainCheckOutByMainCheckOutId,
 } from "@/features/checkout/api";
+import { RouteInvoicePDF } from "@/components/layout/pdf/route-invoice";
 
 export async function GET(
   _req: Request,
@@ -16,21 +17,13 @@ export async function GET(
   try {
     const { id } = await params; // ✅ BẮT BUỘC
     const invoice = await getInvoiceByCheckOut(id);
+    console.log(id);
+    console.log(invoice);
     if (!invoice) {
       return new Response("Invoice not found", { status: 404 });
     }
 
-    const checkout = await getMainCheckOutByMainCheckOutId(id);
-    if (!checkout) {
-      return new Response("Checkout not found", { status: 404 });
-    }
-
-    const stream = await pdf(
-      <InvoicePDF
-        checkout={checkout}
-        invoice={invoice}
-      />,
-    ).toBuffer(); // ← trả ReadableStream
+    const stream = await pdf(<RouteInvoicePDF invoice={invoice} />).toBuffer(); // ← trả ReadableStream
 
     return new Response(stream as any, {
       headers: {
