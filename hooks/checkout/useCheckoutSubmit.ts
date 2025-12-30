@@ -242,6 +242,9 @@ export function useCheckoutSubmit({
           note: data.note,
           total_shipping:
             shippingCostCurrent > 0 ? shippingCostCurrent : shippingCost,
+          carrier: normalized.find((i) => i.carrier === "amm")
+            ? "spedition"
+            : "dpd",
         });
 
         // toast.success(t("orderSuccess"));

@@ -33,7 +33,7 @@ const HeaderLogo = () => {
         className="h-full w-full lg:w-auto"
       >
         <Image
-          src={"/logo-noel-1.svg"}
+          src={"/logo-new-year.svg"}
           height={200}
           width={200}
           alt=""

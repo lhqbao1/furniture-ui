@@ -53,20 +53,19 @@ export default function CreateOrderPageClient() {
   useManualCheckoutLogic(form, setDisabledFields);
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
-    if (
-      values.carrier === "amm" &&
-      (!values.phone || values.phone.trim() === "")
-    ) {
-      toast.error("Phone number is required for SPEDITION carrier");
-      return;
-    }
-
     const totalShipping = values.items.find((i) => i.carrier === "amm")
       ? 35.95
       : 5.95;
 
     const orderCarrier = totalShipping === 35.95 ? "spedition" : "dpd";
 
+    if (
+      orderCarrier === "spedition" &&
+      (!values.phone || values.phone.trim() === "")
+    ) {
+      toast.error("Phone number is required for SPEDITION carrier");
+      return;
+    }
     createOrderManualMutation.mutate(
       {
         ...values,

@@ -9,6 +9,7 @@ export const CreateOrderSchema = (t: (key: string) => string) =>
       note: z.string().optional().nullable(),
       coupon_amount: z.number().optional().nullable(),
       voucher_amount: z.number().optional().nullable(),
+      carrier: z.string().optional(),
       terms: z
         .boolean()
         .refine((val) => val === true, { message: t("must_accept_terms") }),

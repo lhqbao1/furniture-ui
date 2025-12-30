@@ -8,7 +8,7 @@ interface BannerProps {
 const Banner = ({ height, isHome = false }: BannerProps) => {
   return (
     <div
-      className="relative w-full flex-shrink-0 z-0 h-[200px] lg:h-[300px] 2xl:h-[600px] block"
+      className="relative w-full flex-shrink-0 z-0 h-[200px] lg:h-[300px] 2xl:h-[750px] block"
       style={height ? { height: `${height}px` } : undefined}
     >
       {/* Background image */}
@@ -23,11 +23,11 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
         unoptimized
       /> */}
       <video
-        src="/video/banner.mp4"
+        src="/video/banner-1.mp4"
         autoPlay={isHome}
         muted
         playsInline
-        className="absolute w-full h-full object-cover"
+        className="absolute w-full h-full object-cover object-[50%_80%]"
       />
     </div>
   );
