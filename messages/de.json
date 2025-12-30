@@ -321,7 +321,6 @@
   "justAsk": "Fragen Sie einfach!",
   "shippingPolicy": "Liefer- und Versandbedingungen",
     "paymentTerms": "Zahlungsbedingungen",
-    
   "resendOtpDes": "Senden Sie den OTP-Code erneut an Ihre E-Mail/Ihre Telefonnummer",
   "resendOtp": "OTP erneut senden",
   "resendIn": "Erneut senden in",
@@ -418,5 +417,6 @@
   "messageSendFail": "Anfrage konnte nicht gesendet werden",
   "productPrice": "Preis",
   "buyNow": "Jetzt kaufen",
-  "priceComparison": "Preisvergleich"
+  "priceComparison": "Preisvergleich",
+  "checkWithAI": "Mit echter KI prüfen"
 }

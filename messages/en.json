@@ -421,5 +421,6 @@
   "messageSendFail": "Failed to send request",
   "productPrice": "Price",
   "buyNow": "Buy now",
-  "priceComparison": "Price comparison"
+  "priceComparison": "Price comparison",
+  "checkWithAI": "Check with Real AI"
 }
