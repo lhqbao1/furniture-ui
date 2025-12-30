@@ -18,8 +18,6 @@ import { toast } from "sonner";
 import RichEditor from "@/components/shared/tiptap/tiptap-editor";
 import { InvoicePDF } from "../../pdf/agb-file";
 import { pdf } from "@react-pdf/renderer";
-import { saveAs } from "file-saver"; // npm i file-saver
-import { formatDate } from "@/lib/date-formated";
 import { useUploadStaticFile } from "@/features/file/hook";
 import { FadeLoader } from "react-spinners";
 

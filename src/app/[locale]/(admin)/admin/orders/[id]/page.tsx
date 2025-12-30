@@ -1,7 +1,6 @@
 "use client";
 export const ssr = false;
 
-import { orderDetailColumn } from "@/components/layout/admin/orders/order-details/columns";
 import DocumentTable from "@/components/layout/admin/orders/order-details/document/document-table";
 import OrderDeliveryOrder from "@/components/layout/admin/orders/order-details/order-delivery-order";
 import OrderSummary from "@/components/layout/admin/orders/order-details/order-summary";
@@ -19,6 +18,7 @@ import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import OrderDetailsSkeleton from "./skeleton";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
+import { getOrderDetailColumns } from "@/components/layout/admin/orders/order-details/columns";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   if (!checkOutMain?.checkouts) return [];
@@ -86,7 +86,11 @@ const OrderDetails = () => {
       </div>
       <ProductTable
         data={cartItems}
-        columns={orderDetailColumn}
+        columns={getOrderDetailColumns({
+          country_code:
+            invoice?.main_checkout.checkouts[0].shipping_address.country,
+          tax_id: invoice?.main_checkout.checkouts[0].user.tax_id,
+        })}
         page={page}
         setPage={setPage}
         pageSize={pageSize}
@@ -122,6 +126,8 @@ const OrderDetails = () => {
                 .flatMap((c) => c.cart)
                 .flatMap((c) => c.items) ?? [],
               invoice?.voucher_amount,
+              invoice?.main_checkout.checkouts[0].shipping_address.country,
+              invoice?.main_checkout.checkouts[0].user.tax_id,
             ).totalVat
           }
           total_amount={order.total_amount}

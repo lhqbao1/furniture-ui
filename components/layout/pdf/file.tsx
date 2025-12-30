@@ -13,6 +13,10 @@ import { Font } from "@react-pdf/renderer";
 import { useMemo } from "react";
 import { FooterSection } from "./file-footer";
 import { getCountryName } from "@/lib/country-name";
+import {
+  calculateOrderTaxWithDiscount,
+  calculateProductVAT,
+} from "@/lib/caculate-vat";
 
 Font.register({
   family: "Roboto",
@@ -169,7 +173,6 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             <Text>
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name ?? ""}
             </Text>
-
             <Text>
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
@@ -351,7 +354,14 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   {item.quantity}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
-                  {checkout.tax}%
+                  {calculateProductVAT(
+                    item.final_price,
+                    item.products.tax,
+                    invoice?.main_checkout.checkouts[0].shipping_address
+                      .country,
+                    invoice?.main_checkout.checkouts[0].user.tax_id,
+                  ).vatRate * 100}
+                  %
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>
                   {item.item_price.toLocaleString("de-DE", {
@@ -467,15 +477,17 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   fontWeight: "bold",
                 }}
               >
-                {/* {calculateVAT({
-                  items: invoice?.total_amount_item,
-                  shipping: invoice?.total_shipping,
-                  discount: invoice?.voucher_amount,
-                  taxPercent: checkout?.tax ?? 19,
-                }).toLocaleString("de-DE", {
+                {calculateOrderTaxWithDiscount(
+                  invoice?.main_checkout.checkouts
+                    .flatMap((c) => c.cart)
+                    .flatMap((c) => c.items) ?? [],
+                  invoice?.voucher_amount,
+                  invoice?.main_checkout.checkouts[0].shipping_address.country,
+                  invoice?.main_checkout.checkouts[0].user.tax_id,
+                ).totalVat.toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                })} */}
+                })}
                 €
               </Text>
             </View>

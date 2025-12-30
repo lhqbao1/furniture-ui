@@ -163,6 +163,9 @@ export default function InvoiceTable({
         <FileTable
           columns={createInvoiceColumns({
             tax: checkout?.tax ?? "",
+            country_code:
+              invoice?.main_checkout.checkouts[0].shipping_address.country,
+            tax_id: invoice?.main_checkout.checkouts[0].user.tax_id,
           })}
           data={flattenedCartItems}
           voucher={invoice?.voucher_amount}
@@ -209,6 +212,8 @@ export default function InvoiceTable({
                 .flatMap((c) => c.cart)
                 .flatMap((c) => c.items) ?? [],
               invoice?.voucher_amount,
+              invoice?.main_checkout.checkouts[0].shipping_address.country,
+              invoice?.main_checkout.checkouts[0].user.tax_id,
             ).totalVat.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

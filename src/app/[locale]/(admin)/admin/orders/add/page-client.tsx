@@ -66,6 +66,7 @@ export default function CreateOrderPageClient() {
       toast.error("Phone number is required for SPEDITION carrier");
       return;
     }
+
     createOrderManualMutation.mutate(
       {
         ...values,
