@@ -2,6 +2,7 @@
 import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { CartItem } from "@/types/cart";
+import { calculateProductVAT } from "@/lib/caculate-vat";
 
 export type InvoiceColumnsProps = {
   locale?: string; // ví dụ "de-DE"
@@ -14,6 +15,8 @@ export type InvoiceColumnsProps = {
   showEan?: boolean;
   // parseTax function override (optional)
   tax?: string | number;
+  country_code?: string | null;
+  tax_id?: string | null;
 };
 
 export const parseTax = (tax: string | number): number => {
@@ -30,6 +33,8 @@ export const createInvoiceColumns = ({
   numberFormatOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 },
   showEan = true,
   tax,
+  country_code,
+  tax_id,
 }: InvoiceColumnsProps = {}): ColumnDef<CartItem>[] => {
   const moneyFormatter = (value: number) =>
     `${Number(value).toLocaleString(locale, numberFormatOptions)}${currency}`;
@@ -78,7 +83,13 @@ export const createInvoiceColumns = ({
       accessorKey: "vat",
       header: "MwSt.",
       cell: ({ row }) => {
-        return <div>{row.original.products.tax}</div>;
+        const { vatRate } = calculateProductVAT(
+          row.original.final_price,
+          row.original.products.tax,
+          country_code,
+          tax_id,
+        );
+        return <div>{vatRate * 100}%</div>;
       },
     },
     {

@@ -1,77 +1,75 @@
+import { calculateProductVAT } from "@/lib/caculate-vat";
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
-export const orderDetailColumn: ColumnDef<CartItem>[] = [
-  {
-    accessorKey: "pos",
-    header: () => <div className="text-center w-full">POS.</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.index + 1}</div>;
+interface OrderDetailColumnsProps {
+  country_code?: string | null;
+  tax_id?: string | null;
+}
+
+export function getOrderDetailColumns({
+  country_code,
+  tax_id,
+}: OrderDetailColumnsProps): ColumnDef<CartItem>[] {
+  return [
+    {
+      id: "pos",
+      header: () => <div className="text-center w-full">POS.</div>,
+      cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
     },
-  },
-  {
-    accessorKey: "id",
-    header: () => <div className="text-center w-full">ID</div>,
-    cell: ({ row }) => {
-      return (
-        // <Link href={`/product/${row.original.products.url_key}`}>
-        //   <div className="text-center">
-        //     #{row.original.products.id_provider}
-        //   </div>
-        // </Link>
+    {
+      id: "id",
+      header: () => <div className="text-center w-full">ID</div>,
+      cell: ({ row }) => (
         <div className="text-center">#{row.original.products.id_provider}</div>
-      );
+      ),
     },
-  },
-  {
-    accessorKey: "ean",
-    header: () => <div className="text-center w-full">EAN</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.products.ean}</div>;
+    {
+      id: "ean",
+      header: () => <div className="text-center w-full">EAN</div>,
+      cell: ({ row }) => (
+        <div className="text-center">{row.original.products.ean}</div>
+      ),
     },
-  },
-  {
-    accessorKey: "product_name",
-    header: "NAME",
-    cell: ({ row }) => {
-      return (
+    {
+      id: "product_name",
+      header: "NAME",
+      cell: ({ row }) => (
         <div className="flex gap-2 items-center">
-          {/* <Image
-            src={
-              row.original.products.static_files
-                ? row.original.products.static_files[0].url
-                : ""
-            }
-            height={40}
-            width={40}
-            alt=""
-          /> */}
           {row.original.products.name}
         </div>
-      );
+      ),
     },
-  },
 
-  {
-    accessorKey: "tax",
-    header: () => <div className="text-center w-full">TAX</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-right">
-          €
-          {(row.original.final_price - row.original.price_whithout_tax).toFixed(
-            2,
-          )}
-        </div>
-      );
+    // ✅ VAT COLUMN (DÙNG LOGIC MỚI)
+    {
+      id: "vat",
+      header: () => <div className="text-center w-full">VAT</div>,
+      cell: ({ row }) => {
+        const { vat } = calculateProductVAT(
+          row.original.final_price,
+          row.original.products.tax,
+          country_code,
+          tax_id,
+        );
+
+        return (
+          <div className="text-right">
+            €
+            {vat.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </div>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "invoice_amount",
-    header: () => <div className="text-right w-full">UNIT PRICE</div>,
-    cell: ({ row }) => {
-      return (
+
+    {
+      id: "unit_price",
+      header: () => <div className="text-right w-full">UNIT PRICE</div>,
+      cell: ({ row }) => (
         <div className="text-right">
           €
           {row.original.item_price.toLocaleString("de-DE", {
@@ -79,22 +77,19 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
             maximumFractionDigits: 2,
           })}
         </div>
-      );
+      ),
     },
-  },
-  {
-    accessorKey: "quantity",
-    header: () => <div className="text-center w-full">QUANTITY</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.quantity}</div>;
+    {
+      id: "quantity",
+      header: () => <div className="text-center w-full">QUANTITY</div>,
+      cell: ({ row }) => (
+        <div className="text-center">{row.original.quantity}</div>
+      ),
     },
-  },
-
-  {
-    accessorKey: "total_invoice_amount",
-    header: () => <div className="text-right w-full">TOTAL AMOUNT</div>,
-    cell: ({ row }) => {
-      return (
+    {
+      id: "total_amount",
+      header: () => <div className="text-right w-full">TOTAL AMOUNT</div>,
+      cell: ({ row }) => (
         <div className="text-right">
           €
           {row.original.final_price.toLocaleString("de-DE", {
@@ -102,24 +97,22 @@ export const orderDetailColumn: ColumnDef<CartItem>[] = [
             maximumFractionDigits: 2,
           })}
         </div>
-      );
+      ),
     },
-  },
-  {
-    accessorKey: "ware_house",
-    header: () => <div className="text-center w-full">WAREHOUSE</div>,
-    cell: ({ row }) => {
-      return (
+    {
+      id: "warehouse",
+      header: () => <div className="text-center w-full">WAREHOUSE</div>,
+      cell: () => (
         <div className="flex justify-center">
           <Image
-            src={"/amm.jpeg"}
+            src="/amm.jpeg"
             height={40}
             width={40}
             alt=""
             className="w-12 h-12 object-contain"
           />
         </div>
-      );
+      ),
     },
-  },
-];
+  ];
+}

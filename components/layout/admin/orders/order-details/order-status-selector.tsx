@@ -12,6 +12,22 @@ import { STATUS_ACTIVE_RULES, STATUS_OPTIONS } from "@/data/data";
 import PaidConfirmDialog from "./dialog/paid-comfirm-dialog";
 import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
 
+export const getStatusLabel = (status: string) => {
+  const normalized = status.toLowerCase();
+
+  const found = STATUS_OPTIONS.find((opt) => {
+    // match trực tiếp theo key
+    if (opt.key === normalized) return true;
+
+    // match theo statuses (backend → ui)
+    if (opt.statuses?.includes(normalized)) return true;
+
+    return false;
+  });
+
+  return found ? found.label : status;
+};
+
 export default function OrderStatusSelector({
   status,
   order,
@@ -60,22 +76,18 @@ export default function OrderStatusSelector({
     }
   };
 
-  // helper to display label for current value
-  const labelFor = (k: string) => {
-    const found = STATUS_OPTIONS.find((s) => s.key === k);
-    return found ? found.label : k;
+  const labelForStatus = (status: string) => {
+    const found = STATUS_OPTIONS.find((s) =>
+      s.statuses?.includes(status.toLowerCase()),
+    );
+    return found ? found.label : status;
   };
 
   return (
     <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold">
       <div className="flex gap-1 items-center flex-1">
         <div>Status:</div>
-        <div>
-          {labelFor(
-            STATUS_OPTIONS.find((i) => i.key === status.toLowerCase())?.label ??
-              "",
-          )}
-        </div>
+        <span>{getStatusLabel(status)}</span>
       </div>
 
       <div className="flex items-center gap-2">
@@ -95,6 +107,7 @@ export default function OrderStatusSelector({
                 key={opt.key}
                 value={opt.key}
                 disabled={!opt.active} // ⬅️ disable option không hợp lệ
+                className="cursor-pointer"
               >
                 {opt.key === "completed" ? "" : `${opt.pos - 1}.`} {opt.label}
               </SelectItem>

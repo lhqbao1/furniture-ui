@@ -1,7 +1,9 @@
 "use client";
 
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import TableToolbar from "@/components/layout/admin/products/products-list/toolbar";
+import TableToolbar, {
+  ToolbarType,
+} from "@/components/layout/admin/products/products-list/toolbar";
 import { productColumnsDSP } from "@/components/layout/dsp/admin/products/list/columns";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllProductsDSP } from "@/features/dsp/products/hook";
@@ -32,7 +34,6 @@ const ProductListDSP = () => {
 
   return (
     <div className="space-y-12">
-      {/* <ProductStatistic statistic={statisticDemo} /> */}
       <div className="text-3xl text-secondary font-bold text-center">
         Product List
       </div>
@@ -44,8 +45,10 @@ const ProductListDSP = () => {
         addButtonUrl="/dsp/admin/products/add"
         setSearchQuery={setSearchQuery}
         setPage={setPage}
-        showAll={showAll}
-        setShowAll={setShowAll} // 🔥 truyền vào toolbar
+        type={ToolbarType.product}
+        // type={ToolbarType.product}
+        // showAll={showAll}
+        // setShowAll={setShowAll} // 🔥 truyền vào toolbar
       />
       {isLoading ? (
         <ProductTableSkeleton />

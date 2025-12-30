@@ -79,13 +79,28 @@ interface CheckOutMainResponse {
   pagination: Pagination;
 }
 
-interface CheckOutStatistics {
+export interface CheckOutStatistics {
   count_order: number;
   total_order: number;
-  count_processing_order: number;
-  total_processing_order: number;
-  count_return_cancel_order: number;
-  total_return_cancel_order: number;
-  count_completed_order: number;
-  total_completed_order: number;
+
+  count_waiting_payment_order: number;
+  total_waiting_payment_order: number;
+
+  count_payment_received_order: number;
+  total_payment_received_order: number;
+
+  count_preparing_shipping_order: number;
+  total_preparing_shipping_order: number;
+
+  count_dispatched_order: number;
+  total_dispatched_order: number;
+
+  count_cancel_order: number;
+  total_cancel_order: number;
+
+  count_return_order: number;
+  total_return_order: number;
+
+  count_stock_reserved_order: number;
+  total_stock_reserved_order: number;
 }

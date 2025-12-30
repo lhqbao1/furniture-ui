@@ -63,7 +63,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                 </NavigationMenuTrigger>
 
                 {category.children?.length > 0 && (
-                  <NavigationMenuContent className="rounded-sm border-none ring-0">
+                  <NavigationMenuContent className="rounded-sm border-none ring-0 z-50">
                     <div className="min-w-[200px]">
                       {category.children.map((child) => (
                         <NavigationMenuLink

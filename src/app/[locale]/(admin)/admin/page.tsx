@@ -1,5 +1,6 @@
 "use client";
 import OrderDateFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-date";
+import OrderStatistic from "@/components/layout/admin/orders/order-list/statistics";
 import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import { useGetCheckOutStatistic } from "@/features/checkout/hook";
@@ -22,28 +23,40 @@ const AdminPage = () => {
 
   const mergedStatistic = [
     {
-      count: statistic?.count_order,
-      total: statistic?.total_order ?? 0,
-      label: "Orders",
-      textColor: "rgb(41, 171, 226)",
+      count: statistic?.count_dispatched_order,
+      total: statistic?.total_dispatched_order ?? 0,
+      label: "Dispatched",
+      textColor: "#39B54A",
     },
     {
-      count: statistic?.count_return_cancel_order,
-      total: statistic?.total_return_cancel_order ?? 0,
-      label: "Returned & Cancelled",
-      textColor: "rgba(242, 5, 5, 0.8)",
+      count: statistic?.count_payment_received_order,
+      total: statistic?.total_payment_received_order ?? 0,
+      label: "Payment Received",
+      textColor: "#FED000",
     },
     {
-      count: statistic?.count_processing_order,
-      total: statistic?.total_processing_order ?? 0,
-      label: "Processing",
-      textColor: "rgb(255, 11, 133)",
+      count: statistic?.count_waiting_payment_order,
+      total: statistic?.total_waiting_payment_order ?? 0,
+      label: "Waiting for payment",
+      textColor: "#9b59ff",
     },
     {
-      count: statistic?.count_completed_order,
-      total: statistic?.total_completed_order ?? 0,
-      label: "Done",
-      textColor: "rgb(81, 190, 140)",
+      count: statistic?.count_stock_reserved_order,
+      total: statistic?.total_stock_reserved_order ?? 0,
+      label: "Stock Reserved",
+      textColor: "#ff4f7b",
+    },
+    {
+      count: statistic?.count_return_order,
+      total: statistic?.total_return_order ?? 0,
+      label: "Returned",
+      textColor: "#F7931E",
+    },
+    {
+      count: statistic?.count_cancel_order,
+      total: statistic?.total_cancel_order ?? 0,
+      label: "Canceled",
+      textColor: "#FF0000",
     },
   ];
   return (
@@ -54,7 +67,7 @@ const AdminPage = () => {
       {isLoadingStatistic || !statistic ? (
         <ProductStatisticSkeleton />
       ) : (
-        <ProductStatistic
+        <OrderStatistic
           statistic={mergedStatistic}
           isOrder
           fromDate={fromDate}

@@ -1,5 +1,5 @@
 import { formatDateToNum } from "@/lib/ios-to-num";
-import { CheckOutMain } from "@/types/checkout";
+import { CheckOut, CheckOutMain } from "@/types/checkout";
 import { InvoiceResponse } from "@/types/invoice";
 import {
   Document,
@@ -18,19 +18,23 @@ import {
   calculateProductVAT,
 } from "@/lib/caculate-vat";
 
+import path from "path";
+
+const fontPath = (p: string) => path.join(process.cwd(), "public", p);
+
 Font.register({
   family: "Roboto",
-  src: "/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf",
+  src: fontPath("fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf"),
 });
 
 Font.register({
   family: "Figtree",
-  src: "/fonts/Figtree/Figtree-VariableFont_wght.ttf",
+  src: fontPath("fonts/Figtree/Figtree-VariableFont_wght.ttf"),
 });
 
 Font.register({
   family: "FigtreeBold",
-  src: "/fonts/Figtree/figtree-bold.ttf",
+  src: fontPath("fonts/Figtree/figtree-bold.ttf"),
 });
 
 const styles = StyleSheet.create({
@@ -110,36 +114,37 @@ const styles = StyleSheet.create({
   },
 });
 
-interface InvoicePDFProps {
-  checkout: CheckOutMain;
+interface RouteInvoicePDFProps {
   invoice: InvoiceResponse;
 }
 
-export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
-  const flattenedCartItems = useMemo(() => {
-    const checkouts = invoice?.main_checkout?.checkouts;
-    if (!checkouts) return [];
+function getFlattenedCartItems(invoice: InvoiceResponse) {
+  const checkouts = invoice?.main_checkout?.checkouts;
+  if (!checkouts) return [];
 
-    return (
-      checkouts
-        // ❌ Loại checkout có status "exchange" hoặc "cancel_exchange"
-        .filter((checkout) => {
-          const status = checkout.status?.toLowerCase();
-          return status !== "exchange" && status !== "cancel_exchange";
-        })
+  return (
+    checkouts
+      // ❌ Loại checkout có status "exchange" hoặc "cancel_exchange"
+      .filter((checkout: CheckOut) => {
+        const status = checkout.status?.toLowerCase();
+        return status !== "exchange" && status !== "cancel_exchange";
+      })
 
-        // ✔ Flatten items
-        .flatMap((checkout) => {
-          // Nếu checkout.cart là array (CartResponse)
-          if (Array.isArray(checkout.cart)) {
-            return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
-          }
+      // ✔ Flatten items
+      .flatMap((checkout: CheckOut) => {
+        // Nếu checkout.cart là array (CartResponse)
+        if (Array.isArray(checkout.cart)) {
+          return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
+        }
 
-          // Nếu checkout.cart là object (CartResponseItem)
-          return checkout.cart?.items ?? [];
-        })
-    );
-  }, [invoice]);
+        // Nếu checkout.cart là object (CartResponseItem)
+        return checkout.cart?.items ?? [];
+      })
+  );
+}
+
+export const RouteInvoicePDF = ({ invoice }: RouteInvoicePDFProps) => {
+  const flattenedCartItems = getFlattenedCartItems(invoice);
 
   return (
     <Document>
@@ -176,41 +181,51 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             <Text>
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
-                : checkout.checkouts?.[0]?.invoice_address?.recipient_name
-                ? checkout.checkouts[0].invoice_address.recipient_name
-                : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
-                    checkout.checkouts?.[0]?.user?.last_name ?? ""
+                : invoice.main_checkout.checkouts?.[0]?.invoice_address
+                    ?.recipient_name
+                ? invoice.main_checkout.checkouts[0].invoice_address
+                    .recipient_name
+                : `${
+                    invoice.main_checkout.checkouts?.[0]?.user?.first_name ?? ""
+                  } ${
+                    invoice.main_checkout.checkouts?.[0]?.user?.last_name ?? ""
                   }`}
             </Text>
             <Text>
               {" "}
-              {checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address?.address_line
-                : checkout?.checkouts?.[0]?.shipping_address?.address_line}
+              {invoice.main_checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
+                ? invoice.main_checkout?.checkouts?.[0]?.invoice_address
+                    ?.address_line
+                : invoice.main_checkout?.checkouts?.[0]?.shipping_address
+                    ?.address_line}
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.invoice_address?.additional_address_line?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address
+              {invoice.main_checkout?.checkouts?.[0]?.invoice_address?.additional_address_line?.trim()
+                ? invoice.main_checkout?.checkouts?.[0]?.invoice_address
                     ?.additional_address_line
-                : checkout?.checkouts?.[0]?.shipping_address
+                : invoice.main_checkout?.checkouts?.[0]?.shipping_address
                     ?.additional_address_line}
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.invoice_address?.postal_code?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address?.postal_code
-                : checkout?.checkouts?.[0]?.shipping_address?.postal_code}{" "}
-              {checkout?.checkouts?.[0]?.invoice_address?.city?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address?.city
-                : checkout?.checkouts?.[0]?.shipping_address?.city}
+              {invoice.main_checkout?.checkouts?.[0]?.invoice_address?.postal_code?.trim()
+                ? invoice.main_checkout?.checkouts?.[0]?.invoice_address
+                    ?.postal_code
+                : invoice.main_checkout?.checkouts?.[0]?.shipping_address
+                    ?.postal_code}{" "}
+              {invoice.main_checkout?.checkouts?.[0]?.invoice_address?.city?.trim()
+                ? invoice.main_checkout?.checkouts?.[0]?.invoice_address?.city
+                : invoice.main_checkout?.checkouts?.[0]?.shipping_address?.city}
             </Text>
             <Text>
               {getCountryName(
-                checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
-                  ? checkout?.checkouts?.[0]?.invoice_address?.country
-                  : checkout?.checkouts?.[0]?.shipping_address?.country ?? "",
+                invoice.main_checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
+                  ? invoice.main_checkout?.checkouts?.[0]?.invoice_address
+                      ?.country
+                  : invoice.main_checkout?.checkouts?.[0]?.shipping_address
+                      ?.country ?? "",
               )}
             </Text>
-            <Text>{checkout.checkouts[0].user.tax_id}</Text>
+            <Text>{invoice.main_checkout.checkouts[0].user.tax_id}</Text>
           </View>
           <View
             style={{
@@ -256,7 +271,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               }}
             >
               <Text style={{ width: 80, fontWeight: "bold" }}>Datum:</Text>
-              <Text>{formatDateToNum(checkout.created_at)}</Text>
+              <Text>{formatDateToNum(invoice.main_checkout.created_at)}</Text>
             </View>
 
             <View
@@ -268,7 +283,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               }}
             >
               <Text style={{ width: 80, fontWeight: "bold" }}>Kunden-Nr:</Text>
-              <Text>{checkout.checkouts[0].user.user_code}</Text>
+              <Text>{invoice.main_checkout.checkouts[0].user.user_code}</Text>
             </View>
 
             <View
@@ -603,7 +618,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               </Text>
             </View>
 
-            {checkout.status.toLowerCase() === "pending" ? (
+            {invoice.main_checkout.status.toLowerCase() === "pending" ? (
               ""
             ) : (
               <View
@@ -624,7 +639,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 >
                   Zahlung{" "}
                   <Text style={{ textTransform: "capitalize" }}>
-                    ({checkout.from_marketplace ?? checkout.payment_method}
+                    (
+                    {invoice.main_checkout.from_marketplace ??
+                      invoice.main_checkout.payment_method}
                   </Text>{" "}
                   Managed Payments) vom {formatDateToNum(invoice.created_at)}
                 </Text>
@@ -673,7 +690,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   fontWeight: "bold",
                 }}
               >
-                {checkout.status.toLowerCase() === "pending"
+                {invoice.main_checkout.status.toLowerCase() === "pending"
                   ? (
                       (invoice?.total_amount_item ?? 0) +
                       (invoice?.total_shipping ?? 0) -
@@ -689,7 +706,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
           </View>
         </View>
 
-        {checkout.status.toLowerCase() === "pending" ? (
+        {invoice.main_checkout.status.toLowerCase() === "pending" ? (
           <View style={{ marginTop: 10, textAlign: "left", fontSize: 10 }}>
             <Text>
               Zahlungsbedingungen: Zahlung innerhalb von {invoice.payment_term}{" "}
