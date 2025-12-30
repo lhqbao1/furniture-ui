@@ -22,6 +22,16 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
         className="object-cover"
         unoptimized
       /> */}
+      {/* <Image
+        src="/short-banner.jpg"
+        alt="Banner"
+        fetchPriority="high"
+        width={1900}
+        height={200}
+        // sizes="(min-width: 1024px) 100vw"
+        className="object-cover"
+        unoptimized
+      /> */}
       <video
         src="/video/banner-1.mp4"
         autoPlay={isHome}
