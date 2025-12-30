@@ -24,6 +24,7 @@ interface SelectedProduct {
   product: ProductItem;
   quantity: number;
   final_price: number;
+  carrier: string;
 }
 
 interface SelectOrderItemsProps {
@@ -56,7 +57,12 @@ const SelectOrderItems = ({
       if (prev.some((p) => p.product.id === product.id)) return prev;
       return [
         ...prev,
-        { product, quantity: 1, final_price: product.final_price ?? 0 },
+        {
+          product,
+          quantity: 1,
+          final_price: product.final_price ?? 0,
+          carrier: product.carrier,
+        },
       ];
     });
   };
@@ -96,6 +102,7 @@ const SelectOrderItems = ({
       title: item.product.name,
       sku: item.product.sku ?? "",
       final_price: item.final_price,
+      carrier: item.carrier,
     }));
     setValue("items", items);
   }, [listProducts, setValue]);

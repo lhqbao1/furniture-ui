@@ -348,7 +348,10 @@ export default function InvoiceTable({
 
         {checkout && invoice && (
           <div className="w-full flex justify-center col-span-3">
-            <Button variant={"outline"}>
+            <Button
+              variant={"outline"}
+              onClick={() => console.log("hehe")}
+            >
               <PDFDownloadLink
                 document={
                   <InvoicePDF

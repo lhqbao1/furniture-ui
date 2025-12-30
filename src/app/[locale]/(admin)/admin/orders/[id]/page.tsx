@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import OrderDetailsSkeleton from "./skeleton";
+import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   if (!checkOutMain?.checkouts) return [];
@@ -115,13 +116,14 @@ const OrderDetails = () => {
           sub_total={order.total_amount_item}
           shipping_amount={order.total_shipping}
           discount_amount={Math.abs(order.voucher_amount)}
-          // tax={calculateVAT({
-          //   items: invoice?.total_amount_item,
-          //   shipping: invoice?.total_shipping,
-          //   discount: invoice?.voucher_amount,
-          //   taxPercent: order.tax ?? 19,
-          // })}
-          tax={0}
+          tax={
+            calculateOrderTaxWithDiscount(
+              invoice?.main_checkout.checkouts
+                .flatMap((c) => c.cart)
+                .flatMap((c) => c.items) ?? [],
+              invoice?.voucher_amount,
+            ).totalVat
+          }
           total_amount={order.total_amount}
           payment_method={order.payment_method}
           entry_date={order.created_at}

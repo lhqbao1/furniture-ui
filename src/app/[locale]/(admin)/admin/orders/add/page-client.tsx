@@ -20,6 +20,7 @@ import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/orde
 import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
 import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
 import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreate";
+import { calculateShippingCost } from "@/hooks/caculate-shipping";
 
 export interface CartItem {
   id: number;
@@ -35,6 +36,7 @@ interface SelectedProduct {
   product: ProductItem;
   quantity: number;
   final_price: number;
+  carrier: string;
 }
 
 export default function CreateOrderPageClient() {
@@ -51,7 +53,6 @@ export default function CreateOrderPageClient() {
   useManualCheckoutLogic(form, setDisabledFields);
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
-    const total_shipping = values.carrier === "amm" ? 35.95 : 5.95;
     if (
       values.carrier === "amm" &&
       (!values.phone || values.phone.trim() === "")
@@ -60,10 +61,17 @@ export default function CreateOrderPageClient() {
       return;
     }
 
+    const totalShipping = values.items.find((i) => i.carrier === "amm")
+      ? 35.95
+      : 5.95;
+
+    const orderCarrier = totalShipping === 35.95 ? "spedition" : "dpd";
+
     createOrderManualMutation.mutate(
       {
         ...values,
-        total_shipping: total_shipping,
+        total_shipping: totalShipping,
+        carrier: orderCarrier,
         email:
           values.email && values.email?.length > 0 ? values.email : "guest",
         company_name:

@@ -2,7 +2,6 @@ import AnimatedCarousel from "@/components/layout/home/3d-carousel";
 import CategorySection from "@/components/layout/home/category-section";
 import NewsletterVoucherSection from "@/components/layout/home/contact-voucher-section";
 import FeaturedProducts from "@/components/layout/home/featured-products";
-import RecentViewed from "@/components/layout/home/recent-viewed";
 
 import { getProductByTag, getAllProducts } from "@/features/products/api";
 import { getVouchers } from "@/features/vouchers/api";
