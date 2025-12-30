@@ -15,7 +15,7 @@ function formatDate(date: Date) {
   )}`;
 }
 
-export default function OrderStatusFilter() {
+export default function OrderDateFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
 

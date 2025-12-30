@@ -37,6 +37,7 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
         autoPlay={isHome}
         muted
         playsInline
+        loop
         className="absolute w-full h-full object-cover object-[50%_80%]"
       />
     </div>

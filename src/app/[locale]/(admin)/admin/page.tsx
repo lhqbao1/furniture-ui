@@ -1,4 +1,5 @@
 "use client";
+import OrderDateFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-date";
 import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import { useGetCheckOutStatistic } from "@/features/checkout/hook";
@@ -46,7 +47,10 @@ const AdminPage = () => {
     },
   ];
   return (
-    <div>
+    <div className="space-y-6">
+      <div className="w-[200px] mt-6">
+        <OrderDateFilter />
+      </div>
       {isLoadingStatistic || !statistic ? (
         <ProductStatisticSkeleton />
       ) : (
