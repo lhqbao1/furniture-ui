@@ -12,7 +12,7 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
       style={height ? { height: `${height}px` } : undefined}
     >
       {/* Background image */}
-      <Image
+      {/* <Image
         src="/home1.webp"
         alt="Banner"
         fill
@@ -21,6 +21,13 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
         // sizes="(min-width: 1024px) 100vw"
         className="object-cover"
         unoptimized
+      /> */}
+      <video
+        src="/video/banner.mp4"
+        autoPlay={isHome}
+        muted
+        playsInline
+        className="absolute w-full h-full object-cover"
       />
     </div>
   );

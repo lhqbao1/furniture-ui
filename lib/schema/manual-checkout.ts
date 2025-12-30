@@ -55,6 +55,7 @@ export const ManualCreateOrderSchema = z
           final_price: z
             .number()
             .nonnegative({ message: "Final price must be positive" }),
+          carrier: z.string(),
         }),
       )
       .min(1, { message: "You must select at least one product" }),
