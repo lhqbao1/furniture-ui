@@ -11,7 +11,7 @@ export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
     {
       accessorKey: "product_name",
       header: t("product"),
-      meta: { width: "300px" },
+      meta: { width: "400px" },
       cell: ({ row }) => (
         <div className="line-clamp-2 text-wrap">
           {row.original.products.name}
@@ -23,7 +23,7 @@ export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
       header: t("quantity"),
       meta: { width: "100px" },
       cell: ({ row }) => (
-        <div className="text-center">{row.original.quantity}</div>
+        <div className="text-center">x{row.original.quantity}</div>
       ),
     },
     {

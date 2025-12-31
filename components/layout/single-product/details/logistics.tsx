@@ -7,69 +7,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useDeliveryEstimate } from "@/hooks/get-estimated-shipping";
+import { formatDateDE } from "@/lib/format-date-DE";
 
 interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
-}
-
-export function getLatestInventory(inventory: any[]) {
-  if (!inventory || inventory.length === 0) return null;
-
-  return inventory.reduce((latest, item) => {
-    if (!latest) return item;
-    return new Date(item.date_received) > new Date(latest.date_received)
-      ? item
-      : latest;
-  }, null);
-}
-
-export function getDeliveryDayRange(
-  deliveryTime?: string,
-): { min: number; max: number } | null {
-  if (!deliveryTime) return null;
-
-  const parts = deliveryTime
-    .split("-")
-    .map((d) => Number(d.trim()))
-    .filter((d) => !isNaN(d));
-
-  if (parts.length === 1) {
-    return { min: parts[0], max: parts[0] };
-  }
-
-  if (parts.length >= 2) {
-    return {
-      min: Math.min(...parts),
-      max: Math.max(...parts),
-    };
-  }
-
-  return null;
-}
-
-export function formatDateDE(date: Date) {
-  return date.toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
-
-export function addBusinessDays(startDate: Date, businessDays: number) {
-  const result = new Date(startDate);
-  let addedDays = 0;
-
-  while (addedDays < businessDays) {
-    result.setDate(result.getDate() + 1);
-
-    const day = result.getDay();
-    // 0 = Sunday, 6 = Saturday → bỏ qua
-    if (day !== 0 && day !== 6) {
-      addedDays++;
-    }
-  }
-
-  return result;
 }
 
 const ProductDetailsLogistic = ({
@@ -77,39 +19,11 @@ const ProductDetailsLogistic = ({
 }: ProductDetailsLogisticProps) => {
   const t = useTranslations();
 
-  const latestInventory = React.useMemo(
-    () => getLatestInventory(productDetails.inventory),
-    [productDetails.inventory],
-  );
-
-  const deliveryDayRange = React.useMemo(
-    () => getDeliveryDayRange(productDetails.delivery_time),
-    [productDetails.delivery_time],
-  );
-
-  const estimatedDeliveryRange = React.useMemo(() => {
-    if (!deliveryDayRange) return null;
-
-    let startDate: Date | null = null;
-
-    // CASE 1: hết hàng + có inventory
-    if (productDetails.stock === 0 && latestInventory) {
-      startDate = new Date(latestInventory.date_received);
-    }
-
-    // CASE 2: còn hàng
-    if (productDetails.stock > 0) {
-      startDate = new Date();
-    }
-
-    // CASE 3: stock = 0 & không inventory
-    // if (!startDate) return null;
-
-    return {
-      from: addBusinessDays(startDate ?? new Date(), deliveryDayRange.min),
-      to: addBusinessDays(startDate ?? new Date(), deliveryDayRange.max),
-    };
-  }, [deliveryDayRange, productDetails.stock, latestInventory]);
+  const estimatedDeliveryRange = useDeliveryEstimate({
+    stock: productDetails.stock,
+    inventory: productDetails.inventory,
+    deliveryTime: productDetails.delivery_time,
+  });
 
   return (
     <div className="space-y-2">

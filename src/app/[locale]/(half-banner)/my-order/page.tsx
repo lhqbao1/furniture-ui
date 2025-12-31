@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 const MyOrder = () => {
   const t = useTranslations();
   return (
-    <div className="min-h-screen overflow-scroll w-full py-8 space-y-6">
+    <div className="min-h-screen w-full py-8 space-y-6">
       <h1 className="section-header">{t("myOrder")}</h1>
       <OrderList />
     </div>

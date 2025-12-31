@@ -29,6 +29,7 @@ import { useLocale } from "next-intl";
 import { ProductItem } from "@/types/products";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
+import ExportOrderExcelButton from "./export-button";
 
 export enum ToolbarType {
   product = "product",
@@ -104,11 +105,9 @@ export default function OrderToolbar({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* <div className="flex gap-2 text-sm font-medium">
-          <Button variant="ghost" className="">Export</Button>
-          <ExportExcelButton data={exportData ?? []} />
-          <ImportDialog setIsImporting={setIsImporting} />
-        </div> */}
+        <div className="flex gap-2 text-sm font-medium">
+          <ExportOrderExcelButton />
+        </div>
       </div>
 
       {/* Search (auto, no button) */}
