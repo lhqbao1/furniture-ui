@@ -247,25 +247,16 @@ const OrderList = () => {
                           />
                         )}
 
-                        {/* {isDispatched && (
+                        {isDispatched && (
                           <Button
                             variant="outline"
                             onClick={() => {
-                              // mở dialog / gọi API cancel
-                              setShowCancelDialog(true);
+                              router.push(`/my-order/${item.id}`, { locale });
                             }}
                           >
                             {t("return")}
                           </Button>
-                        )} */}
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            router.push(`/my-order/${item.id}`, { locale });
-                          }}
-                        >
-                          {t("return")}
-                        </Button>
+                        )}
 
                         {isDispatched && (
                           <Button
