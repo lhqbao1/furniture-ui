@@ -101,7 +101,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URL động cho product
   let products: ProductItem[] = [];
   try {
-    const res = await apiPublic.get("/products/all");
+    const res = await apiPublic.get("/products/all", {
+      params: {
+        all_products: false,
+        is_econelo: false,
+      },
+    });
+
     products = res.data;
   } catch (e) {
     products = [];

@@ -97,12 +97,6 @@ export function MyOrderDataTable<TData, TValue>({
             >
               <div className="flex justify-between w-full">
                 <div className="text-md font-semibold">Lieferung: {pos}</div>
-                {/* <div className="flex gap-3">
-                  <p className="text-md">
-                    Voraussichtliches Lieferdatum:{" "}
-                    {getMaxDeliveryTime(orderData)} {t("business_days")}
-                  </p>
-                </div> */}
                 <p>{orderData.status}</p>
               </div>
             </TableHead>

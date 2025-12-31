@@ -2,6 +2,7 @@ import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   cancelExchangeOrder,
+  cancelMainCheckout,
   cancelNoStockOrder,
   cancelOrder,
   changeOrderReturnStatus,
@@ -9,6 +10,7 @@ import {
   createDeliveryOrder,
   createManualCheckOut,
   DeliveryOrderPayload,
+  getAllCheckOutMain,
   GetAllCheckoutParams,
   getCheckOut,
   getCheckOutByCheckOutId,
@@ -147,6 +149,14 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
   });
 }
 
+export function useGetAllCheckOutMain() {
+  return useQuery({
+    queryKey: ["checkout-main-all"],
+    queryFn: () => getAllCheckOutMain(),
+    retry: false,
+  });
+}
+
 export function useReturnOrder() {
   const qc = useQueryClient();
   return useMutation({
@@ -273,3 +283,23 @@ export function useCreateDeliveryOrder() {
     },
   });
 }
+
+export const useCancelMainCheckout = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: cancelMainCheckout,
+
+    onSuccess: () => {
+      // 🔁 refresh invoice list của user
+      queryClient.invalidateQueries({
+        queryKey: ["invoice-by-user-id"],
+      });
+
+      // (optional) refresh order list nếu có
+      queryClient.invalidateQueries({
+        queryKey: ["checkout-user-id"],
+      });
+    },
+  });
+};

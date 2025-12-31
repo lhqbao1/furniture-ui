@@ -29,7 +29,16 @@ Font.register({
 
 Font.register({
   family: "Figtree",
-  src: fontPath("fonts/Figtree/Figtree-VariableFont_wght.ttf"),
+  fonts: [
+    {
+      src: "/fonts/Figtree/Figtree-Regular.ttf",
+      fontWeight: "normal",
+    },
+    {
+      src: "/fonts/Figtree/Figtree-Bold.ttf",
+      fontWeight: "bold",
+    },
+  ],
 });
 
 Font.register({

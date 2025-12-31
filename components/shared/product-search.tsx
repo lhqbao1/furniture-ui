@@ -78,6 +78,7 @@ export default function ProductSearch({
   const { data, isLoading } = useProductsAlgoliaSearch({
     query: debouncedQuery,
     is_econelo: false,
+    is_active: true,
   });
 
   const results = data?.items ?? [];

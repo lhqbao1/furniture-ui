@@ -14,11 +14,7 @@ import { debounce } from "lodash";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 import QuantityControl from "./quantity-input";
-import {
-  formatDateDE,
-  getDeliveryDayRange,
-  getLatestInventory,
-} from "../single-product/details/logistics";
+
 import { addBusinessDays } from "date-fns";
 import { InventoryItem } from "@/types/products";
 import { useLocale, useTranslations } from "next-intl";
@@ -26,6 +22,11 @@ import { Link, useRouter } from "@/src/i18n/navigation";
 import { useAddToWishList } from "@/features/wishlist/hook";
 import { HandleApiError } from "@/lib/api-helper";
 import ProductBrand from "../single-product/product-brand";
+import {
+  getDeliveryDayRange,
+  getLatestInventory,
+} from "@/hooks/get-estimated-shipping";
+import { formatDateDE } from "@/lib/format-date-DE";
 
 interface CartItemProps {
   cartServer?: CartItem;

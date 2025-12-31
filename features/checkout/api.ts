@@ -94,6 +94,11 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
   return data as CheckOutMainResponse;
 }
 
+export async function getAllCheckOutMain() {
+  const { data } = await apiAdmin.get("/checkout/main-checkouts/all");
+  return data as CheckOutMain[];
+}
+
 export async function getCheckOutByCheckOutId(checkout_id: string) {
   const { data } = await apiFlexible.get(`/checkout/details/${checkout_id}`);
   return data as CheckOut;
@@ -200,3 +205,8 @@ export async function cancelExchangeOrder(checkout_id: string) {
   );
   return data;
 }
+
+export const cancelMainCheckout = async (mainCheckoutId: string) => {
+  const res = await api.put(`/checkout/canceled/${mainCheckoutId}`);
+  return res.data;
+};
