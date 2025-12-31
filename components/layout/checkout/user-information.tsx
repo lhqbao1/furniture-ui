@@ -58,9 +58,6 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
     enabled: !!userIdLogin,
   });
 
-  console.log(invoiceAddress);
-  console.log(userData);
-
   // Khi user login → đổ dữ liệu vào form
   useEffect(() => {
     if (!userData) return;
@@ -79,12 +76,7 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
       invoice_city: invoiceAddress?.city ?? "",
       invoice_country: invoiceAddress?.country ?? "",
     });
-
-    // if(!invoiceAddress) return;
-    // form.reset({
-
-    // })
-  }, [userData]);
+  }, [userData, invoiceAddress]);
 
   return (
     <div className="space-y-4">
