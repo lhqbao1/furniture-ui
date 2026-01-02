@@ -51,37 +51,6 @@ const OrderStatistic = ({
           </div>
         </div>
       ))}
-
-      {/* Date pickers */}
-      {/* <div className="grid lg:grid-cols-2 grid-cols-1 gap-2 mt-2">
-        <div className="flex gap-2 items-center justify-start">
-          <div className="">From:</div>
-          <SingleDatePicker
-            label=""
-            value={fromDate}
-            onChange={(v) => {
-              if (!v) return setFromDate?.(undefined);
-              const d = new Date(v);
-              d.setHours(0, 0, 0, 0);
-              setFromDate?.(formatDate(d));
-            }}
-          />
-        </div>
-
-        <div className="flex gap-2 items-center justify-start">
-          <div>To:</div>
-          <SingleDatePicker
-            label=""
-            value={endDate}
-            onChange={(v) => {
-              if (!v) return setEndDate?.(undefined);
-              const d = new Date(v);
-              d.setHours(23, 59, 59, 0);
-              setEndDate?.(formatDate(d));
-            }}
-          />
-        </div>
-      </div> */}
     </div>
   );
 };

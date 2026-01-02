@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar1 } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface SingleDatePickerProps {
   label: string;
   value?: string;
   onChange: (val: string | undefined) => void;
+  className?: string;
 }
 
 function formatDate(d?: Date) {
@@ -39,6 +41,7 @@ export const SingleDatePicker = ({
   label,
   value,
   onChange,
+  className,
 }: SingleDatePickerProps) => {
   const [open, setOpen] = useState(false);
   const selected = parseDate(value);
@@ -59,7 +62,7 @@ export const SingleDatePicker = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="justify-start flex-1 w-full"
+          className={cn("justify-start", className)}
           type="button"
         >
           <Calendar1 className="mr-2 h-4 w-4" />

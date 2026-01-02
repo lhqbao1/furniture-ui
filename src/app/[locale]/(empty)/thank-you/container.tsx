@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { userIdAtom } from "@/store/auth";
 import { useUseVoucher } from "@/features/vouchers/hook";
 import { currentVoucherAtom } from "@/store/voucher";
+import { Loader2 } from "lucide-react";
 
 const OrderPlaced = () => {
   const router = useRouter();
@@ -28,6 +29,7 @@ const OrderPlaced = () => {
   const hasFetchedRef = React.useRef(false);
   const hasProcessedRef = React.useRef(false);
   const [delayed, setDelayed] = React.useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(true);
 
   const [userId, setUserId] = useAtom(userIdAtom);
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
@@ -48,6 +50,18 @@ const OrderPlaced = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!isProcessingPayment) return;
+
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isProcessingPayment]);
 
   const retryCaptureUntilSuccess = async (paymentId: string) => {
     const maxRetries = 5;
@@ -87,9 +101,18 @@ const OrderPlaced = () => {
         await retryCaptureUntilSuccess(paymentId);
       }
 
+      // ✅ Capture OK → ẩn loader
+      setIsProcessingPayment(false);
+
       return getMainCheckOutByMainCheckOutId(checkoutId!);
     },
   });
+
+  useEffect(() => {
+    if (checkout) {
+      setIsProcessingPayment(false);
+    }
+  }, [checkout]);
 
   const { data: invoice } = useQuery({
     queryKey: ["invoice-checkout", checkoutId],
@@ -175,11 +198,19 @@ const OrderPlaced = () => {
         <p className="text-gray-600 text-lg mt-2">{t("trackingInfoMessage")}</p>
         <p className="text-gray-600 text-lg mt-2">{t("thankYouShopping")}</p>
 
+        {isProcessingPayment && (
+          <div className="mt-6 flex flex-col items-center gap-3 text-gray-600">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm italic">{t("orderProcessingMessage")}</p>
+          </div>
+        )}
+
         {/* <p className="text-primary text-base mt-6">
                     {t('redirectHome')} <span className="font-semibold text-secondary">{counter}</span> {t('seconds')}.
                 </p> */}
         <Button
-          variant={"secondary"}
+          variant="secondary"
+          disabled={isProcessingPayment}
           onClick={() => router.push("/", { locale })}
           className="mt-6"
         >
