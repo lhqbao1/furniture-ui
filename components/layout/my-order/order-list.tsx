@@ -240,7 +240,7 @@ const OrderList = () => {
                         })}
                       </div>
                       <div className="flex justify-center items-center gap-2">
-                        {isPaid && canCancel && (
+                        {isPaid && (
                           <CancelOrderDialog
                             id={item.id}
                             code={item.checkout_code}

@@ -29,16 +29,16 @@ const AdminPage = () => {
       textColor: "#39B54A",
     },
     {
-      count: statistic?.count_payment_received_order,
-      total: statistic?.total_payment_received_order ?? 0,
-      label: "Payment Received",
-      textColor: "#FED000",
-    },
-    {
       count: statistic?.count_waiting_payment_order,
       total: statistic?.total_waiting_payment_order ?? 0,
       label: "Waiting for payment",
       textColor: "#9b59ff",
+    },
+    {
+      count: statistic?.count_preparing_shipping_order,
+      total: statistic?.total_preparing_shipping_order ?? 0,
+      label: "Preparing Shipping",
+      textColor: "#FED000",
     },
     {
       count: statistic?.count_stock_reserved_order,
@@ -61,7 +61,7 @@ const AdminPage = () => {
   ];
   return (
     <div className="space-y-6">
-      <div className="w-[200px] mt-6">
+      <div className="mt-6">
         <OrderDateFilter />
       </div>
       {isLoadingStatistic || !statistic ? (

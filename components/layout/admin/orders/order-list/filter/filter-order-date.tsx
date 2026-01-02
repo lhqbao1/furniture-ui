@@ -4,6 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { SingleDatePicker } from "@/components/shared/single-date-picker";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 function formatDate(date: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -87,24 +89,54 @@ export default function OrderDateFilter() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 items-start">
+      <div className="flex flex-col gap-2 items-start w-full">
         <Label>From:</Label>
 
-        <SingleDatePicker
-          label=""
-          value={fromDate}
-          onChange={(v) => handleFromDateChange(v ?? undefined)}
-        />
+        <div className="flex items-center gap-2 w-full">
+          <SingleDatePicker
+            label=""
+            value={fromDate}
+            onChange={(v) => handleFromDateChange(v ?? undefined)}
+            className="w-[200px]"
+          />
+
+          {fromDate && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={() => handleFromDateChange(undefined)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-2 items-start">
+      <div className="flex flex-col gap-2 items-start w-full">
         <Label>To:</Label>
 
-        <SingleDatePicker
-          label=""
-          value={endDate}
-          onChange={(v) => handleToDateChange(v ?? undefined)}
-        />
+        <div className="flex items-center gap-2 w-full">
+          <SingleDatePicker
+            label=""
+            value={endDate}
+            onChange={(v) => handleToDateChange(v ?? undefined)}
+            className="w-[200px]"
+          />
+
+          {endDate && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={() => handleToDateChange(undefined)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

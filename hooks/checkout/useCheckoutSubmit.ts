@@ -218,9 +218,7 @@ export function useCheckoutSubmit({
         if (!shippingId) {
           const created = await createShipping.mutateAsync({
             user_id: finalUserId ?? "",
-            recipient_name:
-              data.company_name?.trim() ||
-              `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
+            recipient_name: data.shipping_recipient_name ?? "",
             email: data.email ?? "",
             postal_code: data.shipping_postal_code,
             phone_number: data.shipping_phone_number ?? "",

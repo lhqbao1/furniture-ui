@@ -469,5 +469,6 @@
     "deliveredLate": "Lieferung erfolgte verspätet",
     "receivedMoreItems": "Mehr Artikel erhalten als bestellt",
     "noReason": "Kein Grund angegeben"
-  }
+  },
+    "orderProcessingMessage": "Ihre Bestellung wird bearbeitet. Dies kann einen Moment dauern. Bitte bleiben Sie auf dieser Seite."
 }

@@ -36,6 +36,7 @@ const OrderDetailsDrawer = ({ invoice, checkout }: OrderDetailsDrawerProps) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const locale = useLocale();
+  console.log(checkout);
 
   const handleNavigateTracking = (checkout: CheckOut) => {
     const url = getTrackingUrl(checkout);
