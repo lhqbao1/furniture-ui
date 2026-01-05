@@ -22,11 +22,11 @@ const libre = Libre_Caslon_Display({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.prestige-home.de"),
   title: {
-    default: "Prestige Home – Elektromobilität & Lifestyle",
+    default: "Prestige Home – Qualität für Wohnen & Technik",
     template: "%s | Prestige Home",
   },
   description:
-    "Premium E-Scooter, E-Bikes und Elektrofahrzeuge von Prestige Home – Qualität, Design und Nachhaltigkeit vereint.",
+    "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe. Qualität, Funktionalität und modernes Design aus einer Hand.",
   icons: {
     icon: "/favicon.ico",
     apple: "/favicon.ico",
