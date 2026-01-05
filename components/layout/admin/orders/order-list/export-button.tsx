@@ -9,6 +9,11 @@ import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useQuery } from "@tanstack/react-query";
 import { getAllProductsSelect } from "@/features/product-group/api";
 import { getAllCheckOutMain } from "@/features/checkout/api";
+import { getStatusStyle } from "./status-styles";
+import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
+import { CheckOutMain } from "@/types/checkout";
+import { formatDateDE } from "@/lib/format-date-DE";
+import { formatDateString } from "@/lib/date-formated";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -21,6 +26,12 @@ function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
       }
     });
   }
+}
+
+function getPrimaryCheckout(p: CheckOutMain) {
+  if (!Array.isArray(p.checkouts)) return undefined;
+
+  return p.checkouts.find((c) => c.invoice_address) ?? p.checkouts[0];
 }
 
 export default function ExportOrderExcelButton() {
@@ -40,80 +51,77 @@ export default function ExportOrderExcelButton() {
     const clean = (val: any) =>
       val === null || val === undefined || val === "None" ? "" : val;
 
-    const exportData = data
-      // .filter((p) => p.is_active === true)
-      .map((p) => ({
+    const exportData = data.map((p) => {
+      const checkout = getPrimaryCheckout(p);
+      const invoice = checkout?.invoice_address;
+      const shipping = checkout?.shipping_address;
+      const user = checkout?.user;
+      const allItems = p.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [];
+
+      return {
         code: clean(p.checkout_code),
-        ean: clean(p.ean),
-        brand_name: clean(p.brand?.name),
-        supplier_name: clean(p.owner?.business_name),
-        manufacturer_sku: clean(p.sku),
-        manufacturing_country: clean(p.manufacture_country),
-        customs_tariff_nr: clean(p.tariff_number),
-        name: clean(p.name),
-        description: clean(p.description),
-        technical_description: clean(p.technical_description),
-        categories: clean(p.categories?.map((c) => c.code).join(", ")),
-        category_name: clean(p.categories?.map((c) => c.name).join(", ")),
-        unit: clean(p.unit),
-        amount_unit: clean(p.amount_unit),
-        delivery_time: clean(p.delivery_time),
-        carrier: clean(p.carrier),
-        net_purchase_cost: clean(p.cost),
-        delivery_cost: clean(p.delivery_cost),
-        return_cost: clean(p.return_cost),
-        original_price: clean(p.price),
-        sale_price: clean(p.final_price),
-        vat: clean(p.tax),
-        stock: clean(p.stock),
-        img_url: clean(
-          p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
+        status: clean(getStatusStyle(p.status).text),
+        date: clean(formatDateString(p.created_at)),
+        note: clean(p.note ?? ""),
+        shipping_cost: clean(p.total_shipping),
+
+        // ===== ITEMS (flatMap nhưng gộp) =====
+        product_names: clean(
+          allItems
+            .map((i) => i.products.name)
+            .filter(Boolean)
+            .join(" | "),
         ),
-        length: clean(p.length),
-        width: clean(p.width),
-        height: clean(p.height),
-        weight: clean(p.weight),
-        weee_nr: clean(p.weee_nr),
-        eek: clean(p.eek),
-        SEO_keywords: clean(p.meta_keywords),
-        materials: clean(p.materials),
-        color: clean(p.color),
-        log_height: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.height || 0), 0),
+        total_quantity: allItems.reduce((sum, i) => sum + (i.quantity ?? 0), 0),
+
+        total_amount: calculateOrderTaxWithDiscount(
+          p.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
+          p?.voucher_amount,
+          shipping?.country ?? "DE",
+          user?.tax_id,
+        ).totalGross.toLocaleString("de-DE", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+
+        marketplace: clean(p.from_marketplace),
+        marketplace_order_id: clean(p.marketplace_order_id),
+        payment_method: clean(p.payment_method),
+
+        // -------- Invoice --------
+        invoice_name: clean(invoice?.recipient_name ?? ""),
+        invoice_company_name: clean(user?.company_name ?? ""),
+        invoice_tax_number: clean(user?.tax_id ?? ""),
+        invoice_phone_number: clean(invoice?.phone_number ?? ""),
+        invoice_address: clean(invoice?.address_line ?? ""),
+        invoice_additional_address: clean(
+          invoice?.additional_address_line ?? "",
         ),
-        log_width: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.width || 0), 0),
+        invoice_city: clean(invoice?.city ?? ""),
+        invoice_postal_code: clean(invoice?.postal_code ?? ""),
+        invoice_country: clean(invoice?.country ?? ""),
+
+        // -------- Shipping --------
+        recipient_name: clean(shipping?.recipient_name ?? ""),
+        recipient_phone_number: clean(shipping?.phone_number ?? ""),
+        shipping_address: clean(shipping?.address_line ?? ""),
+        shipping_additional_address: clean(
+          shipping?.additional_address_line ?? "",
         ),
-        log_length: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.length || 0), 0),
+        shipping_city: clean(shipping?.city ?? ""),
+        shipping_postal_code: clean(shipping?.postal_code ?? ""),
+        shipping_country: clean(shipping?.country ?? ""),
+
+        carrier: clean(
+          checkout?.shipment ? checkout.shipment.shipping_carrier : "",
         ),
-        log_weight: clean(
-          p.packages?.reduce((sum, pkg) => sum + (pkg.weight || 0), 0),
+        shipping_date: clean(
+          checkout?.shipment
+            ? formatDateString(checkout.shipment.shipper_date)
+            : "",
         ),
-        benutzerhandbuch: clean(
-          p.pdf_files
-            ?.filter((f) =>
-              f?.title?.toLowerCase?.().includes("benutzerhandbuch"),
-            )
-            .map((f) => f.url.replaceAll(" ", "%20"))
-            .join("|"),
-        ),
-        sicherheit_information: clean(
-          p.pdf_files
-            ?.filter((f) => f?.title?.toLowerCase?.().includes("sicherheit"))
-            .map((f) => f.url.replaceAll(" ", "%20"))
-            .join("|"),
-        ),
-        aufbauanleitung: clean(
-          p.pdf_files
-            ?.filter((f) =>
-              f?.title?.toLowerCase?.().includes("aufbauanleitung"),
-            )
-            .map((f) => f.url.replaceAll(" ", "%20"))
-            .join("|"),
-        ),
-        product_link: `https://www.prestige-home.de/de/product/${p.url_key}`,
-      }));
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
 

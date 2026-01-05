@@ -84,6 +84,38 @@ export function AdminSideBar() {
       ],
     },
     {
+      title: "Accounting",
+      url: "/admin/accounting",
+      icon: ChevronRight,
+      children: [
+        {
+          title: "Cost Management",
+          url: "/admin/accounting/cost",
+          icon: CornerDownRight,
+        },
+        // {
+        //   title: "Payments",
+        //   url: "/admin/accounting/payments",
+        //   icon: CornerDownRight,
+        // },
+        // {
+        //   title: "Refunds",
+        //   url: "/admin/accounting/refunds",
+        //   icon: CornerDownRight,
+        // },
+        // {
+        //   title: "Payouts",
+        //   url: "/admin/accounting/payouts",
+        //   icon: CornerDownRight,
+        // },
+        // {
+        //   title: "Reports",
+        //   url: "/admin/accounting/reports",
+        //   icon: CornerDownRight,
+        // },
+      ],
+    },
+    {
       title: "Logistics",
       url: "/admin/logistic",
       icon: ChevronRight,
