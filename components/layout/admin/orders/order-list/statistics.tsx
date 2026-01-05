@@ -1,14 +1,25 @@
+import { cn } from "@/lib/utils";
 import { Statistic } from "@/types/statistics";
 import React from "react";
 
 interface OrderStatisticProps {
   statistic?: Statistic[];
   isOrder?: boolean;
+  isDashBoard?: boolean;
 }
 
-const OrderStatistic = ({ statistic, isOrder }: OrderStatisticProps) => {
+const OrderStatistic = ({
+  statistic,
+  isOrder,
+  isDashBoard,
+}: OrderStatisticProps) => {
   return (
-    <div className="grid lg:grid-cols-3 grid-cols-2 gap-4">
+    <div
+      className={cn(
+        "grid grid-cols-2 gap-4",
+        isDashBoard ? " lg:grid-cols-3" : "lg:grid-cols-4",
+      )}
+    >
       {(statistic ?? []).map((item, idx) => (
         <div
           key={idx}

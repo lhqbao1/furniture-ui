@@ -269,7 +269,7 @@ export default function RootLayout({
         </noscript>
 
         <RuntimeErrorLogger />
-        <TrustedShops />
+        {/* <TrustedShops /> */}
         <QueryProvider>{children}</QueryProvider>
 
         <Toaster
