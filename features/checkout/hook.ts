@@ -316,10 +316,10 @@ export const useGetCheckOutDashboard = (params: OrderStatisticsParams) => {
 };
 
 export const useGetProductsCheckOutDashboard = (
-  params: OrderStatisticsParams,
+  params?: OrderStatisticsParams,
 ) => {
   return useQuery({
-    queryKey: ["checkout-dashboard-products", params],
+    queryKey: ["checkout-dashboard-products", params ?? "default"],
     queryFn: () => getProductsCheckOutDashboard(params),
     retry: false,
   });

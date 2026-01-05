@@ -224,7 +224,7 @@ export const getCheckOutDashboard = async (params: OrderStatisticsParams) => {
 };
 
 export const getProductsCheckOutDashboard = async (
-  params: OrderStatisticsParams,
+  params?: OrderStatisticsParams,
 ) => {
   const res = await api.get(`/checkout/dash-board/products`, {
     params: {

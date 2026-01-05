@@ -20,6 +20,11 @@ import { userIdAtom } from "@/store/auth";
 import { useUseVoucher } from "@/features/vouchers/hook";
 import { currentVoucherAtom } from "@/store/voucher";
 import { Loader2 } from "lucide-react";
+import { TrustedShopsCheckout } from "@/components/layout/thank-you/trusted-card";
+import {
+  formatDateToTrustedShops,
+  getOrderLatestDeliveryDate,
+} from "@/hooks/get-latest-delivery-date";
 
 const OrderPlaced = () => {
   const router = useRouter();
@@ -170,6 +175,18 @@ const OrderPlaced = () => {
     process();
   }, [checkout, invoice, user]);
 
+  const estimatedDeliveryDate = formatDateToTrustedShops(
+    getOrderLatestDeliveryDate(
+      checkout?.checkouts.flatMap((c) =>
+        c.cart.items.map((item) => ({
+          stock: item.products.stock,
+          inventory: item.products.inventory,
+          deliveryTime: item.products.delivery_time,
+        })),
+      ) ?? [],
+    ),
+  );
+
   return (
     <div className="w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10">
       <div className="px-5 py-6 flex flex-col items-center gap-3">
@@ -217,6 +234,20 @@ const OrderPlaced = () => {
           {t("continueShopping")}
         </Button>
       </div>
+
+      {checkout && (
+        <TrustedShopsCheckout
+          amount={checkout?.total_amount}
+          buyerEmail={checkout.checkouts[0].user.email}
+          currency="EUR"
+          estimatedDeliveryDate={estimatedDeliveryDate ?? ""}
+          orderNumber={checkout.checkout_code}
+          paymentType={checkout.payment_method}
+          products={checkout.checkouts
+            .flatMap((c) => c.cart.items)
+            .flatMap((c) => c.products)}
+        />
+      )}
     </div>
   );
 };

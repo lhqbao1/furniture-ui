@@ -1,4 +1,5 @@
 "use client";
+import OverViewTab from "@/components/layout/admin/accountant/cost/overview-tabs";
 import OrderDateFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-date";
 import OrderStatistic from "@/components/layout/admin/orders/order-list/statistics";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
@@ -57,7 +58,7 @@ const AdminPage = () => {
     },
   ];
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-6">
       <div className="mt-6">
         <OrderDateFilter />
       </div>
@@ -69,6 +70,7 @@ const AdminPage = () => {
           isOrder
         />
       )}
+      <OverViewTab />
     </div>
   );
 };

@@ -15,6 +15,7 @@ const OverViewTab = () => {
   const searchParams = useSearchParams();
 
   const fromDateParam = searchParams.get("from_date") ?? undefined;
+  const endDateParam = searchParams.get("to_date") ?? undefined;
 
   // 🔹 Tháng đang chọn
   const selectedMonth = React.useMemo(
@@ -39,7 +40,10 @@ const OverViewTab = () => {
     data: currentData,
     isLoading: isCurrentLoading,
     isError: isCurrentError,
-  } = useGetCheckOutDashboard(currentRange);
+  } = useGetCheckOutDashboard({
+    from_date: fromDateParam,
+    to_date: endDateParam,
+  });
 
   // 🔹 Fetch tháng trước
   const {

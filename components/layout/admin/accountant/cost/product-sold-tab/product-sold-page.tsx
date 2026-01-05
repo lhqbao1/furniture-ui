@@ -18,21 +18,17 @@ const ProductSoldPage = () => {
 
   const fromDateParam = searchParams.get("from_date") ?? undefined;
 
-  // 🔹 Tháng đang chọn
-  const selectedMonth = React.useMemo(
-    () => (fromDateParam ? new Date(fromDateParam) : new Date()),
-    [fromDateParam],
-  );
+  const selectedMonth = React.useMemo(() => {
+    if (!fromDateParam) return null;
+    return new Date(fromDateParam);
+  }, [fromDateParam]);
 
-  // 🔹 Range tháng hiện tại
-  const currentRange = React.useMemo(
-    () => getMonthRange(selectedMonth),
-    [selectedMonth],
-  );
+  const currentRange = React.useMemo(() => {
+    if (!selectedMonth) return undefined;
+    return getMonthRange(selectedMonth);
+  }, [selectedMonth]);
 
-  const { data, isLoading, isError } =
-    useGetProductsCheckOutDashboard(currentRange);
-
+  const { data, isLoading } = useGetProductsCheckOutDashboard(currentRange);
   return (
     <div className="space-y-7">
       {isLoading || !data ? (

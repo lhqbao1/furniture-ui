@@ -22,7 +22,6 @@ export const providerColumns = ({
   onOpenDrawer,
 }: ProviderColumnsProps): ColumnDef<ProviderItem>[] => {
   const marketplaces = extractMarketplaces(data);
-
   return [
     {
       accessorKey: "id_provider",
