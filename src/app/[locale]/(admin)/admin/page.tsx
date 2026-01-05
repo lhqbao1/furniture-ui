@@ -21,28 +21,10 @@ const AdminPage = () => {
 
   const mergedStatistic = [
     {
-      count: statistic?.count_dispatched_order,
-      total: statistic?.total_dispatched_order ?? 0,
-      label: "Dispatched",
+      count: statistic?.count_order,
+      total: statistic?.total_order ?? 0,
+      label: "Total",
       textColor: "#39B54A",
-    },
-    {
-      count: statistic?.count_waiting_payment_order,
-      total: statistic?.total_waiting_payment_order ?? 0,
-      label: "Waiting for payment",
-      textColor: "#9b59ff",
-    },
-    {
-      count: statistic?.count_preparing_shipping_order,
-      total: statistic?.total_preparing_shipping_order ?? 0,
-      label: "Preparing Shipping",
-      textColor: "#FED000",
-    },
-    {
-      count: statistic?.count_stock_reserved_order,
-      total: statistic?.total_stock_reserved_order ?? 0,
-      label: "Stock Reserved",
-      textColor: "#ff4f7b",
     },
     {
       count: statistic?.count_return_order,

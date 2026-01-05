@@ -15,7 +15,7 @@ export function TrustedShops() {
     <Script
       id="trusted-shops"
       src="//widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
       async
       data-desktop-position="right"
       data-desktop-custom-width="156"
