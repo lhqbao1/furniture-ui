@@ -239,12 +239,12 @@ export default function RootLayout({
         /> */}
 
         {/* Usercentrics CMP */}
-        <Script
+        {/* <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="RlDaintBne_uoh"
           strategy="afterInteractive"
-        />
+        /> */}
       </head>
 
       <body
