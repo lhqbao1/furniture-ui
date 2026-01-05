@@ -248,43 +248,50 @@ const OrderDetailsDrawer = ({ invoice, checkout }: OrderDetailsDrawerProps) => {
             {/* Shipping Address */}
             <div className="space-y-2">
               <h3 className="text-2xl font-semibold">{t("shippingAddress")}</h3>
-
-              <div className="text-base leading-relaxed">
-                <div>
-                  {checkout.checkouts[0].shipping_address.recipient_name}
+              {checkout?.checkouts[0]?.shipping_address && (
+                <div className="text-base leading-relaxed">
+                  <div>
+                    {checkout.checkouts[0].shipping_address.recipient_name}
+                  </div>
+                  <div>
+                    {checkout.checkouts[0].shipping_address.address_line}
+                  </div>
+                  <div>
+                    {checkout.checkouts[0].shipping_address.postal_code}{" "}
+                    {checkout.checkouts[0].shipping_address.city}
+                  </div>
+                  <div>
+                    {getCountryLabelDE(
+                      checkout.checkouts[0].shipping_address.country,
+                    )}
+                  </div>
                 </div>
-                <div>{checkout.checkouts[0].shipping_address.address_line}</div>
-                <div>
-                  {checkout.checkouts[0].shipping_address.postal_code}{" "}
-                  {checkout.checkouts[0].shipping_address.city}
-                </div>
-                <div>
-                  {getCountryLabelDE(
-                    checkout.checkouts[0].shipping_address.country,
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Invoice Address */}
             <div className="space-y-2">
               <h3 className="text-2xl font-semibold">{t("invoiceAddress")}</h3>
 
-              <div className="text-base leading-relaxed">
-                <div>
-                  {checkout.checkouts[0].invoice_address.recipient_name}
+              {checkout?.checkouts[0]?.shipping_address && (
+                <div className="text-base leading-relaxed">
+                  <div>
+                    {checkout.checkouts[0].invoice_address.recipient_name}
+                  </div>
+                  <div>
+                    {checkout.checkouts[0].invoice_address.address_line}
+                  </div>
+                  <div>
+                    {checkout.checkouts[0].invoice_address.postal_code}{" "}
+                    {checkout.checkouts[0].invoice_address.city}
+                  </div>
+                  <div>
+                    {getCountryLabelDE(
+                      checkout.checkouts[0].invoice_address.country,
+                    )}
+                  </div>
                 </div>
-                <div>{checkout.checkouts[0].invoice_address.address_line}</div>
-                <div>
-                  {checkout.checkouts[0].invoice_address.postal_code}{" "}
-                  {checkout.checkouts[0].invoice_address.city}
-                </div>
-                <div>
-                  {getCountryLabelDE(
-                    checkout.checkouts[0].invoice_address.country,
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
