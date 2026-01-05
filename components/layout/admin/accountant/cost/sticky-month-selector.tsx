@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar } from "@/components/ui/calendar";
+
 import { Label } from "@/components/ui/label";
 import {
   Popover,
@@ -9,7 +10,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 
@@ -35,20 +36,18 @@ export default function MonthRangeCalendarPopover() {
 
   const [open, setOpen] = useState(false);
 
-  const [activeMonth, setActiveMonth] = useState<Date>(() => {
-    const fromParam = searchParams.get("from_date");
-    return fromParam ? new Date(fromParam) : new Date();
-  });
+  const [activeMonth, setActiveMonth] = useState<Date | null>(null);
 
-  // 🔄 Sync URL → UI (back / forward / reload)
   useEffect(() => {
     const fromParam = searchParams.get("from_date");
     if (fromParam) {
       setActiveMonth(new Date(fromParam));
+    } else {
+      setActiveMonth(null);
     }
   }, [searchParams]);
 
-  const range = getMonthRange(activeMonth);
+  const range = activeMonth ? getMonthRange(activeMonth) : undefined;
 
   const handleMonthChange = (month: Date) => {
     setActiveMonth(month);
@@ -65,6 +64,17 @@ export default function MonthRangeCalendarPopover() {
     setOpen(false);
   };
 
+  const handleClear = () => {
+    setActiveMonth(null);
+
+    const params = new URLSearchParams(searchParams);
+    params.delete("from_date");
+    params.delete("to_date");
+
+    const query = params.toString();
+    router.push(query ? `?${query}` : "?", { scroll: false });
+  };
+
   return (
     <div className="flex flex-col gap-1 mt-3 sticky top-6">
       <Label className="text-sm font-semibold">Accounting Month</Label>
@@ -76,10 +86,28 @@ export default function MonthRangeCalendarPopover() {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-[240px] justify-between font-normal"
+            className="w-[240px] justify-between font-normal pr-2"
           >
-            {format(activeMonth, "MMMM yyyy")}
-            <CalendarIcon className="ml-2 h-4 w-4 opacity-70" />
+            <span>
+              {activeMonth ? format(activeMonth, "MMMM yyyy") : "Select month"}
+            </span>
+
+            <span className="flex items-center gap-1">
+              {activeMonth && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation(); // ❗ không mở popover
+                    handleClear();
+                  }}
+                  className="rounded p-1 hover:bg-muted"
+                >
+                  <X className="h-3.5 w-3.5 opacity-70" />
+                </button>
+              )}
+
+              <CalendarIcon className="h-4 w-4 opacity-70" />
+            </span>
           </Button>
         </PopoverTrigger>
 
@@ -89,7 +117,7 @@ export default function MonthRangeCalendarPopover() {
         >
           <Calendar
             mode="range"
-            month={activeMonth}
+            month={activeMonth ?? undefined}
             selected={range}
             onMonthChange={handleMonthChange}
             showOutsideDays={false}

@@ -10,7 +10,7 @@ export function marketplaceColumn(
     id: key, // 🔥 BẮT BUỘC
     header: () => (
       <div className="flex justify-center items-center w-full font-medium">
-        {label}
+        {label.toLowerCase() !== "null" ? label : "Prestige Home"}
       </div>
     ),
     columns: [
