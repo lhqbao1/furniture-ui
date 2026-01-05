@@ -104,3 +104,43 @@ export interface CheckOutStatistics {
   count_stock_reserved_order: number;
   total_stock_reserved_order: number;
 }
+
+export interface MarketplaceOverviewItem {
+  marketplace: string;
+  total_orders: number;
+  total_amount: number;
+  percentage: number; // % trên grand total
+}
+
+export interface CheckoutDashboardResponse {
+  from_date: string | null;
+  to_date: string | null;
+  grand_total_amount: number;
+  data: MarketplaceOverviewItem[];
+}
+
+export interface QuantityAmount {
+  total_quantity: number;
+  total_amount: number;
+}
+
+export interface ProviderItem {
+  id_provider: string;
+
+  total_quantity: number;
+  total_amount: number;
+
+  by_marketplace: Record<string, QuantityAmount>;
+  by_status: Record<string, QuantityAmount>;
+}
+
+export interface ProviderSummary {
+  total_id_provider: number;
+  total_quantity: number;
+  total_amount: number;
+}
+
+export interface ProviderOverviewResponse {
+  summary: ProviderSummary;
+  items: ProviderItem[];
+}

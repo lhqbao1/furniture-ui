@@ -1,15 +1,12 @@
 "use client";
 import OrderDateFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-date";
 import OrderStatistic from "@/components/layout/admin/orders/order-list/statistics";
-import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import { useGetCheckOutStatistic } from "@/features/checkout/hook";
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
 import React, { useState } from "react";
 
 const AdminPage = () => {
-  const [fromDate, setFromDate] = useState<string>();
-  const [endDate, setEndDate] = useState<string>();
   const filters = useOrderListFilters();
 
   const {
@@ -70,10 +67,6 @@ const AdminPage = () => {
         <OrderStatistic
           statistic={mergedStatistic}
           isOrder
-          fromDate={fromDate}
-          endDate={endDate}
-          setFromDate={setFromDate}
-          setEndDate={setEndDate}
         />
       )}
     </div>

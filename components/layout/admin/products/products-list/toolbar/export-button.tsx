@@ -140,7 +140,7 @@ export default function ExportExcelButton() {
       onClick={handleExport}
       disabled={isFetching}
     >
-      {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
+      {isFetching ? <Loader2 className="animate-spin" /> : "Product Export"}
     </Button>
   );
 }

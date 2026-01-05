@@ -129,6 +129,13 @@ export async function getProductById(id: string) {
   return data as ProductItem;
 }
 
+export async function getProductByIdProvider(id_provider: string) {
+  const { data } = await apiPublic.get(
+    `/products/by-id-provider/${id_provider}`,
+  );
+  return data as ProductItem;
+}
+
 export async function getProductBySlug(product_slug: string) {
   try {
     const { data } = await apiPublic.get(`/products/by-slug/${product_slug}`);
