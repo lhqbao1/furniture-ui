@@ -92,3 +92,33 @@ export const useDeliveryEstimate = ({
     };
   }, [stock, inventory, deliveryTime]);
 };
+
+export function calculateDeliveryEstimate({
+  stock,
+  inventory,
+  deliveryTime,
+}: UseDeliveryEstimateParams): { from: Date; to: Date } | null {
+  const deliveryRange = getDeliveryDayRange(deliveryTime);
+  if (!deliveryRange) return null;
+
+  const latestInventory = getLatestInventory(inventory ?? []);
+
+  let startDate: Date | null = null;
+
+  // CASE 1: còn hàng
+  if (stock > 0) {
+    startDate = new Date();
+  }
+
+  // CASE 2: hết hàng nhưng có inventory sắp về
+  if (stock === 0 && latestInventory) {
+    startDate = new Date(latestInventory.date_received);
+  }
+
+  if (!startDate) return null;
+
+  return {
+    from: addBusinessDays(startDate, deliveryRange.min),
+    to: addBusinessDays(startDate, deliveryRange.max),
+  };
+}
