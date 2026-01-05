@@ -15,13 +15,16 @@ import {
   getCheckOut,
   getCheckOutByCheckOutId,
   getCheckOutByUserId,
+  getCheckOutDashboard,
   getCheckOutMain,
   getCheckOutMainByUserIdAdmin,
   getCheckOutStatistics,
   getCheckOutSupplier,
   getCheckOutSupplierByCheckOutId,
   getMainCheckOutByMainCheckOutId,
+  getProductsCheckOutDashboard,
   makeOrderPaid,
+  OrderStatisticsParams,
   returnOrder,
 } from "./api";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
@@ -301,5 +304,23 @@ export const useCancelMainCheckout = () => {
         queryKey: ["checkout-user-id"],
       });
     },
+  });
+};
+
+export const useGetCheckOutDashboard = (params: OrderStatisticsParams) => {
+  return useQuery({
+    queryKey: ["checkout-dashboard", params],
+    queryFn: () => getCheckOutDashboard(params),
+    retry: false,
+  });
+};
+
+export const useGetProductsCheckOutDashboard = (
+  params: OrderStatisticsParams,
+) => {
+  return useQuery({
+    queryKey: ["checkout-dashboard-products", params],
+    queryFn: () => getProductsCheckOutDashboard(params),
+    retry: false,
   });
 };

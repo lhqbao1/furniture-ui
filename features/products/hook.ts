@@ -14,6 +14,7 @@ import {
   getAllProducts,
   GetAllProductsParams,
   getProductById,
+  getProductByIdProvider,
   getProductByTag,
   getProductsAlgoliaSearch,
   GetProductsSearchParams,
@@ -106,6 +107,15 @@ export function useGetProductById(id: string) {
     queryKey: ["product", id],
     queryFn: () => getProductById(id),
     enabled: !!id,
+    retry: false,
+  });
+}
+
+export function useGetProductByIdProvider(id_provider: string) {
+  return useQuery({
+    queryKey: ["product-by-id-provider", id_provider],
+    queryFn: () => getProductByIdProvider(id_provider),
+    enabled: !!id_provider,
     retry: false,
   });
 }

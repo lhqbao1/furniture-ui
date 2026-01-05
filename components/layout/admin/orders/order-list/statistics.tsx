@@ -1,34 +1,12 @@
-import { SingleDatePicker } from "@/components/shared/single-date-picker";
 import { Statistic } from "@/types/statistics";
 import React from "react";
-
-function formatDate(date: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-    date.getDate(),
-  )}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-    date.getSeconds(),
-  )}`;
-}
 
 interface OrderStatisticProps {
   statistic?: Statistic[];
   isOrder?: boolean;
-  fromDate?: string;
-  setFromDate?: React.Dispatch<React.SetStateAction<string | undefined>>;
-  endDate?: string;
-  setEndDate?: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-const OrderStatistic = ({
-  statistic,
-  isOrder,
-  fromDate,
-  setFromDate,
-  endDate,
-  setEndDate,
-}: OrderStatisticProps) => {
+const OrderStatistic = ({ statistic, isOrder }: OrderStatisticProps) => {
   return (
     <div className="grid lg:grid-cols-3 grid-cols-2 gap-4">
       {(statistic ?? []).map((item, idx) => (

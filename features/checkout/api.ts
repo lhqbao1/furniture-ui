@@ -4,10 +4,12 @@ import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import {
   CheckOut,
+  CheckoutDashboardResponse,
   CheckOutMain,
   CheckOutMainResponse,
   CheckOutResponse,
   CheckOutStatistics,
+  ProviderOverviewResponse,
 } from "@/types/checkout";
 
 export interface GetAllCheckoutParams {
@@ -209,4 +211,26 @@ export async function cancelExchangeOrder(checkout_id: string) {
 export const cancelMainCheckout = async (mainCheckoutId: string) => {
   const res = await api.put(`/checkout/canceled/${mainCheckoutId}`);
   return res.data;
+};
+
+export const getCheckOutDashboard = async (params: OrderStatisticsParams) => {
+  const res = await api.get(`/checkout/dash-board/market-place`, {
+    params: {
+      ...(params?.from_date !== undefined && { from_date: params.from_date }),
+      ...(params?.to_date !== undefined && { to_date: params.to_date }),
+    },
+  });
+  return res.data as CheckoutDashboardResponse;
+};
+
+export const getProductsCheckOutDashboard = async (
+  params: OrderStatisticsParams,
+) => {
+  const res = await api.get(`/checkout/dash-board/products`, {
+    params: {
+      ...(params?.from_date !== undefined && { from_date: params.from_date }),
+      ...(params?.to_date !== undefined && { to_date: params.to_date }),
+    },
+  });
+  return res.data as ProviderOverviewResponse;
 };
