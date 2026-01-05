@@ -21,14 +21,8 @@ const CostManagement = () => {
     <div className="space-y-3">
       <StickyMonthSelector />
       <div className="h-[2000px] mt-6">
-        <Tabs defaultValue="overview">
+        <Tabs defaultValue="product-sold">
           <TabsList className="gap-4 text-xl">
-            <TabsTrigger
-              value="overview"
-              className="text-lg"
-            >
-              Overview
-            </TabsTrigger>
             <TabsTrigger
               value="product-sold"
               className="text-lg"
@@ -66,13 +60,6 @@ const CostManagement = () => {
               Reports
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="overview">
-            <Card>
-              <CardContent className="grid gap-6">
-                <OverViewTab />
-              </CardContent>
-            </Card>
-          </TabsContent>
           <TabsContent value="product-sold">
             <Card>
               <CardContent className="grid gap-6">

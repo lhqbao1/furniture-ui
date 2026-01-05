@@ -88,8 +88,8 @@ export default function OrderDateFilter() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 items-start w-full">
+    <div className="flex gap-4">
+      <div className="flex flex-col gap-2 items-start w-fit">
         <Label>From:</Label>
 
         <div className="flex items-center gap-2 w-full">
@@ -114,7 +114,7 @@ export default function OrderDateFilter() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 items-start w-full">
+      <div className="flex flex-col gap-2 items-start w-fit">
         <Label>To:</Label>
 
         <div className="flex items-center gap-2 w-full">
