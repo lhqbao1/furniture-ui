@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { COUNTRY_OPTIONS } from "@/data/data";
+import { BRAND_COUNTRY_OPTIONS, COUNTRY_OPTIONS } from "@/data/data";
 import FormImageUpload from "./image-picker";
 
 type AddOrEditBrandFormProps = {
@@ -258,7 +258,7 @@ export default function AddOrEditBrandForm({
                     </SelectTrigger>
 
                     <SelectContent className="max-h-80">
-                      {COUNTRY_OPTIONS.map((c) => (
+                      {BRAND_COUNTRY_OPTIONS.map((c) => (
                         <SelectItem
                           key={c.value}
                           value={c.value}
