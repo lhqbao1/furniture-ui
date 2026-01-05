@@ -174,6 +174,7 @@ export default function RootLayout({
             fbq('track', 'PageView');
           `}
         </Script> */}
+
         <Script
           id="fb-pixel-safe"
           strategy="afterInteractive"
@@ -239,12 +240,12 @@ export default function RootLayout({
         /> */}
 
         {/* Usercentrics CMP */}
-        {/* <Script
+        <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="RlDaintBne_uoh"
           strategy="afterInteractive"
-        /> */}
+        />
       </head>
 
       <body
@@ -269,7 +270,7 @@ export default function RootLayout({
         </noscript>
 
         <RuntimeErrorLogger />
-        {/* <TrustedShops /> */}
+        <TrustedShops />
         <QueryProvider>{children}</QueryProvider>
 
         <Toaster

@@ -50,6 +50,7 @@ const AdminPage = () => {
         <OrderStatistic
           statistic={mergedStatistic}
           isOrder
+          isDashBoard
         />
       )}
       <OverViewTab />

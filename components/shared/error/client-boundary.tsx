@@ -8,6 +8,8 @@ interface State {
   error?: Error;
 }
 
+const AUTO_RELOAD_KEY = "__auto_reload_done__";
+
 class ClientBoundary extends React.Component<
   { children: React.ReactNode },
   State
@@ -26,13 +28,27 @@ class ClientBoundary extends React.Component<
       stack: error.stack,
       componentStack: info.componentStack,
     });
+
+    // 🔁 Auto reload ONE TIME
+    if (typeof window !== "undefined") {
+      const hasReloaded = sessionStorage.getItem(AUTO_RELOAD_KEY);
+
+      if (!hasReloaded) {
+        sessionStorage.setItem(AUTO_RELOAD_KEY, "true");
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
+      }
+    }
   }
 
   handleReset = () => {
+    sessionStorage.removeItem(AUTO_RELOAD_KEY);
     this.setState({ hasError: false, error: undefined });
   };
 
   handleReload = () => {
+    sessionStorage.removeItem(AUTO_RELOAD_KEY);
     window.location.reload();
   };
 
@@ -41,27 +57,22 @@ class ClientBoundary extends React.Component<
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl text-center">
-            {/* Icon */}
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
               <span className="text-2xl">⚠️</span>
             </div>
 
-            {/* Title */}
             <h1 className="text-2xl font-semibold text-gray-800">
               Something went wrong
             </h1>
 
-            {/* Description */}
             <p className="mt-2 text-sm text-gray-600">
-              An unexpected error occurred on this page. You can try again or
-              reload the page.
+              An unexpected error occurred. Please try again or reload the page.
             </p>
 
-            {/* Buttons */}
             <div className="mt-6 flex flex-col gap-3">
               <button
                 onClick={this.handleReset}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2 text-white transition hover:bg-gray-800"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800"
               >
                 <RotateCw size={16} />
                 Try again
@@ -69,14 +80,13 @@ class ClientBoundary extends React.Component<
 
               <button
                 onClick={this.handleReload}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition hover:bg-gray-50"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-gray-700 hover:bg-gray-50"
               >
                 <RefreshCcw size={16} />
                 Reload page
               </button>
             </div>
 
-            {/* Error detail (dev only) */}
             {process.env.NODE_ENV === "development" && this.state.error && (
               <pre className="mt-6 max-h-40 overflow-auto rounded bg-gray-100 p-3 text-left text-xs text-red-600">
                 {this.state.error.message}
