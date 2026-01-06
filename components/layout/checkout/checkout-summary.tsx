@@ -141,6 +141,8 @@ const CheckoutSummary = ({
     let nextValue = 0;
     const currentValue = form.getValues("voucher_amount");
 
+    console.log(selectedVoucher);
+
     /**
      * 1️⃣ PRODUCT voucher
      */
@@ -158,7 +160,10 @@ const CheckoutSummary = ({
     /**
      * 2️⃣ USER SPECIFIC
      */
-    if (selectedVoucher.type === "user_specific") {
+    if (
+      selectedVoucher.type === "user_specific" ||
+      selectedVoucher.type === "order"
+    ) {
       nextValue =
         selectedVoucher.discount_type === "percent"
           ? (orderValue * selectedVoucher.discount_value) / 100
@@ -188,6 +193,9 @@ const CheckoutSummary = ({
     /**
      * 5️⃣ SET VALUE
      */
+
+    console.log(currentValue);
+    console.log(nextValue);
     if (currentValue !== nextValue) {
       form.setValue("voucher_amount", nextValue, {
         shouldDirty: false,

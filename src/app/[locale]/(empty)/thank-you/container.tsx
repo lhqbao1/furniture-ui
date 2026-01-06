@@ -108,6 +108,7 @@ const OrderPlaced = () => {
 
       // ✅ Capture OK → ẩn loader
       setIsProcessingPayment(false);
+      console.log("done");
 
       return getMainCheckOutByMainCheckOutId(checkoutId!);
     },
