@@ -104,7 +104,9 @@ export async function getProductsAlgoliaSearch(
       ...(params?.categories && { categories: params.categories }), // 👈 array
       ...(params?.color && { color: params.color }),
       ...(params?.materials && { materials: params.materials }),
-      ...(params?.is_econelo && { is_econelo: params.is_econelo }),
+      ...(params?.is_econelo !== undefined && {
+        is_econelo: params.is_econelo,
+      }),
       ...(params?.delivery_time && { delivery_time: params.delivery_time }),
       ...(params?.price_min !== undefined && { price_min: params.price_min }),
       ...(params?.price_max !== undefined && { price_max: params.price_max }),

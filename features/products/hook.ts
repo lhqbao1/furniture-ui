@@ -86,6 +86,7 @@ export function useProductsAlgoliaSearch(params?: GetProductsSearchParams) {
       params?.colorsKey,
       params?.materials,
       params?.materialsKey,
+      params?.is_econelo,
     ],
     queryFn: () => getProductsAlgoliaSearch(params),
     enabled: !!params, // không gọi khi params chưa sẵn sàng

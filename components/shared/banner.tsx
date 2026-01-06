@@ -27,16 +27,6 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
           100vw
         "
       />
-      {/* <Image
-        src="/short-banner.jpg"
-        alt="Banner"
-        fetchPriority="high"
-        width={1900}
-        height={200}
-        // sizes="(min-width: 1024px) 100vw"
-        className="object-cover"
-        unoptimized
-      /> */}
     </div>
   );
 };
