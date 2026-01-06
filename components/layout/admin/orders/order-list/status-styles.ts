@@ -120,7 +120,7 @@ export function getShippingStatusStyle(raw: string) {
   switch (key) {
     case "paid":
       return {
-        text: "Waiting for shipping",
+        text: "Payment Received",
         bg: "bg-[#D4EEF9]",
         color: "text-[#29ABE2]",
       };
@@ -133,7 +133,7 @@ export function getShippingStatusStyle(raw: string) {
 
     case "shipped":
       return {
-        text: "stock reserved",
+        text: "Dispatched",
         bg: "bg-[#dcfce7]",
         color: "text-[#22c55e]",
       };

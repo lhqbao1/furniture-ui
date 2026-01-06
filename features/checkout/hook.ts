@@ -351,6 +351,7 @@ export function useCheckoutDashboardLast6Months() {
     chartData: months.map((m, index) => ({
       month: m.label,
       total: queries[index]?.data?.grand_total_amount ?? 0,
+      total_order: queries[index]?.data?.grand_total_orders ?? 0,
     })),
   };
 }
