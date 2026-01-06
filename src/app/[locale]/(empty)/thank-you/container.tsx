@@ -95,21 +95,25 @@ const OrderPlaced = () => {
     throw new Error("Capture payment failed after 5 retries");
   };
 
-  const { data: checkout } = useQuery({
+  const { data: checkout, error } = useQuery({
     queryKey: ["checkout-id", checkoutId],
     enabled: delayed && Boolean(checkoutId) && !hasFetchedRef.current,
     retry: false, // Ta tự retry rồi nên không cần retry của React Query
     queryFn: async () => {
       hasFetchedRef.current = true;
 
-      if (!paymentIntentId && paymentId) {
-        await retryCaptureUntilSuccess(paymentId);
+      try {
+        if (!paymentIntentId && paymentId) {
+          await retryCaptureUntilSuccess(paymentId);
+        }
+
+        return await getMainCheckOutByMainCheckOutId(checkoutId!);
+      } catch (err) {
+        console.error(err);
+        throw err;
+      } finally {
+        setIsProcessingPayment(false); // 🔥 LUÔN TẮT
       }
-
-      // ✅ Capture OK → ẩn loader
-      setIsProcessingPayment(false);
-
-      return getMainCheckOutByMainCheckOutId(checkoutId!);
     },
   });
 
