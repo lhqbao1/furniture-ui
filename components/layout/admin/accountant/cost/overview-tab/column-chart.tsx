@@ -44,79 +44,71 @@ export function ChartBarMultiple({ data }: ChartBarMultipleProps) {
   if (!chartData.length) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Marketplace Performance</CardTitle>
-        <CardDescription>Revenue by marketplace</CardDescription>
-      </CardHeader>
+    <div>
+      <ChartContainer
+        config={chartConfig}
+        className="p-3"
+      >
+        <BarChart data={chartData}>
+          <CartesianGrid vertical={false} />
 
-      <CardContent>
-        <ChartContainer
-          config={chartConfig}
-          className="p-3"
-        >
-          <BarChart data={chartData}>
-            <CartesianGrid vertical={false} />
+          <XAxis dataKey="marketplace" />
 
-            <XAxis dataKey="marketplace" />
+          {/* LEFT: REVENUE */}
+          <YAxis
+            yAxisId="left"
+            tickFormatter={(v) => `${v.toLocaleString("de-DE")} €`}
+          />
 
-            {/* LEFT: REVENUE */}
-            <YAxis
-              yAxisId="left"
-              tickFormatter={(v) => `${v.toLocaleString("de-DE")} €`}
-            />
+          {/* RIGHT: ORDERS */}
+          <YAxis
+            yAxisId="right"
+            orientation="right"
+            domain={[0, "auto"]}
+            tickFormatter={(v) => `${v}`}
+          />
 
-            {/* RIGHT: ORDERS */}
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              domain={[0, "auto"]}
-              tickFormatter={(v) => `${v}`}
-            />
+          <ChartTooltip
+            content={
+              <ChartTooltipContent
+                formatter={(value, name) => {
+                  if (name === "total_amount") {
+                    return [`${Number(value).toLocaleString("de-DE")}€`];
+                  }
+                  return [`${value}`, "Orders"];
+                }}
+              />
+            }
+          />
 
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  formatter={(value, name) => {
-                    if (name === "total_amount") {
-                      return [`${Number(value).toLocaleString("de-DE")}€`];
-                    }
-                    return [`${value}`, "Orders"];
-                  }}
-                />
-              }
-            />
+          {/* 🔹 BAR: REVENUE */}
+          <Bar
+            yAxisId="left"
+            dataKey="total_amount"
+            fill="var(--color-total_amount)"
+            radius={[6, 6, 0, 0]}
+          />
 
-            {/* 🔹 BAR: REVENUE */}
-            <Bar
-              yAxisId="left"
-              dataKey="total_amount"
-              fill="var(--color-total_amount)"
-              radius={[6, 6, 0, 0]}
-            />
-
-            {/* 🔹 LINE: ORDERS */}
-            <Line
-              yAxisId="right"
-              dataKey="total_orders"
-              type="monotone"
-              stroke="hsl(var(--chart-2))"
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 5 }}
-            />
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
-
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
+          {/* 🔹 LINE: ORDERS */}
+          <Line
+            yAxisId="right"
+            dataKey="total_orders"
+            type="monotone"
+            stroke="hsl(var(--chart-2))"
+            strokeWidth={3}
+            dot={false}
+            activeDot={{ r: 5 }}
+          />
+        </BarChart>
+      </ChartContainer>
+      <div className="flex flex-col items-center">
+        <div className="flex gap-2 font-medium leading-none text-sm text-secondary">
           Marketplace comparison overview <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="text-muted-foreground leading-none">
+        <div className="text-muted-foreground leading-none text-sm">
           Total revenue vs order volume
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetCheckOutDashboard } from "@/features/checkout/hook";
-import { Loader2 } from "lucide-react";
+import { Loader2, TrendingUp } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { ChartPieLabelList } from "./overview-tab/pie-chart";
@@ -10,6 +10,14 @@ import {
   getPreviousMonthRange,
 } from "@/hooks/get-previous-month";
 import { ChartBarMultiple } from "./overview-tab/column-chart";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const OverViewTab = () => {
   const searchParams = useSearchParams();
@@ -62,21 +70,25 @@ const OverViewTab = () => {
   if (!currentData || !previousData || isPrevError) return <>Error</>;
 
   return (
-    <div className="space-y-6 grid grid-cols-2 gap-6">
-      <ChartPieLabelList
-        data={currentData.data}
-        total={currentData.grand_total_amount}
-        previousTotal={previousData.grand_total_amount}
-      />
+    <Card>
+      <CardHeader>
+        <CardTitle>Marketplace Performance</CardTitle>
+        <CardDescription>Revenue by marketplace</CardDescription>
+      </CardHeader>
 
-      <ChartBarMultiple data={currentData.data} />
+      <CardContent>
+        <div className="space-y-6 grid grid-cols-2 gap-6">
+          <ChartPieLabelList
+            data={currentData.data}
+            total={currentData.grand_total_amount}
+            previousTotal={previousData.grand_total_amount}
+            hasPrevious={fromDateParam && endDateParam ? true : false}
+          />
 
-      {/* 🔥 Sau này dùng để so sánh */}
-      {/* <ComparisonCard
-        current={currentData.grand_total_amount}
-        previous={previousData.grand_total_amount}
-      /> */}
-    </div>
+          <ChartBarMultiple data={currentData.data} />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

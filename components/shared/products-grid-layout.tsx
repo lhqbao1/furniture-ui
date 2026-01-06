@@ -30,6 +30,7 @@ const ProductsGridLayout = ({
               key={product.id}
               className={isSmall ? "" : ""}
               isProductDetails={isProductDetails}
+              isLCP={idx === 0}
             />
           );
         })}

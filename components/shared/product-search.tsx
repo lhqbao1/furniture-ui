@@ -75,32 +75,36 @@ export default function ProductSearch({
 
   /* ---------------- FETCH ---------------- */
 
-  const { data, isLoading } = useProductsAlgoliaSearch({
-    query: debouncedQuery,
-    is_econelo: false,
-    is_active: true,
-  });
+  const { data, isLoading } = useProductsAlgoliaSearch(
+    !isShopAllPage
+      ? {
+          query: debouncedQuery,
+          is_econelo: false,
+          is_active: true,
+        }
+      : undefined,
+  );
 
   const results = data?.items ?? [];
 
   /* ----------- SYNC STATE → URL (shop-all only) ----------- */
 
-  React.useEffect(() => {
-    if (!isShopAllPage) return;
+  // React.useEffect(() => {
+  //   if (!isShopAllPage) return;
 
-    const params = new URLSearchParams(searchParams.toString());
-    const current = params.get("search") ?? "";
+  //   const params = new URLSearchParams(searchParams.toString());
+  //   const current = params.get("search") ?? "";
 
-    if (current === debouncedQuery) return;
+  //   if (current === debouncedQuery) return;
 
-    if (debouncedQuery) {
-      params.set("search", debouncedQuery);
-    } else {
-      params.delete("search");
-    }
+  //   if (debouncedQuery) {
+  //     params.set("search", debouncedQuery);
+  //   } else {
+  //     params.delete("search");
+  //   }
 
-    router.replace(`/shop-all?${params.toString()}`, { locale });
-  }, [debouncedQuery, isShopAllPage]);
+  //   router.replace(`/shop-all?${params.toString()}`, { locale });
+  // }, [debouncedQuery, isShopAllPage]);
 
   /* ---------------- DROPDOWN ---------------- */
 
@@ -146,11 +150,16 @@ export default function ProductSearch({
     addSearchKeyword(value);
     setOpen(false);
 
-    if (!isShopAllPage) {
-      router.push(
-        { pathname: "/shop-all", query: { search: value } },
-        { locale },
-      );
+    // clone params hiện tại
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("search", value);
+
+    if (isShopAllPage) {
+      // ✅ đang ở /shop-all → chỉ update query
+      router.replace(`/shop-all?${params.toString()}`, { locale });
+    } else {
+      // ✅ chưa ở /shop-all → điều hướng sang
+      router.push(`/shop-all?${params.toString()}`, { locale });
     }
   }
 
@@ -175,7 +184,11 @@ export default function ProductSearch({
             placeholder={`${t("search")}...`}
             className="h-10 w-full rounded-full border bg-white pl-4 xl:h-12"
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              if (!isShopAllPage) {
+                setOpen(true);
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -193,6 +206,7 @@ export default function ProductSearch({
 
       {/* ---------------- DROPDOWN ---------------- */}
       {open &&
+        !isShopAllPage &&
         createPortal(
           <div
             ref={dropdownRef}

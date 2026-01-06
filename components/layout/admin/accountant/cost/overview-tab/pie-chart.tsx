@@ -45,12 +45,14 @@ interface ChartPieLabelListProps {
   data: MarketplaceOverviewItem[];
   total: number;
   previousTotal: number;
+  hasPrevious: boolean;
 }
 
 export function ChartPieLabelList({
   data,
   total,
   previousTotal,
+  hasPrevious,
 }: ChartPieLabelListProps) {
   // 🔹 MAP API → Chart data
   const chartData = data.map((item) => ({
@@ -102,35 +104,37 @@ export function ChartPieLabelList({
           })}
           <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="flex items-center gap-2 font-medium leading-none">
-          {trend.direction === "up" && (
-            <>
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-green-600">
-                Trending up by {trend.percent.toFixed(1)}% compared to last
-                month
-              </span>
-            </>
-          )}
+        {hasPrevious && (
+          <div className="flex items-center gap-2 font-medium leading-none">
+            {trend.direction === "up" && (
+              <>
+                <TrendingUp className="h-4 w-4 text-green-600" />
+                <span className="text-green-600">
+                  Trending up by {trend.percent.toFixed(1)}% compared to last
+                  month
+                </span>
+              </>
+            )}
 
-          {trend.direction === "down" && (
-            <>
-              <TrendingDown className="h-4 w-4 text-red-600" />
-              <span className="text-red-600">
-                Down by {trend.percent.toFixed(1)}% compared to last month
-              </span>
-            </>
-          )}
+            {trend.direction === "down" && (
+              <>
+                <TrendingDown className="h-4 w-4 text-red-600" />
+                <span className="text-red-600">
+                  Down by {trend.percent.toFixed(1)}% compared to last month
+                </span>
+              </>
+            )}
 
-          {trend.direction === "neutral" && (
-            <>
-              <Minus className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                No change compared to last month
-              </span>
-            </>
-          )}
-        </div>
+            {trend.direction === "neutral" && (
+              <>
+                <Minus className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">
+                  No change compared to last month
+                </span>
+              </>
+            )}
+          </div>
+        )}
 
         <div className="text-muted-foreground leading-none">
           Showing marketplace revenue distribution

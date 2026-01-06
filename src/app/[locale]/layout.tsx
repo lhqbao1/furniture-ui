@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import "../globals.css";
 import { routing } from "@/src/i18n/routing";
 import type { Metadata } from "next";
-import WhatsAppChatBox from "@/components/shared/whatsapp-box-chat";
-import SaleFixedIcon from "@/components/shared/sale-fixed-icon";
 import TawkChat from "@/components/shared/tawk";
 import IntlClientProviderWithAuth from "./intlProviderWithAuth";
 import { getMessages } from "next-intl/server";

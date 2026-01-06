@@ -31,6 +31,7 @@ interface ProductCardProps {
   idx: number;
   isSmall?: boolean;
   isProductDetails?: boolean;
+  isLCP?: boolean;
 }
 
 export default function ProductCard({
@@ -39,6 +40,7 @@ export default function ProductCard({
   idx,
   isSmall,
   isProductDetails,
+  isLCP,
 }: ProductCardProps) {
   const cardRefs = useRef<HTMLDivElement[]>([]);
   const t = useTranslations();
@@ -182,13 +184,6 @@ export default function ProductCard({
           }
         }
       >
-        {/* <Link
-          href={`/product/${product.url_key}`}
-          locale={locale}
-          passHref
-        >
-        
-        </Link> */}
         <div className="bg-white p-0 group z-0">
           <Link
             href={`/product/${product.url_key}`}
@@ -203,14 +198,17 @@ export default function ProductCard({
                   product.static_files?.[0]?.url || "/placeholder-product.webp"
                 }
                 alt={product.name}
-                width={800} // số bất kỳ > 0
+                width={800}
                 height={800}
+                priority={isLCP} // 🔥 QUAN TRỌNG
+                loading={isLCP ? "eager" : "lazy"}
+                sizes="(max-width: 768px) 50vw, 25vw"
                 className="
-      object-contain
-      transition-all duration-500 ease-in-out
-      group-hover:-translate-x-6
-      group-hover:opacity-0 rounded-xl
-    "
+                  object-contain
+                  transition-all duration-500 ease-in-out
+                  group-hover:-translate-x-6
+                  group-hover:opacity-0 rounded-xl
+                "
               />
 
               {/* Image 2 */}
@@ -218,16 +216,17 @@ export default function ProductCard({
                 <Image
                   src={product.static_files[1].url}
                   alt={product.name}
-                  width={800} // số bất kỳ > 0
+                  width={800}
                   height={800}
+                  loading="lazy"
                   className="
-        object-contain
-        absolute rounded-xl
-        translate-x-6 opacity-0
-        transition-all duration-500 ease-in-out
-        group-hover:translate-x-0
-        group-hover:opacity-100
-      "
+                    object-contain
+                    absolute rounded-xl
+                    translate-x-6 opacity-0
+                    transition-all duration-500 ease-in-out
+                    group-hover:translate-x-0
+                    group-hover:opacity-100
+                  "
                 />
               )}
             </div>
