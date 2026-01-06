@@ -14,9 +14,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ProductItem } from "@/types/products";
 import { ProductGroupDetailResponse } from "@/types/product-group";
 import ProductImageWrapper from "./image/product-image-wrapper";
-import { useRouter } from "@/src/i18n/navigation";
 import ProductBrand from "./product-brand";
-import MobileStickyCart from "./sticky-cart-mobile";
 
 interface ProductDetailsProps {
   reviews: ReviewResponse[];

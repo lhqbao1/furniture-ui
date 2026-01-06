@@ -49,7 +49,10 @@ export function ChartBarMultiple({ data }: ChartBarMultipleProps) {
         config={chartConfig}
         className="p-3"
       >
-        <BarChart data={chartData}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 20 }}
+        >
           <CartesianGrid vertical={false} />
 
           <XAxis dataKey="marketplace" />

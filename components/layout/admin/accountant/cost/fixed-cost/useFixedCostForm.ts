@@ -166,11 +166,12 @@ export function useFixedCostForm() {
     try {
       // ✅ CASE 1: item đã tồn tại trên DB → DELETE API
       if (item.id) {
+        console.log("hehe");
         await deleteFixedFeeMutation.mutateAsync(item.id);
       }
 
       // ✅ CASE 2: item local → chỉ xoá state
-      setItems((prev) => prev.filter((_, i) => i !== index));
+      // setItems((prev) => prev.filter((_, i) => i !== index));
 
       toast.success("Fixed cost removed");
     } catch (error) {

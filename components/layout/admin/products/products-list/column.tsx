@@ -689,15 +689,27 @@ export const getProductColumns = (
     cell: ({ row }) => {
       const stock = row.original.stock;
       const result_stock = row.original.result_stock;
-      console.log(stock);
-      console.log(result_stock);
-
       const computedStock =
         typeof stock === "number" && typeof result_stock === "number"
           ? stock - (result_stock ?? 0)
           : "";
 
-      return <div className="text-center">{row.original.stock} pcs.</div>;
+      return (
+        <div
+          className={cn(
+            "text-center text-white rounded-xl px-2 py-1",
+            row.original.stock === 0
+              ? "bg-gray-300 text-black"
+              : row.original.stock < 10
+              ? "bg-red-500"
+              : row.original.stock <= 20
+              ? "bg-primary"
+              : "bg-secondary",
+          )}
+        >
+          {row.original.stock} pcs.
+        </div>
+      );
     },
     enableSorting: true,
   },
