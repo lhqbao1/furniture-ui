@@ -1,5 +1,10 @@
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   cancelExchangeOrder,
   cancelMainCheckout,
@@ -28,6 +33,8 @@ import {
   returnOrder,
 } from "./api";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
+import React from "react";
+import { getLast6Months } from "@/lib/get-last-6-months";
 
 export function useGetCheckOut({ page, page_size }: GetAllCheckoutParams = {}) {
   return useQuery({
@@ -324,3 +331,26 @@ export const useGetProductsCheckOutDashboard = (
     retry: false,
   });
 };
+
+export function useCheckoutDashboardLast6Months() {
+  const months = React.useMemo(() => getLast6Months(), []);
+
+  const queries = useQueries({
+    queries: months.map((m) => ({
+      queryKey: ["checkout-dashboard", m.from_date, m.to_date],
+      queryFn: () =>
+        getCheckOutDashboard({
+          from_date: m.from_date,
+          to_date: m.to_date,
+        }),
+    })),
+  });
+
+  return {
+    isLoading: queries.some((q) => q.isLoading),
+    chartData: months.map((m, index) => ({
+      month: m.label,
+      total: queries[index]?.data?.grand_total_amount ?? 0,
+    })),
+  };
+}
