@@ -237,6 +237,11 @@ export type ProductItem = {
   vouchers: VoucherItem[];
 
   faqs: ProductFAQ[];
+  bullet_point_1: string;
+  bullet_point_2: string;
+  bullet_point_3: string;
+  bullet_point_4: string;
+  bullet_point_5: string;
 };
 
 export type ProductResponse = {

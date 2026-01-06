@@ -34,6 +34,11 @@ export type SyncToAmazonInput = {
   min_stock: number;
   max_stock: number;
   handling_time?: number;
+  bullet_point1: string;
+  bullet_point2: string;
+  bullet_point3: string;
+  bullet_point4: string;
+  bullet_point5: string;
 };
 
 export async function syncToAmazon(input: SyncToAmazonInput) {

@@ -77,7 +77,7 @@ export default function MonthRangeCalendarPopover() {
 
   return (
     <div className="flex flex-col gap-1 mt-3 sticky top-6">
-      <Label className="text-sm font-semibold">Accounting Month</Label>
+      <Label className="text-sm font-semibold">Select Month</Label>
 
       <Popover
         open={open}

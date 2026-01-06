@@ -17,7 +17,7 @@ export function TrustedShops() {
       src="//widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
       strategy="lazyOnload"
       async
-      data-desktop-position="right"
+      data-desktop-position="left"
       data-desktop-custom-width="156"
       data-desktop-disable-reviews="false"
       data-desktop-enable-custom="false"
@@ -28,7 +28,7 @@ export function TrustedShops() {
       data-mobile-enable-fadeout="true"
       data-disable-mobile="false"
       data-disable-trustbadge="false"
-      data-color-scheme="light"
+      data-color-scheme="dark"
       charSet="UTF-8"
     />
   );

@@ -268,6 +268,11 @@ const SyncToAmazonForm = ({
             min_stock: values.min_stock ?? 0,
             max_stock: values.max_stock ?? 10,
             handling_time: values.handling_time ?? 0,
+            bullet_point1: product.bullet_point_1 ?? null,
+            bullet_point2: product.bullet_point_2 ?? null,
+            bullet_point3: product.bullet_point_3 ?? null,
+            bullet_point4: product.bullet_point_4 ?? null,
+            bullet_point5: product.bullet_point_5 ?? null,
           };
 
           syncToAmazonMutation.mutate(payload);
