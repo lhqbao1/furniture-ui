@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import OrderPlaced from "./container";
 import { Loader2 } from "lucide-react";
 import { useLocale } from "next-intl";
-import { TrustedShopsCheckout } from "@/components/layout/thank-you/trusted-card";
 
 const OrderPlacedWrapper = () => {
   const router = useRouter();

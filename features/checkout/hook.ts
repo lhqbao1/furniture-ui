@@ -175,6 +175,7 @@ export function useReturnOrder() {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({ queryKey: ["checkout-user-id"] });
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables],
       });
@@ -196,6 +197,7 @@ export function useChangeOrderReturnStatus() {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({ queryKey: ["checkout-user-id"] });
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables],
       });
@@ -211,6 +213,7 @@ export function useCancelOrder() {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({ queryKey: ["checkout-user-id"] });
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables],
       });
@@ -227,6 +230,7 @@ export function useCancelNoStockOrder() {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
       qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({ queryKey: ["checkout-user-id"] });
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables],
       });
