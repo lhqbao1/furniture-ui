@@ -34,6 +34,7 @@ export interface syncToEbayInput {
   brand: string;
   manufacturer: EbayManufacturer;
   documents?: EbayDocument[] | null;
+  ebay_offer_id: string | null;
 }
 
 export async function syncToEbay(input: syncToEbayInput) {

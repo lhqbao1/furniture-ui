@@ -116,6 +116,7 @@ export interface CheckoutDashboardResponse {
   from_date: string | null;
   to_date: string | null;
   grand_total_amount: number;
+  grand_total_orders: number;
   data: MarketplaceOverviewItem[];
 }
 

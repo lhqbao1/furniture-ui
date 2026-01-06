@@ -55,7 +55,7 @@ export const providerColumns = ({
       header: () => <div className="text-center font-medium">Total Amount</div>,
       cell: ({ row }) => (
         <div className="text-center font-medium">
-          €{" "}
+          €
           {row.original.total_amount.toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,

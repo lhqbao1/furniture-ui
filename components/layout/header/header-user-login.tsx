@@ -17,7 +17,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/src/i18n/navigation";
 import { toast } from "sonner";
 import { LoginDrawer } from "@/components/shared/login-drawer";
-import { useMediaQuery } from "react-responsive";
 
 const HeaderUserLogin = () => {
   const [userId, setUserId] = useAtom(userIdAtom);

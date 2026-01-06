@@ -29,9 +29,6 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   const locale = useLocale();
   const t = useTranslations();
 
-  const [, setCurrentCategoryId] = useAtom(currentCategoryIdAtom);
-  const [, setCategoryClicked] = useAtom(categoryClickedAtom);
-
   if (isMobile) {
     return <CategoriesDrawer categories={categories} />;
   }

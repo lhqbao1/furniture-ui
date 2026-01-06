@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { MonthlyChart } from "./overview-tab/monthly-chart";
 
 const OverViewTab = () => {
   const searchParams = useSearchParams();
@@ -86,6 +87,12 @@ const OverViewTab = () => {
           />
 
           <ChartBarMultiple data={currentData.data} />
+
+          <div className="col-span-2">
+            <div className="w-1/2 mx-auto">
+              <MonthlyChart />
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

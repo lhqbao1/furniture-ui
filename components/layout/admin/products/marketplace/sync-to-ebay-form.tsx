@@ -226,7 +226,7 @@ const SyncToEbayForm = ({
             const payload: syncToEbayInput = {
               price: ebayData?.final_price ?? product.final_price,
               sku: product.id_provider,
-              stock: product.stock,
+              stock: product.stock - Math.abs(product.result_stock ?? 0),
               tax: product.tax ? product.tax : null,
               product: {
                 description: stripHtmlRegex(
@@ -260,6 +260,7 @@ const SyncToEbayForm = ({
                 product.pdf_files && product.pdf_files.length > 0
                   ? product.pdf_files
                   : null,
+              ebay_offer_id: ebayData?.marketplace_offer_id ?? null,
             };
 
             syncToEbayMutation.mutate(payload);
@@ -278,7 +279,7 @@ const SyncToEbayForm = ({
                   f.url.replace(/\s+/g, "%20"),
                 ) ?? [],
               price: kauflandData?.final_price ?? product.final_price,
-              stock: product.stock,
+              stock: product.stock - Math.abs(product.result_stock ?? 0),
               carrier: product.carrier,
               sku: product.id_provider,
               product_id: product.id,

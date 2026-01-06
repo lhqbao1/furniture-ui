@@ -67,7 +67,7 @@ const AdminInventoryList = () => {
   return (
     <div className="space-y-6 pb-12">
       <div className="text-3xl text-secondary font-bold text-center">
-        Inventory
+        Incoming Inventory
       </div>
 
       <InventoryTableToolbar
