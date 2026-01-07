@@ -191,10 +191,6 @@ const OrderPlaced = () => {
     ),
   );
 
-  console.log(
-    checkout?.checkouts.flatMap((c) => c.cart.items).flatMap((c) => c.products),
-  );
-
   return (
     <div className="w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10">
       <div className="px-5 py-6 flex flex-col items-center gap-3">
@@ -243,7 +239,7 @@ const OrderPlaced = () => {
         </Button>
       </div>
 
-      {/* {checkout && (
+      {checkout && (
         <TrustedShopsCheckout
           amount={checkout?.total_amount}
           buyerEmail={checkout.checkouts[0].user.email}
@@ -255,7 +251,7 @@ const OrderPlaced = () => {
             .flatMap((c) => c.cart.items)
             .flatMap((c) => c.products)}
         />
-      )} */}
+      )}
     </div>
   );
 };
