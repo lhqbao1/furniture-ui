@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   createFixedFee,
   deleteFixedFee,
@@ -9,6 +14,8 @@ import {
 } from "./api";
 import { CreateFixedFeeValues } from "@/lib/schema/fixed-cost";
 import { FixedFeeItem } from "@/types/fixed-fee";
+import { useMemo } from "react";
+import { getLast6Months } from "@/lib/get-last-6-months";
 
 export const useGetFixedFeeWithTime = (params: GetFixedFeeWithTimeParams) => {
   return useQuery({
@@ -67,3 +74,32 @@ export const useDeleteFixedFee = () => {
     },
   });
 };
+
+export function useFixedCostLast6Months() {
+  const months = useMemo(() => getLast6Months(), []);
+
+  const queries = useQueries({
+    queries: months.map((m) => ({
+      queryKey: ["fixed-fee-time", m.from_date, m.to_date],
+      queryFn: () => {
+        const from = new Date(m.from_date);
+        return getFixedFeeWithTime({
+          month: from.getMonth() + 1,
+          year: from.getFullYear(),
+        });
+      },
+    })),
+  });
+
+  const isLoading = queries.some((q) => q.isLoading);
+
+  const chartData = months.map((m, index) => ({
+    month: m.label,
+    total: queries[index]?.data?.total_fee ?? 0,
+  }));
+
+  return {
+    isLoading,
+    chartData,
+  };
+}

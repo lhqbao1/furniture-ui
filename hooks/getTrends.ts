@@ -1,8 +1,27 @@
-export function getTrend(current: number, previous: number) {
-  if (!previous || previous <= 0) {
+export type TrendDirection = "up" | "down" | "neutral" | "no-data";
+
+export function getTrend(current: number, previous?: number | null) {
+  // ❗ CASE 1: tháng trước không có data
+  if (previous == null || previous === 0) {
     return {
-      direction: "neutral" as const,
+      direction: "no-data" as const,
       percent: 0,
+    };
+  }
+
+  // ❗ CASE 2: có data nhưng = 0
+  if (previous === 0) {
+    if (current === 0) {
+      return {
+        direction: "neutral" as const,
+        percent: 0,
+      };
+    }
+
+    // có data = 0 → tăng từ 0
+    return {
+      direction: "up" as const,
+      percent: 100,
     };
   }
 

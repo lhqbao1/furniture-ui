@@ -31,7 +31,7 @@ export function FixedCostRow({
       }`}
     >
       <Input
-        disabled={isReadonly}
+        // disabled={isReadonly}
         className={item.isCloned ? "border-destructive" : ""}
         placeholder="Cost type"
         value={item.type}
@@ -39,7 +39,7 @@ export function FixedCostRow({
       />
 
       <Input
-        disabled={isReadonly}
+        // disabled={isReadonly}
         className={item.isCloned ? "border-destructive" : ""}
         type="number"
         placeholder="Amount (€)"
@@ -52,7 +52,7 @@ export function FixedCostRow({
       <Button
         variant="ghost"
         size="icon"
-        disabled={isReadonly}
+        // disabled={isReadonly}
         onClick={() => onRemove(index)}
         className="text-muted-foreground hover:text-destructive"
       >

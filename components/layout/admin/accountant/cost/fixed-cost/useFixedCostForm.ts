@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { getFixedFeeWithTime } from "@/features/fixed-fee/api";
@@ -51,6 +51,34 @@ export function useFixedCostForm() {
     queryFn: () => getFixedFeeWithTime({ month, year }),
     enabled: Boolean(month && year),
   });
+
+  const prevMonthYear = useMemo(() => {
+    if (month === 1) {
+      return {
+        month: 12,
+        year: year - 1,
+      };
+    }
+
+    return {
+      month: month - 1,
+      year,
+    };
+  }, [month, year]);
+
+  const { data: prevMonthData } = useQuery({
+    queryKey: ["fixed-fee-time", prevMonthYear.month, prevMonthYear.year],
+    queryFn: () =>
+      getFixedFeeWithTime({
+        month: prevMonthYear.month,
+        year: prevMonthYear.year,
+      }),
+    enabled: Boolean(prevMonthYear.month && prevMonthYear.year),
+  });
+
+  const prevMonthTotalFee = useMemo(() => {
+    return prevMonthData?.total_fee ?? 0;
+  }, [prevMonthData]);
 
   /* ---------------- helpers ---------------- */
 
@@ -106,12 +134,8 @@ export function useFixedCostForm() {
 
     setItems((prev) =>
       prev.map((item) => {
-        // backend có data → không clone
-        if (item.amount !== "") {
-          return { ...item, isCloned: false };
-        }
+        if (item.amount !== "") return item;
 
-        // backend chưa có → tìm base
         const base = baseMonthItems.find(
           (b) => b.type === item.type && b.amount !== "",
         );
@@ -133,7 +157,28 @@ export function useFixedCostForm() {
     }
 
     setHasCloned(true);
-  }, [month, year, data, baseMonthItems, hasCloned]);
+  }, [data, baseMonthItems, month, year, hasCloned]);
+
+  useEffect(() => {
+    if (!prevMonthData) return;
+
+    const mapped: FixedCostItemUI[] = DEFAULT_FIXED_COSTS.map((type) => {
+      const matched = prevMonthData.fixed_fees.find((i) => i.type === type);
+
+      return {
+        type,
+        amount: matched ? Number(matched.amount) : "",
+        isCloned: false,
+      };
+    });
+
+    setBaseMonthItems(mapped);
+    setHasCloned(false); // 👈 reset khi base đổi
+  }, [prevMonthData]);
+
+  useEffect(() => {
+    setHasCloned(false);
+  }, [month, year]);
 
   /* -------- actions ---------- */
 
@@ -219,6 +264,10 @@ export function useFixedCostForm() {
     }
   };
 
+  const totalFee = useMemo(() => {
+    return data?.total_fee ?? 0;
+  }, [data]);
+
   return {
     month,
     year,
@@ -233,5 +282,7 @@ export function useFixedCostForm() {
     submit,
     isSubmitting: createFixedFeeMutation.isPending,
     hasChanges,
+    totalFee,
+    prevMonthTotalFee, // 👈 thêm cái này
   };
 }
