@@ -251,7 +251,7 @@ const ProductDetailInputs = ({
           render={({ field }) => {
             const computedStock =
               typeof stock === "number" && typeof result_stock === "number"
-                ? stock - result_stock
+                ? stock - Math.abs(result_stock ?? 0)
                 : "";
 
             return (
