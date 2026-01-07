@@ -68,10 +68,6 @@ const OrderDetails = () => {
   const createdAt = formatDate(order.created_at);
   const updatedAt = formatDateTimeString(order.updated_at);
 
-  console.log(
-    order.checkouts.flatMap((c) => c.cart.items).flatMap((c) => c.products),
-  );
-
   return (
     <div className="space-y-12 pb-20 mt-6">
       <AdminBackButton />

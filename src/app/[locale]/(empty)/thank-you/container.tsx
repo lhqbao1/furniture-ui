@@ -20,7 +20,10 @@ import { userIdAtom } from "@/store/auth";
 import { useUseVoucher } from "@/features/vouchers/hook";
 import { currentVoucherAtom } from "@/store/voucher";
 import { Loader2 } from "lucide-react";
-import { TrustedShopsCheckout } from "@/components/layout/thank-you/trusted-card";
+import {
+  TrustedShopsCheckout,
+  TrustedShopsCheckoutProps,
+} from "@/components/layout/thank-you/trusted-card";
 import {
   formatDateToTrustedShops,
   getOrderLatestDeliveryDate,
@@ -40,6 +43,8 @@ const OrderPlaced = () => {
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
   const [voucherId, setVoucherId] = useAtom(currentVoucherAtom);
+  const [trustedShopData, setTrustedShopData] =
+    useState<TrustedShopsCheckoutProps | null>(null);
 
   const capturePaymentMutation = useCapturePayment();
   const uploadStaticFileMutation = useUploadStaticFile();
@@ -191,6 +196,23 @@ const OrderPlaced = () => {
     ),
   );
 
+  useEffect(() => {
+    if (!checkout) return;
+    if (trustedShopData) return; // ❗ chỉ set 1 lần
+
+    setTrustedShopData({
+      orderNumber: checkout.checkout_code,
+      buyerEmail: checkout.checkouts[0].user.email,
+      amount: checkout.total_amount,
+      currency: "EUR",
+      paymentType: checkout.payment_method,
+      estimatedDeliveryDate: estimatedDeliveryDate ?? "",
+      products: checkout.checkouts
+        .flatMap((c) => c.cart.items)
+        .map((i) => i.products),
+    });
+  }, [checkout, estimatedDeliveryDate, trustedShopData]);
+
   return (
     <div className="w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10">
       <div className="px-5 py-6 flex flex-col items-center gap-3">
@@ -239,19 +261,7 @@ const OrderPlaced = () => {
         </Button>
       </div>
 
-      {checkout && (
-        <TrustedShopsCheckout
-          amount={checkout?.total_amount}
-          buyerEmail={checkout.checkouts[0].user.email}
-          currency="EUR"
-          estimatedDeliveryDate={estimatedDeliveryDate ?? ""}
-          orderNumber={checkout.checkout_code}
-          paymentType={checkout.payment_method}
-          products={checkout.checkouts
-            .flatMap((c) => c.cart.items)
-            .flatMap((c) => c.products)}
-        />
-      )}
+      {trustedShopData && <TrustedShopsCheckout {...trustedShopData} />}
     </div>
   );
 };
