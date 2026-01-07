@@ -36,7 +36,6 @@ export function useCheckoutSubmit({
   invoiceAddress,
   cartItems,
   localCart,
-  hasServerCart,
   shippingCost,
   locale,
   currentUserId,
@@ -47,7 +46,6 @@ export function useCheckoutSubmit({
   invoiceAddress: Address | undefined; // invoice address
   cartItems: CartResponse | undefined; // cart server (mảng supplier)
   localCart: CartItemLocal[]; // cart local (guest)
-  hasServerCart: boolean; // flag cart server hay local
   shippingCost: number; // shipping được tính từ logic
   locale: string; // locale hiện tại
   currentUserId: string;

@@ -141,8 +141,6 @@ const CheckoutSummary = ({
     let nextValue = 0;
     const currentValue = form.getValues("voucher_amount");
 
-    console.log(selectedVoucher);
-
     /**
      * 1️⃣ PRODUCT voucher
      */
@@ -194,8 +192,6 @@ const CheckoutSummary = ({
      * 5️⃣ SET VALUE
      */
 
-    console.log(currentValue);
-    console.log(nextValue);
     if (currentValue !== nextValue) {
       form.setValue("voucher_amount", nextValue, {
         shouldDirty: false,

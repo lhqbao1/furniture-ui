@@ -24,6 +24,7 @@ import { flattenCartItems } from "@/hooks/cart/flattenCart";
 const CartPageClient = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [userId, setUserId] = useAtom(userIdAtom);
+  const isAuthenticated = Boolean(userId);
   const [authHydrated] = useAtom(authHydratedAtom);
   const router = useRouter();
   const t = useTranslations();
@@ -47,15 +48,14 @@ const CartPageClient = () => {
   const flatItems = React.useMemo(() => {
     return flattenCartItems(cart ?? []);
   }, [cart]);
-  const hasServerCart = Array.isArray(cart) && cart.length > 0;
 
   const normalized = React.useMemo(() => {
-    const items = hasServerCart
+    const items = isAuthenticated
       ? cart?.flatMap((g) => g.items) ?? []
-      : localCart;
+      : localCart ?? [];
 
-    return normalizeCartItems(items, hasServerCart);
-  }, [cart, localCart, hasServerCart]);
+    return normalizeCartItems(items, isAuthenticated);
+  }, [cart, localCart, isAuthenticated]);
 
   const shippingCost = React.useMemo(() => {
     return calculateShipping(normalized);

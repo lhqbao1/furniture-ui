@@ -21,6 +21,7 @@ import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 export function useCheckoutInit() {
   const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
   const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
+  const isAuthenticated = Boolean(userLoginId);
 
   const finalUserId = userLoginId || userGuestId;
 
@@ -68,11 +69,11 @@ export function useCheckoutInit() {
     retry: false,
   });
 
-  const hasServerCart = Array.isArray(cartItems) && cartItems.length > 0;
-
   const normalized = normalizeCartItems(
-    hasServerCart ? cartItems.flatMap((g) => g.items) : localCart,
-    hasServerCart,
+    isAuthenticated && cartItems
+      ? cartItems.flatMap((g) => g.items)
+      : localCart,
+    isAuthenticated,
   );
 
   const shippingCost = calculateShipping(normalized);
@@ -86,7 +87,6 @@ export function useCheckoutInit() {
     cartItems,
     localCart,
     isLoadingCart,
-    hasServerCart,
     shippingCost,
     hasOtherCarrier,
     userGuestId,
