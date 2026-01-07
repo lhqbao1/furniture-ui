@@ -65,7 +65,7 @@ export function TrustedShopsCheckout(props: TrustedShopsCheckoutProps) {
     <>
       {/* TS script phải load TRƯỚC */}
       <Script
-        src="https://widgets.trustedshops.com/js/YOUR_TS_ID.js"
+        src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
         strategy="beforeInteractive"
       />
 
