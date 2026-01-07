@@ -691,7 +691,7 @@ export const getProductColumns = (
       const result_stock = row.original.result_stock;
       const computedStock =
         typeof stock === "number" && typeof result_stock === "number"
-          ? stock - (result_stock ?? 0)
+          ? stock - Math.abs(result_stock ?? 0)
           : "";
 
       return (
@@ -707,7 +707,7 @@ export const getProductColumns = (
               : "bg-secondary",
           )}
         >
-          {row.original.stock} pcs.
+          {computedStock} pcs.
         </div>
       );
     },
