@@ -1,10 +1,11 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect } from "react";
+import { useRef } from "react";
 import { mapTrustedShopsPaymentType } from "@/hooks/map-payment-method";
 import { ProductItem } from "@/types/products";
 
+/* ⛔ GIỮ NGUYÊN – KHÔNG ĐỤNG */
 export interface TrustedShopsCheckoutProps {
   orderNumber: string;
   buyerEmail: string;
@@ -24,10 +25,16 @@ export function TrustedShopsCheckout({
   estimatedDeliveryDate,
   products,
 }: TrustedShopsCheckoutProps) {
-  useEffect(() => {
-    if (!window._ts) return;
+  const sentRef = useRef(false);
 
-    // 1️⃣ Service review (ORDER)
+  const sendTrustedShops = () => {
+    if (sentRef.current) return;
+    sentRef.current = true;
+
+    // 🔑 luôn init trước
+    window._ts = window._ts || [];
+
+    // 1️⃣ SERVICE REVIEW (ORDER)
     window._ts.push([
       "_ec.Order",
       {
@@ -40,7 +47,7 @@ export function TrustedShopsCheckout({
       },
     ]);
 
-    // 2️⃣ Product reviews
+    // 2️⃣ PRODUCT REVIEWS (GIỮ NGUYÊN LOGIC CŨ)
     products.forEach((p) => {
       window._ts!.push([
         "_ec.Product",
@@ -55,20 +62,29 @@ export function TrustedShopsCheckout({
       ]);
     });
 
-    // 3️⃣ Trigger Trustcard
+    // 3️⃣ OPEN TRUSTCARD
     window._ts.push(["_ec.Show"]);
-  }, []);
+  };
 
   return (
     <>
+      {/* 🔑 INIT QUEUE – BẮT BUỘC */}
       <Script
-        src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          window._ts = window._ts || [];
+        id="ts-init"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: "window._ts = window._ts || [];",
         }}
       />
 
+      {/* 🔑 TRUSTED SHOPS SCRIPT */}
+      <Script
+        src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
+        strategy="afterInteractive"
+        onLoad={sendTrustedShops}
+      />
+
+      {/* 🔑 CONTAINER */}
       <div id="trustedshops_checkout" />
     </>
   );
