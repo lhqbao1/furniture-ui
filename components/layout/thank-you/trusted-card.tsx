@@ -1,9 +1,9 @@
 "use client";
 
+import Script from "next/script";
+import { useEffect } from "react";
 import { mapTrustedShopsPaymentType } from "@/hooks/map-payment-method";
 import { ProductItem } from "@/types/products";
-import Script from "next/script";
-import React from "react";
 
 export interface TrustedShopsCheckoutProps {
   orderNumber: string;
@@ -11,79 +11,65 @@ export interface TrustedShopsCheckoutProps {
   amount: number;
   currency: "EUR";
   paymentType: string;
-  estimatedDeliveryDate: string; // YYYY-MM-DD
+  estimatedDeliveryDate: string;
   products: ProductItem[];
 }
 
-export function TrustedShopsCheckout(props: TrustedShopsCheckoutProps) {
-  const {
-    orderNumber,
-    buyerEmail,
-    amount,
-    currency,
-    paymentType,
-    estimatedDeliveryDate,
-    products,
-  } = props;
+export function TrustedShopsCheckout({
+  orderNumber,
+  buyerEmail,
+  amount,
+  currency,
+  paymentType,
+  estimatedDeliveryDate,
+  products,
+}: TrustedShopsCheckoutProps) {
+  useEffect(() => {
+    if (!window._ts) return;
 
-  const html = React.useMemo(() => {
-    return `
-     <div id="trustedShopsCheckout" style="display:none">
-      <span id="tsCheckoutOrderNr">${orderNumber}</span>
-      <span id="tsCheckoutBuyerEmail">${buyerEmail}</span>
-      <span id="tsCheckoutOrderAmount">${amount.toFixed(2)}</span>
-      <span id="tsCheckoutOrderCurrency">${currency}</span>
-      <span id="tsCheckoutOrderPaymentType">
-        ${mapTrustedShopsPaymentType(paymentType)}
-      </span>
-      <span id="tsCheckoutOrderEstDeliveryDate">${estimatedDeliveryDate}</span>
+    // 1️⃣ Service review (ORDER)
+    window._ts.push([
+      "_ec.Order",
+      {
+        order_id: orderNumber,
+        order_amount: amount.toFixed(2),
+        order_currency: currency,
+        order_paymentType: mapTrustedShopsPaymentType(paymentType),
+        order_estimatedDeliveryDate: estimatedDeliveryDate,
+        email: buyerEmail,
+      },
+    ]);
 
-      ${products
-        .map(
-          (p) => `
-        <span class="tsCheckoutProductItem">
-          <span class="tsCheckoutProductUrl">https://prestige-home.de/de/product/${
-            p.url_key
-          }</span>
-          <span class="tsCheckoutProductImageUrl">${
-            p.static_files?.[0]?.url ?? ""
-          }</span>
-          <span class="tsCheckoutProductName">${p.name}</span>
-          <span class="tsCheckoutProductSKU">${p.sku}</span>
-          ${p.ean ? `<span class="tsCheckoutProductGTIN">${p.ean}</span>` : ""}
-          ${
-            p.brand?.name
-              ? `<span class="tsCheckoutProductBrand">${p.brand.name}</span>`
-              : ""
-          }
-        </span>
-      `,
-        )
-        .join("")}
-    </div>
-  `;
-  }, [
-    orderNumber,
-    buyerEmail,
-    amount,
-    currency,
-    paymentType,
-    estimatedDeliveryDate,
-    products,
-  ]);
+    // 2️⃣ Product reviews
+    products.forEach((p) => {
+      window._ts!.push([
+        "_ec.Product",
+        {
+          id: p.sku,
+          name: p.name,
+          url: `https://prestige-home.de/de/product/${p.url_key}`,
+          imageUrl: p.static_files?.[0]?.url,
+          gtin: p.ean,
+          brand: p.brand?.name,
+        },
+      ]);
+    });
+
+    // 3️⃣ Trigger Trustcard
+    window._ts.push(["_ec.Show"]);
+  }, []);
 
   return (
     <>
-      {/* TS script phải load TRƯỚC */}
       <Script
-        src="https://widgets.trustedshops.com/js/XXX.js"
+        src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
         strategy="afterInteractive"
         onLoad={() => {
-          console.log("Trusted Shops loaded");
+          window._ts = window._ts || [];
         }}
       />
 
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <div id="trustedshops_checkout" />
     </>
   );
 }
