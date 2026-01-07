@@ -320,7 +320,7 @@ export const useCancelMainCheckout = () => {
 
 export const useGetCheckOutDashboard = (params: OrderStatisticsParams) => {
   return useQuery({
-    queryKey: ["checkout-dashboard", params],
+    queryKey: ["checkout-dashboard", params.from_date, params.to_date],
     queryFn: () => getCheckOutDashboard(params),
     retry: false,
   });

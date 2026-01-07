@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OverViewTab from "@/components/layout/admin/accountant/cost/overview-tabs";
 import ProductSoldPage from "@/components/layout/admin/accountant/cost/product-sold-tab/product-sold-page";
 import FixedCostPage from "@/components/layout/admin/accountant/cost/fixed-cost/fixed-cost-page";
+import VariableCostPage from "@/components/layout/admin/accountant/cost/variable-cost/variable-cost-page";
 
 const CostManagement = () => {
   return (
@@ -72,6 +73,13 @@ const CostManagement = () => {
             <Card>
               <CardContent>
                 <FixedCostPage />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="variable-cost">
+            <Card>
+              <CardContent>
+                <VariableCostPage />
               </CardContent>
             </Card>
           </TabsContent>

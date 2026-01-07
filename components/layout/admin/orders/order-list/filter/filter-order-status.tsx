@@ -29,13 +29,20 @@ export default function OrderStatusFilter() {
     setSelected(current ? current.split(",") : []);
   }, [searchParams]);
 
-  const toggleStatus = (key: string) => {
+  const toggleStatus = (item: (typeof STATUS_OPTIONS)[number]) => {
+    // danh sách backend statuses mà item đại diện
+    const backendStatuses = item.statuses ?? [item.key];
+
+    const isSelected = backendStatuses.every((s) => selected.includes(s));
+
     let updated: string[];
 
-    if (selected.includes(key)) {
-      updated = selected.filter((s) => s !== key);
+    if (isSelected) {
+      // remove toàn bộ statuses
+      updated = selected.filter((s) => !backendStatuses.includes(s));
     } else {
-      updated = [...selected, key];
+      // add toàn bộ statuses (tránh duplicate)
+      updated = Array.from(new Set([...selected, ...backendStatuses]));
     }
 
     setSelected(updated);
@@ -69,9 +76,15 @@ export default function OrderStatusFilter() {
             <div
               key={item.key}
               className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-accent rounded-md"
-              onClick={() => toggleStatus(item.key)}
+              onClick={() => toggleStatus(item)}
             >
-              <Checkbox checked={selected.includes(item.key)} />
+              <Checkbox
+                checked={
+                  item.statuses
+                    ? item.statuses.every((s) => selected.includes(s))
+                    : selected.includes(item.key)
+                }
+              />
               <span>{item.label}</span>
             </div>
           ))}
