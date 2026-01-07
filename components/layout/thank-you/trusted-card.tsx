@@ -3,8 +3,9 @@
 import { mapTrustedShopsPaymentType } from "@/hooks/map-payment-method";
 import { ProductItem } from "@/types/products";
 import Script from "next/script";
+import React from "react";
 
-interface TrustedShopsCheckoutProps {
+export interface TrustedShopsCheckoutProps {
   orderNumber: string;
   buyerEmail: string;
   amount: number;
@@ -25,8 +26,9 @@ export function TrustedShopsCheckout(props: TrustedShopsCheckoutProps) {
     products,
   } = props;
 
-  const html = `
-    <div id="trustedShopsCheckout" style="display:none">
+  const html = React.useMemo(() => {
+    return `
+     <div id="trustedShopsCheckout" style="display:none">
       <span id="tsCheckoutOrderNr">${orderNumber}</span>
       <span id="tsCheckoutBuyerEmail">${buyerEmail}</span>
       <span id="tsCheckoutOrderAmount">${amount.toFixed(2)}</span>
@@ -60,13 +62,25 @@ export function TrustedShopsCheckout(props: TrustedShopsCheckoutProps) {
         .join("")}
     </div>
   `;
+  }, [
+    orderNumber,
+    buyerEmail,
+    amount,
+    currency,
+    paymentType,
+    estimatedDeliveryDate,
+    products,
+  ]);
 
   return (
     <>
       {/* TS script phải load TRƯỚC */}
       <Script
-        src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
-        strategy="beforeInteractive"
+        src="https://widgets.trustedshops.com/js/XXX.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          console.log("Trusted Shops loaded");
+        }}
       />
 
       <div dangerouslySetInnerHTML={{ __html: html }} />
