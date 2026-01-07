@@ -251,7 +251,7 @@ const ProductDetailInputs = ({
           render={({ field }) => {
             const computedStock =
               typeof stock === "number" && typeof result_stock === "number"
-                ? stock - (result_stock ?? 0)
+                ? stock - result_stock
                 : "";
 
             return (
@@ -265,7 +265,7 @@ const ProductDetailInputs = ({
                     type="number"
                     inputMode="decimal"
                     disabled={!isDSP}
-                    value={isDSP ? field.value ?? "" : field.value}
+                    value={isDSP ? field.value ?? "" : computedStock}
                     onChange={
                       isDSP
                         ? (e) =>

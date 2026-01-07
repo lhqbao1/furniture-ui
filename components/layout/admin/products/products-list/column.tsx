@@ -707,7 +707,7 @@ export const getProductColumns = (
               : "bg-secondary",
           )}
         >
-          {row.original.stock} pcs.
+          {computedStock} pcs.
         </div>
       );
     },
