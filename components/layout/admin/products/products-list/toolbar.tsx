@@ -35,6 +35,7 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
+import FilterExportForm from "./toolbar/filter-export-dialog";
 
 export enum ToolbarType {
   product = "product",
@@ -59,6 +60,8 @@ type ImageFile = {
   url: string;
 };
 
+const FILTER_KEYS = ["search", "status", "channel", "from_date", "to_date"];
+
 export default function TableToolbar({
   searchQuery,
   pageSize,
@@ -82,24 +85,46 @@ export default function TableToolbar({
   const defaultSearch = searchParams.get("search") ?? "";
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
-
+  const [prevParams, setPrevParams] = useState(
+    Object.fromEntries(searchParams.entries()),
+  );
   // debounce inputValue
   const [debouncedSearch] = useDebounce(searchValue, 600);
 
   // push URL khi debounce hoàn thành
   useEffect(() => {
-    router.push(
-      {
-        pathname,
-        query: {
-          page: 1,
-          search: debouncedSearch || "",
-        },
-      },
-      { scroll: false },
-    );
+    const current = Object.fromEntries(searchParams.entries());
 
-    setPage(1);
+    const filterChanged = FILTER_KEYS.some((k) => current[k] !== prevParams[k]);
+
+    if (filterChanged) {
+      router.push(
+        {
+          pathname,
+          query: { ...current, page: 1 },
+        },
+        { scroll: false },
+      );
+      setPage(1);
+    }
+
+    setPrevParams(current);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const currentSearch = searchParams.get("search") ?? "";
+    if (debouncedSearch !== currentSearch) {
+      router.push(
+        {
+          pathname,
+          query: {
+            ...Object.fromEntries(searchParams.entries()),
+            search: debouncedSearch || undefined,
+          },
+        },
+        { scroll: false },
+      );
+    }
   }, [debouncedSearch]);
 
   const handleDownloadZip = async () => {
@@ -175,7 +200,18 @@ export default function TableToolbar({
 
         <div className="flex gap-2 text-sm font-medium">
           {/* <Button variant="ghost" className="">Export</Button> */}
-          <ExportExcelButton />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Export <ChevronDown className="ml-1 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-[600px] p-4 space-y-4">
+              {/* Filter here */}
+              <FilterExportForm />
+            </DropdownMenuContent>
+          </DropdownMenu>
           <ImportDialog
             setIsImporting={setIsImporting}
             isSupplier

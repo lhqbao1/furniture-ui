@@ -689,19 +689,21 @@ export const getProductColumns = (
     cell: ({ row }) => {
       const stock = row.original.stock;
       const result_stock = row.original.result_stock;
-      const computedStock =
-        typeof stock === "number" && typeof result_stock === "number"
-          ? stock - Math.abs(result_stock ?? 0)
-          : "";
+      const toNum = (v: any) => (isFinite(Number(v)) ? Number(v) : 0);
+
+      const s = toNum(stock);
+      const r = toNum(result_stock);
+
+      const computedStock = s - Math.abs(r);
 
       return (
         <div
           className={cn(
             "text-center text-white rounded-xl px-2 py-1",
             row.original.stock === 0
-              ? "bg-gray-300 text-black"
+              ? "bg-red-500 text-white"
               : row.original.stock < 10
-              ? "bg-red-500"
+              ? "bg-gray-400"
               : row.original.stock <= 20
               ? "bg-primary"
               : "bg-secondary",

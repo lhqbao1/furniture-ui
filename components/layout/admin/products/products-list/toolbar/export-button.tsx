@@ -39,8 +39,7 @@ export default function ExportExcelButton() {
     if (!data || data.length === 0) return;
 
     // Hàm xử lý giá trị null / undefined / "None"
-    const clean = (val: any) =>
-      val === null || val === undefined || val === "None" ? "" : val;
+    const clean = (val: any) => (val === null || val === undefined ? "" : val);
 
     const exportData = data
       // .filter((p) => p.is_active === true)

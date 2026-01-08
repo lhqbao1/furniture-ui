@@ -48,6 +48,8 @@ interface OrderToolbarProps {
   type: ToolbarType;
 }
 
+const FILTER_KEYS = ["search", "status", "channel", "from_date", "to_date"];
+
 export default function OrderToolbar({
   pageSize,
   setPageSize,
@@ -66,24 +68,49 @@ export default function OrderToolbar({
 
   const [openAddModal, setOpenAddModal] = useState(false);
   const defaultSearch = searchParams.get("search") ?? "";
-  const [searchValue, setSearchValue] = useState(defaultSearch);
+  const status = searchParams.get("status") ?? "";
 
+  const [searchValue, setSearchValue] = useState(defaultSearch);
+  const [prevParams, setPrevParams] = useState(
+    Object.fromEntries(searchParams.entries()),
+  );
   const [debouncedSearch] = useDebounce(searchValue, 600);
 
   // push URL khi debounce hoàn thành
   useEffect(() => {
-    router.push(
-      {
-        pathname,
-        query: {
-          page: 1,
-          search: debouncedSearch || "",
-        },
-      },
-      { scroll: false },
-    );
+    const current = Object.fromEntries(searchParams.entries());
 
-    setPage(1);
+    // check filter changed
+    const filterChanged = FILTER_KEYS.some((k) => current[k] !== prevParams[k]);
+
+    if (filterChanged) {
+      router.push(
+        {
+          pathname,
+          query: { ...current, page: 1 },
+        },
+        { scroll: false },
+      );
+      setPage(1);
+    }
+
+    setPrevParams(current);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const currentSearch = searchParams.get("search") ?? "";
+    if (debouncedSearch !== currentSearch) {
+      router.push(
+        {
+          pathname,
+          query: {
+            ...Object.fromEntries(searchParams.entries()),
+            search: debouncedSearch || undefined,
+          },
+        },
+        { scroll: false },
+      );
+    }
   }, [debouncedSearch]);
 
   return (

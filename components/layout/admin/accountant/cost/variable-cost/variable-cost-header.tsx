@@ -76,14 +76,6 @@ export function VariableCostHeader({
           </SelectContent>
         </Select>
       </div>
-
-      <div className="font-medium">
-        Add variable cost for{" "}
-        {new Date(0, month - 1).toLocaleString("en-US", {
-          month: "long",
-        })}{" "}
-        {year}
-      </div>
     </>
   );
 }

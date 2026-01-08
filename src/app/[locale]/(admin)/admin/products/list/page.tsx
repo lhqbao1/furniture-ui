@@ -33,8 +33,10 @@ const ProductList = () => {
 
   // 🧩 Khi user back lại (hoặc reload), đọc page từ URL
   useEffect(() => {
-    const urlPage = Number(searchParams.get("page")) || 1;
-    setPage(urlPage);
+    const param = searchParams.get("page");
+    if (param !== null) {
+      setPage(Number(param));
+    }
   }, [searchParams]);
 
   const { data, isLoading, isError } = useGetAllProducts({
@@ -44,6 +46,13 @@ const ProductList = () => {
     search: filters.search,
     sort_by_stock: filters.sort_by_stock,
   });
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [page]);
 
   if (isError) return <div>No data</div>;
 
