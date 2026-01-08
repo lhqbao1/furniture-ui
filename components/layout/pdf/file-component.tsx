@@ -187,11 +187,15 @@ export default function InvoiceTable({
         <div className="flex gap-0 justify-end">
           <div className="mr-6">Versandkosten (brutto)</div>
           <div className="w-[100px] text-right">
-            {calculateShippingCost(
+            {/* {calculateShippingCost(
               invoice?.main_checkout.checkouts
                 .flatMap((c) => c.cart)
                 .flatMap((c) => c.items) ?? [],
             ).gross?.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })} */}
+            {invoice?.total_shipping?.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}

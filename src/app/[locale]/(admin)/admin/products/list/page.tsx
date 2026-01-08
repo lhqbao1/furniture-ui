@@ -6,9 +6,8 @@ import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useGetAllProducts } from "@/features/products/hook";
-import { searchProductQueryStringAtom, sortByStockAtom } from "@/store/product";
+import { sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { getProductColumns } from "@/components/layout/admin/products/products-list/column";

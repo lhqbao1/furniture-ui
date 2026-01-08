@@ -996,7 +996,7 @@ export const productStatus = ["active", "inactive"];
 export const STATUS_OPTIONS = [
   { key: "pending", label: "Waiting for payment", active: true, pos: 2 },
   { key: "paid", label: "Payment received", active: true, pos: 3 },
-  { key: "stock_reserved", label: "Stock reserved", active: true, pos: 4 },
+  { key: "tock_reserved", label: "Stock reserved", active: true, pos: 4 },
   {
     key: "preparation_shipping",
     label: "Preparing",

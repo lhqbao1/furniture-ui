@@ -32,8 +32,7 @@ export async function GET() {
           : largeImage;
 
         const categories =
-          p.categories?.map((c) => c.name).join(" > ") ||
-          "General";
+          p.categories?.map((c) => c.name).join(" > ") || "General";
         const colors =
           p.options
             ?.filter((opt) => opt.variant_name?.toLowerCase() === "color")
@@ -48,7 +47,13 @@ export async function GET() {
     <pid>${escapeXml(p.id_provider || p.id)}</pid>
     <desc><![CDATA[${escapeCDATA(cleanDescription(p.description))}]]></desc>
     <category>${escapeXml(categories)}</category>
-    <purl>https://prestige-home.de/product/${escapeXml(p.url_key)}</purl>
+    <purl>${
+      p.brand
+        ? p.brand.name.toLowerCase() === "econelo"
+          ? `https://prestige-home.de/de/product/${p.url_key}`
+          : `https://econelo.de/produkt/${p.url_key}`
+        : `https://prestige-home.de/de/product/${p.url_key}`
+    }</purl>
     <imgurl>${escapeXml(encodeURI(largeImage))}</imgurl>
     <price>
       ${p.final_price.toFixed(2)}
@@ -62,14 +67,14 @@ export async function GET() {
     <colour>${escapeXml(colors)}</colour>
     <condition>new</condition>
     <keywords>${escapeXml(
-      [p.name, p.brand, colors].filter(Boolean).join(", ")
+      [p.name, p.brand, colors].filter(Boolean).join(", "),
     )}</keywords>
     <lang>DE</lang>
     <ptype>${escapeXml(p.categories?.[0]?.name || "Product")}</ptype>
     <currency>EUR</currency>
     <delcost>${p.carrier === "dpd" ? "5.95" : "35.95"}</delcost>
     <deltime>${
-      p.delivery_time 
+      p.delivery_time
         ? `Standard delivery in ${p.delivery_time} working days`
         : `Standard delivery in 3-5 working days`
     }</deltime>
@@ -77,7 +82,10 @@ export async function GET() {
     <alternate_image>${escapeXml(encodeURI(alternateImage))}</alternate_image>
     <large_image>${escapeXml(encodeURI(largeImage))}</large_image>
     <thumburl>${escapeXml(encodeURI(largeImage))}</thumburl>
-    <lastupdated>${new Date().toISOString().replace("T", " ").slice(0, 19)}</lastupdated>
+    <lastupdated>${new Date()
+      .toISOString()
+      .replace("T", " ")
+      .slice(0, 19)}</lastupdated>
   </product>`;
       })
       .join("\n");
@@ -96,7 +104,7 @@ ${itemsXml}
     console.error(err);
     return NextResponse.json(
       { success: false, error: "Failed to generate AWIN XML feed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
