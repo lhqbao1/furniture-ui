@@ -11,7 +11,7 @@ const CostManagement = () => {
     <div className="space-y-3">
       {/* <StickyMonthSelector /> */}
       <div className="h-[2000px] mt-6">
-        <Tabs defaultValue="product-sold">
+        <Tabs defaultValue="fixed-cost">
           <TabsList className="gap-4 text-xl">
             <TabsTrigger
               value="fixed-cost"

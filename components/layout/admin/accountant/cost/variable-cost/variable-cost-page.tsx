@@ -37,7 +37,22 @@ export default function VariableCostPage() {
         setMonth={setMonth}
         setYear={setYear}
       />
-      <div className="flex items-center justify-between">
+      <div className="border-b">
+        <VariableCostTable
+          month={month}
+          year={year}
+          setMonth={setMonth}
+          setYear={setYear}
+        />
+      </div>
+      <div className="flex items-center justify-between mt-8">
+        <div className="font-medium">
+          Add variable cost for{" "}
+          {new Date(0, month - 1).toLocaleString("en-US", {
+            month: "long",
+          })}{" "}
+          {year}
+        </div>
         <Button
           variant="outline"
           onClick={() => addMarketplace(`custom_${Date.now()}`)}
@@ -68,14 +83,6 @@ export default function VariableCostPage() {
         >
           {isSubmitting ? "Saving..." : "Submit variable costs"}
         </Button>
-      </div>
-      <div>
-        <VariableCostTable
-          month={month}
-          year={year}
-          setMonth={setMonth}
-          setYear={setYear}
-        />
       </div>
     </div>
   );

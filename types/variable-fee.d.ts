@@ -13,11 +13,11 @@ export interface VariableFeeItem {
 }
 
 export interface VariableCostItemUI {
-  id?: string; // có thì là DB item
+  ids?: string; // có thì là DB item
   marketplace: string;
   type: string;
   amount: number | "";
-  originalAmount?: number; // để diff
+  originalAmount?: number | ""; // để diff
 }
 
 export interface VariableMarketplaceUI {
@@ -34,6 +34,7 @@ export interface GetVariableFeeParams {
 export interface VariableFeeTypeAmount {
   type: string;
   amount: number;
+  ids: string[];
 }
 
 export interface VariableMarketplaceResponse {

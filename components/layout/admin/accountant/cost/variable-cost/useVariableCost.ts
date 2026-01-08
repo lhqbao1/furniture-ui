@@ -128,8 +128,10 @@ export function useVariableCost({
 
     try {
       // ✅ CASE 1: data thật → gọi DELETE API
-      if (target.id) {
-        await deleteMutation.mutateAsync(target.id);
+      const feeId = target.ids;
+
+      if (feeId) {
+        await deleteMutation.mutateAsync(feeId);
         toast.success("Variable fee deleted");
       }
 
@@ -139,7 +141,11 @@ export function useVariableCost({
           m.marketplace === marketplace
             ? {
                 ...m,
-                fees: m.fees.filter((f) => f.type !== type),
+                fees: m.fees.map((f) =>
+                  f.type === type
+                    ? { ...f, amount: "", originalAmount: "" }
+                    : f,
+                ),
               }
             : m,
         ),
@@ -168,10 +174,10 @@ export function useVariableCost({
           };
 
           // UPDATE
-          if (fee.id) {
+          if (fee.ids) {
             if (fee.amount !== fee.originalAmount) {
               await updateMutation.mutateAsync({
-                id: fee.id,
+                id: fee.ids,
                 input: payload,
               });
               updated++;
@@ -207,8 +213,6 @@ export function useVariableCost({
     to_date,
   });
 
-  console.log(marketplaceData);
-
   useEffect(() => {
     setMarketplaces(buildEmptyMarketplaces());
   }, [month, year]);
@@ -233,6 +237,7 @@ export function useVariableCost({
           return matched
             ? {
                 ...fee,
+                ids: matched.ids[0], // optional nếu cần giữ list
                 amount: matched.amount,
                 originalAmount: matched.amount,
               }
@@ -251,6 +256,7 @@ export function useVariableCost({
             ...newFeesFromApi.map((f) => ({
               marketplace: m.marketplace,
               type: f.type,
+              id: f.ids[0], // <-- ADD
               amount: f.amount,
               originalAmount: f.amount,
             })),
