@@ -133,12 +133,19 @@ export interface ProviderItem {
 
   by_marketplace: Record<string, QuantityAmount>;
   by_status: Record<string, QuantityAmount>;
+
+  cost: number;
+  delivery_cost: number;
+  total_cost: number;
+  total_profit: number;
+  product_margin: number;
 }
 
 export interface ProviderSummary {
   total_id_provider: number;
   total_quantity: number;
   total_amount: number;
+  total_cost: number;
 }
 
 export interface ProviderOverviewResponse {

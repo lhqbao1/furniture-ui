@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useGetSuppliers } from "@/features/supplier/hook";
+import SupplierSelect from "./supplier-select";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -24,7 +25,7 @@ function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
 }
 
 const FilterExportForm = () => {
-  const [supplier, setSupplier] = useState<string>("amazon");
+  const [supplier, setSupplier] = useState<string>("");
   const [status, setStatus] = useState<"active" | "inactive" | "all">("all");
 
   const buildParams = () => {
@@ -136,30 +137,13 @@ const FilterExportForm = () => {
     <div>
       <div className="space-y-4">
         {/* Supplier Filter */}
-        <div className="space-y-2">
-          <Label>Supplier</Label>
-          <RadioGroup
-            value={supplier}
-            onValueChange={(v) => setSupplier(v)}
-          >
-            {suppliers
-              ?.filter((s) => !s.business_name.includes("tes"))
-              ?.map((item, index) => {
-                return (
-                  <div
-                    className="flex items-center gap-2"
-                    key={item.id}
-                  >
-                    <RadioGroupItem
-                      value={item.id}
-                      id="sup-amazon"
-                    />
-                    <Label htmlFor="sup-amazon">{item.business_name}</Label>
-                  </div>
-                );
-              })}
-          </RadioGroup>
-        </div>
+        {suppliers && (
+          <SupplierSelect
+            suppliers={suppliers}
+            supplier={supplier}
+            setSupplier={setSupplier}
+          />
+        )}
 
         {/* Status Filter */}
         <div className="space-y-2">
