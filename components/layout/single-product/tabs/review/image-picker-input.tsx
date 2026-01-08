@@ -78,7 +78,7 @@ function SortableImage({
         src={item.url}
         alt={`Uploaded-${item.id}`}
         fill
-        className="object-cover z-0"
+        className="object-contain z-0"
         unoptimized
       />
       <button
@@ -296,7 +296,7 @@ function ImagePickerInput<T extends FieldValues>({
         ) : null
       ) : items.length > 0 ? (
         <div
-          className={`overflow-y-scroll ${
+          className={`overflow-y-auto ${
             isAddProduct ? "col-span-9" : "col-span-12"
           }`}
         >
@@ -321,12 +321,9 @@ function ImagePickerInput<T extends FieldValues>({
               items={items.map((i) => i.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="w-full h-fit flex flex-wrap gap-4">
+              <div className="w-full h-fit grid grid-cols-4 gap-4 ">
                 {items.map((it, idx) => (
-                  <div
-                    key={it.id}
-                    className="flex-1 min-w-[120px] max-w-[200px]"
-                  >
+                  <div key={it.id}>
                     <SortableImage
                       item={it}
                       onRemove={() => removeImage(idx)}

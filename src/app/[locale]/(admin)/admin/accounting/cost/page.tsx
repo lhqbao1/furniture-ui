@@ -1,19 +1,7 @@
 "use client";
-import StickyMonthSelector from "@/components/layout/admin/accountant/cost/sticky-month-selector";
 import React from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import OverViewTab from "@/components/layout/admin/accountant/cost/overview-tabs";
 import ProductSoldPage from "@/components/layout/admin/accountant/cost/product-sold-tab/product-sold-page";
 import FixedCostPage from "@/components/layout/admin/accountant/cost/fixed-cost/fixed-cost-page";
 import VariableCostPage from "@/components/layout/admin/accountant/cost/variable-cost/variable-cost-page";
@@ -21,21 +9,21 @@ import VariableCostPage from "@/components/layout/admin/accountant/cost/variable
 const CostManagement = () => {
   return (
     <div className="space-y-3">
-      <StickyMonthSelector />
+      {/* <StickyMonthSelector /> */}
       <div className="h-[2000px] mt-6">
         <Tabs defaultValue="product-sold">
           <TabsList className="gap-4 text-xl">
-            <TabsTrigger
-              value="product-sold"
-              className="text-lg"
-            >
-              Products Sold
-            </TabsTrigger>
             <TabsTrigger
               value="fixed-cost"
               className="text-lg"
             >
               Fixed Cost
+            </TabsTrigger>
+            <TabsTrigger
+              value="product-sold"
+              className="text-lg"
+            >
+              Products Sold
             </TabsTrigger>
             <TabsTrigger
               value="variable-cost"

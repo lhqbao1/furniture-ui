@@ -33,7 +33,7 @@ const mergeMarketplaceCostData = (
         orders: item.total_orders,
         grossRevenue: item.total_amount,
         fee: feeData.total,
-        feePercent: item.percentage,
+        feePercent: (feeData.total / item.total_amount) * 100,
       };
     })
     .filter(Boolean) as MarketplaceCostRow[];
@@ -95,13 +95,18 @@ const VariableCostTable = ({
             <td className="px-4 py-2 text-right">{row.orders}</td>
 
             <td className="px-4 py-2 text-right">
-              {row.grossRevenue.toLocaleString("en-US", {
+              {row.grossRevenue.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
               })}
             </td>
 
             <td className="px-4 py-2 text-right text-destructive">
-              -{row.fee.toLocaleString("en-US")}
+              -
+              {row.fee.toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </td>
 
             <td className="px-4 py-2 text-right">

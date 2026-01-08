@@ -62,9 +62,11 @@ export async function GET() {
     );
 
     const rows = activeProducts.map((p) => {
-      const productUrl = p.url_key
-        ? `https://www.prestige-home.de/de/product/${p.url_key}`
-        : "";
+      const productUrl = p.brand
+        ? p.brand.name.toLowerCase() === "econelo"
+          ? `https://prestige-home.de/de/product/${p.url_key}`
+          : `https://econelo.de/produkt/${p.url_key}`
+        : `https://prestige-home.de/de/product/${p.url_key}`;
 
       const imageUrl = p.static_files?.[0]?.url ?? "";
 

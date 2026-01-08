@@ -45,6 +45,11 @@ export async function GET() {
             ?.filter((opt) => opt.variant_name?.toLowerCase() === "color")
             .map((opt) => opt.label)
             .join(", ") || "";
+        const url = p.brand
+          ? p.brand.name.toLowerCase() === "econelo"
+            ? `https://prestige-home.de/de/product/${p.url_key}`
+            : `https://econelo.de/produkt/${p.url_key}`
+          : `https://prestige-home.de/de/product/${p.url_key}`;
 
         return `
  <product>
@@ -60,9 +65,7 @@ export async function GET() {
 
   <Preis>${p.final_price.toFixed(2)}</Preis>
 
-  <Deeplink><![CDATA[https://prestige-home.de/de/product/${
-    p.url_key
-  }]]></Deeplink>
+  <Deeplink><![CDATA[${url}]]></Deeplink>
 
   <MPN>${escapeXml(p.sku)}</MPN>
 

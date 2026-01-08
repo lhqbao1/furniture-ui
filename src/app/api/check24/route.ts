@@ -68,7 +68,13 @@ export async function GET() {
           escapeCsv(p.id_provider),
           escapeCsv(p.name),
           escapeCsv(html(cleanDescription(p.description))),
-          escapeCsv(`https://www.prestige-home.de/de/product/${p.url_key}`),
+          escapeCsv(
+            p.brand
+              ? p.brand.name.toLowerCase() === "econelo"
+                ? `https://prestige-home.de/de/product/${p.url_key}`
+                : `https://econelo.de/produkt/${p.url_key}`
+              : `https://prestige-home.de/de/product/${p.url_key}`,
+          ),
           escapeCsv(p.brand.name ?? ""),
           escapeCsv(p.color.toUpperCase()),
           escapeCsv(size),
