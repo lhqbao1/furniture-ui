@@ -113,7 +113,11 @@ export default function ExportExcelButton() {
             .map((f) => f.url.replaceAll(" ", "%20"))
             .join("|"),
         ),
-        product_link: `https://www.prestige-home.de/de/product/${p.url_key}`,
+        product_link: p.brand
+          ? p.brand.name.toLowerCase() === "econelo"
+            ? `https://prestige-home.de/de/product/${p.url_key}`
+            : `https://econelo.de/produkt/${p.url_key}`
+          : `https://prestige-home.de/de/product/${p.url_key}`,
       }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);

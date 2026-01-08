@@ -2,7 +2,6 @@
 
 import React from "react";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import { getDeliveryOrderColumns } from "@/components/layout/cart/columns";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
 import { orderListExpandColumns } from "./product-columns";

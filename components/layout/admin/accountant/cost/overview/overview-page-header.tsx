@@ -9,19 +9,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface VariableCostHeaderProps {
+interface OverviewPageHeaderProps {
   month: number;
   year: number;
   setMonth: (m: number) => void;
   setYear: (y: number) => void;
 }
 
-export function VariableCostHeader({
+export function OverviewPageHeader({
   month,
   year,
   setMonth,
   setYear,
-}: VariableCostHeaderProps) {
+}: OverviewPageHeaderProps) {
   const currentYear = new Date().getFullYear();
   const YEARS = [currentYear - 1, currentYear, currentYear + 1];
 

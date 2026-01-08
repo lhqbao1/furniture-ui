@@ -1,0 +1,108 @@
+// components/provider-table.tsx
+"use client";
+
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ProviderItem, ProviderOverviewResponse } from "@/types/checkout";
+import { useCallback, useMemo } from "react";
+import { productMarginColumns } from "./columns";
+
+interface ProductMarginTableProps {
+  data: ProviderOverviewResponse;
+  setSelectedProviderId: (id_provider: string) => void;
+  setOpen: (open: boolean) => void;
+}
+
+export function ProductMarginTable({
+  data,
+  setOpen,
+  setSelectedProviderId,
+}: ProductMarginTableProps) {
+  const handleOpenDrawer = useCallback(
+    (id: string) => {
+      setSelectedProviderId(id);
+      setOpen(true);
+    },
+    [setSelectedProviderId, setOpen],
+  );
+
+  const columns = useMemo(
+    () =>
+      productMarginColumns({
+        onOpenDrawer: handleOpenDrawer,
+        data: data.items,
+      }),
+    [handleOpenDrawer],
+  );
+
+  const table = useReactTable({
+    data: data.items,
+    columns: columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <div className="rounded-md border overflow-x-auto">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  colSpan={header.colSpan} // 🔥 BẮT BUỘC
+                  style={{ width: header.getSize() }}
+                  className="bg-secondary/10"
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+
+        <TableBody>
+          {table.getRowModel().rows.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    style={{ width: cell.column.getSize() }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={table.getAllLeafColumns().length}
+                className="text-center py-6"
+              >
+                No data
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}

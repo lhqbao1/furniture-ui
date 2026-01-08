@@ -29,12 +29,6 @@ export function FixedCostHeader({
 
   return (
     <>
-      {/* {isReadonly && (
-        <div className="text-sm text-destructive">
-          This month is locked and cannot be edited.
-        </div>
-      )} */}
-
       <div className="flex gap-4">
         <Select
           value={month.toString()}
