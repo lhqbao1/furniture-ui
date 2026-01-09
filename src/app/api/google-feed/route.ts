@@ -44,11 +44,11 @@ export async function GET() {
   )}]]></g:description>
 <g:link>${escapeXml(
           encodeURI(
-            `https://prestige-home.de/product${
-              p.categories && p.categories.length > 0
-                ? `/${p.categories[0].slug}`
-                : ""
-            }/${p.id}`,
+            p.brand
+              ? p.brand.name.toLowerCase() === "econelo"
+                ? `https://econelo.de/produkt/${p.url_key}`
+                : `https://prestige-home.de/de/product/${p.url_key}`
+              : `https://prestige-home.de/de/product/${p.url_key}`,
           ),
         )}</g:link>
 <g:image_link>${escapeXml(

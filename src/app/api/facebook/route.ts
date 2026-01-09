@@ -42,7 +42,13 @@ export async function GET() {
           escapeCsv(p.stock > 0 ? "in stock" : "out of stock"),
           "new",
           escapeCsv(p.final_price.toFixed(2) + " EUR"),
-          escapeCsv(`https://prestige-home.de/de/product/${p.url_key}`),
+          escapeCsv(
+            p.brand
+              ? p.brand.name.toLowerCase() === "econelo"
+                ? `https://econelo.de/produkt/${p.url_key}`
+                : `https://prestige-home.de/de/product/${p.url_key}`
+              : `https://prestige-home.de/de/product/${p.url_key}`,
+          ),
           escapeCsv(cleanImageLink(p.static_files[0]?.url)),
           escapeCsv(p.brand.company_name ?? ""),
           escapeCsv(p.stock ?? ""),

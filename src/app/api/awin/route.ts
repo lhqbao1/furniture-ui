@@ -50,8 +50,8 @@ export async function GET() {
     <purl>${
       p.brand
         ? p.brand.name.toLowerCase() === "econelo"
-          ? `https://prestige-home.de/de/product/${p.url_key}`
-          : `https://econelo.de/produkt/${p.url_key}`
+          ? `https://econelo.de/produkt/${p.url_key}`
+          : `https://prestige-home.de/de/product/${p.url_key}`
         : `https://prestige-home.de/de/product/${p.url_key}`
     }</purl>
     <imgurl>${escapeXml(encodeURI(largeImage))}</imgurl>

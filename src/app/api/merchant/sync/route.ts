@@ -22,8 +22,8 @@ async function syncProducts() {
     description: p.description,
     link: p.brand
       ? p.brand.name.toLowerCase() === "econelo"
-        ? `https://prestige-home.de/de/product/${p.url_key}`
-        : `https://econelo.de/produkt/${p.url_key}`
+        ? `https://econelo.de/produkt/${p.url_key}`
+        : `https://prestige-home.de/de/product/${p.url_key}`
       : `https://prestige-home.de/de/product/${p.url_key}`,
     imageLink: p.static_files[0].url,
     price: {
