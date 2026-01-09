@@ -213,21 +213,21 @@ export function useCheckoutSubmit({
         }
 
         // Shipping
-        if (!shippingId) {
-          const created = await createShipping.mutateAsync({
-            user_id: finalUserId ?? "",
-            recipient_name: data.shipping_recipient_name ?? "",
-            email: data.email ?? "",
-            postal_code: data.shipping_postal_code,
-            phone_number: data.shipping_phone_number ?? "",
-            address_line: data.shipping_address_line,
-            additional_address_line: data.shipping_address_additional,
-            city: data.shipping_city,
-            country: data.shipping_country,
-            is_default: true,
-          });
-          shippingId = created.id;
-        }
+        // if (!shippingId) {
+        const created = await createShipping.mutateAsync({
+          user_id: finalUserId ?? "",
+          recipient_name: data.shipping_recipient_name ?? "",
+          email: data.email ?? "",
+          postal_code: data.shipping_postal_code,
+          phone_number: data.shipping_phone_number ?? "",
+          address_line: data.shipping_address_line,
+          additional_address_line: data.shipping_address_additional,
+          city: data.shipping_city,
+          country: data.shipping_country,
+          is_default: true,
+        });
+        shippingId = created.id;
+        // }
 
         // Checkout
         const checkout = await createCheckOut.mutateAsync({
