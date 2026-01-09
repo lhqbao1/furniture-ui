@@ -330,7 +330,11 @@ export const useGetProductsCheckOutDashboard = (
   params?: OrderStatisticsParams,
 ) => {
   return useQuery({
-    queryKey: ["checkout-dashboard-products", params ?? "default"],
+    queryKey: [
+      "checkout-dashboard-products",
+      params?.from_date,
+      params?.to_date,
+    ],
     queryFn: () => getProductsCheckOutDashboard(params),
     retry: false,
   });

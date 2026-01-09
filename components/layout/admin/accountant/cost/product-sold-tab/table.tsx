@@ -39,7 +39,7 @@ export function ProviderTable({
 
   const columns = useMemo(
     () => providerColumns({ onOpenDrawer: handleOpenDrawer, data: data }),
-    [handleOpenDrawer],
+    [handleOpenDrawer, data],
   );
 
   const table = useReactTable({

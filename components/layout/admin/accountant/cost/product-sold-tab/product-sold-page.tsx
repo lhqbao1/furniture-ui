@@ -1,36 +1,43 @@
 "use client";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetProductsCheckOutDashboard } from "@/features/checkout/hook";
-import { getMonthRange } from "@/hooks/get-previous-month";
-import { useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { ProviderTable } from "./table";
 import { DashboardStats } from "./stat";
 import { DashboardStatsSkeleton } from "./stats-skeleton";
 import { ProviderDrawer } from "./product-drawer";
+import { ProductSoldHeader } from "./product-sold-header";
+import { formatLocal, getMonthRange } from "@/hooks/get-month-range-by-month";
 
 const ProductSoldPage = () => {
+  const now = new Date();
   const [open, setOpen] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(
     null,
   );
-  const searchParams = useSearchParams();
 
-  const fromDateParam = searchParams.get("from_date") ?? undefined;
+  const [month, setMonth] = useState<number>(now.getMonth() + 1);
+  const [year, setYear] = useState<number>(now.getFullYear());
 
-  const selectedMonth = React.useMemo(() => {
-    if (!fromDateParam) return null;
-    return new Date(fromDateParam);
-  }, [fromDateParam]);
+  const { start, end } = getMonthRange(year, month);
 
-  const currentRange = React.useMemo(() => {
-    if (!selectedMonth) return undefined;
-    return getMonthRange(selectedMonth);
-  }, [selectedMonth]);
+  const from_date = formatLocal(start);
+  const to_date = formatLocal(end);
 
-  const { data, isLoading } = useGetProductsCheckOutDashboard(currentRange);
+  const { data, isLoading } = useGetProductsCheckOutDashboard({
+    from_date,
+    to_date,
+  });
+
   return (
     <div className="space-y-7">
+      <ProductSoldHeader
+        month={month}
+        year={year}
+        setMonth={setMonth}
+        setYear={setYear}
+      />
+
       {isLoading || !data ? (
         <DashboardStatsSkeleton />
       ) : (

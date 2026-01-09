@@ -194,6 +194,7 @@ const SyncToAmazonForm = ({
       },
       {
         onSuccess(data) {
+          console.log(product);
           const amazonData = data.marketplace_products?.find(
             (m) => m.marketplace === "amazon",
           );
@@ -221,10 +222,7 @@ const SyncToAmazonForm = ({
             toast.error("brand is missing");
             return;
           }
-          if (
-            product.packages.length === 0 ||
-            product.number_of_packages === 0
-          ) {
+          if (product.packages.length === 0) {
             toast.error("Packages number is missing");
             return;
           }
