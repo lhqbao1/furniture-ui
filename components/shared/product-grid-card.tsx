@@ -24,6 +24,7 @@ import CountUp from "../CountUp";
 import ProductPricingField from "./product-pricing-field";
 import ProductBrand from "../layout/single-product/product-brand";
 import CartDrawer from "./cart-drawer";
+import { useAddToCartLocalEnhanced } from "@/hooks/cart/add-to-cart-enhanched";
 
 interface ProductCardProps {
   product: ProductItem;
@@ -50,11 +51,11 @@ export default function ProductCard({
   const router = useRouter();
   const locale = useLocale();
   const [userId, setUserId] = useAtom(userIdAtom);
+  const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
 
   const addToCartMutation = useAddToCart();
   const addToWishlistMutation = useAddToWishList();
   const addProductToViewMutation = useAddViewedProduct();
-  const { addToCartLocal, cart } = useCartLocal();
 
   const handleAddProductToViewed = (productId: string) => {
     addProductToViewMutation.mutate({ productId: productId });
@@ -64,61 +65,7 @@ export default function ProductCard({
     if (!currentProduct) return;
 
     if (!userId) {
-      const existingItem = cart.find(
-        (item: CartItemLocal) => item.product_id === currentProduct.id,
-      );
-      const totalQuantity = (existingItem?.quantity || 0) + 1;
-
-      const totalIncomingStock =
-        currentProduct.inventory?.reduce(
-          (sum, inv) => sum + (inv.incoming_stock ?? 0),
-          0,
-        ) ?? 0;
-
-      if (totalQuantity > currentProduct.stock + totalIncomingStock) {
-        toast.error(t("notEnoughStock"));
-        return;
-      }
-
-      addToCartLocal(
-        {
-          item: {
-            product_id: currentProduct.id,
-            quantity: 1,
-            is_active: true,
-            item_price: currentProduct.final_price,
-            final_price: currentProduct.final_price,
-            img_url:
-              currentProduct.static_files.length > 0
-                ? currentProduct.static_files[0].url
-                : "",
-            product_name: currentProduct.name,
-            stock: currentProduct.stock,
-            carrier: currentProduct.carrier ? currentProduct.carrier : "amm",
-            id_provider: currentProduct.id_provider
-              ? currentProduct.id_provider
-              : "",
-            delivery_time: currentProduct.delivery_time
-              ? currentProduct.delivery_time
-              : "",
-            brand_name: currentProduct.brand.name,
-            length: currentProduct.length,
-            width: currentProduct.width,
-            height: currentProduct.height,
-            color: currentProduct.color,
-            inventory: currentProduct.inventory,
-            url_key: currentProduct.url_key,
-          },
-        },
-        {
-          onSuccess(data, variables, context) {
-            toast.success(t("addToCartSuccess"));
-          },
-          onError(error, variables, context) {
-            toast.error(t("addToCartFail"));
-          },
-        },
-      );
+      addToCartLocalOnly(currentProduct, 1);
     } else {
       addToCartMutation.mutate(
         { productId: currentProduct.id ?? "", quantity: 1 },

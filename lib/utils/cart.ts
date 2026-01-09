@@ -22,6 +22,7 @@ export type CartItemLocal = {
   color?: string;
   inventory: InventoryItem[];
   url_key: string;
+  result_stock: number;
 };
 
 const CART_KEY = "guest_cart";

@@ -28,7 +28,11 @@ export async function GET() {
           Produktbezeichnung: p.name.trim(),
           Herstellername: p.brand?.name || "Prestige Home",
           Preis: p.final_price.toFixed(2),
-          Deeplink: `https://prestige-home.de/product/${p.url_key}`,
+          Deeplink: p.brand
+            ? p.brand.name.toLowerCase() === "econelo"
+              ? `https://econelo.de/produkt/${p.url_key}`
+              : `https://prestige-home.de/de/product/${p.url_key}`
+            : `https://prestige-home.de/de/product/${p.url_key}`,
           EAN: p.ean ?? "",
           Verfügbarkeit: categoryPath,
           Kategorie: categories,

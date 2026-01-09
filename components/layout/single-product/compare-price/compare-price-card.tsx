@@ -20,6 +20,7 @@ import { hasRequestedVoucherAtom, voucherDialogAtom } from "@/store/voucher";
 import VoucherApply from "../../checkout/voucher-apply";
 import VoucherApplyComapre from "./voucher-apply";
 import CountUp from "@/components/CountUp";
+import { useAddToCartLocalEnhanced } from "@/hooks/cart/add-to-cart-enhanched";
 
 const MARKETPLACE_ICON_MAP: Record<string, string> = {
   kaufland: "/kaufland-seeklogo.png",
@@ -52,66 +53,19 @@ const ComparePriceCard = ({
   const locale = useLocale();
   const t = useTranslations();
   const [userId, setUserId] = useAtom(userIdAtom);
-  const { addToCartLocal, cart } = useCartLocal();
   const createCartMutation = useAddToCart();
   const [hasRequestedVoucher, setHasRequestedVoucher] = useAtom(
     hasRequestedVoucherAtom,
   );
   const [dialogStep, setDialogStep] = useAtom(voucherDialogAtom);
+  const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
 
   const handleAddToCart = (values: any) => {
     if (!product) return;
 
     // LOCAL CART
     if (!userId) {
-      const existingItem = cart.find(
-        (item: CartItemLocal) => item.product_id === product.id,
-      );
-
-      const totalQuantity = (existingItem?.quantity || 0) + values.quantity;
-      const totalIncomingStock =
-        product.inventory?.reduce(
-          (sum, inv) => sum + (inv.incoming_stock ?? 0),
-          0,
-        ) ?? 0;
-
-      if (totalQuantity > product.stock + totalIncomingStock) {
-        toast.error(t("notEnoughStock"));
-        return;
-      }
-
-      addToCartLocal(
-        {
-          item: {
-            product_id: product.id,
-            quantity: values.quantity,
-            is_active: true,
-            item_price: product.final_price,
-            final_price: product.final_price,
-            img_url:
-              product.static_files.length > 0
-                ? product.static_files[0].url
-                : "",
-            product_name: product.name,
-            stock: product.stock,
-            carrier: product.carrier ?? "amm",
-            id_provider: product.id_provider ?? "",
-            delivery_time: product.delivery_time ?? "",
-            brand_name: product.brand.name,
-            length: product.length,
-            width: product.width,
-            height: product.height,
-            color: product.color,
-            inventory: product.inventory,
-            url_key: product.url_key,
-          },
-        },
-        {
-          onSuccess: () => toast.success(t("addToCartSuccess")),
-          onError: () => toast.error(t("addToCartFail")),
-        },
-      );
-
+      addToCartLocalOnly(product, values.quantity);
       return;
     }
 

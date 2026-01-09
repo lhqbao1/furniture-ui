@@ -28,7 +28,7 @@ export function TrustedShops() {
       data-mobile-enable-fadeout="true"
       data-disable-mobile="false"
       data-disable-trustbadge="false"
-      data-color-scheme="dark"
+      data-color-scheme="light"
       charSet="UTF-8"
     />
   );
