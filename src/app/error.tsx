@@ -50,6 +50,10 @@ export default function GlobalError({
             </pre>
           )}
 
+          <pre className="mt-4 max-w-xl overflow-auto rounded bg-gray-100 p-4 text-left text-sm text-red-500">
+            Error from extensions
+          </pre>
+
           <div className="mt-6 flex gap-3">
             <button
               onClick={() => {
