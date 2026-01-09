@@ -45,6 +45,7 @@ const ProductList = () => {
     all_products: filters.all_products,
     search: filters.search,
     sort_by_stock: filters.sort_by_stock,
+    supplier_id: filters.supplier_id,
   });
 
   useEffect(() => {

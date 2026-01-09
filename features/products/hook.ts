@@ -39,6 +39,7 @@ export function useGetAllProducts({
   is_econelo,
   brand,
   sort_by_marketplace,
+  supplier_id,
 }: GetAllProductsParams = {}) {
   return useQuery({
     queryKey: [
@@ -52,6 +53,7 @@ export function useGetAllProducts({
       is_econelo,
       brand,
       sort_by_marketplace,
+      supplier_id,
     ],
     queryFn: () =>
       getAllProducts({
@@ -64,6 +66,7 @@ export function useGetAllProducts({
         is_econelo,
         brand,
         sort_by_marketplace,
+        supplier_id,
       }),
     // placeholderData: keepPreviousData,
     retry: false,

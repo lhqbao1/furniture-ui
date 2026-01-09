@@ -134,7 +134,9 @@ export const getInventoryColumns = (
   {
     accessorKey: "incomming",
     header: () => (
-      <div className="text-center uppercase">Incoming stock / date / cost</div>
+      <div className="text-center uppercase">
+        Incoming stock / date / landed cost
+      </div>
     ),
     cell: ({ row }) => {
       const inventoryData = row.original.inventory;
@@ -188,7 +190,9 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "cost",
-    header: ({}) => <div className="text-center uppercase">Unit cost</div>,
+    header: ({}) => (
+      <div className="text-center uppercase">Unit landed cost</div>
+    ),
     cell: ({ row }) => {
       return (
         <div className="text-center">
@@ -205,21 +209,24 @@ export const getInventoryColumns = (
     },
   },
 
-  {
-    accessorKey: "total_cost",
-    header: ({}) => <div className="text-center uppercase">Total cost</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          €
-          {(row.original.cost * row.original.stock).toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "total_cost",
+  //   header: ({}) => <div className="text-center uppercase">Total cost</div>,
+  //   cell: ({ row }) => {
+  //     return (
+  //       <div className="text-center">
+  //         €
+  //         {(row.original.cost * row.original.incomming_stock).toLocaleString(
+  //           "de-DE",
+  //           {
+  //             minimumFractionDigits: 2,
+  //             maximumFractionDigits: 2,
+  //           },
+  //         )}
+  //       </div>
+  //     );
+  //   },
+  // },
 
   {
     accessorKey: "price",

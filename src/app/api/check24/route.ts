@@ -76,7 +76,7 @@ export async function GET() {
               : `https://prestige-home.de/de/product/${p.url_key}`,
           ),
           escapeCsv(p.brand.name ?? ""),
-          escapeCsv(p.color.toUpperCase()),
+          escapeCsv(p.color ? p.color.toUpperCase() : ""),
           escapeCsv(size),
           escapeCsv(p.height),
           escapeCsv(p.width),
@@ -124,7 +124,7 @@ export async function GET() {
     return new Response(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": "attachment; filename=product-feed.csv",
+        "Content-Disposition": "attachment; filename=check24-feed.csv",
       },
     });
   } catch (err) {

@@ -14,6 +14,7 @@ export interface GetAllProductsParams {
   is_econelo?: boolean;
   brand?: string;
   sort_by_marketplace?: string;
+  supplier_id?: string;
 }
 
 export type GetProductsSearchParams = {
@@ -69,6 +70,9 @@ export async function getAllProducts(params?: GetAllProductsParams) {
     params: {
       ...(params?.page !== undefined && { page: params.page }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
+      ...(params?.supplier_id !== undefined && {
+        supplier_id: params.supplier_id,
+      }),
       ...(params?.all_products !== undefined && {
         all_products: params.all_products,
       }),

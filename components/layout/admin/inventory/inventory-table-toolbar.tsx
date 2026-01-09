@@ -32,6 +32,7 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
 import InventoryFilterForm from "./filter-form";
+import ImportInventoryDialog from "./dialog/import-dialog";
 
 export enum ToolbarType {
   product = "product",
@@ -166,7 +167,7 @@ export default function InventoryTableToolbar({
 
         <div className="flex gap-2 text-sm font-medium">
           {/* <Button variant="ghost" className="">Export</Button> */}
-          {/* <ImportDialog setIsImporting={setIsImporting} /> */}
+          <ImportInventoryDialog setIsImporting={setIsImporting} />
         </div>
       </div>
 

@@ -19,6 +19,15 @@ export async function importProduct(file: FormData) {
   return data;
 }
 
+export async function importProductInventory(file: FormData) {
+  const { data } = await apiPublic.post("import/inventory", file, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return data;
+}
+
 export async function importProductSupplier(
   file: FormData,
   supplier_id: string,
