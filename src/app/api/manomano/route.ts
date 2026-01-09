@@ -78,7 +78,7 @@ export async function GET() {
     return new Response(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": "attachment; filename=menomeno-feed.csv",
+        "Content-Disposition": "attachment; filename=manomano-feed.csv",
       },
     });
   } catch (err) {
