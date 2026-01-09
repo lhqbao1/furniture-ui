@@ -234,6 +234,7 @@ export default function ProductCard({
             className="md:has-[>svg]:px-2.5 lg:has-[>svg]:px-3 has-[>svg]:px-2 bg-secondary/90 hover:bg-secondary rounded-full group h-8 md:h-10 lg:h-12"
             onClick={() => {
               handleAddToCart(product);
+              if (isMobile) return;
               setOpen(true);
             }}
           >
