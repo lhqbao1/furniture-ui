@@ -152,6 +152,7 @@ export default function ProductCard({
                 sizes="(max-width: 768px) 50vw, 25vw"
                 className="
                   object-contain
+                  w-full h-full
                   transition-all duration-500 ease-in-out
                   group-hover:-translate-x-6
                   group-hover:opacity-0 rounded-xl
