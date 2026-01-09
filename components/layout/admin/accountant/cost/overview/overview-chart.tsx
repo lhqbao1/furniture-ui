@@ -17,11 +17,12 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { useDashboard6Months } from "./useOverview";
+import { ProfitRevenueBarChartSkeleton } from "./chart-skeleton";
 
 export function ProfitRevenueBarChart() {
   const { data, isLoading } = useDashboard6Months();
 
-  if (isLoading) return <div>Loading chart...</div>;
+  if (isLoading) return <ProfitRevenueBarChartSkeleton />;
 
   const chartData = data?.map((item) => ({
     month: `${item.month}/${String(item.year).slice(-2)}`,

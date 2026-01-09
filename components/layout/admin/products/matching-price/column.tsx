@@ -247,6 +247,7 @@ function EditMarketplacePriceField({
               product.pdf_files && product.pdf_files.length > 0
                 ? product.pdf_files
                 : null,
+            ebay_offer_id: marketplaceProduct?.marketplace_offer_id ?? "",
           };
 
           const amazonPayload: SyncToAmazonInput = {
@@ -288,6 +289,11 @@ function EditMarketplacePriceField({
             min_stock: marketplaceProduct?.min_stock ?? 0,
             max_stock: marketplaceProduct?.max_stock ?? 10,
             handling_time: marketplaceProduct?.handling_time ?? 0,
+            bullet_point1: product.bullet_point_1,
+            bullet_point2: product.bullet_point_2,
+            bullet_point3: product.bullet_point_3,
+            bullet_point4: product.bullet_point_4,
+            bullet_point5: product.bullet_point_5,
           };
 
           if (marketplaceKey === "kaufland") {
