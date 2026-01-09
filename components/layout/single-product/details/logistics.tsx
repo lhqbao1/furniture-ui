@@ -20,7 +20,7 @@ const ProductDetailsLogistic = ({
   const t = useTranslations();
 
   const estimatedDeliveryRange = useDeliveryEstimate({
-    stock: productDetails.stock,
+    stock: productDetails.stock - (productDetails.result_stock ?? 0),
     inventory: productDetails.inventory,
     deliveryTime: productDetails.delivery_time,
   });

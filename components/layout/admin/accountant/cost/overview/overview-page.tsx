@@ -13,6 +13,7 @@ import { useGetVariableFeeByMarketplaceAndTime } from "@/features/variable-cost/
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OverviewSkeleton } from "./skeleton";
+import { ProfitRevenueBarChart } from "./overview-chart";
 const OverviewPage = () => {
   const now = new Date();
 
@@ -69,65 +70,69 @@ const OverviewPage = () => {
       {!currentData || !data || !fixedFee || !variableFeeData ? (
         <OverviewSkeleton />
       ) : (
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Revenue</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xl font-semibold">
-              €
-              {currentData?.grand_total_amount.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </CardContent>
-          </Card>
+        <div>
+          <div className="grid grid-cols-3 gap-4 mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xl font-semibold">
+                €
+                {currentData?.grand_total_amount.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Total Cost{" "}
-                <span className="text-xs font-light text-gray-400">
-                  (Landed Cost + Fixed Cost + Variable Cost)
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  Total Cost{" "}
+                  <span className="text-xs font-light text-gray-400">
+                    (Landed Cost + Fixed Cost + Variable Cost)
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-xl font-semibold">
+                €
+                {totalCost.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+                <div className="text-xs font-light text-gray-400">
+                  ( {productCost.toLocaleString("de-DE")} +{" "}
+                  {fixedCost.toLocaleString("de-DE")} +{" "}
+                  {variableCost.toLocaleString("de-DE")})
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Profit Margin</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xl font-semibold flex items-center gap-2">
+                €
+                {profit.toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+                <span
+                  className={cn(profit < 0 ? "text-red-600" : "text-secondary")}
+                >
+                  ({margin.toFixed(2)}%)
                 </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-xl font-semibold">
-              €
-              {totalCost.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              <div className="text-xs font-light text-gray-400">
-                ( {productCost.toLocaleString("de-DE")} +{" "}
-                {fixedCost.toLocaleString("de-DE")} +{" "}
-                {variableCost.toLocaleString("de-DE")})
-              </div>
-            </CardContent>
-          </Card>
+                {profit < 0 ? (
+                  <ArrowDownRight className="h-5 w-5 text-red-600" />
+                ) : (
+                  <ArrowUpRight className="h-5 w-5 text-secondary" />
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Profit Margin</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xl font-semibold flex items-center gap-2">
-              €
-              {profit.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              <span
-                className={cn(profit < 0 ? "text-red-600" : "text-secondary")}
-              >
-                ({margin.toFixed(2)}%)
-              </span>
-              {profit < 0 ? (
-                <ArrowDownRight className="h-5 w-5 text-red-600" />
-              ) : (
-                <ArrowUpRight className="h-5 w-5 text-secondary" />
-              )}
-            </CardContent>
-          </Card>
+          <ProfitRevenueBarChart />
         </div>
       )}
     </div>

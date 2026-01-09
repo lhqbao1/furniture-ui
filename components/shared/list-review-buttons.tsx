@@ -12,6 +12,7 @@ import { useCartLocal } from "@/hooks/cart";
 import { useRouter } from "@/src/i18n/navigation";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
+import { useAddToCartLocalEnhanced } from "@/hooks/cart/add-to-cart-enhanched";
 
 interface IconListProps {
   currentProduct?: ProductItem;
@@ -22,48 +23,16 @@ const IconList = ({ currentProduct }: IconListProps) => {
   const containersRef = useRef<HTMLDivElement[]>([]);
   const addToCartMutation = useAddToCart();
   const addToWishlistMutation = useAddToWishList();
-  const { addToCartLocal } = useCartLocal();
   const router = useRouter();
   const locale = useLocale();
   const [userId, setUserId] = useAtom(userIdAtom);
+  const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
 
   const handleAddToCart = () => {
     if (!currentProduct) return;
 
     if (!userId) {
-      addToCartLocal(
-        {
-          item: {
-            product_id: currentProduct.id,
-            quantity: 1,
-            is_active: true,
-            item_price: currentProduct.final_price,
-            final_price: currentProduct.final_price,
-            img_url: currentProduct.static_files[0].url,
-            product_name: currentProduct.name,
-            stock: currentProduct.stock,
-            carrier: currentProduct.carrier ? currentProduct.carrier : "amm",
-            delivery_time: currentProduct.delivery_time
-              ? currentProduct.delivery_time
-              : "",
-            brand_name: currentProduct.brand.name,
-            length: currentProduct.length,
-            width: currentProduct.width,
-            height: currentProduct.height,
-            color: currentProduct.color,
-            inventory: currentProduct.inventory,
-            url_key: currentProduct.url_key,
-          },
-        },
-        {
-          onSuccess(data, variables, context) {
-            toast.success(t("addToCartSuccess"));
-          },
-          onError(error, variables, context) {
-            toast.error(t("addToCartFail"));
-          },
-        },
-      );
+      addToCartLocalOnly(currentProduct, 1);
     } else {
       addToCartMutation.mutate(
         { productId: currentProduct.id ?? "", quantity: 1 },

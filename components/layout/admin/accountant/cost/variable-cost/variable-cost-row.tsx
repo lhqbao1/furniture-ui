@@ -37,8 +37,9 @@ export function VariableFeeRow({
           placeholder="Amount (€)"
           value={fee.amount}
           onChange={(e) =>
-            onChange(e.target.value ? Number(e.target.value) : "")
+            onChange(e.target.value === "" ? "" : Number(e.target.value))
           }
+          onWheel={(e) => e.currentTarget.blur()} // 👈 fix scroll change
         />
 
         <Button
@@ -61,7 +62,7 @@ export function VariableFeeRow({
             <DialogTitle>Remove Fee</DialogTitle>
             <DialogDescription>
               Are you sure you want to remove "<b>{fee.type}</b>"?
-              {fee.ids && (
+              {fee.id && (
                 <span className="text-xs text-muted-foreground block mt-1">
                   (This will delete it permanently)
                 </span>

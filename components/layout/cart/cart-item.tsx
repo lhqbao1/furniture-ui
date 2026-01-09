@@ -50,6 +50,7 @@ type CartItemUI = {
   inventory: InventoryItem[];
   url_key: string;
   id_provider?: string;
+  result_stock: number;
 };
 
 const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
@@ -79,6 +80,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         inventory: cartServer.products.inventory,
         url_key: cartServer.products.url_key,
         id_provider: cartServer.products.id_provider,
+        result_stock: cartServer.products.result_stock ?? 0,
       }
     : localProducts
     ? {
@@ -99,6 +101,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         inventory: localProducts.inventory,
         url_key: localProducts.url_key,
         id_provider: localProducts.id_provider,
+        result_stock: localProducts.result_stock ?? 0,
       }
     : null;
 
@@ -236,16 +239,17 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
 
   const estimatedDeliveryRange = React.useMemo(() => {
     if (!deliveryDayRange) return null;
+    const stock = item.stock - item.result_stock;
 
     let startDate: Date | null = null;
 
     // CASE 1: hết hàng + có inventory
-    if (item.stock === 0 && latestInventory) {
+    if (stock === 0 && latestInventory) {
       startDate = new Date(latestInventory.date_received);
     }
 
     // CASE 2: còn hàng
-    if (item.stock > 0) {
+    if (stock > 0) {
       startDate = new Date();
     }
 
@@ -274,9 +278,6 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
       },
     );
   };
-
-  console.log(uiQuantity);
-  console.log(item.price);
 
   /* -------------------------------------------------
    * UI
