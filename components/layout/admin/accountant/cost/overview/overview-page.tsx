@@ -85,7 +85,12 @@ const OverviewPage = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Total Cost</CardTitle>
+              <CardTitle>
+                Total Cost{" "}
+                <span className="text-xs font-light text-gray-400">
+                  (Landed Cost + Fixed Cost + Variable Cost)
+                </span>
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-xl font-semibold">
               €
@@ -93,7 +98,7 @@ const OverviewPage = () => {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
-              <div className="text-sm text-gray-400">
+              <div className="text-xs font-light text-gray-400">
                 ( {productCost.toLocaleString("de-DE")} +{" "}
                 {fixedCost.toLocaleString("de-DE")} +{" "}
                 {variableCost.toLocaleString("de-DE")})

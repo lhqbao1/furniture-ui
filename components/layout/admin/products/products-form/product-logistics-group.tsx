@@ -368,7 +368,7 @@ const ProductLogisticsGroup = ({
                 </div>
 
                 <div className="grid lg:grid-cols-4 grid-cols-2 gap-3 w-full">
-                  {["length", "height", "width", "weight"].map((key) => (
+                  {["length", "width", "height", "weight"].map((key) => (
                     <FormField
                       key={key}
                       control={control}
