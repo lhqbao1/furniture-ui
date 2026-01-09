@@ -89,7 +89,7 @@ export const createInvoiceColumns = ({
           country_code,
           tax_id,
         );
-        return <div>{vatRate * 100}%</div>;
+        return <div>{(vatRate * 100).toFixed(2)}%</div>;
       },
     },
     {
