@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import QueryProvider from "@/lib/query-provider";
 import RuntimeErrorLogger from "@/components/shared/error/runtime-error-logger";
-import ClientBoundary from "@/components/shared/error/client-boundary";
 import { TrustedShops } from "@/components/shared/trusted-shop";
 
 const figtree = Figtree({

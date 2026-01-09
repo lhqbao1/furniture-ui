@@ -325,8 +325,8 @@ const Footer = () => {
       <div className="footer-column lg:col-span-12 col-span-6 flex items-center justify-start flex-col">
         {/* <h4 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h4> */}
         <div className="flex gap-1 mt-2 lg:mt-8">
-          {/* <Link
-            href="https://www.facebook.com/profile.php?id=61578621160298"
+          <Link
+            href="https://www.facebook.com/people/Prestige-Home/61584341162783/"
             target="_blank"
           >
             <Image
@@ -337,7 +337,7 @@ const Footer = () => {
               className="w-12 h-12 object-fill hover:scale-110 duration-300 transition-all"
               unoptimized
             />
-          </Link> */}
+          </Link>
           <Link
             href="https://x.com/prestihome_de"
             target="_blank"

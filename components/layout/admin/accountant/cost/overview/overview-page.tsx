@@ -12,6 +12,7 @@ import { getFixedFeeWithTime } from "@/features/fixed-fee/api";
 import { useGetVariableFeeByMarketplaceAndTime } from "@/features/variable-cost/hook";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { OverviewSkeleton } from "./skeleton";
 const OverviewPage = () => {
   const now = new Date();
 
@@ -66,7 +67,7 @@ const OverviewPage = () => {
       />
 
       {!currentData || !data || !fixedFee || !variableFeeData ? (
-        ""
+        <OverviewSkeleton />
       ) : (
         <div className="grid grid-cols-3 gap-4 mt-4">
           <Card>

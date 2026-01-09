@@ -192,7 +192,12 @@ export function useFixedCostForm() {
         i === index
           ? {
               ...item,
-              [field]: field === "amount" ? Number(value) || "" : value,
+              [field]:
+                field === "amount"
+                  ? value === ""
+                    ? ""
+                    : Number(value)
+                  : value,
               isCloned: false,
             }
           : item,
@@ -211,12 +216,11 @@ export function useFixedCostForm() {
     try {
       // ✅ CASE 1: item đã tồn tại trên DB → DELETE API
       if (item.id) {
-        console.log("hehe");
         await deleteFixedFeeMutation.mutateAsync(item.id);
+      } else {
+        // ✅ CASE 2: item local → chỉ xoá state
+        setItems((prev) => prev.filter((_, i) => i !== index));
       }
-
-      // ✅ CASE 2: item local → chỉ xoá state
-      // setItems((prev) => prev.filter((_, i) => i !== index));
 
       toast.success("Fixed cost removed");
     } catch (error) {
@@ -230,36 +234,40 @@ export function useFixedCostForm() {
       let updated = 0;
 
       for (const item of items) {
-        if (!item.type || !item.amount) continue;
+        if (
+          !item.type ||
+          item.amount === "" ||
+          item.amount === null ||
+          item.amount === undefined
+        ) {
+          continue;
+        }
 
         const payload: CreateFixedFeeValues = {
           type: item.type,
-          amount: Number(item.amount),
+          amount: Number(item.amount), // 0 ok
           month,
           year,
         };
 
-        // ✅ CASE 1: đã tồn tại → UPDATE nếu thay đổi
         if (item.id) {
-          if (item.amount !== item.originalAmount) {
+          if (Number(item.amount) !== Number(item.originalAmount)) {
             await updateFixedFeeMutation.mutateAsync({
               id: item.id,
               input: payload,
             });
             updated++;
           }
-          continue;
+        } else {
+          await createFixedFeeMutation.mutateAsync(payload);
+          created++;
         }
-
-        // ✅ CASE 2: chưa tồn tại → CREATE
-        await createFixedFeeMutation.mutateAsync(payload);
-        created++;
       }
 
       toast.success(
         `Saved successfully: ${created} created, ${updated} updated`,
       );
-    } catch (error) {
+    } catch {
       toast.error("Failed to save fixed costs");
     }
   };
