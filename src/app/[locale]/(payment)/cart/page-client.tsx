@@ -50,16 +50,16 @@ const CartPageClient = () => {
   }, [cart]);
 
   const normalized = React.useMemo(() => {
-    const items = isAuthenticated
+    const items = userId
       ? cart?.flatMap((g) => g.items) ?? []
       : localCart ?? [];
 
     return normalizeCartItems(items, isAuthenticated);
   }, [cart, localCart, isAuthenticated]);
 
-  const shippingCost = React.useMemo(() => {
-    return calculateShipping(normalized);
-  }, [normalized]);
+  const shippingCost = normalized?.length
+    ? calculateShipping(normalized) ?? 0
+    : 0;
 
   return (
     <div className="mt-6 md:pb-0 pb-6 lg:px-0 px-4 container-padding overflow-auto">

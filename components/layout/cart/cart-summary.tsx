@@ -45,10 +45,10 @@ const CartSummary = ({
   const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
   const [discount, setDiscount] = React.useState<number>(0);
 
-  const [discountAmount, setDiscountAmout] = useState<VoucherItem>();
   const { cart: localCart } = useCartLocal();
 
   const { shippingCost } = useCheckoutInit();
+
   const orderValue = React.useMemo(() => {
     if (userId && cart && cart.length > 0) {
       return cart

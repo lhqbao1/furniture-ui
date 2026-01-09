@@ -70,14 +70,27 @@ export function useCheckoutInit() {
   });
 
   const normalized = normalizeCartItems(
-    isAuthenticated && cartItems
-      ? cartItems.flatMap((g) => g.items)
-      : localCart,
+    isAuthenticated && userLoginId && Array.isArray(cartItems)
+      ? cartItems.flatMap((g) => g.items ?? [])
+      : Array.isArray(localCart)
+      ? localCart
+      : [],
     isAuthenticated,
   );
 
-  const shippingCost = calculateShipping(normalized);
-  const hasOtherCarrier = checkShippingType(normalized);
+  let shippingCost = 0;
+  let hasOtherCarrier = false;
+
+  if (Array.isArray(normalized) && normalized.length > 0) {
+    try {
+      const v = calculateShipping(normalized);
+      if (Number.isFinite(v)) shippingCost = v;
+      hasOtherCarrier = checkShippingType(normalized);
+    } catch (e) {
+      console.warn("Shipping calculation failed:", e);
+    }
+  }
+
   const totalAmount = 1;
 
   return {
