@@ -41,7 +41,15 @@ export async function GET() {
     ];
 
     const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0 && p.brand)
+      .filter(
+        (p) =>
+          p.final_price > 0 &&
+          p.is_active &&
+          p.stock > 0 &&
+          p.brand &&
+          p.price &&
+          p.price > 0,
+      )
       .map((p) => {
         return [
           escapeCsv(p.id_provider),
