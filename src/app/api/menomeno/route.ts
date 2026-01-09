@@ -65,8 +65,11 @@ export async function GET() {
           escapeCsv(formatEuro(p.price || 0)),
           escapeCsv(1),
           escapeCsv(1),
-          escapeCsv(p.carrier === "amm" ? "Spedition" : "Phaket"),
-          escapeCsv(html(p.delivery_time.replace(/(\d+)-(\d+)/, "$1#$2"))),
+          escapeCsv(p.stock - (p.result_stock ?? 0)),
+
+          escapeCsv(p.carrier.toUpperCase()),
+          escapeCsv(p.delivery_time.replace(/(\d+)-(\d+)/, "$1#$2")),
+          escapeCsv(p.weight ?? 0),
         ].join(",");
       });
 
