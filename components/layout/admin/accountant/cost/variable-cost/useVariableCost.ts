@@ -127,25 +127,19 @@ export function useVariableCost({
     if (!target) return;
 
     try {
-      // ✅ CASE 1: data thật → gọi DELETE API
-      const feeId = target.ids;
+      const id = target.id; // unified
 
-      if (feeId) {
-        await deleteMutation.mutateAsync(feeId);
+      if (id) {
+        await deleteMutation.mutateAsync(id);
         toast.success("Variable fee deleted");
       }
 
-      // ✅ CASE 2: local → chỉ xoá state
       setMarketplaces((prev) =>
         prev.map((m) =>
           m.marketplace === marketplace
             ? {
                 ...m,
-                fees: m.fees.map((f) =>
-                  f.type === type
-                    ? { ...f, amount: "", originalAmount: "" }
-                    : f,
-                ),
+                fees: m.fees.filter((f) => f.type !== type),
               }
             : m,
         ),
@@ -163,31 +157,33 @@ export function useVariableCost({
 
       for (const m of marketplaces) {
         for (const fee of m.fees) {
-          if (!fee.amount) continue;
+          if (
+            fee.amount === "" ||
+            fee.amount === null ||
+            fee.amount === undefined
+          )
+            continue;
 
           const payload = {
             marketplace: m.marketplace,
             type: fee.type,
             month,
             year,
-            amount: Number(fee.amount),
+            amount: Number(fee.amount), // 0 ok
           };
 
-          // UPDATE
-          if (fee.ids) {
-            if (fee.amount !== fee.originalAmount) {
+          if (fee.id) {
+            if (Number(fee.amount) !== Number(fee.originalAmount)) {
               await updateMutation.mutateAsync({
-                id: fee.ids,
+                id: fee.id,
                 input: payload,
               });
               updated++;
             }
-            continue;
+          } else {
+            await createMutation.mutateAsync(payload);
+            created++;
           }
-
-          // CREATE
-          await createMutation.mutateAsync(payload);
-          created++;
         }
       }
 
@@ -237,7 +233,7 @@ export function useVariableCost({
           return matched
             ? {
                 ...fee,
-                ids: matched.ids[0], // optional nếu cần giữ list
+                id: matched.ids[0], // unified here
                 amount: matched.amount,
                 originalAmount: matched.amount,
               }
@@ -256,7 +252,7 @@ export function useVariableCost({
             ...newFeesFromApi.map((f) => ({
               marketplace: m.marketplace,
               type: f.type,
-              id: f.ids[0], // <-- ADD
+              id: f.ids[0],
               amount: f.amount,
               originalAmount: f.amount,
             })),

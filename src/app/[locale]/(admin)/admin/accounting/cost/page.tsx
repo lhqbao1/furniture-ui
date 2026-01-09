@@ -40,12 +40,6 @@ const CostManagement = () => {
               Variable Cost
             </TabsTrigger>
             <TabsTrigger
-              value="allocation"
-              className="text-lg"
-            >
-              Allocation
-            </TabsTrigger>
-            <TabsTrigger
               value="product-margin"
               className="text-lg"
             >
