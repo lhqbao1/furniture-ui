@@ -1,5 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { importProduct, importProductSupplier, uploadStaticFile } from "./api";
+import {
+  importProduct,
+  importProductInventory,
+  importProductSupplier,
+  uploadStaticFile,
+} from "./api";
 
 export function useUploadStaticFile() {
   return useMutation({
@@ -14,6 +19,16 @@ export function useImportProducts() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (file: FormData) => importProduct(file),
+    onSuccess: () => {
+      qc.refetchQueries({ queryKey: ["products"] });
+    },
+  });
+}
+
+export function useImportProductInventory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (file: FormData) => importProductInventory(file),
     onSuccess: () => {
       qc.refetchQueries({ queryKey: ["products"] });
     },
