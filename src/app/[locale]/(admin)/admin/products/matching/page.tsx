@@ -10,6 +10,9 @@ import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { getMatchingPriceColumn } from "@/components/layout/admin/products/matching-price/column";
+import TableToolbar, {
+  ToolbarType,
+} from "@/components/layout/admin/products/products-list/toolbar";
 
 const ProductList = () => {
   const [page, setPage] = useState(1);
@@ -39,7 +42,7 @@ const ProductList = () => {
     page,
     page_size: pageSize,
     all_products: "false",
-    // search: filters.search,
+    search: filters.search,
     sort_by_stock: "asc",
     sort_by_marketplace: "desc",
   });
@@ -63,6 +66,13 @@ const ProductList = () => {
       <div className="text-3xl text-secondary font-bold text-center">
         Price Benchmark
       </div>
+
+      <TableToolbar
+        setPage={setPage}
+        setPageSize={setPageSize}
+        pageSize={pageSize}
+        type={ToolbarType.product}
+      />
 
       {isLoading ? (
         <ProductTableSkeleton />
