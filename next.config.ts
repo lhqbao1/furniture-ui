@@ -39,6 +39,7 @@ const nextConfig: NextConfig = {
     qualities: [70, 80],
     deviceSizes: [320, 640, 1024],
     imageSizes: [16, 32, 48, 64],
+    preload: false,
   },
 };
 
