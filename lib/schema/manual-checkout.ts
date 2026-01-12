@@ -45,7 +45,7 @@ export const ManualCreateOrderSchema = z
     items: z
       .array(
         z.object({
-          product_id: z.string().min(1, { message: "Product ID is required" }),
+          id_provider: z.string().min(1, { message: "Product ID is required" }),
           quantity: z
             .number()
             .int({ message: "Quantity must be an integer" })

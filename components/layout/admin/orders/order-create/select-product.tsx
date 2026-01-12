@@ -97,7 +97,7 @@ const SelectOrderItems = ({
   // 🔹 Auto update form.items khi listProducts thay đổi
   useEffect(() => {
     const items = listProducts.map((item) => ({
-      product_id: item.product.id,
+      id_provider: item.product.id_provider,
       quantity: item.quantity,
       title: item.product.name,
       sku: item.product.sku ?? "",

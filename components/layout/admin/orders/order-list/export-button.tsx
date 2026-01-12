@@ -7,7 +7,6 @@ import { ProductItem } from "@/types/products";
 import { Loader2 } from "lucide-react";
 import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useQuery } from "@tanstack/react-query";
-import { getAllProductsSelect } from "@/features/product-group/api";
 import { getAllCheckOutMain } from "@/features/checkout/api";
 import { getStatusStyle } from "./status-styles";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";

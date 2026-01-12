@@ -42,7 +42,7 @@ export async function getAllProductsSelect({
   is_customer?: boolean;
   all_products?: boolean;
   is_econelo?: boolean;
-  supplier_id?: string;
+  supplier_id?: string | null;
 }) {
   const { data } = await apiPublic.get("/products/all", {
     params: {

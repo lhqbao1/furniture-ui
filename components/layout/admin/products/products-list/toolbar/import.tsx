@@ -165,26 +165,33 @@ const ImportDialog = ({
 
                   <CommandGroup>
                     {/* Suppliers from API */}
-                    {listSuppliers.map((item) => (
-                      <CommandItem
-                        key={item.id}
-                        value={item.business_name}
-                        onSelect={() => {
-                          setSupplierId(item.id);
-                          setOpenSupplier(false); // ✅ đóng popover
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            supplierId === item.id
-                              ? "opacity-100"
-                              : "opacity-0",
-                          )}
-                        />
-                        {item.business_name}
-                      </CommandItem>
-                    ))}
+                    {listSuppliers
+                      ?.slice() // tránh mutate array gốc
+                      .sort((a, b) =>
+                        a.business_name.localeCompare(b.business_name, "de", {
+                          sensitivity: "base",
+                        }),
+                      )
+                      .map((item) => (
+                        <CommandItem
+                          key={item.id}
+                          value={item.business_name}
+                          onSelect={() => {
+                            setSupplierId(item.id);
+                            setOpenSupplier(false); // ✅ đóng popover
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              supplierId === item.id
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                          {item.business_name}
+                        </CommandItem>
+                      ))}
 
                     {/* Custom option */}
                     <CommandItem

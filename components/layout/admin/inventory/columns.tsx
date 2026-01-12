@@ -135,7 +135,7 @@ export const getInventoryColumns = (
     accessorKey: "incomming",
     header: () => (
       <div className="text-center uppercase">
-        Incoming stock / date / landed cost
+        Incoming stock / date /unit landed cost
       </div>
     ),
     cell: ({ row }) => {
@@ -160,13 +160,10 @@ export const getInventoryColumns = (
                 </span>
                 <span className="px-2">
                   €
-                  {(row.original.cost * item.incoming_stock).toLocaleString(
-                    "de-DE",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    },
-                  )}
+                  {item.cost_received.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               </div>
 
@@ -190,15 +187,23 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "cost",
-    header: ({}) => (
-      <div className="text-center uppercase">Unit landed cost</div>
-    ),
+    header: ({}) => <div className="text-center uppercase">Landed cost</div>,
     cell: ({ row }) => {
+      const inv = row.original.inventory || [];
+
+      const total = inv.reduce((sum, item) => {
+        const cost = Number(item.cost_received ?? 0);
+        const stock = Number(item.incoming_stock ?? 0);
+
+        const value = cost * stock;
+        return sum + (isNaN(value) ? 0 : value);
+      }, 0);
+
       return (
         <div className="text-center">
           €
-          {row.original.cost
-            ? row.original.cost.toLocaleString("de-DE", {
+          {total > 0
+            ? total.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })

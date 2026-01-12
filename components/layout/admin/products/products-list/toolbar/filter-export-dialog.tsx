@@ -10,6 +10,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useGetSuppliers } from "@/features/supplier/hook";
 import SupplierSelect from "./supplier-select";
+import { SupplierResponse } from "@/types/supplier";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -33,8 +34,21 @@ const FilterExportForm = () => {
     if (status === "active") all_products = true;
     if (status === "inactive") all_products = false;
 
+    // supplier logic
+    let supplier_id: string | null | undefined = undefined;
+
+    if (supplier === "") {
+      // all suppliers → do not send supplier_id
+      supplier_id = undefined;
+    } else if (supplier === "prestige_home") {
+      // prestige → explicitly null
+      supplier_id = "null";
+    } else {
+      supplier_id = supplier; // actual supplier id
+    }
+
     return {
-      supplier_id: supplier || undefined, // <-- gửi id
+      supplier_id,
       all_products,
     };
   };
@@ -46,6 +60,7 @@ const FilterExportForm = () => {
   });
 
   const { data: suppliers, isLoading, isError } = useGetSuppliers();
+  if (!suppliers) return <>Loading...</>;
 
   const handleExport = async () => {
     const res = await refetch();
@@ -133,13 +148,42 @@ const FilterExportForm = () => {
     saveAs(blob, "export.xlsx");
   };
 
+  // Add prestige home option
+  const extendedSuppliers: SupplierResponse[] = [
+    {
+      id: "",
+      business_name: "All",
+      delivery_multiple: false,
+      vat_id: "",
+      email: "",
+      email_order: "",
+      email_billing: "",
+      phone_number: "",
+      created_at: "",
+      updated_at: "",
+    },
+    {
+      id: "prestige_home",
+      business_name: "Prestige Home",
+      delivery_multiple: false,
+      vat_id: "",
+      email: "",
+      email_order: "",
+      email_billing: "",
+      phone_number: "",
+      created_at: "",
+      updated_at: "",
+    },
+    ...suppliers,
+  ];
+
   return (
     <div>
       <div className="space-y-4">
         {/* Supplier Filter */}
         {suppliers && (
           <SupplierSelect
-            suppliers={suppliers}
+            suppliers={extendedSuppliers}
             supplier={supplier}
             setSupplier={setSupplier}
           />
