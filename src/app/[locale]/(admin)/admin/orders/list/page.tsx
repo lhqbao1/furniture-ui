@@ -3,7 +3,6 @@ import { orderColumns } from "@/components/layout/admin/orders/order-list/column
 import OrderExpandTable from "@/components/layout/admin/orders/order-list/expand-delivery";
 import OrderToolbar from "@/components/layout/admin/orders/order-list/order-toolbar";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import ProductStatistic from "@/components/layout/admin/products/products-list/statistic";
 import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
@@ -78,7 +77,7 @@ const OrderList = () => {
       count: statistic?.count_preparing_shipping_order,
       total: statistic?.total_preparing_shipping_order ?? 0,
       label: "Preparing Shipping",
-      textColor: "#FED000",
+      textColor: "#29ABE2",
     },
     {
       count: statistic?.count_stock_reserved_order,

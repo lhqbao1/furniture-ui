@@ -44,15 +44,18 @@ export default function GlobalError({
             An unexpected error occurred. Please try again or reload the page.
           </p>
 
-          {process.env.NODE_ENV === "development" && (
+          {/* {process.env.NODE_ENV === "development" && (
             <pre className="mt-4 max-w-xl overflow-auto rounded bg-gray-100 p-4 text-left text-sm text-red-500">
               {error.message}
             </pre>
-          )}
-
+          )} */}
           <pre className="mt-4 max-w-xl overflow-auto rounded bg-gray-100 p-4 text-left text-sm text-red-500">
-            Error from extensions
+            {error.message}
           </pre>
+
+          {/* <pre className="mt-4 max-w-xl overflow-auto rounded bg-gray-100 p-4 text-left text-sm text-red-500">
+            Error from extensions
+          </pre> */}
 
           <div className="mt-6 flex gap-3">
             <button
