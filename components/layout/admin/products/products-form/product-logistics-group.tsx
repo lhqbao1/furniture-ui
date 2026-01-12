@@ -42,7 +42,7 @@ const ProductLogisticsGroup = ({
     { id: "amm", logo: "/amm.jpeg" },
     { id: "dpd", logo: "/dpd.jpeg" },
     { id: "dhl", logo: "/dhl.png" },
-    { id: "gls", logo: "/gls.png" },
+    { id: "gls", logo: "/gls-new.png" },
     { id: "ups", logo: "/ups.png" },
     { id: "hermes", logo: "/hermes.png" },
     { id: "fexed", logo: "/fedex.png" },
@@ -53,7 +53,7 @@ const ProductLogisticsGroup = ({
     { id: "dpd", logo: "/dpd.jpeg" },
     { id: "dhl", logo: "/dhl.png" },
     { id: "hermes", logo: "/hermes.png" },
-    { id: "gls", logo: "/gls.png" },
+    { id: "gls", logo: "/gls-new.png" },
     { id: "ups", logo: "/ups.png" },
   ];
 
