@@ -9,8 +9,10 @@ const intlMiddleware = createMiddleware({
 });
 
 export default function middleware(req: NextRequest) {
-  const res = intlMiddleware(req);
+  const res = intlMiddleware(req) as NextResponse;
   const { pathname, searchParams } = req.nextUrl;
+
+  res.headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
 
   // ✅ Điều kiện nhận diện URL kiểu WooCommerce cũ
   const looksLikeOldWooProduct =
