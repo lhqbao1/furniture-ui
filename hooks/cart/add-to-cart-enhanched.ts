@@ -4,9 +4,11 @@ import { useCartLocal } from "@/hooks/cart";
 import { toast } from "sonner";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { ProductItem } from "@/types/products";
+import { useTranslations } from "next-intl";
 
 export function useAddToCartLocalEnhanced() {
   const { addToCartLocal, cart } = useCartLocal();
+  const t = useTranslations();
 
   const addToCartLocalOnly = (product: ProductItem, quantity: number = 1) => {
     if (!product) return;
@@ -24,7 +26,7 @@ export function useAddToCartLocalEnhanced() {
       ) ?? 0;
 
     if (totalQuantity > product.stock + totalIncomingStock) {
-      toast.error("Not enough stock");
+      toast.error(t("notEnoughStock"));
       return;
     }
 
@@ -53,8 +55,8 @@ export function useAddToCartLocalEnhanced() {
         },
       },
       {
-        onSuccess: () => toast.success("Added to cart"),
-        onError: () => toast.error("Failed to add to cart"),
+        onSuccess: () => toast.success(t("addToCartSuccess")),
+        onError: () => toast.error(t("addToCartFail")),
       },
     );
   };
