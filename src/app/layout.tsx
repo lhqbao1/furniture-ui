@@ -6,6 +6,7 @@ import Script from "next/script";
 import QueryProvider from "@/lib/query-provider";
 import RuntimeErrorLogger from "@/components/shared/error/runtime-error-logger";
 import { TrustedShops } from "@/components/shared/trusted-shop";
+import { Providers } from "./providers";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -79,6 +80,10 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
+        <meta
+          name="apple-mobile-web-app-capable"
+          content="no"
+        />
         <Script
           id="gtag-stub"
           strategy="beforeInteractive"
@@ -253,28 +258,29 @@ export default function RootLayout({
       <body
         className={`${figtree.variable} ${libre.variable} font-sans antialiased`}
       >
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-WKVQP2QH"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          ></iframe>
-        </noscript>
+        <Providers>
+          <noscript>
+            <iframe
+              src="https://www.googletagmanager.com/ns.html?id=GTM-WKVQP2QH"
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            ></iframe>
+          </noscript>
 
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none", visibility: "hidden" }}
-            src="https://www.facebook.com/tr?id=1625686318416498&ev=PageView&noscript=1"
-          />
-        </noscript>
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none", visibility: "hidden" }}
+              src="https://www.facebook.com/tr?id=1625686318416498&ev=PageView&noscript=1"
+            />
+          </noscript>
 
-        <RuntimeErrorLogger />
-        <TrustedShops />
-        <QueryProvider>{children}</QueryProvider>
-
+          <RuntimeErrorLogger />
+          <TrustedShops />
+          <QueryProvider>{children}</QueryProvider>
+        </Providers>
         <Toaster
           expand
           richColors
