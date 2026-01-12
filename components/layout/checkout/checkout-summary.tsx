@@ -31,6 +31,7 @@ interface CheckoutSummaryProps {
   localCart: CartItemLocal[];
   hasOtherCarrier: boolean;
   shippingCost: number;
+  userLoginId: string | null;
 }
 
 const CheckoutSummary = ({
@@ -38,11 +39,15 @@ const CheckoutSummary = ({
   localCart,
   hasOtherCarrier,
   shippingCost,
+  userLoginId,
 }: CheckoutSummaryProps) => {
   const form = useFormContext();
   const t = useTranslations();
   const [currentVoucher, setCurrentVoucher] = useAtom(currentVoucherAtom);
   const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
+
+  const hasServerCart =
+    !!userLoginId && Array.isArray(cartItems) && cartItems.length > 0;
 
   const { data: listValidProducts } = useGetVoucherProducts(voucherId ?? "");
   const validProductIdSet = React.useMemo<Set<string>>(() => {
@@ -52,8 +57,7 @@ const CheckoutSummary = ({
   const productSubtotalForVoucher = React.useMemo(() => {
     if (validProductIdSet.size === 0) return 0;
 
-    // ✅ Logged-in cart
-    if (cartItems && cartItems.length > 0) {
+    if (hasServerCart) {
       return cartItems
         .flatMap((g) => g.items)
         .filter(
@@ -65,14 +69,13 @@ const CheckoutSummary = ({
         .reduce((sum, i) => sum + (i.final_price ?? 0), 0);
     }
 
-    // ✅ Local cart
     return (
       localCart
         ?.filter((i) => i.is_active && validProductIdSet.has(i.product_id))
         .reduce((sum, i) => sum + (i.item_price ?? 0) * (i.quantity ?? 1), 0) ??
       0
     );
-  }, [validProductIdSet, cartItems, localCart]);
+  }, [validProductIdSet, cartItems, localCart, hasServerCart]);
 
   const voucherAmount = useWatch({
     control: form.control,
@@ -97,7 +100,7 @@ const CheckoutSummary = ({
   // }, [cartItems, localCart]);
 
   const orderValue = React.useMemo(() => {
-    if (cartItems && cartItems.length > 0) {
+    if (hasServerCart) {
       return cartItems
         .flatMap((g) => g.items)
         .filter((i) => i.is_active)
@@ -109,7 +112,7 @@ const CheckoutSummary = ({
         ?.filter((i) => i.is_active)
         .reduce((s, i) => s + (i.item_price ?? 0) * (i.quantity ?? 1), 0) ?? 0
     );
-  }, [cartItems, localCart]);
+  }, [cartItems, localCart, hasServerCart]);
 
   // const carrier = React.useMemo<"dpd" | "amm" | undefined>(() => {
   //   if (shippingCost === 35.95) return "amm";
@@ -206,6 +209,7 @@ const CheckoutSummary = ({
     productSubtotalForVoucher, // 🔥 BẮT BUỘC
     listValidProducts, // 🔥 BẮT BUỘC
   ]);
+
   React.useEffect(() => {
     if (!voucherId) {
       const current = form.getValues("voucher_amount");
@@ -308,7 +312,7 @@ const CheckoutSummary = ({
             <span className="text-right col-span-2">
               €
               {(
-                (cartItems && cartItems.length > 0
+                (hasServerCart
                   ? cartItems
                       .flatMap((g) => g.items)
                       .filter((i) => i.is_active)

@@ -174,6 +174,7 @@ export default function CheckOutFormSection() {
             localCart={localCart}
             hasOtherCarrier={hasOtherCarrier}
             shippingCost={shippingCost}
+            userLoginId={userLoginId}
           />
 
           {/* PAYMENT */}

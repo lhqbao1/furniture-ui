@@ -5,7 +5,6 @@ import { useRef } from "react";
 import { mapTrustedShopsPaymentType } from "@/hooks/map-payment-method";
 import { ProductItem } from "@/types/products";
 
-/* ⛔ GIỮ NGUYÊN – KHÔNG ĐỤNG */
 export interface TrustedShopsCheckoutProps {
   orderNumber: string;
   buyerEmail: string;
@@ -31,10 +30,9 @@ export function TrustedShopsCheckout({
     if (sentRef.current) return;
     sentRef.current = true;
 
-    // 🔑 luôn init trước
     window._ts = window._ts || [];
 
-    // 1️⃣ SERVICE REVIEW (ORDER)
+    //SERVICE REVIEW (ORDER)
     window._ts.push([
       "_ec.Order",
       {
@@ -47,7 +45,7 @@ export function TrustedShopsCheckout({
       },
     ]);
 
-    // 2️⃣ PRODUCT REVIEWS (GIỮ NGUYÊN LOGIC CŨ)
+    //PRODUCT REVIEWS
     products.forEach((p) => {
       window._ts!.push([
         "_ec.Product",
@@ -62,13 +60,13 @@ export function TrustedShopsCheckout({
       ]);
     });
 
-    // 3️⃣ OPEN TRUSTCARD
+    //OPEN TRUSTCARD
     window._ts.push(["_ec.Show"]);
   };
 
   return (
     <>
-      {/* 🔑 INIT QUEUE – BẮT BUỘC */}
+      {/*INIT QUEUE */}
       <Script
         id="ts-init"
         strategy="beforeInteractive"
@@ -77,14 +75,14 @@ export function TrustedShopsCheckout({
         }}
       />
 
-      {/* 🔑 TRUSTED SHOPS SCRIPT */}
+      {/*TRUSTED SHOPS SCRIPT */}
       <Script
         src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
         strategy="afterInteractive"
         onLoad={sendTrustedShops}
       />
 
-      {/* 🔑 CONTAINER */}
+      {/*CONTAINER */}
       <div id="trustedshops_checkout" />
     </>
   );
