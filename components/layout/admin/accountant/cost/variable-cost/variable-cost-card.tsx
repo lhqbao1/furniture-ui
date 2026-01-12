@@ -27,7 +27,9 @@ export function VariableMarketplaceCard({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="font-medium capitalize">
-          {data.marketplace.replace("_", " ")}
+          {typeof data?.marketplace === "string"
+            ? data.marketplace.replace(/_/g, " ")
+            : ""}
         </div>
 
         <div className="flex gap-2">
