@@ -53,6 +53,7 @@ export default function CheckOutFormSection() {
     cartItems,
     localCart,
     isLoadingCart,
+    hasServerCart,
     shippingCost,
     hasOtherCarrier,
     userGuestId,

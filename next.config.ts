@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: [],
+    cacheComponents: false, // allocate full chunk instead of streaming
   },
 
   // ✅ Bỏ qua lỗi ESLint và TypeScript khi build production trên Vercel

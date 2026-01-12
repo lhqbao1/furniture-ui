@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/command";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
 import { SupplierResponse } from "@/types/supplier";
 
 interface SupplierSelectProps {
@@ -60,24 +59,31 @@ export default function SupplierSelect({
             <CommandList>
               <CommandEmpty>No supplier found.</CommandEmpty>
 
-              {filteredSuppliers?.map((item) => (
-                <CommandItem
-                  key={item.id}
-                  value={item.business_name.toLowerCase()}
-                  onSelect={() => {
-                    setSupplier(item.id);
-                    setOpen(false);
-                  }}
-                >
-                  {item.business_name}
-                  <Check
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      item.id === supplier ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                </CommandItem>
-              ))}
+              {filteredSuppliers
+                ?.slice() // tránh mutate array gốc
+                .sort((a, b) =>
+                  a.business_name.localeCompare(b.business_name, "de", {
+                    sensitivity: "base",
+                  }),
+                )
+                .map((item) => (
+                  <CommandItem
+                    key={item.id}
+                    value={item.business_name.toLowerCase()}
+                    onSelect={() => {
+                      setSupplier(item.id);
+                      setOpen(false);
+                    }}
+                  >
+                    {item.business_name}
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        item.id === supplier ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </CommandItem>
+                ))}
             </CommandList>
           </Command>
         </PopoverContent>

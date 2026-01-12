@@ -1,6 +1,7 @@
 // hooks/checkout/useCheckoutInit.ts
 "use client";
 
+import { useEffect, useState } from "react";
 import { useCartLocal } from "@/hooks/cart";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@/types/user";
@@ -21,7 +22,6 @@ import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 export function useCheckoutInit() {
   const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
   const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
-  const isAuthenticated = Boolean(userLoginId);
 
   const finalUserId = userLoginId || userGuestId;
 
@@ -69,28 +69,15 @@ export function useCheckoutInit() {
     retry: false,
   });
 
+  const hasServerCart = Array.isArray(cartItems) && cartItems.length > 0;
+
   const normalized = normalizeCartItems(
-    isAuthenticated && userLoginId && Array.isArray(cartItems)
-      ? cartItems.flatMap((g) => g.items ?? [])
-      : Array.isArray(localCart)
-      ? localCart
-      : [],
-    isAuthenticated,
+    hasServerCart ? cartItems.flatMap((g) => g.items) : localCart,
+    hasServerCart,
   );
 
-  let shippingCost = 0;
-  let hasOtherCarrier = false;
-
-  if (Array.isArray(normalized) && normalized.length > 0) {
-    try {
-      const v = calculateShipping(normalized);
-      if (Number.isFinite(v)) shippingCost = v;
-      hasOtherCarrier = checkShippingType(normalized);
-    } catch (e) {
-      console.warn("Shipping calculation failed:", e);
-    }
-  }
-
+  const shippingCost = calculateShipping(normalized);
+  const hasOtherCarrier = checkShippingType(normalized);
   const totalAmount = 1;
 
   return {
@@ -100,6 +87,7 @@ export function useCheckoutInit() {
     cartItems,
     localCart,
     isLoadingCart,
+    hasServerCart,
     shippingCost,
     hasOtherCarrier,
     userGuestId,

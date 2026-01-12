@@ -21,51 +21,20 @@ export default function OrderDateFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const now = new Date();
-  const defaultFrom = new Date(now.getFullYear(), 0, 1); // 1 Jan current year
-  defaultFrom.setHours(0, 0, 0, 0);
-
-  const defaultTo = new Date();
-  defaultTo.setHours(23, 59, 59, 0);
-
   // ---------------------------
   // Load values from URL
   // ---------------------------
-  const rawFrom = searchParams.get("from_date");
-  const rawTo = searchParams.get("to_date");
-
   const [fromDate, setFromDate] = useState<string | undefined>(
-    rawFrom ?? formatDate(defaultFrom),
+    searchParams.get("from_date") || undefined,
   );
-
   const [endDate, setEndDate] = useState<string | undefined>(
-    rawTo ?? formatDate(defaultTo),
+    searchParams.get("to_date") || undefined,
   );
 
   const param = searchParams.get("status") || "";
   const initialSelected = param ? param.split(",") : [];
 
   const [selected, setSelected] = useState<string[]>(initialSelected);
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-
-    let changed = false;
-
-    if (!rawFrom) {
-      params.set("from_date", formatDate(defaultFrom));
-      changed = true;
-    }
-
-    if (!rawTo) {
-      params.set("to_date", formatDate(defaultTo));
-      changed = true;
-    }
-
-    if (changed) {
-      router.replace(`?${params.toString()}`, { scroll: false });
-    }
-  }, []); // chỉ chạy 1 lần
 
   // Sync params -> UI khi user back/forward
   useEffect(() => {

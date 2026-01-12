@@ -12,7 +12,7 @@ interface RelatedBlogsProps {
   slug: string;
 }
 
-const stripHtml = (html: string) => html.replace(/<[^>]*>/g, "");
+const stripHtml = (html: string) => html.replace(/<[^>]*>/g, "") ?? "";
 
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString("de-DE", {

@@ -20,7 +20,6 @@ import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/orde
 import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
 import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
 import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreate";
-import { calculateShippingCost } from "@/hooks/caculate-shipping";
 
 export interface CartItem {
   id: number;

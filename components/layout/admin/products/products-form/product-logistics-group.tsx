@@ -40,6 +40,7 @@ const ProductLogisticsGroup = ({
 
   const carriers = [
     { id: "amm", logo: "/amm.jpeg" },
+    { id: "spedition", logo: "/amm.jpeg" },
     { id: "dpd", logo: "/dpd.jpeg" },
     { id: "dhl", logo: "/dhl.png" },
     { id: "gls", logo: "/gls-new.png" },
@@ -122,48 +123,52 @@ const ProductLogisticsGroup = ({
         <FormField
           control={form.control}
           name="carrier"
-          render={({ field }) => (
-            <FormItem className="flex flex-col w-full">
-              <FormLabel className="text-black font-semibold text-sm col-span-2">
-                Carrier
-              </FormLabel>
-              <FormControl>
-                <Select
-                  value={field.value ?? ""}
-                  onValueChange={field.onChange}
-                >
-                  <SelectTrigger
-                    placeholderColor
-                    className="border col-span-4 font-light"
+          render={({ field }) => {
+            const value = field.value === "spedition" ? "amm" : field.value;
+
+            return (
+              <FormItem className="flex flex-col w-full">
+                <FormLabel className="text-black font-semibold text-sm col-span-2">
+                  Carrier
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    value={value ?? ""}
+                    onValueChange={(val) => field.onChange(val)}
                   >
-                    <SelectValue placeholder="Select carrier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(isDSP ? DSPcarriers : carriers).map((c) => (
-                      <SelectItem
-                        key={c.id}
-                        value={c.id}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Image
-                            src={c.logo}
-                            alt={c.id}
-                            width={30}
-                            height={20}
-                            className="object-contain"
-                          />
-                          <span className="uppercase">
-                            {c.id === "amm" ? "Spedition" : c.id}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                    <SelectTrigger
+                      placeholderColor
+                      className="border col-span-4 font-light"
+                    >
+                      <SelectValue placeholder="Select carrier" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(isDSP ? DSPcarriers : carriers).map((c) => (
+                        <SelectItem
+                          key={c.id}
+                          value={c.id}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={c.logo}
+                              alt={c.id}
+                              width={30}
+                              height={20}
+                              className="object-contain"
+                            />
+                            <span className="uppercase">
+                              {c.id === "amm" ? "Spedition" : c.id}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         <FormField

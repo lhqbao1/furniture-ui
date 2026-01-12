@@ -14,7 +14,6 @@ import ComparePriceSection from "@/components/layout/single-product/compare-pric
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { getBlogsByProductSlug } from "@/features/blog/api";
 import RelatedBlogs from "@/components/layout/single-product/related-blogs";
-import MobileStickyCart from "@/components/layout/single-product/sticky-cart-mobile";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -34,12 +33,17 @@ export async function generateStaticParams() {
   const products = await getProductsFeed();
   const locales = ["de"];
 
-  return products.flatMap((p) =>
-    locales.map((locale) => ({
-      locale,
-      slug: [p.url_key],
-    })),
-  );
+  return products
+    .filter(
+      (p) =>
+        p?.url_key && typeof p.url_key === "string" && p.url_key.length > 0,
+    )
+    .flatMap((p) =>
+      locales.map((locale) => ({
+        locale,
+        slug: [p.url_key],
+      })),
+    );
 }
 
 /* --------------------------------------------------------

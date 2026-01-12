@@ -69,8 +69,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// export const dynamic = "force-dynamic";
+// export const revalidate = 0;
 
 export default function RootLayout({
   children,
@@ -80,10 +80,10 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
-        <meta
+        {/* <meta
           name="apple-mobile-web-app-capable"
           content="no"
-        />
+        /> */}
         <Script
           id="gtag-stub"
           strategy="beforeInteractive"
@@ -281,6 +281,7 @@ export default function RootLayout({
           <TrustedShops />
           <QueryProvider>{children}</QueryProvider>
         </Providers>
+
         <Toaster
           expand
           richColors

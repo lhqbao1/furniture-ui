@@ -89,7 +89,7 @@ const VariableCostTable = ({
             className="border-t"
           >
             <td className="px-4 py-2 capitalize">
-              {row.marketplace.replace("_", " ")}
+              {row.marketplace.replace("_", " ") ?? ""}
             </td>
 
             <td className="px-4 py-2 text-right">{row.orders}</td>

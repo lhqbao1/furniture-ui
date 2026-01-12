@@ -30,6 +30,7 @@ import { ProductItem } from "@/types/products";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
 import ExportOrderExcelButton from "./export-button";
+import OrderImport from "./order-import";
 
 export enum ToolbarType {
   product = "product",
@@ -134,6 +135,7 @@ export default function OrderToolbar({
 
         <div className="flex gap-2 text-sm font-medium">
           <ExportOrderExcelButton />
+          <OrderImport />
         </div>
       </div>
 
