@@ -40,9 +40,6 @@ const FilterExportForm = () => {
     if (supplier === "") {
       // all suppliers → do not send supplier_id
       supplier_id = undefined;
-    } else if (supplier === "prestige_home") {
-      // prestige → explicitly null
-      supplier_id = "null";
     } else {
       supplier_id = supplier; // actual supplier id
     }

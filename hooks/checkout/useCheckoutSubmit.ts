@@ -147,6 +147,7 @@ export function useCheckoutSubmit({
           cleanupNeeded = true;
 
           localStorage.setItem("access_token", newUser.access_token);
+          localStorage.setItem("user_id", newUser.id);
           setUserGuestId(newUser.id);
           // setUserLoginId(newUser.id);
         }
@@ -293,6 +294,9 @@ export function useCheckoutSubmit({
         setCheckoutId("");
         // form.reset();
         cleanupNeeded = true;
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("userIdGuest");
+        localStorage.removeItem("access_token");
       } finally {
         const guestId = localStorage.getItem("userIdGuest");
 
