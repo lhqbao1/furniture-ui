@@ -544,8 +544,6 @@ export default function CheckoutPaymentLogic({
       return;
     }
 
-    console.log("payment");
-
     // ======================
     // CREATE NEW PAYMENT REQUEST
     // ======================
@@ -557,12 +555,8 @@ export default function CheckoutPaymentLogic({
       requestPayerName: true,
     });
 
-    console.log("has payment");
-
     // gán vào ref
     paymentRequestRef.current = pr;
-
-    console.log(pr);
 
     // CHECK SUPPORT
     pr.canMakePayment().then((res) => {

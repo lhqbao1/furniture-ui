@@ -24,46 +24,6 @@ export function TrustedShopsCheckout({
   estimatedDeliveryDate,
   products,
 }: TrustedShopsCheckoutProps) {
-  const sentRef = useRef(false);
-
-  const sendTrustedShops = () => {
-    if (sentRef.current) return;
-    sentRef.current = true;
-
-    window._ts = window._ts || [];
-
-    //SERVICE REVIEW (ORDER)
-    window._ts.push([
-      "_ec.Order",
-      {
-        order_id: orderNumber,
-        order_amount: amount.toFixed(2),
-        order_currency: currency,
-        order_paymentType: mapTrustedShopsPaymentType(paymentType),
-        order_estimatedDeliveryDate: estimatedDeliveryDate,
-        email: buyerEmail,
-      },
-    ]);
-
-    //PRODUCT REVIEWS
-    products.forEach((p) => {
-      window._ts!.push([
-        "_ec.Product",
-        {
-          id: p.sku,
-          name: p.name,
-          url: `https://prestige-home.de/de/product/${p.url_key}`,
-          imageUrl: p.static_files?.[0]?.url,
-          gtin: p.ean,
-          brand: p.brand?.name,
-        },
-      ]);
-    });
-
-    //OPEN TRUSTCARD
-    window._ts.push(["_ec.Show"]);
-  };
-
   return (
     <>
       <div

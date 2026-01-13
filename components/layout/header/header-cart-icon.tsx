@@ -17,9 +17,11 @@ const HeaderCartIcon = () => {
     queryFn: getCartItems,
     enabled: !!userId,
   });
+
   const displayedCart = userId
     ? cart?.reduce((count, group) => count + group.items.length, 0) ?? 0
     : localCart.length;
+
   return (
     <Link
       href={`/cart`}

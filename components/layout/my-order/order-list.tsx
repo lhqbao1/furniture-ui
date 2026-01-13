@@ -53,8 +53,6 @@ import CancelOrderDialog from "./cancel-dialog";
 const OrderList = () => {
   const [userId, setUserId] = useAtom(userIdAtom);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [showContactDialog, setShowContactDialog] = useState(false);
-  const [contactOrderId, setContactOrderId] = useAtom(contactOrderIdAtom);
   const t = useTranslations();
   const router = useRouter();
   const locale = useLocale();
