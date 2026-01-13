@@ -49,6 +49,7 @@ import {
 import OrderDetailsDrawer from "./details-drawer";
 import { useCancelMainCheckout } from "@/features/checkout/hook";
 import CancelOrderDialog from "./cancel-dialog";
+import { OrderListSkeleton } from "./skeleton";
 
 const OrderList = () => {
   const [userId, setUserId] = useAtom(userIdAtom);
@@ -56,8 +57,6 @@ const OrderList = () => {
   const t = useTranslations();
   const router = useRouter();
   const locale = useLocale();
-
-  const cancelMutation = useCancelMainCheckout();
 
   const {
     data: order,
@@ -82,6 +81,10 @@ const OrderList = () => {
   });
 
   const columns = useMyOrderTableColumns();
+
+  if (isLoadingOrder) {
+    return <OrderListSkeleton />;
+  }
 
   return (
     <div className="lg:w-1/2 mx-auto space-y-6">
@@ -229,9 +232,7 @@ const OrderList = () => {
                       <div className={cn("text-right text-lg")}>
                         {t("total")}: €
                         {(
-                          item.total_amount +
-                          item.total_shipping -
-                          item.voucher_amount
+                          item.total_amount - item.voucher_amount
                         ).toLocaleString("de-DE", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
