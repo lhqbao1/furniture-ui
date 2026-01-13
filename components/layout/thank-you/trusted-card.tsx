@@ -82,8 +82,42 @@ export function TrustedShopsCheckout({
         onLoad={sendTrustedShops}
       />
 
-      {/*CONTAINER */}
-      <div id="trustedshops_checkout" />
+      <div
+        id="trustedShopsCheckout"
+        style={{ display: "none" }}
+      >
+        <span id="tsCheckoutOrderNr">{orderNumber}</span>
+        <span id="tsCheckoutBuyerEmail">{buyerEmail}</span>
+        <span id="tsCheckoutOrderAmount">
+          {amount.toLocaleString("DE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </span>
+        <span id="tsCheckoutOrderCurrency">EUR</span>
+        <span id="tsCheckoutOrderPaymentType">{paymentType}</span>
+        <span id="tsCheckoutOrderEstDeliveryDate">{estimatedDeliveryDate}</span>
+
+        {products.map((item, index) => {
+          return (
+            <span className="tsCheckoutProductItem">
+              <span className="tsCheckoutProductUrl">{item.url_key ?? ""}</span>
+              <span className="tsCheckoutProductImageUrl">
+                {item.static_files && item.static_files.length > 0
+                  ? item.static_files[0].url
+                  : ""}
+              </span>
+              <span className="tsCheckoutProductName">{item.name}</span>
+              <span className="tsCheckoutProductSKU">{item.id_provider}</span>
+              <span className="tsCheckoutProductGTIN">{item.ean}</span>
+              {/* <span className="tsCheckoutProductMPN">0123456789</span> */}
+              <span className="tsCheckoutProductBrand">
+                {item.brand ? item.brand.name : "Prestige Home"}
+              </span>
+            </span>
+          );
+        })}
+      </div>
     </>
   );
 }
