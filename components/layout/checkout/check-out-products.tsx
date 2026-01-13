@@ -50,7 +50,7 @@ const CheckoutProducts = ({
             />
           ))
         )
-      ) : cartItems && cartItems.length > 0 ? (
+      ) : userId && cartItems && cartItems.length > 0 ? (
         <CartTable
           isLoadingCart={isLoadingCart}
           cart={

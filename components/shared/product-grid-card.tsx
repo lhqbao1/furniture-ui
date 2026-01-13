@@ -184,6 +184,7 @@ export default function ProductCard({
             <ProductBrand
               brand={product.brand.name}
               brand_image={product.brand ? product.brand.img_url : ""}
+              isProductDetail={isProductDetails}
             />
             <Link
               href={`/product/${product.url_key}`}

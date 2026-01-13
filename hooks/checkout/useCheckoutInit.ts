@@ -1,7 +1,6 @@
 // hooks/checkout/useCheckoutInit.ts
 "use client";
 
-import { useEffect, useState } from "react";
 import { useCartLocal } from "@/hooks/cart";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@/types/user";
@@ -29,6 +28,13 @@ export function useCheckoutInit() {
     queryKey: ["user", finalUserId],
     queryFn: () => getUserById(finalUserId ?? ""),
     enabled: !!finalUserId,
+    retry: false,
+  });
+
+  const { data: realUser } = useQuery<User>({
+    queryKey: ["user", userLoginId],
+    queryFn: () => getUserById(userLoginId ?? ""),
+    enabled: !!userLoginId,
     retry: false,
   });
 
@@ -83,6 +89,7 @@ export function useCheckoutInit() {
 
   return {
     user,
+    realUser,
     addresses,
     invoiceAddress,
     cartItems,

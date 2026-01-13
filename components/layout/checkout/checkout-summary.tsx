@@ -265,7 +265,7 @@ const CheckoutSummary = ({
             </span>
             <span className="text-right col-span-2">
               €
-              {(cartItems && cartItems.length > 0
+              {(userLoginId && cartItems && cartItems.length > 0
                 ? cartItems
                     .flatMap((g) => g.items)
                     .filter((i) => i.is_active)

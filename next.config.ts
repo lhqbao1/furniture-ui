@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_APP_VERSION:
+      process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev",
+  },
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: [],
