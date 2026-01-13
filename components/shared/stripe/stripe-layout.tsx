@@ -53,7 +53,7 @@ export default function StripeLayout({
         return_url: `https://prestige-home.de/${locale}/thank-you`,
       });
 
-      if (error) toast.error(error.message + "heheh");
+      if (error) toast.error(error.message);
     };
 
     autoKlarna();

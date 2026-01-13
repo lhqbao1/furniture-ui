@@ -13,7 +13,6 @@ import { CheckOut, CheckOutMain } from "@/types/checkout";
 import { useLocale, useTranslations } from "next-intl";
 import { formatDate } from "@/lib/date-formated";
 import { InvoiceResponse } from "@/types/invoice";
-import { formatDateDE } from "@/lib/format-date-DE";
 import Image from "next/image";
 import { formatDateToNum } from "@/lib/ios-to-num";
 import { getTrackingUrl } from "@/lib/tracking/get-tracking-url";

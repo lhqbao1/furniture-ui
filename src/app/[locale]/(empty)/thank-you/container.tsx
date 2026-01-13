@@ -42,14 +42,12 @@ const OrderPlaced = () => {
   const [userId, setUserId] = useAtom(userIdAtom);
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
-  const [voucherId, setVoucherId] = useAtom(currentVoucherAtom);
   const [trustedShopData, setTrustedShopData] =
     useState<TrustedShopsCheckoutProps | null>(null);
 
   const capturePaymentMutation = useCapturePayment();
   const uploadStaticFileMutation = useUploadStaticFile();
   const sendMailMutation = useSendMail();
-  const useVoucherMutation = useUseVoucher();
 
   const t = useTranslations();
 
