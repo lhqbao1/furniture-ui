@@ -21,6 +21,20 @@ const ProductBrand = ({ brand, brand_image }: ProductBrandProps) => {
           width={50}
           height={50}
           alt=""
+          className="h-[40px] w-auto object-cover rounded-sm cursor-pointer hover:scale-105 transition-all duration-300"
+          onClick={() => {
+            if (!brand) return;
+
+            router.push(
+              {
+                pathname: "/shop-all",
+                query: {
+                  brand: brand,
+                },
+              },
+              { locale },
+            );
+          }}
         />
       ) : (
         <p

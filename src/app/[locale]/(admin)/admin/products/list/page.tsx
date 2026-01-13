@@ -55,6 +55,25 @@ const ProductList = () => {
     });
   }, [page]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    let changed = false;
+
+    if (params.get("all_products") === null) {
+      params.set("all_products", "true");
+      changed = true;
+    }
+
+    if (params.get("supplier_id") === null) {
+      params.set("supplier_id", "prestige_home");
+      changed = true;
+    }
+
+    if (changed) {
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+  }, [searchParams, router]);
+
   if (isError) return <div>No data</div>;
 
   return (
