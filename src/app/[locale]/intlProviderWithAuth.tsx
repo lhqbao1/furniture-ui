@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { NextIntlClientProvider } from "next-intl";
 import { authHydratedAtom } from "@/store/auth";
+import { useCheckAppVersion } from "@/hooks/useCheckVersion";
 
 type Props = React.ComponentProps<typeof NextIntlClientProvider>;
 
@@ -12,6 +13,7 @@ export default function IntlClientProviderWithAuth({
   ...props
 }: Props) {
   const [, setAuthHydrated] = useAtom(authHydratedAtom);
+  useCheckAppVersion();
 
   useEffect(() => {
     setAuthHydrated(true);

@@ -80,6 +80,11 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__APP_VERSION__ = "${process.env.NEXT_PUBLIC_APP_VERSION}";`,
+          }}
+        />
         {/* <meta
           name="apple-mobile-web-app-capable"
           content="no"
