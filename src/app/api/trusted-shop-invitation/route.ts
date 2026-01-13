@@ -24,7 +24,7 @@ export async function GET() {
       reference: "#100126-0005",
       firstName: "Nguyen",
       lastName: "Linh",
-      transactionDate: "10.01.2026",
+      transactionDate: "10.01.2026, 18:39",
       productName:
         "Klappbarer Liegestuhl Adirondack aus Akazie, ca. 84 x 69 x 93 cm - Braun",
       productSku: "1000041",
