@@ -394,7 +394,7 @@ const Footer = () => {
         </div>
 
         <div className="text-sm mt-2 text-center">
-          Copyright © 2025 Prestige Home Gmbh. All Rights Reserved
+          Copyright © 2025 Prestige Home Gmbh. All Rights Reserved.
         </div>
       </div>
     </footer>
