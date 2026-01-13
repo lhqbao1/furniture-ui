@@ -104,7 +104,7 @@ export default function CheckOutFormSection() {
 
   const totalEuro = useMemo(() => {
     const productsTotal =
-      cartItems && cartItems.length > 0
+      userLoginId && cartItems && cartItems.length > 0
         ? cartItems
             .flatMap((g) => g.items)
             .filter((i) => i.is_active)
