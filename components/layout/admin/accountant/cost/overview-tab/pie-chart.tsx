@@ -72,7 +72,7 @@ export function ChartPieLabelList({
     <div>
       <ChartContainer
         config={chartConfig}
-        className="mx-auto aspect-square max-h-[350px] w-[400px] pb-0"
+        className="mx-auto aspect-square max-h-[350px] xl:w-[400px] w-full pb-0"
       >
         <PieChart>
           <ChartTooltip

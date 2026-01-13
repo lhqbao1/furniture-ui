@@ -46,12 +46,13 @@ export async function getAllProductsSelect({
 }) {
   const { data } = await apiPublic.get("/products/all", {
     params: {
-      ...(search ? { search } : {}),
+      ...(search !== undefined ? { search } : {}),
       is_customer,
-      ...(all_products ? { all_products } : {}),
-      ...(is_econelo ? { is_econelo } : {}),
+      all_products,
       is_econelo,
-      ...(supplier_id ? { supplier_id } : {}),
+      ...(supplier_id !== undefined && supplier_id !== null
+        ? { supplier_id }
+        : {}),
     },
     headers: {
       "Content-Type": "application/json",

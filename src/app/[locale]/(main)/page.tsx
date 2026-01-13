@@ -32,8 +32,6 @@ export default async function HomePage() {
       <div className="md:w-[95%] xl:w-3/4 w-[95%]">
         {" "}
         {/* CRITICAL FIRST PAINT */}
-        {/* <RecentViewed products={trendingProducts} /> */}
-        {/* <VoucherSection vouchers={voucherList} /> */}
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <FeaturedProducts products={allProducts} />
         </Suspense>

@@ -66,22 +66,6 @@ export function TrustedShopsCheckout({
 
   return (
     <>
-      {/*INIT QUEUE */}
-      <Script
-        id="ts-init"
-        strategy="beforeInteractive"
-        dangerouslySetInnerHTML={{
-          __html: "window._ts = window._ts || [];",
-        }}
-      />
-
-      {/*TRUSTED SHOPS SCRIPT */}
-      <Script
-        src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
-        strategy="afterInteractive"
-        onLoad={sendTrustedShops}
-      />
-
       <div
         id="trustedShopsCheckout"
         style={{ display: "none" }}

@@ -47,7 +47,7 @@ export function ChartBarMultiple({ data }: ChartBarMultipleProps) {
     <div>
       <ChartContainer
         config={chartConfig}
-        className="p-3"
+        className="xl:p-3"
       >
         <BarChart
           data={chartData}
