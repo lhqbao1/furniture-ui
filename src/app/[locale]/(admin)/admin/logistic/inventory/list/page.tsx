@@ -2,6 +2,7 @@
 
 import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
+import InventoryTimeLine from "@/components/layout/admin/inventory/time-line";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllProducts } from "@/features/products/hook";
@@ -58,6 +59,8 @@ const AdminInventoryList = () => {
         addButtonUrl="/admin/products/add"
         setPage={setPage}
       />
+
+      <InventoryTimeLine />
 
       {isLoading ? (
         <ProductTableSkeleton />
