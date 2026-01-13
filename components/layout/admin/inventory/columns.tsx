@@ -153,18 +153,16 @@ export const getInventoryColumns = (
               className="w-full flex flex-row-reverse items-center justify-end gap-1"
             >
               {/* INFO */}
-              <div className="flex justify-center items-center divide-x divide-gray-300 text-sm">
-                <span className="px-2">{item.incoming_stock} pcs</span>
-                <span className="px-2">
-                  {formatIOSDate(item.date_received)}
-                </span>
-                <span className="px-2">
+              <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
+                <div className="">{item.incoming_stock} pcs</div>
+                <div className="">{formatIOSDate(item.date_received)}</div>
+                <div className="">
                   €
                   {item.cost_received.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                </span>
+                </div>
               </div>
 
               {/* ACTIONS */}
@@ -239,14 +237,18 @@ export const getInventoryColumns = (
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          €
-          {row.original.final_price
-            ? row.original.final_price.toLocaleString("de-DE", {
+          {row.original.final_price ? (
+            <div>
+              €
+              {row.original.final_price.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })
-            : "Updating"}
-          /pcs
+              })}
+              /pcs
+            </div>
+          ) : (
+            "Updating"
+          )}
         </div>
       );
     },
