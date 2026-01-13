@@ -1,10 +1,23 @@
 "use client";
 
+import { useCheckAppVersion } from "@/hooks/useCheckVersion";
 import { useEffect } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useCheckAppVersion();
+
   useEffect(() => {
     const handler = (e: any) => {
+      const pathname = window.location.pathname;
+
+      // ❗ guard checkout / thank-you
+      if (
+        pathname.startsWith("/check-out") ||
+        pathname.startsWith("/thank-you")
+      ) {
+        return;
+      }
+
       const msg = e?.reason?.message || e?.message || "";
 
       if (
@@ -16,7 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         const key = "chunk-reloaded";
         if (!sessionStorage.getItem(key)) {
           sessionStorage.setItem(key, "1");
-          location.reload();
+          window.location.reload();
         }
       }
     };

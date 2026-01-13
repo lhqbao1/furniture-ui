@@ -6,9 +6,20 @@ export function useCheckAppVersion() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("/version.json", {
-          cache: "no-cache",
-        });
+        // guard pages
+        const pathname = window.location.pathname;
+        if (
+          pathname.startsWith("/checkout") ||
+          pathname.startsWith("/order/thank-you")
+        ) {
+          return;
+        }
+
+        if (document.hidden || !navigator.onLine) {
+          return;
+        }
+
+        const res = await fetch("/version.json", { cache: "no-cache" });
         const data = await res.json();
 
         // @ts-ignore
@@ -19,7 +30,7 @@ export function useCheckAppVersion() {
       } catch (err) {
         console.warn("Failed to check version:", err);
       }
-    }, 10000); // 10s poll
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);

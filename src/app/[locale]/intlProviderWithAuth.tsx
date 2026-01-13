@@ -13,7 +13,6 @@ export default function IntlClientProviderWithAuth({
   ...props
 }: Props) {
   const [, setAuthHydrated] = useAtom(authHydratedAtom);
-  useCheckAppVersion();
 
   useEffect(() => {
     setAuthHydrated(true);
