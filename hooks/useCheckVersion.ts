@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 
 export function useCheckAppVersion() {
+  if (process.env.NODE_ENV === "development") return;
+
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
