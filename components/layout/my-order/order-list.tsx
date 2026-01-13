@@ -49,6 +49,7 @@ import {
 import OrderDetailsDrawer from "./details-drawer";
 import { useCancelMainCheckout } from "@/features/checkout/hook";
 import CancelOrderDialog from "./cancel-dialog";
+import { OrderListSkeleton } from "./skeleton";
 
 const OrderList = () => {
   const [userId, setUserId] = useAtom(userIdAtom);
@@ -81,7 +82,9 @@ const OrderList = () => {
 
   const columns = useMyOrderTableColumns();
 
-  console.log(order);
+  if (isLoadingOrder) {
+    return <OrderListSkeleton />;
+  }
 
   return (
     <div className="lg:w-1/2 mx-auto space-y-6">
