@@ -21,9 +21,17 @@ export function useGetProductsSelect(params?: {
   is_customer?: boolean;
   all_products?: boolean;
   is_econelo?: boolean;
+  supplier_id?: string;
 }) {
   return useQuery({
-    queryKey: ["all-products", params],
+    queryKey: [
+      "all-products",
+      params?.search,
+      params?.is_customer,
+      params?.all_products,
+      params?.is_econelo,
+      params?.supplier_id,
+    ],
     queryFn: () => getAllProductsSelect(params ?? {}),
   });
 }

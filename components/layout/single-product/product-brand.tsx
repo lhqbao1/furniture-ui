@@ -2,34 +2,47 @@
 import { useRouter } from "@/src/i18n/navigation";
 import { ProductItem } from "@/types/products";
 import { useLocale } from "next-intl";
+import Image from "next/image";
 import React from "react";
 
 interface ProductBrandProps {
   brand: string;
+  brand_image: string;
 }
 
-const ProductBrand = ({ brand }: ProductBrandProps) => {
+const ProductBrand = ({ brand, brand_image }: ProductBrandProps) => {
   const router = useRouter();
   const locale = useLocale();
   return (
-    <p
-      className="uppercase text-xs md:text-sm cursor-pointer text-black/50 font-bold hover:text-secondary"
-      onClick={() => {
-        if (!brand) return;
+    <>
+      {brand_image ? (
+        <Image
+          src={brand_image}
+          width={50}
+          height={50}
+          alt=""
+        />
+      ) : (
+        <p
+          className="uppercase text-xs md:text-sm cursor-pointer text-black/50 font-bold hover:text-secondary"
+          onClick={() => {
+            if (!brand) return;
 
-        router.push(
-          {
-            pathname: "/shop-all",
-            query: {
-              brand: brand,
-            },
-          },
-          { locale },
-        );
-      }}
-    >
-      {brand}
-    </p>
+            router.push(
+              {
+                pathname: "/shop-all",
+                query: {
+                  brand: brand,
+                },
+              },
+              { locale },
+            );
+          }}
+        >
+          {brand}
+        </p>
+      )}
+    </>
   );
 };
 

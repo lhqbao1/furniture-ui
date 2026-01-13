@@ -77,19 +77,21 @@ const OverViewTab = () => {
         <CardDescription>Revenue by marketplace</CardDescription>
       </CardHeader>
 
-      <CardContent>
-        <div className="space-y-6 grid grid-cols-2 gap-6">
-          <ChartPieLabelList
-            data={currentData.data}
-            total={currentData.grand_total_amount}
-            previousTotal={previousData.grand_total_amount}
-            hasPrevious={fromDateParam && endDateParam ? true : false}
-          />
+      <CardContent className="xl:px-6 px-2">
+        <div className="xl:space-y-6 space-y-12 grid grid-cols-1 2xl:grid-cols-2 xl:gap-6 gap-0">
+          <div className="col-span-1">
+            <ChartPieLabelList
+              data={currentData.data}
+              total={currentData.grand_total_amount}
+              previousTotal={previousData.grand_total_amount}
+              hasPrevious={fromDateParam && endDateParam ? true : false}
+            />
+          </div>
 
           <ChartBarMultiple data={currentData.data} />
 
-          <div className="col-span-2">
-            <div className="w-1/2 mx-auto">
+          <div className="2xl:col-span-2">
+            <div className="xl:w-1/2 w-full mx-auto">
               <MonthlyChart />
             </div>
           </div>

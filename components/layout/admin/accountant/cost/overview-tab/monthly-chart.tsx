@@ -22,6 +22,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useCheckoutDashboardLast6Months } from "@/features/checkout/hook";
+import { useMediaQuery } from "react-responsive";
 
 interface ChartData {
   month: string;
@@ -103,6 +104,9 @@ function OrdersLabel({
 }
 
 export function MonthlyChart() {
+  const isMobile = useMediaQuery({
+    maxWidth: 768,
+  });
   const { chartData, isLoading } = useCheckoutDashboardLast6Months();
 
   if (isLoading) {
@@ -116,7 +120,7 @@ export function MonthlyChart() {
         <CardDescription>Revenue & Orders</CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="xl:px-6 px-2">
         <ChartContainer
           config={{
             total: {
@@ -131,7 +135,11 @@ export function MonthlyChart() {
         >
           <LineChart
             data={chartData}
-            margin={{ top: 30, left: 40, right: 40 }}
+            margin={
+              isMobile
+                ? { top: 16, left: 0, right: 0 }
+                : { top: 30, left: 40, right: 40 }
+            }
           >
             <CartesianGrid vertical={false} />
 

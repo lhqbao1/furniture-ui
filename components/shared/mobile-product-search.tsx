@@ -41,6 +41,8 @@ export default function MobileProductSearch() {
 
   const { data: products, isLoading } = useGetProductsSelect({
     search: debouncedQuery,
+    is_econelo: false,
+    all_products: true,
   });
   const results = products ?? [];
 
@@ -62,7 +64,7 @@ export default function MobileProductSearch() {
             />
           </div>
         </DrawerTrigger>
-        <DrawerContent className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500">
+        <DrawerContent className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500 overflow-hidden">
           <DrawerTitle className="border-b-2 p-4 flex justify-between">
             <div className="uppercase font-bold text-xl">
               {t("searchProduct")}
