@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetSuppliers } from "@/features/supplier/hook";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SupplierSelect from "../supplier-select";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { SupplierResponse } from "@/types/supplier";
@@ -11,9 +11,19 @@ const SupplierFilter = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [supplier, setSupplier] = useState<string>(
-    searchParams.get("supplier_id") ?? "",
+  const [supplier, setSupplier] = useState(
+    searchParams.get("supplier_id") ?? "prestige_home",
   );
+
+  useEffect(() => {
+    const raw = searchParams.get("supplier_id");
+
+    if (raw === null) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("supplier_id", "prestige_home");
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const { data: suppliers } = useGetSuppliers();
   if (!suppliers) return <>Loading...</>;

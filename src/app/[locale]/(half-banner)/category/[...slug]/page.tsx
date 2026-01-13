@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getCategoryBySlug } from "@/features/category/api";
 import ProductCategory from "@/components/layout/category/category-page";
 import { getCategoryCached } from "@/features/category/api-server";
+import ShopAllFilterSection from "@/components/layout/shop-all/shop-all-filter-section";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;

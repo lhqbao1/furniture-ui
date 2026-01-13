@@ -473,5 +473,6 @@
     "receivedMoreItems": "Received more items than ordered",
     "noReason": "No reason given"
   },
-  "orderProcessingMessage": "Your order is being processed. This may take a moment. Please remain on this page."
+  "orderProcessingMessage": "Your order is being processed. This may take a moment. Please remain on this page.",
+  "noProducts": "No product found"
 }

@@ -13,7 +13,13 @@ import FilterListMaterials from "./filter-list-material";
 import PriceRangeFilter from "./filter-price-range";
 import FilterListDeliveryTime from "./filter-delivery-time";
 
-const ShopAllFilterSection = () => {
+interface ShopAllFilterSectionProps {
+  isShopAll?: boolean;
+}
+
+const ShopAllFilterSection = ({
+  isShopAll = true,
+}: ShopAllFilterSectionProps) => {
   const t = useTranslations();
   return (
     <aside>
@@ -22,22 +28,25 @@ const ShopAllFilterSection = () => {
         className="w-full space-y-8 border-r border-black"
         defaultValue={["category"]} // ✅
       >
-        <AccordionItem
-          value="category"
-          className="border-black"
-        >
-          <AccordionTrigger
-            className="pr-4"
-            iconClassName="size-7 text-black"
+        {isShopAll && (
+          <AccordionItem
+            value="category"
+            className="border-black"
           >
-            <span className="text-black font-bold text-xl">
-              {t("categories")}
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-4 text-balance">
-            <FilterListCategories />
-          </AccordionContent>
-        </AccordionItem>
+            <AccordionTrigger
+              className="pr-4"
+              iconClassName="size-7 text-black"
+            >
+              <span className="text-black font-bold text-xl">
+                {t("categories")}
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="flex flex-col gap-4 text-balance">
+              <FilterListCategories />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
         <AccordionItem
           value="brand"
           className="border-black"
