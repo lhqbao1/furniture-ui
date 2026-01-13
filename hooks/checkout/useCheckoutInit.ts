@@ -69,7 +69,8 @@ export function useCheckoutInit() {
     retry: false,
   });
 
-  const hasServerCart = Array.isArray(cartItems) && cartItems.length > 0;
+  const hasServerCart =
+    !!userLoginId && Array.isArray(cartItems) && cartItems.length > 0;
 
   const normalized = normalizeCartItems(
     hasServerCart ? cartItems.flatMap((g) => g.items) : localCart,

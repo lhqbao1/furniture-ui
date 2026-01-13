@@ -31,15 +31,22 @@ export function useCartData() {
     enabled: !!userId,
     queryFn: async () => {
       const response = await getCartItems();
-      return [...response].sort((a, b) => {
-        const latestA = Math.max(
-          ...a.items.map((i) => new Date(i.created_at).getTime()),
-        );
-        const latestB = Math.max(
-          ...b.items.map((i) => new Date(i.created_at).getTime()),
-        );
-        return latestB - latestA;
-      });
+      const safe = Array.isArray(response) ? response : [];
+
+      return safe
+        .map((g) => ({
+          ...g,
+          items: Array.isArray(g.items) ? g.items : [],
+        }))
+        .sort((a, b) => {
+          const latestA = Math.max(
+            ...(a.items.map((i) => new Date(i.created_at).getTime()) ?? [0]),
+          );
+          const latestB = Math.max(
+            ...(b.items.map((i) => new Date(i.created_at).getTime()) ?? [0]),
+          );
+          return latestB - latestA;
+        });
     },
   });
 
@@ -49,6 +56,10 @@ export function useCartData() {
   );
 
   const total = useMemo(() => {
+    if (userId) {
+      if (!cart || isLoadingCart) return 0;
+    }
+
     if (userId && cart) {
       return cart
         .flatMap((g) => g.items)

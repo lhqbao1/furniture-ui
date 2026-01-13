@@ -5,7 +5,6 @@ import { useRef } from "react";
 import { mapTrustedShopsPaymentType } from "@/hooks/map-payment-method";
 import { ProductItem } from "@/types/products";
 
-/* ⛔ GIỮ NGUYÊN – KHÔNG ĐỤNG */
 export interface TrustedShopsCheckoutProps {
   orderNumber: string;
   buyerEmail: string;
@@ -31,10 +30,9 @@ export function TrustedShopsCheckout({
     if (sentRef.current) return;
     sentRef.current = true;
 
-    // 🔑 luôn init trước
     window._ts = window._ts || [];
 
-    // 1️⃣ SERVICE REVIEW (ORDER)
+    //SERVICE REVIEW (ORDER)
     window._ts.push([
       "_ec.Order",
       {
@@ -47,7 +45,7 @@ export function TrustedShopsCheckout({
       },
     ]);
 
-    // 2️⃣ PRODUCT REVIEWS (GIỮ NGUYÊN LOGIC CŨ)
+    //PRODUCT REVIEWS
     products.forEach((p) => {
       window._ts!.push([
         "_ec.Product",
@@ -62,13 +60,13 @@ export function TrustedShopsCheckout({
       ]);
     });
 
-    // 3️⃣ OPEN TRUSTCARD
+    //OPEN TRUSTCARD
     window._ts.push(["_ec.Show"]);
   };
 
   return (
     <>
-      {/* 🔑 INIT QUEUE – BẮT BUỘC */}
+      {/*INIT QUEUE */}
       <Script
         id="ts-init"
         strategy="beforeInteractive"
@@ -77,15 +75,49 @@ export function TrustedShopsCheckout({
         }}
       />
 
-      {/* 🔑 TRUSTED SHOPS SCRIPT */}
+      {/*TRUSTED SHOPS SCRIPT */}
       <Script
         src="https://widgets.trustedshops.com/js/XDA9856CEB99C2BDF63BF8E9EF89A20FE.js"
         strategy="afterInteractive"
         onLoad={sendTrustedShops}
       />
 
-      {/* 🔑 CONTAINER */}
-      <div id="trustedshops_checkout" />
+      <div
+        id="trustedShopsCheckout"
+        style={{ display: "none" }}
+      >
+        <span id="tsCheckoutOrderNr">{orderNumber}</span>
+        <span id="tsCheckoutBuyerEmail">{buyerEmail}</span>
+        <span id="tsCheckoutOrderAmount">
+          {amount.toLocaleString("DE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </span>
+        <span id="tsCheckoutOrderCurrency">EUR</span>
+        <span id="tsCheckoutOrderPaymentType">{paymentType}</span>
+        <span id="tsCheckoutOrderEstDeliveryDate">{estimatedDeliveryDate}</span>
+
+        {products.map((item, index) => {
+          return (
+            <span className="tsCheckoutProductItem">
+              <span className="tsCheckoutProductUrl">{item.url_key ?? ""}</span>
+              <span className="tsCheckoutProductImageUrl">
+                {item.static_files && item.static_files.length > 0
+                  ? item.static_files[0].url
+                  : ""}
+              </span>
+              <span className="tsCheckoutProductName">{item.name}</span>
+              <span className="tsCheckoutProductSKU">{item.id_provider}</span>
+              <span className="tsCheckoutProductGTIN">{item.ean}</span>
+              {/* <span className="tsCheckoutProductMPN">0123456789</span> */}
+              <span className="tsCheckoutProductBrand">
+                {item.brand ? item.brand.name : "Prestige Home"}
+              </span>
+            </span>
+          );
+        })}
+      </div>
     </>
   );
 }
