@@ -57,8 +57,6 @@ const OrderList = () => {
   const router = useRouter();
   const locale = useLocale();
 
-  const cancelMutation = useCancelMainCheckout();
-
   const {
     data: order,
     isLoading: isLoadingOrder,
@@ -82,6 +80,8 @@ const OrderList = () => {
   });
 
   const columns = useMyOrderTableColumns();
+
+  console.log(order);
 
   return (
     <div className="lg:w-1/2 mx-auto space-y-6">
@@ -229,9 +229,7 @@ const OrderList = () => {
                       <div className={cn("text-right text-lg")}>
                         {t("total")}: €
                         {(
-                          item.total_amount +
-                          item.total_shipping -
-                          item.voucher_amount
+                          item.total_amount - item.voucher_amount
                         ).toLocaleString("de-DE", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
