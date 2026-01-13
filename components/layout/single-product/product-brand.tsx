@@ -8,14 +8,19 @@ import React from "react";
 interface ProductBrandProps {
   brand: string;
   brand_image: string;
+  isProductDetail?: boolean;
 }
 
-const ProductBrand = ({ brand, brand_image }: ProductBrandProps) => {
+const ProductBrand = ({
+  brand,
+  brand_image,
+  isProductDetail = false,
+}: ProductBrandProps) => {
   const router = useRouter();
   const locale = useLocale();
   return (
     <>
-      {brand_image ? (
+      {brand_image && isProductDetail === true ? (
         <Image
           src={brand_image}
           width={50}

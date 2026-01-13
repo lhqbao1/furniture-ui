@@ -72,6 +72,7 @@ const ProductDetails = ({
                     brand_image={
                       productDetails.brand ? productDetails.brand.img_url : ""
                     }
+                    isProductDetail
                   />
                   <h2 className="lg:text-3xl text-xl font-semibold text-black">
                     {productDetails.name}
