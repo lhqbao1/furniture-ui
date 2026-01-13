@@ -92,9 +92,7 @@ export function useCheckoutSubmit({
       try {
         const isDifferentEmail = user?.email && user.email !== data.email;
 
-        // Case 1: Guest
-        // Case 2: Logged-in user but email changed
-        if (!user?.id || isDifferentEmail) {
+        if (!userLoginId || isDifferentEmail) {
           await sendOtp(data.email);
           setPendingData(data);
           setOtpEmail(data.email);
@@ -147,7 +145,7 @@ export function useCheckoutSubmit({
           cleanupNeeded = true;
 
           localStorage.setItem("access_token", newUser.access_token);
-          localStorage.setItem("user_id", newUser.id);
+          // setUserLoginId(newUser.id);
           setUserGuestId(newUser.id);
           // setUserLoginId(newUser.id);
         }
@@ -294,8 +292,8 @@ export function useCheckoutSubmit({
         setCheckoutId("");
         // form.reset();
         cleanupNeeded = true;
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("userIdGuest");
+        setUserLoginId(null);
+        setUserGuestId(null);
         localStorage.removeItem("access_token");
       } finally {
         const guestId = localStorage.getItem("userIdGuest");
