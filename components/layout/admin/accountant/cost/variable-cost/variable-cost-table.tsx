@@ -1,6 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useVariableCost } from "./useVariableCost";
 import { GetVariableFeeByMarketplaceResponse } from "@/types/variable-fee";
+import { useAtom } from "jotai";
+import { variableCostAtom } from "@/store/variable";
 
 export interface MarketplaceCostRow {
   marketplace: string;
@@ -25,15 +27,24 @@ const mergeMarketplaceCostData = (
     .map((item) => {
       const feeData = variableFeeData[item.marketplace];
 
-      // ❌ marketplace không có variable fee
       if (!feeData || typeof feeData !== "object") return null;
+
+      const isPrestige = item.marketplace === "prestige_home";
+
+      const feePercent = isPrestige
+        ? feeData.total // % đúng nghĩa
+        : (item.total_amount * feeData.total) / 100; // tiền
+
+      const fee = isPrestige
+        ? (feeData.total / item.total_amount) * 100 // tiền
+        : feeData.total; // %
 
       return {
         marketplace: item.marketplace,
         orders: item.total_orders,
         grossRevenue: item.total_amount,
-        fee: feeData.total,
-        feePercent: (feeData.total / item.total_amount) * 100,
+        fee,
+        feePercent,
       };
     })
     .filter(Boolean) as MarketplaceCostRow[];
@@ -52,12 +63,14 @@ const VariableCostTable = ({
   setMonth,
   setYear,
 }: VariableCostTableProps) => {
+  const [variableCost, setVariableCost] = useAtom(variableCostAtom);
   const { variableFeeData, marketplaceData } = useVariableCost({
     month,
     year,
     setMonth,
     setYear,
   });
+
   const tableRows = useMemo(() => {
     if (!variableFeeData || !marketplaceData) return [];
 
@@ -66,6 +79,15 @@ const VariableCostTable = ({
       marketplaceData.data ?? [],
     );
   }, [variableFeeData, marketplaceData]);
+
+  const totalFeePercent = useMemo(
+    () => tableRows.reduce((sum, i) => sum + i.feePercent, 0),
+    [tableRows],
+  );
+
+  useEffect(() => {
+    setVariableCost(totalFeePercent);
+  }, [totalFeePercent, setVariableCost]);
 
   if (!variableFeeData || !marketplaceData) {
     return <>Loading...</>; // hoặc skeleton
@@ -77,8 +99,8 @@ const VariableCostTable = ({
           <th className="text-left px-4 py-2">Marketplace</th>
           <th className="text-right px-4 py-2">Orders</th>
           <th className="text-right px-4 py-2">Gross Revenue</th>
-          <th className="text-right px-4 py-2">Fee €</th>
           <th className="text-right px-4 py-2">Fee %</th>
+          <th className="text-right px-4 py-2">Fee €</th>
         </tr>
       </thead>
 
@@ -102,15 +124,15 @@ const VariableCostTable = ({
             </td>
 
             <td className="px-4 py-2 text-right text-destructive">
-              -
               {row.fee.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
+              %
             </td>
 
             <td className="px-4 py-2 text-right">
-              {row.feePercent.toFixed(2)}%
+              {row.feePercent.toFixed(2)}€
             </td>
           </tr>
         ))}

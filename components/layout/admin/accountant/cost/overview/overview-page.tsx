@@ -14,8 +14,12 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OverviewSkeleton } from "./skeleton";
 import { ProfitRevenueBarChart } from "./overview-chart";
+import { useAtom } from "jotai";
+import { variableCostAtom } from "@/store/variable";
+
 const OverviewPage = () => {
   const now = new Date();
+  const [variableCost, setVariableCost] = useAtom(variableCostAtom);
 
   const [month, setMonth] = useState<number>(now.getMonth() + 1);
   const [year, setYear] = useState<number>(now.getFullYear());
@@ -51,8 +55,7 @@ const OverviewPage = () => {
   const revenue = currentData?.grand_total_amount || 0;
   const productCost = data?.summary.total_cost || 0;
   const fixedCost = fixedFee?.total_fee || 0;
-  const variableCost =
-    typeof variableFeeData?.total === "number" ? variableFeeData.total : 0;
+
   const totalCost = productCost + fixedCost + variableCost;
   const profit = revenue - totalCost;
 

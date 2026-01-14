@@ -124,7 +124,16 @@ const ProductLogisticsGroup = ({
           control={form.control}
           name="carrier"
           render={({ field }) => {
-            const value = field.value === "spedition" ? "amm" : field.value;
+            let value = field.value;
+            if (value === "spedition") value = "amm"; // normalize import/DB
+
+            const mergedCarriers = (isDSP ? DSPcarriers : carriers)
+              .filter((c) => c.id !== "spedition") // hide legacy
+              .map((c) =>
+                c.id === "amm"
+                  ? { ...c, label: "Spedition" } // UI label
+                  : { ...c, label: c.id.toUpperCase() },
+              );
 
             return (
               <FormItem className="flex flex-col w-full">
@@ -134,7 +143,11 @@ const ProductLogisticsGroup = ({
                 <FormControl>
                   <Select
                     value={value ?? ""}
-                    onValueChange={(val) => field.onChange(val)}
+                    onValueChange={(val) => {
+                      // normalize output canonical
+                      if (val === "spedition") val = "amm";
+                      field.onChange(val);
+                    }}
                   >
                     <SelectTrigger
                       placeholderColor
@@ -143,7 +156,7 @@ const ProductLogisticsGroup = ({
                       <SelectValue placeholder="Select carrier" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(isDSP ? DSPcarriers : carriers).map((c) => (
+                      {mergedCarriers.map((c) => (
                         <SelectItem
                           key={c.id}
                           value={c.id}
@@ -156,9 +169,7 @@ const ProductLogisticsGroup = ({
                               height={20}
                               className="object-contain"
                             />
-                            <span className="uppercase">
-                              {c.id === "amm" ? "Spedition" : c.id}
-                            </span>
+                            <span className="uppercase">{c.label}</span>
                           </div>
                         </SelectItem>
                       ))}

@@ -17,6 +17,8 @@ import {
 import { ProviderItem, ProviderOverviewResponse } from "@/types/checkout";
 import { useCallback, useMemo } from "react";
 import { productMarginColumns } from "./columns";
+import { useAtom } from "jotai";
+import { variableCostAtom } from "@/store/variable";
 
 interface ProductMarginTableProps {
   data: ProviderOverviewResponse;
@@ -29,6 +31,8 @@ export function ProductMarginTable({
   setOpen,
   setSelectedProviderId,
 }: ProductMarginTableProps) {
+  const [variableCost, setVariableCost] = useAtom(variableCostAtom);
+
   const handleOpenDrawer = useCallback(
     (id: string) => {
       setSelectedProviderId(id);
@@ -42,6 +46,7 @@ export function ProductMarginTable({
       productMarginColumns({
         onOpenDrawer: handleOpenDrawer,
         data: data.items,
+        variable_cost: variableCost,
       }),
     [handleOpenDrawer],
   );

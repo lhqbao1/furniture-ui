@@ -20,7 +20,7 @@ const DEFAULT_MARKETPLACES = [
 ];
 
 const DEFAULT_FEES_BY_MARKETPLACE: Record<string, string[]> = {
-  default: ["transaction", "ads", "additional"],
+  default: ["percent"],
 
   prestige_home: ["Spedition", "DPD", "stripe", "paypal"],
 };
