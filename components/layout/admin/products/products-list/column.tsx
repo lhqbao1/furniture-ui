@@ -656,6 +656,7 @@ export const getProductColumns = (
       );
     },
   },
+
   // ✅ Cột STOCK — thêm sort server-side logic ở đây
   {
     accessorKey: "stock",
@@ -733,6 +734,32 @@ export const getProductColumns = (
       <>
         {row.original.cost ? (
           <div className="text-right">€{row.original.cost.toFixed(2)}</div>
+        ) : (
+          <div className="text-center">—</div>
+        )}
+      </>
+    ),
+  },
+  {
+    accessorKey: "color",
+    header: () => <div className="text-center">COLOR</div>,
+    cell: ({ row }) => (
+      <>
+        {row.original.color ? (
+          <div className="text-right">{row.original.color}</div>
+        ) : (
+          <div className="text-center">—</div>
+        )}
+      </>
+    ),
+  },
+  {
+    accessorKey: "material",
+    header: () => <div className="text-center">MATERIAL</div>,
+    cell: ({ row }) => (
+      <>
+        {row.original.materials ? (
+          <div className="text-right">{row.original.materials}</div>
         ) : (
           <div className="text-center">—</div>
         )}

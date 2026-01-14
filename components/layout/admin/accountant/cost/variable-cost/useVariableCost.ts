@@ -21,8 +21,7 @@ const DEFAULT_MARKETPLACES = [
 
 const DEFAULT_FEES_BY_MARKETPLACE: Record<string, string[]> = {
   default: ["percent"],
-
-  prestige_home: ["Spedition", "DPD", "stripe", "paypal"],
+  prestige_home: ["percent"],
 };
 
 const getDefaultFees = (marketplace: string): string[] => {
