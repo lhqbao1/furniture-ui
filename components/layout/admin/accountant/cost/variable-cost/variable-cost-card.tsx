@@ -32,7 +32,7 @@ export function VariableMarketplaceCard({
             : ""}
         </div>
 
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <Input
             placeholder="Fee label (e.g. shipping_fedex)"
             value={newFeeType}
@@ -50,7 +50,7 @@ export function VariableMarketplaceCard({
           >
             <Plus className="h-4 w-4" />
           </Button>
-        </div>
+        </div> */}
       </CardHeader>
 
       <CardContent className="space-y-3">

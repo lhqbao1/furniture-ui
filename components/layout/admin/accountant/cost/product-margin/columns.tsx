@@ -4,11 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 interface ProviderColumnsProps {
   data: ProviderItem[];
   onOpenDrawer: (id: string) => void;
+  variable_cost: number;
 }
 
 export const productMarginColumns = ({
   data,
   onOpenDrawer,
+  variable_cost,
 }: ProviderColumnsProps): ColumnDef<ProviderItem>[] => {
   return [
     {
@@ -84,6 +86,34 @@ export const productMarginColumns = ({
     },
 
     {
+      accessorKey: "variable_cost",
+      size: 120,
+      header: () => (
+        <div className="text-center font-medium">Variable Cost</div>
+      ),
+      cell: ({ row }) => {
+        const revenue = row.original.total_amount;
+        const totalRevenue = data.reduce(
+          (sum, item) => sum + item.total_amount,
+          0,
+        );
+
+        const share = totalRevenue > 0 ? revenue / totalRevenue : 0;
+        const allocated = share * variable_cost;
+
+        return (
+          <div className="text-center">
+            {allocated.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+            €
+          </div>
+        );
+      },
+    },
+
+    {
       accessorKey: "total_cost",
       size: 120,
       header: () => <div className="text-center font-medium">Total cost</div>,
@@ -101,25 +131,50 @@ export const productMarginColumns = ({
       accessorKey: "total_sold",
       size: 160,
       header: () => <div className="text-center font-medium">Total Profit</div>,
-      cell: ({ row }) => (
-        <div className="text-center font-medium">
-          {row.original.total_profit.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const revenue = row.original.total_amount;
+        const totalRevenue = data.reduce(
+          (sum, item) => sum + item.total_amount,
+          0,
+        );
+        const landed_cost = row.original.cost;
+        const delivery_cost = row.original.delivery_cost;
+        const share = totalRevenue > 0 ? revenue / totalRevenue : 0;
+        const allocated = share * variable_cost;
+        const total_cost = landed_cost + delivery_cost + allocated;
+        const profit = revenue - total_cost;
+
+        return (
+          <div className="text-center font-medium">
+            {profit.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </div>
+        );
+      },
     },
 
     {
       accessorKey: "margin",
       size: 160,
       header: () => <div className="text-center font-medium">Margin</div>,
-      cell: ({ row }) => (
-        <div className="text-center font-medium">
-          {(row.original.product_margin * 100).toFixed(2)}%
-        </div>
-      ),
+      cell: ({ row }) => {
+        const revenue = row.original.total_amount;
+        const totalRevenue = data.reduce(
+          (sum, item) => sum + item.total_amount,
+          0,
+        );
+        const landed_cost = row.original.cost;
+        const delivery_cost = row.original.delivery_cost;
+        const share = totalRevenue > 0 ? revenue / totalRevenue : 0;
+        const allocated = share * variable_cost;
+        const total_cost = landed_cost + delivery_cost + allocated;
+        const margin = ((revenue - total_cost) / revenue) * 100;
+        return (
+          <div className="text-center font-medium">{margin.toFixed(2)}%</div>
+        );
+      },
     },
   ];
 };

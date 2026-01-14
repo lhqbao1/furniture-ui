@@ -603,9 +603,7 @@ export const getProductColumns = (
       </Button>
     ),
     // cell: ({ row }) => <EditableNameCell product={row.original} />,
-    cell: ({ row }) => (
-      <div className="max-w-60 w-60 text-wrap">{row.original.name}</div>
-    ),
+    cell: ({ row }) => <EditableNameCell product={row.original} />,
     enableSorting: true,
   },
   {
