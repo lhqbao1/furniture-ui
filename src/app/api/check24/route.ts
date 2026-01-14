@@ -63,6 +63,8 @@ export async function GET() {
         const categories = p.categories?.map((c) => c.name).join(", ") || "";
         const size = `${p.height} x ${p.width} x ${p.length} cm`;
         const lyingSurface = `${p.width} x ${p.length} cm`;
+        const color = p.color.split(" and ").join("/");
+
         return [
           escapeCsv(p.ean),
           escapeCsv(p.id_provider),
@@ -76,7 +78,7 @@ export async function GET() {
               : `https://prestige-home.de/de/product/${p.url_key}`,
           ),
           escapeCsv(p.brand.name ?? ""),
-          escapeCsv(p.color ? p.color.toUpperCase() : ""),
+          escapeCsv(p.color ? color.toUpperCase() : ""),
           escapeCsv(size),
           escapeCsv(p.height),
           escapeCsv(p.width),

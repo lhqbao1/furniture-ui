@@ -12,18 +12,18 @@ const SupplierFilter = () => {
   const searchParams = useSearchParams();
 
   const [supplier, setSupplier] = useState(
-    searchParams.get("supplier_id") ?? "prestige_home",
+    searchParams.get("supplier_id") ?? "",
   );
 
-  useEffect(() => {
-    const raw = searchParams.get("supplier_id");
+  // useEffect(() => {
+  //   const raw = searchParams.get("supplier_id");
 
-    if (raw === null) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("supplier_id", "prestige_home");
-      router.push(`?${params.toString()}`, { scroll: false });
-    }
-  }, [searchParams, router]);
+  //   if (raw === null) {
+  //     const params = new URLSearchParams(searchParams.toString());
+  //     params.set("supplier_id", "prestige_home");
+  //     router.push(`?${params.toString()}`, { scroll: false });
+  //   }
+  // }, [searchParams, router]);
 
   const { data: suppliers } = useGetSuppliers();
   if (!suppliers) return <>Loading...</>;
