@@ -26,7 +26,6 @@ export function VariableFeeRow({
   onRemove,
 }: VariableFeeRowProps) {
   const [openConfirm, setOpenConfirm] = useState(false);
-  console.log(fee);
   return (
     <>
       <div className="grid grid-cols-[1fr_1fr_auto] gap-3 items-center">
@@ -34,11 +33,7 @@ export function VariableFeeRow({
 
         <Input
           type="number"
-          placeholder={
-            fee.marketplace.toLowerCase() === "prestige_home"
-              ? "Amount"
-              : "Percent"
-          }
+          placeholder={"Percent"}
           value={fee.amount}
           onChange={(e) =>
             onChange(e.target.value === "" ? "" : Number(e.target.value))

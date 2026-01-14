@@ -6,13 +6,16 @@ import { VariableMarketplaceCard } from "./variable-cost-card";
 import { useVariableCost } from "./useVariableCost";
 import VariableCostTable from "./variable-cost-table";
 import { VariableCostHeader } from "./variable-cost-header";
-import { useState } from "react";
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function VariableCostPage() {
   const now = new Date();
 
   const [month, setMonth] = useState<number>(now.getMonth() + 1);
   const [year, setYear] = useState<number>(now.getFullYear());
+  const [newMarketplace, setNewMarketplace] = React.useState("");
+  const [adding, setAdding] = React.useState(false);
 
   const {
     marketplaces,
@@ -55,12 +58,44 @@ export default function VariableCostPage() {
         </div>
         <Button
           variant="outline"
-          onClick={() => addMarketplace(`custom_${Date.now()}`)}
+          onClick={() => setAdding(true)}
         >
           <Plus className="h-4 w-4 mr-1" />
           Add marketplace
         </Button>
       </div>
+
+      {adding && (
+        <div className="flex items-center justify-end gap-2 mt-4">
+          <Input
+            placeholder="Marketplace name"
+            value={newMarketplace}
+            onChange={(e) => setNewMarketplace(e.target.value)}
+            className="w-64"
+          />
+
+          <Button
+            onClick={() => {
+              if (!newMarketplace.trim()) return;
+              addMarketplace(newMarketplace.trim().toLowerCase());
+              setNewMarketplace("");
+              setAdding(false);
+            }}
+          >
+            Submit
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setAdding(false);
+              setNewMarketplace("");
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {marketplaces.map((m) => (
