@@ -69,7 +69,13 @@ export async function GET() {
           escapeCsv(p.ean),
           escapeCsv(p.id_provider),
           escapeCsv(p.name),
-          escapeCsv(html(cleanDescription(p.description))),
+          escapeCsv(
+            html(
+              `<div>${cleanDescription(p.description || "")}<div>Artikel-ID: ${
+                p.id_provider
+              }</div></div>`,
+            ),
+          ),
           escapeCsv(
             p.brand
               ? p.brand.name.toLowerCase() === "econelo"

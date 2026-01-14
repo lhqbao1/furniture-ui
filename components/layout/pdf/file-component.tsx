@@ -48,7 +48,8 @@ export default function InvoiceTable({
   });
 
   const flattenedCartItems = useMemo(() => {
-    const checkouts = invoice?.main_checkout?.checkouts;
+    const checkouts = checkout?.checkouts;
+
     if (!checkouts) return [];
 
     return (
@@ -86,7 +87,7 @@ export default function InvoiceTable({
       <div className="flex justify-between gap-8 w-full">
         <div className="flex flex-col gap-0">
           <span className="text-sm">
-            Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
+            Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlina
           </span>
           {checkout?.checkouts?.[0]?.user.company_name
             ? checkout?.checkouts?.[0]?.user.company_name
@@ -218,6 +219,7 @@ export default function InvoiceTable({
               invoice?.voucher_amount,
               invoice?.main_checkout.checkouts[0].shipping_address.country,
               invoice?.main_checkout.checkouts[0].user.tax_id,
+              checkout?.total_shipping,
             ).totalVat.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

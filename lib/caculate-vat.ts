@@ -1,4 +1,5 @@
 import { CartItem } from "@/types/cart";
+import { ManualOrderItem } from "./schema/manual-checkout";
 
 type TaxBucket = {
   vatRate: number;
@@ -46,12 +47,16 @@ function splitGross(gross: number, vatRate: number) {
   return { net, vat };
 }
 
-function calculateShippingCost(
-  items: CartItem[],
+export function calculateShippingCostManual(
+  items: ManualOrderItem[],
   country_code?: string | null,
   tax_id?: string | null,
 ) {
-  const hasAmm = items.some((item) => item.products?.carrier === "amm");
+  const hasAmm = items.some(
+    (item) =>
+      item?.carrier.toLowerCase() === "amm" ||
+      item?.carrier.toLowerCase() === "spedition",
+  );
 
   const gross = hasAmm ? 35.95 : 5.95;
 
@@ -61,10 +66,37 @@ function calculateShippingCost(
   const { net, vat } = splitGross(gross, vatRate);
 
   return {
-    gross,
-    net,
-    vat,
-    vatRate,
+    gross: Number(gross) || 0,
+    net: Number(net) || 0,
+    vat: Number(vat) || 0,
+    vatRate: Number(vatRate) || 0,
+  };
+}
+
+export function calculateShippingCost(
+  items: CartItem[],
+  country_code?: string | null,
+  tax_id?: string | null,
+  total_shipping?: number,
+) {
+  const hasAmm = items.some(
+    (item) =>
+      item.products?.carrier.toLowerCase() === "amm" ||
+      item.products?.carrier.toLowerCase() === "spedition",
+  );
+
+  const gross = total_shipping ?? (hasAmm ? 35.95 : 5.95);
+
+  // ✅ VAT cho shipping: base là 19%
+  const vatRate = parseTaxRate("19%", country_code, tax_id);
+
+  const { net, vat } = splitGross(gross, vatRate);
+
+  return {
+    gross: Number(gross) || 0,
+    net: Number(net) || 0,
+    vat: Number(vat) || 0,
+    vatRate: Number(vatRate) || 0,
   };
 }
 
@@ -73,6 +105,7 @@ export function calculateOrderTaxWithDiscount(
   discountGross: number = 0, // GROSS discount
   country_code?: string | null,
   tax_id?: string | null,
+  total_shipping?: number,
 ) {
   const buckets = new Map<number, TaxBucket>();
 
@@ -93,16 +126,26 @@ export function calculateOrderTaxWithDiscount(
     buckets.get(vatRate)!.gross += gross;
   }
 
-  const shipping = calculateShippingCost(items, country_code, tax_id);
-  if (!buckets.has(shipping.vatRate)) {
-    buckets.set(shipping.vatRate, {
-      vatRate: shipping.vatRate,
+  const shipping = calculateShippingCost(
+    items,
+    country_code,
+    tax_id,
+    total_shipping,
+  );
+
+  const shippingGross = Number(shipping.gross) || 0;
+  const shippingRate = Number(shipping.vatRate) || 0;
+
+  if (!buckets.has(shippingRate)) {
+    buckets.set(shippingRate, {
+      vatRate: shippingRate,
       gross: 0,
       net: 0,
       vat: 0,
     });
   }
-  buckets.get(shipping.vatRate)!.gross += shipping.gross;
+
+  buckets.get(shippingRate)!.gross += shippingGross;
 
   // 3️⃣ Total gross before discount
   let totalGrossBeforeDiscount = 0;
@@ -121,12 +164,19 @@ export function calculateOrderTaxWithDiscount(
 
   for (const bucket of buckets.values()) {
     const ratio = bucket.gross / totalGrossBeforeDiscount;
-    const bucketDiscountGross = +(appliedDiscountGross * ratio).toFixed(2);
+    const discountGross = +(appliedDiscountGross * ratio).toFixed(2);
 
-    bucket.discountGross = bucketDiscountGross;
-    bucket.gross = +(bucket.gross - bucketDiscountGross).toFixed(2);
+    bucket.discountGross = discountGross;
+    bucket.gross = +(bucket.gross - discountGross).toFixed(2);
 
-    const { net, vat } = splitGross(bucket.gross, bucket.vatRate);
+    let net = 0;
+    let vat = 0;
+
+    if (bucket.gross > 0) {
+      const split = splitGross(bucket.gross, bucket.vatRate);
+      net = split.net;
+      vat = split.vat;
+    }
 
     bucket.net = net;
     bucket.vat = vat;

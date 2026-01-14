@@ -48,12 +48,6 @@ const SupplierOrderDetails = () => {
         <div className="col-span-8 h-full">
           <OrderDetailsShipmentSupplier order={order} />
         </div>
-
-        {!order.shipment && (
-          <div className="col-span-4">
-            <ShipmentInput checkoutId={order.id} />
-          </div>
-        )}
       </div>
 
       <ProductTable
@@ -69,6 +63,12 @@ const SupplierOrderDetails = () => {
         hasCount={false}
         hasHeaderBackGround
       />
+
+      {!order.shipment && (
+        <div className="col-span-4">
+          <ShipmentInput checkoutId={order.id} />
+        </div>
+      )}
       {/* <div className="flex justify-between w-full">
         {order.status !== "Pending" ? (
           <div className="flex gap-12">

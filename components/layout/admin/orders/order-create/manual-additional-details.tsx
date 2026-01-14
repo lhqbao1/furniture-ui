@@ -255,6 +255,39 @@ export default function ManualAdditionalInformation({
             );
           }}
         />
+
+        <FormField
+          control={form.control}
+          name="total_shipping"
+          render={({ field }) => (
+            <FormItem className="flex flex-col col-span-1">
+              <FormLabel className="text-black font-semibold text-sm">
+                Total Shipping
+              </FormLabel>
+              <FormControl>
+                <div className="relative flex items-center w-full">
+                  <Input
+                    {...field}
+                    type="number"
+                    min={0}
+                    className="pl-7"
+                    step="0.01"
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === ""
+                          ? undefined
+                          : e.target.valueAsNumber,
+                      )
+                    }
+                  />
+                  <span className="absolute left-3 text-gray-500">€</span>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </div>
   );

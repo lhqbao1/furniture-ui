@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,16 @@ import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/orde
 import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
 import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
 import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreate";
+import { calculateShipping } from "@/hooks/caculate-shipping";
+import {
+  calculateShippingCost,
+  calculateShippingCostManual,
+} from "@/lib/caculate-vat";
+import {
+  getCountryCode,
+  getCountryLabelDE,
+} from "@/components/shared/getCountryNameDe";
+import { fromArrayBufferToHex } from "google-auth-library/build/src/crypto/shared";
 
 export interface CartItem {
   id: number;
@@ -49,19 +59,49 @@ export default function CreateOrderPageClient() {
     defaultValues: manualCheckoutDefaultValues,
   });
 
+  const listItems = form.watch("items");
+  const countryCode = getCountryCode(form.watch("country"));
+  const taxId = form.watch("tax_id") || null;
+
+  const shipping = calculateShippingCostManual(
+    listItems,
+    countryCode,
+    taxId,
+  ).gross;
+
+  useEffect(() => {
+    // guard item empty
+    if (!listItems || listItems.length === 0) {
+      form.setValue("total_shipping", 0);
+      return;
+    }
+
+    const autoShipping = calculateShippingCostManual(
+      listItems,
+      countryCode,
+      taxId,
+    ).gross;
+
+    const currentShipping = form.getValues("total_shipping");
+
+    // Nếu user chưa nhập thủ công, mới override
+    if (currentShipping == null || currentShipping === 0) {
+      form.setValue("total_shipping", autoShipping, { shouldDirty: true });
+    }
+  }, [listItems, countryCode, taxId]);
+
   useManualCheckoutLogic(form, setDisabledFields);
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
-    const totalShipping = values.items.find((i) => i.carrier === "amm")
-      ? 35.95
-      : 5.95;
+    const orderCarrier = listItems.some(
+      (i) =>
+        i.carrier.toLowerCase() === "amm" ||
+        i.carrier.toLowerCase() === "spedition",
+    )
+      ? "spedition"
+      : "dpd";
 
-    const orderCarrier = totalShipping === 35.95 ? "spedition" : "dpd";
-
-    if (
-      orderCarrier === "spedition" &&
-      (!values.phone || values.phone.trim() === "")
-    ) {
+    if (orderCarrier === "spedition" && !values.phone) {
       toast.error("Phone number is required for SPEDITION carrier");
       return;
     }
@@ -69,7 +109,8 @@ export default function CreateOrderPageClient() {
     createOrderManualMutation.mutate(
       {
         ...values,
-        total_shipping: totalShipping,
+        total_shipping:
+          values.total_shipping !== shipping ? values.total_shipping : shipping,
         carrier: orderCarrier,
         email:
           values.email && values.email?.length > 0 ? values.email : "guest",
@@ -106,7 +147,6 @@ export default function CreateOrderPageClient() {
             handleSubmit(values);
           },
           (errors) => {
-            console.log(errors);
             // Lấy message lỗi đầu tiên nếu có
             const firstError: any = Object.values(errors)[0];
             const message =

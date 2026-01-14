@@ -90,7 +90,7 @@ const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
             />
 
             {/* Shipped date */}
-            <FormField
+            {/* <FormField
               control={form.control}
               name="shipped_date"
               render={({ field }) => (
@@ -115,7 +115,7 @@ const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <Button
               type="submit"
