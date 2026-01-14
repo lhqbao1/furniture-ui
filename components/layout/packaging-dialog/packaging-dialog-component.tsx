@@ -9,13 +9,12 @@ import { useMemo } from "react";
 import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
 import { getCountryName } from "@/lib/country-name";
-import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
-import { calculateShippingCost } from "@/hooks/caculate-shipping";
 import { PackagingDialogTable } from "./packaging-dialog-table";
 import { packagingColumns } from "./packaging-dialog-columns";
 import { CartItem } from "@/types/cart";
 import { InvoicePDF } from "../pdf/file";
 import { PackageSlipPdf } from "../pdf/package-slip-pdf";
+import { check } from "zod";
 
 interface InvoiceTableProps {
   checkoutId: string;
@@ -50,7 +49,8 @@ export default function InvoiceTable({
   });
 
   const flattenedCartItems = useMemo(() => {
-    const checkouts = invoice?.main_checkout?.checkouts;
+    const checkouts = checkout?.checkouts;
+
     if (!checkouts) return [];
 
     return (
@@ -108,13 +108,12 @@ export default function InvoiceTable({
           <span className="text-sm">
             Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
           </span>
-          {checkout?.checkouts?.[0]?.user.company_name
-            ? checkout?.checkouts?.[0]?.user.company_name
+          {checkout?.checkouts[0].user.company_name &&
+          !checkout.checkouts[0].shipping_address.recipient_name
+            ? checkout.checkouts[0].user.company_name
             : checkout?.checkouts?.[0]?.shipping_address?.recipient_name
             ? checkout?.checkouts?.[0]?.shipping_address?.recipient_name
-            : `${checkout?.checkouts?.[0]?.user?.first_name ?? ""} ${
-                checkout?.checkouts?.[0]?.user?.last_name ?? ""
-              }`}
+            : ""}
           <span>
             {checkout?.checkouts?.[0]?.shipping_address?.address_line?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.address_line

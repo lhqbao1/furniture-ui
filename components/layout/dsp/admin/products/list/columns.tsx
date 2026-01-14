@@ -564,7 +564,7 @@ export const productColumnsDSP: ColumnDef<ProductItem>[] = [
       const carrier = row.original.carrier?.toLowerCase();
 
       let image: string | null = null;
-      if (carrier === "amm") {
+      if (carrier === "amm" || carrier === "spedition") {
         image = "/amm.jpeg";
       } else if (carrier === "dpd") {
         image = "/dpd.jpeg";

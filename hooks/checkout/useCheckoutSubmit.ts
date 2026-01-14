@@ -237,7 +237,11 @@ export function useCheckoutSubmit({
           note: data.note,
           total_shipping:
             shippingCostCurrent > 0 ? shippingCostCurrent : shippingCost,
-          carrier: normalized.find((i) => i.carrier === "amm")
+          carrier: normalized.find(
+            (i) =>
+              i.carrier.toLowerCase() === "amm" ||
+              i.carrier.toLowerCase() === "spedition",
+          )
             ? "spedition"
             : "dpd",
         });

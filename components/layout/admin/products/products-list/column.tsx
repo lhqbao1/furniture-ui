@@ -740,32 +740,7 @@ export const getProductColumns = (
       </>
     ),
   },
-  {
-    accessorKey: "color",
-    header: () => <div className="text-center">COLOR</div>,
-    cell: ({ row }) => (
-      <>
-        {row.original.color ? (
-          <div className="text-right">{row.original.color}</div>
-        ) : (
-          <div className="text-center">—</div>
-        )}
-      </>
-    ),
-  },
-  {
-    accessorKey: "material",
-    header: () => <div className="text-center">MATERIAL</div>,
-    cell: ({ row }) => (
-      <>
-        {row.original.materials ? (
-          <div className="text-right">{row.original.materials}</div>
-        ) : (
-          <div className="text-center">—</div>
-        )}
-      </>
-    ),
-  },
+
   {
     accessorKey: "shipping_cost",
     header: () => <div className="text-center">DELIVERY COST</div>,

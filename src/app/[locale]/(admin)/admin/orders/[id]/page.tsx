@@ -68,6 +68,8 @@ const OrderDetails = () => {
   const createdAt = formatDate(order.created_at);
   const updatedAt = formatDateTimeString(order.updated_at);
 
+  console.log(order);
+
   return (
     <div className="space-y-12 pb-20 mt-6">
       <AdminBackButton />
@@ -128,6 +130,7 @@ const OrderDetails = () => {
               invoice?.voucher_amount,
               invoice?.main_checkout.checkouts[0].shipping_address.country,
               invoice?.main_checkout.checkouts[0].user.tax_id,
+              order.total_shipping,
             ).totalVat
           }
           total_amount={order.total_amount}

@@ -72,7 +72,10 @@ export default function AddOrEditVouchersForm({
         form.setValue("max_discount", 5.95);
       }
 
-      if (watchCarrier === "amm") {
+      if (
+        watchCarrier?.toLowerCase() === "amm" ||
+        watchCarrier?.toLowerCase() === "spedition"
+      ) {
         form.setValue("discount_value", 35.95);
         form.setValue("max_discount", 35.95);
       }

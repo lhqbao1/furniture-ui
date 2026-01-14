@@ -77,7 +77,11 @@ const ProductDetailsLogistic = ({
         <Truck size={25} />
         <span className="text-gray-800 font-medium text-sm">
           {t("shippingCost", {
-            shippingCost: productDetails.carrier === "amm" ? "35,95€" : "5,95€",
+            shippingCost:
+              productDetails.carrier.toLowerCase() === "amm" ||
+              productDetails.carrier.toLowerCase() === "spedition"
+                ? "35,95€"
+                : "5,95€",
           })}{" "}
           inkl. MwSt.
         </span>
@@ -112,35 +116,36 @@ const ProductDetailsLogistic = ({
           </span>
 
           <ul className="space-y-1 text-gray-600 text-sm">
-            {productDetails.carrier === "amm" && (
-              <>
-                <li className="flex items-start gap-2">
-                  <span className="text-base leading-5">•</span>
-                  <span className="text-base">
-                    Lieferung <strong>frei Bordsteinkante</strong>{" "}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="inline-block w-3.5 h-3.5 text-gray-500 ml-1 mb-0.5" />
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-secondary">
-                        <p className="text-white text-sm">
-                          „Frei Bordsteinkante“ bedeutet: Lieferung bis zur
-                          Grundstücksgrenze – kein Transport ins Haus oder zur
-                          Wohnung.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </span>
-                </li>
+            {productDetails.carrier.toLowerCase() === "amm" ||
+              (productDetails.carrier.toLowerCase() === "spedition" && (
+                <>
+                  <li className="flex items-start gap-2">
+                    <span className="text-base leading-5">•</span>
+                    <span className="text-base">
+                      Lieferung <strong>frei Bordsteinkante</strong>{" "}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="inline-block w-3.5 h-3.5 text-gray-500 ml-1 mb-0.5" />
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-secondary">
+                          <p className="text-white text-sm">
+                            „Frei Bordsteinkante“ bedeutet: Lieferung bis zur
+                            Grundstücksgrenze – kein Transport ins Haus oder zur
+                            Wohnung.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </span>
+                  </li>
 
-                <li className="flex items-start gap-2">
-                  <span className="text-base leading-5">•</span>
-                  <span className="text-base">
-                    Speditionsversand nach Terminabsprache
-                  </span>
-                </li>
-              </>
-            )}
+                  <li className="flex items-start gap-2">
+                    <span className="text-base leading-5">•</span>
+                    <span className="text-base">
+                      Speditionsversand nach Terminabsprache
+                    </span>
+                  </li>
+                </>
+              ))}
 
             {/* <li className="flex items-start gap-2">
               <span className="text-base leading-5">•</span>

@@ -61,7 +61,11 @@ const OrderDetailUser = ({
         <h5 className="font-bold">Shipping address</h5>
         <div className="space-y-2.5">
           <div className="text-sm">
-            <div>{shippingAddress.recipient_name}</div>
+            <div>
+              {user.company_name && !shippingAddress.recipient_name
+                ? user.company_name
+                : shippingAddress.recipient_name}
+            </div>
             <div>{shippingAddress.phone_number}</div>
             <div>{shippingAddress.address_line}</div>
             <div>{shippingAddress.additional_address_line}</div>

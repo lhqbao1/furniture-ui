@@ -1,5 +1,21 @@
 import { optional, z } from "zod";
 
+export const ManualOrderItemSchema = z.object({
+  id_provider: z.string().min(1, { message: "Product ID is required" }),
+  quantity: z
+    .number()
+    .int({ message: "Quantity must be an integer" })
+    .nonnegative({ message: "Quantity must be positive" }),
+  title: z.string().optional(),
+  sku: z.string().optional(),
+  final_price: z
+    .number()
+    .nonnegative({ message: "Final price must be positive" }),
+  carrier: z.string(),
+});
+
+export type ManualOrderItem = z.infer<typeof ManualOrderItemSchema>;
+
 export const ManualCreateOrderSchema = z
   .object({
     email: z.string().optional().nullable(),
@@ -42,23 +58,9 @@ export const ManualCreateOrderSchema = z
 
     status: z.string().min(1, "Status is required"),
 
-    items: z
-      .array(
-        z.object({
-          id_provider: z.string().min(1, { message: "Product ID is required" }),
-          quantity: z
-            .number()
-            .int({ message: "Quantity must be an integer" })
-            .nonnegative({ message: "Quantity must be positive" }),
-          title: z.string().optional(),
-          sku: z.string().optional(),
-          final_price: z
-            .number()
-            .nonnegative({ message: "Final price must be positive" }),
-          carrier: z.string(),
-        }),
-      )
-      .min(1, { message: "You must select at least one product" }),
+    items: z.array(ManualOrderItemSchema).min(1, {
+      message: "You must select at least one product",
+    }),
   })
   .superRefine((data, ctx) => {
     if (

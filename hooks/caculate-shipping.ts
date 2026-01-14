@@ -26,13 +26,21 @@ export function normalizeCartItems(
 export function calculateShipping(cartItems: NormalizedCartItem[]): number {
   if (!Array.isArray(cartItems) || cartItems.length === 0) return 0;
 
-  const hasAmmCarrier = cartItems.some((item) => item?.carrier === "amm");
+  const hasAmmCarrier = cartItems.some(
+    (item) =>
+      item?.carrier.toLowerCase() === "amm" ||
+      item?.carrier.toLowerCase() === "spedition",
+  );
 
   return hasAmmCarrier ? 35.95 : 5.95;
 }
 
 export function calculateShippingCost(items: CartItem[]) {
-  const hasAmm = items.some((item) => item.products?.carrier === "amm");
+  const hasAmm = items.some(
+    (item) =>
+      item.products?.carrier === "amm" ||
+      item.products?.carrier === "spedition",
+  );
 
   const gross = hasAmm ? 35.95 : 5.95;
   const vatRate = 0.19;
@@ -46,5 +54,9 @@ export function calculateShippingCost(items: CartItem[]) {
 export function checkShippingType(cartItems: NormalizedCartItem[]): boolean {
   if (!Array.isArray(cartItems) || cartItems.length === 0) return false;
 
-  return cartItems.some((item) => item?.carrier === "amm");
+  return cartItems.some(
+    (item) =>
+      item?.carrier.toLowerCase() === "amm" ||
+      item?.carrier.toLowerCase() === "spedition",
+  );
 }
