@@ -29,15 +29,9 @@ const mergeMarketplaceCostData = (
 
       if (!feeData || typeof feeData !== "object") return null;
 
-      const isPrestige = item.marketplace === "prestige_home";
+      const feePercent = (item.total_amount * feeData.total) / 100;
 
-      const feePercent = isPrestige
-        ? feeData.total // % đúng nghĩa
-        : (item.total_amount * feeData.total) / 100; // tiền
-
-      const fee = isPrestige
-        ? (feeData.total / item.total_amount) * 100 // tiền
-        : feeData.total; // %
+      const fee = feeData.total;
 
       return {
         marketplace: item.marketplace,
