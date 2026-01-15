@@ -70,7 +70,7 @@ export async function GET() {
         const categories = p.categories?.map((c) => c.name).join(", ") || "";
         const size = `${p.height} x ${p.width} x ${p.length} cm`;
         const lyingSurface = `${p.width} x ${p.length} cm`;
-        const color = p.color.split(" and ").join("/");
+        const color = p.color.replace(/\s+(and|und)\s+/gi, "/");
 
         return [
           escapeCsv(p.ean),
