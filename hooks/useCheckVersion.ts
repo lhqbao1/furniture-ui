@@ -11,8 +11,10 @@ export function useCheckAppVersion() {
         // guard pages
         const pathname = window.location.pathname;
         if (
-          pathname.startsWith("/check-out") ||
-          pathname.startsWith("/thank-you")
+          pathname.includes("/check-out") ||
+          pathname.includes("/thank-you") ||
+          pathname.includes("/login") ||
+          pathname.includes("/sign-up")
         ) {
           return;
         }
