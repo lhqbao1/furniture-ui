@@ -282,6 +282,18 @@ const Footer = () => {
       <div className="footer-column xl:my-8 my-4 lg:col-span-12 col-span-6 flex items-center justify-center">
         <div className="lg:mt-4 flex items-center gap-2 mt-2">
           <a
+            href="https://legal.trustedshops.com"
+            rel="noopener"
+          >
+            <img
+              src="https://legal-images.trustedshops.com/Rechtspartner-Logo.png"
+              alt="Legal Partner Logo"
+              width="140"
+              loading="lazy"
+              style={{ width: "140px" }}
+            />
+          </a>
+          <a
             href="https://geizhals.de"
             target="_blank"
             rel="noopener noreferrer"
