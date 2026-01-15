@@ -199,6 +199,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
+          brand_id: product.brand.id,
         },
         id: product.id,
       },

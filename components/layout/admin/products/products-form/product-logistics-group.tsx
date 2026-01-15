@@ -277,29 +277,6 @@ const ProductLogisticsGroup = ({
           )}
         />
 
-        {/*Incoterm */}
-        <FormField
-          control={form.control}
-          name="incoterm"
-          render={({ field }) => (
-            <FormItem className="flex flex-col w-full">
-              <FormLabel className="text-black font-semibold text-sm col-span-2">
-                Incoterm
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder=""
-                  {...field}
-                  value={field.value ?? ""}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  className="col-span-4"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         {/* Pallet unit input */}
         <FormField
           control={form.control}

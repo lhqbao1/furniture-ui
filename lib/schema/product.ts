@@ -163,7 +163,7 @@ export const addProductSchema = z.object({
   delivery_time: z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),
   tariff_number: z.string().optional().nullable(),
-  brand_id: z.string().optional().nullable(),
+  brand_id: z.string().min(1, "Brand is required"),
   ebay: z.boolean().optional().nullable(),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
   weight: z.number().optional().nullable(),

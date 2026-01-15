@@ -123,7 +123,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
           control={form.control}
           name="return_cost"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem className="flex flex-col lg:col-span-3 col-span-12">
               <FormLabel className="text-black font-semibold text-sm">
                 Return cost
               </FormLabel>

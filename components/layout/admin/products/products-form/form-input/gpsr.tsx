@@ -22,7 +22,7 @@ const GpsrInput = () => {
   const form = useFormContext();
   const { data: brands, isLoading: isLoadingBrand } = useGetBrands();
 
-  const brandId = form.watch("brand_id");
+  const brandId = form.watch("brand_id") ?? "";
   const isEconelo = form.watch("is_econelo");
 
   // Lấy brand đang chọn (memo để tránh re-render không cần thiết)
@@ -56,13 +56,20 @@ const GpsrInput = () => {
           <FormControl className="col-span-6">
             <div>
               {brands ? (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  defaultValue={field.value ?? ""}
+                  value={field.value ?? ""}
+                  onValueChange={field.onChange}
+                >
                   <SelectTrigger className="w-full border font-light">
                     <SelectValue placeholder="Select brand" />
                   </SelectTrigger>
                   <SelectContent>
                     {brands.map((b) => (
-                      <SelectItem key={b.id} value={b.id}>
+                      <SelectItem
+                        key={b.id}
+                        value={b.id}
+                      >
                         {b.name}
                       </SelectItem>
                     ))}
