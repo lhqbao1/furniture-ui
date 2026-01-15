@@ -127,7 +127,7 @@ const VariableCostTable = ({
             </td>
 
             <td className="px-4 py-2 text-right">
-              {row.feePercent.toFixed(2)}€
+              {row.feePercent.toFixed(2)}
             </td>
           </tr>
         ))}

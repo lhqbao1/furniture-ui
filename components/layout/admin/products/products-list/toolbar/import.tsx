@@ -104,11 +104,12 @@ const ImportDialog = ({
           setIsImporting(true);
           setOpen(false);
         },
-        onError: () => {
+        onError: (e) => {
           toast.error("Import products failed", {
             id: toastId,
           });
           setIsImporting(false);
+          console.log(e);
         },
       });
     }
