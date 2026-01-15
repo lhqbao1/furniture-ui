@@ -95,7 +95,7 @@ const ListPolicy = ({
     <div className="flex lg:pt-12 pt-3 pb-4 gap-6">
       {/* Sidebar bên trái */}
       <div className="hidden lg:block w-1/3 border-r sticky top-10">
-        <div className="sticky top-30 max-h-[calc(100vh-2.5rem)] overflow-y-auto">
+        <div className="sticky top-42 max-h-[calc(100vh-2.5rem)] overflow-y-auto">
           <Accordion
             type="single"
             collapsible
@@ -104,7 +104,10 @@ const ListPolicy = ({
             onValueChange={(val) => setOpenAccordion(val)}
           >
             {filteredPolicies.map((item) => (
-              <AccordionItem value={item.id} key={item.id}>
+              <AccordionItem
+                value={item.id}
+                key={item.id}
+              >
                 <AccordionTrigger
                   onClick={(e) => {
                     e.preventDefault();
@@ -168,13 +171,13 @@ const ListPolicy = ({
                           currentPolicy?.id === item.id &&
                             currentPolicyItem === policyItemIndex
                             ? "bg-secondary/20 hover:bg-secondary-20 px-2 py-1 font-semibold"
-                            : ""
+                            : "",
                         )}
                         onClick={() => {
                           setCurrentPolicyItem(policyItemIndex);
                           // delay 1 tick để đảm bảo DOM ổn định rồi mới scroll
                           setTimeout(() => {
-                            scrollTo(`${item.id}-${policyItemIndex}`, -80);
+                            scrollTo(`${item.id}-${policyItemIndex}`, -190);
                           }, 200);
                         }}
                       >
@@ -185,7 +188,7 @@ const ListPolicy = ({
                             currentPolicy?.id === item.id &&
                               currentPolicyItem === policyItemIndex
                               ? "block"
-                              : "hidden"
+                              : "hidden",
                           )}
                         />
                       </div>

@@ -1,5 +1,5 @@
 import { ProductItem } from "@/types/products";
-import { Clock, Info, Truck, Undo2 } from "lucide-react";
+import { Clock, Info, ShieldCheckIcon, Truck, Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
 import {
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
+import Link from "next/link";
 
 interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
@@ -154,6 +155,15 @@ const ProductDetailsLogistic = ({
           </ul>
         </div>
       </div>
+
+      <Link href={"/agb"}>
+        <div className="flex flex-row gap-4 items-center">
+          <ShieldCheckIcon size={25} />
+          <span className="text-gray-800 font-medium text-sm">
+            24 Monate gesetzliche Gewährleistung
+          </span>
+        </div>
+      </Link>
     </div>
   );
 };
