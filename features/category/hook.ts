@@ -13,6 +13,7 @@ import {
   getCategoriesWithChildren,
   getCategoryById,
   getCategoryByName,
+  getChildrenCategoryByParent,
   removeProductFromCategory,
 } from "./api";
 
@@ -123,5 +124,12 @@ export function useGetCategoryByName(params?: string) {
   return useQuery({
     queryKey: ["category-by-name", params],
     queryFn: () => getCategoryByName(params),
+  });
+}
+
+export function useGetChildrenCategoriesByParent(slug: string) {
+  return useQuery({
+    queryKey: ["category-children", slug],
+    queryFn: () => getChildrenCategoryByParent(slug),
   });
 }

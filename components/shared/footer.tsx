@@ -1,16 +1,23 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { Link } from "@/src/i18n/navigation";
+import { Link, usePathname } from "@/src/i18n/navigation";
 import { useTranslations } from "next-intl";
 import ListStars from "./list-stars";
+import { cn } from "@/lib/utils";
 
 const Footer = () => {
   const t = useTranslations();
+  const pathName = usePathname();
+  const isProductDetail = pathName.includes("product");
+
   return (
     <footer
       id="footer"
-      className="bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-32 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-26 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl relative"
+      className={cn(
+        "bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-32 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-26 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl relative",
+        isProductDetail ? "pb-30" : "",
+      )}
     >
       <div className="lg:w-1/2 w-full lg:col-span-12 col-span-6 shadow-[0_4px_20px_rgba(0,177,89,0.15)] flex lg:flex-row flex-col lg:items-center justify-center lg:gap-24 gap-6 mb-6 lg:absolute lg:left-1/2 lg:-translate-x-1/2 top-0 lg:-translate-y-1/2 bg-white px-6 py-4 rounded-tl-2xl rounded-tr-2xl">
         <div className="flex flex-col gap-2 items-center justify-center">
@@ -127,59 +134,10 @@ const Footer = () => {
           <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/blog`}>Blog</Link>
           </li>
+          <li className="hover:pl-2 transition-all duration-500">
+            <Link href={`/dsp/login`}>Händler-Login</Link>
+          </li>
         </ul>
-        <div className="lg:mt-4 flex flex-col gap-2 mt-2">
-          <a
-            href="https://geizhals.de"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-fit"
-          >
-            <Image
-              src="https://gzhls.at/b/brands/geizhals_logo_official.svg"
-              width={120}
-              height={60}
-              alt="Geizhals Preisvergleich"
-              priority
-            />
-          </a>
-          <a
-            href="https://www.idealo.de/preisvergleich/Shop/336129.html#i"
-            className="w-fit"
-          >
-            <img
-              src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
-              loading="lazy"
-              alt="zu www.idealo.de"
-            />
-          </a>
-          {/* <a
-            href="https://www.praktiker.de/marktplatz/prestige-home-5786"
-            rel="nofollow"
-          >
-            <img
-              src="https://www.praktiker.de/marktplatz/images/badges/praktiker_trust_logo_s1s.png"
-              width="120"
-              height="50"
-              alt="Praktiker Trust Logo"
-            />
-          </a> */}
-          <a
-            href="/file/FSC.pdf"
-            target="_blank"
-            rel="nofollow noopener noreferrer"
-            aria-label="Open FSC Certificate PDF"
-            className="w-fit"
-          >
-            <Image
-              src="/fsc-footer.jpg"
-              width={120}
-              height={40}
-              alt="FSC Certificate"
-              priority
-            />
-          </a>
-        </div>
       </div>
 
       {/* Cột 3: Term & Policy */}
@@ -318,6 +276,73 @@ const Footer = () => {
               unoptimized
             />
           </div>
+        </div>
+      </div>
+
+      <div className="footer-column xl:my-8 my-4 lg:col-span-12 col-span-6 flex items-center justify-center">
+        <div className="lg:mt-4 flex items-center gap-2 mt-2">
+          <a
+            href="https://geizhals.de"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-fit"
+          >
+            <Image
+              src="https://gzhls.at/b/brands/geizhals_logo_official.svg"
+              width={120}
+              height={60}
+              alt="Geizhals Preisvergleich"
+              priority
+            />
+          </a>
+          <a
+            href="https://www.idealo.de/preisvergleich/Shop/336129.html#i"
+            className="w-fit"
+          >
+            <img
+              src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
+              loading="lazy"
+              alt="zu www.idealo.de"
+            />
+          </a>
+          <a
+            href="https://www.billiger.de"
+            target="_blank"
+            rel="noopener"
+          >
+            {" "}
+            <img
+              src="https://cdn.billiger.com/partnerbutton/light/30588"
+              alt="billiger.de - The price-comparison"
+              title="billiger.de - The price-comparison"
+            />{" "}
+          </a>
+          {/* <a
+            href="https://www.praktiker.de/marktplatz/prestige-home-5786"
+            rel="nofollow"
+          >
+            <img
+              src="https://www.praktiker.de/marktplatz/images/badges/praktiker_trust_logo_s1s.png"
+              width="120"
+              height="50"
+              alt="Praktiker Trust Logo"
+            />
+          </a> */}
+          <a
+            href="/file/FSC.pdf"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            aria-label="Open FSC Certificate PDF"
+            className="w-fit"
+          >
+            <Image
+              src="/fsc-footer.jpg"
+              width={120}
+              height={40}
+              alt="FSC Certificate"
+              priority
+            />
+          </a>
         </div>
       </div>
 

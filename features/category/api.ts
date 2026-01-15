@@ -5,6 +5,7 @@ import {
   CategoryBySlugResponse,
   CategoryInput,
   CategoryResponse,
+  ListCategoryChildrenNameByParent,
 } from "@/types/categories";
 import { ProductItem } from "@/types/products";
 import { cache } from "react";
@@ -142,4 +143,9 @@ export async function editCategory(input: CategoryInput, id: string) {
 export async function deleteCategory(id: string) {
   const { data } = await apiAdmin.delete(`/categories/${id}`);
   return data;
+}
+
+export async function getChildrenCategoryByParent(category_slug: string) {
+  const { data } = await apiPublic.get(`/categories/child/${category_slug}`);
+  return data as ListCategoryChildrenNameByParent;
 }

@@ -5,10 +5,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useMemo } from "react";
 import FilterSection from "./skeleton";
+import { usePathname } from "@/src/i18n/navigation";
 
-const FilterListCategories = () => {
+interface FilterListCategoriesProps {
+  isParentCategory?: boolean;
+}
+
+const FilterListCategories = ({
+  isParentCategory = false,
+}: FilterListCategoriesProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathName = usePathname();
+  const slug = pathName.replace("/category/", "");
 
   const {
     data: parentCategories,
@@ -18,6 +27,9 @@ const FilterListCategories = () => {
 
   const categories = useMemo(() => {
     if (!parentCategories) return [];
+    if (isParentCategory && slug)
+      return parentCategories.find((p) => p.name.toLowerCase().includes(slug))
+        ?.children;
     return parentCategories.flatMap((parent) => parent.children ?? []);
   }, [parentCategories]);
 
@@ -56,7 +68,7 @@ const FilterListCategories = () => {
 
   return (
     <div className="space-y-3">
-      {categories.map((item) => {
+      {categories?.map((item) => {
         const checked = selectedCategories.includes(item.name);
 
         return (

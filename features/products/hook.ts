@@ -93,6 +93,8 @@ export function useProductsAlgoliaSearch(params?: GetProductsSearchParams) {
     ],
     queryFn: () => getProductsAlgoliaSearch(params),
     enabled: !!params, // không gọi khi params chưa sẵn sàng
+    staleTime: 1000 * 60 * 3,
+    refetchOnWindowFocus: false,
   });
 }
 

@@ -15,12 +15,15 @@ import FilterListDeliveryTime from "./filter-delivery-time";
 
 interface ShopAllFilterSectionProps {
   isShopAll?: boolean;
+  isParentCategory?: boolean;
 }
 
 const ShopAllFilterSection = ({
   isShopAll = true,
+  isParentCategory = false,
 }: ShopAllFilterSectionProps) => {
   const t = useTranslations();
+
   return (
     <aside>
       <Accordion
@@ -28,7 +31,7 @@ const ShopAllFilterSection = ({
         className="w-full space-y-8 border-r border-black"
         defaultValue={["category"]} // ✅
       >
-        {isShopAll && (
+        {isShopAll || isParentCategory ? (
           <AccordionItem
             value="category"
             className="border-black"
@@ -42,9 +45,11 @@ const ShopAllFilterSection = ({
               </span>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 text-balance">
-              <FilterListCategories />
+              <FilterListCategories isParentCategory={isParentCategory} />
             </AccordionContent>
           </AccordionItem>
+        ) : (
+          ""
         )}
 
         <AccordionItem
