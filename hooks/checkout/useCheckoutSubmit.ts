@@ -233,7 +233,9 @@ export function useCheckoutSubmit({
           ...data,
           invoice_address_id: invoiceId,
           shipping_address_id: shippingId,
-          supplier_carts: mapToSupplierCarts(cartItems ?? cartData),
+          supplier_carts: mapToSupplierCarts(
+            userLoginId && cartItems ? cartItems : cartData,
+          ),
           note: data.note,
           total_shipping:
             shippingCostCurrent > 0 ? shippingCostCurrent : shippingCost,
