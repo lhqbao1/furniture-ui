@@ -53,6 +53,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
+          brand_id: product.brand.id,
         },
         id: product.id,
       },
@@ -130,6 +131,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
+          brand_id: product.brand.id,
         },
         id: product.id,
       },
@@ -210,6 +212,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
+          brand_id: product.brand.id,
         },
         id: product.id,
       },
@@ -295,6 +298,7 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
+          brand_id: product.brand.id,
         },
         id: product.id,
       },
@@ -390,6 +394,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
                   quantity: item.quantity,
                 }))
               : null,
+          brand_id: product.brand.id,
         },
         id: product.id,
       },

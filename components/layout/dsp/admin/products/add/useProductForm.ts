@@ -10,7 +10,10 @@ import { useAddProduct, useEditProduct } from "@/features/products/hook";
 import { ProductItem } from "@/types/products";
 import { normalizeProductValues } from "@/components/layout/admin/products/products-form/normalize-product-values";
 import { submitProductDSP } from "./submit-handler";
-import { addProductDSPSchema } from "@/lib/schema/dsp/product";
+import {
+  addProductDSPSchema,
+  defaultValuesDSP,
+} from "@/lib/schema/dsp/product";
 import { useAddProductDSP } from "@/features/dsp/products/hook";
 
 export const useProductFormDSP = ({
@@ -27,7 +30,7 @@ export const useProductFormDSP = ({
   const [isLoadingSEO, setIsLoadingSEO] = useState(false);
 
   const initialValues = normalizeProductValues(
-    productValuesClone || productValues,
+    productValuesClone || defaultValuesDSP,
   );
 
   const form = useForm<z.infer<typeof addProductDSPSchema>>({

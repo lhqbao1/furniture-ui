@@ -21,6 +21,18 @@ import ProductLogisticsGroup from "@/components/layout/admin/products/products-f
 import { defaultValuesDSP, ProductInputDSP } from "@/lib/schema/dsp/product";
 import { useProductFormDSP } from "./useProductForm";
 
+function getFirstErrorMessage(errors: any): string | undefined {
+  for (const key in errors) {
+    const err = errors[key];
+    if (err?.message) return err.message;
+    if (typeof err === "object") {
+      const nested = getFirstErrorMessage(err);
+      if (nested) return nested;
+    }
+  }
+  return undefined;
+}
+
 interface AddProductFormDSPProps {
   productValues?: Partial<ProductItem>;
   onSubmit: (values: ProductInputDSP) => Promise<void> | void;
@@ -49,15 +61,14 @@ const ProductFormDSP = ({
     <div className="pb-20 px-30">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(
-            (values) => {
-              handleSubmit(values);
-            },
-            (errors) => {
-              toast.error("Please check the form for errors");
-              console.log(errors);
-            },
-          )}
+          onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+            const message = getFirstErrorMessage(errors);
+            console.log(form.getValues());
+            toast.error("Form validation error", {
+              description:
+                message ?? "Please fix the highlighted fields and try again.",
+            });
+          })}
         >
           <div className="grid-cols-12 grid gap-24 w-full">
             <div className="col-span-9 flex flex-col gap-4">

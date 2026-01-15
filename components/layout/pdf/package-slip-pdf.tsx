@@ -13,10 +13,7 @@ import { Font } from "@react-pdf/renderer";
 import { useMemo } from "react";
 import { FooterSection } from "./file-footer";
 import { getCountryName } from "@/lib/country-name";
-import {
-  calculateOrderTaxWithDiscount,
-  calculateProductVAT,
-} from "@/lib/caculate-vat";
+
 import { CartItem } from "@/types/cart";
 
 Font.register({
@@ -226,7 +223,6 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
                   : checkout?.checkouts?.[0]?.invoice_address?.country ?? "",
               )}
             </Text>
-            <Text>{checkout.checkouts[0].user.tax_id}</Text>
 
             {checkout?.checkouts?.[0]?.shipping_address?.email ? (
               <Text>
@@ -256,7 +252,7 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
                 paddingHorizontal: 8,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>Rechnung</Text>
+              <Text style={{ fontWeight: "bold" }}>Lieferschein</Text>
             </View>
 
             {/* Rows */}
@@ -271,7 +267,12 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
               <Text style={{ width: 80, fontWeight: "bold" }}>
                 Belegnummer:
               </Text>
-              <Text>{invoice.invoice_code}</Text>
+              <Text>
+                {checkout.checkouts[0].shipment &&
+                checkout.checkouts[0].shipment.tracking_number
+                  ? checkout.checkouts[0].shipment.tracking_number
+                  : ""}
+              </Text>
             </View>
 
             <View

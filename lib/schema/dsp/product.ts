@@ -6,12 +6,37 @@ const StaticFileSchema = z.object({
   url: z.string(),
 });
 
-export const packageSchema = z.object({
-  weight: z.number().nonnegative().optional().nullable(),
-  length: z.number().nonnegative().optional().nullable(),
-  width: z.number().nonnegative().optional().nullable(),
-  height: z.number().nonnegative().optional().nullable(),
-});
+export const packageSchema = z
+  .object({
+    weight: z.number().nonnegative().optional().nullable(),
+    length: z.number().nonnegative().optional().nullable(),
+    width: z.number().nonnegative().optional().nullable(),
+    height: z.number().nonnegative().optional().nullable(),
+  })
+  .superRefine((pkg, ctx) => {
+    const fields = ["length", "width", "height", "weight"] as const;
+
+    const filledFields = fields.filter(
+      (key) => pkg[key] !== null && pkg[key] !== undefined,
+    );
+
+    // ❌ nhập dở dang (1–3 field)
+    if (filledFields.length > 0 && filledFields.length < 4) {
+      fields.forEach((key) => {
+        const value = pkg[key];
+
+        // 👉 CHỈ báo lỗi cho field còn thiếu
+        if (value === null || value === undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "If you enter package dimensions, all fields are required.",
+            path: [key], // 👈 field cụ thể
+          });
+        }
+      });
+    }
+  });
 
 export const addProductDSPSchema = z.object({
   name: z
@@ -36,13 +61,13 @@ export const addProductDSPSchema = z.object({
   amount_unit: z.string().optional().nullable(),
   incoterm: z.string().optional().nullable(),
   sku: z.string().min(1, { message: "Sku is required" }),
-  packaging_amount: z.string().optional().nullable(),
   ean: z.string().min(1, { message: "EAN is required" }),
+  packaging_amount: z.string().optional().nullable(),
   carrier: z.string().optional().nullable(),
   delivery_time: z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),
   tariff_number: z.string().optional().nullable(),
-  brand_id: z.string().min(1, "Brand is required"),
+  brand_id: z.string().min(1, { message: "Brand is required" }),
   ebay: z.boolean().optional().nullable(),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
   weight: z.number().optional().nullable(),
@@ -82,15 +107,9 @@ export const defaultValuesDSP = {
   ebay: false,
   ean: "",
   sku: "",
-  // delivery_cost: 0,
+  brand_id: "",
   collection: null as string | null,
-  // ean: "",
   is_active: false,
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
-  // brand_id: "",
-  // carrier: "",
-  // delivery_time: "",
-  // manufacture_country: "",
-  // tariff_number: ""
 };

@@ -310,6 +310,12 @@ export default function RootLayout({
               "bg-[rgba(81,190,140,0.2)] text-white z-100 top-10 translate-y-10",
           }}
         />
+
+        <script
+          src="https://www.dwin1.com/121738.js"
+          type="text/javascript"
+          defer
+        ></script>
       </body>
     </html>
   );

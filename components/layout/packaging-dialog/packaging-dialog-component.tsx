@@ -12,9 +12,7 @@ import { getCountryName } from "@/lib/country-name";
 import { PackagingDialogTable } from "./packaging-dialog-table";
 import { packagingColumns } from "./packaging-dialog-columns";
 import { CartItem } from "@/types/cart";
-import { InvoicePDF } from "../pdf/file";
 import { PackageSlipPdf } from "../pdf/package-slip-pdf";
-import { check } from "zod";
 
 interface InvoiceTableProps {
   checkoutId: string;
@@ -142,7 +140,6 @@ export default function InvoiceTable({
                 : checkout?.checkouts?.[0]?.invoice_address?.country ?? "",
             )}
           </span>
-          <span>{checkout?.checkouts?.[0]?.user?.tax_id}</span>
 
           {checkout?.checkouts?.[0]?.shipping_address?.email ? (
             <span>
@@ -159,14 +156,19 @@ export default function InvoiceTable({
         <div className="w-[320px] border border-gray-400 text-[13px]">
           {/* Header */}
           <div className="bg-[#d2d2d2] relative z-50 text-center font-semibold py-1 border-b border-gray-400">
-            Rechnung
+            Lieferschein
           </div>
 
           {/* Body */}
           <div className="p-3 space-y-1.5">
             <div className="flex justify-between">
               <span className="font-medium">Belegnummer:</span>
-              <span>{invoice?.invoice_code}</span>
+              <span>
+                {checkout?.checkouts[0].shipment &&
+                checkout.checkouts[0].shipment.tracking_number
+                  ? checkout.checkouts[0].shipment.tracking_number
+                  : ""}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Datum:</span>

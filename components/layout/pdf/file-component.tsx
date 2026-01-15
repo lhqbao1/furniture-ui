@@ -87,7 +87,7 @@ export default function InvoiceTable({
       <div className="flex justify-between gap-8 w-full">
         <div className="flex flex-col gap-0">
           <span className="text-sm">
-            Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlina
+            Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
           </span>
           {checkout?.checkouts?.[0]?.user.company_name
             ? checkout?.checkouts?.[0]?.user.company_name

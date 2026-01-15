@@ -1084,6 +1084,7 @@ export const COUNTRY_ORIGIN_OPTIONS = [
 ];
 export const CARRIERS = [
   { id: "amm", logo: "/amm.jpeg" },
+  { id: "spedition", logo: "/amm.jpeg" },
   { id: "dpd", logo: "/dpd.jpeg" },
   { id: "dhl", logo: "/dhl.png" },
   { id: "gls", logo: "/gls-new.png" },

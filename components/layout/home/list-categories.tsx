@@ -56,7 +56,20 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                   //   setCategoryClicked(true);
                   // }}
                 >
-                  {category.name}
+                  <NavigationMenuLink
+                    key={category.id}
+                    onClick={() => {
+                      // setCurrentCategoryId(child.id);
+                      // setCategoryClicked(true);
+                      router.push(`/category/${category.slug}`, { locale });
+                    }}
+                    className="
+                          relative cursor-pointer px-2 py-2 text-sm
+                           w-fit
+                        "
+                  >
+                    {category.name}
+                  </NavigationMenuLink>
                 </NavigationMenuTrigger>
 
                 {category.children?.length > 0 && (
