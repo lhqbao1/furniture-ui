@@ -134,6 +134,9 @@ const Footer = () => {
           <li className="hover:pl-2 transition-all duration-500">
             <Link href={`/blog`}>Blog</Link>
           </li>
+          <li className="hover:pl-2 transition-all duration-500">
+            <Link href={`/dsp/login`}>Händler-Login</Link>
+          </li>
         </ul>
       </div>
 
