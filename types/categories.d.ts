@@ -69,3 +69,8 @@ export interface CategoryBySlugResponse {
 export type AddOrRemoveProductToCategoryInput = {
   products: string[];
 };
+
+export type ListCategoryChildrenNameByParent = {
+  name: string;
+  child: string[];
+};

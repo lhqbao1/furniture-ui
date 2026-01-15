@@ -106,19 +106,9 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                   </FormItem>
                 )}
               />
-              <div className="w-full flex justify-end">
-                <div
-                  onClick={(e) => {
-                    handleAddWishlist();
-                  }}
-                  className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white border-gray-600 border hover:border-secondary transition-all duration-300 hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
-                >
-                  <Heart />
-                </div>
-              </div>
             </div>
 
-            <div className="space-y-2 lg:basis-2/5 basis-3/5 relative">
+            <div className="space-y-2 lg:basis-2/5 basis-3/5 relative flex gap-2">
               {productDetails.stock > 0 ||
               (productDetails.stock === 0 &&
                 getTotalIncomingStock(productDetails.inventory) > 0) ? (
@@ -153,6 +143,16 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                   {t("priceComparison")}
                 </Button>
               )} */}
+              <div className="flex justify-end">
+                <div
+                  onClick={(e) => {
+                    handleAddWishlist();
+                  }}
+                  className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white transition-all duration-300 hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
+                >
+                  <Heart />
+                </div>
+              </div>
             </div>
           </div>
 

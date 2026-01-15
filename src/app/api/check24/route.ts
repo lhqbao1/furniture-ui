@@ -58,7 +58,14 @@ export async function GET() {
     ];
 
     const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0 && p.brand)
+      .filter(
+        (p) =>
+          p.final_price > 0 &&
+          p.is_active &&
+          p.stock > 0 &&
+          p.brand &&
+          p.component,
+      )
       .map((p) => {
         const categories = p.categories?.map((c) => c.name).join(", ") || "";
         const size = `${p.height} x ${p.width} x ${p.length} cm`;
@@ -101,11 +108,7 @@ export async function GET() {
           escapeCsv(p.static_files.length > 7 ? p.static_files[7].url : ""),
           escapeCsv(p.static_files.length > 8 ? p.static_files[8].url : ""),
           escapeCsv(p.static_files.length > 9 ? p.static_files[9].url : ""),
-          escapeCsv(
-            p.bundles?.length
-              ? p.bundles.map((item) => item.bundle_item.name).join(", ")
-              : p.name,
-          ),
+          escapeCsv(p.component),
           escapeCsv(p.stock ?? ""),
           escapeCsv(`${formatEuro(p.final_price)} €`),
           escapeCsv(`${p.delivery_time} Werktage`),

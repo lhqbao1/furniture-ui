@@ -213,6 +213,7 @@ export type ProductItem = {
   options: VariantOptionResponse[];
   categories: CategoryResponse[];
   brand: BrandResponse;
+  component: string;
 
   delivery_multiple: boolean;
   return_cost: number;

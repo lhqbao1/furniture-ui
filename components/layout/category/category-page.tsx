@@ -4,19 +4,18 @@ import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import React, { useEffect, useState } from "react";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { CustomPagination } from "@/components/shared/custom-pagination";
-import { useAtom } from "jotai";
-import {
-  currentCategoryIdAtom,
-  currentCategoryNameAtom,
-} from "@/store/category";
 import { useTranslations } from "next-intl";
 import { CategoryBySlugResponse } from "@/types/categories";
 import { useQuery } from "@tanstack/react-query";
-import { getCategoryBySlug } from "@/features/category/api";
+import {
+  getCategoryBySlug,
+  getChildrenCategoryByParent,
+} from "@/features/category/api";
 import ShopAllFilterSection from "../shop-all/shop-all-filter-section";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/src/i18n/navigation";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
+import { useGetChildrenCategoriesByParent } from "@/features/category/hook";
 
 interface ProductCategoryProps {
   categorySlugs: string[];
@@ -42,6 +41,14 @@ const ProductCategory = ({
   const brandsKey =
     brands.length > 0 ? brands.slice().sort().join("|") : undefined;
 
+  const categoriesParams = searchParams.getAll("categories");
+  const categoriesKey =
+    categoriesParams.length > 0
+      ? categoriesParams.slice().sort().join("|")
+      : undefined;
+
+  console.log(categoriesParams);
+
   const colors = searchParams.getAll("color");
   const colorsKey =
     colors.length > 0 ? colors.slice().sort().join("|") : undefined;
@@ -64,13 +71,14 @@ const ProductCategory = ({
     setPageSize(pageSizeFromUrl);
   }, [pageFromUrl, pageSizeFromUrl]);
 
-  const { data: categoryData, isFetching } = useQuery({
-    queryKey: ["category", categorySlugs, page, pageSize],
+  const {
+    data: listCategory,
+    isLoading: isLoadingList,
+    isError: isErrorList,
+  } = useQuery({
+    queryKey: ["category-children", categorySlugs],
     queryFn: () =>
-      getCategoryBySlug(categorySlugs[categorySlugs.length - 1], {
-        page,
-        page_size: pageSize,
-      }),
+      getChildrenCategoryByParent(categorySlugs[categorySlugs.length - 1]),
 
     // ✅ giữ data cũ khi refetch
     placeholderData: (prev) => prev,
@@ -94,8 +102,13 @@ const ProductCategory = ({
       materialsKey,
       delivery_time: deliveryTime,
       delivery_timeKey: deliveryTimeKey,
-      categories: categoryData ? [categoryData.name] : [], // 👈
-      categoriesKey: categoryData?.name, // 👈
+      categories:
+        categoriesParams && categoriesParams.length > 0
+          ? categoriesParams
+          : listCategory?.child && listCategory?.child?.length > 0
+          ? listCategory.child
+          : [listCategory?.name ?? ""],
+      categoriesKey: categoriesKey,
     });
 
   const handlePageChange = (newPage: number) => {
@@ -112,7 +125,12 @@ const ProductCategory = ({
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-2 md:block md:col-span-4 lg:col-span-3 xl:col-span-2 hidden">
           <div className="sticky top-48 max-h-[calc(100vh-6rem)] pr-2 overflow-y-auto no-scrollbar">
-            <ShopAllFilterSection isShopAll={false} />
+            <ShopAllFilterSection
+              isShopAll={false}
+              isParentCategory={
+                listCategory && listCategory.child.length > 0 ? true : false
+              }
+            />
           </div>
         </div>
         <div className="pt-0 pb-12 lg:w-[90%] md:w-[95%] xl:w-[90%] w-full mx-auto col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
@@ -126,18 +144,23 @@ const ProductCategory = ({
             ""
           )}
 
-          {!categoryData && !algoliaData && isFetching && isAlgoliaLoading ? (
+          {!listCategory &&
+          !algoliaData &&
+          isLoadingList &&
+          isAlgoliaLoading ? (
             <ProductGridSkeleton length={12} />
           ) : (
             <div className="filter-section">
               <div className="pt-2 md:pt-6 lg:pt-10 pb-12">
-                {algoliaData && algoliaData?.items.length > 0 ? (
+                {isAlgoliaLoading ? (
+                  <ProductGridSkeleton length={12} />
+                ) : !algoliaData ? (
+                  <div>{t("noProducts")}</div>
+                ) : (
                   <ProductsGridLayout
                     hasBadge
                     data={algoliaData?.items ?? []}
                   />
-                ) : (
-                  <div className="text-center">{t("noProducts")}</div>
                 )}
               </div>
             </div>
