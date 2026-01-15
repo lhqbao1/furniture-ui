@@ -9,11 +9,21 @@ import { VariableCostHeader } from "./variable-cost-header";
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 
-export default function VariableCostPage() {
+interface VariableCostPageProps {
+  month: number;
+  year: number;
+  setMonth: (month: number) => void;
+  setYear: (year: number) => void;
+}
+
+export default function VariableCostPage({
+  month,
+  year,
+  setMonth,
+  setYear,
+}: VariableCostPageProps) {
   const now = new Date();
 
-  const [month, setMonth] = useState<number>(now.getMonth() + 1);
-  const [year, setYear] = useState<number>(now.getFullYear());
   const [newMarketplace, setNewMarketplace] = React.useState("");
   const [adding, setAdding] = React.useState(false);
 

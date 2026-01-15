@@ -12,7 +12,7 @@ export interface MarketplaceCostRow {
   feePercent: number;
 }
 
-const mergeMarketplaceCostData = (
+export const mergeMarketplaceCostData = (
   variableFeeData: GetVariableFeeByMarketplaceResponse,
   checkoutData: {
     marketplace: string;
@@ -58,6 +58,7 @@ const VariableCostTable = ({
   setYear,
 }: VariableCostTableProps) => {
   const [variableCost, setVariableCost] = useAtom(variableCostAtom);
+
   const { variableFeeData, marketplaceData } = useVariableCost({
     month,
     year,

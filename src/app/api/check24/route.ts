@@ -107,15 +107,13 @@ export async function GET() {
               : p.name,
           ),
           escapeCsv(p.stock ?? ""),
-          escapeCsv(html(`${formatEuro(p.final_price)} €`)),
-          escapeCsv(html(`${p.delivery_time} Werktage`)),
+          escapeCsv(`${formatEuro(p.final_price)} €`),
+          escapeCsv(`${p.delivery_time} Werktage`),
           escapeCsv(p.carrier === "dpd" ? "Paket" : "Spedition"),
           escapeCsv(
-            html(
-              p.carrier === "dpd"
-                ? `${formatEuro(5.95)} €`
-                : `${formatEuro(35.95)} €`,
-            ),
+            p.carrier === "dpd"
+              ? `${formatEuro(5.95)} €`
+              : `${formatEuro(35.95)} €`,
           ),
           escapeCsv(p.brand.name ?? ""),
           escapeCsv(p.brand.company_address ?? ""),
