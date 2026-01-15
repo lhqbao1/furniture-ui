@@ -6,7 +6,7 @@ const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // 1. Public API - không có token
 export const apiPublic = axios.create({
   baseURL,
-  withCredentials: true,
+  withCredentials: false,
 });
 
 // 2. User API - attach access_token

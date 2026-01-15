@@ -8,6 +8,8 @@ import VariableCostTable from "./variable-cost-table";
 import { VariableCostHeader } from "./variable-cost-header";
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { variableCostAtom } from "@/store/variable";
+import { useAtom } from "jotai";
 
 interface VariableCostPageProps {
   month: number;
@@ -23,6 +25,7 @@ export default function VariableCostPage({
   setYear,
 }: VariableCostPageProps) {
   const now = new Date();
+  const [variableCost, setVariableCost] = useAtom(variableCostAtom);
 
   const [newMarketplace, setNewMarketplace] = React.useState("");
   const [adding, setAdding] = React.useState(false);
@@ -57,6 +60,9 @@ export default function VariableCostPage({
           setMonth={setMonth}
           setYear={setYear}
         />
+      </div>
+      <div className="text-end text-lg">
+        Total: <span className="font-semibold">{variableCost}€</span>
       </div>
       <div className="flex items-center justify-between mt-8">
         <div className="font-medium">
