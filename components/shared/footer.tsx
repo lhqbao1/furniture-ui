@@ -288,9 +288,9 @@ const Footer = () => {
             <img
               src="https://legal-images.trustedshops.com/Rechtspartner-Logo.png"
               alt="Legal Partner Logo"
-              width="268"
+              width="140"
               loading="lazy"
-              style={{ width: "268px" }}
+              style={{ width: "140px" }}
             />
           </a>
           <a
