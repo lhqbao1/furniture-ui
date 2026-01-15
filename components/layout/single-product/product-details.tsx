@@ -75,10 +75,10 @@ const ProductDetails = ({
                     isProductDetail
                   />
                   <h2 className="lg:text-3xl text-xl font-semibold text-black">
-                    {productDetails.name}
+                    {productDetails.name ?? ""}
                   </h2>
                   <div>
-                    {t("itemNumber")}: {productDetails.id_provider}
+                    {t("itemNumber")}: {productDetails.id_provider ?? ""}
                   </div>
                 </div>
                 <ListStarsReview reviews={reviews} />

@@ -35,19 +35,16 @@ const OrderDetailOverView = ({
         <div>Last update:</div>
         <div>{updated_at}</div>
       </div>
-      <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold cursor-pointer">
-        <div className="flex gap-1">
-          <div>Payment Method:</div>
-          <div
-            translate="no"
-            className="capitalize"
-          >
-            {order.from_marketplace
-              ? `${order.from_marketplace} Managed Payments`
-              : order.payment_method}
-          </div>
+      <div className="flex gap-1 text-sm">
+        <div>Payment Method:</div>
+        <div
+          translate="no"
+          className="capitalize"
+        >
+          {order.from_marketplace
+            ? `${order.from_marketplace} Managed Payments`
+            : order.payment_method}
         </div>
-        <ArrowRight size={16} />
       </div>
 
       <div className="space-y-2 mt-2">
@@ -55,19 +52,6 @@ const OrderDetailOverView = ({
           order={order}
           status={status}
         />
-        {/* <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold cursor-pointer">
-          <div className="flex gap-1">
-            <div>Chanel:</div>
-            <div
-              translate="no"
-              className="capitalize"
-            >
-              {order.from_marketplace ?? "Prestige Home"}
-            </div>
-          </div>
-          <ArrowRight size={16} />
-        </div>
-       */}
       </div>
     </div>
   );

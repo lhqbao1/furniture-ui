@@ -143,7 +143,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                 </Button>
               )}
 
-              {productDetails.marketplace_products.length > 0 && (
+              {/* {productDetails.marketplace_products.length > 0 && (
                 <Button
                   type="button"
                   variant={"secondary"}
@@ -152,7 +152,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                 >
                   {t("priceComparison")}
                 </Button>
-              )}
+              )} */}
             </div>
           </div>
 

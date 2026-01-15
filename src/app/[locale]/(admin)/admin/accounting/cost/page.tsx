@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductSoldPage from "@/components/layout/admin/accountant/cost/product-sold-tab/product-sold-page";
@@ -7,8 +8,44 @@ import FixedCostPage from "@/components/layout/admin/accountant/cost/fixed-cost/
 import VariableCostPage from "@/components/layout/admin/accountant/cost/variable-cost/variable-cost-page";
 import ProductMarginPage from "@/components/layout/admin/accountant/cost/product-margin/product-margin-page";
 import OverviewPage from "@/components/layout/admin/accountant/cost/overview/overview-page";
+import { useAtom } from "jotai";
+import { variableCostAtom } from "@/store/variable";
+import { useVariableCost } from "@/components/layout/admin/accountant/cost/variable-cost/useVariableCost";
+import { mergeMarketplaceCostData } from "@/components/layout/admin/accountant/cost/variable-cost/variable-cost-table";
 
 const CostManagement = () => {
+  const now = new Date();
+
+  const [month, setMonth] = useState<number>(now.getMonth() + 1);
+  const [year, setYear] = useState<number>(now.getFullYear());
+
+  const [variableCost, setVariableCost] = useAtom(variableCostAtom);
+
+  const { variableFeeData, marketplaceData } = useVariableCost({
+    month,
+    year,
+    setMonth,
+    setYear,
+  });
+
+  const tableRows = useMemo(() => {
+    if (!variableFeeData || !marketplaceData) return [];
+
+    return mergeMarketplaceCostData(
+      variableFeeData,
+      marketplaceData.data ?? [],
+    );
+  }, [variableFeeData, marketplaceData]);
+
+  const totalFeePercent = useMemo(
+    () => tableRows.reduce((sum, i) => sum + i.feePercent, 0),
+    [tableRows],
+  );
+
+  useEffect(() => {
+    setVariableCost(totalFeePercent);
+  }, [totalFeePercent, setVariableCost]);
+
   return (
     <div className="space-y-3">
       {/* <StickyMonthSelector /> */}
@@ -70,7 +107,12 @@ const CostManagement = () => {
           <TabsContent value="variable-cost">
             <Card>
               <CardContent>
-                <VariableCostPage />
+                <VariableCostPage
+                  month={month}
+                  year={year}
+                  setMonth={setMonth}
+                  setYear={setYear}
+                />
               </CardContent>
             </Card>
           </TabsContent>
