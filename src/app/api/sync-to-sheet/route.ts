@@ -5,9 +5,7 @@ import { google } from "googleapis";
 import { NextResponse } from "next/server";
 
 // Bạn nên lưu nội dung JSON credentials trong biến môi trường
-const serviceAccount = JSON.parse(
-  process.env.GOOGLE_SERVICE_ACCOUNT_JSON!.replace(/\\n/g, "\n"),
-);
+const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!);
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
