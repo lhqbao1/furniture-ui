@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useEffect, useState } from "react";
 import { tokenStore } from "@/lib/token";
 
-export default function QueryProvider({ children }: { children: ReactNode }) {
+export default function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(() => new QueryClient());
 
   useEffect(() => {

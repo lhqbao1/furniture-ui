@@ -72,7 +72,6 @@ const ExchangeConfirmDialog = ({
     isError,
   } = useGetAllProducts({
     search: queryParams,
-    all_products: "true",
     page_size: 100,
   });
 
