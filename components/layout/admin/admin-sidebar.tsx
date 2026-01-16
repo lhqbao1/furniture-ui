@@ -40,6 +40,11 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         {
+          title: "Product Related",
+          url: "/admin/products/related",
+          icon: CornerDownRight,
+        },
+        {
           title: "Product Group",
           url: "/admin/products/group",
           icon: CornerDownRight,
