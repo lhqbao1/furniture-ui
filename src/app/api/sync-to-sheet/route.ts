@@ -30,7 +30,10 @@ export async function GET() {
       range: "Sheet1!A2:Z9999", // xoá từ dòng 2 trở xuống
     });
 
-    const products = await getProductsFeed(); // bạn sẽ viết hàm này
+    const products = await getAllProductsSelect({
+      is_econelo: false,
+      all_products: true,
+    }); // bạn sẽ viết hàm này
 
     // 3️⃣ Lọc sản phẩm đang active và có tồn kho
     const activeProducts = products.filter(

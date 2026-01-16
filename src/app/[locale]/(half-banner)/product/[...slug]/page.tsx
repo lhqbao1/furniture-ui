@@ -14,6 +14,7 @@ import ComparePriceSection from "@/components/layout/single-product/compare-pric
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { getBlogsByProductSlug } from "@/features/blog/api";
 import RelatedBlogs from "@/components/layout/single-product/related-blogs";
+import BoughtTogetherSection from "@/components/layout/single-product/bought-together";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -238,9 +239,11 @@ export default async function Page({
             parentProduct={plainParent}
           />
 
-          {plainProduct && plainProduct.marketplace_products.length > 0 && (
+          <BoughtTogetherSection productDetails={plainProduct} />
+
+          {/* {plainProduct && plainProduct.marketplace_products.length > 0 && (
             <ComparePriceSection product={plainProduct} />
-          )}
+          )} */}
 
           <div className="lg:mt-12 mt-0">
             <ProductDetailsTab

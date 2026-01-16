@@ -10,6 +10,7 @@ const LoginGoogleButton = () => {
   const handleLoginGoogle = () => {
     window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}google/login`;
   };
+
   return (
     <div className="flex flex-col gap-4 justify-center items-center mt-8">
       <Button
