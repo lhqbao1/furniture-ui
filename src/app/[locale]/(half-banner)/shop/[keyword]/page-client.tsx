@@ -1,7 +1,6 @@
 "use client";
 
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
-import { getAllProducts } from "@/features/products/api";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { CustomPagination } from "@/components/shared/custom-pagination";

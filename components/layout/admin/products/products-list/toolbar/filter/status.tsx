@@ -13,28 +13,22 @@ export default function ProductStatusFilter() {
 
   const showAllParam = searchParams.get("all_products");
 
-  // ⭐ default = true → nếu không có param thì mặc định là ALL
-  const showAll = showAllParam === "true" || showAllParam === null;
+  console.log(showAllParam);
 
-  const value = showAll ? "true" : "false";
+  const value = showAllParam === null ? "all" : showAllParam;
 
   const handleChange = (v: string) => {
     const params = new URLSearchParams(searchParams);
 
-    params.set("all_products", v);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
-  useEffect(() => {
-    const raw = searchParams.get("all_products");
-
-    // nếu chưa có param → set default
-    if (raw === null) {
-      const params = new URLSearchParams(searchParams);
-      params.set("all_products", "true");
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    if (v === "all") {
+      params.delete("all_products");
+    } else {
+      params.set("all_products", v);
     }
-  }, [searchParams, pathname, router]);
+
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -47,7 +41,7 @@ export default function ProductStatusFilter() {
       >
         <div className="flex items-center space-x-2">
           <RadioGroupItem
-            value="false"
+            value="true"
             id="active"
           />
           <Label
@@ -60,7 +54,20 @@ export default function ProductStatusFilter() {
 
         <div className="flex items-center space-x-2">
           <RadioGroupItem
-            value="true"
+            value="false"
+            id="inactive"
+          />
+          <Label
+            htmlFor="active"
+            className="cursor-pointer"
+          >
+            Inactive
+          </Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem
+            value="all"
             id="all"
           />
           <Label

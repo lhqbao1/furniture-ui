@@ -7,11 +7,11 @@ import qs from "qs";
 export interface GetAllProductsParams {
   page?: number;
   page_size?: number;
-  all_products?: string;
+  all_products?: string | null;
   search?: string;
   is_inventory?: string;
   sort_by_stock?: string;
-  is_econelo?: boolean;
+  is_econelo?: boolean | null;
   brand?: string;
   sort_by_marketplace?: string;
   supplier_id?: string;

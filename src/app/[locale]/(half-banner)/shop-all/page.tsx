@@ -3,10 +3,7 @@
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { CustomPagination } from "@/components/shared/custom-pagination";
-import {
-  useGetAllProducts,
-  useProductsAlgoliaSearch,
-} from "@/features/products/hook";
+import { useProductsAlgoliaSearch } from "@/features/products/hook";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useEffect, useState } from "react";
 import ShopAllFilterSection from "@/components/layout/shop-all/shop-all-filter-section";
