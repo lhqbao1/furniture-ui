@@ -28,7 +28,7 @@ const BoughtTogetherSection = ({
     isLoading,
     isError,
   } = useGetRelatedProducts(productDetails.id);
-  if (!relatedProducts || isError) return;
+  if (!relatedProducts || relatedProducts.length === 0 || isError) return;
   if (isLoading) return <FBTSectionSkeleton />;
 
   return (
