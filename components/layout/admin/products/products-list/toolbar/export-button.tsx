@@ -3,9 +3,7 @@
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
-import { ProductItem } from "@/types/products";
 import { Loader2 } from "lucide-react";
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useQuery } from "@tanstack/react-query";
 import { getAllProductsSelect } from "@/features/product-group/api";
 
@@ -25,10 +23,7 @@ function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
 export default function ExportExcelButton() {
   const { data, isFetching, refetch } = useQuery({
     queryKey: ["all-products"],
-    queryFn: () =>
-      getAllProductsSelect({
-        all_products: true,
-      }),
+    queryFn: () => getAllProductsSelect({}),
     enabled: false, // ❌ không auto call
   });
 

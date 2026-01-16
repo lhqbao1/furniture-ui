@@ -13,8 +13,6 @@ export default function ProductStatusFilter() {
 
   const showAllParam = searchParams.get("all_products");
 
-  console.log(showAllParam);
-
   const value = showAllParam === null ? "all" : showAllParam;
 
   const handleChange = (v: string) => {

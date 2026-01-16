@@ -44,6 +44,13 @@ const AdminInventoryList = () => {
     is_inventory: filters.is_inventory,
   });
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [page]);
+
   if (isError) return <div>No data</div>;
 
   return (

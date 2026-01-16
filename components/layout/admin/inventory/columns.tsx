@@ -167,10 +167,13 @@ export const getInventoryColumns = (
                 <div className="">{formatIOSDate(item.date_received)}</div>
                 <div className="">
                   €
-                  {item.cost_received.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {(item.cost_received / item.incoming_stock).toLocaleString(
+                    "de-DE",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    },
+                  )}
                 </div>
               </div>
 
@@ -200,22 +203,25 @@ export const getInventoryColumns = (
 
       const total = inv.reduce((sum, item) => {
         const cost = Number(item.cost_received ?? 0);
-        const stock = Number(item.incoming_stock ?? 0);
 
-        const value = cost * stock;
+        const value = cost;
         return sum + (isNaN(value) ? 0 : value);
       }, 0);
 
       return (
         <div className="text-center">
-          €
-          {total > 0
-            ? total.toLocaleString("de-DE", {
+          {total > 0 ? (
+            <>
+              {" "}
+              €
+              {total.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })
-            : "Updating"}
-          /pcs
+              })}
+            </>
+          ) : (
+            "Updating"
+          )}
         </div>
       );
     },
