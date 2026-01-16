@@ -34,13 +34,13 @@ export async function getProductGroup() {
 export async function getAllProductsSelect({
   search,
   is_customer = false,
-  all_products = false,
+  all_products,
   is_econelo,
   supplier_id,
 }: {
   search?: string;
   is_customer?: boolean;
-  all_products?: boolean;
+  all_products?: boolean | null;
   is_econelo?: boolean;
   supplier_id?: string | null;
 }) {

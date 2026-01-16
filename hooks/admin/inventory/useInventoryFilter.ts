@@ -6,7 +6,7 @@ export function useProductInventoryFilters() {
   return {
     page: Number(searchParams.get("page")) || 1,
     pageSize: Number(searchParams.get("page_size")) || 50,
-    all_products: searchParams.get("all_products") || "true",
+    all_products: searchParams.get("all_products") || null,
     search: searchParams.get("search") || "",
     is_inventory: searchParams.get("is_inventory") || "true",
   };

@@ -30,24 +30,20 @@ const FilterExportForm = () => {
   const [status, setStatus] = useState<"active" | "inactive" | "all">("all");
 
   const buildParams = () => {
-    let all_products: boolean | undefined = undefined;
-    if (status === "active") all_products = true;
-    if (status === "inactive") all_products = false;
+    const params: any = {};
 
-    // supplier logic
-    let supplier_id: string | null | undefined = undefined;
+    if (status === "active") {
+      params.all_products = true;
+    } else if (status === "inactive") {
+      params.all_products = false;
+    }
+    // status === "all" => không set all_products
 
-    if (supplier === "") {
-      // all suppliers → do not send supplier_id
-      supplier_id = undefined;
-    } else {
-      supplier_id = supplier; // actual supplier id
+    if (supplier) {
+      params.supplier_id = supplier === "" ? undefined : supplier;
     }
 
-    return {
-      supplier_id,
-      all_products,
-    };
+    return params;
   };
 
   const { data, isFetching, refetch } = useQuery({
@@ -60,6 +56,7 @@ const FilterExportForm = () => {
   if (!suppliers) return <>Loading...</>;
 
   const handleExport = async () => {
+    console.log(buildParams());
     const res = await refetch();
     const data = res.data;
 
