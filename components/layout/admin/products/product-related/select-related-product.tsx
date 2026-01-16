@@ -32,6 +32,7 @@ const SelectRelatedProducts = () => {
 
   const { data: listProducts, isLoading } = useGetProductsSelect({
     is_econelo: false,
+    all_products: true,
   });
 
   return (
