@@ -15,6 +15,8 @@ import Image from "next/image";
 import React from "react";
 import FBTSectionSkeleton from "./skeleton/bought-together-skeleton";
 import BoughtTogetherAddToCart from "./bought-together-add-to-cart";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 
 interface BoughtTogetherSectionProps {
   productDetails: ProductItem;
@@ -23,6 +25,7 @@ interface BoughtTogetherSectionProps {
 const BoughtTogetherSection = ({
   productDetails,
 }: BoughtTogetherSectionProps) => {
+  const locale = useLocale();
   const {
     data: relatedProducts,
     isLoading,
@@ -98,7 +101,11 @@ const BoughtTogetherSection = ({
                     unoptimized
                   />
                   <div className="flex flex-col items-center relative w-full space-y-1.5">
-                    <p className="text-center">{item.name}</p>
+                    <Link href={`/product/${item.url_key}`}>
+                      <p className="text-center hover:text-secondary cursor-pointer">
+                        {item.name}
+                      </p>
+                    </Link>
                     <div className="flex items-center gap-2">
                       <Label
                         htmlFor="terms"
