@@ -56,9 +56,7 @@ export async function getAllProductsSelect({
     },
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
     },
-    withCredentials: true, // nếu backend cần cookie/session
   });
 
   return data as ProductItem[];

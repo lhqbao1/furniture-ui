@@ -108,7 +108,16 @@ export const getInventoryColumns = (
     cell: ({ row }) => (
       <div className="max-w-80 w-80 text-wrap">
         <div>{row.original.name}</div>
-        <div>SKU: {row.original.sku}</div>
+        <div className="flex gap-2 items-center">
+          <div>SKU: {row.original.sku}</div>
+          <Link
+            href={`/admin/products/${row.original.id}/edit`}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            <Pencil className="size-3 text-primary cursor-pointer" />
+          </Link>
+        </div>
       </div>
     ),
     enableSorting: true,

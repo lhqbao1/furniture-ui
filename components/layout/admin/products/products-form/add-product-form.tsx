@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { toast } from "sonner";
+import LogStockTab from "./log-stock-tab";
 
 function getFirstErrorMessage(errors: any): string | undefined {
   for (const key in errors) {
@@ -231,6 +232,30 @@ const ProductForm = ({
                     </Card>
                   </div>
                 </AccordionItem>
+
+                {/* Log Stock */}
+                {productValues && (
+                  <AccordionItem
+                    value="log"
+                    className="border-none"
+                  >
+                    <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
+                      Stock Log
+                    </AccordionTrigger>
+
+                    <div
+                      className={
+                        openAccordion.includes("log") ? "block mt-4" : "hidden"
+                      }
+                    >
+                      <Card>
+                        <CardContent>
+                          <LogStockTab productDetail={productValues} />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </AccordionItem>
+                )}
               </Accordion>
             </div>
 
