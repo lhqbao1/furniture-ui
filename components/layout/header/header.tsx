@@ -22,7 +22,7 @@ const PageHeader = async () => {
           <ProductSearch />
         </div>
 
-        <div className="flex h-full items-center justify-end w-fit gap-3 lg:items-end lg:gap-6">
+        <div className="flex h-full items-center justify-end lg:w-fit w-full gap-3 lg:items-end lg:gap-6">
           {/*Mobile Search */}
           <MobileProductSearch />
           {/*Shopping cart */}
