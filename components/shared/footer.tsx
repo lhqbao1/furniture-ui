@@ -19,8 +19,8 @@ const Footer = () => {
         isProductDetail ? "pb-30" : "",
       )}
     >
-      <div className="lg:w-1/2 w-full lg:col-span-12 col-span-6 shadow-[0_4px_20px_rgba(0,177,89,0.15)] flex lg:flex-row flex-col lg:items-center justify-center lg:gap-24 gap-6 mb-6 lg:absolute lg:left-1/2 lg:-translate-x-1/2 top-0 lg:-translate-y-1/2 bg-white px-6 py-4 rounded-tl-2xl rounded-tr-2xl">
-        <div className="flex flex-col gap-2 items-center justify-center">
+      {/* <div className="lg:w-1/2 w-full lg:col-span-12 col-span-6 shadow-[0_4px_20px_rgba(0,177,89,0.15)] flex lg:flex-row flex-col lg:items-center justify-center lg:gap-24 gap-6 mb-6 lg:absolute lg:left-1/2 lg:-translate-x-1/2 top-0 lg:-translate-y-1/2 bg-white px-6 py-4 rounded-tl-2xl rounded-tr-2xl">
+        {/* <div className="flex flex-col gap-2 items-center justify-center">
           <Link
             href={
               "https://www.ebay.de/sch/i.html?item=365962209706&rt=nc&_trksid=p4429486.m3561.l161211&_ssn=prestige.home"
@@ -39,7 +39,7 @@ const Footer = () => {
           </Link>
           <ListStars rating={5} />
           <div className="text-sm font-semibold">96% 5-Stars</div>
-        </div>
+        </div> */}
         {/* <div className="flex flex-col gap-2 items-center justify-center">
           <Link
             href={
@@ -60,7 +60,7 @@ const Footer = () => {
           <ListStars rating={5} />
           <div className="text-sm font-semibold">100% 5-Stars</div>
         </div> */}
-        <div className="flex flex-col gap-2 items-center justify-center">
+        {/* <div className="flex flex-col gap-2 items-center justify-center">
           <Link
             href={"https://www.kaufland.de/shops/Prestige_Home_GmbH/"}
             target="_blank"
@@ -77,8 +77,8 @@ const Footer = () => {
           </Link>
           <ListStars rating={5} />
           <div className="text-sm font-semibold">100% 5-Stars</div>
-        </div>
-      </div>
+        </div> */}
+      </div> */}
       {/* Cột 1: Newsletter */}
       {/* <div className="footer-column col-span-6 lg:col-span-4 space-y-3 mb-6 lg:mb-0">
         <h4 className="">{t("notifyByEmail")}</h4>
