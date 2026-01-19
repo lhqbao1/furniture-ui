@@ -37,9 +37,9 @@ const LogStockTab = ({ productDetail }: LogStockTabProps) => {
                   {formatDateTimeString(item.created_at)}
                 </div>
                 <div className="text-sm">
-                  {item.main_checkout
-                    ? item.main_checkout.from_marketplace.toUpperCase()
-                    : ""}
+                 {item.main_checkout?.from_marketplace
+  ? item.main_checkout.from_marketplace.toUpperCase()
+  : "Prestige Home"}
                 </div>
                 <div className="text-sm"></div>
                 <div className="text-sm">
