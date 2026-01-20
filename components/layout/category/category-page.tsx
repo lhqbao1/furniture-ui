@@ -136,12 +136,10 @@ const ProductCategory = ({
         <div className="pt-0 pb-12 lg:w-[90%] md:w-[95%] xl:w-[90%] w-full mx-auto col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
           <CustomBreadCrumb currentPage={category?.name ?? ""} />
           <h2 className="section-header">{category?.name}</h2>
-          {category?.products.length === 0 ? (
+          {algoliaData && algoliaData.items?.length === 0 && (
             <p className="text-center text-xl font-bold mt-2">
               {t("emptyCategory")}
             </p>
-          ) : (
-            ""
           )}
 
           {!listCategory &&
