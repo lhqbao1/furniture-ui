@@ -160,7 +160,7 @@ const ListPolicy = ({
                     {item.name}
                   </div>
                 </AccordionTrigger>
-                {item.name === "Impressum" ? (
+                {/* {item.name === "Impressum" ? (
                   ""
                 ) : (
                   <AccordionContent className="flex flex-col gap-1.5 text-balance">
@@ -195,7 +195,7 @@ const ListPolicy = ({
                       </div>
                     ))}
                   </AccordionContent>
-                )}
+                )} */}
               </AccordionItem>
             ))}
           </Accordion>
