@@ -219,6 +219,12 @@ const OrderPlaced = () => {
     const a = localStorage.getItem("soluteclid");
     if (!a) return;
 
+    const [timestamp, originUrl] = a.split(" ", 2);
+    if (parseInt(timestamp) + ttl <= Date.now()) {
+      localStorage.removeItem("soluteclid");
+      return;
+    }
+
     const b = a.split(" ", 2);
     if (parseInt(b[0]) + ttl > Date.now()) {
       const url = new URL("https://cmodul.solutenetwork.com/conversion");
@@ -229,6 +235,7 @@ const OrderPlaced = () => {
 
       fetch(url.toString()).finally(() => {
         sessionStorage.setItem("solute_sent", "1");
+        localStorage.removeItem("soluteclid"); // cleanup sau conversion success
       });
     } else {
       localStorage.removeItem("soluteclid");
