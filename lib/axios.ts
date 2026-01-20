@@ -66,6 +66,7 @@ apiAdmin.interceptors.response.use(
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("admin_access_token");
+      localStorage.removeItem("admin_user_id");
 
       // 👉 Redirect về admin login
       window.location.href = "/admin-login";
@@ -104,9 +105,12 @@ apiFlexible.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("access_token");
       localStorage.removeItem("admin_access_token");
       localStorage.removeItem("dsp_access_token");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("admin_user_id");
+      localStorage.removeItem("seller_id");
 
       // 👉 Trường hợp flexible thì redirect về login chung
       // window.location.href = "/login"
@@ -137,6 +141,7 @@ apiDSP.interceptors.response.use(
   async (error: AxiosError) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("dsp_access_token");
+      localStorage.removeItem("seller_id");
 
       // 👉 Redirect về admin login
       window.location.href = "/dsp/login";

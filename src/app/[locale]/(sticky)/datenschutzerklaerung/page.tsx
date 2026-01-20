@@ -8,37 +8,32 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import React from "react";
 
-// ✅ Metadata SEO
-export const metadata = {
-  title: "Widerrufsbelehrung",
+export const revalidate = 3600; // ISR: regenerate mỗi 1h
+
+export const metadata: Metadata = {
+  title: "Datenschutzerklärung",
   description:
-    "Hier finden Sie die Widerrufsbelehrung (Rücktrittsrecht) von Prestige Home. Erfahren Sie, wie Sie Ihre Bestellung widerrufen können.",
+    "Lesen Sie die Datenschutzerklärung von Prestige Home – Informationen zum Datenschutz, zur Verarbeitung personenbezogener Daten und zu Ihren Rechten.",
   alternates: {
-    canonical: "http://prestige-home.de/de/cancellation",
+    canonical: "http://prestige-home.de/de/datenschutzerklaerung",
   },
   openGraph: {
-    title: "Widerrufsbelehrung - Prestige Home",
+    title: "Datenschutzerklärung",
     description:
-      "Alles über Ihr Rücktrittsrecht bei Prestige Home. Informationen zum Widerruf von Bestellungen.",
-    url: "https://www.prestige-home.de/cancellation",
+      "Transparenz über Datenschutz und Ihre Rechte bei Prestige Home.",
+    url: "https://www.prestige-home.de/datenschutzerklaerung",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "article",
   },
-  twitter: {
-    card: "summary",
-    title: "Widerrufsbelehrung",
-    description:
-      "Informationen zum Rücktrittsrecht und Widerruf Ihrer Bestellung bei Prestige Home.",
-  },
 };
 
-export const revalidate = 3600; // ISR: regenerate mỗi 1h
-
-export default async function WiderrufPage() {
+export default async function DatenschutzerklarungPage() {
   const queryClient = new QueryClient();
 
   const versions = await getPolicyVersion();
@@ -59,25 +54,27 @@ export default async function WiderrufPage() {
   return (
     <>
       <Script
-        id="schema-cancellation"
+        id="schema-privacy"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "MerchantReturnPolicy",
-            name: "Widerrufsbelehrung – Rückgaberecht",
-            url: "https://www.prestige-home.de/de/cancellation",
-            applicableCountry: "DE",
+            "@type": "AboutPage",
+            name: "Datenschutzerklärung – Prestige Home",
+            url: "https://www.prestige-home.de/de/datenschutzerklaerung",
+            about: {
+              "@type": "Thing",
+              name: "Privacy Policy / Data Protection",
+            },
             inLanguage: "de",
-            returnPolicyCategory:
-              "https://schema.org/MerchantReturnFiniteReturnWindow",
-            merchantReturnDays: 14,
-            returnMethod: "https://schema.org/ReturnByMail",
-            returnFees: "https://schema.org/FreeReturn",
             publisher: {
               "@type": "Organization",
               name: "Prestige Home",
               url: "https://www.prestige-home.de",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/5c38c322-bafc-4e6f-8d14-0c1ba4b7b8de_invoice-logo.png",
+              },
             },
           }),
         }}

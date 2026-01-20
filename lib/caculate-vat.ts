@@ -52,11 +52,10 @@ export function calculateShippingCostManual(
   country_code?: string | null,
   tax_id?: string | null,
 ) {
-  const hasAmm = items.some(
-    (item) =>
-      item?.carrier.toLowerCase() === "amm" ||
-      item?.carrier.toLowerCase() === "spedition",
-  );
+  const hasAmm = items.some((item) => {
+    const c = item?.carrier?.trim()?.toLowerCase();
+    return !c || c === "amm" || c === "spedition";
+  });
 
   const gross = hasAmm ? 35.95 : 5.95;
 

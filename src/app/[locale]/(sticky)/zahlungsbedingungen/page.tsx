@@ -17,13 +17,13 @@ export const metadata = {
   description:
     "Alle Informationen zu Zahlungsarten, Zahlungsmethoden und Zahlungsbedingungen bei Prestige Home.",
   alternates: {
-    canonical: "https://www.prestige-home.de/de/payment-terms",
+    canonical: "https://www.prestige-home.de/de/zahlungsbedingungen",
   },
   openGraph: {
     title: "Zahlungsbedingungen - Prestige Home",
     description:
       "Details zu allen Zahlungsarten und Zahlungsbedingungen bei Prestige Home.",
-    url: "https://www.prestige-home.de/de/payment-terms",
+    url: "https://www.prestige-home.de/de/zahlungsbedingungen",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "article",
@@ -67,7 +67,7 @@ export default async function PaymentTermsPage() {
             "@context": "https://schema.org",
             "@type": "PaymentMethod",
             name: "Zahlungsbedingungen",
-            url: "https://www.prestige-home.de/de/payment-terms",
+            url: "https://www.prestige-home.de/de/zahlungsbedingungen",
             description:
               "Übersicht der akzeptierten Zahlungsarten, Zahlungsbedingungen und Zahlungsabwicklung bei Prestige Home.",
             acceptedPaymentMethod: [

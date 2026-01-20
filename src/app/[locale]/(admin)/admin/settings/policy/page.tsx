@@ -1,6 +1,5 @@
 "use client";
 import ListPolicyAdmin from "@/components/layout/admin/policy/list-policy";
-import PolicyListVersion from "@/components/layout/admin/policy/list-version";
 import { useGetPolicyVersion } from "@/features/policy/hook";
 import React, { useState } from "react";
 
@@ -14,7 +13,10 @@ const PolicyPage = () => {
       {!data || isLoading ? (
         ""
       ) : (
-        <ListPolicyAdmin versionData={data} versionId={data[0].id ?? ""} />
+        <ListPolicyAdmin
+          versionData={data}
+          versionId={data[0].id ?? ""}
+        />
       )}
     </div>
   );

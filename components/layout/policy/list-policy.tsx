@@ -64,12 +64,13 @@ const ListPolicy = ({
       return (
         (path?.includes("agb") && name.includes("agb")) ||
         (path?.includes("impressum") && name.includes("impressum")) ||
-        (path?.includes("cancellation") && name.includes("widerruf")) ||
-        (path?.includes("payment-terms") &&
+        (path?.includes("widerrufsbelehrung") && name.includes("widerruf")) ||
+        (path?.includes("zahlungsbedingungen") &&
           name.includes("zahlungsbedingungen")) ||
-        (path?.includes("shipping-and-delivery") &&
-          name.includes("versandbedingungen")) ||
-        (path?.includes("privacy-policy") && name.includes("datenschutzer"))
+        (path?.includes("versandbedingungen") &&
+          name.toLowerCase().includes("versandbedingungen")) ||
+        (path?.includes("datenschutzerklaerung") &&
+          name.includes("datenschutzer"))
       );
     });
 
@@ -129,23 +130,23 @@ const ListPolicy = ({
                           case item.name
                             .toLowerCase()
                             .includes("versandbedingungen"):
-                            router.push("/shipping-and-delivery", { locale });
+                            router.push("/versandbedingungen", { locale });
                             break;
 
                           case item.name
                             .toLowerCase()
                             .includes("zahlungsbedingungen"):
-                            router.push("/payment-terms", { locale });
+                            router.push("/zahlungsbedingungen", { locale });
                             break;
 
                           case item.name.toLowerCase().includes("widerruf"):
-                            router.push("/cancellation", { locale });
+                            router.push("/widerrufsbelehrung", { locale });
                             break;
 
                           case item.name
                             .toLowerCase()
                             .includes("datenschutzer"):
-                            router.push("/privacy-policy", { locale });
+                            router.push("/datenschutzerklaerung", { locale });
                             break;
 
                           default:

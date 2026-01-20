@@ -8,9 +8,14 @@ export function TrustedShops() {
   const pathname = usePathname();
 
   // ❌ Không load TrustedShops trong admin
-  if (pathname.includes("/admin")) {
+  if (
+    pathname.includes("/admin") ||
+    pathname.includes("/login") ||
+    pathname.includes("/dsp")
+  ) {
     return null;
   }
+
   return (
     <Script
       id="trusted-shops"

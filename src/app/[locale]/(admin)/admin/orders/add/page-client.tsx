@@ -93,6 +93,7 @@ export default function CreateOrderPageClient() {
   useManualCheckoutLogic(form, setDisabledFields);
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
+    console.log(values);
     const orderCarrier = listItems.some(
       (i) =>
         i.carrier.toLowerCase() === "amm" ||

@@ -1,8 +1,4 @@
 "use client";
-
-import Script from "next/script";
-import { useRef } from "react";
-import { mapTrustedShopsPaymentType } from "@/hooks/map-payment-method";
 import { ProductItem } from "@/types/products";
 
 export interface TrustedShopsCheckoutProps {

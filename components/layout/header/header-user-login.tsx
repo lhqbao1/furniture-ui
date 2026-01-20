@@ -37,9 +37,6 @@ const HeaderUserLogin = () => {
     enabled: !!userId,
   });
 
-  console.log(userId);
-  console.log(user);
-
   const onLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("userId");

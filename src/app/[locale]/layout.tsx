@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import TawkChat from "@/components/shared/tawk";
 import IntlClientProviderWithAuth from "./intlProviderWithAuth";
 import { getMessages } from "next-intl/server";
+import { AuthSanity } from "@/hooks/auth/auth-sanity";
 
 type Props = {
   children: React.ReactNode;
@@ -52,6 +53,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       messages={messages} // ✅ BẮT BUỘC
       timeZone="Europe/Berlin"
     >
+      <AuthSanity />
       <TawkChat />
       {/* <SaleFixedIcon /> */}
       {children}
