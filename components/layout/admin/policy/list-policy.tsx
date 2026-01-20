@@ -239,6 +239,10 @@ const ListPolicyAdmin = ({
         >
           Cancel
         </Button>
+
+        <div className="p-2 border border-gray-500 w-fit rounded-sm mt-4">
+          Remember to apply h2 tag for heading
+        </div>
       </div>
 
       {/* Sidebar */}

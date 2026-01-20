@@ -68,13 +68,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: "https://www.prestige-home.de/de/cancellation",
+      url: "https://www.prestige-home.de/de/widerrufsbelehrung",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: "https://www.prestige-home.de/de/privacy-policy",
+      url: "https://www.prestige-home.de/de/datenschutzerklaerung",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,

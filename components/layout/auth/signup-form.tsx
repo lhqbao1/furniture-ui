@@ -27,7 +27,7 @@ import GenderSelect from "./sign-up/gender-select";
 import SignUpSignUpOtpDialog from "./sign-up/sign-up-otp-dialog";
 import AGBDialogTrigger from "./sign-up/agb-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import WiderrufPage from "@/src/app/[locale]/(sticky)/cancellation/page";
+import WiderrufPage from "@/src/app/[locale]/(sticky)/widerrufsbelehrung/page";
 import WiderrufDialogTrigger from "./sign-up/widderuf-dialog";
 
 export default function SignUpForm() {

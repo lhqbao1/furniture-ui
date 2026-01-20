@@ -17,13 +17,13 @@ export const metadata = {
   description:
     "Informationen zu Versand, Lieferung und Zustellbedingungen von Prestige Home. Erfahren Sie alles über Versandarten, Lieferzeiten und Kosten.",
   alternates: {
-    canonical: "https://www.prestige-home.de/de/shipping-and-delivery",
+    canonical: "https://www.prestige-home.de/de/versandbedingungen",
   },
   openGraph: {
     title: "Liefer- und Versandbedingungen - Prestige Home",
     description:
       "Alle wichtigen Informationen zu Versand, Lieferung und Zustellung bei Prestige Home.",
-    url: "https://www.prestige-home.de/de/shipping-and-delivery",
+    url: "https://www.prestige-home.de/de/versandbedingungen",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "article",
@@ -67,7 +67,7 @@ export default async function ShippingPolicyPage() {
             "@context": "https://schema.org",
             "@type": "ShippingDeliveryTime",
             name: "Liefer- und Versandbedingungen",
-            url: "https://www.prestige-home.de/de/shipping-and-delivery",
+            url: "https://www.prestige-home.de/de/versandbedingungen",
             transitTimeLabel: "Standardversand innerhalb Deutschlands",
             handlingTime: {
               "@type": "QuantitativeValue",

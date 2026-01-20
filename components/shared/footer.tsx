@@ -89,16 +89,16 @@ const Footer = () => {
             <Link href={`/agb`}>{t("termCondition")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
-            <Link href={`/privacy-policy`}>{t("privacyPolicy")}</Link>
+            <Link href={`/datenschutzerklaerung`}>{t("privacyPolicy")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
-            <Link href={`/shipping-and-delivery`}>{t("shippingPolicy")}</Link>
+            <Link href={`/versandbedingungen`}>{t("shippingPolicy")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
-            <Link href={`/payment-terms`}>{t("paymentTerms")}</Link>
+            <Link href={`/zahlungsbedingungen`}>{t("paymentTerms")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
-            <Link href={`/cancellation`}>Widerruf</Link>
+            <Link href={`/widerrufsbelehrung`}>Widerruf</Link>
           </li>
 
           <li className="hover:pl-2 transition-all duration-500">
