@@ -41,7 +41,7 @@ const AdminInventoryList = () => {
     page_size: pageSize,
     all_products: filters.all_products,
     search: filters.search,
-    is_inventory: filters.is_inventory,
+    is_inventory: "false",
     supplier_id: filters.supplier_id,
   });
 
@@ -57,7 +57,7 @@ const AdminInventoryList = () => {
   return (
     <div className="space-y-6 pb-12">
       <div className="text-3xl text-secondary font-bold text-center">
-        Incoming Inventory
+        Inventory
       </div>
 
       <InventoryTableToolbar

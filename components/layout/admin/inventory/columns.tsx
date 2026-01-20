@@ -122,13 +122,6 @@ export const getInventoryColumns = (
     ),
     enableSorting: true,
   },
-  {
-    accessorKey: "physical",
-    header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.stock} pcs.</div>;
-    },
-  },
 
   {
     accessorKey: "available",
@@ -149,6 +142,14 @@ export const getInventoryColumns = (
       return (
         <div className="text-center">{row.original.result_stock} pcs.</div>
       );
+    },
+  },
+
+  {
+    accessorKey: "physical",
+    header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.stock} pcs.</div>;
     },
   },
 
