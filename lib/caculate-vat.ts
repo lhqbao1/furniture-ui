@@ -78,15 +78,24 @@ export function calculateShippingCost(
   tax_id?: string | null,
   total_shipping?: number,
 ) {
+  // ❗ Không có carrier -> return 0
+  if (!items || items.every((i) => !i.products?.carrier)) {
+    return {
+      gross: 0,
+      net: 0,
+      vat: 0,
+      vatRate: 0,
+    };
+  }
+
   const hasAmm = items.some(
     (item) =>
-      item.products?.carrier.toLowerCase() === "amm" ||
-      item.products?.carrier.toLowerCase() === "spedition",
+      item.products?.carrier?.toLowerCase() === "amm" ||
+      item.products?.carrier?.toLowerCase() === "spedition",
   );
 
   const gross = total_shipping ?? (hasAmm ? 35.95 : 5.95);
 
-  // ✅ VAT cho shipping: base là 19%
   const vatRate = parseTaxRate("19%", country_code, tax_id);
 
   const { net, vat } = splitGross(gross, vatRate);

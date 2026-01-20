@@ -13,6 +13,23 @@ import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 import { CheckOutMain } from "@/types/checkout";
 import { formatDateDE } from "@/lib/format-date-DE";
 import { formatDateString } from "@/lib/date-formated";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { useState } from "react";
+import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -34,9 +51,11 @@ function getPrimaryCheckout(p: CheckOutMain) {
 }
 
 export default function ExportOrderExcelButton() {
+  const [marketplace, setMarketplace] = useState("");
+
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["checkout-main-all"],
-    queryFn: () => getAllCheckOutMain(),
+    queryKey: ["checkout-main-all", marketplace],
+    queryFn: () => getAllCheckOutMain(marketplace),
     enabled: false, // ❌ không auto call
   });
 
@@ -125,8 +144,6 @@ export default function ExportOrderExcelButton() {
     const worksheet = XLSX.utils.json_to_sheet(exportData);
 
     // Ép TEXT cho các cột đã chốt
-    forceTextColumns(worksheet, ["A", "B", "G", "K", "N"]);
-
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
 
@@ -140,12 +157,46 @@ export default function ExportOrderExcelButton() {
   };
 
   return (
-    <Button
-      variant="outline"
-      onClick={handleExport}
-      disabled={isFetching}
-    >
-      {isFetching ? <Loader2 className="animate-spin" /> : "Order Export"}
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Export Orders</Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent className="w-64 p-3 space-y-4">
+        {/* Marketplace Filter */}
+        <div className="space-y-1">
+          <Select
+            value={marketplace}
+            onValueChange={setMarketplace}
+          >
+            <SelectTrigger
+              placeholderColor
+              className="border"
+            >
+              <SelectValue placeholder="All Marketplace" />
+            </SelectTrigger>
+            <SelectContent>
+              {CHANEL_OPTIONS.map((item) => (
+                <SelectItem
+                  key={item.key}
+                  value={item.key}
+                >
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Export Button */}
+        <Button
+          onClick={handleExport}
+          className="w-full"
+          disabled={isFetching}
+        >
+          {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
+        </Button>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
