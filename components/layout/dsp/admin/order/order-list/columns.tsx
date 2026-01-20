@@ -84,10 +84,10 @@ const ActionCellChild = ({
         <Eye className="w-4 h-4 text-amber-500" />
       </Button>
 
-      <ViewFileChildDialog
+      {/* <ViewFileChildDialog
         checkoutId={checkoutId}
         data={items}
-      />
+      /> */}
 
       {status?.toLowerCase() === "exchange" && (
         <CancelExchangeDialog

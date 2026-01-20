@@ -18,7 +18,6 @@ const ProductManual = () => {
   const uploadFileMutation = useUploadStaticFile();
 
   const pdfFiles = form.watch("pdf_files") || [];
-  console.log(pdfFiles);
   const [removedFiles, setRemovedFiles] = useState<any[]>([]);
   // ============================
   // UPLOAD NEW FILE (Replace old one)

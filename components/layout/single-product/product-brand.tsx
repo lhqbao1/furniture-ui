@@ -7,7 +7,7 @@ import React from "react";
 
 interface ProductBrandProps {
   brand: string;
-  brand_image: string;
+  brand_image?: string;
   isProductDetail?: boolean;
 }
 

@@ -225,7 +225,7 @@ const ListPolicyAdmin = ({
   if (!versionId) return <></>;
 
   return (
-    <div className="grid grid-cols-12 pt-3 lg:h-[calc(100vh-100px)] h-fit pb-4">
+    <div className="grid grid-cols-12 pt-3 h-fit pb-4">
       <div className="space-x-2 col-span-12 mb-12">
         <Button
           className="text-xl"
@@ -274,7 +274,7 @@ const ListPolicyAdmin = ({
           {currentPolicy?.name}
         </h1>
         <div className="col-span-12">
-          {editorValues[currentPolicy?.id] ? (
+          {editorValues[currentPolicy?.id] !== undefined ? (
             <RichEditor
               value={editorValues[currentPolicy.id]}
               onChangeValue={(val) =>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CopyCheck, Eye, Pencil } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
   HoverCard,
@@ -314,29 +315,34 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
     );
   };
 
+  useEffect(() => {
+    if (product.owner?.id) {
+      setValue(product.owner.id.toString());
+    } else {
+      setValue("");
+    }
+  }, [product.owner]);
+
   return (
     <div className="flex justify-center text-center w-full">
       {editing ? (
         <Select
-          value={value.toString()}
+          value={value}
+          onOpenChange={(open) => {
+            if (!open && !EditProductMutation.isPending) {
+              setEditing(false);
+            }
+          }}
           onValueChange={(val) => {
             setValue(val);
-            handleEditSupplier(val); // gọi mutation ngay khi chọn xong
+            handleEditSupplier(val);
           }}
           disabled={EditProductMutation.isPending || isLoading}
         >
-          <SelectTrigger
-            placeholderColor
-            className={cn(
-              "w-36 border",
-              EditProductMutation.isPending && "cursor-wait",
-            )}
-          >
-            {/* <SelectValue
-              placeholder={isLoading ? "Loading..." : "Select supplier"}
-            /> */}
+          <SelectTrigger className="w-36 border">
+            <SelectValue placeholder={isLoading ? "Loading..." : ""} />
           </SelectTrigger>
-          <SelectContent className="border">
+          <SelectContent>
             {suppliers?.map((s) => (
               <SelectItem
                 key={s.id}

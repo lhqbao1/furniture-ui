@@ -68,7 +68,7 @@ const ListPolicy = ({
         (path?.includes("payment-terms") &&
           name.includes("zahlungsbedingungen")) ||
         (path?.includes("shipping-and-delivery") &&
-          name.includes("versandbedingungen")) ||
+          name.toLowerCase().includes("versandbedingungen")) ||
         (path?.includes("privacy-policy") && name.includes("datenschutzer"))
       );
     });
