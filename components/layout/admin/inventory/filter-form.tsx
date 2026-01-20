@@ -16,7 +16,7 @@ const InventoryFilterForm = () => {
     <div className="space-y-4 grid grid-cols-3">
       <div className="col-span-3 space-y-4">
         <ProductStatusFilter />
-        <ProductHasInventoryFilter />
+        {/* <ProductHasInventoryFilter /> */}
         <SupplierFilter />
       </div>
       <div className="flex justify-end pt-3 col-span-3">

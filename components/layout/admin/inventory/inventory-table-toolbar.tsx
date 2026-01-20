@@ -33,6 +33,7 @@ import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
 import InventoryFilterForm from "./filter-form";
 import ImportInventoryDialog from "./dialog/import-dialog";
+import FilterExportForm from "../products/products-list/toolbar/filter-export-dialog";
 
 export enum ToolbarType {
   product = "product",
@@ -150,20 +151,21 @@ export default function InventoryTableToolbar({
     <div className="flex flex-col lg:flex-row items-center justify-center gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
       <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex items-center gap-1"
-            >
-              Group action <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Delete Selected</DropdownMenuItem>
-            <DropdownMenuItem>Export Selected</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
+        <div className="flex gap-2 text-sm font-medium">
+          {/* <Button variant="ghost" className="">Export</Button> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Export <ChevronDown className="ml-1 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-[600px] p-4 space-y-4">
+              {/* Filter here */}
+              <FilterExportForm />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <div className="flex gap-2 text-sm font-medium">
           {/* <Button variant="ghost" className="">Export</Button> */}

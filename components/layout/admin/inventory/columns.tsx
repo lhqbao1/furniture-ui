@@ -108,25 +108,72 @@ export const getInventoryColumns = (
     cell: ({ row }) => (
       <div className="max-w-80 w-80 text-wrap">
         <div>{row.original.name}</div>
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-col gap-2 items-start">
           <div>SKU: {row.original.sku}</div>
-          <Link
+          <div>ID: {row.original.id_provider}</div>
+          <div>
+            Supplier:{" "}
+            {row.original?.owner && row.original.owner.business_name
+              ? row.original.owner.business_name
+              : "Prestige Home"}
+          </div>
+
+          {/* <Link
             href={`/admin/products/${row.original.id}/edit`}
             target="_blank"
             rel="noopener noreferrer nofollow"
           >
             <Pencil className="size-3 text-primary cursor-pointer" />
-          </Link>
+          </Link> */}
         </div>
       </div>
     ),
     enableSorting: true,
   },
+
   {
-    accessorKey: "physical",
-    header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
+    accessorKey: "purchase_cost",
+    header: ({}) => <div className="text-center uppercase">Purchase cost</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.stock} pcs.</div>;
+      return (
+        <div className="text-center">
+          {row.original.cost > 0 ? (
+            <>
+              {" "}
+              €
+              {row.original.cost.toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "price",
+    header: ({}) => <div className="text-center uppercase">Sale price</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          {row.original.final_price ? (
+            <div>
+              €
+              {row.original.final_price.toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              /pcs
+            </div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      );
     },
   },
 
@@ -148,6 +195,123 @@ export const getInventoryColumns = (
     cell: ({ row }) => {
       return (
         <div className="text-center">{row.original.result_stock} pcs.</div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "physical",
+    header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.stock} pcs.</div>;
+    },
+  },
+
+  {
+    accessorKey: "available_purchase_value",
+    header: ({}) => (
+      <div className="text-center uppercase">Available Purchase Value</div>
+    ),
+    cell: ({ row }) => {
+      const available = row.original.stock - (row.original.result_stock ?? 0);
+      return (
+        <div className="text-center">
+          {row.original.cost ? (
+            <div>
+              €
+              {(row.original.cost * available).toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              /pcs
+            </div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "reserved_purchase_value",
+    header: ({}) => (
+      <div className="text-center uppercase">Reserved Purchase Value</div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          {row.original.result_stock ? (
+            <div>
+              €
+              {(row.original.cost * row.original.result_stock).toLocaleString(
+                "de-DE",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                },
+              )}
+              /pcs
+            </div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "physical_purchase_value",
+    header: ({}) => (
+      <div className="text-center uppercase">Physical Purchase Value</div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          {row.original.stock && row.original.cost > 0 ? (
+            <div>
+              €
+              {(row.original.cost * row.original.stock).toLocaleString(
+                "de-DE",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                },
+              )}
+              /pcs
+            </div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "available_sale_value",
+    header: ({}) => (
+      <div className="text-center uppercase">Available Sale Value</div>
+    ),
+    cell: ({ row }) => {
+      const available = row.original.stock - (row.original.result_stock ?? 0);
+
+      return (
+        <div className="text-center">
+          {available && row.original.final_price > 0 ? (
+            <div>
+              €
+              {(row.original.final_price * available).toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              /pcs
+            </div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
       );
     },
   },
@@ -238,66 +402,6 @@ export const getInventoryColumns = (
   //     );
   //   },
   // },
-
-  {
-    accessorKey: "cost",
-    header: ({}) => <div className="text-center uppercase">Landed cost</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.cost > 0 ? (
-            <>
-              {" "}
-              €
-              {row.original.cost.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </>
-          ) : (
-            "Updating"
-          )}
-        </div>
-      );
-    },
-  },
-
-  {
-    accessorKey: "price",
-    header: ({}) => <div className="text-center uppercase">Sale price</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.final_price ? (
-            <div>
-              €
-              {row.original.final_price.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              /pcs
-            </div>
-          ) : (
-            "Updating"
-          )}
-        </div>
-      );
-    },
-  },
-
-  {
-    accessorKey: "supplier",
-    header: ({}) => <div className="text-center uppercase">Supplier</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.owner
-            ? row.original.owner.business_name
-            : "Prestige Home"}
-        </div>
-      );
-    },
-  },
 
   // {
   //   id: "actions",
