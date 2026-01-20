@@ -96,8 +96,10 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
   return data as CheckOutMainResponse;
 }
 
-export async function getAllCheckOutMain() {
-  const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all");
+export async function getAllCheckOutMain(channel?: string) {
+  const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all", {
+    params: { channel },
+  });
   return data as CheckOutMain[];
 }
 
