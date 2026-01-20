@@ -15,9 +15,6 @@ export function AuthSanity() {
     const uid = localStorage.getItem("user_id");
     const token = localStorage.getItem("access_token");
 
-    console.log(uid);
-    console.log(token);
-
     if (uid && !token) {
       localStorage.removeItem("user_id");
       setUserId(null);
