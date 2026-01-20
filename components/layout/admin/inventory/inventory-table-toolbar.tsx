@@ -34,6 +34,7 @@ import { useSearchParams } from "next/navigation";
 import InventoryFilterForm from "./filter-form";
 import ImportInventoryDialog from "./dialog/import-dialog";
 import FilterExportForm from "../products/products-list/toolbar/filter-export-dialog";
+import ExportInventoryDialog from "./dialog/export-dialog";
 
 export enum ToolbarType {
   product = "product",
@@ -162,7 +163,7 @@ export default function InventoryTableToolbar({
 
             <DropdownMenuContent className="w-[600px] p-4 space-y-4">
               {/* Filter here */}
-              <FilterExportForm />
+              <ExportInventoryDialog />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

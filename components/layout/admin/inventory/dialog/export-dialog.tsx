@@ -56,7 +56,6 @@ const ExportInventoryDialog = () => {
   if (!suppliers) return <>Loading...</>;
 
   const handleExport = async () => {
-    console.log(buildParams());
     const res = await refetch();
     const data = res.data;
 
@@ -65,70 +64,53 @@ const ExportInventoryDialog = () => {
     const clean = (val: any) => (val === null || val === undefined ? "" : val);
 
     const exportData = data.map((p) => ({
-      id: clean(p.id_provider),
-      ean: clean(p.ean),
-      brand_name: clean(p.brand?.name),
-      supplier_name: clean(p.owner?.business_name),
-      manufacturer_sku: clean(p.sku),
-      manufacturing_country: clean(p.manufacture_country),
-      customs_tariff_nr: clean(p.tariff_number),
-      name: clean(p.name),
-      description: clean(p.description),
-      technical_description: clean(p.technical_description),
-      categories: clean(p.categories?.map((c) => c.code).join(", ")),
-      category_name: clean(p.categories?.map((c) => c.name).join(", ")),
-      unit: clean(p.unit),
-      amount_unit: clean(p.amount_unit),
-      delivery_time: clean(p.delivery_time),
-      carrier: clean(p.carrier),
-      net_purchase_cost: clean(p.cost),
-      delivery_cost: clean(p.delivery_cost),
-      return_cost: clean(p.return_cost),
-      original_price: clean(p.price),
-      sale_price: clean(p.final_price),
-      vat: clean(p.tax),
-      stock: clean(p.stock),
-      img_url: clean(
-        p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
-      ),
-      length: clean(p.length),
-      width: clean(p.width),
-      height: clean(p.height),
-      weight: clean(p.weight),
-      weee_nr: clean(p.weee_nr),
-      eek: clean(p.eek),
-      SEO_keywords: clean(p.meta_keywords),
-      materials: clean(p.materials),
-      color: clean(p.color),
-      log_height: clean(p.packages?.reduce((s, q) => s + (q.height || 0), 0)),
-      log_width: clean(p.packages?.reduce((s, q) => s + (q.width || 0), 0)),
-      log_length: clean(p.packages?.reduce((s, q) => s + (q.length || 0), 0)),
-      log_weight: clean(p.packages?.reduce((s, q) => s + (q.weight || 0), 0)),
-      benutzerhandbuch: clean(
-        p.pdf_files
-          ?.filter((f) =>
-            f?.title?.toLowerCase?.().includes("benutzerhandbuch"),
-          )
-          .map((f) => f.url.replaceAll(" ", "%20"))
-          .join("|"),
-      ),
-      sicherheit_information: clean(
-        p.pdf_files
-          ?.filter((f) => f?.title?.toLowerCase?.().includes("sicherheit"))
-          .map((f) => f.url.replaceAll(" ", "%20"))
-          .join("|"),
-      ),
-      aufbauanleitung: clean(
-        p.pdf_files
-          ?.filter((f) => f?.title?.toLowerCase?.().includes("aufbauanleitung"))
-          .map((f) => f.url.replaceAll(" ", "%20"))
-          .join("|"),
-      ),
-      product_link: `https://www.prestige-home.de/de/product/${p.url_key}`,
+      id: p.id_provider ?? undefined, // text
+      name: p.name ?? undefined, // text
+      ean: p.ean ?? undefined, // text
+      sku: p.sku ?? undefined, // text
+      supplier: p.owner?.business_name ?? undefined, // text
+
+      // === cost & price ===
+      net_purchase_cost: typeof p.cost === "number" ? p.cost : undefined,
+
+      sale_price: typeof p.final_price === "number" ? p.final_price : undefined,
+
+      // === stock === (value)
+      available_stock:
+        typeof p.stock === "number"
+          ? p.stock - (p.result_stock ?? 0)
+          : undefined,
+
+      reserved_stock:
+        typeof p.result_stock === "number" ? p.result_stock : undefined,
+
+      physical_stock: typeof p.stock === "number" ? p.stock : undefined,
+
+      // === purchase value ===
+      available_purchase_value:
+        typeof p.cost === "number" && typeof p.stock === "number"
+          ? (p.stock - (p.result_stock ?? 0)) * p.cost
+          : undefined,
+
+      reserved_purchase_value:
+        typeof p.cost === "number" && typeof p.result_stock === "number"
+          ? p.result_stock * p.cost
+          : undefined,
+
+      physical_purchase_value:
+        typeof p.cost === "number" && typeof p.stock === "number"
+          ? p.stock * p.cost
+          : undefined,
+
+      // === sale value ===
+      available_sale_value:
+        typeof p.final_price === "number" && typeof p.stock === "number"
+          ? (p.stock - (p.result_stock ?? 0)) * p.final_price
+          : undefined,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
-    forceTextColumns(worksheet, ["A", "B", "G", "K", "N"]);
+    forceTextColumns(worksheet, ["A", "B", "C", "D", "E"]);
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
@@ -139,7 +121,7 @@ const ExportInventoryDialog = () => {
     });
 
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, "export.xlsx");
+    saveAs(blob, "export-inventory.xlsx");
   };
 
   // Add prestige home option
