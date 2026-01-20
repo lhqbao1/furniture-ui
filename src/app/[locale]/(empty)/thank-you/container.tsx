@@ -182,6 +182,7 @@ const OrderPlaced = () => {
     process();
   }, [checkout, invoice, user]);
 
+  //AWIN Tracking
   useEffect(() => {
     if (!checkout) return;
 
@@ -205,6 +206,33 @@ const OrderPlaced = () => {
     img.width = 0;
     img.height = 0;
     document.body.appendChild(img);
+  }, [checkout]);
+
+  //Billiger Tracking
+  useEffect(() => {
+    if (!checkout) return;
+
+    // chống double fire khi refresh / rerender
+    if (sessionStorage.getItem("solute_sent")) return;
+
+    const ttl = 1000 * 60 * 60 * 24 * 30;
+    const a = localStorage.getItem("soluteclid");
+    if (!a) return;
+
+    const b = a.split(" ", 2);
+    if (parseInt(b[0]) + ttl > Date.now()) {
+      const url = new URL("https://cmodul.solutenetwork.com/conversion");
+      url.searchParams.set("val", checkout.total_amount.toString());
+      url.searchParams.set("oid", checkout.checkout_code);
+      url.searchParams.set("factor", "1");
+      url.searchParams.set("url", b[1]);
+
+      fetch(url.toString()).finally(() => {
+        sessionStorage.setItem("solute_sent", "1");
+      });
+    } else {
+      localStorage.removeItem("soluteclid");
+    }
   }, [checkout]);
 
   const estimatedDeliveryDate = formatDateToTrustedShops(

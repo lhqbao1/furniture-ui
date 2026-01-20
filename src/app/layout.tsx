@@ -7,6 +7,7 @@ import QueryProvider from "@/lib/query-provider";
 import RuntimeErrorLogger from "@/components/shared/error/runtime-error-logger";
 import { TrustedShops } from "@/components/shared/trusted-shop";
 import { Providers } from "./providers";
+import { BilligerSoluteLanding } from "@/components/shared/billiger/landing";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -294,7 +295,7 @@ export default function RootLayout({
               src="https://www.facebook.com/tr?id=1625686318416498&ev=PageView&noscript=1"
             />
           </noscript>
-
+          <BilligerSoluteLanding />
           <RuntimeErrorLogger />
           <TrustedShops />
           <QueryProvider>{children}</QueryProvider>
