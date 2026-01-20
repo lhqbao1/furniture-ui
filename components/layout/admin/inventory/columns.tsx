@@ -123,10 +123,22 @@ export const getInventoryColumns = (
     enableSorting: true,
   },
   {
+    accessorKey: "physical",
+    header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.stock} pcs.</div>;
+    },
+  },
+
+  {
     accessorKey: "available",
     header: ({}) => <div className="text-center uppercase">Available</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.stock} pcs.</div>;
+      return (
+        <div className="text-center">
+          {row.original.stock - (row.original.result_stock ?? 0)} pcs.
+        </div>
+      );
     },
   },
 
@@ -140,81 +152,104 @@ export const getInventoryColumns = (
     },
   },
 
-  {
-    accessorKey: "incomming",
-    header: () => (
-      <div className="text-center uppercase">
-        Incoming stock / date /unit landed cost
-      </div>
-    ),
-    cell: ({ row }) => {
-      const inventoryData = row.original.inventory;
+  // {
+  //   accessorKey: "incomming",
+  //   header: () => (
+  //     <div className="text-center uppercase">
+  //       Incoming stock / date /unit landed cost
+  //     </div>
+  //   ),
+  //   cell: ({ row }) => {
+  //     const inventoryData = row.original.inventory;
 
-      if (!inventoryData || inventoryData.length === 0) {
-        return <div className="text-center">Updating</div>;
-      }
+  //     if (!inventoryData || inventoryData.length === 0) {
+  //       return <div className="text-center">Updating</div>;
+  //     }
 
-      return (
-        <div className="flex flex-col gap-2 items-center">
-          {inventoryData.map((item) => (
-            <div
-              key={item.id}
-              className="w-full flex flex-row-reverse items-center justify-end gap-1"
-            >
-              {/* INFO */}
-              <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
-                <div className="">{item.incoming_stock} pcs</div>
-                <div className="">{formatIOSDate(item.date_received)}</div>
-                <div className="">
-                  €
-                  {(item.cost_received / item.incoming_stock).toLocaleString(
-                    "de-DE",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    },
-                  )}
-                </div>
-              </div>
+  //     return (
+  //       <div className="flex flex-col gap-2 items-center">
+  //         {inventoryData.map((item) => (
+  //           <div
+  //             key={item.id}
+  //             className="w-full flex flex-row-reverse items-center justify-end gap-1"
+  //           >
+  //             {/* INFO */}
+  //             <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
+  //               <div className="">{item.incoming_stock} pcs</div>
+  //               <div className="">{formatIOSDate(item.date_received)}</div>
+  //               <div className="">
+  //                 €
+  //                 {(item.cost_received / item.incoming_stock).toLocaleString(
+  //                   "de-DE",
+  //                   {
+  //                     minimumFractionDigits: 2,
+  //                     maximumFractionDigits: 2,
+  //                   },
+  //                 )}
+  //               </div>
+  //             </div>
 
-              {/* ACTIONS */}
-              <div className="flex gap-2">
-                <EditInventoryDialog
-                  cost={row.original.cost}
-                  productId={row.original.id}
-                  stock={row.original.stock}
-                  inventoryData={item}
-                />
+  //             {/* ACTIONS */}
+  //             <div className="flex gap-2">
+  //               <EditInventoryDialog
+  //                 cost={row.original.cost}
+  //                 productId={row.original.id}
+  //                 stock={row.original.stock}
+  //                 inventoryData={item}
+  //               />
 
-                <ProductInventoryDeleteDialog id={item.id} />
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    },
-  },
+  //               <ProductInventoryDeleteDialog id={item.id} />
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     );
+  //   },
+  // },
+
+  // {
+  //   accessorKey: "cost",
+  //   header: ({}) => <div className="text-center uppercase">Landed cost</div>,
+  //   cell: ({ row }) => {
+  //     const inv = row.original.inventory || [];
+
+  //     const total = inv.reduce((sum, item) => {
+  //       const cost = Number(item.cost_received ?? 0);
+
+  //       const value = cost;
+  //       return sum + (isNaN(value) ? 0 : value);
+  //     }, 0);
+
+  //     return (
+  //       <div className="text-center">
+  //         {total > 0 ? (
+  //           <>
+  //             {" "}
+  //             €
+  //             {total.toLocaleString("de-DE", {
+  //               minimumFractionDigits: 2,
+  //               maximumFractionDigits: 2,
+  //             })}
+  //           </>
+  //         ) : (
+  //           "Updating"
+  //         )}
+  //       </div>
+  //     );
+  //   },
+  // },
 
   {
     accessorKey: "cost",
     header: ({}) => <div className="text-center uppercase">Landed cost</div>,
     cell: ({ row }) => {
-      const inv = row.original.inventory || [];
-
-      const total = inv.reduce((sum, item) => {
-        const cost = Number(item.cost_received ?? 0);
-
-        const value = cost;
-        return sum + (isNaN(value) ? 0 : value);
-      }, 0);
-
       return (
         <div className="text-center">
-          {total > 0 ? (
+          {row.original.cost > 0 ? (
             <>
               {" "}
               €
-              {total.toLocaleString("de-DE", {
+              {row.original.cost.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
@@ -226,25 +261,6 @@ export const getInventoryColumns = (
       );
     },
   },
-
-  // {
-  //   accessorKey: "total_cost",
-  //   header: ({}) => <div className="text-center uppercase">Total cost</div>,
-  //   cell: ({ row }) => {
-  //     return (
-  //       <div className="text-center">
-  //         €
-  //         {(row.original.cost * row.original.incomming_stock).toLocaleString(
-  //           "de-DE",
-  //           {
-  //             minimumFractionDigits: 2,
-  //             maximumFractionDigits: 2,
-  //           },
-  //         )}
-  //       </div>
-  //     );
-  //   },
-  // },
 
   {
     accessorKey: "price",
@@ -283,9 +299,9 @@ export const getInventoryColumns = (
     },
   },
 
-  {
-    id: "actions",
-    header: "ACTION",
-    cell: ({ row }) => <ActionsCell product={row.original} />,
-  },
+  // {
+  //   id: "actions",
+  //   header: "ACTION",
+  //   cell: ({ row }) => <ActionsCell product={row.original} />,
+  // },
 ];

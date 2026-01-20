@@ -9,5 +9,6 @@ export function useProductInventoryFilters() {
     all_products: searchParams.get("all_products") || null,
     search: searchParams.get("search") || "",
     is_inventory: searchParams.get("is_inventory") || "true",
+    supplier_id: searchParams.get("supplier_id") || "",
   };
 }
