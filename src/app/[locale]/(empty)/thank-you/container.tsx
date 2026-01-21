@@ -236,9 +236,11 @@ const OrderPlaced = () => {
         checkout.checkouts?.[0]?.user?.tax_id,
       );
       // fallback = "0,00"
-      const val = Number(calc?.totalNetWithoutShipping ?? 0).toFixed(2);
+      const val = Number(calc?.totalNetWithoutShipping ?? 0);
 
-      url.searchParams.set("val", val);
+      console.log(val);
+
+      url.searchParams.set("val", val.toString());
       url.searchParams.set("oid", checkout.checkout_code);
       url.searchParams.set("factor", "1");
       url.searchParams.set("url", b[1]);
