@@ -229,20 +229,22 @@ const OrderPlaced = () => {
     const b = a.split(" ", 2);
     if (parseInt(b[0]) + ttl > Date.now()) {
       const url = new URL("https://cmodul.solutenetwork.com/conversion");
-      url.searchParams.set(
-        "val",
-        calculateOrderTaxWithDiscount(
-          checkout.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
-          checkout?.voucher_amount,
-          checkout.checkouts[0].shipping_address?.country ?? "DE",
-          checkout.checkouts[0].user?.tax_id,
-        )
-          .totalNetWithoutShipping.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-          .toString(),
+      const calc = calculateOrderTaxWithDiscount(
+        checkout.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
+        checkout?.voucher_amount ?? 0,
+        checkout.checkouts?.[0]?.shipping_address?.country ?? "DE",
+        checkout.checkouts?.[0]?.user?.tax_id,
       );
+      // fallback = "0,00"
+      const val = Number(calc?.totalNetWithoutShipping ?? 0).toLocaleString(
+        "de-DE",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        },
+      );
+
+      url.searchParams.set("val", val);
       url.searchParams.set("oid", checkout.checkout_code);
       url.searchParams.set("factor", "1");
       url.searchParams.set("url", b[1]);
