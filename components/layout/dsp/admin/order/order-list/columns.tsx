@@ -127,20 +127,25 @@ export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
     accessorKey: "created_at",
     header: () => <div className="text-center w-full">DATE CREATED</div>,
     cell: ({ row }) => {
-      let iso = row.original.created_at.toString();
+      const iso = row.original?.created_at;
+      if (!iso) return <div className="text-center">—</div>;
 
-      // 👉 Nếu backend không gửi Z, mình thêm vào để JS parse đúng UTC
-      if (!iso.endsWith("Z")) {
-        iso += "Z";
+      let str = iso.toString();
+      if (!str.endsWith("Z")) str += "Z";
+
+      let date;
+      try {
+        date = new Date(str);
+        if (isNaN(date.getTime())) throw new Error("Invalid date");
+      } catch {
+        return <div className="text-center">—</div>;
       }
-
-      const date = new Date(iso);
 
       const time = date.toLocaleString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
-        timeZone: "Europe/Berlin", // giờ Berlin
+        timeZone: "Europe/Berlin",
       });
 
       const day = date.toLocaleString("en-US", {
@@ -162,16 +167,21 @@ export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
     accessorKey: "customer",
     header: () => <div className="text-center">SHIP TO NAME</div>,
     cell: ({ row }) => {
+      const checkout = row.original;
+      const user = checkout?.user;
+      const shipping = checkout?.shipping_address;
+
+      const name = user?.company_name || shipping?.recipient_name || "";
+
+      const email =
+        user?.email && user.email !== "guest"
+          ? user.email
+          : shipping?.email || "";
+
       return (
         <div className="text-center">
-          <div>
-            {row.original.user.company_name
-              ? row.original.user.company_name
-              : row.original.shipping_address.recipient_name}
-          </div>
-          <div>
-            {row.original.user.email !== "guest" ? row.original.user.email : ""}{" "}
-          </div>
+          <div>{name}</div>
+          <div>{email}</div>
         </div>
       );
     },
@@ -182,7 +192,7 @@ export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          {row.original.shipping_address.country}
+          {row.original?.shipping_address?.country ?? ""}
         </div>
       );
     },
@@ -193,7 +203,7 @@ export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          {row.original.shipping_address.postal_code}
+          {row.original?.shipping_address?.postal_code ?? ""}
         </div>
       );
     },
@@ -203,7 +213,9 @@ export const orderChildSupplierColumns: ColumnDef<CheckOut>[] = [
     header: () => <div className="text-center">SHIP TO CITY</div>,
     cell: ({ row }) => {
       return (
-        <div className="text-center">{row.original.shipping_address.city}</div>
+        <div className="text-center">
+          {row.original?.shipping_address?.city ?? ""}
+        </div>
       );
     },
   },
