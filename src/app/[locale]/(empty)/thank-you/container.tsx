@@ -184,30 +184,30 @@ const OrderPlaced = () => {
   }, [checkout, invoice, user]);
 
   //AWIN Tracking
-  useEffect(() => {
-    if (!checkout) return;
+  // useEffect(() => {
+  //   if (!checkout) return;
 
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.innerHTML = `
-    var AWIN = AWIN || {};
-    AWIN.Tracking = AWIN.Tracking || {};
-    AWIN.Tracking.Sale = {
-      amount: "${checkout.total_amount}",
-      orderRef: "${checkout.checkout_code}",
-      currency: "EUR",
-      channel: "aw",
-      customerAcquisition: "0"
-    };
-  `;
-    document.body.appendChild(s);
+  //   const s = document.createElement("script");
+  //   s.type = "text/javascript";
+  //   s.innerHTML = `
+  //   var AWIN = AWIN || {};
+  //   AWIN.Tracking = AWIN.Tracking || {};
+  //   AWIN.Tracking.Sale = {
+  //     amount: "${checkout.total_amount}",
+  //     orderRef: "${checkout.checkout_code}",
+  //     currency: "EUR",
+  //     channel: "aw",
+  //     customerAcquisition: "0"
+  //   };
+  // `;
+  //   document.body.appendChild(s);
 
-    const img = document.createElement("img");
-    img.src = `https://www.awin1.com/sread.img?tt=ns&tv=2&merchant=121738&amount=${checkout.total_amount}&cr=EUR&ref=${checkout.checkout_code}&parts=default:${checkout.total_amount}&vc=&ch=aw&customeracquisition=0`;
-    img.width = 0;
-    img.height = 0;
-    document.body.appendChild(img);
-  }, [checkout]);
+  //   const img = document.createElement("img");
+  //   img.src = `https://www.awin1.com/sread.img?tt=ns&tv=2&merchant=121738&amount=${checkout.total_amount}&cr=EUR&ref=${checkout.checkout_code}&parts=default:${checkout.total_amount}&vc=&ch=aw&customeracquisition=0`;
+  //   img.width = 0;
+  //   img.height = 0;
+  //   document.body.appendChild(img);
+  // }, [checkout]);
 
   //Billiger Tracking
   useEffect(() => {
@@ -229,20 +229,22 @@ const OrderPlaced = () => {
     const b = a.split(" ", 2);
     if (parseInt(b[0]) + ttl > Date.now()) {
       const url = new URL("https://cmodul.solutenetwork.com/conversion");
-      url.searchParams.set(
-        "val",
-        calculateOrderTaxWithDiscount(
-          checkout.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
-          checkout?.voucher_amount,
-          checkout.checkouts[0].shipping_address?.country ?? "DE",
-          checkout.checkouts[0].user?.tax_id,
-        )
-          .totalNetWithoutShipping.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-          .toString(),
+      const calc = calculateOrderTaxWithDiscount(
+        checkout.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
+        checkout?.voucher_amount ?? 0,
+        checkout.checkouts?.[0]?.shipping_address?.country ?? "DE",
+        checkout.checkouts?.[0]?.user?.tax_id,
       );
+      // fallback = "0,00"
+      const val = Number(calc?.totalNetWithoutShipping ?? 0).toLocaleString(
+        "de-DE",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        },
+      );
+
+      url.searchParams.set("val", val);
       url.searchParams.set("oid", checkout.checkout_code);
       url.searchParams.set("factor", "1");
       url.searchParams.set("url", b[1]);

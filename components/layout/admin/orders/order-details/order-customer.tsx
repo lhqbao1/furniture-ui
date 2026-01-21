@@ -74,6 +74,7 @@ const OrderDetailUser = ({
               <div>{shippingAddress.city}</div>
             </div>
             <div>{getCountryName(shippingAddress.country)}</div>
+            <div>{shippingAddress.email}</div>
           </div>
         </div>
       </div>
