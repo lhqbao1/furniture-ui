@@ -1,5 +1,5 @@
 import qs from "qs";
-import { api, apiAdmin, apiDSP, apiFlexible } from "@/lib/axios";
+import { api, apiAdmin, apiDSP, apiFlexible, apiPublic } from "@/lib/axios";
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import {
@@ -46,6 +46,21 @@ export async function createCheckOut(item: CreateOrderFormValues) {
     withCredentials: true,
   });
   return data as CheckOut;
+}
+
+export async function trackAwin(awc: string) {
+  const { data } = await apiPublic.post(
+    "/awin/track",
+    { awc },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    },
+  );
+
+  return data;
 }
 
 export async function createManualCheckOut(item: ManualCreateOrderFormValues) {

@@ -106,7 +106,7 @@ export default function OrderToolbar({
           pathname,
           query: {
             ...Object.fromEntries(searchParams.entries()),
-            search: debouncedSearch || undefined,
+            search: debouncedSearch,
           },
         },
         { scroll: false },

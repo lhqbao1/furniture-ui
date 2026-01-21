@@ -8,6 +8,7 @@ import RuntimeErrorLogger from "@/components/shared/error/runtime-error-logger";
 import { TrustedShops } from "@/components/shared/trusted-shop";
 import { Providers } from "./providers";
 import { BilligerSoluteLanding } from "@/components/shared/billiger/landing";
+import { AwinLanding } from "@/components/shared/awin-lading";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -296,6 +297,7 @@ export default function RootLayout({
             />
           </noscript>
           <BilligerSoluteLanding />
+          <AwinLanding />
           <RuntimeErrorLogger />
           <TrustedShops />
           <QueryProvider>{children}</QueryProvider>
@@ -311,12 +313,6 @@ export default function RootLayout({
               "bg-[rgba(81,190,140,0.2)] text-white z-100 top-10 translate-y-10",
           }}
         />
-
-        <script
-          src="https://www.dwin1.com/121738.js"
-          type="text/javascript"
-          defer
-        ></script>
       </body>
     </html>
   );
