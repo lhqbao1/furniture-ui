@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 export function AwinTracker() {
   useEffect(() => {
-    if (typeof window === "undefined") return; // safety for SSR hydration
+    if (typeof window === "undefined") return;
 
     const search = new URLSearchParams(window.location.search);
     const utm = search.get("utm_source");
@@ -13,20 +13,31 @@ export function AwinTracker() {
 
     if (utm !== "awin" || !awc) return;
 
-    // TTL store for conversion stage
     const ttl = 1000 * 60 * 60 * 24 * 30;
+    const stored = localStorage.getItem("awc_awin");
+
+    let shouldTrack = false;
+
+    if (stored) {
+      const [timestamp, prevAwc] = stored.split(" ", 2);
+
+      // TTL check
+      const valid = +timestamp + ttl > Date.now();
+
+      // nếu awc mới khác → override
+      if (!valid || prevAwc !== awc) {
+        shouldTrack = true;
+      }
+    } else {
+      shouldTrack = true;
+    }
+
+    if (!shouldTrack) return;
+
+    // update storage
     localStorage.setItem("awc_awin", `${Date.now()} ${awc}`);
 
-    // prevent double fire
-    if (sessionStorage.getItem("awin_track_sent")) return;
-
-    trackAwin(awc)
-      .catch((err) => {
-        console.error("[AWIN TRACK ERROR]", err);
-      })
-      .finally(() => {
-        sessionStorage.setItem("awin_track_sent", "1");
-      });
+    trackAwin(awc).catch(console.error);
   }, []);
 
   return null;
