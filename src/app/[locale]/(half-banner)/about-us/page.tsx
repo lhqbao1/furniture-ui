@@ -81,7 +81,55 @@ const AboutUsPage = () => {
             Unternehmen aus Asien stellen wir sicher, dass jedes Produkt Ihre
             Bedürfnisse erfüllt und gleichzeitig Ihr Budget schont.
           </p>
+
+          <div className="w-full space-y-6">
+            <h3 className="font-bold text-black">Our Brands</h3>
+            <div className="grid grid-cols-5 gap-10">
+              <Image
+                src={"/p-outdoor.png"}
+                width={300}
+                height={200}
+                alt=""
+                unoptimized
+                className="w-[300px] h-[200px] object-contain"
+              />
+              <Image
+                src={"/p-indoor.png"}
+                width={300}
+                height={200}
+                alt=""
+                unoptimized
+                className="w-[300px] h-[200px] object-contain"
+              />
+              <Image
+                src={"/p.png"}
+                width={300}
+                height={200}
+                alt=""
+                unoptimized
+                className="w-[300px] h-[200px] object-contain"
+              />
+
+              <Image
+                src={"/econelo-logo.png"}
+                width={300}
+                height={200}
+                alt=""
+                unoptimized
+                className="w-[300px] h-[200px] object-contain"
+              />
+              <Image
+                src={"/pres-mobility.png"}
+                width={300}
+                height={200}
+                alt=""
+                unoptimized
+                className="w-[300px] h-[200px] object-contain"
+              />
+            </div>
+          </div>
         </div>
+
         <div className="grid grid-cols-4 gap-4 w-2/3 mt-6">
           {Array.from({ length: 8 }, (_, i) => i + 1).map((i) => (
             <Image
