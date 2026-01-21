@@ -54,7 +54,6 @@ export default function ProductCard({
   const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
 
   const addToCartMutation = useAddToCart();
-  const addToWishlistMutation = useAddToWishList();
   const addProductToViewMutation = useAddViewedProduct();
 
   const handleAddProductToViewed = (productId: string) => {
@@ -85,27 +84,6 @@ export default function ProductCard({
         },
       );
     }
-  };
-
-  const handleAddToWishlist = (currentProduct: ProductItem) => {
-    if (!currentProduct) return;
-    addToWishlistMutation.mutate(
-      { productId: currentProduct.id ?? "", quantity: 1 },
-      {
-        onSuccess(data, variables, context) {
-          toast.success(t("addToWishlistSuccess"));
-        },
-        onError(error, variables, context) {
-          const { status, message } = HandleApiError(error, t);
-          // if (status === 400) {
-          //   toast.error(t("notEnoughStock"));
-          //   return;
-          // }
-          toast.error(message);
-          if (status === 401) router.push("/login", { locale });
-        },
-      },
-    );
   };
 
   return (
@@ -202,25 +180,12 @@ export default function ProductCard({
               </h3>
             </Link>
 
-            <>
+            <div className="flex">
               <ProductPricingField
                 product={product}
                 isProductDetails={isProductDetails}
               />
-
-              {/* <div className="space-x-2 flex items-center">
-                <div className="flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((item) => {
-                    return (
-                      <div key={item}>
-                        <Star size={18} />
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="text-base font-semibold">(0)</p>
-              </div> */}
-            </>
+            </div>
           </div>
 
           {/* Four lines starting from center of each edge */}
@@ -230,7 +195,7 @@ export default function ProductCard({
           <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span> */}
         </div>
         <div className="flex gap-1 items-center mt-0 md:mt-0 lg:mt-0 pb-4">
-          <Button
+          {/* <Button
             type="button"
             variant={"ghost"}
             size={"lg"}
@@ -243,23 +208,13 @@ export default function ProductCard({
             }}
           >
             <ShoppingBasket className="size-4 md:size-6 text-white transition-transform duration-200 group-hover:scale-110" />
-          </Button>
-          <div className="md:block hidden">
+          </Button> */}
+          {/* <div className="md:block hidden">
             <CartDrawer
               open={open}
               onOpenChange={setOpen}
             />
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            aria-label="Add to cart"
-            className="md:has-[>svg]:px-3 lg:has-[>svg]:px-3 has-[>svg]:px-2 rounded-full hover:bg-secondary hover:text-white transition-colors duration-200 h-8 md:h-10 lg:h-12"
-            onClick={() => handleAddToWishlist(product)}
-          >
-            <Heart className="size-4 md:size-6 stroke-current transition-colors duration-200" />
-          </Button>
+          </div> */}
         </div>
       </div>
       {/* {product.stock === 0 && (

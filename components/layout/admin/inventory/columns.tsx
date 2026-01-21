@@ -119,12 +119,6 @@ export const getInventoryColumns = (
         <div>{row.original.name}</div>
         <div className="flex flex-col gap-2 items-start">
           <div>SKU: {row.original.sku}</div>
-          <div>
-            Supplier:{" "}
-            {row.original?.owner && row.original.owner.business_name
-              ? row.original.owner.business_name
-              : "Prestige Home"}
-          </div>
 
           {/* <Link
             href={`/admin/products/${row.original.id}/edit`}
@@ -137,6 +131,20 @@ export const getInventoryColumns = (
       </div>
     ),
     enableSorting: true,
+  },
+
+  {
+    accessorKey: "supplier",
+    header: ({}) => <div className="text-center uppercase">SUPPLIER</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          {row.original.owner
+            ? row.original.owner.business_name
+            : "Prestige Home"}
+        </div>
+      );
+    },
   },
 
   {

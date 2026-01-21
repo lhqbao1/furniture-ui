@@ -20,7 +20,7 @@ const ProductBrand = ({
   const locale = useLocale();
   return (
     <>
-      {brand_image && isProductDetail === true ? (
+      {/* {brand_image && isProductDetail === true ? (
         <Image
           src={brand_image}
           width={50}
@@ -60,7 +60,25 @@ const ProductBrand = ({
         >
           {brand}
         </p>
-      )}
+      )} */}
+      <p
+        className="uppercase text-xs md:text-sm cursor-pointer text-black/50 font-bold hover:text-secondary"
+        onClick={() => {
+          if (!brand) return;
+
+          router.push(
+            {
+              pathname: "/shop-all",
+              query: {
+                brand: brand,
+              },
+            },
+            { locale },
+          );
+        }}
+      >
+        {brand}
+      </p>
     </>
   );
 };

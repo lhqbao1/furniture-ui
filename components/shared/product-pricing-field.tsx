@@ -7,7 +7,13 @@ import CountUp from "../CountUp";
 import { usePrevious } from "@uidotdev/usehooks";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { Button } from "../ui/button";
+import { Heart } from "lucide-react";
+import { useAddToWishList } from "@/features/wishlist/hook";
+import { toast } from "sonner";
+import { HandleApiError } from "@/lib/api-helper";
+import { useRouter } from "@/src/i18n/navigation";
 
 interface ProductPricingFieldProps {
   product: ProductItem;
@@ -21,6 +27,9 @@ const ProductPricingField = ({
   const [currentVoucher] = useAtom(currentVoucherAtom);
   const [lastVoucher, setLastVoucher] = useAtom(lastVoucherAtom);
   const t = useTranslations();
+  const addToWishlistMutation = useAddToWishList();
+  const router = useRouter();
+  const locale = useLocale();
   const voucherRef = useRef<HTMLDivElement | null>(null);
   // ✅ check voucher match
   const matchedVoucher = product.vouchers?.find((v) => v.id === currentVoucher);
@@ -85,8 +94,29 @@ const ProductPricingField = ({
     };
   }, [matchedVoucher]);
 
+  const handleAddToWishlist = (currentProduct: ProductItem) => {
+    if (!currentProduct) return;
+    addToWishlistMutation.mutate(
+      { productId: currentProduct.id ?? "", quantity: 1 },
+      {
+        onSuccess(data, variables, context) {
+          toast.success(t("addToWishlistSuccess"));
+        },
+        onError(error, variables, context) {
+          const { status, message } = HandleApiError(error, t);
+          // if (status === 400) {
+          //   toast.error(t("notEnoughStock"));
+          //   return;
+          // }
+          toast.error(message);
+          if (status === 401) router.push("/login", { locale });
+        },
+      },
+    );
+  };
+
   return (
-    <>
+    <div className="w-full">
       {shouldAnimate ? (
         <CountUp
           from={prevPrice}
@@ -115,11 +145,16 @@ const ProductPricingField = ({
             <div className="text-sm md:text-base font-semibold text-black">
               €
             </div>
+            {isProductDetails && (
+              <span className="text-sm text-gray-800 font-light ml-2">
+                inkl. MwSt.
+              </span>
+            )}
           </div>
           {!isProductDetails &&
             product.price &&
             product.price > product.final_price && (
-              <p className="text-[10px] md:text-base min-h-0 mb-0.5">
+              <p className="text-[10px] md:text-sm min-h-0 mb-0.5 text-gray-700 font-light">
                 {!product.owner ||
                 product.owner.business_name === "Prestige Home"
                   ? t("ogPrice")
@@ -135,9 +170,23 @@ const ProductPricingField = ({
       )}
 
       {!isProductDetails && (
-        <p className="font-light text-xs md:text-sm">zzgl. Versandkosten</p>
+        <div className="flex items-center justify-between">
+          <p className="font-light text-xs md:text-sm mt-1.5">
+            zzgl. Versandkosten
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="lg"
+            aria-label="Add to cart"
+            className="hover:bg-transparent"
+            onClick={() => handleAddToWishlist(product)}
+          >
+            <Heart className="size-4 md:size-6 text-secondary group-hover:fill-secondary" />
+          </Button>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 

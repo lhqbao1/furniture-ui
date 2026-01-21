@@ -324,7 +324,7 @@
   "resendOtpDes": "Senden Sie den OTP-Code erneut an Ihre E-Mail/Ihre Telefonnummer",
   "resendOtp": "OTP erneut senden",
   "resendIn": "Erneut senden in",
-  "shippingCost": "zzgl. {shippingCost} Versand",
+  "shippingCost": "zzgl. {shippingCost} Versandkosten",
   "ogPrice": "Vorher",
   "ogPriceSupplier": "UVP",
   "itemNumber": "Artikelnummer",
