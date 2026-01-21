@@ -28,6 +28,7 @@ import {
   formatDateToTrustedShops,
   getOrderLatestDeliveryDate,
 } from "@/hooks/get-latest-delivery-date";
+import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 
 const OrderPlaced = () => {
   const router = useRouter();
@@ -228,7 +229,20 @@ const OrderPlaced = () => {
     const b = a.split(" ", 2);
     if (parseInt(b[0]) + ttl > Date.now()) {
       const url = new URL("https://cmodul.solutenetwork.com/conversion");
-      url.searchParams.set("val", checkout.total_amount.toString());
+      url.searchParams.set(
+        "val",
+        calculateOrderTaxWithDiscount(
+          checkout.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
+          checkout?.voucher_amount,
+          checkout.checkouts[0].shipping_address?.country ?? "DE",
+          checkout.checkouts[0].user?.tax_id,
+        )
+          .totalNetWithoutShipping.toLocaleString("de-DE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+          .toString(),
+      );
       url.searchParams.set("oid", checkout.checkout_code);
       url.searchParams.set("factor", "1");
       url.searchParams.set("url", b[1]);
