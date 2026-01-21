@@ -68,16 +68,6 @@ const OrderDetails = () => {
   const createdAt = formatDate(order.created_at);
   const updatedAt = formatDateTimeString(order.updated_at);
 
-  const calc = calculateOrderTaxWithDiscount(
-    order.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
-    order?.voucher_amount ?? 0,
-    order.checkouts?.[0]?.shipping_address?.country ?? "DE",
-    order.checkouts?.[0]?.user?.tax_id,
-  );
-  // fallback = "0,00"
-  const val = Number(calc?.totalNetWithoutShipping ?? 0);
-
-  console.log(val);
   return (
     <div className="space-y-12 pb-20 mt-6">
       <AdminBackButton />
