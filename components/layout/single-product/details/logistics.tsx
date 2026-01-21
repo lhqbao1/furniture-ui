@@ -10,6 +10,7 @@ import {
 import { useDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
 import Link from "next/link";
+import ShippingDrawer from "../shipping-drawer";
 
 interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
@@ -37,10 +38,10 @@ const ProductDetailsLogistic = ({
               productDetails.stock === 0
                 ? "bg-gray-300"
                 : productDetails.stock < 10
-                ? "bg-red-500"
-                : productDetails.stock <= 20
-                ? "bg-primary"
-                : "bg-secondary"
+                  ? "bg-red-500"
+                  : productDetails.stock <= 20
+                    ? "bg-primary"
+                    : "bg-secondary"
             }`}
           />
 
@@ -49,10 +50,10 @@ const ProductDetailsLogistic = ({
               productDetails.stock === 0
                 ? "bg-gray-300"
                 : productDetails.stock < 10
-                ? "bg-gray-300"
-                : productDetails.stock <= 20
-                ? "bg-primary"
-                : "bg-secondary"
+                  ? "bg-gray-300"
+                  : productDetails.stock <= 20
+                    ? "bg-primary"
+                    : "bg-secondary"
             }`}
           />
 
@@ -61,42 +62,22 @@ const ProductDetailsLogistic = ({
               productDetails.stock === 0
                 ? "bg-gray-300"
                 : productDetails.stock < 10
-                ? "bg-gray-300"
-                : productDetails.stock <= 20
-                ? "bg-gray-400"
-                : "bg-secondary"
+                  ? "bg-gray-300"
+                  : productDetails.stock <= 20
+                    ? "bg-gray-400"
+                    : "bg-secondary"
             }`}
           />
         </div>
       </div>
 
-      {/* <div>
-        {t("inStock1")}: {productDetails.stock} Stück
-      </div> */}
+      <ShippingDrawer productDetails={productDetails} />
 
-      <div className="flex flex-row gap-4 items-center">
-        <Truck size={25} />
-        <span className="text-gray-800 font-medium text-sm">
-          {t("shippingCost", {
-            shippingCost:
-              productDetails.carrier.toLowerCase() === "amm" ||
-              productDetails.carrier.toLowerCase() === "spedition"
-                ? "35,95€"
-                : "5,95€",
-          })}{" "}
-          inkl. MwSt.
-        </span>
-      </div>
-
-      <div className="flex flex-row gap-4 items-center">
-        <Undo2 size={25} />
-        <span className="text-gray-800 font-medium text-sm">
-          14-Tage-Rückgaberecht
-        </span>
-      </div>
-
-      <div className="flex flex-row gap-4 items-center">
-        <Clock size={25} />
+      <div className="flex flex-row gap-4 items-start">
+        <Clock
+          size={25}
+          className="mt-1.5"
+        />
         <div>
           <span className="text-gray-800 font-medium text-sm">
             {estimatedDeliveryRange ? (
@@ -121,8 +102,8 @@ const ProductDetailsLogistic = ({
               (productDetails.carrier.toLowerCase() === "spedition" && (
                 <>
                   <li className="flex items-start gap-2">
-                    <span className="text-base leading-5">•</span>
-                    <span className="text-base">
+                    <span className="text-sm leading-5">•</span>
+                    <span className="text-sm">
                       Lieferung <strong>frei Bordsteinkante</strong>{" "}
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -140,30 +121,23 @@ const ProductDetailsLogistic = ({
                   </li>
 
                   <li className="flex items-start gap-2">
-                    <span className="text-base leading-5">•</span>
-                    <span className="text-base">
+                    <span className="text-sm leading-5">•</span>
+                    <span className="text-sm">
                       Speditionsversand nach Terminabsprache
                     </span>
                   </li>
                 </>
               ))}
-
-            {/* <li className="flex items-start gap-2">
-              <span className="text-base leading-5">•</span>
-              <span className="text-base">Versand aus Deutschland</span>
-            </li> */}
           </ul>
         </div>
       </div>
 
-      <Link href={"/agb"}>
-        <div className="flex flex-row gap-4 items-center">
-          <ShieldCheckIcon size={25} />
-          <span className="text-gray-800 font-medium text-sm">
-            24 Monate gesetzliche Gewährleistung
-          </span>
-        </div>
-      </Link>
+      <div className="flex flex-row gap-4 items-center">
+        <Undo2 size={25} />
+        <span className="text-gray-800 font-medium text-sm">
+          14-Tage-Rückgaberecht
+        </span>
+      </div>
     </div>
   );
 };
