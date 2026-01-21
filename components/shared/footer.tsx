@@ -315,7 +315,7 @@ const Footer = () => {
               unoptimized
             />
           </Link>
-          <Link
+          {/* <Link
             href="https://x.com/prestihome_de"
             target="_blank"
           >
@@ -327,7 +327,7 @@ const Footer = () => {
               className="w-12 h-12 object-fill hover:scale-110 duration-300 transition-all"
               unoptimized
             />
-          </Link>
+          </Link> */}
 
           <Link
             href="https://www.instagram.com/prestige_home_gmbh/"
@@ -342,7 +342,7 @@ const Footer = () => {
               unoptimized
             />
           </Link>
-          <Link
+          {/* <Link
             href="https://www.linkedin.com/company/prestige-home-gmbh/"
             target="_blank"
           >
@@ -354,7 +354,7 @@ const Footer = () => {
               className="w-12 h-12 object-fill hover:scale-110 duration-300 transition-all"
               unoptimized
             />
-          </Link>
+          </Link> */}
           <Link
             href="https://www.pinterest.com/prestigehomegmbh/"
             target="_blank"

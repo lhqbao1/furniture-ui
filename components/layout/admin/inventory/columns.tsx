@@ -87,6 +87,15 @@ export const getInventoryColumns = (
       );
     },
   },
+
+  {
+    accessorKey: "id",
+    header: ({}) => <div className="text-center uppercase">ID</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.id_provider}</div>;
+    },
+  },
+
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -110,7 +119,6 @@ export const getInventoryColumns = (
         <div>{row.original.name}</div>
         <div className="flex flex-col gap-2 items-start">
           <div>SKU: {row.original.sku}</div>
-          <div>ID: {row.original.id_provider}</div>
           <div>
             Supplier:{" "}
             {row.original?.owner && row.original.owner.business_name
@@ -223,7 +231,6 @@ export const getInventoryColumns = (
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
-              /pcs
             </div>
           ) : (
             <div className="text-center">—</div>
@@ -251,7 +258,6 @@ export const getInventoryColumns = (
                   maximumFractionDigits: 2,
                 },
               )}
-              /pcs
             </div>
           ) : (
             <div className="text-center">—</div>
@@ -279,7 +285,6 @@ export const getInventoryColumns = (
                   maximumFractionDigits: 2,
                 },
               )}
-              /pcs
             </div>
           ) : (
             <div className="text-center">—</div>
@@ -306,7 +311,6 @@ export const getInventoryColumns = (
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
-              /pcs
             </div>
           ) : (
             <div className="text-center">—</div>
