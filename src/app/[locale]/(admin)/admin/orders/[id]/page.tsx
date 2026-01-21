@@ -69,6 +69,17 @@ const OrderDetails = () => {
   const updatedAt = formatDateTimeString(order.updated_at);
 
   console.log(order);
+  console.log(
+    calculateOrderTaxWithDiscount(
+      order.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
+      order?.voucher_amount,
+      order.checkouts[0].shipping_address?.country ?? "DE",
+      order.checkouts[0].user?.tax_id,
+    ).totalNetWithoutShipping.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+  );
 
   return (
     <div className="space-y-12 pb-20 mt-6">

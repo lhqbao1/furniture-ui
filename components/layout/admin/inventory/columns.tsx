@@ -501,9 +501,9 @@ export const getInventoryColumns = (
   //   },
   // },
 
-  {
-    id: "actions",
-    header: "ACTION",
-    cell: ({ row }) => <ActionsCell product={row.original} />,
-  },
+  // {
+  //   id: "actions",
+  //   header: "ACTION",
+  //   cell: ({ row }) => <ActionsCell product={row.original} />,
+  // },
 ];
