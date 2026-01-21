@@ -174,16 +174,10 @@ const ProductPricingField = ({
           <p className="font-light text-xs md:text-sm mt-1.5">
             zzgl. Versandkosten
           </p>
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            aria-label="Add to cart"
-            className="hover:bg-transparent"
+          <Heart
+            className="size-4 md:size-6 text-secondary hover:fill-secondary cursor-pointer"
             onClick={() => handleAddToWishlist(product)}
-          >
-            <Heart className="size-4 md:size-6 text-secondary group-hover:fill-secondary" />
-          </Button>
+          />
         </div>
       )}
     </div>

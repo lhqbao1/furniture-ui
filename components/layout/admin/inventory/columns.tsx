@@ -19,6 +19,11 @@ import AddOrEditInventoryDialog from "./dialog/add-inventory-dialog";
 import ProductInventoryDeleteDialog from "./dialog/delete-dialog";
 import { Pencil, Trash } from "lucide-react";
 import EditInventoryDialog from "./dialog/edit-inventory-dialog";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useEditProduct } from "@/features/products/hook";
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -36,6 +41,89 @@ function ActionsCell({ product }: { product: ProductItem }) {
       />
 
       {/* {product.inventory && product.inventory.length > 0 ? <ProductInventoryDeleteDialog id={}/> : ""} */}
+    </div>
+  );
+}
+
+function EditableStockCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState<number | string>(product.stock);
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductStock = () => {
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          stock: Number(value),
+          ...(product.categories?.length
+            ? { category_ids: product.categories.map((c) => c.id) }
+            : {}),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand.id,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess(data, variables, context) {
+          toast.success("Update product stock successful");
+          setEditing(false);
+        },
+        onError(error, variables, context) {
+          toast.error("Update product stock fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="">
+      {editing ? (
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => {
+            const v = e.target.value;
+            setValue(v === "" ? "" : Number(v));
+          }}
+          onBlur={() => {
+            if (value !== product.stock) {
+            } else {
+              setEditing(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductStock();
+            }
+            if (e.key === "Escape") {
+              setValue(product.stock);
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            "w-20",
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer text-center"
+          onClick={() => setEditing(true)}
+        >
+          {product.stock}
+        </div>
+      )}
     </div>
   );
 }
@@ -199,7 +287,7 @@ export const getInventoryColumns = (
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          {row.original.stock - (row.original.result_stock ?? 0)} pcs.
+          {row.original.stock - (row.original.result_stock ?? 0)}
         </div>
       );
     },
@@ -209,9 +297,7 @@ export const getInventoryColumns = (
     accessorKey: "reserved",
     header: ({}) => <div className="text-center uppercase">Reserved</div>,
     cell: ({ row }) => {
-      return (
-        <div className="text-center">{row.original.result_stock} pcs.</div>
-      );
+      return <div className="text-center">{row.original.result_stock} </div>;
     },
   },
 
@@ -219,7 +305,7 @@ export const getInventoryColumns = (
     accessorKey: "physical",
     header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.stock} pcs.</div>;
+      return <EditableStockCell product={row.original} />;
     },
   },
 
@@ -415,9 +501,9 @@ export const getInventoryColumns = (
   //   },
   // },
 
-  // {
-  //   id: "actions",
-  //   header: "ACTION",
-  //   cell: ({ row }) => <ActionsCell product={row.original} />,
-  // },
+  {
+    id: "actions",
+    header: "ACTION",
+    cell: ({ row }) => <ActionsCell product={row.original} />,
+  },
 ];
