@@ -75,7 +75,7 @@ export const useDeliveryEstimate = ({
     let startDate: Date | null = null;
 
     // CASE 1: còn hàng
-    if (stock > 0) {
+    if (stock > 0 || stock < 0) {
       startDate = new Date();
     }
 
