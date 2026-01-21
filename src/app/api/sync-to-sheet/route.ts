@@ -73,8 +73,11 @@ export async function GET() {
             .map((f) => f.url)
             .join(",")
         : "";
-      const productType = p.brand.name === "Econelo" ? "Elektromobil" : "";
-      const productCategory = p.brand.name === "Econelo" ? "2444" : "";
+
+      const shippingLabel =
+        p.carrier === "amm" || p.carrier === "spedition"
+          ? "Spedition"
+          : "Paket";
 
       return [
         p.id_provider ?? "",
@@ -91,8 +94,7 @@ export async function GET() {
         shipping,
         additionalImages,
         "new",
-        productType,
-        productCategory,
+        shippingLabel,
       ];
     });
     // 4️⃣ Ghi vào Google Sheet (ví dụ từ A2)
