@@ -60,7 +60,7 @@ const ActionCell = ({
         variant={"ghost"}
         type="button"
         onClick={() => {
-          setExpandedRowId?.(isExpanded ? null : currentRowId ?? null);
+          setExpandedRowId?.(isExpanded ? null : (currentRowId ?? null));
         }}
         className="p-1"
       >
@@ -145,7 +145,7 @@ const ActionCellChild = ({
         variant={"ghost"}
         type="button"
         onClick={() =>
-          setExpandedRowId?.(isExpanded ? null : currentRowId ?? null)
+          setExpandedRowId?.(isExpanded ? null : (currentRowId ?? null))
         }
         className="p-1"
       >
@@ -209,9 +209,13 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
             ) : (
               <div>
                 {row.original.from_marketplace === "ebay"
-                  ? row.original.checkouts[0]?.shipping_address.recipient_name
-                  : row.original.checkouts[0]?.invoice_address.recipient_name ??
-                    ""}
+                  ? (row.original.checkouts[0]?.shipping_address
+                      ?.recipient_name ??
+                    row.original.checkouts[0]?.invoice_address
+                      ?.recipient_name ??
+                    "")
+                  : (row.original.checkouts[0]?.invoice_address
+                      ?.recipient_name ?? "")}
               </div>
             )}
           </div>
