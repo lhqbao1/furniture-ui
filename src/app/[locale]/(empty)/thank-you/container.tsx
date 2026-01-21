@@ -238,9 +238,7 @@ const OrderPlaced = () => {
       // fallback = "0,00"
       const val = Number(calc?.totalNetWithoutShipping ?? 0);
 
-      console.log(val);
-
-      url.searchParams.set("val", val.toString());
+      url.searchParams.set("val", val.toFixed(2).replace(".", ","));
       url.searchParams.set("oid", checkout.checkout_code);
       url.searchParams.set("factor", "1");
       url.searchParams.set("url", b[1]);
