@@ -51,6 +51,7 @@ const AddressList = ({ userId }: AddressListProps) => {
     <div className="grid grid-cols-2 gap-4">
       {[...addresses]
         .sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0)) // default lên đầu
+        .slice(0, 4)
         .map((address) => (
           <Card
             key={address.id}
