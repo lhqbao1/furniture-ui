@@ -32,6 +32,7 @@ import {
 import Image from "next/image";
 import { Check } from "lucide-react";
 import { ProductItem } from "@/types/products";
+import { toast } from "sonner";
 
 type FormItem = {
   product_id: string;
@@ -60,6 +61,7 @@ const AmmWeAvisPage = () => {
         unit: "St",
       },
     ]);
+    console.log(product);
   };
 
   const removeItem = (productId: string) => {
@@ -70,7 +72,6 @@ const AmmWeAvisPage = () => {
   };
 
   const importAmmProductMutation = useImportAmmProducts();
-
   function onSubmit(values: z.infer<typeof ammWeAvisSchema>) {
     if (!products) return;
 
@@ -89,7 +90,21 @@ const AmmWeAvisPage = () => {
       }),
     };
 
-    importAmmProductMutation.mutate(payload);
+    // 👉 show loading toast
+    const toastId = toast.loading("Importing products...");
+
+    importAmmProductMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success("Products imported successfully.", {
+          id: toastId, // ✅ replace loading toast
+        });
+      },
+      onError: () => {
+        toast.error("Failed to import products.", {
+          id: toastId, // ✅ replace loading toast
+        });
+      },
+    });
   }
 
   const {
@@ -99,6 +114,18 @@ const AmmWeAvisPage = () => {
   } = useGetProductsSelect({
     all_products: true,
   });
+
+  const orderedProducts = React.useMemo(() => {
+    if (!products) return [];
+
+    const selectedIds = new Set((items || []).map((i: any) => i.product_id));
+
+    const selectedProducts = products.filter((p) => selectedIds.has(p.id));
+
+    const unselectedProducts = products.filter((p) => !selectedIds.has(p.id));
+
+    return [...selectedProducts, ...unselectedProducts];
+  }, [products, items]);
 
   return (
     <Form {...form}>
@@ -279,7 +306,7 @@ const AmmWeAvisPage = () => {
                 <Command>
                   <CommandInput placeholder="Search products..." />
                   <CommandGroup className="max-h-[300px] overflow-y-auto">
-                    {products?.map((product) => {
+                    {orderedProducts?.map((product) => {
                       const selected = items?.some(
                         (i: any) => i.product_id === product.id,
                       );
@@ -332,14 +359,13 @@ const AmmWeAvisPage = () => {
 
               {items.map((item: any, index: number) => {
                 const product = products?.find((p) => p.id === item.product_id);
-
                 return (
                   <div
                     key={item.product_id}
                     className="grid grid-cols-12 items-center gap-2"
                   >
                     <div className="col-span-5">{product?.name}</div>
-                    <div className="col-span-3">{product?.sku}</div>
+                    <div className="col-span-3">{product?.sku.toString()}</div>
                     <div className="col-span-2">St</div>
                     <div className="col-span-1">
                       <Input
