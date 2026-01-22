@@ -36,6 +36,7 @@ import { saveAs } from "file-saver";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
 import FilterExportForm from "./toolbar/filter-export-dialog";
+import { cn } from "@/lib/utils";
 
 export enum ToolbarType {
   product = "product",
@@ -81,6 +82,8 @@ export default function TableToolbar({
 
   const [openAddModal, setOpenAddModal] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [hasShownSpaceToast, setHasShownSpaceToast] = useState(false);
+
   const pathname = usePathname();
   const defaultSearch = searchParams.get("search") ?? "";
 
@@ -223,8 +226,29 @@ export default function TableToolbar({
       <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap">
         <Input
           placeholder="Search"
+          className={cn(
+            searchValue.includes(" ") &&
+              "border-yellow-400 focus-visible:ring-yellow-400",
+          )}
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            // ✅ nếu có dấu cách
+            if (value.includes(" ")) {
+              if (!hasShownSpaceToast) {
+                toast.warning(
+                  "Your search contains spaces. Please check your keyword.",
+                );
+                setHasShownSpaceToast(true);
+              }
+            } else {
+              // reset khi user xoá hết dấu cách
+              setHasShownSpaceToast(false);
+            }
+
+            setSearchValue(value);
+          }}
         />
       </div>
 
