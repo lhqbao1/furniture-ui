@@ -1,13 +1,12 @@
-export const config = {
-    regions: ['fra1'],
-  };
-import { apiAdmin } from "@/lib/axios";
+import { apiPublic } from "@/lib/axios";
+import { ImportWeAvisPayload } from "@/lib/schema/amm-weavis";
 
-export async function importAmmProduct(file: FormData){
-    const {data} = await apiAdmin.post('/amm/import-weavis', file, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        }
-    })
-    return data
+export async function importWeAvis(payload: ImportWeAvisPayload) {
+  const { data } = await apiPublic.post("/amm/import-weavis", payload, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data;
 }

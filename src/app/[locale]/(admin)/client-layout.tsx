@@ -19,7 +19,7 @@ export default function ClientAdminLayout({
         <div className="flex">
           <SidebarProvider defaultOpen>
             <AdminSideBar />
-            <div className="container-padding lg:pt-8 pt-2 w-full pointer-events-auto">
+            <div className="container-padding lg:pt-8 pt-2 xl:w-[calc(100%-240px)] pointer-events-auto overflow-auto">
               <AdminHeader />
               {children}
             </div>
