@@ -31,7 +31,6 @@ export function ProductImageCarousel({
 
   const handleSelectImage = (index: number) => {
     setMainImageIndex(index);
-    console.log(index);
     if (api) api.scrollTo(index); // 👈 scroll đến item vừa click
   };
 

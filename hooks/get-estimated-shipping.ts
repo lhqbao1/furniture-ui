@@ -72,19 +72,20 @@ export const useDeliveryEstimate = ({
 
     const latestInventory = getLatestInventory(inventory ?? []);
 
-    let startDate: Date | null = null;
+    let startDate: Date;
 
-    // CASE 1: còn hàng
-    if (stock > 0 || stock < 0) {
+    // CASE 1: còn hàng → hôm nay
+    if (stock !== 0) {
       startDate = new Date();
     }
-
     // CASE 2: hết hàng nhưng có inventory sắp về
-    if (stock === 0 && latestInventory) {
+    else if (latestInventory) {
       startDate = new Date(latestInventory.date_received);
     }
-
-    if (!startDate) return null;
+    // CASE 3: hết hàng & không có inventory → vẫn tính (fallback)
+    else {
+      startDate = new Date();
+    }
 
     return {
       from: addBusinessDays(startDate, deliveryRange.min),

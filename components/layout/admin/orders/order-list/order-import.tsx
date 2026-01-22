@@ -100,10 +100,10 @@ const normalize = (row: any, preset: any, channel: string) => {
       row["country"] === "DE"
         ? 19
         : row["country"] === "AT"
-        ? hasCompany
-          ? 0
-          : 20
-        : null,
+          ? hasCompany
+            ? 0
+            : 20
+          : null,
     status: row["status"] || null,
     payment_term: row["payment_term"] || null,
     total_shipping: row["total_shipping"] || 35.95,
@@ -171,8 +171,6 @@ const OrderImport = () => {
 
       const payload = Object.values(grouped);
       setOrders(payload);
-
-      console.log("FINAL PAYLOAD:", payload);
     };
 
     reader.readAsBinaryString(uploaded);

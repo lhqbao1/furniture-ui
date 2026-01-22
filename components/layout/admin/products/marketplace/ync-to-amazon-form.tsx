@@ -194,7 +194,6 @@ const SyncToAmazonForm = ({
       },
       {
         onSuccess(data) {
-          console.log(product);
           const amazonData = data.marketplace_products?.find(
             (m) => m.marketplace === "amazon",
           );

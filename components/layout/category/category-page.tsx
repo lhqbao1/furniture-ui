@@ -47,8 +47,6 @@ const ProductCategory = ({
       ? categoriesParams.slice().sort().join("|")
       : undefined;
 
-  console.log(categoriesParams);
-
   const colors = searchParams.getAll("color");
   const colorsKey =
     colors.length > 0 ? colors.slice().sort().join("|") : undefined;
@@ -106,8 +104,8 @@ const ProductCategory = ({
         categoriesParams && categoriesParams.length > 0
           ? categoriesParams
           : listCategory?.child && listCategory?.child?.length > 0
-          ? listCategory.child
-          : [listCategory?.name ?? ""],
+            ? listCategory.child
+            : [listCategory?.name ?? ""],
       categoriesKey: categoriesKey,
     });
 

@@ -35,7 +35,6 @@ const OrderDetailsDrawer = ({ invoice, checkout }: OrderDetailsDrawerProps) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const locale = useLocale();
-  console.log(checkout);
 
   const handleNavigateTracking = (checkout: CheckOut) => {
     const url = getTrackingUrl(checkout);
@@ -156,13 +155,6 @@ const OrderDetailsDrawer = ({ invoice, checkout }: OrderDetailsDrawerProps) => {
             {/* Header */}
             <div className="flex justify-between items-center">
               <h3 className="text-2xl font-semibold">{t("totalSummary")}</h3>
-
-              {/* {isDispatched && (
-                <Button
-                  variant={"outline"}
-                  onClick={() => console.log("hehe")}
-                ></Button>
-              )} */}
               {invoice && (
                 <button
                   type="button"
