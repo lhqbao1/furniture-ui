@@ -135,6 +135,7 @@ export function AdminSideBar() {
           url: "/admin/logistic/inventory/incoming",
           icon: CornerDownRight,
         },
+        { title: "We Avis", url: "/admin/amm/we-avis", icon: CornerDownRight },
       ],
     },
     {
@@ -169,14 +170,6 @@ export function AdminSideBar() {
           url: "/admin/settings/policy",
           icon: CornerDownRight,
         },
-      ],
-    },
-    {
-      title: "AMM",
-      url: "/admin/amm",
-      icon: ChevronRight,
-      children: [
-        { title: "We Avis", url: "/admin/amm/we-avis", icon: CornerDownRight },
       ],
     },
   ];
