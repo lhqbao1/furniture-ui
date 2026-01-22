@@ -70,7 +70,9 @@ export async function GET() {
           p.brand &&
           p.brand.name.toLowerCase() !== "prestige works" &&
           p.component &&
-          p.carrier,
+          p.carrier &&
+          p.color &&
+          p.materials,
       )
       .map((p) => {
         const categories = p.categories?.map((c) => c.name).join(", ") || "";

@@ -11,7 +11,7 @@ import { ProductInput } from "@/lib/schema/product";
 import { toast } from "sonner";
 import ProductForm from "@/components/layout/admin/products/products-form/add-product-form";
 import { useLocale } from "next-intl";
-import AdminBackButton from "@/components/layout/admin/admin-back-button";
+import { ProductItem } from "@/types/products";
 
 const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params); // unwrap Promise
@@ -20,6 +20,23 @@ const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const createProductMutation = useAddProduct();
 
   const { data, isLoading, isError } = useGetProductById(id);
+
+  const sanitizedCloneValues = React.useMemo<
+    Partial<ProductItem> | undefined
+  >(() => {
+    if (!data) return undefined;
+
+    const { ean, sku, stock, result_stock, ...rest } = data;
+
+    return {
+      ...rest,
+      ean: undefined,
+      sku: undefined,
+      stock: undefined,
+      result_stock: undefined,
+    };
+  }, [data]);
+
   if (isError) return <div>No data</div>;
   if (isLoading || !data) return <ProductFormSkeleton />;
 
@@ -40,7 +57,7 @@ const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
       <div className="p-6">
         <h1 className="text-xl font-bold mb-4">Clone Product</h1>
         <ProductForm
-          productValuesClone={data}
+          productValuesClone={sanitizedCloneValues}
           onSubmit={handleCreate}
           isPending={createProductMutation.isPending}
         />
