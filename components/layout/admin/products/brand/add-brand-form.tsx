@@ -77,7 +77,7 @@ export default function AddOrEditBrandForm({
             company_city: values.company_city,
             company_country: values.company_country,
             company_postal_code: values.company_postal_code,
-            company_phone: values.company_phone,
+            company_phone: values.company_phone ?? undefined,
           },
         },
         {
@@ -102,7 +102,7 @@ export default function AddOrEditBrandForm({
           company_city: values.company_city,
           company_country: values.company_country,
           company_postal_code: values.company_postal_code,
-          company_phone: values.company_phone,
+          company_phone: values.company_phone ?? undefined,
         },
         {
           onSuccess(data, variables, context) {
@@ -285,6 +285,7 @@ export default function AddOrEditBrandForm({
                   <Input
                     placeholder=""
                     {...field}
+                    value={field.value ?? ""} // ✅ quan trọng
                   />
                 </FormControl>
                 <FormMessage />
@@ -306,7 +307,7 @@ export default function AddOrEditBrandForm({
                   updating
                 </>
               ) : (
-                submitText ?? "Update Brand"
+                (submitText ?? "Update Brand")
               )
             ) : createBrand.isPending ? (
               <>
@@ -314,7 +315,7 @@ export default function AddOrEditBrandForm({
                 creating
               </>
             ) : (
-              submitText ?? "Create Brand"
+              (submitText ?? "Create Brand")
             )}
           </Button>
         </div>

@@ -149,9 +149,9 @@ export default function InventoryTableToolbar({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-center gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-2 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
-      <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
+      <div className="flex items-center lg:gap-2 gap-2 flex-wrap lg:flex-nowrap ">
         <div className="flex gap-2 text-sm font-medium">
           {/* <Button variant="ghost" className="">Export</Button> */}
           <DropdownMenu>
@@ -201,7 +201,7 @@ export default function InventoryTableToolbar({
       </div>
 
       {/* Right group */}
-      <div className="flex items-center gap-4 flex-wrap lg:flex-nowrap justify-center lg:justify-start">
+      <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap justify-center lg:justify-start">
         {/* <div>
           <Select
             value={String(pageSize)}
@@ -248,6 +248,13 @@ export default function InventoryTableToolbar({
             <InventoryFilterForm />
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Button
+          variant={"secondary"}
+          onClick={() => router.push("/admin/logistic/inventory/incoming/add")}
+        >
+          Add PO
+        </Button>
 
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
