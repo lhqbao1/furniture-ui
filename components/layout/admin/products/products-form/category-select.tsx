@@ -31,6 +31,10 @@ interface MultiSelectProps {
   placeholder?: string;
 }
 
+type FlattenCategory = CategoryResponse & {
+  isParent: boolean;
+};
+
 export function MultiSelectField({
   fieldName,
   label,
@@ -40,23 +44,51 @@ export function MultiSelectField({
   const { data: options, isLoading, isError } = useGetCategories();
 
   // hàm flatten chỉ lấy leaf nodes
+  // const flattenCategories = (
+  //   categories: CategoryResponse[],
+  // ): CategoryResponse[] => {
+  //   let result: CategoryResponse[] = [];
+  //   for (const cat of categories) {
+  //     if (cat.children && cat.children.length > 0) {
+  //       // nếu có children -> lấy children đệ quy
+  //       result = [...result, ...flattenCategories(cat.children)];
+  //     } else {
+  //       // nếu không có children -> leaf node
+  //       result.push(cat);
+  //     }
+  //   }
+  //   return result;
+  // };
+
+  // const leafOptions: CategoryResponse[] = React.useMemo(() => {
+  //   if (!options) return [];
+  //   return flattenCategories(options);
+  // }, [options]);
+
   const flattenCategories = (
-    categories: CategoryResponse[]
-  ): CategoryResponse[] => {
-    let result: CategoryResponse[] = [];
+    categories: CategoryResponse[],
+    level = 0,
+  ): FlattenCategory[] => {
+    let result: FlattenCategory[] = [];
+
     for (const cat of categories) {
-      if (cat.children && cat.children.length > 0) {
-        // nếu có children -> lấy children đệ quy
-        result = [...result, ...flattenCategories(cat.children)];
-      } else {
-        // nếu không có children -> leaf node
-        result.push(cat);
+      const hasChildren = !!(cat.children && cat.children.length > 0);
+
+      // luôn push category hiện tại (cha hoặc con)
+      result.push({
+        ...cat,
+        isParent: hasChildren,
+      });
+
+      if (hasChildren) {
+        result = [...result, ...flattenCategories(cat.children!, level + 1)];
       }
     }
+
     return result;
   };
 
-  const leafOptions: CategoryResponse[] = React.useMemo(() => {
+  const flatOptions = React.useMemo(() => {
     if (!options) return [];
     return flattenCategories(options);
   }, [options]);
@@ -77,18 +109,18 @@ export function MultiSelectField({
         };
 
         const orderedOptions = React.useMemo(() => {
-          if (!leafOptions) return [];
+          if (!flatOptions) return [];
           // Các category đã chọn
-          const selectedItems = leafOptions.filter((opt) =>
-            selected.includes(opt.id)
+          const selectedItems = flatOptions.filter((opt) =>
+            selected.includes(opt.id),
           );
           // Các category chưa chọn
-          const unselectedItems = leafOptions.filter(
-            (opt) => !selected.includes(opt.id)
+          const unselectedItems = flatOptions.filter(
+            (opt) => !selected.includes(opt.id),
           );
           // Ghép lại: chọn trước, chưa chọn sau
           return [...selectedItems, ...unselectedItems];
-        }, [leafOptions, selected]);
+        }, [flatOptions, selected]);
 
         return (
           <FormItem className="flex flex-col w-full">
@@ -99,7 +131,10 @@ export function MultiSelectField({
             )}
 
             <Popover>
-              <PopoverTrigger asChild className="font-light">
+              <PopoverTrigger
+                asChild
+                className="font-light"
+              >
                 <Button
                   variant="outline"
                   className="w-full justify-between"
@@ -117,12 +152,12 @@ export function MultiSelectField({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[200px] max-h-[400px] overflow-y-scroll p-0">
+              <PopoverContent className="w-[200px] max-h-[400px] overflow-y-scroll p-0 pointer-events-auto">
                 {isLoading ? (
                   <div className="flex items-center justify-center p-4">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>
-                ) : isError || !leafOptions || leafOptions.length === 0 ? (
+                ) : isError || !flatOptions || flatOptions.length === 0 ? (
                   <div className="p-4 text-center text-sm text-muted-foreground">
                     No categories available
                   </div>
@@ -133,20 +168,37 @@ export function MultiSelectField({
                       className="h-10"
                     />
                     <CommandGroup>
-                      {orderedOptions.map((opt) => (
-                        <CommandItem
-                          key={opt.id}
-                          onSelect={() => toggleSelect(opt.id)}
-                          className="flex items-center gap-2 cursor-pointer"
-                        >
-                          <Checkbox
-                            checked={selected.includes(opt.id)}
-                            onCheckedChange={() => toggleSelect(opt.id)}
-                            className="pointer-events-none"
-                          />
-                          <span>{opt.name}</span>
-                        </CommandItem>
-                      ))}
+                      {flatOptions.map((opt) => {
+                        const isSelected = selected.includes(opt.id);
+
+                        // 👉 CATEGORY CHA
+                        if (opt.isParent) {
+                          return (
+                            <div
+                              key={opt.id}
+                              className="px-3 py-2 text-sm font-semibold text-muted-foreground cursor-default"
+                            >
+                              {opt.name}
+                            </div>
+                          );
+                        }
+
+                        // 👉 CATEGORY CON (leaf)
+                        return (
+                          <CommandItem
+                            key={opt.id}
+                            onSelect={() => toggleSelect(opt.id)}
+                            className="flex items-center gap-2 cursor-pointer pl-6"
+                          >
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={() => toggleSelect(opt.id)}
+                              className="pointer-events-none"
+                            />
+                            <span>{opt.name}</span>
+                          </CommandItem>
+                        );
+                      })}
                     </CommandGroup>
                   </Command>
                 )}
