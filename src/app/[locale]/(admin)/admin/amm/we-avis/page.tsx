@@ -96,8 +96,14 @@ const AmmWeAvisPage = () => {
     importAmmProductMutation.mutate(payload, {
       onSuccess: () => {
         toast.success("Products imported successfully.", {
-          id: toastId, // ✅ replace loading toast
+          id: toastId,
         });
+
+        // ✅ clear selected products
+        form.setValue("items", []);
+
+        // ✅ clear order number
+        form.setValue("kopfdaten.order_number", "");
       },
       onError: () => {
         toast.error("Failed to import products.", {

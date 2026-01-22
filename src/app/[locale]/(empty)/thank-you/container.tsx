@@ -182,30 +182,30 @@ const OrderPlaced = () => {
   }, [checkout, invoice, user]);
 
   //AWIN Tracking
-  useEffect(() => {
-    if (!checkout) return;
+  // useEffect(() => {
+  //   if (!checkout) return;
 
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.innerHTML = `
-    var AWIN = AWIN || {};
-    AWIN.Tracking = AWIN.Tracking || {};
-    AWIN.Tracking.Sale = {
-      amount: "${checkout.total_amount}",
-      orderRef: "${checkout.checkout_code}",
-      currency: "EUR",
-      channel: "aw",
-      customerAcquisition: "0"
-    };
-  `;
-    document.body.appendChild(s);
+  //   const s = document.createElement("script");
+  //   s.type = "text/javascript";
+  //   s.innerHTML = `
+  //   var AWIN = AWIN || {};
+  //   AWIN.Tracking = AWIN.Tracking || {};
+  //   AWIN.Tracking.Sale = {
+  //     amount: "${checkout.total_amount}",
+  //     orderRef: "${checkout.checkout_code}",
+  //     currency: "EUR",
+  //     channel: "aw",
+  //     customerAcquisition: "0"
+  //   };
+  // `;
+  //   document.body.appendChild(s);
 
-    const img = document.createElement("img");
-    img.src = `https://www.awin1.com/sread.img?tt=ns&tv=2&merchant=121738&amount=${checkout.total_amount}&cr=EUR&ref=${checkout.checkout_code}&parts=default:${checkout.total_amount}&vc=&ch=aw&customeracquisition=0`;
-    img.width = 0;
-    img.height = 0;
-    document.body.appendChild(img);
-  }, [checkout]);
+  //   const img = document.createElement("img");
+  //   img.src = `https://www.awin1.com/sread.img?tt=ns&tv=2&merchant=121738&amount=${checkout.total_amount}&cr=EUR&ref=${checkout.checkout_code}&parts=default:${checkout.total_amount}&vc=&ch=aw&customeracquisition=0`;
+  //   img.width = 0;
+  //   img.height = 0;
+  //   document.body.appendChild(img);
+  // }, [checkout]);
 
   //Billiger Tracking
   useEffect(() => {
