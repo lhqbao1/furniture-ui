@@ -19,7 +19,7 @@ const escapeCDATA = (str?: string) =>
 export async function GET() {
   try {
     const products = await getAllProductsSelect({
-      is_econelo: false,
+      is_econelo: true,
       all_products: true,
     });
 
