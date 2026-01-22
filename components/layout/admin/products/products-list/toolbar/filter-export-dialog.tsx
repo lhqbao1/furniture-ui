@@ -56,7 +56,6 @@ const FilterExportForm = () => {
   if (!suppliers) return <>Loading...</>;
 
   const handleExport = async () => {
-    console.log(buildParams());
     const res = await refetch();
     const data = res.data;
 

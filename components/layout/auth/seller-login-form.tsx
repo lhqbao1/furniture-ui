@@ -139,7 +139,6 @@ export default function SellerLoginForm() {
           className="space-y-6"
           onSubmit={form.handleSubmit(
             (values) => {
-              console.log("✅ Valid submit", values);
               handleSubmit(values);
             },
             (errors) => {

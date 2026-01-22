@@ -109,7 +109,6 @@ const ImportDialog = ({
             id: toastId,
           });
           setIsImporting(false);
-          console.log(e);
         },
       });
     }

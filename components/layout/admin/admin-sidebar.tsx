@@ -130,6 +130,11 @@ export function AdminSideBar() {
           url: "/admin/logistic/inventory/list",
           icon: CornerDownRight,
         },
+        {
+          title: "Incoming Inventory",
+          url: "/admin/logistic/inventory/incoming",
+          icon: CornerDownRight,
+        },
       ],
     },
     {

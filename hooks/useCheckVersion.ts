@@ -28,7 +28,6 @@ export function useCheckAppVersion() {
 
         // @ts-ignore
         if (data.version !== window.__APP_VERSION__) {
-          console.log("New version detected → reloading app...");
           window.location.reload();
         }
       } catch (err) {

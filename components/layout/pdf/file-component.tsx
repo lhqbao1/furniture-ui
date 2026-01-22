@@ -92,10 +92,10 @@ export default function InvoiceTable({
           {checkout?.checkouts?.[0]?.user.company_name
             ? checkout?.checkouts?.[0]?.user.company_name
             : checkout?.checkouts?.[0]?.invoice_address?.recipient_name
-            ? checkout?.checkouts?.[0]?.invoice_address?.recipient_name
-            : `${checkout?.checkouts?.[0]?.user?.first_name ?? ""} ${
-                checkout?.checkouts?.[0]?.user?.last_name ?? ""
-              }`}
+              ? checkout?.checkouts?.[0]?.invoice_address?.recipient_name
+              : `${checkout?.checkouts?.[0]?.user?.first_name ?? ""} ${
+                  checkout?.checkouts?.[0]?.user?.last_name ?? ""
+                }`}
           <span>
             {checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
               ? checkout?.checkouts?.[0]?.invoice_address?.address_line
@@ -121,7 +121,7 @@ export default function InvoiceTable({
             {getCountryName(
               checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
                 ? checkout?.checkouts?.[0]?.invoice_address?.country
-                : checkout?.checkouts?.[0]?.shipping_address?.country ?? "",
+                : (checkout?.checkouts?.[0]?.shipping_address?.country ?? ""),
             )}
           </span>
           <span>{checkout?.checkouts?.[0]?.user?.tax_id}</span>
@@ -359,10 +359,7 @@ export default function InvoiceTable({
 
         {checkout && invoice && (
           <div className="w-full flex justify-center col-span-3">
-            <Button
-              variant={"outline"}
-              onClick={() => console.log("hehe")}
-            >
+            <Button variant={"outline"}>
               <PDFDownloadLink
                 document={
                   <InvoicePDF

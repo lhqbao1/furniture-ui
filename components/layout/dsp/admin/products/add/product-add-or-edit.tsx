@@ -63,7 +63,6 @@ const ProductFormDSP = ({
         <form
           onSubmit={form.handleSubmit(handleSubmit, (errors) => {
             const message = getFirstErrorMessage(errors);
-            console.log(form.getValues());
             toast.error("Form validation error", {
               description:
                 message ?? "Please fix the highlighted fields and try again.",

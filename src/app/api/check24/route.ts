@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { getAllProductsSelect } from "@/features/product-group/api";
 
 // Escape CSV value
 const escapeCsv = (value?: string | number) => {
@@ -11,7 +12,10 @@ const escapeCsv = (value?: string | number) => {
 
 export async function GET() {
   try {
-    const products = await getProductsFeed();
+    const products = await getAllProductsSelect({
+      is_econelo: false,
+      all_products: true,
+    });
 
     const formatEuro = (value: number) => value.toFixed(2).replace(".", ",");
 
@@ -64,6 +68,7 @@ export async function GET() {
           p.is_active &&
           p.stock > 0 &&
           p.brand &&
+          p.brand.name.toLowerCase() !== "prestige works" &&
           p.component &&
           p.carrier,
       )

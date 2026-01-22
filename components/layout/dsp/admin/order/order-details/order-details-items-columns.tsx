@@ -41,7 +41,6 @@ export function orderDetailItemColumnSupplier(
       accessorKey: "status",
       header: () => <div className="text-center w-full">STATUS</div>,
       cell: ({ row }) => {
-        console.log(order.status);
         const raw = order.status?.toLowerCase() ?? "";
         const { text, bg, color } = getShippingStatusStyle(raw);
 

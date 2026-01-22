@@ -102,7 +102,6 @@ export default function RequestOfferDialog({
           toast.success(t("messageSent"));
           setDialogStep("apply");
           setHasRequestedVoucher(true);
-          console.log(dialogStep);
         },
         onError() {
           toast.error(

@@ -110,8 +110,8 @@ export default function InvoiceTable({
           !checkout.checkouts[0].shipping_address.recipient_name
             ? checkout.checkouts[0].user.company_name
             : checkout?.checkouts?.[0]?.shipping_address?.recipient_name
-            ? checkout?.checkouts?.[0]?.shipping_address?.recipient_name
-            : ""}
+              ? checkout?.checkouts?.[0]?.shipping_address?.recipient_name
+              : ""}
           <span>
             {checkout?.checkouts?.[0]?.shipping_address?.address_line?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.address_line
@@ -137,7 +137,7 @@ export default function InvoiceTable({
             {getCountryName(
               checkout?.checkouts?.[0]?.shipping_address?.country?.trim()
                 ? checkout?.checkouts?.[0]?.shipping_address?.country
-                : checkout?.checkouts?.[0]?.invoice_address?.country ?? "",
+                : (checkout?.checkouts?.[0]?.invoice_address?.country ?? ""),
             )}
           </span>
 
@@ -269,10 +269,7 @@ export default function InvoiceTable({
       <div className="absolute top-0 z-20 grid grid-cols-3 gap-6 left-1/2 -translate-x-1/2">
         {checkout && invoice && (
           <div className="w-full flex justify-center col-span-3 gap-2 absolute">
-            <Button
-              variant={"outline"}
-              onClick={() => console.log("hehe")}
-            >
+            <Button variant={"outline"}>
               <PDFDownloadLink
                 document={
                   <PackageSlipPdf

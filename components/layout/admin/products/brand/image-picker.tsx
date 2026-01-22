@@ -24,7 +24,6 @@ export default function FormImageUpload({
   const uploadMutation = useUploadStaticFile();
 
   const fieldValue = form.watch(name); // giá trị trong form: string | null
-  console.log(fieldValue);
   const initialPreview = fieldValue && fieldValue !== "" ? fieldValue : null;
 
   const [preview, setPreview] = useState<string | null>(initialPreview);
@@ -60,8 +59,6 @@ export default function FormImageUpload({
     setPreview(null);
     form.setValue(name, "");
   };
-
-  console.log(preview);
 
   return (
     <FormField

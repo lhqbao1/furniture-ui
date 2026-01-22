@@ -17,8 +17,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { userIdAtom } from "@/store/auth";
-import { useUseVoucher } from "@/features/vouchers/hook";
-import { currentVoucherAtom } from "@/store/voucher";
 import { Loader2 } from "lucide-react";
 import {
   TrustedShopsCheckout,
@@ -315,10 +313,6 @@ const OrderPlaced = () => {
             <p className="text-sm italic">{t("orderProcessingMessage")}</p>
           </div>
         )}
-
-        {/* <p className="text-primary text-base mt-6">
-                    {t('redirectHome')} <span className="font-semibold text-secondary">{counter}</span> {t('seconds')}.
-                </p> */}
         <Button
           variant="secondary"
           disabled={isProcessingPayment}
