@@ -84,12 +84,12 @@ export default function ExportOrderExcelButton() {
 
       return {
         code: clean(p.checkout_code),
-        status: clean(getStatusStyle(p.status).text),
+        marketplace: clean(p.from_marketplace),
+        marketplace_order_id: clean(p.marketplace_order_id),
         date: clean(formatDateDDMMYYYY(p.created_at)),
+        status: clean(getStatusStyle(p.status).text),
+        payment_method: clean(p.payment_method),
         note: clean(p.note ?? ""),
-        shipping_cost: clean(p.total_shipping),
-
-        // ===== ITEMS (flatMap nhưng gộp) =====
         product_names: clean(
           allItems
             .map((i) => i.products.name)
@@ -97,20 +97,11 @@ export default function ExportOrderExcelButton() {
             .join(" | "),
         ),
         total_quantity: allItems.reduce((sum, i) => sum + (i.quantity ?? 0), 0),
+        shipping_cost: clean(p.total_shipping),
+        discount_amout: clean(p.voucher_amount),
+        total_amount: clean(p.total_amount),
 
-        total_amount: calculateOrderTaxWithDiscount(
-          p.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
-          p?.voucher_amount,
-          shipping?.country ?? "DE",
-          user?.tax_id,
-        ).totalGross.toLocaleString("de-DE", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-
-        marketplace: clean(p.from_marketplace),
-        marketplace_order_id: clean(p.marketplace_order_id),
-        payment_method: clean(p.payment_method),
+        // ===== ITEMS (flatMap nhưng gộp) =====
 
         // -------- Invoice --------
         invoice_name: clean(invoice?.recipient_name ?? ""),
