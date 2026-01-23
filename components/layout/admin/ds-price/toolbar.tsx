@@ -34,6 +34,7 @@ import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import FilterExportForm from "../products/products-list/toolbar/filter-export-dialog";
+import DSPriceExport from "./export-button";
 
 export enum ToolbarType {
   product = "product",
@@ -127,77 +128,10 @@ export default function DSPriceToolbar({
     }
   }, [debouncedSearch]);
 
-  const handleDownloadZip = async () => {
-    if (!exportData?.length) {
-      toast.error("Không có sản phẩm nào để tải ảnh");
-      return;
-    }
-
-    const zip = new JSZip();
-    toast.loading("Uploading...");
-
-    let totalCount = 0;
-
-    for (const item of exportData) {
-      const folderName = sanitizeFolderName(
-        `${item.id_provider}-${item.name}` || "unknown",
-      );
-      const folder = zip.folder(folderName);
-
-      for (const [index, file] of (item.static_files || []).entries()) {
-        try {
-          const response = await fetch(file.url);
-          const blob = await response.blob();
-
-          const ext =
-            file.url
-              .match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)?.[1]
-              ?.toLowerCase() || "jpg";
-          const filename = `image_${index + 1}.${ext}`;
-
-          folder?.file(filename, blob);
-          totalCount++;
-        } catch (error) {
-          console.error("Lỗi tải ảnh:", file.url, error);
-        }
-      }
-    }
-
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, "images.zip");
-
-    toast.success(
-      `Downloaded ${totalCount} images from ${exportData.length} products`,
-    );
-  };
-
-  // Helper: loại bỏ ký tự đặc biệt trong tên folder
-  function sanitizeFolderName(name: string) {
-    return name
-      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") // loại ký tự không hợp lệ trong tên file
-      .replace(/\s+/g, "_") // đổi khoảng trắng thành _
-      .trim();
-  }
-
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
       <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex items-center gap-1"
-            >
-              Group action <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Delete Selected</DropdownMenuItem>
-            <DropdownMenuItem>Export Selected</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         <div className="flex gap-2 text-sm font-medium">
           {/* <Button variant="ghost" className="">Export</Button> */}
           <DropdownMenu>
@@ -209,7 +143,7 @@ export default function DSPriceToolbar({
 
             <DropdownMenuContent className="w-[600px] p-4 space-y-4">
               {/* Filter here */}
-              <FilterExportForm />
+              <DSPriceExport />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -264,79 +198,7 @@ export default function DSPriceToolbar({
             </SelectContent>
           </Select>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
-              View <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Compact</DropdownMenuItem>
-            <DropdownMenuItem>Comfortable</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
-              Columns <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Name</DropdownMenuItem>
-            <DropdownMenuItem>Stock</DropdownMenuItem>
-            <DropdownMenuItem>Price</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {addButtonText && (
-          <Button
-            className="bg-primary hover:bg-primary font-semibold"
-            onClick={() => {
-              if (addButtonUrl) {
-                router.push(addButtonUrl, { locale });
-              } else if (isAddButtonModal) {
-                setOpenAddModal(true);
-              }
-            }}
-          >
-            {addButtonText}
-          </Button>
-        )}
       </div>
-      <Button
-        variant={"secondary"}
-        onClick={() => handleDownloadZip()}
-      >
-        Download images
-      </Button>
-
-      {isAddButtonModal && (
-        <Dialog
-          open={openAddModal}
-          onOpenChange={setOpenAddModal}
-        >
-          <DialogContent className="w-1/3">
-            <DialogHeader>
-              <DialogTitle>{addButtonText}</DialogTitle>
-            </DialogHeader>
-            {addButtonModalContent &&
-              React.cloneElement(
-                addButtonModalContent as React.ReactElement<{
-                  onClose?: () => void;
-                }>,
-                { onClose: () => setOpenAddModal(false) },
-              )}
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 }
