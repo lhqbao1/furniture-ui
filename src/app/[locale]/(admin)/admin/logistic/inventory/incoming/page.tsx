@@ -1,5 +1,6 @@
 "use client";
 
+import { getIncomingInventoryColumns } from "@/components/layout/admin/incoming-inventory/column";
 import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
 import InventoryTimeLine from "@/components/layout/admin/inventory/time-line";
@@ -41,7 +42,7 @@ const IncomingInventoryList = () => {
     page_size: pageSize,
     all_products: filters.all_products,
     search: filters.search,
-    is_inventory: "false",
+    is_inventory: "true",
     supplier_id: filters.supplier_id,
   });
 
@@ -75,7 +76,7 @@ const IncomingInventoryList = () => {
       ) : (
         <ProductTable
           data={data?.items ?? []}
-          columns={getInventoryColumns(setSortByStock)}
+          columns={getIncomingInventoryColumns(setSortByStock)}
           page={page}
           pageSize={pageSize}
           setPage={handlePageChange}

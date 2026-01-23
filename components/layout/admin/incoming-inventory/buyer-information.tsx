@@ -18,8 +18,12 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { PlusCircle } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
 import AddUserDialog from "./dialog/add-user-dialog";
+import {
+  useGetAllCustomers,
+  useGetCustomer,
+} from "@/features/incoming-inventory/customer/hook";
 
 /**
  * Mock buyers data (tạm thời, sau này thay bằng API)
@@ -46,16 +50,20 @@ const MOCK_BUYERS = [
 const BuyerInformation = () => {
   const { control, setValue } = useFormContext();
 
+  const { data: buyer, isLoading, isError } = useGetAllCustomers();
+
+  console.log(buyer);
+
   const handleSelectBuyer = (buyerId: string) => {
-    const buyer = MOCK_BUYERS.find((b) => b.id === buyerId);
+    const data = buyer?.find((b) => b.id === buyerId);
     if (!buyer) return;
 
     // 👉 autofill fields
-    setValue("buyer_name", buyer.name);
-    setValue("buyer_address", buyer.address);
-    setValue("buyer_city", buyer.city);
-    setValue("buyer_country", buyer.country);
-    setValue("buyer_postal_code", buyer.postal_code);
+    setValue("name", data?.name);
+    setValue("address", data?.address);
+    setValue("city", data?.city);
+    setValue("country", data?.country);
+    setValue("postal_code", data?.postal_code);
   };
 
   return (
@@ -75,15 +83,19 @@ const BuyerInformation = () => {
                   <SelectValue placeholder="Select a buyer" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
-                {MOCK_BUYERS.map((buyer) => (
-                  <SelectItem
-                    key={buyer.id}
-                    value={buyer.id}
-                  >
-                    {buyer.name} – {buyer.city}
-                  </SelectItem>
-                ))}
+              <SelectContent className="pointer-events-auto">
+                {!buyer || isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  buyer.map((buyer) => (
+                    <SelectItem
+                      key={buyer.id}
+                      value={buyer.id}
+                    >
+                      {buyer.name} – {buyer.city}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </FormItem>
@@ -91,14 +103,15 @@ const BuyerInformation = () => {
           {/* ===== Buyer Name ===== */}
           <FormField
             control={control}
-            name="buyer_name"
+            name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-2">
                 <FormLabel>Buyer Name</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -109,14 +122,15 @@ const BuyerInformation = () => {
           {/* ===== Buyer Address ===== */}
           <FormField
             control={control}
-            name="buyer_address"
+            name="address"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-2">
                 <FormLabel>Buyer Address</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -127,7 +141,7 @@ const BuyerInformation = () => {
           {/* ===== Buyer City ===== */}
           <FormField
             control={control}
-            name="buyer_city"
+            name="city"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Buyer City</FormLabel>
@@ -135,6 +149,7 @@ const BuyerInformation = () => {
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -145,7 +160,7 @@ const BuyerInformation = () => {
           {/* ===== Buyer Country ===== */}
           <FormField
             control={control}
-            name="buyer_country"
+            name="country"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Buyer Country</FormLabel>
@@ -153,6 +168,7 @@ const BuyerInformation = () => {
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -163,7 +179,7 @@ const BuyerInformation = () => {
           {/* ===== Buyer Postal Code ===== */}
           <FormField
             control={control}
-            name="buyer_postal_code"
+            name="postal_code"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Buyer Postal Code</FormLabel>
@@ -171,6 +187,7 @@ const BuyerInformation = () => {
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />

@@ -15,15 +15,15 @@ import {
 } from "@/components/ui/hover-card";
 import { formatDate } from "@/lib/date-formated";
 import { formatIOSDate } from "@/lib/ios-to-num";
-import AddOrEditInventoryDialog from "./dialog/add-inventory-dialog";
-import ProductInventoryDeleteDialog from "./dialog/delete-dialog";
 import { Pencil, Trash } from "lucide-react";
-import EditInventoryDialog from "./dialog/edit-inventory-dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
+import AddOrEditInventoryDialog from "../inventory/dialog/add-inventory-dialog";
+import EditInventoryDialog from "../inventory/dialog/edit-inventory-dialog";
+import ProductInventoryDeleteDialog from "../inventory/dialog/delete-dialog";
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -128,7 +128,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
   );
 }
 
-export const getInventoryColumns = (
+export const getIncomingInventoryColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,
   is_incoming?: boolean,
 ): ColumnDef<ProductItem>[] => [
@@ -283,228 +283,60 @@ export const getInventoryColumns = (
   },
 
   {
-    accessorKey: "available",
-    header: ({}) => <div className="text-center uppercase">Available</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.stock - (row.original.result_stock ?? 0)}
-        </div>
-      );
-    },
-  },
-
-  {
-    accessorKey: "reserved",
-    header: ({}) => <div className="text-center uppercase">Reserved</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.result_stock} </div>;
-    },
-  },
-
-  {
-    accessorKey: "physical",
-    header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
-    cell: ({ row }) => {
-      return <EditableStockCell product={row.original} />;
-    },
-  },
-
-  {
-    accessorKey: "available_purchase_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Available Purchase Value</div>
+    accessorKey: "incomming",
+    header: () => (
+      <div className="text-center uppercase">
+        Incoming stock / date /unit landed cost
+      </div>
     ),
     cell: ({ row }) => {
-      const available = row.original.stock - (row.original.result_stock ?? 0);
+      const inventoryData = row.original.inventory;
+
+      if (!inventoryData || inventoryData.length === 0) {
+        return <div className="text-center">Updating</div>;
+      }
+
       return (
-        <div className="text-center">
-          {row.original.cost ? (
-            <div>
-              €
-              {(row.original.cost * available).toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+        <div className="flex flex-col gap-2 items-center">
+          {inventoryData.map((item) => (
+            <div
+              key={item.id}
+              className="w-full flex flex-row-reverse items-center justify-end gap-1"
+            >
+              {/* INFO */}
+              <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
+                <div className="">{item.incoming_stock} pcs</div>
+                <div className="">{formatIOSDate(item.date_received)}</div>
+                <div className="">
+                  €
+                  {item.cost_received.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </div>
+              </div>
+
+              {/* ACTIONS */}
+              <div className="flex gap-2">
+                <EditInventoryDialog
+                  cost={row.original.cost}
+                  productId={row.original.id}
+                  stock={row.original.stock}
+                  inventoryData={item}
+                />
+
+                <ProductInventoryDeleteDialog id={item.id} />
+              </div>
             </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
+          ))}
         </div>
       );
     },
   },
 
   {
-    accessorKey: "reserved_purchase_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Reserved Purchase Value</div>
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.result_stock ? (
-            <div>
-              €
-              {(row.original.cost * row.original.result_stock).toLocaleString(
-                "de-DE",
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                },
-              )}
-            </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
+    id: "actions",
+    header: "ACTION",
+    cell: ({ row }) => <ActionsCell product={row.original} />,
   },
-
-  {
-    accessorKey: "physical_purchase_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Physical Purchase Value</div>
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.stock && row.original.cost > 0 ? (
-            <div>
-              €
-              {(row.original.cost * row.original.stock).toLocaleString(
-                "de-DE",
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                },
-              )}
-            </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
-  },
-
-  {
-    accessorKey: "available_sale_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Available Sale Value</div>
-    ),
-    cell: ({ row }) => {
-      const available = row.original.stock - (row.original.result_stock ?? 0);
-
-      return (
-        <div className="text-center">
-          {available && row.original.final_price > 0 ? (
-            <div>
-              €
-              {(row.original.final_price * available).toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </div>
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
-  },
-
-  // {
-  //   accessorKey: "incomming",
-  //   header: () => (
-  //     <div className="text-center uppercase">
-  //       Incoming stock / date /unit landed cost
-  //     </div>
-  //   ),
-  //   cell: ({ row }) => {
-  //     const inventoryData = row.original.inventory;
-
-  //     if (!inventoryData || inventoryData.length === 0) {
-  //       return <div className="text-center">Updating</div>;
-  //     }
-
-  //     return (
-  //       <div className="flex flex-col gap-2 items-center">
-  //         {inventoryData.map((item) => (
-  //           <div
-  //             key={item.id}
-  //             className="w-full flex flex-row-reverse items-center justify-end gap-1"
-  //           >
-  //             {/* INFO */}
-  //             <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
-  //               <div className="">{item.incoming_stock} pcs</div>
-  //               <div className="">{formatIOSDate(item.date_received)}</div>
-  //               <div className="">
-  //                 €
-  //                 {(item.cost_received / item.incoming_stock).toLocaleString(
-  //                   "de-DE",
-  //                   {
-  //                     minimumFractionDigits: 2,
-  //                     maximumFractionDigits: 2,
-  //                   },
-  //                 )}
-  //               </div>
-  //             </div>
-
-  //             {/* ACTIONS */}
-  //             <div className="flex gap-2">
-  //               <EditInventoryDialog
-  //                 cost={row.original.cost}
-  //                 productId={row.original.id}
-  //                 stock={row.original.stock}
-  //                 inventoryData={item}
-  //               />
-
-  //               <ProductInventoryDeleteDialog id={item.id} />
-  //             </div>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     );
-  //   },
-  // },
-
-  // {
-  //   accessorKey: "cost",
-  //   header: ({}) => <div className="text-center uppercase">Landed cost</div>,
-  //   cell: ({ row }) => {
-  //     const inv = row.original.inventory || [];
-
-  //     const total = inv.reduce((sum, item) => {
-  //       const cost = Number(item.cost_received ?? 0);
-
-  //       const value = cost;
-  //       return sum + (isNaN(value) ? 0 : value);
-  //     }, 0);
-
-  //     return (
-  //       <div className="text-center">
-  //         {total > 0 ? (
-  //           <>
-  //             {" "}
-  //             €
-  //             {total.toLocaleString("de-DE", {
-  //               minimumFractionDigits: 2,
-  //               maximumFractionDigits: 2,
-  //             })}
-  //           </>
-  //         ) : (
-  //           "Updating"
-  //         )}
-  //       </div>
-  //     );
-  //   },
-  // },
-
-  // {
-  //   id: "actions",
-  //   header: "ACTION",
-  //   cell: ({ row }) => <ActionsCell product={row.original} />,
-  // },
 ];

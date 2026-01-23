@@ -9,7 +9,6 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useGetSuppliers } from "@/features/supplier/hook";
-import { SupplierResponse } from "@/types/supplier";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -87,35 +86,6 @@ const DSPriceExport = () => {
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, "export.xlsx");
   };
-
-  // Add prestige home option
-  const extendedSuppliers: SupplierResponse[] = [
-    {
-      id: "",
-      business_name: "All",
-      delivery_multiple: false,
-      vat_id: "",
-      email: "",
-      email_order: "",
-      email_billing: "",
-      phone_number: "",
-      created_at: "",
-      updated_at: "",
-    },
-    {
-      id: "prestige_home",
-      business_name: "Prestige Home",
-      delivery_multiple: false,
-      vat_id: "",
-      email: "",
-      email_order: "",
-      email_billing: "",
-      phone_number: "",
-      created_at: "",
-      updated_at: "",
-    },
-    ...suppliers,
-  ];
 
   return (
     <div>
