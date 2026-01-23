@@ -12,6 +12,7 @@ import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
 import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
+import { getDsPriceColumn } from "@/components/layout/admin/ds-price/column";
 
 const DSPriceProductList = () => {
   const [page, setPage] = useState(1);
@@ -45,7 +46,7 @@ const DSPriceProductList = () => {
     all_products: filters.all_products,
     search: filters.search,
     sort_by_stock: filters.sort_by_stock,
-    supplier_id: filters.supplier_id,
+    supplier_id: "prestige_home",
   });
 
   useEffect(() => {
@@ -65,8 +66,6 @@ const DSPriceProductList = () => {
       <TableToolbar
         pageSize={pageSize}
         setPageSize={setPageSize}
-        addButtonText="Add Product"
-        addButtonUrl="/admin/products/add"
         exportData={[]}
         setPage={setPage}
         type={ToolbarType.product}
@@ -77,7 +76,7 @@ const DSPriceProductList = () => {
       ) : (
         <ProductTable
           data={data ? data.items : []}
-          columns={getProductColumns(setSortByStock)}
+          columns={getDsPriceColumn(setSortByStock)}
           page={page}
           pageSize={pageSize}
           setPage={handlePageChange}

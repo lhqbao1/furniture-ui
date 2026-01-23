@@ -101,8 +101,6 @@ export default function ExportOrderExcelButton() {
         discount_amout: clean(p.voucher_amount),
         total_amount: clean(p.total_amount),
 
-        // ===== ITEMS (flatMap nhưng gộp) =====
-
         // -------- Invoice --------
         invoice_name: clean(invoice?.recipient_name ?? ""),
         invoice_company_name: clean(user?.company_name ?? ""),
