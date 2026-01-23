@@ -10,9 +10,9 @@ import { useGetAllProducts } from "@/features/products/hook";
 import { sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import React, { useEffect, useState } from "react";
-import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { getDsPriceColumn } from "@/components/layout/admin/ds-price/column";
+import DSPriceToolbar from "@/components/layout/admin/ds-price/toolbar";
 
 const DSPriceProductList = () => {
   const [page, setPage] = useState(1);
@@ -63,7 +63,7 @@ const DSPriceProductList = () => {
       <div className="text-3xl text-secondary font-bold text-center">
         Product List
       </div>
-      <TableToolbar
+      <DSPriceToolbar
         pageSize={pageSize}
         setPageSize={setPageSize}
         exportData={[]}
