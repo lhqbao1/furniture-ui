@@ -55,17 +55,30 @@ const BuyerInformation = () => {
   const { data: buyer, isLoading, isError } = useGetAllCustomers();
 
   const handleSelectBuyer = (buyerId: string) => {
+    if (buyerId === "__CLEAR__") {
+      // ❌ Clear selection
+      setSelectedBuyerId(null);
+
+      setValue("name", "");
+      setValue("address", "");
+      setValue("city", "");
+      setValue("country", "");
+      setValue("postal_code", "");
+
+      return;
+    }
+
     setSelectedBuyerId(buyerId);
 
     const data = buyer?.find((b) => b.id === buyerId);
-    if (!buyer) return;
+    if (!data) return;
 
-    // 👉 autofill fields
-    setValue("name", data?.name);
-    setValue("address", data?.address);
-    setValue("city", data?.city);
-    setValue("country", data?.country);
-    setValue("postal_code", data?.postal_code);
+    // ✅ autofill fields
+    setValue("name", data.name);
+    setValue("address", data.address);
+    setValue("city", data.city);
+    setValue("country", data.country);
+    setValue("postal_code", data.postal_code);
   };
 
   const handleEditBuyer = (buyerId: string) => {
@@ -93,6 +106,9 @@ const BuyerInformation = () => {
                 </FormControl>
 
                 <SelectContent className="pointer-events-auto">
+                  {/* 🔹 Clear option */}
+                  <SelectItem value="__CLEAR__">— Clear selection —</SelectItem>
+
                   {!buyer || isLoading ? (
                     <div className="flex justify-center py-2">
                       <Loader2 className="animate-spin h-4 w-4" />
