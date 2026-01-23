@@ -59,6 +59,12 @@ export default function ExportOrderExcelButton() {
     enabled: false, // ❌ không auto call
   });
 
+  const getExportFileName = (marketplace: string) => {
+    if (!marketplace) return "order_export.xlsx";
+
+    return `order_export_${marketplace}.xlsx`;
+  };
+
   const handleExport = async () => {
     const res = await refetch(); // 🔥 gọi API tại đây
     const data = res.data;
@@ -153,7 +159,7 @@ export default function ExportOrderExcelButton() {
     });
 
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, "export.xlsx");
+    saveAs(blob, getExportFileName(marketplace));
   };
 
   return (

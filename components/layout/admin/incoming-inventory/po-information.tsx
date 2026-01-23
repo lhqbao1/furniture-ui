@@ -25,7 +25,7 @@ const POInformation = () => {
             name="bank_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Name</FormLabel>
+                <FormLabel>PO Number</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -43,7 +43,7 @@ const POInformation = () => {
             name="bank_address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Address</FormLabel>
+                <FormLabel>PI Number</FormLabel>
                 <FormControl>
                   <Input
                     {...field}

@@ -20,13 +20,13 @@ const WarehouseInformation = () => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
-          {/* ===== Bank Name ===== */}
+          {/* ===== warehouse Name ===== */}
           <FormField
             control={control}
-            name="bank_name"
+            name="ware_house_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Name</FormLabel>
+                <FormLabel>Warehouse ID</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -38,13 +38,13 @@ const WarehouseInformation = () => {
             )}
           />
 
-          {/* ===== Bank Address ===== */}
+          {/* ===== warehouse Address ===== */}
           <FormField
             control={control}
-            name="bank_address"
+            name="warehouse_address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Address</FormLabel>
+                <FormLabel>Warehouse Address</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -56,13 +56,13 @@ const WarehouseInformation = () => {
             )}
           />
 
-          {/* ===== Bank City ===== */}
+          {/* ===== warehouse Country ===== */}
           <FormField
             control={control}
-            name="bank_account_no"
+            name="warehouse_city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank City</FormLabel>
+                <FormLabel>Warehouse City</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -74,13 +74,12 @@ const WarehouseInformation = () => {
             )}
           />
 
-          {/* ===== Bank Country ===== */}
           <FormField
             control={control}
-            name="bank_swift"
+            name="warehouse_country"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Country</FormLabel>
+                <FormLabel>Warehouse Country</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -92,13 +91,12 @@ const WarehouseInformation = () => {
             )}
           />
 
-          {/* ===== Bank Postal Code ===== */}
           <FormField
             control={control}
-            name="bank_currency"
+            name="warehouse_postal_code"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Postal Code</FormLabel>
+                <FormLabel>Warehouse Postal Code</FormLabel>
                 <FormControl>
                   <Input
                     {...field}

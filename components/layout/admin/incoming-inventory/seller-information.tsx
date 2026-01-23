@@ -18,9 +18,10 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import AddUserDialog from "./dialog/add-user-dialog";
 
 /**
- * Mock buyers data (tạm thời, sau này thay bằng API)
+ * Mock sellers data (tạm thời, sau này thay bằng API)
  */
 const MOCK_SELLERS = [
   {
@@ -44,29 +45,30 @@ const MOCK_SELLERS = [
 const SellerInformation = () => {
   const { control, setValue } = useFormContext();
 
-  const handleSelectBuyer = (buyerId: string) => {
-    const seller = MOCK_SELLERS.find((b) => b.id === buyerId);
+  const handleSelectseller = (sellerId: string) => {
+    const seller = MOCK_SELLERS.find((b) => b.id === sellerId);
     if (!seller) return;
 
     // 👉 autofill fields
-    setValue("buyer_name", seller.name);
-    setValue("buyer_address", seller.address);
-    setValue("buyer_city", seller.city);
-    setValue("buyer_country", seller.country);
-    setValue("buyer_postal_code", seller.postal_code);
+    setValue("seller_name", seller.name);
+    setValue("seller_address", seller.address);
+    setValue("seller_city", seller.city);
+    setValue("seller_country", seller.country);
+    setValue("seller_postal_code", seller.postal_code);
   };
 
   return (
-    <Card className="col-span-4">
-      <CardHeader className="text-xl text-secondary font-semibold">
+    <Card className="col-span-3">
+      <CardHeader className="text-xl text-secondary font-semibold flex gap-2 items-center">
         Seller Information
+        <AddUserDialog />
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2  gap-4">
           {/* ===== Select Seller ===== */}
           <FormItem className="col-span-2">
             <FormLabel className="text-sm">Select Seller</FormLabel>
-            <Select onValueChange={handleSelectBuyer}>
+            <Select onValueChange={handleSelectseller}>
               <FormControl>
                 <SelectTrigger className="border">
                   <SelectValue placeholder="Select a seller" />
@@ -88,7 +90,7 @@ const SellerInformation = () => {
           {/* ===== Seller Name ===== */}
           <FormField
             control={control}
-            name="buyer_name"
+            name="seller_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller Name</FormLabel>
@@ -103,10 +105,27 @@ const SellerInformation = () => {
             )}
           />
 
+          <FormField
+            control={control}
+            name="seller_tax_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Seller Tax ID</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* ===== Seller Address ===== */}
           <FormField
             control={control}
-            name="buyer_address"
+            name="seller_address"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller Address</FormLabel>
@@ -124,7 +143,7 @@ const SellerInformation = () => {
           {/* ===== Seller City ===== */}
           <FormField
             control={control}
-            name="buyer_city"
+            name="seller_city"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller City</FormLabel>
@@ -142,7 +161,7 @@ const SellerInformation = () => {
           {/* ===== Seller Country ===== */}
           <FormField
             control={control}
-            name="buyer_country"
+            name="seller_country"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller Country</FormLabel>
@@ -160,7 +179,7 @@ const SellerInformation = () => {
           {/* ===== Seller Postal Code ===== */}
           <FormField
             control={control}
-            name="buyer_postal_code"
+            name="seller_postal_code"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller Postal Code</FormLabel>

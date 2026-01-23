@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { useImportAmmProducts } from "@/features/amm/hook";
@@ -61,7 +61,6 @@ const AmmWeAvisPage = () => {
         unit: "St",
       },
     ]);
-    console.log(product);
   };
 
   const removeItem = (productId: string) => {

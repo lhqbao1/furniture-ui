@@ -158,6 +158,11 @@ export function AdminSideBar() {
           url: "/admin/crm/vouchers/list",
           icon: CornerDownRight,
         },
+        {
+          title: "DS Price",
+          url: "/admin/crm/ds/list",
+          icon: CornerDownRight,
+        },
       ],
     },
     {
