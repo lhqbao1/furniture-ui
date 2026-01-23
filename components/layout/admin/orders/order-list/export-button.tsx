@@ -12,7 +12,7 @@ import { getStatusStyle } from "./status-styles";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 import { CheckOutMain } from "@/types/checkout";
 import { formatDateDE } from "@/lib/format-date-DE";
-import { formatDateString } from "@/lib/date-formated";
+import { formatDateDDMMYYYY, formatDateString } from "@/lib/date-formated";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -85,7 +85,7 @@ export default function ExportOrderExcelButton() {
       return {
         code: clean(p.checkout_code),
         status: clean(getStatusStyle(p.status).text),
-        date: clean(formatDateString(p.created_at)),
+        date: clean(formatDateDDMMYYYY(p.created_at)),
         note: clean(p.note ?? ""),
         shipping_cost: clean(p.total_shipping),
 
@@ -141,7 +141,7 @@ export default function ExportOrderExcelButton() {
         ),
         shipping_date: clean(
           checkout?.shipment
-            ? formatDateString(checkout.shipment.shipper_date)
+            ? formatDateDDMMYYYY(checkout.shipment.shipper_date)
             : "",
         ),
       };
