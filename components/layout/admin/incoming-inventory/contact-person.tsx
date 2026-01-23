@@ -9,26 +9,26 @@ import {
 } from "@/components/ui/form";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import AddBankDialog from "./dialog/add-bank-dialog";
+import AddContactPersonDialog from "./dialog/add-contact-person-dialog";
 
-const SellerBankingInformation = () => {
+const ContactPersonInformation = () => {
   const { control } = useFormContext();
 
   return (
     <Card className="col-span-3">
       <CardHeader className="text-xl text-secondary font-semibold flex gap-2 items-center">
-        Bank Information
-        <AddBankDialog />
+        Contact Person Information
+        <AddContactPersonDialog />
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          {/* ===== Bank Name ===== */}
+        <div className="grid grid-cols-1 gap-4">
+          {/* ===== Contact Person Name ===== */}
           <FormField
             control={control}
             name="bank_name"
             render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel>Bank Name</FormLabel>
+              <FormItem>
+                <FormLabel>Contact Person Name</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -40,13 +40,13 @@ const SellerBankingInformation = () => {
             )}
           />
 
-          {/* ===== Bank Address ===== */}
+          {/* ===== Contact Person Address ===== */}
           <FormField
             control={control}
             name="bank_address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Address</FormLabel>
+                <FormLabel>Contact Person Email</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -58,49 +58,13 @@ const SellerBankingInformation = () => {
             )}
           />
 
-          {/* ===== Bank City ===== */}
+          {/* ===== Contact Person City ===== */}
           <FormField
             control={control}
             name="bank_account_no"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank City</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* ===== Bank Country ===== */}
-          <FormField
-            control={control}
-            name="bank_swift"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Bank Country</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* ===== Bank Postal Code ===== */}
-          <FormField
-            control={control}
-            name="bank_currency"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Bank Postal Code</FormLabel>
+                <FormLabel>Contact Person Phone</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -117,4 +81,4 @@ const SellerBankingInformation = () => {
   );
 };
 
-export default SellerBankingInformation;
+export default ContactPersonInformation;

@@ -18,6 +18,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { PlusCircle } from "lucide-react";
+import AddUserDialog from "./dialog/add-user-dialog";
 
 /**
  * Mock buyers data (tạm thời, sau này thay bằng API)
@@ -57,9 +59,10 @@ const BuyerInformation = () => {
   };
 
   return (
-    <Card className="col-span-4">
-      <CardHeader className="text-xl text-secondary font-semibold">
+    <Card className="col-span-3">
+      <CardHeader className="text-xl text-secondary font-semibold flex gap-2 items-center">
         Buyer Information
+        <AddUserDialog />
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">

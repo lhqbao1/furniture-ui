@@ -12,7 +12,7 @@ import { getStatusStyle } from "./status-styles";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 import { CheckOutMain } from "@/types/checkout";
 import { formatDateDE } from "@/lib/format-date-DE";
-import { formatDateString } from "@/lib/date-formated";
+import { formatDateDDMMYYYY, formatDateString } from "@/lib/date-formated";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,6 +59,12 @@ export default function ExportOrderExcelButton() {
     enabled: false, // ❌ không auto call
   });
 
+  const getExportFileName = (marketplace: string) => {
+    if (!marketplace) return "order_export.xlsx";
+
+    return `order_export_${marketplace}.xlsx`;
+  };
+
   const handleExport = async () => {
     const res = await refetch(); // 🔥 gọi API tại đây
     const data = res.data;
@@ -78,12 +84,12 @@ export default function ExportOrderExcelButton() {
 
       return {
         code: clean(p.checkout_code),
+        marketplace: clean(p.from_marketplace),
+        marketplace_order_id: clean(p.marketplace_order_id),
+        date: clean(formatDateDDMMYYYY(p.created_at)),
         status: clean(getStatusStyle(p.status).text),
-        date: clean(formatDateString(p.created_at)),
+        payment_method: clean(p.payment_method),
         note: clean(p.note ?? ""),
-        shipping_cost: clean(p.total_shipping),
-
-        // ===== ITEMS (flatMap nhưng gộp) =====
         product_names: clean(
           allItems
             .map((i) => i.products.name)
@@ -91,20 +97,11 @@ export default function ExportOrderExcelButton() {
             .join(" | "),
         ),
         total_quantity: allItems.reduce((sum, i) => sum + (i.quantity ?? 0), 0),
+        shipping_cost: clean(p.total_shipping),
+        discount_amout: clean(p.voucher_amount),
+        total_amount: clean(p.total_amount),
 
-        total_amount: calculateOrderTaxWithDiscount(
-          p.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
-          p?.voucher_amount,
-          shipping?.country ?? "DE",
-          user?.tax_id,
-        ).totalGross.toLocaleString("de-DE", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-
-        marketplace: clean(p.from_marketplace),
-        marketplace_order_id: clean(p.marketplace_order_id),
-        payment_method: clean(p.payment_method),
+        // ===== ITEMS (flatMap nhưng gộp) =====
 
         // -------- Invoice --------
         invoice_name: clean(invoice?.recipient_name ?? ""),
@@ -135,7 +132,7 @@ export default function ExportOrderExcelButton() {
         ),
         shipping_date: clean(
           checkout?.shipment
-            ? formatDateString(checkout.shipment.shipper_date)
+            ? formatDateDDMMYYYY(checkout.shipment.shipper_date)
             : "",
         ),
       };
@@ -153,7 +150,7 @@ export default function ExportOrderExcelButton() {
     });
 
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, "export.xlsx");
+    saveAs(blob, getExportFileName(marketplace));
   };
 
   return (

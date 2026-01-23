@@ -12,6 +12,7 @@ import SellerInformation from "./seller-information";
 import POInformation from "./po-information";
 import SellerBankingInformation from "./seller-banking-information";
 import WarehouseInformation from "./warehouse-information";
+import ContactPersonInformation from "./contact-person";
 
 const AddIncomingInventoryForm = () => {
   const form = useForm<z.infer<typeof incomingInventorySchema>>({
@@ -41,6 +42,7 @@ const AddIncomingInventoryForm = () => {
           <BuyerInformation />
           <SellerInformation />
           <SellerBankingInformation />
+          <ContactPersonInformation />
           <POInformation />
           <WarehouseInformation />
         </div>

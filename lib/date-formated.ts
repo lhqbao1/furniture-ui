@@ -43,6 +43,21 @@ export function formatDateString(dateString: any) {
   });
 }
 
+export function formatDateDDMMYYYY(dateString: any) {
+  if (!dateString) return "";
+
+  // Nếu backend trả chuỗi không có Z → thêm Z để parse đúng UTC
+  const normalized = dateString.endsWith("Z") ? dateString : dateString + "Z";
+
+  const date = new Date(normalized);
+
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const year = date.getUTCFullYear();
+
+  return `${day}.${month}.${year}`;
+}
+
 // utils/date.ts
 export function formatDate(dateString: Date) {
   return new Date(dateString).toLocaleString("en-US", {
