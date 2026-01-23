@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   FormField,
@@ -24,6 +24,7 @@ import {
   useGetAllCustomers,
   useGetCustomer,
 } from "@/features/incoming-inventory/customer/hook";
+import { Button } from "@/components/ui/button";
 
 /**
  * Mock buyers data (tạm thời, sau này thay bằng API)
@@ -49,12 +50,13 @@ const MOCK_BUYERS = [
 
 const BuyerInformation = () => {
   const { control, setValue } = useFormContext();
+  const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
 
   const { data: buyer, isLoading, isError } = useGetAllCustomers();
 
-  console.log(buyer);
-
   const handleSelectBuyer = (buyerId: string) => {
+    setSelectedBuyerId(buyerId);
+
     const data = buyer?.find((b) => b.id === buyerId);
     if (!buyer) return;
 
@@ -64,6 +66,10 @@ const BuyerInformation = () => {
     setValue("city", data?.city);
     setValue("country", data?.country);
     setValue("postal_code", data?.postal_code);
+  };
+
+  const handleEditBuyer = (buyerId: string) => {
+    console.log(buyerId);
   };
 
   return (
@@ -77,27 +83,45 @@ const BuyerInformation = () => {
           {/* ===== Select Buyer ===== */}
           <FormItem className="col-span-2">
             <FormLabel className="text-sm">Select Buyer</FormLabel>
-            <Select onValueChange={handleSelectBuyer}>
-              <FormControl>
-                <SelectTrigger className="border">
-                  <SelectValue placeholder="Select a buyer" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent className="pointer-events-auto">
-                {!buyer || isLoading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  buyer.map((buyer) => (
-                    <SelectItem
-                      key={buyer.id}
-                      value={buyer.id}
-                    >
-                      {buyer.name} – {buyer.city}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+
+            <div className="flex items-center gap-2">
+              <Select onValueChange={handleSelectBuyer}>
+                <FormControl>
+                  <SelectTrigger className="border flex-1">
+                    <SelectValue placeholder="Select a buyer" />
+                  </SelectTrigger>
+                </FormControl>
+
+                <SelectContent className="pointer-events-auto">
+                  {!buyer || isLoading ? (
+                    <div className="flex justify-center py-2">
+                      <Loader2 className="animate-spin h-4 w-4" />
+                    </div>
+                  ) : (
+                    buyer.map((b) => (
+                      <SelectItem
+                        key={b.id}
+                        value={b.id}
+                      >
+                        {b.name} – {b.city}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+
+              {/* 🔹 Edit button */}
+              {selectedBuyerId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleEditBuyer(selectedBuyerId)}
+                >
+                  ✏️
+                </Button>
+              )}
+            </div>
           </FormItem>
 
           {/* ===== Buyer Name ===== */}
