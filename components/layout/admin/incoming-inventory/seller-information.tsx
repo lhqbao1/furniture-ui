@@ -105,23 +105,6 @@ const SellerInformation = () => {
             )}
           />
 
-          <FormField
-            control={control}
-            name="seller_tax_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Seller Tax ID</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           {/* ===== Seller Address ===== */}
           <FormField
             control={control}

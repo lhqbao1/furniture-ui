@@ -182,30 +182,45 @@ const OrderPlaced = () => {
   }, [checkout, invoice, user]);
 
   //AWIN Tracking
-  // useEffect(() => {
-  //   if (!checkout) return;
+  // AWIN Tracking
+  useEffect(() => {
+    if (!checkout) return;
 
-  //   const s = document.createElement("script");
-  //   s.type = "text/javascript";
-  //   s.innerHTML = `
-  //   var AWIN = AWIN || {};
-  //   AWIN.Tracking = AWIN.Tracking || {};
-  //   AWIN.Tracking.Sale = {
-  //     amount: "${checkout.total_amount}",
-  //     orderRef: "${checkout.checkout_code}",
-  //     currency: "EUR",
-  //     channel: "aw",
-  //     customerAcquisition: "0"
-  //   };
-  // `;
-  //   document.body.appendChild(s);
+    // 🔥 CHỈ CHẠY KHI CÓ awc_awin
+    const awcAwin = localStorage.getItem("awc_awin");
+    if (!awcAwin) return;
 
-  //   const img = document.createElement("img");
-  //   img.src = `https://www.awin1.com/sread.img?tt=ns&tv=2&merchant=121738&amount=${checkout.total_amount}&cr=EUR&ref=${checkout.checkout_code}&parts=default:${checkout.total_amount}&vc=&ch=aw&customeracquisition=0`;
-  //   img.width = 0;
-  //   img.height = 0;
-  //   document.body.appendChild(img);
-  // }, [checkout]);
+    const calc = calculateOrderTaxWithDiscount(
+      checkout.checkouts.flatMap((c) => c.cart.items),
+    );
+
+    const amount = calc.totalNetWithoutShipping;
+
+    const s = document.createElement("script");
+    s.type = "text/javascript";
+    s.innerHTML = `
+    var AWIN = AWIN || {};
+    AWIN.Tracking = AWIN.Tracking || {};
+    AWIN.Tracking.Sale = {
+      amount: "${amount}",
+      orderRef: "${checkout.checkout_code}",
+      parts: "default:${amount}",
+      currency: "EUR",
+      channel: "aw",
+      customerAcquisition: "NEW"
+    };
+  `;
+    document.body.appendChild(s);
+
+    const img = document.createElement("img");
+    img.src = `https://www.awin1.com/sread.img?tt=ns&tv=2&merchant=121738&amount=${amount}&cr=EUR&ref=${checkout.checkout_code}&parts=default:${amount}&ch=aw&customeracquisition=NEW`;
+    img.width = 0;
+    img.height = 0;
+    document.body.appendChild(img);
+
+    // (optional) 🔒 chống fire lại
+    sessionStorage.setItem("awin_sent", "1");
+  }, [checkout]);
 
   //Billiger Tracking
   useEffect(() => {
