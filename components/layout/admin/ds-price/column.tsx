@@ -100,6 +100,94 @@ function EditDSPriceCell({ product }: { product: ProductItem }) {
   );
 }
 
+function EditDeliveryChargeCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.delivery_charge?.toString() ?? "");
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductPrice = () => {
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          delivery_charge: value === "" ? null : Number(value),
+          ...(product.categories?.length
+            ? { category_ids: product.categories.map((c) => c.id) }
+            : {}),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          // 🔹 Thêm bundles
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand.id,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess(data, variables, context) {
+          toast.success("Update product delivery charge successful");
+          setEditing(false);
+        },
+        onError(error, variables, context) {
+          toast.error("Update product delivery charge fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex justify-center">
+      {editing ? (
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            if (Number(value) !== product.delivery_charge) {
+              // optional: auto save
+            } else {
+              setEditing(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductPrice();
+            }
+            if (e.key === "Escape") {
+              setValue(product.delivery_charge?.toString() ?? "");
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            "w-28",
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
+          {product.delivery_charge ? (
+            <div className="text-right">
+              €{product.delivery_charge?.toFixed(2)}
+            </div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const getDsPriceColumn = (
   setSortByStock: (val?: "asc" | "desc") => void,
 ): ColumnDef<ProductItem>[] => [
@@ -271,19 +359,9 @@ export const getDsPriceColumn = (
   },
 
   {
-    accessorKey: "shipping_cost",
+    accessorKey: "delivery_charge",
     header: () => <div className="text-center">DELIVERY CHARGE</div>,
-    cell: ({ row }) => (
-      <>
-        {row.original.delivery_cost ? (
-          <div className="text-right">
-            €{row.original.delivery_cost?.toFixed(2)}
-          </div>
-        ) : (
-          <div className="text-center">—</div>
-        )}
-      </>
-    ),
+    cell: ({ row }) => <EditDeliveryChargeCell product={row.original} />,
   },
   {
     accessorKey: "final_price",
@@ -314,8 +392,14 @@ export const getDsPriceColumn = (
       return (
         <>
           {row.original.ds_price ? (
-            <div>
-              {((row.original.ds_price - row.original.cost) * 100).toFixed(2)}%
+            <div className="text-center">
+              {(
+                ((row.original.ds_price - row.original.cost) /
+                  row.original.cost) *
+                  100 +
+                100
+              ).toFixed(2)}
+              %
             </div>
           ) : (
             <div className="text-center">—</div>

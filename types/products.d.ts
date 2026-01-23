@@ -164,7 +164,8 @@ export type ProductItem = {
   name: string;
   description: string;
   price: number;
-  ds_price: number;
+  ds_price?: number;
+  delivery_charge?: number;
   id_provider: string;
   cost: number;
   discount_percent?: number;

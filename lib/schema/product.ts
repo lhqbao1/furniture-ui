@@ -142,6 +142,7 @@ export const addProductSchema = z.object({
   description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
   ds_price: z.number().nonnegative().optional().nullable(),
+  delivery_charge: z.number().nonnegative().optional().nullable(),
 
   cost: z.number().optional().nullable(),
   delivery_cost: z.number().optional().nullable(),
