@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
 import { useEditProduct } from "@/features/products/hook";
+import { getCarrierLogo } from "@/lib/getCarrierImage";
 import { cn } from "@/lib/utils";
 import { ProductItem } from "@/types/products";
 import { Checkbox } from "@radix-ui/react-checkbox";
@@ -244,6 +245,7 @@ export const getDsPriceColumn = (
   },
   {
     accessorKey: "name",
+    meta: { width: "400px" },
     header: ({ column }) => (
       <Button
         variant={"ghost"}
@@ -260,7 +262,11 @@ export const getDsPriceColumn = (
       </Button>
     ),
     // cell: ({ row }) => <EditableNameCell product={row.original} />,
-    cell: ({ row }) => <div>{row.original.name}</div>,
+    cell: ({ row }) => (
+      <div className="line-clamp-2 w-[300px] text-wrap">
+        {row.original.name}
+      </div>
+    ),
     enableSorting: true,
   },
   {
@@ -356,6 +362,32 @@ export const getDsPriceColumn = (
         )}
       </>
     ),
+  },
+
+  {
+    id: "carrier",
+    header: () => <div className="text-center">CARRIER</div>,
+    cell: ({ row }) => {
+      const carrier = row.original.carrier;
+      const logo = getCarrierLogo(carrier);
+
+      return (
+        <div className="flex items-center justify-center">
+          {logo ? (
+            <Image
+              src={logo}
+              alt={carrier}
+              width={60}
+              height={60}
+              unoptimized
+              className="object-contain"
+            />
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+        </div>
+      );
+    },
   },
 
   {
