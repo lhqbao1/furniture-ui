@@ -351,20 +351,6 @@ export const getDsPriceColumn = (
   },
 
   {
-    accessorKey: "cost",
-    header: () => <div className="text-center">COST</div>,
-    cell: ({ row }) => (
-      <>
-        {row.original.cost ? (
-          <div className="text-right">€{row.original.cost.toFixed(2)}</div>
-        ) : (
-          <div className="text-center">—</div>
-        )}
-      </>
-    ),
-  },
-
-  {
     id: "carrier",
     header: () => <div className="text-center">CARRIER</div>,
     cell: ({ row }) => {
@@ -396,14 +382,12 @@ export const getDsPriceColumn = (
     cell: ({ row }) => <EditDeliveryChargeCell product={row.original} />,
   },
   {
-    accessorKey: "final_price",
-    header: () => <div className="text-center">FINAL PRICE</div>,
+    accessorKey: "cost",
+    header: () => <div className="text-center">COST</div>,
     cell: ({ row }) => (
       <>
-        {row.original.final_price ? (
-          <div className="text-right">
-            €{row.original.final_price.toFixed(2)}
-          </div>
+        {row.original.cost ? (
+          <div className="text-right">€{row.original.cost.toFixed(2)}</div>
         ) : (
           <div className="text-center">—</div>
         )}
@@ -419,7 +403,7 @@ export const getDsPriceColumn = (
 
   {
     accessorKey: "markup_price",
-    header: () => <div className="text-center">MARKUP PRICE</div>,
+    header: () => <div className="text-center">MARKUP</div>,
     cell: ({ row }) => {
       return (
         <>
