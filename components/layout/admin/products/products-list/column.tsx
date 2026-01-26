@@ -54,7 +54,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
@@ -132,7 +132,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
@@ -213,7 +213,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
@@ -299,7 +299,7 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
@@ -400,7 +400,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
                   quantity: item.quantity,
                 }))
               : null,
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
@@ -713,10 +713,10 @@ export const getProductColumns = (
             row.original.stock === 0
               ? "bg-red-500 text-white"
               : row.original.stock < 10
-              ? "bg-gray-400"
-              : row.original.stock <= 20
-              ? "bg-primary"
-              : "bg-secondary",
+                ? "bg-gray-400"
+                : row.original.stock <= 20
+                  ? "bg-primary"
+                  : "bg-secondary",
           )}
         >
           {computedStock} pcs.

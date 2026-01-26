@@ -34,7 +34,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
           ...product,
           name: value,
           category_ids: product.categories.map((c) => c.id),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
           // 🔹 Thêm bundles
           ...(product.bundles?.length
             ? {
@@ -110,7 +110,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
           ...product,
           stock: value,
           category_ids: product.categories.map((c) => c.id), // map ra id array
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
           // 🔹 Thêm bundles
           ...(product.bundles?.length
             ? {
@@ -199,7 +199,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
