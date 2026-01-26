@@ -45,6 +45,7 @@ export const FooterSection = () => (
     {/* COLUMN 3 */}
     <View style={{ width: "20%" }}>
       <Text style={styles.bold}>Geschäftsführung</Text>
+      <Text style={styles.gap}>Marco Oberste</Text>
       <Text style={styles.gap}>Duong Thuy Nguyen</Text>
       <Text style={styles.gap}>Ust-IdNr: DE454714336</Text>
     </View>

@@ -241,10 +241,6 @@ export default async function Page({
 
           <BoughtTogetherSection productDetails={plainProduct} />
 
-          {/* {plainProduct && plainProduct.marketplace_products.length > 0 && (
-            <ComparePriceSection product={plainProduct} />
-          )} */}
-
           <div className="lg:mt-12 mt-0">
             <ProductDetailsTab
               reviews={plainReviews}

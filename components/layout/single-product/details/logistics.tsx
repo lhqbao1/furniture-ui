@@ -98,8 +98,12 @@ const ProductDetailsLogistic = ({
           </span>
 
           <ul className="space-y-1 text-gray-600 text-sm">
-            {productDetails.carrier.toLowerCase() === "amm" ||
-              (productDetails.carrier.toLowerCase() === "spedition" && (
+            {(() => {
+              const carrier = productDetails?.carrier?.toLowerCase();
+
+              if (carrier !== "amm" && carrier !== "spedition") return null;
+
+              return (
                 <>
                   <li className="flex items-start gap-2">
                     <span className="text-sm leading-5">•</span>
@@ -127,7 +131,8 @@ const ProductDetailsLogistic = ({
                     </span>
                   </li>
                 </>
-              ))}
+              );
+            })()}
           </ul>
         </div>
       </div>
