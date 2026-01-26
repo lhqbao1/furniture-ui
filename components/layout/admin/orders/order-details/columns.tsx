@@ -99,20 +99,5 @@ export function getOrderDetailColumns({
         </div>
       ),
     },
-    {
-      id: "warehouse",
-      header: () => <div className="text-center w-full">WAREHOUSE</div>,
-      cell: () => (
-        <div className="flex justify-center">
-          <Image
-            src="/amm.jpeg"
-            height={40}
-            width={40}
-            alt=""
-            className="w-12 h-12 object-contain"
-          />
-        </div>
-      ),
-    },
   ];
 }

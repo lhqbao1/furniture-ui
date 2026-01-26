@@ -22,6 +22,8 @@ import {
 import Image from "next/image";
 import { Check } from "lucide-react";
 import { useGetProductsSelect } from "@/features/product-group/hook";
+import DownloadCSVStamm from "@/components/layout/admin/amm/download-csv-stamm";
+import Link from "next/link";
 
 const AMMProductImportPage = () => {
   const [selectedProduct, setSelectedProduct] =
@@ -36,6 +38,8 @@ const AMMProductImportPage = () => {
   };
   const handleImport = () => {
     if (!selectedProduct) return;
+    if (!selectedProduct.packages || selectedProduct.packages.length === 0)
+      return toast.error("Product is missing the package number");
 
     const payload = [selectedProduct.id_provider];
 
@@ -111,7 +115,10 @@ const AMMProductImportPage = () => {
           <div className="mt-2 text-sm space-y-2">
             <div>Name: {selectedProduct.name}</div>
             <div>ID: {selectedProduct.id_provider}</div>
-            <div>
+            <div>Sku: {selectedProduct.sku}</div>
+            <div>EAN: {selectedProduct.ean}</div>
+
+            <div className="flex gap-2 items-center">
               Image:{" "}
               <Image
                 src={
@@ -123,19 +130,33 @@ const AMMProductImportPage = () => {
                 width={100}
                 height={100}
                 alt=""
+                className="h-[50px] w-auto"
               />
             </div>
+            {!selectedProduct.packages ||
+              (selectedProduct.packages.length === 0 && (
+                <Link
+                  href={`/admin/products/${selectedProduct.id}/edit`}
+                  className="text-red-600 underline"
+                >
+                  Missing package data
+                </Link>
+              ))}
           </div>
         )}
-        <Button
-          className="mt-4 w-fit"
-          disabled={!selectedProduct || importAmmProductMutation.isPending}
-          onClick={handleImport}
-        >
-          {importAmmProductMutation.isPending
-            ? "Importing..."
-            : "Import to AMM"}
-        </Button>
+        <div className="flex gap-1.5 mt-4">
+          <Button
+            className="w-fit"
+            disabled={!selectedProduct || importAmmProductMutation.isPending}
+            onClick={handleImport}
+          >
+            {importAmmProductMutation.isPending
+              ? "Importing..."
+              : "Import to AMM"}
+          </Button>
+
+          {selectedProduct && <DownloadCSVStamm product={selectedProduct} />}
+        </div>
       </div>
     </div>
   );
