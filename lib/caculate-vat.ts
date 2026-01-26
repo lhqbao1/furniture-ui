@@ -195,7 +195,8 @@ export function calculateOrderTaxWithDiscount(
 
   const totalGross = +(totalNet + totalVat).toFixed(2);
 
-  const totalNetWithoutShipping = totalNet - shipping.net;
+  const totalNetWithoutShipping =
+    totalNet - shipping.net - (discountGross ?? 0);
 
   return {
     buckets: Array.from(buckets.values()),

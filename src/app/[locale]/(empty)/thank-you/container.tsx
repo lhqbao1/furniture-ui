@@ -221,6 +221,7 @@ const OrderPlaced = () => {
 
       const calc = calculateOrderTaxWithDiscount(
         checkout.checkouts.flatMap((c) => c.cart.items),
+        checkout.voucher_amount ?? 0,
       );
 
       const amount = Number(calc.totalNetWithoutShipping).toFixed(2);
