@@ -135,7 +135,11 @@ export function AdminSideBar() {
           url: "/admin/logistic/inventory/incoming",
           icon: CornerDownRight,
         },
-        { title: "We Avis", url: "/admin/amm/we-avis", icon: CornerDownRight },
+        {
+          title: "AMM We Avis",
+          url: "/admin/amm/we-avis",
+          icon: CornerDownRight,
+        },
         {
           title: "AMM Product Import",
           url: "/admin/amm/import-product",
