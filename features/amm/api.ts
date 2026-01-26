@@ -10,3 +10,13 @@ export async function importWeAvis(payload: ImportWeAvisPayload) {
 
   return data;
 }
+
+export async function importProductToAmm(id: string[]) {
+  const { data } = await apiPublic.post("/amm/create-artikelstamm", id, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data;
+}

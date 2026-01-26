@@ -15,3 +15,17 @@ export type CustomerDetail = {
   created_at: string;
   updated_at: string;
 };
+
+export type BankInfoDetail = {
+  id: string;
+  bank_name: string;
+  account_no: string;
+  account_name: string;
+  currency: string;
+  swift_code: string;
+  customer_id: string;
+  id: string;
+
+  created_at: string;
+  updated_at: string;
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   FormField,
@@ -19,42 +19,40 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import AddUserDialog from "./dialog/add-user-dialog";
-
-/**
- * Mock sellers data (tạm thời, sau này thay bằng API)
- */
-const MOCK_SELLERS = [
-  {
-    id: "1",
-    name: "John Doe",
-    address: "123 Main Street",
-    city: "Berlin",
-    country: "DE",
-    postal_code: "10115",
-  },
-  {
-    id: "2",
-    name: "Anna Schmidt",
-    address: "Bahnhofstraße 45",
-    city: "Munich",
-    country: "DE",
-    postal_code: "80335",
-  },
-];
+import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook";
+import { Loader2 } from "lucide-react";
 
 const SellerInformation = () => {
   const { control, setValue } = useFormContext();
+  const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
 
-  const handleSelectseller = (sellerId: string) => {
-    const seller = MOCK_SELLERS.find((b) => b.id === sellerId);
-    if (!seller) return;
+  const { data: seller, isLoading, isError } = useGetAllCustomers();
 
-    // 👉 autofill fields
-    setValue("seller_name", seller.name);
-    setValue("seller_address", seller.address);
-    setValue("seller_city", seller.city);
-    setValue("seller_country", seller.country);
-    setValue("seller_postal_code", seller.postal_code);
+  const handleSelectSeller = (buyerId: string) => {
+    if (buyerId === "__CLEAR__") {
+      // ❌ Clear selection
+      setSelectedBuyerId(null);
+
+      setValue("name", "");
+      setValue("address", "");
+      setValue("city", "");
+      setValue("country", "");
+      setValue("postal_code", "");
+
+      return;
+    }
+
+    setSelectedBuyerId(buyerId);
+
+    const data = seller?.find((b) => b.id === buyerId);
+    if (!data) return;
+
+    // ✅ autofill fields
+    setValue("name", data.name);
+    setValue("address", data.address);
+    setValue("city", data.city);
+    setValue("country", data.country);
+    setValue("postal_code", data.postal_code);
   };
 
   return (
@@ -64,40 +62,62 @@ const SellerInformation = () => {
         <AddUserDialog />
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2  gap-4">
+        <div className="grid grid-cols-2 gap-4 overflow-hidden">
           {/* ===== Select Seller ===== */}
-          <FormItem className="col-span-2">
-            <FormLabel className="text-sm">Select Seller</FormLabel>
-            <Select onValueChange={handleSelectseller}>
-              <FormControl>
-                <SelectTrigger className="border">
-                  <SelectValue placeholder="Select a seller" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {MOCK_SELLERS.map((seller) => (
-                  <SelectItem
-                    key={seller.id}
-                    value={seller.id}
+          <FormItem className="grid gap-2 col-span-2 min-w-0">
+            <FormLabel className="text-sm w-full">Select Seller</FormLabel>
+
+            <div className="flex items-center gap-2 min-w-0">
+              <Select onValueChange={handleSelectSeller}>
+                <FormControl>
+                  <SelectTrigger
+                    className="flex-1 min-w-0 border"
+                    placeholderColor
                   >
-                    {seller.name} – {seller.city}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                    <SelectValue
+                      className="truncate"
+                      placeholder="Select a seller"
+                    />
+                  </SelectTrigger>
+                </FormControl>
+
+                <SelectContent className="pointer-events-auto">
+                  {/* 🔹 Clear option */}
+                  <SelectItem value="__CLEAR__">— Clear selection —</SelectItem>
+
+                  {!seller || isLoading ? (
+                    <div className="flex justify-center py-2">
+                      <Loader2 className="animate-spin h-4 w-4" />
+                    </div>
+                  ) : (
+                    seller.map((b) => (
+                      <SelectItem
+                        key={b.id}
+                        value={b.id}
+                      >
+                        {b.name} – {b.city}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+              {selectedBuyerId && <AddUserDialog user_id={selectedBuyerId} />}
+              {/* 🔹 Edit button */}
+            </div>
           </FormItem>
 
           {/* ===== Seller Name ===== */}
           <FormField
             control={control}
-            name="seller_name"
+            name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-2">
                 <FormLabel>Seller Name</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -108,14 +128,15 @@ const SellerInformation = () => {
           {/* ===== Seller Address ===== */}
           <FormField
             control={control}
-            name="seller_address"
+            name="address"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-2">
                 <FormLabel>Seller Address</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -126,7 +147,7 @@ const SellerInformation = () => {
           {/* ===== Seller City ===== */}
           <FormField
             control={control}
-            name="seller_city"
+            name="city"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller City</FormLabel>
@@ -134,6 +155,7 @@ const SellerInformation = () => {
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -144,7 +166,7 @@ const SellerInformation = () => {
           {/* ===== Seller Country ===== */}
           <FormField
             control={control}
-            name="seller_country"
+            name="country"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller Country</FormLabel>
@@ -152,6 +174,7 @@ const SellerInformation = () => {
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -162,7 +185,7 @@ const SellerInformation = () => {
           {/* ===== Seller Postal Code ===== */}
           <FormField
             control={control}
-            name="seller_postal_code"
+            name="postal_code"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Seller Postal Code</FormLabel>
@@ -170,6 +193,7 @@ const SellerInformation = () => {
                   <Input
                     {...field}
                     value={field.value ?? ""}
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
