@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PlusCircle } from "lucide-react";
 
 import {
@@ -15,6 +15,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Field } from "./field-component";
 import { CurrencyField } from "./currency-field";
+import {
+  useCreateBankInfo,
+  useGetBankInfoDetail,
+  useUpdateBankInfo,
+} from "@/features/incoming-inventory/bank/hook";
 
 type IncomingInventoryBank = {
   bank_name: string;
@@ -38,7 +43,25 @@ const CURRENCIES = [
   { value: "SGD", label: "SGD — Singapore Dollar" },
 ];
 
-const AddBankDialog = () => {
+interface AddBankDialogProps {
+  bank_info_id?: string;
+}
+
+const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
+  const createBankInfoMutation = useCreateBankInfo();
+  const editBankInfoMutation = useUpdateBankInfo();
+
+  const [open, setOpen] = useState(false);
+  const [initialBank, setInitialBank] = useState<IncomingInventoryBank | null>(
+    null,
+  );
+
+  const {
+    data: bankDataServer,
+    isLoading,
+    isError,
+  } = useGetBankInfoDetail(bank_info_id);
+
   const [bank, setBank] = useState<IncomingInventoryBank>({
     bank_name: "",
     account_no: "",
@@ -47,6 +70,19 @@ const AddBankDialog = () => {
     swift_code: "",
     address: "",
   });
+
+  //  useEffect(() => {
+  //     if (bankDataServer) {
+  //       const mappedBankInfo: IncomingInventoryBank = {
+  //         account_no: bankDataServer.account_no,
+  //         account_name: bankDataServer.account_name,
+  //         address: bankDataServer.
+  //       };
+
+  //       setUser(mappedUser);
+  //       setInitialUser(mappedUser); // 👈 snapshot ban đầu
+  //     }
+  //   }, [userServer]);
 
   const REQUIRED_FIELDS: (keyof IncomingInventoryBank)[] = [
     "bank_name",

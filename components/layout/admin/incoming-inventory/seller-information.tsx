@@ -70,10 +70,7 @@ const SellerInformation = () => {
             <div className="flex items-center gap-2 min-w-0">
               <Select onValueChange={handleSelectSeller}>
                 <FormControl>
-                  <SelectTrigger
-                    className="flex-1 min-w-0 border"
-                    placeholderColor
-                  >
+                  <SelectTrigger className="flex-1 min-w-0 border">
                     <SelectValue
                       className="truncate"
                       placeholder="Select a seller"

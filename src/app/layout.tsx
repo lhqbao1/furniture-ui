@@ -8,7 +8,6 @@ import RuntimeErrorLogger from "@/components/shared/error/runtime-error-logger";
 import { TrustedShops } from "@/components/shared/trusted-shop";
 import { Providers } from "./providers";
 import { BilligerSoluteLanding } from "@/components/shared/billiger/landing";
-import { AwinLanding } from "@/components/shared/awin-lading";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -83,6 +82,12 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `window.__APP_VERSION__ = "${process.env.NEXT_PUBLIC_APP_VERSION}";`,
           }}
+        />
+
+        <Script
+          id="awin-mastertag"
+          src="https://www.dwin1.com/121738.js"
+          strategy="beforeInteractive"
         />
 
         <Script
@@ -294,7 +299,6 @@ export default function RootLayout({
             />
           </noscript>
           <BilligerSoluteLanding />
-          <AwinLanding />
           <RuntimeErrorLogger />
           <TrustedShops />
           <QueryProvider>{children}</QueryProvider>
