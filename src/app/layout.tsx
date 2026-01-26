@@ -8,6 +8,7 @@ import RuntimeErrorLogger from "@/components/shared/error/runtime-error-logger";
 import { TrustedShops } from "@/components/shared/trusted-shop";
 import { Providers } from "./providers";
 import { BilligerSoluteLanding } from "@/components/shared/billiger/landing";
+import WhatsAppChatBox from "@/components/shared/whatsapp-box-chat";
 
 const figtree = Figtree({
   subsets: ["latin"],
