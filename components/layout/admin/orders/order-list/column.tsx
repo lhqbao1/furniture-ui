@@ -127,11 +127,11 @@ const ActionCellChild = ({
           </DialogContent>
         </Dialog>
       )}
-
+      {/* 
       <ViewFileChildDialog
         checkoutId={checkoutId}
         data={items}
-      />
+      /> */}
 
       {status?.toLowerCase() === "exchange" && (
         <CancelExchangeDialog
