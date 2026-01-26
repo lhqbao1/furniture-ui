@@ -28,6 +28,26 @@ import {
 } from "@/hooks/get-latest-delivery-date";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 
+function waitForAwinReady(timeout = 3000): Promise<boolean> {
+  return new Promise((resolve) => {
+    const start = Date.now();
+
+    const check = () => {
+      if ((window as any).AWIN?.Tracking?.run) {
+        resolve(true);
+        return;
+      }
+      if (Date.now() - start > timeout) {
+        resolve(false);
+        return;
+      }
+      setTimeout(check, 100);
+    };
+
+    check();
+  });
+}
+
 const OrderPlaced = () => {
   const router = useRouter();
   const locale = useLocale();
@@ -181,45 +201,74 @@ const OrderPlaced = () => {
     process();
   }, [checkout, invoice, user]);
 
-  //AWIN Tracking
-  // AWIN Tracking
+  // ====================
+  // AWIN Conversion Tracking
+  // ====================
   useEffect(() => {
     if (!checkout) return;
 
-    // 🔥 CHỈ CHẠY KHI CÓ awc_awin
+    // 🔒 chống double fire
+    if (sessionStorage.getItem("awin_sent")) return;
+
+    // 🔥 chỉ track khi có awc
     const awcAwin = localStorage.getItem("awc_awin");
     if (!awcAwin) return;
 
-    const calc = calculateOrderTaxWithDiscount(
-      checkout.checkouts.flatMap((c) => c.cart.items),
-    );
+    let cancelled = false;
 
-    const amount = calc.totalNetWithoutShipping;
+    const track = async () => {
+      const isReady = await waitForAwinReady();
 
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.innerHTML = `
-    var AWIN = AWIN || {};
-    AWIN.Tracking = AWIN.Tracking || {};
-    AWIN.Tracking.Sale = {
-      amount: "${amount}",
-      orderRef: "${checkout.checkout_code}",
-      parts: "default:${amount}",
-      currency: "EUR",
-      channel: "aw",
-      customerAcquisition: "NEW"
+      const calc = calculateOrderTaxWithDiscount(
+        checkout.checkouts.flatMap((c) => c.cart.items),
+      );
+
+      const amount = Number(calc.totalNetWithoutShipping).toFixed(2);
+      const orderRef = checkout.checkout_code;
+
+      // 👉 CASE 1: MasterTag OK → JS Conversion
+      if (isReady && !cancelled) {
+        (window as any).AWIN.Tracking.Sale = {
+          amount,
+          orderRef,
+          parts: `DEFAULT:${amount}`,
+          currency: "EUR",
+          channel: "aw",
+          customerAcquisition: "NEW",
+          test: "0",
+        };
+
+        (window as any).AWIN.Tracking.run();
+        sessionStorage.setItem("awin_sent", "1");
+        return;
+      }
+
+      // 👉 CASE 2: MasterTag FAIL → fallback pixel
+      if (!cancelled) {
+        const img = document.createElement("img");
+        img.src =
+          `https://www.awin1.com/sread.img?` +
+          `tt=ns&tv=2&merchant=121738` +
+          `&amount=${amount}` +
+          `&cr=EUR` +
+          `&ref=${encodeURIComponent(orderRef)}` +
+          `&parts=DEFAULT:${amount}` +
+          `&ch=aw`;
+
+        img.width = 0;
+        img.height = 0;
+        img.style.display = "none";
+
+        document.body.appendChild(img);
+        sessionStorage.setItem("awin_sent", "1");
+      }
     };
-  `;
-    document.body.appendChild(s);
 
-    const img = document.createElement("img");
-    img.src = `https://www.awin1.com/sread.img?tt=ns&tv=2&merchant=121738&amount=${amount}&cr=EUR&ref=${checkout.checkout_code}&parts=default:${amount}&ch=aw&customeracquisition=NEW`;
-    img.width = 0;
-    img.height = 0;
-    document.body.appendChild(img);
+    track();
 
-    // (optional) 🔒 chống fire lại
-    sessionStorage.setItem("awin_sent", "1");
+    return () => {
+      cancelled = true;
+    };
   }, [checkout]);
 
   //Billiger Tracking
