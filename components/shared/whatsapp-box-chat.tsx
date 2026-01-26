@@ -52,7 +52,6 @@ export default function WhatsAppChatBox() {
     if (!message.trim()) return;
 
     const fullMessage = `${message}\n\nPage: ${currentUrl}`;
-
     const encodedMessage = encodeURIComponent(fullMessage);
     const url = `https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`;
 
