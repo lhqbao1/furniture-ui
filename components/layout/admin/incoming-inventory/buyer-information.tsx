@@ -18,35 +18,9 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Loader2, PlusCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import AddUserDialog from "./dialog/add-user-dialog";
-import {
-  useGetAllCustomers,
-  useGetCustomer,
-} from "@/features/incoming-inventory/customer/hook";
-import { Button } from "@/components/ui/button";
-
-/**
- * Mock buyers data (tạm thời, sau này thay bằng API)
- */
-const MOCK_BUYERS = [
-  {
-    id: "1",
-    name: "John Doe",
-    address: "123 Main Street",
-    city: "Berlin",
-    country: "DE",
-    postal_code: "10115",
-  },
-  {
-    id: "2",
-    name: "Anna Schmidt",
-    address: "Bahnhofstraße 45",
-    city: "Munich",
-    country: "DE",
-    postal_code: "80335",
-  },
-];
+import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook";
 
 const BuyerInformation = () => {
   const { control, setValue } = useFormContext();
@@ -59,11 +33,11 @@ const BuyerInformation = () => {
       // ❌ Clear selection
       setSelectedBuyerId(null);
 
-      setValue("name", "");
-      setValue("address", "");
-      setValue("city", "");
-      setValue("country", "");
-      setValue("postal_code", "");
+      setValue("buyer_name", "");
+      setValue("buyer_address", "");
+      setValue("buyer_city", "");
+      setValue("buyer_country", "");
+      setValue("buyer_postal_code", "");
 
       return;
     }
@@ -74,15 +48,11 @@ const BuyerInformation = () => {
     if (!data) return;
 
     // ✅ autofill fields
-    setValue("name", data.name);
-    setValue("address", data.address);
-    setValue("city", data.city);
-    setValue("country", data.country);
-    setValue("postal_code", data.postal_code);
-  };
-
-  const handleEditBuyer = (buyerId: string) => {
-    console.log(buyerId);
+    setValue("buyer_name", data.name);
+    setValue("buyer_address", data.address);
+    setValue("buyer_city", data.city);
+    setValue("buyer_country", data.country);
+    setValue("buyer_postal_code", data.postal_code);
   };
 
   return (
@@ -92,12 +62,12 @@ const BuyerInformation = () => {
         <AddUserDialog />
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 overflow-hidden">
           {/* ===== Select Buyer ===== */}
-          <FormItem className="col-span-2">
-            <FormLabel className="text-sm">Select Buyer</FormLabel>
+          <FormItem className="grid gap-2 col-span-2 min-w-0">
+            <FormLabel className="text-sm w-full">Select Buyer</FormLabel>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-hidden">
               <Select onValueChange={handleSelectBuyer}>
                 <FormControl>
                   <SelectTrigger className="border flex-1">
@@ -125,25 +95,15 @@ const BuyerInformation = () => {
                   )}
                 </SelectContent>
               </Select>
-
+              {selectedBuyerId && <AddUserDialog user_id={selectedBuyerId} />}
               {/* 🔹 Edit button */}
-              {selectedBuyerId && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleEditBuyer(selectedBuyerId)}
-                >
-                  ✏️
-                </Button>
-              )}
             </div>
           </FormItem>
 
           {/* ===== Buyer Name ===== */}
           <FormField
             control={control}
-            name="name"
+            name="buyer_name"
             render={({ field }) => (
               <FormItem className="col-span-2">
                 <FormLabel>Buyer Name</FormLabel>
@@ -162,7 +122,7 @@ const BuyerInformation = () => {
           {/* ===== Buyer Address ===== */}
           <FormField
             control={control}
-            name="address"
+            name="buyer_address"
             render={({ field }) => (
               <FormItem className="col-span-2">
                 <FormLabel>Buyer Address</FormLabel>
@@ -181,7 +141,7 @@ const BuyerInformation = () => {
           {/* ===== Buyer City ===== */}
           <FormField
             control={control}
-            name="city"
+            name="buyer_city"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Buyer City</FormLabel>
@@ -200,7 +160,7 @@ const BuyerInformation = () => {
           {/* ===== Buyer Country ===== */}
           <FormField
             control={control}
-            name="country"
+            name="buyer_country"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Buyer Country</FormLabel>
@@ -219,7 +179,7 @@ const BuyerInformation = () => {
           {/* ===== Buyer Postal Code ===== */}
           <FormField
             control={control}
-            name="postal_code"
+            name="buyer_postal_code"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Buyer Postal Code</FormLabel>

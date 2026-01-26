@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { PlusCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Pencil, PlusCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -14,7 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Field } from "./field-component";
-import { useCreateCustomer } from "@/features/incoming-inventory/customer/hook";
+import {
+  useCreateCustomer,
+  useGetCustomer,
+  useUpdateCustomer,
+} from "@/features/incoming-inventory/customer/hook";
 import { toast } from "sonner";
 import { CountryField } from "./country-select";
 
@@ -31,9 +35,20 @@ type IncomingInventoryUser = {
   web: string;
 };
 
-const AddUserDialog = () => {
+interface AddUserDialogProps {
+  user_id?: string;
+}
+
+const AddUserDialog = ({ user_id }: AddUserDialogProps) => {
   const createCustomerMutation = useCreateCustomer();
+  const editCustomerMutation = useUpdateCustomer();
+
   const [open, setOpen] = useState(false);
+  const [initialUser, setInitialUser] = useState<IncomingInventoryUser | null>(
+    null,
+  );
+
+  const { data: userServer, isLoading, isError } = useGetCustomer(user_id);
 
   const [user, setUser] = useState<IncomingInventoryUser>({
     name: "",
@@ -47,6 +62,29 @@ const AddUserDialog = () => {
     email: "",
     web: "",
   });
+
+  useEffect(() => {
+    if (userServer) {
+      const mappedUser: IncomingInventoryUser = {
+        name: userServer.name ?? "",
+        tax_id: userServer.tax_id ?? "",
+        address: userServer.address ?? "",
+        city: userServer.city ?? "",
+        country: userServer.country ?? "",
+        postal_code: userServer.postal_code ?? "",
+        fax: userServer.fax ?? "",
+        phone_number: userServer.phone ?? "",
+        email: userServer.email ?? "",
+        web: userServer.website ?? "",
+      };
+
+      setUser(mappedUser);
+      setInitialUser(mappedUser); // 👈 snapshot ban đầu
+    }
+  }, [userServer]);
+
+  const isChanged =
+    initialUser && JSON.stringify(user) !== JSON.stringify(initialUser);
 
   const REQUIRED_FIELDS: (keyof IncomingInventoryUser)[] = [
     "name",
@@ -67,7 +105,7 @@ const AddUserDialog = () => {
     }));
   };
 
-  const handleAdd = () => {
+  const handleSubmit = () => {
     const payload = {
       name: user.name,
       tax_id: user.tax_id || undefined,
@@ -81,13 +119,36 @@ const AddUserDialog = () => {
       website: user.web || undefined,
     };
 
+    // 👉 EDIT MODE
+    if (userServer && isChanged) {
+      editCustomerMutation.mutate(
+        { customerId: user_id!, input: payload },
+        {
+          onSuccess: () => {
+            toast.success("Customer updated successfully");
+            setOpen(false);
+          },
+          onError: () => {
+            toast.error("Failed to update customer");
+          },
+        },
+      );
+      return;
+    }
+
+    // 👉 NO CHANGE
+    if (userServer && !isChanged) {
+      toast.info("No changes detected");
+      return;
+    }
+
+    // 👉 CREATE MODE
     createCustomerMutation.mutate(payload, {
       onSuccess: () => {
         toast.success("Customer created successfully");
         setOpen(false);
       },
-      onError: (error) => {
-        console.error("Create customer error:", error);
+      onError: () => {
         toast.error("Failed to create customer");
       },
     });
@@ -100,13 +161,19 @@ const AddUserDialog = () => {
     >
       {/* 🔹 Trigger */}
       <DialogTrigger asChild>
-        <PlusCircle className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        {userServer ? (
+          <Pencil className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        ) : (
+          <PlusCircle className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        )}
       </DialogTrigger>
 
       {/* 🔹 Content */}
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-xl">Add user</DialogTitle>
+          <DialogTitle className="text-xl">
+            {userServer ? "Edit user" : "Add user"}
+          </DialogTitle>{" "}
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field
@@ -191,10 +258,20 @@ const AddUserDialog = () => {
 
           <Button
             type="button"
-            disabled={!isValid || createCustomerMutation.isPending}
-            onClick={handleAdd}
+            disabled={
+              !isValid ||
+              createCustomerMutation.isPending ||
+              editCustomerMutation.isPending
+            }
+            onClick={handleSubmit}
           >
-            {createCustomerMutation.isPending ? "Creating..." : "Add"}
+            {userServer
+              ? editCustomerMutation.isPending
+                ? "Updating..."
+                : "Save changes"
+              : createCustomerMutation.isPending
+                ? "Creating..."
+                : "Add"}
           </Button>
         </div>
       </DialogContent>

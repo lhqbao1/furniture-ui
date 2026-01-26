@@ -6,12 +6,9 @@ import { CartResponse } from "@/types/cart";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useAtom } from "jotai";
-import { authHydratedAtom, userIdAtom } from "@/store/auth";
 import CartSummarySkeleton from "./skeleton/cart-summary-price-skeleton";
-import VoucherApply from "../checkout/voucher-apply";
 import React, { useState } from "react";
 import { currentVoucherAtom } from "@/store/voucher";
-import { VoucherItem } from "@/types/voucher";
 import { useCartLocal } from "@/hooks/cart";
 import {
   useGetVoucherById,

@@ -64,11 +64,11 @@ export function AdminSideBar() {
           url: "/admin/products/marketplace",
           icon: CornerDownRight,
         },
-        {
-          title: "Price Matching",
-          url: "/admin/products/matching",
-          icon: CornerDownRight,
-        },
+        // {
+        //   title: "Price Matching",
+        //   url: "/admin/products/matching",
+        //   icon: CornerDownRight,
+        // },
       ],
     },
     {
@@ -136,6 +136,11 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         { title: "We Avis", url: "/admin/amm/we-avis", icon: CornerDownRight },
+        {
+          title: "AMM Product Import",
+          url: "/admin/amm/import-product",
+          icon: CornerDownRight,
+        },
       ],
     },
     {
