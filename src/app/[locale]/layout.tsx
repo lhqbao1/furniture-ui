@@ -8,6 +8,7 @@ import IntlClientProviderWithAuth from "./intlProviderWithAuth";
 import { getMessages } from "next-intl/server";
 import { AuthSanity } from "@/hooks/auth/auth-sanity";
 import { AwinTracker } from "@/components/shared/awin-tracker";
+import WhatsAppChatBox from "@/components/shared/whatsapp-box-chat";
 
 type Props = {
   children: React.ReactNode;
@@ -56,7 +57,9 @@ export default async function LocaleLayout({ children, params }: Props) {
     >
       <AwinTracker />
       <AuthSanity />
-      <TawkChat />
+      {/* <TawkChat /> */}
+      <WhatsAppChatBox />
+
       {/* <SaleFixedIcon /> */}
       {children}
     </IntlClientProviderWithAuth>

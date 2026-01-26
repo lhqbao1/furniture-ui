@@ -68,7 +68,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },

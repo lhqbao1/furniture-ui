@@ -46,13 +46,12 @@ export default function WhatsAppChatBox() {
   /* 🔹 AFTER all hooks */
   if (!mounted || pathname.includes("/admin")) return null;
 
-  const PHONE_NUMBER = "+4915901742990";
+  const PHONE_NUMBER = "+4930814537080";
 
   const handleSend = () => {
     if (!message.trim()) return;
 
     const fullMessage = `${message}\n\nPage: ${currentUrl}`;
-
     const encodedMessage = encodeURIComponent(fullMessage);
     const url = `https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`;
 

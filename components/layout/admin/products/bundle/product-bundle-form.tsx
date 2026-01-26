@@ -58,14 +58,14 @@ const ProductBundleForm = ({
       ...productValues,
       category_ids:
         productValues.categories?.map((c: CategoryResponse | number) =>
-          typeof c === "object" ? String(c.id) : String(c)
+          typeof c === "object" ? String(c.id) : String(c),
         ) || [],
-      brand_id: productValues.brand?.id,
+      brand_id: productValues.brand ? productValues.brand.id : null,
     };
   };
 
   const initialValues = normalizeProductValues(
-    productValuesClone || productValues
+    productValuesClone || productValues,
   );
 
   const form = useForm<z.infer<typeof addProductSchema>>({
@@ -97,7 +97,7 @@ const ProductBundleForm = ({
       final_price: values.final_price ?? values.price ?? undefined,
       price: values.price ?? values.final_price ?? undefined,
       stock: values.stock ?? 1,
-      brand_id: productValues?.brand?.id,
+      brand_id: productValues?.brand ? productValues.brand?.id : null,
     };
 
     if (productValuesClone) {
@@ -113,7 +113,7 @@ const ProductBundleForm = ({
             <div className="flex flex-col gap-2">
               <div>Failed to add product</div>
               <div>Please check duplication for SKU or EAN</div>
-            </div>
+            </div>,
           );
           console.log(error);
         },
@@ -131,7 +131,7 @@ const ProductBundleForm = ({
           onError: () => {
             toast.error("Failed to update product");
           },
-        }
+        },
       );
     } else {
       // 🔵 Add mới
@@ -145,7 +145,7 @@ const ProductBundleForm = ({
             <div className="flex flex-col gap-2">
               <div>Failed to add product</div>
               <div>Please check duplication for SKU or EAN</div>
-            </div>
+            </div>,
           );
           console.log(error);
         },
@@ -164,7 +164,7 @@ const ProductBundleForm = ({
             (errors) => {
               toast.error("Please check the form for errors");
               console.log(errors);
-            }
+            },
           )}
         >
           <div className="grid-cols-12 grid gap-24 w-full">

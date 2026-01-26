@@ -39,7 +39,7 @@ function EditDSPriceCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
@@ -125,7 +125,7 @@ function EditDeliveryChargeCell({ product }: { product: ProductItem }) {
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
         id: product.id,
       },
