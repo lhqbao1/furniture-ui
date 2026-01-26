@@ -22,19 +22,19 @@ interface ShippingDrawerProps {
 
 const ShippingDrawer = ({ productDetails }: ShippingDrawerProps) => {
   const t = useTranslations();
+  const carrier = productDetails?.carrier?.toLowerCase();
+
+  const isSpedition = carrier === "amm" || carrier === "spedition";
+
+  const shippingCost = isSpedition ? "35,95€" : "5,95€";
+
   return (
     <Drawer direction="right">
       <DrawerTrigger>
         <div className="flex flex-row gap-4 items-center">
           <Truck size={25} />
           <span className="text-gray-800 font-medium text-sm cursor-pointer hover:underline">
-            {t("shippingCost", {
-              shippingCost:
-                productDetails.carrier.toLowerCase() === "amm" ||
-                productDetails.carrier.toLowerCase() === "spedition"
-                  ? "35,95€"
-                  : "5,95€",
-            })}
+            {t("shippingCost", { shippingCost })}
           </span>
         </div>
       </DrawerTrigger>

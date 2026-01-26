@@ -261,6 +261,7 @@ export default function InvoiceTable({
 
         <div className="">
           <div className="font-semibold">Geschäftsführung</div>
+          <div>Marco Oberste</div>
           <div>Duong Thuy Nguyen</div>
           <div>Ust-IdNr: DE454714336</div>
         </div>
