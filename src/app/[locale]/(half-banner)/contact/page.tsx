@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import ContactFormSection from "@/components/layout/contact/contact-form-section";
 import { Metadata } from "next";
+import ContactInfo from "@/components/layout/contact/contact-info";
 
 export const metadata: Metadata = {
   title: "Kontakt",
@@ -22,12 +23,15 @@ export default function ContactPage() {
   const t = useTranslations();
 
   return (
-    <div className="lg:w-2/5 mx-auto section-padding lg:space-y-12 w-full space-y-4">
+    <div className="mt-6 space-y-6">
       <h1 className="section-header space-x-2">
         <span className="text-secondary">{t("contact")}</span>
         <span className="text-primary">Prestige Home</span>
       </h1>
-      <ContactFormSection />
+      <ContactInfo />
+      <div className="lg:w-2/5 mx-auto section-padding lg:space-y-12 w-full space-y-4">
+        <ContactFormSection />
+      </div>
     </div>
   );
 }

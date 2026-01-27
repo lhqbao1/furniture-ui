@@ -107,7 +107,7 @@ const ProductDetailsLogistic = ({
                 <>
                   <li className="flex items-start gap-2">
                     <span className="text-sm leading-5">•</span>
-                    <span className="text-sm">
+                    <span className="text-sm text-gray-800">
                       Lieferung <strong>frei Bordsteinkante</strong>{" "}
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -126,7 +126,7 @@ const ProductDetailsLogistic = ({
 
                   <li className="flex items-start gap-2">
                     <span className="text-sm leading-5">•</span>
-                    <span className="text-sm">
+                    <span className="text-sm text-gray-800">
                       Speditionsversand nach Terminabsprache
                     </span>
                   </li>

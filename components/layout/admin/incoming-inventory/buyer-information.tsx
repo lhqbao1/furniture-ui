@@ -66,7 +66,6 @@ const BuyerInformation = () => {
           {/* ===== Select Buyer ===== */}
           <FormItem className="grid gap-2 col-span-2 min-w-0">
             <FormLabel className="text-sm w-full">Select Buyer</FormLabel>
-
             <div className="flex items-center gap-2 overflow-hidden">
               <Select onValueChange={handleSelectBuyer}>
                 <FormControl>

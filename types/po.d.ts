@@ -24,7 +24,8 @@ export type BankInfoDetail = {
   currency: string;
   swift_code: string;
   customer_id: string;
-  id: string;
+  address: string;
+  customer_id: string;
 
   created_at: string;
   updated_at: string;

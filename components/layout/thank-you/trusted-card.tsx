@@ -40,8 +40,15 @@ export function TrustedShopsCheckout({
 
         {products.map((item, index) => {
           return (
-            <span className="tsCheckoutProductItem">
-              <span className="tsCheckoutProductUrl">{item.url_key ?? ""}</span>
+            <span
+              className="tsCheckoutProductItem"
+              key={item.id_provider ?? index}
+            >
+              <span className="tsCheckoutProductUrl">
+                {item.url_key
+                  ? `https://prestige-home.de/de/product/${item.url_key}`
+                  : ""}
+              </span>
               <span className="tsCheckoutProductImageUrl">
                 {item.static_files && item.static_files.length > 0
                   ? item.static_files[0].url
@@ -49,7 +56,9 @@ export function TrustedShopsCheckout({
               </span>
               <span className="tsCheckoutProductName">{item.name}</span>
               <span className="tsCheckoutProductSKU">{item.id_provider}</span>
-              <span className="tsCheckoutProductGTIN">{item.ean}</span>
+              {item.ean && (
+                <span className="tsCheckoutProductGTIN">{item.ean}</span>
+              )}
               {/* <span className="tsCheckoutProductMPN">0123456789</span> */}
               <span className="tsCheckoutProductBrand">
                 {item.brand ? item.brand.name : "Prestige Home"}

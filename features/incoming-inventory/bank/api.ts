@@ -8,6 +8,7 @@ export type POBankInput = {
   currency: string;
   swift_code: string;
   customer_id: string;
+  address: string;
 };
 
 export async function createBankInfo(input: POBankInput) {

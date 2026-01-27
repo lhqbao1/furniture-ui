@@ -82,6 +82,7 @@ export async function generateMetadata({
     image: product.static_files?.map((f: StaticFile) => f.url),
     description: product.description,
     sku: product.sku,
+    gtin13: product.ean,
     brand: {
       "@type": "Brand",
       name: product.brand?.name ?? "Prestige Home",
@@ -95,6 +96,7 @@ export async function generateMetadata({
         product.stock > 0
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
+      priceValidUntil: "2026-12-31",
     },
   };
 
@@ -132,6 +134,10 @@ export async function generateMetadata({
       ratingValue: ratingValue.toFixed(1),
       reviewCount: reviews.length,
     };
+  }
+
+  if (product.ean) {
+    schema.gtin13 = product.ean;
   }
 
   return {

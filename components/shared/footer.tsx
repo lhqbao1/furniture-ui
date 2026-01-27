@@ -127,6 +127,7 @@ const Footer = () => {
             <li>Greifswalder Straße 226, 10405 Berlin</li>
             <li>{t("phone_number")}: +49 30 814 537 080</li>
             <li>{t("email")}: info@prestige-home.de</li>
+            <li>Mo – Fr: 09:00 – 17:00 Uhr</li>
           </ul>
           <ul className="space-y-2 text-black-700 text-sm">
             <li className="font-bold">Lager</li>
