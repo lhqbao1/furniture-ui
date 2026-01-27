@@ -70,6 +70,13 @@ const FilterExportForm = () => {
         rawTariff !== "" && rawTariff !== null && rawTariff !== undefined
           ? Number(rawTariff)
           : null;
+
+      const rawVat = clean(p.tax);
+
+      const vat =
+        rawVat && rawVat.includes("%")
+          ? Number(rawVat.replace("%", "").trim())
+          : null;
       return {
         id: Number(clean(p.id_provider)),
         ean: clean(p.ean),
@@ -93,7 +100,7 @@ const FilterExportForm = () => {
         return_cost: clean(p.return_cost),
         original_price: clean(p.price),
         sale_price: clean(p.final_price),
-        vat: clean(p.tax),
+        vat: vat,
         stock: clean(p.stock),
         img_url: clean(
           p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
