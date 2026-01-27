@@ -116,6 +116,7 @@ const SellerBankingInformation = () => {
                 <FormControl>
                   <Input
                     {...field}
+                    disabled
                     value={field.value ?? ""}
                   />
                 </FormControl>
@@ -134,6 +135,7 @@ const SellerBankingInformation = () => {
                 <FormControl>
                   <Input
                     {...field}
+                    disabled
                     value={field.value ?? ""}
                   />
                 </FormControl>
@@ -152,6 +154,7 @@ const SellerBankingInformation = () => {
                 <FormControl>
                   <Input
                     {...field}
+                    disabled
                     value={field.value ?? ""}
                   />
                 </FormControl>
@@ -170,6 +173,7 @@ const SellerBankingInformation = () => {
                 <FormControl>
                   <Input
                     {...field}
+                    disabled
                     value={field.value ?? ""}
                   />
                 </FormControl>
@@ -188,6 +192,7 @@ const SellerBankingInformation = () => {
                 <FormControl>
                   <Input
                     {...field}
+                    disabled
                     value={field.value ?? ""}
                   />
                 </FormControl>

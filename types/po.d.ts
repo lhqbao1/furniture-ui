@@ -30,3 +30,28 @@ export type BankInfoDetail = {
   created_at: string;
   updated_at: string;
 };
+
+export type ContactPersonDetail = {
+  name: string;
+  email: string;
+  phone_number: string;
+  customer_id: string;
+  id: string;
+
+  created_at: string;
+  updated_at: string;
+};
+
+export type WareHouseDetail = {
+  name: string;
+  address: string;
+  postal_code: string;
+  city: string;
+  country: string;
+  email: string;
+  phone_number: string;
+  id: string;
+
+  created_at: string;
+  updated_at: string;
+};

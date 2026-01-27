@@ -41,8 +41,6 @@ const AddIncomingInventoryForm = () => {
         <div className="grid grid-cols-12 gap-6">
           <BuyerInformation />
           <SellerInformation />
-          <SellerBankingInformation />
-          <ContactPersonInformation />
           <POInformation />
           <WarehouseInformation />
         </div>

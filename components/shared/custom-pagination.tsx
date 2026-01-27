@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -9,6 +10,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
 
 interface CustomPaginationProps {
   page: number;
@@ -21,40 +23,53 @@ export function CustomPagination({
   totalPages,
   onPageChange,
 }: CustomPaginationProps) {
+  const [inputPage, setInputPage] = useState<string>(String(page));
+
+  // sync khi page đổi từ bên ngoài
+  useEffect(() => {
+    setInputPage(String(page));
+  }, [page]);
+
   const getPageNumbers = () => {
-    const delta = 2; // số trang hiển thị 2 bên current
+    const delta = 2;
     const pages: (number | string)[] = [];
 
-    // Always show first page
     pages.push(1);
 
     const left = Math.max(2, page - delta);
     const right = Math.min(totalPages - 1, page + delta);
 
-    // Left ellipsis
-    if (left > 2) {
-      pages.push("...");
-    }
+    if (left > 2) pages.push("...");
 
-    // Middle pages
     for (let i = left; i <= right; i++) {
       pages.push(i);
     }
 
-    // Right ellipsis
-    if (right < totalPages - 1) {
-      pages.push("...");
-    }
+    if (right < totalPages - 1) pages.push("...");
 
-    // Always show last page (if > 1)
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
+    if (totalPages > 1) pages.push(totalPages);
 
     return pages;
   };
 
   const pages = getPageNumbers();
+
+  const commitInputPage = () => {
+    let value = Number(inputPage);
+
+    if (!Number.isFinite(value)) return;
+
+    value = Math.floor(value);
+
+    if (value < 1) value = 1;
+    if (value > totalPages) value = totalPages;
+
+    if (value !== page) {
+      onPageChange(value);
+    } else {
+      setInputPage(String(page)); // reset nếu không đổi
+    }
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-4 w-full justify-center mt-6">
@@ -103,6 +118,35 @@ export function CustomPagination({
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+
+      {/* 🔢 Jump to page (chỉ hiện khi nhiều trang) */}
+      {totalPages > 6 && (
+        <div className="flex items-center gap-2 text-sm">
+          <span>Go to page</span>
+          <Input
+            type="number"
+            min={1}
+            max={totalPages}
+            value={inputPage}
+            onChange={(e) => {
+              const val = e.target.value;
+              // chỉ cho số hoặc rỗng
+              if (/^\d*$/.test(val)) {
+                setInputPage(val);
+              }
+            }}
+            onBlur={commitInputPage}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                commitInputPage();
+                e.currentTarget.blur();
+              }
+            }}
+            className="w-20 text-center"
+          />
+          <span className="text-muted-foreground">/ {totalPages}</span>
+        </div>
+      )}
     </div>
   );
 }

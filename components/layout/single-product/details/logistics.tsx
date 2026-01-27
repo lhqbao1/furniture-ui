@@ -139,9 +139,12 @@ const ProductDetailsLogistic = ({
 
       <div className="flex flex-row gap-4 items-center">
         <Undo2 size={25} />
-        <span className="text-gray-800 font-medium text-sm">
+        <Link
+          href={"https://www.prestige-home.de/de/widerrufsbelehrung"}
+          className="text-gray-800 font-medium text-sm hover:underline"
+        >
           14-Tage-Rückgaberecht
-        </span>
+        </Link>
       </div>
     </div>
   );
