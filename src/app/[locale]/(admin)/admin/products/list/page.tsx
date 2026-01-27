@@ -44,7 +44,7 @@ const ProductList = () => {
     page_size: pageSize,
     all_products: filters.all_products,
     search: filters.search,
-    sort_by_stock: filters.sort_by_stock,
+    sort_by_stock: sortByStock,
     supplier_id: filters.supplier_id,
   });
 

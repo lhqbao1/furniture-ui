@@ -110,7 +110,6 @@ const ExportInventoryDialog = () => {
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
-    forceTextColumns(worksheet, ["A", "B", "C", "D", "E"]);
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");

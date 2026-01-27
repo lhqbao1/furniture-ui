@@ -98,7 +98,9 @@ const Footer = () => {
             <Link href={`/zahlungsbedingungen`}>{t("paymentTerms")}</Link>
           </li>
           <li className="hover:pl-2 transition-all duration-500">
-            <Link href={`/widerrufsbelehrung`}>Widerruf</Link>
+            <Link href={`/widerrufsbelehrung`}>
+              Widerrufs-, Rückgabe- & Erstattungsrichtlinie
+            </Link>
           </li>
 
           <li className="hover:pl-2 transition-all duration-500">
@@ -127,6 +129,7 @@ const Footer = () => {
             <li>Greifswalder Straße 226, 10405 Berlin</li>
             <li>{t("phone_number")}: +49 30 814 537 080</li>
             <li>{t("email")}: info@prestige-home.de</li>
+            <li>Mo – Fr: 09:00 – 17:00 Uhr</li>
           </ul>
           <ul className="space-y-2 text-black-700 text-sm">
             <li className="font-bold">Lager</li>
@@ -221,7 +224,7 @@ const Footer = () => {
 
       <div className="footer-column xl:my-8 my-4 lg:col-span-12 col-span-6 flex items-center justify-center">
         <div className="lg:mt-4 flex items-center gap-2 mt-2">
-          <a
+          {/* <a
             href="https://legal.trustedshops.com"
             rel="noopener"
           >
@@ -232,7 +235,7 @@ const Footer = () => {
               loading="lazy"
               style={{ width: "140px" }}
             />
-          </a>
+          </a> */}
           <a
             href="https://geizhals.de"
             target="_blank"

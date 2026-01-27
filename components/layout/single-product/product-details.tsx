@@ -40,8 +40,8 @@ const ProductDetails = ({
   const currentCategoryLink = firstChild?.slug
     ? `category/${firstChild.slug}`
     : currentCategory?.slug
-    ? `category/${currentCategory.slug}`
-    : undefined;
+      ? `category/${currentCategory.slug}`
+      : undefined;
 
   return (
     <>
@@ -77,8 +77,11 @@ const ProductDetails = ({
                   <h2 className="lg:text-3xl text-xl font-semibold text-black">
                     {productDetails.name ?? ""}
                   </h2>
-                  <div>
+                  <div className="text-sm">
                     {t("itemNumber")}: {productDetails.id_provider ?? ""}
+                  </div>
+                  <div className="text-sm">
+                    GTIN: {productDetails.ean ?? ""}
                   </div>
                 </div>
                 <ListStarsReview reviews={reviews} />

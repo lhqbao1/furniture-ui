@@ -243,7 +243,7 @@ const ListPolicy = ({
               >
                 {" "}
                 <a
-                  href="/file/widderuf.pdf"
+                  href="/file/Widerruf.pdf"
                   download
                   className="cursor-pointer flex gap-1 items-center"
                 >

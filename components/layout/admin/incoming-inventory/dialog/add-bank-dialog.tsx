@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { PlusCircle } from "lucide-react";
+import { Pencil, PlusCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -20,6 +20,15 @@ import {
   useGetBankInfoDetail,
   useUpdateBankInfo,
 } from "@/features/incoming-inventory/bank/hook";
+import { toast } from "sonner";
+import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type IncomingInventoryBank = {
   bank_name: string;
@@ -28,6 +37,7 @@ type IncomingInventoryBank = {
   currency: string;
   swift_code: string;
   address: string;
+  customer_id: string;
 };
 
 const CURRENCIES = [
@@ -57,6 +67,12 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
   );
 
   const {
+    data: listUser,
+    isLoading: isLoadingUser,
+    isError: isErrorUser,
+  } = useGetAllCustomers();
+
+  const {
     data: bankDataServer,
     isLoading,
     isError,
@@ -69,20 +85,28 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
     currency: "",
     swift_code: "",
     address: "",
+    customer_id: "",
   });
 
-  //  useEffect(() => {
-  //     if (bankDataServer) {
-  //       const mappedBankInfo: IncomingInventoryBank = {
-  //         account_no: bankDataServer.account_no,
-  //         account_name: bankDataServer.account_name,
-  //         address: bankDataServer.
-  //       };
+  useEffect(() => {
+    if (bankDataServer) {
+      const mappedBankInfo: IncomingInventoryBank = {
+        account_no: bankDataServer.account_no,
+        account_name: bankDataServer.account_name,
+        address: bankDataServer.address,
+        bank_name: bankDataServer.bank_name,
+        currency: bankDataServer.currency,
+        swift_code: bankDataServer.swift_code,
+        customer_id: bankDataServer.customer_id, // 👈 NEW
+      };
 
-  //       setUser(mappedUser);
-  //       setInitialUser(mappedUser); // 👈 snapshot ban đầu
-  //     }
-  //   }, [userServer]);
+      setBank(mappedBankInfo);
+      setInitialBank(mappedBankInfo); // 👈 snapshot ban đầu
+    }
+  }, [bankDataServer]);
+
+  const isChanged =
+    initialBank && JSON.stringify(bank) !== JSON.stringify(initialBank);
 
   const REQUIRED_FIELDS: (keyof IncomingInventoryBank)[] = [
     "bank_name",
@@ -90,6 +114,7 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
     "currency",
     "swift_code",
     "address",
+    "customer_id",
   ];
 
   const isValid = REQUIRED_FIELDS.every(
@@ -103,11 +128,61 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
     }));
   };
 
+  const handleSubmit = () => {
+    const payload = {
+      bank_name: bank.bank_name,
+      account_no: bank.account_no,
+      account_name: bank.account_name || undefined,
+      currency: bank.currency,
+      swift_code: bank.swift_code,
+      address: bank.address,
+      customer_id: bank.customer_id,
+    };
+
+    // 👉 EDIT MODE
+    if (bankDataServer && isChanged) {
+      editBankInfoMutation.mutate(
+        { bankInfoId: bank_info_id!, input: payload },
+        {
+          onSuccess: () => {
+            toast.success("Customer updated successfully");
+            setOpen(false);
+          },
+          onError: () => {
+            toast.error("Failed to update customer");
+          },
+        },
+      );
+      return;
+    }
+
+    // 👉 NO CHANGE
+    if (bankDataServer && !isChanged) {
+      toast.info("No changes detected");
+      return;
+    }
+
+    // 👉 CREATE MODE
+    createBankInfoMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success("Customer created successfully");
+        setOpen(false);
+      },
+      onError: () => {
+        toast.error("Failed to create customer");
+      },
+    });
+  };
+
   return (
     <Dialog>
       {/* 🔹 Trigger */}
       <DialogTrigger asChild>
-        <PlusCircle className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        {bankDataServer ? (
+          <Pencil className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        ) : (
+          <PlusCircle className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        )}
       </DialogTrigger>
 
       {/* 🔹 Content */}
@@ -156,6 +231,32 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
             value={bank.address}
             onChange={(v) => updateField("address", v)}
           />
+          <div className="md:col-span-2">
+            <Label className="text-sm font-medium">
+              Customer <span className="text-red-500">*</span>
+            </Label>
+
+            <Select
+              value={bank.customer_id}
+              onValueChange={(value) => updateField("customer_id", value)}
+              disabled={isLoadingUser}
+            >
+              <SelectTrigger className="mt-1 w-full border">
+                <SelectValue placeholder="Select customer" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {listUser?.map((u) => (
+                  <SelectItem
+                    key={u.id}
+                    value={u.id}
+                  >
+                    {u.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* 🔹 Footer actions (optional) */}
@@ -170,6 +271,7 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
           <Button
             type="button"
             disabled={!isValid}
+            onClick={handleSubmit}
           >
             Add
           </Button>

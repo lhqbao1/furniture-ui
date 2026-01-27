@@ -187,7 +187,7 @@ const SyncToAmazonForm = ({
                 })),
               }
             : { bundles: [] }),
-          brand_id: product.brand.id,
+          brand_id: product.brand ? product.brand.id : null,
         },
 
         id: product.id,

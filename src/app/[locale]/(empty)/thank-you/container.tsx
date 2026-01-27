@@ -57,6 +57,7 @@ const OrderPlaced = () => {
   const hasProcessedRef = React.useRef(false);
   const [delayed, setDelayed] = React.useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(true);
+  const trustbadgeInitRef = React.useRef(false);
 
   const [userId, setUserId] = useAtom(userIdAtom);
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
@@ -327,6 +328,7 @@ const OrderPlaced = () => {
     ),
   );
 
+  //Trusted shop init
   useEffect(() => {
     if (!checkout) return;
     if (trustedShopData) return; // ❗ chỉ set 1 lần
@@ -343,6 +345,29 @@ const OrderPlaced = () => {
         .map((i) => i.products),
     });
   }, [checkout, estimatedDeliveryDate, trustedShopData]);
+
+  //Trusted shop reload
+  useEffect(() => {
+    if (!trustedShopData) return;
+    if (trustbadgeInitRef.current) return;
+
+    const tb = (window as any).trustbadge;
+    if (!tb?.remove || !tb?.reInitialize) return;
+
+    trustbadgeInitRef.current = true;
+
+    const timer = setTimeout(() => {
+      try {
+        tb.remove();
+        tb.reInitialize();
+        console.log("Trusted Shops reinitialized");
+      } catch (e) {
+        console.error("Trusted Shops error", e);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [trustedShopData]);
 
   return (
     <div className="w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10">

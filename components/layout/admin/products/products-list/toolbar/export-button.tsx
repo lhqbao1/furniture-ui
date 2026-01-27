@@ -41,7 +41,7 @@ export default function ExportExcelButton() {
       .map((p) => ({
         id: clean(p.id_provider),
         ean: clean(p.ean),
-        status: clean(p.is_active === true ? "ACTIVE" : "INACTIVE"),
+        status: p.is_active === true ? "ACTIVE" : "INACTIVE",
         brand_name: clean(p.brand?.name),
         supplier_name: clean(p.owner?.business_name),
         manufacturer_sku: clean(p.sku),

@@ -46,30 +46,17 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
         </div>
       ) : (
         <NavigationMenu viewport={isMobile}>
-          <NavigationMenuList className="gap-6 w-[90%] xl:w-full flex-wrap mx-auto">
+          <NavigationMenuList className="gap-x-6 gap-y-2 w-[90%] xl:w-full flex-wrap mx-auto">
             {categories.map((category) => (
               <NavigationMenuItem key={category.id}>
-                <NavigationMenuTrigger
-                  className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer"
-                  // onClick={() => {
-                  //   setCurrentCategoryId(category.id);
-                  //   setCategoryClicked(true);
-                  // }}
-                >
-                  <NavigationMenuLink
-                    key={category.id}
-                    onClick={() => {
-                      // setCurrentCategoryId(child.id);
-                      // setCategoryClicked(true);
-                      router.push(`/category/${category.slug}`, { locale });
-                    }}
-                    className="
-                          relative cursor-pointer px-2 py-2 text-sm
-                           w-fit
-                        "
+                <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer">
+                  <Link
+                    href={`/category/${category.slug}`}
+                    locale={locale}
+                    className="uppercase bg-transparent font-semibold text-sm px-2 py-2"
                   >
                     {category.name}
-                  </NavigationMenuLink>
+                  </Link>
                 </NavigationMenuTrigger>
 
                 {category.children?.length > 0 && (
@@ -108,6 +95,24 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                 className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2 py-1 focus:bg-transparent"
               >
                 <Link href="/shop-all">{t("shopAll")}</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                asChild
+                className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2 py-1 focus:bg-transparent"
+              >
+                <Link href="/about-us">{t("aboutUs")}</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                asChild
+                className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2 py-1 focus:bg-transparent"
+              >
+                <Link href="/contact">{t("contact")}</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
