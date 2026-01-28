@@ -34,6 +34,20 @@ export const orderListExpandColumns: ColumnDef<CartItem>[] = [
   },
 
   {
+    accessorKey: "ware_house",
+    header: () => <div className="text-center w-full">SUPPLIER</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          {row.original.products.owner
+            ? row.original.products.owner.business_name
+            : "Prestige Home"}
+        </div>
+      );
+    },
+  },
+
+  {
     accessorKey: "tax",
     header: () => <div className="text-center w-full">TAX</div>,
     cell: ({ row }) => {
@@ -85,13 +99,7 @@ export const orderListExpandColumns: ColumnDef<CartItem>[] = [
       );
     },
   },
-  {
-    accessorKey: "ware_house",
-    header: () => <div className="text-center w-full">WAREHOUSE</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">AMM</div>;
-    },
-  },
+
   // {
   //   id: "actions",
   //   header: () => <div className="text-center w-full">ACTIONS</div>,

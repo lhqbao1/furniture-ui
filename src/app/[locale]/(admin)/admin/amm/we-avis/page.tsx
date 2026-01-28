@@ -307,7 +307,7 @@ const AmmWeAvisPage = () => {
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-[500px] p-0">
+              <PopoverContent className="w-[500px] p-0 pointer-events-auto">
                 <Command>
                   <CommandInput placeholder="Search products..." />
                   <CommandGroup className="max-h-[300px] overflow-y-auto">

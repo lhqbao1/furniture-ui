@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   FormField,
@@ -22,11 +22,18 @@ import { Loader2 } from "lucide-react";
 import AddUserDialog from "./dialog/add-user-dialog";
 import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook";
 
-const BuyerInformation = () => {
-  const { control, setValue } = useFormContext();
-  const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
+interface BuyerInformationProps {
+  selectedBuyerId: string | null;
+  setSelectedBuyerId: React.Dispatch<React.SetStateAction<string | null>>;
+}
 
-  const { data: buyer, isLoading, isError } = useGetAllCustomers();
+const BuyerInformation = ({
+  selectedBuyerId,
+  setSelectedBuyerId,
+}: BuyerInformationProps) => {
+  const { control, setValue } = useFormContext();
+
+  const { data: buyer, isLoading, dataUpdatedAt } = useGetAllCustomers();
 
   const handleSelectBuyer = (buyerId: string) => {
     if (buyerId === "__CLEAR__") {
@@ -47,6 +54,8 @@ const BuyerInformation = () => {
     const data = buyer?.find((b) => b.id === buyerId);
     if (!data) return;
 
+    setValue("buyer_id", buyerId);
+
     // ✅ autofill fields
     setValue("buyer_name", data.name);
     setValue("buyer_address", data.address);
@@ -54,6 +63,13 @@ const BuyerInformation = () => {
     setValue("buyer_country", data.country);
     setValue("buyer_postal_code", data.postal_code);
   };
+
+  useEffect(() => {
+    if (!selectedBuyerId || !buyer) return;
+
+    handleSelectBuyer(selectedBuyerId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataUpdatedAt, selectedBuyerId]);
 
   return (
     <Card className="col-span-3">
@@ -67,13 +83,15 @@ const BuyerInformation = () => {
           <FormItem className="grid gap-2 col-span-2 min-w-0">
             <FormLabel className="text-sm w-full">Select Buyer</FormLabel>
             <div className="flex items-center gap-2 overflow-hidden">
-              <Select onValueChange={handleSelectBuyer}>
+              <Select
+                value={selectedBuyerId ?? "__CLEAR__"}
+                onValueChange={handleSelectBuyer}
+              >
                 <FormControl>
                   <SelectTrigger className="border flex-1">
                     <SelectValue placeholder="Select a buyer" />
                   </SelectTrigger>
                 </FormControl>
-
                 <SelectContent className="pointer-events-auto">
                   {/* 🔹 Clear option */}
                   <SelectItem value="__CLEAR__">— Clear selection —</SelectItem>

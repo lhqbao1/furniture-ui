@@ -333,12 +333,12 @@ export default function TableToolbar({
           </Button>
         )}
       </div>
-      <Button
+      {/* <Button
         variant={"secondary"}
         onClick={() => handleDownloadZip()}
       >
         Download images
-      </Button>
+      </Button> */}
 
       {isAddButtonModal && (
         <Dialog

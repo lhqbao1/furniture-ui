@@ -1,11 +1,13 @@
 "use client";
 
 import { getIncomingInventoryColumns } from "@/components/layout/admin/incoming-inventory/column";
+import { POColumns } from "@/components/layout/admin/incoming-inventory/po-columns";
 import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
 import InventoryTimeLine from "@/components/layout/admin/inventory/time-line";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
+import { useGetAllPurchaseOrders } from "@/features/incoming-inventory/po/hook";
 import { useGetAllProducts } from "@/features/products/hook";
 import { useProductInventoryFilters } from "@/hooks/admin/inventory/useInventoryFilter";
 import { useRouter } from "@/src/i18n/navigation";
@@ -37,14 +39,7 @@ const IncomingInventoryList = () => {
     setPage(urlPage);
   }, [searchParams]);
 
-  const { data, isLoading, isError } = useGetAllProducts({
-    page,
-    page_size: pageSize,
-    all_products: filters.all_products,
-    search: filters.search,
-    is_inventory: "true",
-    supplier_id: filters.supplier_id,
-  });
+  const { data, isLoading, isError } = useGetAllPurchaseOrders();
 
   useEffect(() => {
     window.scrollTo({
@@ -58,7 +53,7 @@ const IncomingInventoryList = () => {
   return (
     <div className="space-y-6 pb-12">
       <div className="text-3xl text-secondary font-bold text-center">
-        Inventory
+        Purchase Orders
       </div>
 
       <InventoryTableToolbar
@@ -75,14 +70,19 @@ const IncomingInventoryList = () => {
         <ProductTableSkeleton />
       ) : (
         <ProductTable
-          data={data?.items ?? []}
-          columns={getIncomingInventoryColumns(setSortByStock)}
+          data={data ?? []}
+          // columns={getIncomingInventoryColumns(setSortByStock)}
+          columns={POColumns}
           page={page}
           pageSize={pageSize}
           setPage={handlePageChange}
           setPageSize={setPageSize}
-          totalItems={data?.pagination.total_items ?? 0}
-          totalPages={data?.pagination.total_pages ?? 0}
+          totalItems={data?.length ?? 0}
+          totalPages={
+            data && data.length > 0 && data.length > pageSize
+              ? data.length / pageSize
+              : 1
+          }
           hasHeaderBackGround
         />
       )}

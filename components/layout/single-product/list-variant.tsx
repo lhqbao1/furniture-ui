@@ -31,11 +31,8 @@ const ListVariant = ({
 
     const ids = currentProduct.options.map((o) => o.id);
 
-    // ✅ Cập nhật state trước
     setSelectedOptions(ids);
 
-    // ✅ Đảm bảo chỉ setValue sau khi render xong (next tick)
-    // hoặc trong effect riêng biệt
     const timer = setTimeout(() => {
       setValue("option_id", ids, { shouldValidate: false });
     }, 0);
@@ -46,7 +43,6 @@ const ListVariant = ({
   const handleSelect = (variantId: string, optionId: string) => {
     if (!parentProduct) return;
 
-    // Cập nhật state selectedOptions
     setSelectedOptions((prev) => {
       const otherOptions = prev.filter((id) => {
         const isSameVariant = variant.some((g) =>
@@ -57,7 +53,6 @@ const ListVariant = ({
       return [...otherOptions, optionId];
     });
 
-    // 🔍 Tìm product khớp trong parentProduct.products
     const matchedProduct = parentProduct.products.find((product) =>
       product.options?.some((opt) => opt.id === optionId),
     );
@@ -70,7 +65,6 @@ const ListVariant = ({
     }
   };
 
-  // ✅ Khi selectedOptions thay đổi thì update form
   useEffect(() => {
     setValue("option_id", selectedOptions, { shouldValidate: false });
   }, [selectedOptions, setValue]);
@@ -80,6 +74,7 @@ const ListVariant = ({
       parentProduct.products?.flatMap((p) => p.options?.map((o) => o.id) ?? []),
     );
   }, [parentProduct]);
+
   return (
     <Controller
       control={control}

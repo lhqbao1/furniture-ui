@@ -31,6 +31,12 @@ export function useCreateBankInfo() {
     mutationFn: (input: POBankInput) => createBankInfo(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank-info", "all"] });
+      queryClient.invalidateQueries({
+        queryKey: ["customer"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customers"],
+      });
     },
   });
 }
@@ -50,6 +56,12 @@ export function useUpdateBankInfo() {
       queryClient.invalidateQueries({ queryKey: ["bank-info", "all"] });
       queryClient.invalidateQueries({
         queryKey: ["bank-info", "detail", variables.bankInfoId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customer"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customers"],
       });
     },
   });

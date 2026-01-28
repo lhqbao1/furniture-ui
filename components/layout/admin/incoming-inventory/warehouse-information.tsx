@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FormField,
   FormItem,
@@ -20,13 +20,18 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 
-const WarehouseInformation = () => {
-  const { control, setValue } = useFormContext();
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
-    null,
-  );
+interface WarehouseInformationProps {
+  selectedWarehouseId: string | null;
+  setSelectedWarehouseId: React.Dispatch<React.SetStateAction<string | null>>;
+}
 
-  const { data: warehouse, isLoading, isError } = useAllWarehouses();
+const WarehouseInformation = ({
+  selectedWarehouseId,
+  setSelectedWarehouseId,
+}: WarehouseInformationProps) => {
+  const { control, setValue } = useFormContext();
+
+  const { data: warehouse, isLoading, dataUpdatedAt } = useAllWarehouses();
 
   const handleSelectWarehouse = (warehouseId: string) => {
     if (warehouseId === "__CLEAR__") {
@@ -48,6 +53,7 @@ const WarehouseInformation = () => {
 
     const data = warehouse?.find((b) => b.id === warehouseId);
     if (!data) return;
+    setValue("warehouse_id", warehouseId);
 
     // ✅ autofill fields
     setValue("warehouse_name", data.name);
@@ -58,6 +64,13 @@ const WarehouseInformation = () => {
     setValue("warehouse_email", data.email);
     setValue("warehouse_phone_number", data.phone_number);
   };
+
+  useEffect(() => {
+    if (!selectedWarehouseId || !warehouse) return;
+
+    handleSelectWarehouse(selectedWarehouseId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataUpdatedAt, selectedWarehouseId]);
 
   return (
     <Card className="col-span-4">
@@ -71,7 +84,10 @@ const WarehouseInformation = () => {
           <FormItem className="grid gap-2 col-span-2 min-w-0">
             <FormLabel className="text-sm w-full">Select Warehouse</FormLabel>
             <div className="flex items-center gap-2 overflow-hidden">
-              <Select onValueChange={handleSelectWarehouse}>
+              <Select
+                value={selectedWarehouseId ?? "__CLEAR__"}
+                onValueChange={handleSelectWarehouse}
+              >
                 <FormControl>
                   <SelectTrigger className="border flex-1">
                     <SelectValue placeholder="Select a warehouse" />

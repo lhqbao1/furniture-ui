@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   FormField,
@@ -24,23 +24,31 @@ import { Loader2 } from "lucide-react";
 import AddBankDialog from "./dialog/add-bank-dialog";
 import AddContactPersonDialog from "./dialog/add-contact-person-dialog";
 import { se } from "date-fns/locale";
+import { toast } from "sonner";
 
-const SellerInformation = () => {
+interface SellerInformationProps {
+  selectedsellerId: string | null;
+  setSelectedsellerId: React.Dispatch<React.SetStateAction<string | null>>;
+}
+const SellerInformation = ({
+  selectedsellerId,
+  setSelectedsellerId,
+}: SellerInformationProps) => {
   const { control, setValue } = useFormContext();
-  const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
   const [selectedBankId, setSelectedBankId] = useState<string | null>(null);
   const [selectedContactPersonId, setSelectedContactPersonId] = useState<
     string | null
   >(null);
 
-  const { data: seller, isLoading, isError } = useGetAllCustomers();
+  const { data: seller, isLoading, dataUpdatedAt } = useGetAllCustomers();
 
-  const handleSelectSeller = (buyerId: string) => {
-    if (buyerId === "__CLEAR__") {
-      // ❌ Clear selection
-      setSelectedBuyerId(null);
+  const handleSelectSeller = (sellerId: string) => {
+    if (sellerId === "__CLEAR__") {
+      setSelectedsellerId(null);
       setSelectedBankId(null);
       setSelectedContactPersonId(null);
+
+      setValue("seller_id", "");
 
       setValue("name", "");
       setValue("address", "");
@@ -61,33 +69,84 @@ const SellerInformation = () => {
       return;
     }
 
-    setSelectedBuyerId(buyerId);
+    setSelectedsellerId(sellerId);
 
-    const data = seller?.find((b) => b.id === buyerId);
+    const data = seller?.find((b) => b.id === sellerId);
     if (!data) return;
 
-    setSelectedBankId(data.bank_info.id);
-    setSelectedContactPersonId(data.contact_person.id);
-    console.log(data);
+    setValue("seller_id", sellerId);
 
-    // ✅ autofill fields
-    setValue("name", data.name);
-    setValue("address", data.address);
-    setValue("city", data.city);
-    setValue("country", data.country);
-    setValue("postal_code", data.postal_code);
+    // =====================
+    // Seller info (safe)
+    // =====================
+    setValue("name", data.name ?? "");
+    setValue("address", data.address ?? "");
+    setValue("city", data.city ?? "");
+    setValue("country", data.country ?? "");
+    setValue("postal_code", data.postal_code ?? "");
 
-    setValue("bank_name", data.bank_info.bank_name ?? "");
-    setValue("bank_address", data.bank_info.address ?? "");
-    setValue("bank_account_no", data.bank_info.account_no ?? "");
-    setValue("bank_account_name", data.bank_info.account_name ?? "");
-    setValue("bank_swift", data.bank_info.swift_code ?? "");
-    setValue("bank_currency", data.bank_info.currency ?? "");
+    // =====================
+    // Bank info (REQUIRED)
+    // =====================
+    if (!data.bank_info) {
+      setSelectedBankId(null);
 
-    setValue("contact_person_name", data.contact_person.name);
-    setValue("contact_person_email", data.contact_person.email);
-    setValue("contact_person_phone_number", data.contact_person.phone_number);
+      toast.error("Missing bank information", {
+        description:
+          "This seller does not have bank information yet. Bank information is required.",
+      });
+
+      // clear bank fields
+      setValue("bank_name", "");
+      setValue("bank_address", "");
+      setValue("bank_account_no", "");
+      setValue("bank_account_name", "");
+      setValue("bank_swift", "");
+      setValue("bank_currency", "");
+    } else {
+      setSelectedBankId(data.bank_info.id);
+
+      setValue("bank_id", data.bank_info.id);
+      setValue("bank_name", data.bank_info.bank_name ?? "");
+      setValue("bank_address", data.bank_info.address ?? "");
+      setValue("bank_account_no", data.bank_info.account_no ?? "");
+      setValue("bank_account_name", data.bank_info.account_name ?? "");
+      setValue("bank_swift", data.bank_info.swift_code ?? "");
+      setValue("bank_currency", data.bank_info.currency ?? "");
+    }
+
+    // =====================
+    // Contact person (OPTIONAL)
+    // =====================
+    if (!data.contact_person) {
+      setSelectedContactPersonId(null);
+
+      toast.warning("Missing contact person", {
+        description:
+          "This seller does not have a contact person. You can add one if needed.",
+      });
+
+      setValue("contact_person_name", "");
+      setValue("contact_person_email", "");
+      setValue("contact_person_phone_number", "");
+    } else {
+      setSelectedContactPersonId(data.contact_person.id);
+
+      setValue("contact_person_name", data.contact_person.name ?? "");
+      setValue("contact_person_email", data.contact_person.email ?? "");
+      setValue(
+        "contact_person_phone_number",
+        data.contact_person.phone_number ?? "",
+      );
+    }
   };
+
+  useEffect(() => {
+    if (!selectedsellerId || !seller) return;
+
+    handleSelectSeller(selectedsellerId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataUpdatedAt, selectedsellerId]);
 
   return (
     <Card className="col-span-9">
@@ -102,7 +161,11 @@ const SellerInformation = () => {
             <FormItem className="grid gap-2 col-span-6 min-w-0">
               <FormLabel className="text-sm w-full">Select Seller</FormLabel>
               <div className="flex items-center gap-2 min-w-0">
-                <Select onValueChange={handleSelectSeller}>
+                <Select
+                  value={selectedsellerId ?? "__CLEAR__"}
+                  onValueChange={handleSelectSeller}
+                >
+                  {" "}
                   <FormControl>
                     <SelectTrigger className="flex-1 min-w-0 border">
                       <SelectValue
@@ -111,7 +174,6 @@ const SellerInformation = () => {
                       />
                     </SelectTrigger>
                   </FormControl>
-
                   <SelectContent className="pointer-events-auto">
                     {/* 🔹 Clear option */}
                     <SelectItem value="__CLEAR__">
@@ -134,7 +196,9 @@ const SellerInformation = () => {
                     )}
                   </SelectContent>
                 </Select>
-                {selectedBuyerId && <AddUserDialog user_id={selectedBuyerId} />}
+                {selectedsellerId && (
+                  <AddUserDialog user_id={selectedsellerId} />
+                )}
                 {/* 🔹 Edit button */}
               </div>
             </FormItem>
