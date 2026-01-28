@@ -79,7 +79,7 @@ const OrderPlaced = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setParamsChecked(true);
-    }, 1000); // ⏳ chờ 1s
+    }, 300); // ⏳ chờ 1s
 
     return () => clearTimeout(timer);
   }, []);
@@ -149,6 +149,7 @@ const OrderPlaced = () => {
 
       try {
         if (!paymentIntentId && paymentId && paypalToken) {
+          await retryCaptureUntilSuccess(paymentId);
         }
 
         return await getMainCheckOutByMainCheckOutId(checkoutId!);
