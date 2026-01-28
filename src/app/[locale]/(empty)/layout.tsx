@@ -5,7 +5,7 @@ export default function EmptyLayout({
 }>) {
   return (
     <main className="relative flex flex-col items-center justify-center">
-      <section className="lg:max-w-7/12 max-w-11/12">{children}</section>
+      <section className="lg:max-w-7/12 max-w-12/12">{children}</section>
     </main>
   );
 }

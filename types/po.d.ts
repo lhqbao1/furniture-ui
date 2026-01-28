@@ -11,6 +11,8 @@ export type CustomerDetail = {
   fax?: string;
   website?: string;
   article_id?: number;
+  contact_person: ContactPersonDetail;
+  bank_info: BankInfoDetail;
 
   created_at: string;
   updated_at: string;

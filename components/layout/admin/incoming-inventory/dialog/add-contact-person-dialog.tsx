@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { PlusCircle } from "lucide-react";
+import { Pencil, PlusCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -156,7 +156,11 @@ const AddContactPersonDialog = ({
     <Dialog>
       {/* 🔹 Trigger */}
       <DialogTrigger asChild>
-        <PlusCircle className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        {contactPersonData ? (
+          <Pencil className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        ) : (
+          <PlusCircle className="size-4 text-secondary hover:text-secondary/70 cursor-pointer" />
+        )}
       </DialogTrigger>
 
       {/* 🔹 Content */}

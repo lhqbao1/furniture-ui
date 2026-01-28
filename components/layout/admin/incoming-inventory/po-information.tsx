@@ -9,6 +9,22 @@ import {
 } from "@/components/ui/form";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+
+function FormErrorSpace() {
+  return (
+    <div className="min-h-[20px]">
+      <FormMessage />
+    </div>
+  );
+}
 
 const POInformation = () => {
   const { control } = useFormContext();
@@ -18,11 +34,11 @@ const POInformation = () => {
         PO Information
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          {/* ===== Bank Name ===== */}
+        <div className="grid grid-cols-3 gap-4">
+          {/* ===== PO Number ===== */}
           <FormField
             control={control}
-            name="bank_name"
+            name="po_number"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>PO Number</FormLabel>
@@ -32,15 +48,16 @@ const POInformation = () => {
                     value={field.value ?? ""}
                   />
                 </FormControl>
-                <FormMessage />
+
+                <FormErrorSpace />
               </FormItem>
             )}
           />
 
-          {/* ===== Bank Address ===== */}
+          {/* ===== PI Number ===== */}
           <FormField
             control={control}
-            name="bank_address"
+            name="pi_number"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>PI Number</FormLabel>
@@ -50,61 +67,172 @@ const POInformation = () => {
                     value={field.value ?? ""}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormErrorSpace />
               </FormItem>
             )}
           />
 
-          {/* ===== Bank City ===== */}
+          {/* ===== Loading Port ===== */}
           <FormField
             control={control}
-            name="bank_account_no"
+            name="loading_port"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank City</FormLabel>
+                <FormLabel>Loading Port</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ""}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormErrorSpace />
               </FormItem>
             )}
           />
 
-          {/* ===== Bank Country ===== */}
+          {/* ===== Shipping Method ===== */}
           <FormField
             control={control}
-            name="bank_swift"
+            name="shipping_method"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Country</FormLabel>
+                <FormLabel>Shipping Method</FormLabel>
+                <Select
+                  value={field.value ?? "__CLEAR__"}
+                  onValueChange={(val) => {
+                    if (val === "__CLEAR__") {
+                      field.onChange(undefined);
+                    } else {
+                      field.onChange(val);
+                    }
+                  }}
+                >
+                  <FormControl>
+                    <SelectTrigger className="border">
+                      <SelectValue placeholder="Select shipping method" />
+                    </SelectTrigger>
+                  </FormControl>
+
+                  <SelectContent>
+                    <SelectItem value="sea">Sea</SelectItem>
+                    <SelectItem value="train">Train</SelectItem>
+                    <SelectItem value="air">Air</SelectItem>
+                    <SelectItem value="courier">Courier</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <FormErrorSpace />
+              </FormItem>
+            )}
+          />
+
+          {/* ===== Customer PO Number ===== */}
+          <FormField
+            control={control}
+            name="customer_po_order"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Customer PO Number</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ""}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormErrorSpace />
               </FormItem>
             )}
           />
 
-          {/* ===== Bank Postal Code ===== */}
+          {/* ===== Delivery Condition ===== */}
           <FormField
             control={control}
-            name="bank_currency"
+            name="delivery_conditions"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Postal Code</FormLabel>
+                <FormLabel>Delivery Condition</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ""}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormErrorSpace />
+              </FormItem>
+            )}
+          />
+
+          {/* ===== Type Of Billing ===== */}
+          <FormField
+            control={control}
+            name="type_of_bill_of_lading"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type Of Billing</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormErrorSpace />
+              </FormItem>
+            )}
+          />
+
+          {/* ===== Destination ===== */}
+          <FormField
+            control={control}
+            name="destination"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Destination</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormErrorSpace />
+              </FormItem>
+            )}
+          />
+
+          {/* ===== Note ===== */}
+          <FormField
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Note</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormErrorSpace />
+              </FormItem>
+            )}
+          />
+
+          {/* ===== Payment Term ===== */}
+          <FormField
+            control={control}
+            name="payment_terms"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Payment Terms</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={4}
+                    placeholder={`By T/T
+Deposit 30% within 03 days after the order confirmed
+Balance 70% will be paid within 20 days after shipment`}
+                  />
+                </FormControl>
+                <FormErrorSpace />
               </FormItem>
             )}
           />

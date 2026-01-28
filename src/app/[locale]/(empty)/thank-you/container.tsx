@@ -53,6 +53,8 @@ const OrderPlaced = () => {
   const locale = useLocale();
   const params = useSearchParams();
   const paymentIntentId = params?.get("payment_intent"); // Lấy param paymentIntent.id nếu có
+  const paypalToken = params?.get("token");
+
   const hasFetchedRef = React.useRef(false);
   const hasProcessedRef = React.useRef(false);
   const [delayed, setDelayed] = React.useState(false);
@@ -62,6 +64,9 @@ const OrderPlaced = () => {
   const [userId, setUserId] = useAtom(userIdAtom);
   const [checkoutId, setCheckOutId] = useAtom(checkOutIdAtom);
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
+  const [paramsChecked, setParamsChecked] = useState(false);
+  const [captureFailed, setCaptureFailed] = useState(false);
+
   const [trustedShopData, setTrustedShopData] =
     useState<TrustedShopsCheckoutProps | null>(null);
 
@@ -70,6 +75,23 @@ const OrderPlaced = () => {
   const sendMailMutation = useSendMail();
 
   const t = useTranslations();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setParamsChecked(true);
+    }, 1000); // ⏳ chờ 1s
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!paramsChecked) return;
+
+    // ❌ Không có Stripe & không có PayPal
+    if (!paymentIntentId && !paypalToken) {
+      router.replace("/", { locale });
+    }
+  }, [paramsChecked, paymentIntentId, paypalToken, router, locale]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -126,13 +148,16 @@ const OrderPlaced = () => {
       hasFetchedRef.current = true;
 
       try {
-        if (!paymentIntentId && paymentId) {
-          await retryCaptureUntilSuccess(paymentId);
+        if (!paymentIntentId && paymentId && paypalToken) {
         }
 
         return await getMainCheckOutByMainCheckOutId(checkoutId!);
       } catch (err) {
         console.error(err);
+        // 🔥 PAYPAL CAPTURE FAIL
+        if (paypalToken) {
+          setCaptureFailed(true);
+        }
         throw err;
       } finally {
         setIsProcessingPayment(false); // 🔥 LUÔN TẮT
@@ -387,22 +412,43 @@ const OrderPlaced = () => {
           <span className="text-primary text-[40px] font-semibold">Home</span>
         </div>
       </div>
-      <div className="relative flex flex-col items-center justify-center bg-white text-center w-fit h-fit px-40 py-8">
+      <div className="relative flex flex-col items-center justify-center bg-white text-center w-fit h-fit md:px-40 px-20 py-8">
         <div className="absolute top-0 left-0 w-40 h-32 bg-secondary clip-triangle-top-left" />
         <div className="absolute bottom-0 right-0 w-40 h-32 bg-primary clip-triangle-bottom-right" />
 
-        <h1 className="text-6xl text-gray-700 mb-6 italic">{t("thankYou")}</h1>
+        {captureFailed && (
+          <div className="mt-6 text-center text-red-600 max-w-md">
+            <h2 className="text-2xl font-semibold mb-2">
+              {t("paymentFailedTitle")}
+            </h2>
+            <p className="text-sm">{t("paymentFailedMessage")}</p>
+          </div>
+        )}
 
-        <p className="text-gray-600 text-lg">{t("orderPlacedMessage")}</p>
-        <p className="text-gray-600 text-lg mt-2">{t("trackingInfoMessage")}</p>
-        <p className="text-gray-600 text-lg mt-2">{t("thankYouShopping")}</p>
+        {!isProcessingPayment &&
+          !captureFailed &&
+          (paymentIntentId || paypalToken) && (
+            <>
+              <h1 className="text-6xl text-gray-700 mb-6 italic">
+                {t("thankYou")}
+              </h1>
 
-        {isProcessingPayment && (
+              <p className="text-gray-600 text-lg">{t("orderPlacedMessage")}</p>
+              <p className="text-gray-600 text-lg mt-2">
+                {t("trackingInfoMessage")}
+              </p>
+              <p className="text-gray-600 text-lg mt-2">
+                {t("thankYouShopping")}
+              </p>
+            </>
+          )}
+        {isProcessingPayment && paypalToken && (
           <div className="mt-6 flex flex-col items-center gap-3 text-gray-600">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-sm italic">{t("orderProcessingMessage")}</p>
           </div>
         )}
+
         <Button
           variant="secondary"
           disabled={isProcessingPayment}

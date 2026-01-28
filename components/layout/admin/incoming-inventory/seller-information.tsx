@@ -23,6 +23,7 @@ import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook"
 import { Loader2 } from "lucide-react";
 import AddBankDialog from "./dialog/add-bank-dialog";
 import AddContactPersonDialog from "./dialog/add-contact-person-dialog";
+import { se } from "date-fns/locale";
 
 const SellerInformation = () => {
   const { control, setValue } = useFormContext();
@@ -38,6 +39,8 @@ const SellerInformation = () => {
     if (buyerId === "__CLEAR__") {
       // ❌ Clear selection
       setSelectedBuyerId(null);
+      setSelectedBankId(null);
+      setSelectedContactPersonId(null);
 
       setValue("name", "");
       setValue("address", "");
@@ -45,6 +48,16 @@ const SellerInformation = () => {
       setValue("country", "");
       setValue("postal_code", "");
 
+      setValue("bank_name", "");
+      setValue("bank_address", "");
+      setValue("bank_account_no", "");
+      setValue("bank_account_name", "");
+      setValue("bank_swift", "");
+      setValue("bank_currency", "");
+
+      setValue("contact_person_name", "");
+      setValue("contact_person_email", "");
+      setValue("contact_person_phone_number", "");
       return;
     }
 
@@ -53,12 +66,27 @@ const SellerInformation = () => {
     const data = seller?.find((b) => b.id === buyerId);
     if (!data) return;
 
+    setSelectedBankId(data.bank_info.id);
+    setSelectedContactPersonId(data.contact_person.id);
+    console.log(data);
+
     // ✅ autofill fields
     setValue("name", data.name);
     setValue("address", data.address);
     setValue("city", data.city);
     setValue("country", data.country);
     setValue("postal_code", data.postal_code);
+
+    setValue("bank_name", data.bank_info.bank_name ?? "");
+    setValue("bank_address", data.bank_info.address ?? "");
+    setValue("bank_account_no", data.bank_info.account_no ?? "");
+    setValue("bank_account_name", data.bank_info.account_name ?? "");
+    setValue("bank_swift", data.bank_info.swift_code ?? "");
+    setValue("bank_currency", data.bank_info.currency ?? "");
+
+    setValue("contact_person_name", data.contact_person.name);
+    setValue("contact_person_email", data.contact_person.email);
+    setValue("contact_person_phone_number", data.contact_person.phone_number);
   };
 
   return (
@@ -213,6 +241,9 @@ const SellerInformation = () => {
             <div className="flex gap-2 items-center">
               <h4 className="text-xl text-secondary mb-0">Bank Information</h4>
               <AddBankDialog />
+              {selectedBankId && (
+                <AddBankDialog bank_info_id={selectedBankId} />
+              )}
             </div>
             <div className="grid grid-cols-6 gap-4 overflow-hidden mt-1.5">
               {/* ===== Bank Name ===== */}
@@ -318,6 +349,11 @@ const SellerInformation = () => {
                 Contact Person Information
               </h4>
               <AddContactPersonDialog />
+              {selectedContactPersonId && (
+                <AddContactPersonDialog
+                  contact_person_id={selectedContactPersonId}
+                />
+              )}
             </div>
             <div className="grid grid-cols-6 gap-4 overflow-hidden mt-3">
               {/* ===== Contact Person Name ===== */}
@@ -361,7 +397,7 @@ const SellerInformation = () => {
               {/* ===== Contact Person Phone ===== */}
               <FormField
                 control={control}
-                name="contact_person_phone"
+                name="contact_person_phone_number"
                 render={({ field }) => (
                   <FormItem className="col-span-3">
                     <FormLabel>Contact Person Phone</FormLabel>

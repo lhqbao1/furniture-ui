@@ -13,11 +13,21 @@ import POInformation from "./po-information";
 import SellerBankingInformation from "./seller-banking-information";
 import WarehouseInformation from "./warehouse-information";
 import ContactPersonInformation from "./contact-person";
+import { Button } from "@/components/ui/button";
 
 const AddIncomingInventoryForm = () => {
   const form = useForm<z.infer<typeof incomingInventorySchema>>({
     resolver: zodResolver(incomingInventorySchema),
-    defaultValues: {},
+    defaultValues: {
+      po_number: "",
+      pi_number: "",
+      loading_port: "",
+      shipping_method: "",
+      delivery_conditions: "",
+      type_of_bill_of_lading: "",
+      destination: "",
+      payment_terms: "",
+    },
   });
 
   function handleSubmit(data: z.infer<typeof incomingInventorySchema>) {
@@ -44,6 +54,12 @@ const AddIncomingInventoryForm = () => {
           <POInformation />
           <WarehouseInformation />
         </div>
+        <Button
+          type="submit"
+          className="mt-4"
+        >
+          Create PO
+        </Button>
       </form>
     </Form>
   );

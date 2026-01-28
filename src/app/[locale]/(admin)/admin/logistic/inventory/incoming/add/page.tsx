@@ -3,9 +3,8 @@ import React from "react";
 
 const CreateIncomingInventory = () => {
   return (
-    <div className="space-y-6 mt-6">
+    <div className="space-y-6 my-6">
       <AddIncomingInventoryForm />
-      <div>List products with container wrapped</div>
     </div>
   );
 };
