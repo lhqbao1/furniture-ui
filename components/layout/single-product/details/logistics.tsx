@@ -27,6 +27,12 @@ const ProductDetailsLogistic = ({
     deliveryTime: productDetails.delivery_time,
   });
 
+  const carrier = productDetails?.carrier?.toLowerCase();
+
+  const isSpedition = carrier === "amm" || carrier === "spedition";
+
+  const shippingCost = isSpedition ? "35,95€" : "5,95€";
+
   return (
     <div className="space-y-2">
       {/* <div>{t("includeVatAndShipping")}</div> */}
@@ -71,7 +77,16 @@ const ProductDetailsLogistic = ({
         </div>
       </div>
 
-      <ShippingDrawer productDetails={productDetails} />
+      {/* <ShippingDrawer productDetails={productDetails} /> */}
+      <Link
+        href={"https://www.prestige-home.de/de/versandbedingungen"}
+        className="flex flex-row gap-4 items-center"
+      >
+        <Truck size={25} />
+        <span className="text-gray-800 font-medium text-sm cursor-pointer hover:underline">
+          {t("shippingCost", { shippingCost })}
+        </span>
+      </Link>
 
       <div className="flex flex-row gap-4 items-start">
         <Clock

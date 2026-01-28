@@ -471,5 +471,8 @@
     "noReason": "Kein Grund angegeben"
   },
     "orderProcessingMessage": "Ihre Bestellung wird bearbeitet. Dies kann einen Moment dauern. Bitte bleiben Sie auf dieser Seite.",
-    "noProducts": "Keine Produkte gefunden"
+    "noProducts": "Keine Produkte gefunden",
+  "paymentFailedTitle": "Zahlung fehlgeschlagen",
+  "paymentFailedMessage": "Leider konnte Ihre Zahlung nicht abgeschlossen werden. Es wurde kein Betrag abgebucht. Bitte versuchen Sie es erneut oder wählen Sie eine andere Zahlungsmethode.",
+  "retryPayment": "Zahlung erneut versuchen"
 }

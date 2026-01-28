@@ -72,13 +72,6 @@ export default function StripeLayout({
 
   return (
     <>
-      {/* <CheckoutPaymentUI
-        control={form.control}
-        selectedMethod={selectedMethod}
-        onChange={(v) => form.setValue("payment_method", v)}
-        t={t}
-      /> */}
-
       {clientSecret && (
         <>
           {/* CARD → mở dialog nhập thẻ */}

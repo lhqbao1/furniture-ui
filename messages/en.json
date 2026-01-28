@@ -474,5 +474,8 @@
     "noReason": "No reason given"
   },
   "orderProcessingMessage": "Your order is being processed. This may take a moment. Please remain on this page.",
-  "noProducts": "No product found"
+  "noProducts": "No product found",
+  "paymentFailedTitle": "Payment failed",
+  "paymentFailedMessage": "Unfortunately, we could not complete your payment. No amount has been charged. Please try again or choose a different payment method.",
+  "retryPayment": "Try payment again"
 }
