@@ -443,7 +443,7 @@ const OrderPlaced = () => {
               </p>
             </>
           )}
-        {isProcessingPayment && paypalToken && (
+        {isProcessingPayment && (paypalToken || paymentIntentId) && (
           <div className="mt-6 flex flex-col items-center gap-3 text-gray-600">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-sm italic">{t("orderProcessingMessage")}</p>
