@@ -79,7 +79,7 @@ const OrderPlaced = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setParamsChecked(true);
-    }, 1000); // ⏳ chờ 1s
+    }, 300); // ⏳ chờ 1s
 
     return () => clearTimeout(timer);
   }, []);
@@ -149,6 +149,7 @@ const OrderPlaced = () => {
 
       try {
         if (!paymentIntentId && paymentId && paypalToken) {
+          await retryCaptureUntilSuccess(paymentId);
         }
 
         return await getMainCheckOutByMainCheckOutId(checkoutId!);
@@ -425,23 +426,21 @@ const OrderPlaced = () => {
           </div>
         )}
 
-        {!isProcessingPayment &&
-          !captureFailed &&
-          (paymentIntentId || paypalToken) && (
-            <>
-              <h1 className="text-6xl text-gray-700 mb-6 italic">
-                {t("thankYou")}
-              </h1>
+        {!captureFailed && (paymentIntentId || paypalToken) && (
+          <>
+            <h1 className="text-6xl text-gray-700 mb-6 italic">
+              {t("thankYou")}
+            </h1>
 
-              <p className="text-gray-600 text-lg">{t("orderPlacedMessage")}</p>
-              <p className="text-gray-600 text-lg mt-2">
-                {t("trackingInfoMessage")}
-              </p>
-              <p className="text-gray-600 text-lg mt-2">
-                {t("thankYouShopping")}
-              </p>
-            </>
-          )}
+            <p className="text-gray-600 text-lg">{t("orderPlacedMessage")}</p>
+            <p className="text-gray-600 text-lg mt-2">
+              {t("trackingInfoMessage")}
+            </p>
+            <p className="text-gray-600 text-lg mt-2">
+              {t("thankYouShopping")}
+            </p>
+          </>
+        )}
         {isProcessingPayment && paypalToken && (
           <div className="mt-6 flex flex-col items-center gap-3 text-gray-600">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

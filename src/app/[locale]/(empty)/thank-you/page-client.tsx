@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import OrderPlaced from "./container";
 import { Loader2 } from "lucide-react";
 import { useLocale } from "next-intl";
+import { useAtom } from "jotai";
+import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 
 const OrderPlacedWrapper = () => {
   const router = useRouter();
@@ -12,6 +14,8 @@ const OrderPlacedWrapper = () => {
   const params = useSearchParams();
   const status = params?.get("redirect_status");
   const [counter, setCounter] = useState(5);
+  const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
+  const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
 
   useEffect(() => {
     if (status === "failed" && counter === 4) {
@@ -21,10 +25,8 @@ const OrderPlacedWrapper = () => {
       localStorage.removeItem("checkoutId");
       localStorage.removeItem("paymentId");
 
-      // Chỉ xóa token nếu có userIdGuest
-      const guestId = localStorage.getItem("userIdGuest");
-      if (guestId) {
-        localStorage.removeItem("userIdGuest");
+      if (userGuestId && !userLoginId) {
+        setUserGuestId(null);
         localStorage.removeItem("access_token");
       }
     }
