@@ -57,3 +57,48 @@ export type WareHouseDetail = {
   created_at: string;
   updated_at: string;
 };
+
+export type PurchaseOrderDetail = {
+  id: string;
+
+  po_number: string;
+  pi_number: string;
+  customer_po_order: string;
+
+  buyer: CustomerDetail;
+  seller: CustomerDetail;
+  warehouse: WareHouseDetail;
+
+  created_by: string;
+
+  loading_port: string;
+  shipping_method: string;
+
+  number_of_containers: number | null; // 👈 lưu ý: null
+
+  payment_terms: string;
+  delivery_conditions: string;
+  type_of_bill_of_lading: string;
+  destination: string;
+
+  note: string;
+
+  created_at: string; // ISO string
+  updated_at: string; // ISO string
+};
+
+export type POContainerDetail = {
+  id: string;
+
+  container_number: string;
+  purchase_order_id: string;
+
+  size: string;
+
+  date_of_inspection: string; // ISO string
+  date_if_shipment: string; // ISO string
+  delivery_date: string; // ISO string
+
+  created_at: string; // ISO string
+  updated_at: string; // ISO string
+};

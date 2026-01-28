@@ -71,6 +71,7 @@ export const useGetAllCustomers = () => {
   return useQuery({
     queryKey: ["customers"],
     queryFn: getAllCustomers,
+    refetchOnWindowFocus: false,
   });
 };
 

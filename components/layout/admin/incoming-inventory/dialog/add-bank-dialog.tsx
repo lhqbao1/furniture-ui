@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Pencil, PlusCircle } from "lucide-react";
+import { Loader2, Pencil, PlusCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -61,6 +61,9 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
   const createBankInfoMutation = useCreateBankInfo();
   const editBankInfoMutation = useUpdateBankInfo();
 
+  const isSubmitting =
+    createBankInfoMutation.isPending || editBankInfoMutation.isPending;
+
   const [open, setOpen] = useState(false);
   const [initialBank, setInitialBank] = useState<IncomingInventoryBank | null>(
     null,
@@ -78,6 +81,8 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
     isError,
   } = useGetBankInfoDetail(bank_info_id);
 
+  const isEditMode = Boolean(bankDataServer);
+
   const [bank, setBank] = useState<IncomingInventoryBank>({
     bank_name: "",
     account_no: "",
@@ -91,17 +96,17 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
   useEffect(() => {
     if (bankDataServer) {
       const mappedBankInfo: IncomingInventoryBank = {
-        account_no: bankDataServer.account_no,
-        account_name: bankDataServer.account_name,
-        address: bankDataServer.address,
-        bank_name: bankDataServer.bank_name,
-        currency: bankDataServer.currency,
-        swift_code: bankDataServer.swift_code,
-        customer_id: bankDataServer.customer_id, // 👈 NEW
+        bank_name: bankDataServer.bank_name ?? "",
+        account_no: bankDataServer.account_no ?? "",
+        account_name: bankDataServer.account_name ?? "", // ✅
+        currency: bankDataServer.currency ?? "",
+        swift_code: bankDataServer.swift_code ?? "",
+        address: bankDataServer.address ?? "",
+        customer_id: bankDataServer.customer_id ?? "", // ✅
       };
 
       setBank(mappedBankInfo);
-      setInitialBank(mappedBankInfo); // 👈 snapshot ban đầu
+      setInitialBank(mappedBankInfo);
     }
   }, [bankDataServer]);
 
@@ -165,17 +170,20 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
     // 👉 CREATE MODE
     createBankInfoMutation.mutate(payload, {
       onSuccess: () => {
-        toast.success("Customer created successfully");
+        toast.success("Bank data created successfully");
         setOpen(false);
       },
       onError: () => {
-        toast.error("Failed to create customer");
+        toast.error("Failed to create bank data");
       },
     });
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
       {/* 🔹 Trigger */}
       <DialogTrigger asChild>
         {bankDataServer ? (
@@ -270,10 +278,19 @@ const AddBankDialog = ({ bank_info_id }: AddBankDialogProps) => {
 
           <Button
             type="button"
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
             onClick={handleSubmit}
           >
-            Add
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {isEditMode ? "Updating..." : "Adding..."}
+              </span>
+            ) : isEditMode ? (
+              "Update"
+            ) : (
+              "Add"
+            )}
           </Button>
         </div>
       </DialogContent>

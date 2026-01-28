@@ -614,7 +614,7 @@ export const getProductColumns = (
       </Button>
     ),
     // cell: ({ row }) => <EditableNameCell product={row.original} />,
-    cell: ({ row }) => <EditableNameCell product={row.original} />,
+    cell: ({ row }) => <div>{row.original.name}</div>,
     enableSorting: true,
   },
   {

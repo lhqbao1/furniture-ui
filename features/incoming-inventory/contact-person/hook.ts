@@ -18,6 +18,12 @@ export const useCreateContactPerson = () => {
       queryClient.invalidateQueries({
         queryKey: ["contact-persons"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["customer"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customers"],
+      });
     },
   });
 };
@@ -34,6 +40,12 @@ export const useUpdateContactPerson = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ["contact-person-detail", variables.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customer"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customers"],
       });
     },
   });

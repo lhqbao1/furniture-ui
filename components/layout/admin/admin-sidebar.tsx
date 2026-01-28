@@ -131,7 +131,7 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         {
-          title: "Incoming Inventory",
+          title: "Purchasing",
           url: "/admin/logistic/inventory/incoming",
           icon: CornerDownRight,
         },

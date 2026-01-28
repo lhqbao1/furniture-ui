@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Pencil, PlusCircle } from "lucide-react";
+import { Loader2, Pencil, PlusCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -45,7 +45,9 @@ const AddContactPersonDialog = ({
 }: AddContactPersonDialogProps) => {
   const createContactPersonMutation = useCreateContactPerson();
   const editContactPersonMutation = useUpdateContactPerson();
-
+  const isSubmitting =
+    createContactPersonMutation.isPending ||
+    editContactPersonMutation.isPending;
   const [open, setOpen] = useState(false);
   const [initialContactPerson, setInitialContactPerson] =
     useState<IncomingInventoryContactPerson | null>(null);
@@ -62,6 +64,8 @@ const AddContactPersonDialog = ({
     isError,
   } = useContactPersonDetail(contact_person_id);
 
+  const isEditMode = Boolean(contactPersonData);
+
   const [contactPerson, setContactPerson] =
     useState<IncomingInventoryContactPerson>({
       name: "",
@@ -73,10 +77,10 @@ const AddContactPersonDialog = ({
   useEffect(() => {
     if (contactPersonData) {
       const mappedContactPerson: IncomingInventoryContactPerson = {
-        name: contactPersonData.name,
-        email: contactPersonData.email,
-        phone_number: contactPersonData.phone_number,
-        customer_id: contactPersonData.customer_id, // 👈 NEW
+        name: contactPersonData.name ?? "",
+        email: contactPersonData.email ?? "",
+        phone_number: contactPersonData.phone_number ?? "",
+        customer_id: contactPersonData.customer_id ?? "", // 👈 NEW
       };
 
       setContactPerson(mappedContactPerson);
@@ -153,7 +157,10 @@ const AddContactPersonDialog = ({
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+    >
       {/* 🔹 Trigger */}
       <DialogTrigger asChild>
         {contactPersonData ? (
@@ -230,10 +237,19 @@ const AddContactPersonDialog = ({
 
           <Button
             type="button"
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
             onClick={handleSubmit}
           >
-            Add
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {isEditMode ? "Updating..." : "Adding..."}
+              </span>
+            ) : isEditMode ? (
+              "Update"
+            ) : (
+              "Add"
+            )}
           </Button>
         </div>
       </DialogContent>

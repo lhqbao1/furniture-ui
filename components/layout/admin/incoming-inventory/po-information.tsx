@@ -132,7 +132,7 @@ const POInformation = () => {
             name="customer_po_order"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Customer PO Number</FormLabel>
+                <FormLabel>Customer PO Number (Optional)</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -204,7 +204,7 @@ const POInformation = () => {
             name="note"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Note</FormLabel>
+                <FormLabel>Note (Optional)</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
