@@ -207,6 +207,13 @@ export async function cancelNoStockOrder(main_checkout_id: string) {
   return data;
 }
 
+export async function cancelWrongPrice(main_checkout_id: string) {
+  const { data } = await apiAdmin.put(
+    `/checkout/canceled-wrong-price/${main_checkout_id}`,
+  );
+  return data;
+}
+
 export async function createDeliveryOrder(
   main_checkout_id: string,
   payload: DeliveryOrderPayload,

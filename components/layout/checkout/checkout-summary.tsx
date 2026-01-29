@@ -88,18 +88,6 @@ const CheckoutSummary = ({
     name: "coupon_amount",
   });
 
-  // const productIds = React.useMemo(() => {
-  //   if (cartItems && cartItems.length > 0) {
-  //     return cartItems
-  //       .flatMap((g) => g.items)
-  //       .filter((i) => i.is_active)
-  //       .map((i) => i.products?.id) // ✅ lấy từ products
-  //       .filter(Boolean); // ✅ bỏ undefined
-  //   }
-
-  //   return localCart?.filter((i) => i.is_active).map((i) => i.product_id) ?? [];
-  // }, [cartItems, localCart]);
-
   const orderValue = React.useMemo(() => {
     if (hasServerCart) {
       return cartItems
@@ -271,12 +259,12 @@ const CheckoutSummary = ({
                     .flatMap((g) => g.items)
                     .filter((i) => i.is_active)
                     .reduce((s, i) => s + (i.final_price ?? 0), 0)
-                : localCart
+                : (localCart
                     ?.filter((i) => i.is_active)
                     .reduce(
                       (s, i) => s + (i.item_price ?? 0) * (i.quantity ?? 1),
                       0,
-                    ) ?? 0
+                    ) ?? 0)
               ).toLocaleString("de-DE", { minimumFractionDigits: 2 })}
             </span>
           </div>
@@ -318,12 +306,12 @@ const CheckoutSummary = ({
                       .flatMap((g) => g.items)
                       .filter((i) => i.is_active)
                       .reduce((s, i) => s + (i.final_price ?? 0), 0)
-                  : localCart
+                  : (localCart
                       ?.filter((i) => i.is_active)
                       .reduce(
                         (s, i) => s + (i.item_price ?? 0) * (i.quantity ?? 1),
                         0,
-                      ) ?? 0) +
+                      ) ?? 0)) +
                 shippingCost -
                 Number(couponAmount || 0) -
                 Number(voucherAmount || 0)

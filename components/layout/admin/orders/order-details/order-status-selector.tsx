@@ -11,6 +11,7 @@ import { CheckOutMain } from "@/types/checkout";
 import { STATUS_ACTIVE_RULES, STATUS_OPTIONS } from "@/data/data";
 import PaidConfirmDialog from "./dialog/paid-comfirm-dialog";
 import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
+import CancelWrongPriceDialog from "./dialog/canceled-wrong-price-dialog";
 
 export const getStatusLabel = (status: string) => {
   const normalized = status.toLowerCase();
@@ -41,6 +42,7 @@ export default function OrderStatusSelector({
   const [openPaid, setOpenPaid] = React.useState(false);
   const [openExchange, setOpenExchange] = React.useState(false);
   const [openCancelNoStock, setOpenCancelNoStock] = React.useState(false);
+  const [openCancelWrongPrice, setOpenCancelWrongPrice] = React.useState(false);
 
   const options = React.useMemo(() => {
     const current = String(status).toLowerCase();
@@ -73,6 +75,8 @@ export default function OrderStatusSelector({
       setOpenExchange(true);
     } else if (val === "canceled_no_stock") {
       setOpenCancelNoStock(true);
+    } else if (val === "canceled_wrong_price") {
+      setOpenCancelWrongPrice(true);
     }
   };
 
@@ -149,6 +153,18 @@ export default function OrderStatusSelector({
           open={openCancelNoStock}
           onClose={() => {
             setOpenCancelNoStock(false);
+            setValue(status.toLocaleLowerCase());
+          }}
+        />
+      )}
+
+      {openCancelWrongPrice && (
+        <CancelWrongPriceDialog
+          id={order.id}
+          status={status}
+          open={openCancelWrongPrice}
+          onClose={() => {
+            setOpenCancelWrongPrice(false);
             setValue(status.toLocaleLowerCase());
           }}
         />

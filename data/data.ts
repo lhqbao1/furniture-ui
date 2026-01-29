@@ -1018,43 +1018,54 @@ export const STATUS_OPTIONS = [
   { key: "exchange", label: "Exchange", active: true, pos: 11 },
   { key: "canceled_no_stock", label: "Cancel no stock", active: true, pos: 12 },
   {
+    key: "canceled_wrong_price",
+    label: "Cancel wrong price",
+    active: true,
+    pos: 13,
+  },
+
+  {
     key: "items_are_checked",
     label: "Items are checked",
     active: true,
-    pos: 13,
+    pos: 14,
   },
   {
     key: "waiting_for_return",
     label: "Waiting for return",
     active: true,
-    pos: 14,
+    pos: 15,
   },
   {
     key: "warranty_initiated",
     label: "Warranty initiated",
     active: true,
-    pos: 15,
+    pos: 16,
   },
   {
     key: "exchange_initiated",
     label: "Exchange initiated",
     active: true,
-    pos: 16,
+    pos: 17,
   },
   {
     key: "credit_note_created",
     label: "Credit note created",
     active: true,
-    pos: 17,
+    pos: 18,
   },
 ];
 
 export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   completed: ["return", "exchange"],
-  preparation_shipping: ["canceled", "canceled_no_stock"],
+  preparation_shipping: [
+    "canceled",
+    "canceled_no_stock",
+    "canceled_wrong_price",
+  ],
   shipped: ["exchange", "return"],
-  pending: ["paid", "canceled", "canceled_no_stock"],
-  paid: ["canceled", "canceled_no_stock"],
+  pending: ["paid", "canceled", "canceled_no_stock", "canceled_wrong_price"],
+  paid: ["canceled", "canceled_no_stock", "canceled_wrong_price"],
   return: ["items_are_checked"],
   items_are_checked: ["waiting_for_return"],
   waiting_for_return: ["warranty_initiated", "exchange_initiated"],

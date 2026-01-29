@@ -51,3 +51,15 @@ export async function getContainersByPurchaseOrder(
 
   return data;
 }
+
+export async function deletePOContainer(container_id: string) {
+  const { data } = await apiAdmin.delete(`/po/container/${container_id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data;
+}

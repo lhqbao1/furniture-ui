@@ -242,13 +242,6 @@ const CartSummary = ({
         </div>
       </div>
 
-      {/* <div className="py-10 space-y-4 border-b">
-        <VoucherApply
-          voucherId={voucherId}
-          setVoucherId={setVoucherId}
-        />
-      </div> */}
-
       <div className="pt-10">
         <p>Wir akzeptieren</p>
         <div className="flex gap-2 mt-2 lg:mt-4 flex-wrap">

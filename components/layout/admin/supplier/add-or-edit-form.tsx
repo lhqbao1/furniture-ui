@@ -93,6 +93,7 @@ export default function AddOrEditSupplierForm({
               <FormLabel>Business Name</FormLabel>
               <FormControl>
                 <Input
+                  disabled={supplierValues ? true : false}
                   placeholder="Enter business name"
                   {...field}
                 />
@@ -256,14 +257,14 @@ export default function AddOrEditSupplierForm({
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 </>
               ) : (
-                submitText ?? "Update Supplier"
+                (submitText ?? "Update Supplier")
               )
             ) : createSupplierMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               </>
             ) : (
-              submitText ?? "Create Supplier"
+              (submitText ?? "Create Supplier")
             )}
           </Button>
         </div>

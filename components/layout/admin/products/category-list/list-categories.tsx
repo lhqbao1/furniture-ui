@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner";
 import DeleteDialog from "./delete-dialog";
 import { Button } from "@/components/ui/button";
+import ExportCategory from "./export-category";
 
 interface CategoryItemProps {
   category: CategoryResponse;
@@ -188,8 +189,14 @@ const ListCategories = () => {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-2">
+      <div className="flex gap-2 items-center">
         <AddCategoryDrawer />
+        {categories && (
+          <ExportCategory
+            categories={categories}
+            isFetching={isLoading}
+          />
+        )}
       </div>
 
       <div className="space-y-2">
