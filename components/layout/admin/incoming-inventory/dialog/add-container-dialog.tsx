@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, PlusCircle } from "lucide-react";
+import { Edit, Loader2, Pencil, PlusCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -132,8 +132,16 @@ const AddContainerDialog = ({
           variant="outline"
           size="sm"
         >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Container
+          {isEdit ? (
+            <>
+              <Pencil className="h-4 w-4 text-primary" />
+            </>
+          ) : (
+            <>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Container
+            </>
+          )}
         </Button>
       </DialogTrigger>
 

@@ -9,6 +9,11 @@ import {
 } from "@/components/ui/card";
 import { useGetContainersByPurchaseOrder } from "@/features/incoming-inventory/container/hook";
 import React from "react";
+import AddContainerDialog from "../dialog/add-container-dialog";
+import { formatDateDDMMYYYY, formatDateString } from "@/lib/date-formated";
+import { Trash, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import DeleteDialogConfirm from "../dialog/delete-dialog-confirm";
 
 interface ListContainersProps {
   po_id: string;
@@ -16,20 +21,43 @@ interface ListContainersProps {
 
 const ListContainers = ({ po_id }: ListContainersProps) => {
   const { data, isLoading, isError } = useGetContainersByPurchaseOrder(po_id);
-  console.log(data);
   if (!data) return <div>no</div>;
   return (
     <div className="grid grid-cols-2 gap-4 mt-6">
       {data.map((item, index) => {
+        console.log(item);
         return (
           <Card key={item.id}>
             <CardHeader>
-              <CardTitle>{item.container_number}</CardTitle>
-              <CardDescription>Card Description</CardDescription>
-              <CardAction>Card Action</CardAction>
+              <CardTitle>ID: {item.container_number}</CardTitle>
+              <CardDescription>Size: {item.size}</CardDescription>
+              <CardAction className="space-x-2">
+                <AddContainerDialog
+                  purchaseOrderId={po_id}
+                  container={item}
+                />
+                <DeleteDialogConfirm containerId={item.id} />
+              </CardAction>
             </CardHeader>
             <CardContent>
-              <p>Card Content</p>
+              <div>
+                Date of Shipment:{" "}
+                <span className="text-secondary font-semibold">
+                  {formatDateDDMMYYYY(item.date_if_shipment)}
+                </span>
+              </div>
+              <div>
+                Date of Inspection:{" "}
+                <span className="text-secondary font-semibold">
+                  {formatDateDDMMYYYY(item.date_of_inspection)}
+                </span>
+              </div>
+              <div>
+                Date of Delivery:{" "}
+                <span className="text-secondary font-semibold">
+                  {formatDateDDMMYYYY(item.delivery_date)}
+                </span>
+              </div>
             </CardContent>
             <CardFooter>
               <p>Card Footer</p>
