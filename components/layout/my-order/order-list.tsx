@@ -231,9 +231,7 @@ const OrderList = () => {
                     <div className="px-2 py-2">
                       <div className={cn("text-right text-lg")}>
                         {t("total")}: €
-                        {(
-                          item.total_amount - item.voucher_amount
-                        ).toLocaleString("de-DE", {
+                        {item.total_amount.toLocaleString("de-DE", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}

@@ -124,14 +124,14 @@ export function ProductTable<TData, TValue>({
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={`
-                        ${
-                          hasHeaderBackGround
-                            ? "bg-secondary/10"
-                            : "bg-background"
-                        }
-                        
-                      `}
+                    style={{
+                      width: (header.column.columnDef.meta as any)?.width,
+                      minWidth: (header.column.columnDef.meta as any)?.width,
+                      maxWidth: (header.column.columnDef.meta as any)?.width,
+                    }}
+                    className={`${
+                      hasHeaderBackGround ? "bg-secondary/10" : "bg-background"
+                    }`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -154,7 +154,14 @@ export function ProductTable<TData, TValue>({
                     }
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell
+                        key={cell.id}
+                        style={{
+                          width: (cell.column.columnDef.meta as any)?.width,
+                          minWidth: (cell.column.columnDef.meta as any)?.width,
+                          maxWidth: (cell.column.columnDef.meta as any)?.width,
+                        }}
+                      >
                         {flexRender(cell.column.columnDef.cell, {
                           ...cell.getContext(),
                           expandedRowId,

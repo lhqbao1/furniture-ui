@@ -24,6 +24,9 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
+import { useUpdateStockProduct } from "@/features/products/inventory/hook";
+import { useAtom } from "jotai";
+import { adminIdAtom } from "@/store/auth";
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -48,29 +51,24 @@ function ActionsCell({ product }: { product: ProductItem }) {
 function EditableStockCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState<number | string>(product.stock);
   const [editing, setEditing] = useState(false);
-  const EditProductMutation = useEditProduct();
+  const [adminId, setAdminId] = useAtom(adminIdAtom);
+  const EditProductMutation = useUpdateStockProduct();
+  let quantity = 0;
 
   const handleEditProductStock = () => {
+    if (Number(value) < product.stock) {
+      quantity = -(product.stock - Number(value));
+    } else {
+      quantity = Math.abs(Number(value) - product.stock);
+    }
+
     EditProductMutation.mutate(
       {
-        input: {
-          ...product,
-          stock: Number(value),
-          ...(product.categories?.length
-            ? { category_ids: product.categories.map((c) => c.id) }
-            : {}),
-          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-          brand_id: product.brand ? product.brand.id : null,
+        payload: {
+          product_id: product.id,
+          quantity: quantity,
+          user_id: adminId ?? "",
         },
-        id: product.id,
       },
       {
         onSuccess(data, variables, context) {

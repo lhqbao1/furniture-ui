@@ -51,7 +51,7 @@ export async function deleteInventory(inventoryId: string) {
 }
 
 export async function updateStockProduct(payload: UpdateStockInput) {
-  const { data } = await apiAdmin.put(`/products/update-stock`, payload, {
+  const { data } = await apiAdmin.post(`/products/update-stock`, payload, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
