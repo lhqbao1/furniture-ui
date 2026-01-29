@@ -28,12 +28,7 @@ export function TrustedShopsCheckout({
       >
         <span id="tsCheckoutOrderNr">{orderNumber}</span>
         <span id="tsCheckoutBuyerEmail">{buyerEmail}</span>
-        <span id="tsCheckoutOrderAmount">
-          {amount.toLocaleString("DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </span>
+        <span id="tsCheckoutOrderAmount">{amount.toFixed(2)}</span>
         <span id="tsCheckoutOrderCurrency">EUR</span>
         <span id="tsCheckoutOrderPaymentType">{paymentType}</span>
         <span id="tsCheckoutOrderEstDeliveryDate">{estimatedDeliveryDate}</span>

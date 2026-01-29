@@ -5,6 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { BookA, Container, Pencil } from "lucide-react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
+import DeletePODialog from "./dialog/delete-po-dialog";
 
 function ActionsCell({ po }: { po: PurchaseOrderDetail }) {
   return (
@@ -16,6 +17,7 @@ function ActionsCell({ po }: { po: PurchaseOrderDetail }) {
       <Link href={`/admin/logistic/inventory/incoming/${po.id}`}>
         <BookA className="text-primary cursor-pointer size-5" />
       </Link>
+      <DeletePODialog poId={po.id} />
       {/* {product.inventory && product.inventory.length > 0 ? <ProductInventoryDeleteDialog id={}/> : ""} */}
     </div>
   );
@@ -76,33 +78,42 @@ export const POColumns: ColumnDef<PurchaseOrderDetail>[] = [
 
   {
     accessorKey: "shipping_method",
-    header: "Shipping method",
+    header: () => <div className="text-center">Shipping method</div>,
     cell: ({ row }) => {
-      return <div>{row.original.shipping_method}</div>;
+      return (
+        <div className="text-center uppercase">
+          {row.original.shipping_method}
+        </div>
+      );
     },
   },
 
   {
     accessorKey: "destination",
-    header: "Destination",
+    header: () => <div className="text-center">Destination</div>,
     cell: ({ row }) => {
-      return <div>{row.original.destination}</div>;
+      return <div className="text-center">{row.original.destination}</div>;
     },
   },
 
   {
     accessorKey: "number_of_containers",
-    header: "Containers",
+    header: ({}) => <div className="text-center">Containers</div>,
     cell: ({ row }) => {
-      return <div>{row.original.number_of_containers ?? "-"}</div>;
+      return (
+        <div className="text-center">
+          {row.original.number_of_containers ?? "-"}
+        </div>
+      );
     },
   },
 
   {
     accessorKey: "note",
     header: "Note",
+    meta: { width: 300 },
     cell: ({ row }) => {
-      return <div>{row.original.note ?? "-"}</div>;
+      return <div className="text-wrap">{row.original.note ?? "-"}</div>;
     },
   },
 

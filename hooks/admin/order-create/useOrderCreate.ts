@@ -35,6 +35,14 @@ export function useManualCheckoutLogic(
       invoice_postal_code: "59494",
       invoice_country: "DE",
     },
+    norma: {
+      company_name: "NORMA24 Online-Shop GmbH & Co.KG",
+      tax_id: "DE281146018",
+      invoice_address: "Manfred-Roth-Straße 7",
+      invoice_city: "Fürth",
+      invoice_postal_code: "90766",
+      invoice_country: "DE",
+    },
   };
 
   // -------------------------------------------------------------

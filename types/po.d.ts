@@ -109,6 +109,7 @@ export type POContainerInventoryProductDetail = {
   id_provider: string;
   ean: string;
   image: string;
+  id: string;
 };
 
 export type POContainerInventoryDetail = {

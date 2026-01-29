@@ -18,8 +18,6 @@ export const incomingInventorySchema = z.object({
   seller_id: z.string().uuid("You need to choose seller"),
   bank_id: z.string().uuid("You need to have a bank data of seller"),
 
-  warehouse_id: z.string().uuid("You need to choose warehouse"),
-
   customer_po_order: z.string().optional().nullable(),
 
   payment_terms: z.string().min(1, "Payment terms is required"),
