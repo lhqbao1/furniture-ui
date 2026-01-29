@@ -28,13 +28,11 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
 
   const { data, isLoading, isError } = useGetPurchaseOrderDetail(id);
 
-  console.log(data);
-
   const [selectedsellerId, setSelectedsellerId] = useState<string | null>(null);
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
-    null,
-  );
+  // const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
+  //   null,
+  // );
 
   const editPOMutation = useUpdatePurchaseOrder();
   const form = useForm<z.infer<typeof incomingInventorySchema>>({
@@ -77,7 +75,7 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
     // 2️⃣ sync state cho các select
     setSelectedBuyerId(data.buyer.id);
     setSelectedsellerId(data.seller.id);
-    setSelectedWarehouseId(data.warehouse.id);
+    // setSelectedWarehouseId(data.warehouse.id);
   }, [data, form]);
 
   function handleSubmit(data: z.infer<typeof incomingInventorySchema>) {
@@ -123,10 +121,10 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
             selectedsellerId={selectedsellerId}
             setSelectedsellerId={setSelectedsellerId}
           />
-          <WarehouseInformation
+          {/* <WarehouseInformation
             selectedWarehouseId={selectedWarehouseId}
             setSelectedWarehouseId={setSelectedWarehouseId}
-          />
+          /> */}
           <POInformation />
         </div>
         <div className="mt-4 flex gap-2">
