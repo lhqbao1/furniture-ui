@@ -598,23 +598,25 @@ export const getProductColumns = (
   },
   {
     accessorKey: "name",
+    meta: { width: "200px" },
     header: ({ column }) => (
-      <Button
-        variant={"ghost"}
-        className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        <div>NAME</div>
-        <div className="mb-0.5">
-          {{
-            asc: "↑",
-            desc: "↓",
-          }[column.getIsSorted() as string] ?? "↕"}
-        </div>
-      </Button>
+      <>NAME</>
+      // <Button
+      //   variant={"ghost"}
+      //   className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
+      //   onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      // >
+      //   <div>NAME</div>
+      //   <div className="mb-0.5">
+      //     {{
+      //       asc: "↑",
+      //       desc: "↓",
+      //     }[column.getIsSorted() as string] ?? "↕"}
+      //   </div>
+      // </Button>
     ),
     // cell: ({ row }) => <EditableNameCell product={row.original} />,
-    cell: ({ row }) => <div>{row.original.name}</div>,
+    cell: ({ row }) => <div className="text-wrap">{row.original.name}</div>,
     enableSorting: true,
   },
   {
@@ -641,10 +643,11 @@ export const getProductColumns = (
   },
   {
     accessorKey: "owner",
+    meta: { width: "200px" },
     header: ({}) => <div className="text-center">SUPPLIER</div>,
     cell: ({ row }) => {
       return (
-        <div className="text-center">
+        <div className="text-center text-wrap line-clamp-2">
           <EditTableSupplierCell product={row.original} />
         </div>
       );

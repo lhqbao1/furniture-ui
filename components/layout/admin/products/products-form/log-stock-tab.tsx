@@ -21,10 +21,6 @@ const LogStockTab = ({ productDetail }: LogStockTabProps) => {
           <div className="font-semibold uppercase">Quantity:</div>
           <div className="font-semibold uppercase">Note:</div>
         </div>
-        {/* <div className="grid grid-cols-2 col-span-1">
-          <div className="font-semibold uppercase">User Email:</div>
-          <div className="font-semibold uppercase">Updated at:</div>
-        </div> */}
       </div>
       {productDetail.log_stocks?.map((item, index) => {
         return (
@@ -32,26 +28,24 @@ const LogStockTab = ({ productDetail }: LogStockTabProps) => {
             key={item.id}
             className="grid grid-cols-2 gap-6 mt-1.5"
           >
-            {item.main_checkout && (
-              <div className="grid grid-cols-6 gap-4 col-span-2">
-                <div className="text-sm">
-                  {formatDateTimeString(item.created_at)}
-                </div>
-                <div className="text-sm">
-                  {item.main_checkout?.from_marketplace
-                    ? item.main_checkout.from_marketplace.toUpperCase()
-                    : "Prestige Home"}
-                </div>
-                <div className="text-sm"></div>
-                <div className="text-sm">
-                  {item.main_checkout ? item.main_checkout.checkout_code : ""}
-                </div>
-                <div className="text-sm">{item.quantity}</div>
-                <div className="text-sm">
-                  {item.user ? item.user.email : ""}
-                </div>
+            <div className="grid grid-cols-6 gap-4 col-span-2">
+              <div className="text-sm">
+                {formatDateTimeString(item.created_at)}
               </div>
-            )}
+              <div className="text-sm">
+                {item.main_checkout?.from_marketplace
+                  ? item.main_checkout.from_marketplace.toUpperCase()
+                  : "Prestige Home"}
+              </div>
+              <div className="text-sm"></div>
+              <div className="text-sm">
+                {item.main_checkout ? item.main_checkout.checkout_code : ""}
+              </div>
+              <div className="text-sm">{item.quantity}</div>
+              <div className="text-sm text-wrap truncate">
+                {item.user ? item.user.email : ""}
+              </div>
+            </div>
             {/* {item.user && (
               <div className="grid grid-cols-2 col-span-1">
                 <div>{item.user ? item.user.email : ""}</div>

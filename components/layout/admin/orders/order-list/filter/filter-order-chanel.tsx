@@ -20,6 +20,7 @@ export const CHANEL_OPTIONS = [
   { key: "freakout", label: "Freakout" },
   { key: "praktiker", label: "Praktiker" },
   { key: "netto", label: "Netto" },
+  { key: "norma", label: "Norma24" },
   { key: "inprodius", label: "Inprodius" },
 ];
 

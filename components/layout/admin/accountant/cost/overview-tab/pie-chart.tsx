@@ -21,6 +21,7 @@ const chartConfig = {
     label: "Marketplaces",
   },
   praktiker: { label: "Praktiker" },
+  norma: { label: "Norma24" },
   amazon: { label: "Amazon" },
   freakout: { label: "Freakout" },
   netto: { label: "Netto" },
@@ -32,6 +33,7 @@ const chartConfig = {
 
 const MARKETPLACE_COLORS: Record<string, string> = {
   praktiker: "#01A1F7",
+  norma: "#01A1F7",
   amazon: "#FF9900",
   freakout: "#7C3AED",
   netto: "#FAD85B",

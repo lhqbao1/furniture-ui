@@ -14,6 +14,7 @@ import { formatDateDDMMYYYY, formatDateString } from "@/lib/date-formated";
 import { Trash, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DeleteDialogConfirm from "../dialog/delete-dialog-confirm";
+import InventorySelect from "./inventory-select";
 
 interface ListContainersProps {
   po_id: string;
@@ -25,7 +26,6 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
   return (
     <div className="grid grid-cols-2 gap-4 mt-6">
       {data.map((item, index) => {
-        console.log(item);
         return (
           <Card key={item.id}>
             <CardHeader>
@@ -60,7 +60,7 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
               </div>
             </CardContent>
             <CardFooter>
-              <p>Card Footer</p>
+              <InventorySelect containerId={item.id} />
             </CardFooter>
           </Card>
         );

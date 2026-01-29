@@ -103,14 +103,21 @@ export type POContainerDetail = {
   updated_at: string; // ISO string
 };
 
+export type POContainerInventoryProductDetail = {
+  name: string;
+  sku: string;
+  id_provider: string;
+  ean: string;
+  image: string;
+};
+
 export type POContainerInventoryDetail = {
-  container_id: string;
-  product_id: string;
+  id: string;
   quantity: number;
   unit_cost: number;
   total_cost: number;
   description: string;
-  id: string;
+  product: POContainerInventoryProductDetail;
 
   created_at: string; // ISO string
   updated_at: string; // ISO string

@@ -49,6 +49,7 @@ export function useUpdateStockProduct() {
 
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["product"] });
+      qc.invalidateQueries({ queryKey: ["products"] });
     },
   });
 }
