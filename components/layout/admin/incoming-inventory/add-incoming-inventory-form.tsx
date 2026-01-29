@@ -25,9 +25,9 @@ function getLocalISOString() {
 const AddIncomingInventoryForm = () => {
   const [selectedsellerId, setSelectedsellerId] = useState<string | null>(null);
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
-    null,
-  );
+  // const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
+  //   null,
+  // );
 
   const createPOMutation = useCreatePurchaseOrder();
   const form = useForm<z.infer<typeof incomingInventorySchema>>({
@@ -55,7 +55,7 @@ const AddIncomingInventoryForm = () => {
         form.reset();
         setSelectedsellerId(null);
         setSelectedBuyerId(null);
-        setSelectedWarehouseId(null);
+        // setSelectedWarehouseId(null);
       },
       onError(error, variables, context) {
         toast.error("Create purchase order fail");
