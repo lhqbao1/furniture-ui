@@ -10,6 +10,7 @@ import {
   cancelMainCheckout,
   cancelNoStockOrder,
   cancelOrder,
+  cancelWrongPrice,
   changeOrderReturnStatus,
   createCheckOut,
   createDeliveryOrder,
@@ -226,6 +227,23 @@ export function useCancelNoStockOrder() {
   return useMutation({
     mutationFn: (main_checkout_id: string) =>
       cancelNoStockOrder(main_checkout_id),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({ queryKey: ["checkout-user-id"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables],
+      });
+    },
+  });
+}
+
+export function useCancelWrongPriceOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (main_checkout_id: string) =>
+      cancelWrongPrice(main_checkout_id),
     onSuccess: (data, variables) => {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });

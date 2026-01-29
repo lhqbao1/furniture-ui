@@ -57,3 +57,25 @@ export const containerDefaultValues: ContainerValues = {
   date_if_shipment: "",
   delivery_date: "",
 };
+
+export const containerInventorySchema = z.object({
+  product_id: z.string().min(1, "You must select a product"),
+
+  quantity: z.number().min(1, "Quantity is required"),
+
+  unit_cost: z.number().min(1, "Unit cost is required"),
+
+  total_cost: z.number().min(1, "Total cost is required"),
+
+  description: z.string().min(1, "Description is required"),
+});
+
+export type ContainerInventoryValues = z.infer<typeof containerInventorySchema>;
+
+export const containerInventoryDefaultValues: ContainerInventoryValues = {
+  product_id: "",
+  quantity: 0,
+  unit_cost: 0,
+  total_cost: 0,
+  description: "",
+};
