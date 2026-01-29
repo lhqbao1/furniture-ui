@@ -43,7 +43,6 @@ const AddIncomingInventoryForm = () => {
       payment_terms: "",
       buyer_id: "",
       seller_id: "",
-      warehouse_id: "",
       created_by: "admin",
       bank_id: "",
     },
@@ -87,10 +86,10 @@ const AddIncomingInventoryForm = () => {
             selectedsellerId={selectedsellerId}
             setSelectedsellerId={setSelectedsellerId}
           />
-          <WarehouseInformation
+          {/* <WarehouseInformation
             selectedWarehouseId={selectedWarehouseId}
             setSelectedWarehouseId={setSelectedWarehouseId}
-          />
+          /> */}
           <POInformation />
         </div>
         <Button

@@ -8,6 +8,7 @@ import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { useGetBrands } from "@/features/brand/hook";
 import React, { useState } from "react";
+import ExportBrand from "@/components/layout/admin/products/brand/export-button";
 
 const BrandListPage = () => {
   const [page, setPage] = useState(1);
@@ -23,8 +24,14 @@ const BrandListPage = () => {
       <div className="space-y-12">
         <div className="section-header">Product Brands</div>
         <div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
             <AddBrandDialog />
+            {data && (
+              <ExportBrand
+                brands={data}
+                isFetching={isLoading}
+              />
+            )}
           </div>
           {isLoading || !data ? (
             <ProductTableSkeleton />

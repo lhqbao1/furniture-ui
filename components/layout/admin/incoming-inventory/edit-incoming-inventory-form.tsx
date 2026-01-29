@@ -50,7 +50,6 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       payment_terms: "",
       buyer_id: "",
       seller_id: "",
-      warehouse_id: "",
       created_by: "admin",
       bank_id: "",
     },
@@ -71,7 +70,6 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       payment_terms: data.payment_terms ?? "",
       buyer_id: data.buyer.id,
       seller_id: data.seller.id,
-      warehouse_id: data.warehouse.id,
       created_by: "admin",
       bank_id: data.seller.bank_info?.id ?? "",
     });

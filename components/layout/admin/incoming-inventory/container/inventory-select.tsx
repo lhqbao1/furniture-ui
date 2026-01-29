@@ -22,11 +22,12 @@ import { toast } from "sonner";
 import {
   createInventoryPo,
   getContainerInventory,
+  updateInventoryPo,
 } from "@/features/incoming-inventory/inventory/api";
 import { useDeleteInventoryPo } from "@/features/incoming-inventory/inventory/hook";
 
 interface SelectedInventoryItem {
-  inventory_po_id?: string; // 👈 CÓ nếu là data từ API
+  inventory_po_id?: string;
   product_id?: string;
   name: string;
   image?: string;
@@ -37,7 +38,18 @@ interface SelectedInventoryItem {
   description?: string;
   total_cost: number;
 
-  isNew?: boolean; // 👈 item mới thêm, chưa save
+  isNew?: boolean;
+
+  original?: {
+    quantity: number;
+    unit_cost: number;
+    description?: string;
+    total_cost: number;
+  };
+}
+
+interface InventorySelectProps {
+  containerId: string;
 }
 
 function useDebounce<T>(value: T, delay = 400): T {
@@ -54,10 +66,6 @@ function useDebounce<T>(value: T, delay = 400): T {
   }, [value, delay]);
 
   return debouncedValue;
-}
-
-interface InventorySelectProps {
-  containerId: string;
 }
 
 const InventorySelect = ({ containerId }: InventorySelectProps) => {
@@ -167,11 +175,24 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
   const handleSave = async () => {
     if (!validateItems()) return;
 
+    const newItems = items.filter((i) => i.isNew);
+    const updatedItems = items.filter(
+      (i) => !i.isNew && i.inventory_po_id && isItemChanged(i),
+    );
+
+    if (newItems.length === 0 && updatedItems.length === 0) {
+      toast.info("Nothing to save", {
+        description: "No changes detected.",
+      });
+      return;
+    }
+
     try {
-      for (const item of items) {
+      // CREATE
+      for (const item of newItems) {
         await createInventoryPo({
           container_id: containerId,
-          product_id: item.product_id ?? "",
+          product_id: item.product_id!,
           quantity: item.quantity,
           unit_cost: item.unit_cost,
           total_cost: item.total_cost,
@@ -179,11 +200,23 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
         });
       }
 
-      toast.success("Inventory saved", {
-        description: "All products have been created successfully.",
+      // UPDATE
+      for (const item of updatedItems) {
+        await updateInventoryPo(item.inventory_po_id!, {
+          container_id: containerId,
+          product_id: item.product_id!,
+          quantity: item.quantity,
+          unit_cost: item.unit_cost,
+          total_cost: item.total_cost,
+          description: item.description,
+        });
+      }
+
+      toast.success("Inventory updated", {
+        description: `Added ${newItems.length}, updated ${updatedItems.length}`,
       });
 
-      setItems([]); // optional: clear form
+      await fetchInventory(); // reload lại state chuẩn từ backend
     } catch (error) {
       toast.error("Failed to save inventory", {
         description: "Please try again.",
@@ -191,35 +224,53 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
     }
   };
 
-  useEffect(() => {
-    if (!containerId) return;
+  const fetchInventory = async () => {
+    try {
+      const data = await getContainerInventory(containerId);
 
-    const fetchInventory = async () => {
-      try {
-        const data = await getContainerInventory(containerId);
+      const mappedItems: SelectedInventoryItem[] = data.map((item) => ({
+        inventory_po_id: item.id,
+        product_id: item.product.id,
+        name: item.product.name,
+        image: item.product.image ? item.product.image : "/1.png",
+        provider_id: item.product.id_provider,
 
-        const mappedItems: SelectedInventoryItem[] = data.map((item) => ({
-          inventory_po_id: item.id, // 👈 RẤT QUAN TRỌNG
-          product_id: item.product.id_provider, // ✅ product id ĐÚNG
-          name: item.product.name,
-          image: item.product.image ? item.product.image : "/1.png",
-          provider_id: item.product.id_provider,
+        quantity: item.quantity,
+        unit_cost: item.unit_cost,
+        total_cost: item.total_cost,
+        description: item.description ?? "",
 
+        isNew: false,
+
+        original: {
           quantity: item.quantity,
           unit_cost: item.unit_cost,
           total_cost: item.total_cost,
           description: item.description ?? "",
+        },
+      }));
 
-          isNew: false,
-        }));
+      setItems(mappedItems);
+    } catch (error) {
+      toast.error("Failed to load inventory", {
+        description: "Could not fetch container inventory.",
+      });
+    }
+  };
 
-        setItems(mappedItems);
-      } catch (error) {
-        toast.error("Failed to load inventory", {
-          description: "Could not fetch container inventory.",
-        });
-      }
-    };
+  const isItemChanged = (item: SelectedInventoryItem) => {
+    if (!item.original) return false;
+
+    return (
+      item.quantity !== item.original.quantity ||
+      item.unit_cost !== item.original.unit_cost ||
+      item.total_cost !== item.original.total_cost ||
+      (item.description ?? "") !== (item.original.description ?? "")
+    );
+  };
+
+  useEffect(() => {
+    if (!containerId) return;
 
     fetchInventory();
   }, [containerId]);
