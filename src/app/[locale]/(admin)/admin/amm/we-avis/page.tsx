@@ -254,7 +254,7 @@ const AmmWeAvisPage = () => {
           />
           <FormField
             control={form.control}
-            name="kopfdaten.delivery_date"
+            name="kopfdaten.date_of_issue"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Delivery Date</FormLabel>

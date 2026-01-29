@@ -76,11 +76,16 @@ const AddContainerDialog = ({
     if (!container) return;
 
     form.reset({
-      container_number: container.container_number,
-      size: container.size,
-      date_of_inspection: container.date_of_inspection.slice(0, 10),
-      date_if_shipment: container.date_if_shipment.slice(0, 10),
-      delivery_date: container.delivery_date.slice(0, 10),
+      size: container.size ?? "",
+      date_of_inspection: container.date_of_inspection
+        ? container.date_of_inspection.slice(0, 10)
+        : "",
+      date_if_shipment: container.date_if_shipment
+        ? container.date_if_shipment.slice(0, 10)
+        : "",
+      date_of_issue: container.date_of_issue
+        ? container.date_of_issue.slice(0, 10)
+        : "",
     });
   }, [container, form]);
 
@@ -165,21 +170,6 @@ const AddContainerDialog = ({
             })}
             className="grid grid-cols-2 gap-4"
           >
-            {/* Container Number */}
-            <FormField
-              control={form.control}
-              name="container_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Container Number</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Size (Select) */}
             <FormField
               control={form.control}
@@ -214,7 +204,6 @@ const AddContainerDialog = ({
                 </FormItem>
               )}
             />
-
             {/* Date of Inspection */}
             <FormField
               control={form.control}
@@ -232,7 +221,6 @@ const AddContainerDialog = ({
                 </FormItem>
               )}
             />
-
             {/* Date of Shipment */}
             <FormField
               control={form.control}
@@ -250,14 +238,13 @@ const AddContainerDialog = ({
                 </FormItem>
               )}
             />
-
             {/* Delivery Date */}
             <FormField
               control={form.control}
-              name="delivery_date"
+              name="date_of_issue"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Delivery Date</FormLabel>
+                  <FormLabel>Date of issue</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
@@ -268,7 +255,6 @@ const AddContainerDialog = ({
                 </FormItem>
               )}
             />
-
             {/* Actions */}
             <div className="col-span-2 flex justify-end gap-2 pt-2">
               <Button

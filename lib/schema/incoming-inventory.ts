@@ -35,25 +35,22 @@ export const incomingInventorySchema = z.object({
 export type IncomingInventoryValues = z.infer<typeof incomingInventorySchema>;
 
 export const containerSchema = z.object({
-  container_number: z.string().min(1, "Container number is required"),
-
   size: z.string().min(1, "Container size is required"),
 
   date_of_inspection: z.string().min(1, "Date of inspection is required"),
 
   date_if_shipment: z.string().min(1, "Date of shipment is required"),
 
-  delivery_date: z.string().min(1, "Delivery date is required"),
+  date_of_issue: z.string().min(1, "Delivery date is required"),
 });
 
 export type ContainerValues = z.infer<typeof containerSchema>;
 
 export const containerDefaultValues: ContainerValues = {
-  container_number: "",
   size: "",
   date_of_inspection: "",
   date_if_shipment: "",
-  delivery_date: "",
+  date_of_issue: "",
 };
 
 export const containerInventorySchema = z.object({

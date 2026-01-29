@@ -29,8 +29,7 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
         return (
           <Card key={item.id}>
             <CardHeader>
-              <CardTitle>ID: {item.container_number}</CardTitle>
-              <CardDescription>Size: {item.size}</CardDescription>
+              <CardTitle>Size: {item.size}</CardTitle>
               <CardAction className="space-x-2">
                 <AddContainerDialog
                   purchaseOrderId={po_id}
@@ -55,7 +54,7 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
               <div>
                 Date of Delivery:{" "}
                 <span className="text-secondary font-semibold">
-                  {formatDateDDMMYYYY(item.delivery_date)}
+                  {formatDateDDMMYYYY(item.date_of_issue)}
                 </span>
               </div>
             </CardContent>
