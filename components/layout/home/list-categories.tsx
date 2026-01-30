@@ -46,10 +46,10 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
         </div>
       ) : (
         <NavigationMenu viewport={isMobile}>
-          <NavigationMenuList className="gap-x-6 gap-y-2 w-[90%] xl:w-full flex-wrap mx-auto">
+          <NavigationMenuList className="gap-x-2 gap-y-2 w-[90%] xl:w-full flex-wrap mx-auto">
             {categories.map((category) => (
               <NavigationMenuItem key={category.id}>
-                <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer">
+                <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2">
                   <Link
                     href={`/category/${category.slug}`}
                     locale={locale}

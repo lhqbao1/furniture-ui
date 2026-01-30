@@ -29,6 +29,11 @@ import { CSS } from "@dnd-kit/utilities";
 import { StaticFileResponse } from "@/types/products";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+  restrictToWindowEdges,
+} from "@dnd-kit/modifiers";
 
 // ================== TYPES ==================
 export type ImageItem = { id: string; url: string };
@@ -214,7 +219,12 @@ function ImagePickerInput<T extends FieldValues>({
   );
 
   return (
-    <div className={cn("col-span-12 grid grid-cols-12 gap-4", className)}>
+    <div
+      className={cn(
+        "col-span-12 overflow-x-hidden grid grid-cols-12 gap-4",
+        className,
+      )}
+    >
       {/* Dropzone */}
       <div
         {...getRootProps()}
@@ -296,13 +306,14 @@ function ImagePickerInput<T extends FieldValues>({
         ) : null
       ) : items.length > 0 ? (
         <div
-          className={`overflow-y-auto ${
+          className={`overflow-y-auto overflow-x-hidden ${
             isAddProduct ? "col-span-9" : "col-span-12"
           }`}
         >
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            modifiers={[restrictToParentElement]}
             onDragEnd={({ active, over }) => {
               if (!over || active.id === over.id) return;
               const oldIndex = items.findIndex((it) => it.id === active.id);
@@ -321,14 +332,13 @@ function ImagePickerInput<T extends FieldValues>({
               items={items.map((i) => i.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="w-full h-fit grid grid-cols-4 gap-4 ">
+              <div className="w-full h-fit grid grid-cols-4 gap-4">
                 {items.map((it, idx) => (
-                  <div key={it.id}>
-                    <SortableImage
-                      item={it}
-                      onRemove={() => removeImage(idx)}
-                    />
-                  </div>
+                  <SortableImage
+                    key={it.id}
+                    item={it}
+                    onRemove={() => removeImage(idx)}
+                  />
                 ))}
               </div>
             </SortableContext>
