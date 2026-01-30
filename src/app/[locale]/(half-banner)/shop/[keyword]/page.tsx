@@ -18,11 +18,13 @@ type PageParams = {
 export async function generateMetadata({
   params,
 }: {
-  params: PageParams;
+  params: Promise<PageParams>;
 }): Promise<Metadata> {
+  const { keyword } = await params; // ✅ BẮT BUỘC
+
   const keywords = await getAllKeywords();
 
-  const rawKeyword = decodeURIComponent(params.keyword);
+  const rawKeyword = decodeURIComponent(keyword);
   const readable = rawKeyword.replaceAll("-", " ");
 
   // 🔍 tìm keyword tương ứng
@@ -49,9 +51,11 @@ export const revalidate = 300; // ISR
 export default async function ShopKeywordPage({
   params,
 }: {
-  params: PageParams;
+  params: Promise<PageParams>;
 }) {
-  const keywordSlug = decodeURIComponent(params.keyword);
+  const { keyword } = await params; // ✅ BẮT BUỘC
+
+  const keywordSlug = decodeURIComponent(keyword);
   const searchText = keywordSlug.replaceAll("-", " ");
 
   // 🔹 fetch song song (tối ưu)

@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import DeleteDialog from "./delete-dialog";
 import { useLocale } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -367,22 +366,24 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
 
 function ToggleProductStatus({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
-  const hasMarketplace =
-    product.marketplace_products?.some((item) => item.is_active === true) ??
-    false;
-
-  const isIncomplete =
-    product.static_files.length === 0 ||
-    !product.name ||
-    !product.final_price ||
-    !product.brand ||
-    !product.delivery_time ||
-    !product.carrier ||
-    product.categories.length === 0;
 
   const handleToggleStatus = () => {
+    const missingFields: string[] = [];
+
+    if (product.static_files.length === 0) missingFields.push("Images");
+    if (!product.name) missingFields.push("Product name");
+    if (!product.final_price) missingFields.push("Final price");
+    if (!product.brand) missingFields.push("Brand");
+    if (!product.delivery_time) missingFields.push("Delivery time");
+    if (!product.carrier) missingFields.push("Carrier");
+    if (product.categories.length === 0) missingFields.push("Categories");
+
+    const isIncomplete = missingFields.length > 0;
+
     if (isIncomplete && product.is_active === false) {
-      toast.error("Product information is incomplete");
+      toast.error("Product information is incomplete", {
+        description: `Missing: ${missingFields.join(", ")}`,
+      });
       return;
     }
 

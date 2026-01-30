@@ -31,8 +31,24 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
     product.categories.length === 0;
 
   const handleToggleStatus = () => {
+    const missingFields: string[] = [];
+
+    if (product.static_files.length === 0) missingFields.push("Images");
+    if (!product.name) missingFields.push("Product name");
+    if (!product.final_price) missingFields.push("Final price");
+    if (!product.cost) missingFields.push("Net Purchase Cost");
+    if (!product.delivery_cost) missingFields.push("Delivery cost");
+    if (!product.brand) missingFields.push("Brand");
+    if (!product.delivery_time) missingFields.push("Delivery time");
+    if (!product.carrier) missingFields.push("Carrier");
+    if (product.categories.length === 0) missingFields.push("Categories");
+
+    const isIncomplete = missingFields.length > 0;
+
     if (isIncomplete && product.is_active === false) {
-      toast.error("Product information is incomplete");
+      toast.error("Product information is incomplete", {
+        description: `Missing: ${missingFields.join(", ")}`,
+      });
       return;
     }
 

@@ -18,9 +18,11 @@ import {
   getProductByTag,
   getProductsAlgoliaSearch,
   GetProductsSearchParams,
+  updateBulkActiveProducts,
 } from "./api";
 import { ProductInput } from "@/lib/schema/product";
 import { ProductItem, ProductResponse } from "@/types/products";
+import { toast } from "sonner";
 interface SEOInput {
   title: string;
   description: string;
@@ -29,6 +31,12 @@ interface GetProductByTagParams {
   is_customer?: boolean;
   is_econelo?: boolean;
 }
+
+interface BulkActivePayload {
+  productIds: string[];
+  isActive: boolean;
+}
+
 export function useGetAllProducts({
   page,
   page_size,
@@ -96,6 +104,31 @@ export function useProductsAlgoliaSearch(params?: GetProductsSearchParams) {
     refetchOnWindowFocus: false,
   });
 }
+
+export const useUpdateBulkActiveProducts = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ productIds, isActive }: BulkActivePayload) =>
+      updateBulkActiveProducts(productIds, isActive),
+
+    onSuccess: () => {
+      toast.success("Products updated successfully");
+
+      // 🔄 refetch / invalidate product list
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
+    },
+
+    onError: (error: any) => {
+      toast.error("Failed to update products", {
+        description:
+          error?.response?.data?.message ?? "Please try again later.",
+      });
+    },
+  });
+};
 
 export function useDeleteProduct() {
   const qc = useQueryClient();

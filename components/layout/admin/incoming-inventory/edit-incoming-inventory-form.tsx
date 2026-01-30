@@ -30,9 +30,6 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
 
   const [selectedsellerId, setSelectedsellerId] = useState<string | null>(null);
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
-  // const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
-  //   null,
-  // );
 
   const editPOMutation = useUpdatePurchaseOrder();
   const form = useForm<z.infer<typeof incomingInventorySchema>>({
@@ -122,9 +119,9 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
             setSelectedsellerId={setSelectedsellerId}
           />
           {/* <WarehouseInformation
-            selectedWarehouseId={selectedWarehouseId}
-            setSelectedWarehouseId={setSelectedWarehouseId}
-          /> */}
+              selectedWarehouseId={selectedWarehouseId}
+              setSelectedWarehouseId={setSelectedWarehouseId}
+            /> */}
           <POInformation />
         </div>
         <div className="mt-4 flex gap-2">

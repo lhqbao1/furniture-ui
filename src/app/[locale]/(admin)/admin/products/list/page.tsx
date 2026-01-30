@@ -17,6 +17,7 @@ const ProductList = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -70,6 +71,7 @@ const ProductList = () => {
         exportData={[]}
         setPage={setPage}
         type={ToolbarType.product}
+        product_ids={selectedProductIds} // 👈 thêm prop nếu cần
       />
 
       {isLoading ? (
@@ -85,6 +87,7 @@ const ProductList = () => {
           totalItems={data?.pagination.total_items ?? 0}
           totalPages={data?.pagination.total_pages ?? 0}
           hasHeaderBackGround
+          onSelectionChange={setSelectedProductIds} // 👈 đây
         />
       )}
     </div>

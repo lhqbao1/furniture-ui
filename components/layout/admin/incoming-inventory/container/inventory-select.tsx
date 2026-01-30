@@ -15,7 +15,14 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { Check, Loader2, Plus, Trash2 } from "lucide-react";
+import {
+  Check,
+  Loader2,
+  Pencil,
+  PencilOffIcon,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ProductItem } from "@/types/products";
 import { toast } from "sonner";
@@ -25,6 +32,7 @@ import {
   updateInventoryPo,
 } from "@/features/incoming-inventory/inventory/api";
 import { useDeleteInventoryPo } from "@/features/incoming-inventory/inventory/hook";
+import { useUpdatePurchaseOrder } from "@/features/incoming-inventory/po/hook";
 
 interface SelectedInventoryItem {
   inventory_po_id?: string;
@@ -39,6 +47,7 @@ interface SelectedInventoryItem {
   total_cost: number;
 
   isNew?: boolean;
+  isEditing?: boolean; // 👈 thêm
 
   original?: {
     quantity: number;
@@ -50,6 +59,7 @@ interface SelectedInventoryItem {
 
 interface InventorySelectProps {
   containerId: string;
+  po_id: string;
 }
 
 function useDebounce<T>(value: T, delay = 400): T {
@@ -68,12 +78,14 @@ function useDebounce<T>(value: T, delay = 400): T {
   return debouncedValue;
 }
 
-const InventorySelect = ({ containerId }: InventorySelectProps) => {
+const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 400);
 
   const { mutate: deleteInventoryPoMutate, isPending } =
     useDeleteInventoryPo(containerId);
+
+  const editPOMutation = useUpdatePurchaseOrder();
 
   const { data: products, isLoading } = useGetAllProducts({
     search: debouncedSearch,
@@ -102,6 +114,7 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
           unit_cost: 0,
           total_cost: 0,
           isNew: true,
+          isEditing: true, // 👈 NEW item edit được ngay
         },
       ];
     });
@@ -216,6 +229,15 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
         description: `Added ${newItems.length}, updated ${updatedItems.length}`,
       });
 
+      // 👇 ĐẶT Ở ĐÂY
+      setItems((prev) =>
+        prev.map((i) => ({
+          ...i,
+          isEditing: false,
+          isNew: false,
+        })),
+      );
+
       await fetchInventory(); // reload lại state chuẩn từ backend
     } catch (error) {
       toast.error("Failed to save inventory", {
@@ -241,6 +263,7 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
         description: item.description ?? "",
 
         isNew: false,
+        isEditing: false, // 👈 LOCK
 
         original: {
           quantity: item.quantity,
@@ -357,8 +380,7 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
                 <th className="p-2">Qty</th>
                 <th className="p-2">Unit cost</th>
                 <th className="p-2">Total</th>
-                <th className="p-2">Description</th>
-                <th className="p-2"></th>
+                <th className="p-2">Actions</th>
               </tr>
             </thead>
 
@@ -387,6 +409,7 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
                         type="number"
                         min={0}
                         value={item.quantity}
+                        disabled={!item.isEditing}
                         onChange={(e) => {
                           const quantity = Number(e.target.value);
                           setItems((prev) =>
@@ -409,6 +432,7 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
                         type="number"
                         min={0}
                         value={item.unit_cost}
+                        disabled={!item.isEditing}
                         onChange={(e) => {
                           const unit_cost = Number(e.target.value);
                           setItems((prev) =>
@@ -430,7 +454,29 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
                       €{item.total_cost.toFixed(2)}
                     </td>
 
-                    <td className="p-2 text-right">
+                    <td className="p-2 text-right flex justify-end gap-1 h-full">
+                      {/* EDIT */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() =>
+                          setItems((prev) =>
+                            prev.map((p, i) =>
+                              i === index
+                                ? { ...p, isEditing: !p.isEditing }
+                                : p,
+                            ),
+                          )
+                        }
+                      >
+                        {item.isEditing ? (
+                          <PencilOffIcon className="h-4 w-4 text-primary" />
+                        ) : (
+                          <Pencil className="h-4 w-4 text-primary" />
+                        )}
+                      </Button>
+
+                      {/* DELETE */}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -448,9 +494,12 @@ const InventorySelect = ({ containerId }: InventorySelectProps) => {
                       className="p-2 pt-0"
                     >
                       <textarea
-                        className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm
+             focus:outline-none focus:ring-2 focus:ring-ring
+             disabled:opacity-50"
                         placeholder="Description / note"
                         value={item.description ?? ""}
+                        disabled={!item.isEditing}
                         onChange={(e) =>
                           setItems((prev) =>
                             prev.map((p, i) =>

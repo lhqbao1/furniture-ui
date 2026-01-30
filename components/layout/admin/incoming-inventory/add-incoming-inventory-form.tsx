@@ -25,9 +25,6 @@ function getLocalISOString() {
 const AddIncomingInventoryForm = () => {
   const [selectedsellerId, setSelectedsellerId] = useState<string | null>(null);
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
-  // const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
-  //   null,
-  // );
 
   const createPOMutation = useCreatePurchaseOrder();
   const form = useForm<z.infer<typeof incomingInventorySchema>>({

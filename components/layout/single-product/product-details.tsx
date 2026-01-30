@@ -80,9 +80,6 @@ const ProductDetails = ({
                   <div className="text-sm">
                     {t("itemNumber")}: {productDetails.id_provider ?? ""}
                   </div>
-                  <div className="text-sm">
-                    GTIN: {productDetails.ean ?? ""}
-                  </div>
                 </div>
                 <ListStarsReview reviews={reviews} />
 

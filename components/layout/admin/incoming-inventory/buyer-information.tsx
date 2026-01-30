@@ -67,9 +67,34 @@ const BuyerInformation = ({
   useEffect(() => {
     if (!selectedBuyerId || !buyer) return;
 
+    const data = buyer.find((b) => b.id === selectedBuyerId);
+    if (!data) return;
     handleSelectBuyer(selectedBuyerId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataUpdatedAt, selectedBuyerId]);
+
+    // ❗ CHỈ set react-hook-form, KHÔNG setSelectedBuyerId
+    setValue("buyer_id", data.id);
+    setValue("buyer_name", data.name);
+    setValue("buyer_address", data.address);
+    setValue("buyer_city", data.city);
+    setValue("buyer_country", data.country);
+    setValue("buyer_postal_code", data.postal_code);
+  }, [buyer, selectedBuyerId, setValue]);
+  // ⛔ CHẶN render Select khi data chưa sẵn sàng
+  if (isLoading || !buyer) {
+    return (
+      <Card className="col-span-3">
+        <CardHeader className="text-xl font-semibold">
+          Buyer Information
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2">
+            <Loader2 className="animate-spin h-4 w-4" />
+            Loading buyers...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="col-span-3">

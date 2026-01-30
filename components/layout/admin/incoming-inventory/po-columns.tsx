@@ -62,17 +62,40 @@ export const POColumns: ColumnDef<PurchaseOrderDetail>[] = [
   },
   {
     accessorKey: "customer_po_order",
-    header: "Customer PO Order",
+    header: () => <div className="text-center">Customer PO Order</div>,
     cell: ({ row }) => {
-      return <div>{row.original.customer_po_order ?? "-"}</div>;
+      return (
+        <div className="text-center">
+          {row.original.customer_po_order ?? "-"}
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "buyer",
+    header: () => <div className="text-center">BUYER</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.buyer.name}</div>;
+    },
+  },
+
+  {
+    accessorKey: "seller",
+    meta: { width: 300 },
+    header: () => <div className="text-center">SELLER</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center text-wrap">{row.original.seller.name}</div>
+      );
     },
   },
 
   {
     accessorKey: "loading_port",
-    header: "Loading Port",
+    header: () => <div className="text-center">Loading Port</div>,
     cell: ({ row }) => {
-      return <div>{row.original.loading_port}</div>;
+      return <div className="text-center">{row.original.loading_port}</div>;
     },
   },
 
@@ -113,7 +136,9 @@ export const POColumns: ColumnDef<PurchaseOrderDetail>[] = [
     header: "Note",
     meta: { width: 300 },
     cell: ({ row }) => {
-      return <div className="text-wrap">{row.original.note ?? "-"}</div>;
+      return (
+        <div className="text-wrap line-clamp-2">{row.original.note ?? "-"}</div>
+      );
     },
   },
 

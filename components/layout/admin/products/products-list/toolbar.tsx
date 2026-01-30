@@ -37,6 +37,7 @@ import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
 import FilterExportForm from "./toolbar/filter-export-dialog";
 import { cn } from "@/lib/utils";
+import UpdateStatusDialog from "./toolbar/bulk-update/status-dialog";
 
 export enum ToolbarType {
   product = "product",
@@ -55,6 +56,7 @@ interface TableToolbarProps {
   addButtonModalContent?: React.ReactNode;
   exportData?: ProductItem[];
   type: ToolbarType;
+  product_ids?: string[];
 }
 
 type ImageFile = {
@@ -75,6 +77,7 @@ export default function TableToolbar({
   addButtonModalContent,
   exportData,
   type,
+  product_ids,
 }: TableToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -83,6 +86,7 @@ export default function TableToolbar({
   const [openAddModal, setOpenAddModal] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [hasShownSpaceToast, setHasShownSpaceToast] = useState(false);
+  const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
 
   const pathname = usePathname();
   const defaultSearch = searchParams.get("search") ?? "";
@@ -196,9 +200,16 @@ export default function TableToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Delete Selected</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setOpenUpdateStatus(true)}>
+              Update Status
+            </DropdownMenuItem>
             <DropdownMenuItem>Export Selected</DropdownMenuItem>
           </DropdownMenuContent>
+          <UpdateStatusDialog
+            open={openUpdateStatus}
+            onOpenChange={setOpenUpdateStatus}
+            productIds={product_ids ?? []}
+          />
         </DropdownMenu>
 
         <div className="flex gap-2 text-sm font-medium">
