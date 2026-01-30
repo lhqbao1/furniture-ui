@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { title } from "process";
 import { createManualCheckOut } from "@/features/checkout/api";
+import ExportExampleOrderExcelButton from "./export-example-button";
 
 const PRESET_BY_MARKETPLACE: Record<string, any> = {
   netto: {
@@ -222,6 +223,7 @@ const OrderImport = () => {
         <DialogHeader>
           <DialogTitle>Import Orders</DialogTitle>
         </DialogHeader>
+        <ExportExampleOrderExcelButton />
 
         {/* CHOOSE CHANNEL FIRST */}
         <div className="mt-2">
@@ -229,8 +231,11 @@ const OrderImport = () => {
             onValueChange={setChannel}
             defaultValue={channel ?? undefined}
           >
-            <SelectTrigger className="border">
-              <SelectValue placeholder="Select marketplace" />
+            <SelectTrigger
+              className="border"
+              placeholderColor
+            >
+              <SelectValue placeholder="Select channel" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="amazon">Amazon</SelectItem>

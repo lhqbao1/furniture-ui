@@ -23,8 +23,8 @@ import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook"
 import { Loader2 } from "lucide-react";
 import AddBankDialog from "./dialog/add-bank-dialog";
 import AddContactPersonDialog from "./dialog/add-contact-person-dialog";
-import { se } from "date-fns/locale";
 import { toast } from "sonner";
+import { CustomerDetail } from "@/types/po";
 
 interface SellerInformationProps {
   selectedsellerId: string | null;
@@ -39,14 +39,36 @@ const SellerInformation = ({
   const [selectedContactPersonId, setSelectedContactPersonId] = useState<
     string | null
   >(null);
+  const [selectedSeller, setSelectedSeller] = useState<CustomerDetail>();
 
   const { data: seller, isLoading, dataUpdatedAt } = useGetAllCustomers();
+
+  const clearBankAndContact = () => {
+    setSelectedBankId(null);
+    setSelectedContactPersonId(null);
+
+    // bank
+    setValue("bank_id", "");
+    setValue("bank_name", "");
+    setValue("bank_address", "");
+    setValue("bank_account_no", "");
+    setValue("bank_account_name", "");
+    setValue("bank_swift", "");
+    setValue("bank_currency", "");
+
+    // contact person
+    setValue("contact_person_id", "");
+    setValue("contact_person_name", "");
+    setValue("contact_person_email", "");
+    setValue("contact_person_phone_number", "");
+  };
 
   const handleSelectSeller = (sellerId: string) => {
     if (sellerId === "__CLEAR__") {
       setSelectedsellerId(null);
-      setSelectedBankId(null);
-      setSelectedContactPersonId(null);
+      setSelectedSeller(undefined);
+
+      clearBankAndContact();
 
       setValue("seller_id", "");
 
@@ -55,18 +77,12 @@ const SellerInformation = ({
       setValue("city", "");
       setValue("country", "");
       setValue("postal_code", "");
-
-      setValue("bank_name", "");
-      setValue("bank_address", "");
-      setValue("bank_account_no", "");
-      setValue("bank_account_name", "");
-      setValue("bank_swift", "");
-      setValue("bank_currency", "");
-
-      setValue("contact_person_name", "");
-      setValue("contact_person_email", "");
-      setValue("contact_person_phone_number", "");
       return;
+    }
+
+    // 🔥 Nếu đổi sang seller KHÁC → clear trước
+    if (sellerId !== selectedsellerId) {
+      clearBankAndContact();
     }
 
     setSelectedsellerId(sellerId);
@@ -75,6 +91,7 @@ const SellerInformation = ({
     if (!data) return;
 
     setValue("seller_id", sellerId);
+    setSelectedSeller(data);
 
     // =====================
     // Seller info (safe)
@@ -84,61 +101,63 @@ const SellerInformation = ({
     setValue("city", data.city ?? "");
     setValue("country", data.country ?? "");
     setValue("postal_code", data.postal_code ?? "");
+  };
 
-    // =====================
-    // Bank info (REQUIRED)
-    // =====================
-    if (!data.bank_info) {
+  const handleSelectBank = (bank_info_id: string) => {
+    if (bank_info_id === "__CLEAR__") {
+      // ❌ Clear selection
       setSelectedBankId(null);
 
-      toast.error("Missing bank information", {
-        description:
-          "This seller does not have bank information yet. Bank information is required.",
-      });
-
-      // clear bank fields
+      // 🔥 clear all bank-related fields
       setValue("bank_name", "");
       setValue("bank_address", "");
       setValue("bank_account_no", "");
       setValue("bank_account_name", "");
       setValue("bank_swift", "");
       setValue("bank_currency", "");
-    } else {
-      setSelectedBankId(data.bank_info.id);
 
-      setValue("bank_id", data.bank_info.id);
-      setValue("bank_name", data.bank_info.bank_name ?? "");
-      setValue("bank_address", data.bank_info.address ?? "");
-      setValue("bank_account_no", data.bank_info.account_no ?? "");
-      setValue("bank_account_name", data.bank_info.account_name ?? "");
-      setValue("bank_swift", data.bank_info.swift_code ?? "");
-      setValue("bank_currency", data.bank_info.currency ?? "");
+      return;
     }
 
-    // =====================
-    // Contact person (OPTIONAL)
-    // =====================
-    if (!data.contact_person) {
+    setSelectedBankId(bank_info_id);
+
+    const data = selectedSeller?.bank_infos?.find((b) => b.id === bank_info_id);
+    if (!data) return;
+
+    // ✅ autofill bank fields
+    setValue("bank_id", data.id);
+    setValue("bank_name", data.bank_name ?? "");
+    setValue("bank_address", data.address ?? "");
+    setValue("bank_account_no", data.account_no ?? "");
+    setValue("bank_account_name", data.account_name ?? "");
+    setValue("bank_swift", data.swift_code ?? "");
+    setValue("bank_currency", data.currency ?? "");
+  };
+
+  const handleSelectContactPerson = (contact_person_id: string) => {
+    if (contact_person_id === "__CLEAR__") {
+      // ❌ Clear selection
       setSelectedContactPersonId(null);
 
-      toast.warning("Missing contact person", {
-        description:
-          "This seller does not have a contact person. You can add one if needed.",
-      });
-
+      // 🔥 clear all bank-related fields
       setValue("contact_person_name", "");
       setValue("contact_person_email", "");
       setValue("contact_person_phone_number", "");
-    } else {
-      setSelectedContactPersonId(data.contact_person.id);
-
-      setValue("contact_person_name", data.contact_person.name ?? "");
-      setValue("contact_person_email", data.contact_person.email ?? "");
-      setValue(
-        "contact_person_phone_number",
-        data.contact_person.phone_number ?? "",
-      );
+      return;
     }
+
+    setSelectedContactPersonId(contact_person_id);
+
+    const data = selectedSeller?.contact_persons?.find(
+      (b) => b.id === contact_person_id,
+    );
+    if (!data) return;
+
+    // ✅ autofill bank fields
+    setValue("contact_person_id", data.id ?? "");
+    setValue("contact_person_name", data.name ?? "");
+    setValue("contact_person_email", data.email ?? "");
+    setValue("contact_person_phone_number", data.phone_number ?? "");
   };
 
   useEffect(() => {
@@ -308,103 +327,158 @@ const SellerInformation = ({
               {selectedBankId && (
                 <AddBankDialog bank_info_id={selectedBankId} />
               )}
+              {!selectedsellerId && (
+                <span className="text-sm text-red-400">
+                  (Need to select seller first)
+                </span>
+              )}
             </div>
-            <div className="grid grid-cols-6 gap-4 overflow-hidden mt-1.5">
-              {/* ===== Bank Name ===== */}
-              <FormField
-                control={control}
-                name="bank_name"
-                render={({ field }) => (
-                  <FormItem className="col-span-3">
-                    <FormLabel>Bank Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {selectedsellerId && (
+              <div className="grid grid-cols-6 gap-4 overflow-hidden mt-1.5">
+                {/* ===== Select Bank ===== */}
+                <FormItem className="grid gap-2 col-span-6 min-w-0">
+                  <FormLabel className="text-sm w-full">Select Bank</FormLabel>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Select onValueChange={handleSelectBank}>
+                      <FormControl>
+                        <SelectTrigger className="flex-1 min-w-0 border">
+                          <SelectValue
+                            className="truncate"
+                            placeholder="Select a banks"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
 
-              {/* ===== Bank Address ===== */}
-              <FormField
-                control={control}
-                name="bank_address"
-                render={({ field }) => (
-                  <FormItem className="col-span-3">
-                    <FormLabel>Bank Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <SelectContent className="pointer-events-auto">
+                        {/* 🔹 Clear option */}
+                        <SelectItem value="__CLEAR__">
+                          — Clear selection —
+                        </SelectItem>
 
-              {/* ===== Bank City ===== */}
-              <FormField
-                control={control}
-                name="bank_account_no"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Bank Account Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        {isLoading ? (
+                          <div className="flex justify-center py-2">
+                            <Loader2 className="animate-spin h-4 w-4" />
+                          </div>
+                        ) : !selectedSeller?.bank_infos ||
+                          selectedSeller.bank_infos.length === 0 ? (
+                          <div className="px-3 py-2 text-sm text-muted-foreground">
+                            No bank information available
+                          </div>
+                        ) : (
+                          selectedSeller.bank_infos.map((b) => (
+                            <SelectItem
+                              key={b.id}
+                              value={b.id}
+                            >
+                              {b.bank_name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {selectedBankId && (
+                      <AddBankDialog bank_info_id={selectedBankId} />
+                    )}
+                    {/* 🔹 Edit button */}
+                  </div>
+                </FormItem>
 
-              {/* ===== Bank Country ===== */}
-              <FormField
-                control={control}
-                name="bank_swift"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Bank Swift Code</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* ===== Bank Name ===== */}
+                <FormField
+                  control={control}
+                  name="bank_name"
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormLabel>Bank Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {/* ===== Bank Postal Code ===== */}
-              <FormField
-                control={control}
-                name="bank_currency"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Currecy</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                {/* ===== Bank Address ===== */}
+                <FormField
+                  control={control}
+                  name="bank_address"
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormLabel>Bank Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* ===== Bank City ===== */}
+                <FormField
+                  control={control}
+                  name="bank_account_no"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Bank Account Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* ===== Bank Country ===== */}
+                <FormField
+                  control={control}
+                  name="bank_swift"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Bank Swift Code</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* ===== Bank Postal Code ===== */}
+                <FormField
+                  control={control}
+                  name="bank_currency"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Currecy</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
           </div>
 
           <div className="mt-4 flex flex-col gap-4">
@@ -418,65 +492,124 @@ const SellerInformation = ({
                   contact_person_id={selectedContactPersonId}
                 />
               )}
+              {!selectedsellerId && (
+                <span className="text-sm text-red-400">
+                  (Need to select seller first)
+                </span>
+              )}
             </div>
-            <div className="grid grid-cols-6 gap-4 overflow-hidden mt-3">
-              {/* ===== Contact Person Name ===== */}
-              <FormField
-                control={control}
-                name="contact_person_name"
-                render={({ field }) => (
-                  <FormItem className="col-span-3">
-                    <FormLabel>Contact Person Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {selectedsellerId && (
+              <div className="grid grid-cols-6 gap-4 overflow-hidden mt-3">
+                {/* ===== Select Bank ===== */}
+                <FormItem className="grid gap-2 col-span-6 min-w-0">
+                  <FormLabel className="text-sm w-full">
+                    Select Contact Person
+                  </FormLabel>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Select onValueChange={handleSelectContactPerson}>
+                      <FormControl>
+                        <SelectTrigger className="flex-1 min-w-0 border">
+                          <SelectValue
+                            className="truncate"
+                            placeholder="Select a contact person"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
 
-              {/* ===== Contact Person Email ===== */}
-              <FormField
-                control={control}
-                name="contact_person_email"
-                render={({ field }) => (
-                  <FormItem className="col-span-3">
-                    <FormLabel>Contact Person Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <SelectContent className="pointer-events-auto">
+                        {/* 🔹 Clear option */}
+                        <SelectItem value="__CLEAR__">
+                          — Clear selection —
+                        </SelectItem>
 
-              {/* ===== Contact Person Phone ===== */}
-              <FormField
-                control={control}
-                name="contact_person_phone_number"
-                render={({ field }) => (
-                  <FormItem className="col-span-3">
-                    <FormLabel>Contact Person Phone</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        disabled
-                        value={field.value ?? ""}
+                        {isLoading ? (
+                          <div className="flex justify-center py-2">
+                            <Loader2 className="animate-spin h-4 w-4" />
+                          </div>
+                        ) : !selectedSeller?.contact_persons ||
+                          selectedSeller.contact_persons.length === 0 ? (
+                          <div className="px-3 py-2 text-sm text-muted-foreground">
+                            No contact person information available
+                          </div>
+                        ) : (
+                          selectedSeller.contact_persons.map((b) => (
+                            <SelectItem
+                              key={b.id}
+                              value={b.id}
+                            >
+                              {b.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {selectedContactPersonId && (
+                      <AddContactPersonDialog
+                        contact_person_id={selectedContactPersonId}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                    )}
+                    {/* 🔹 Edit button */}
+                  </div>
+                </FormItem>
+
+                {/* ===== Contact Person Name ===== */}
+                <FormField
+                  control={control}
+                  name="contact_person_name"
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormLabel>Contact Person Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* ===== Contact Person Email ===== */}
+                <FormField
+                  control={control}
+                  name="contact_person_email"
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormLabel>Contact Person Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* ===== Contact Person Phone ===== */}
+                <FormField
+                  control={control}
+                  name="contact_person_phone_number"
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormLabel>Contact Person Phone</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
