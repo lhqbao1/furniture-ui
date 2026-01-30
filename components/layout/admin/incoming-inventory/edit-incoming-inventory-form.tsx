@@ -30,9 +30,6 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
 
   const [selectedsellerId, setSelectedsellerId] = useState<string | null>(null);
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
-  // const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(
-  //   null,
-  // );
 
   const editPOMutation = useUpdatePurchaseOrder();
   const form = useForm<z.infer<typeof incomingInventorySchema>>({

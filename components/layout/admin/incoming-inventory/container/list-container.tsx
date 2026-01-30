@@ -59,7 +59,10 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
               </div>
             </CardContent>
             <CardFooter>
-              <InventorySelect containerId={item.id} />
+              <InventorySelect
+                containerId={item.id}
+                po_id={po_id}
+              />
             </CardFooter>
           </Card>
         );

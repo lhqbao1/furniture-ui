@@ -65,7 +65,7 @@ const PRESET_BY_MARKETPLACE: Record<string, any> = {
 };
 
 const normalize = (row: any, preset: any, channel: string) => {
-  const hasCompany = preset?.company_name || row["company_name"];
+  const hasCompany = preset?.company_name ?? row["company_name"];
 
   return {
     email: row["email"]?.trim() ?? "guest",
@@ -76,14 +76,14 @@ const normalize = (row: any, preset: any, channel: string) => {
       ? preset.company_name
       : row["company_name"] || null,
 
-    address: row["address"]?.trim() || null,
-    additional_address: row["additional_address"]?.trim() || null,
-    recipient_name: row["recipient_name"] || null,
-    city: row["city"] || null,
-    country: row["country"] || null,
-    phone: row["phone"] || null,
-    postal_code: row["postal_code"]?.toString().trim() || null,
-    email_shipping: row["email_shipping"] || null,
+    address: row["address"]?.trim() ?? null,
+    additional_address: row["additional_address"]?.trim() ?? null,
+    recipient_name: row["recipient_name"] ?? null,
+    city: row["city"] ?? null,
+    country: row["country"] ?? null,
+    phone: row["phone"] ?? null,
+    postal_code: row["postal_code"]?.toString().trim() ?? null,
+    email_shipping: row["email_shipping"] ?? null,
 
     invoice_address: preset?.invoice_address ?? row["invoice_address"] ?? null,
     invoice_recipient_name:
@@ -97,12 +97,12 @@ const normalize = (row: any, preset: any, channel: string) => {
 
     from_marketplace: channel.toLowerCase().trim(),
     marketplace_order_id:
-      row["marketplace_order_id"]?.toString().trim() || null,
+      row["marketplace_order_id"]?.toString().trim() ?? null,
 
-    id_provider: row["id_provider"]?.toString().trim() || null,
+    id_provider: row["id_provider"]?.toString().trim() ?? null,
     quantity: Number(row["quantity"] ?? 1),
-    title: row["title"] || null,
-    sku: row["sku"] || null,
+    title: row["title"] ?? null,
+    sku: row["sku"] ?? null,
     final_price: Number(row["final_price"] ?? 1),
     tax:
       row["country"] === "DE"
@@ -112,9 +112,9 @@ const normalize = (row: any, preset: any, channel: string) => {
             ? 0
             : 20
           : null,
-    status: row["status"] || null,
-    payment_term: row["payment_term"] || null,
-    total_shipping: row["total_shipping"] || 35.95,
+    status: row["status"] ?? null,
+    payment_term: row["payment_term"] ?? null,
+    total_shipping: row["total_shipping"] ?? 35.95,
     vat: Number(row["vat"]),
   };
 };
@@ -200,6 +200,7 @@ const OrderImport = () => {
       for (const order of orders) {
         await createManualCheckOut(order);
       }
+      console.log(orders);
 
       toast.success("All orders created successfully!", { id: toastId });
     } catch (err: any) {

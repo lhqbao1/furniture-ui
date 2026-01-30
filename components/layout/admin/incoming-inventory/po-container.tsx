@@ -3,6 +3,8 @@ import { useGetPurchaseOrderDetail } from "@/features/incoming-inventory/po/hook
 import React from "react";
 import AddContainerDialog from "./dialog/add-container-dialog";
 import ListContainers from "./container/list-container";
+import { Button } from "@/components/ui/button";
+import AdminBackButton from "../admin-back-button";
 
 interface POContainerProps {
   id: string;
@@ -16,6 +18,9 @@ const POContainer = ({ id }: POContainerProps) => {
       <h2 className="text-secondary text-center">
         Containers of {data?.po_number}
       </h2>
+      <div className="text-left mb-2">
+        <AdminBackButton />
+      </div>
       {data && (
         <div className="text-left ">
           <AddContainerDialog purchaseOrderId={id} />
