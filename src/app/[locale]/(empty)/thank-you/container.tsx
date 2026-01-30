@@ -356,7 +356,6 @@ const OrderPlaced = () => {
 
   //Trusted shop init
   useEffect(() => {
-    console.log(checkout);
     if (!checkout) return;
     if (trustedShopData) return; // ❗ chỉ set 1 lần
 

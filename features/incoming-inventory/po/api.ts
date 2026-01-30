@@ -2,6 +2,10 @@ import { apiAdmin } from "@/lib/axios";
 import { IncomingInventoryValues } from "@/lib/schema/incoming-inventory";
 import { PurchaseOrderDetail } from "@/types/po";
 
+export interface UpdatePONumberOfContainerInput {
+  number_of_containers: number;
+}
+
 export async function createPurchaseOrder(input: IncomingInventoryValues) {
   const { data } = await apiAdmin.post("/po/purchase-order", input, {
     headers: {
@@ -17,6 +21,25 @@ export async function createPurchaseOrder(input: IncomingInventoryValues) {
 export async function updatePurchaseOrder(
   purchaseOrderId: string,
   input: IncomingInventoryValues,
+) {
+  const { data } = await apiAdmin.put(
+    `/po/purchase-order/${purchaseOrderId}`,
+    input,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    },
+  );
+
+  return data;
+}
+
+export async function updatePurchaseOrderNumberOfContainer(
+  purchaseOrderId: string,
+  input: UpdatePONumberOfContainerInput,
 ) {
   const { data } = await apiAdmin.put(
     `/po/purchase-order/${purchaseOrderId}`,

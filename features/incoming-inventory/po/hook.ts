@@ -4,7 +4,9 @@ import {
   deletePurchaseOrder,
   getAllPurchaseOrders,
   getPurchaseOrderDetail,
+  UpdatePONumberOfContainerInput,
   updatePurchaseOrder,
+  updatePurchaseOrderNumberOfContainer,
 } from "./api";
 import { IncomingInventoryValues } from "@/lib/schema/incoming-inventory";
 import { PurchaseOrderDetail } from "@/types/po";
@@ -12,6 +14,11 @@ import { PurchaseOrderDetail } from "@/types/po";
 type UpdatePurchaseOrderInput = {
   purchaseOrderId: string;
   data: IncomingInventoryValues;
+};
+
+type UpdatePONumberOfContainersInput = {
+  purchaseOrderId: string;
+  input: UpdatePONumberOfContainerInput;
 };
 
 export const PURCHASE_ORDER_QUERY_KEY = ["purchase-orders"];
@@ -36,6 +43,25 @@ export function useUpdatePurchaseOrder() {
   return useMutation({
     mutationFn: ({ purchaseOrderId, data }: UpdatePurchaseOrderInput) =>
       updatePurchaseOrder(purchaseOrderId, data),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: PURCHASE_ORDER_QUERY_KEY,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["purchase-order-detail", variables.purchaseOrderId],
+      });
+    },
+  });
+}
+
+export function useUpdatePONumberOfContainers() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ purchaseOrderId, input }: UpdatePONumberOfContainersInput) =>
+      updatePurchaseOrderNumberOfContainer(purchaseOrderId, input),
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

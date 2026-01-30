@@ -66,7 +66,7 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       buyer_id: data.buyer.id,
       seller_id: data.seller.id,
       created_by: "admin",
-      bank_id: data.seller.bank_info?.id ?? "",
+      bank_id: data.seller.bank_infos[0]?.id ?? "",
     });
 
     // 2️⃣ sync state cho các select

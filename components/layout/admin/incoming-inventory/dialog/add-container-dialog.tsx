@@ -41,6 +41,10 @@ import {
 } from "@/features/incoming-inventory/container/hook";
 import { toast } from "sonner";
 import { getFirstErrorMessage } from "@/lib/get-first-error";
+import {
+  useUpdatePONumberOfContainers,
+  useUpdatePurchaseOrder,
+} from "@/features/incoming-inventory/po/hook";
 
 const CONTAINER_SIZES = [
   "01X40GP",
@@ -53,16 +57,19 @@ const CONTAINER_SIZES = [
 interface AddContainerDialogProps {
   purchaseOrderId: string; // 👈 nhận từ cha
   container?: POContainerDetail;
+  currentContainer?: number;
 }
 
 const AddContainerDialog = ({
   purchaseOrderId,
   container,
+  currentContainer,
 }: AddContainerDialogProps) => {
   const [open, setOpen] = useState(false);
   const isEdit = !!container;
   const createContainerMutation = useCreatePOContainer();
   const updateContainerMutation = useUpdatePOContainer();
+  const updatePOMutation = useUpdatePONumberOfContainers();
 
   const isSubmitting =
     createContainerMutation.isPending || updateContainerMutation.isPending;
@@ -112,9 +119,16 @@ const AddContainerDialog = ({
         },
       );
     } else {
+      console.log(currentContainer);
       createContainerMutation.mutate(payload, {
         onSuccess: () => {
           toast.success("Container created successfully");
+          updatePOMutation.mutate({
+            input: {
+              number_of_containers: (currentContainer ?? 0) + 1,
+            },
+            purchaseOrderId: purchaseOrderId,
+          });
           setOpen(false);
         },
         onError: () => {

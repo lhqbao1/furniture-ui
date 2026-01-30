@@ -14,7 +14,7 @@ const POContainer = ({ id }: POContainerProps) => {
   const { data, isLoading, isError } = useGetPurchaseOrderDetail(id);
 
   return (
-    <div>
+    <div className="mb-6">
       <h2 className="text-secondary text-center">
         Containers of {data?.po_number}
       </h2>
@@ -23,7 +23,10 @@ const POContainer = ({ id }: POContainerProps) => {
       </div>
       {data && (
         <div className="text-left ">
-          <AddContainerDialog purchaseOrderId={id} />
+          <AddContainerDialog
+            purchaseOrderId={id}
+            currentContainer={data.number_of_containers ?? 0}
+          />
         </div>
       )}
       <ListContainers po_id={id} />

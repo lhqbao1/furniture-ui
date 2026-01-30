@@ -24,11 +24,28 @@ import { Check } from "lucide-react";
 import { useGetProductsSelect } from "@/features/product-group/hook";
 import DownloadCSVStamm from "@/components/layout/admin/amm/download-csv-stamm";
 import Link from "next/link";
+import { useGetAllProducts } from "@/features/products/hook";
+
+function useDebounce<T>(value: T, delay = 400): T {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
+
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 const AMMProductImportPage = () => {
   const [selectedProduct, setSelectedProduct] =
     React.useState<ProductItem | null>(null);
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const debouncedSearch = useDebounce(search, 400);
 
   const importAmmProductMutation = useImportProductToAmm();
 
@@ -60,8 +77,10 @@ const AMMProductImportPage = () => {
     data: products,
     isLoading,
     isError,
-  } = useGetProductsSelect({
-    all_products: true,
+  } = useGetAllProducts({
+    page_size: 20,
+    page: 1,
+    search: debouncedSearch, // 👈 dùng debounce
   });
 
   return (
@@ -83,30 +102,42 @@ const AMMProductImportPage = () => {
           </PopoverTrigger>
 
           <PopoverContent className="w-[600px] p-0">
-            <Command>
-              <CommandInput placeholder="Search products..." />
+            <Command shouldFilter={false}>
+              <CommandInput
+                placeholder="Search products..."
+                value={search}
+                onValueChange={setSearch}
+              />
+
               <CommandGroup className="max-h-[300px] overflow-y-auto">
-                {products?.map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    onSelect={() => handleSelectProduct(product)}
-                  >
-                    <div className="flex gap-2 items-center">
-                      <Image
-                        src={product.static_files?.[0]?.url ?? "/1.png"}
-                        width={30}
-                        height={30}
-                        alt=""
-                      />
-                      <div>
-                        <div className="truncate">{product.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {product.id_provider}
+                {isLoading && (
+                  <div className="py-4 text-center text-sm text-muted-foreground">
+                    Searching...
+                  </div>
+                )}
+
+                {!isLoading &&
+                  products?.items?.map((product) => (
+                    <CommandItem
+                      key={product.id}
+                      onSelect={() => handleSelectProduct(product)}
+                    >
+                      <div className="flex gap-2 items-center">
+                        <Image
+                          src={product.static_files?.[0]?.url ?? "/1.png"}
+                          width={30}
+                          height={30}
+                          alt=""
+                        />
+                        <div>
+                          <div className="truncate">{product.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {product.id_provider}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CommandItem>
-                ))}
+                    </CommandItem>
+                  ))}
               </CommandGroup>
             </Command>
           </PopoverContent>
