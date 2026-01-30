@@ -74,6 +74,12 @@ const ProductDetailsProperties = ({
           ) : (
             ""
           )}
+          {product.ean && (
+            <div className="grid grid-cols-2 lg:w-1/2 w-full">
+              <div>GTIN:</div>
+              <div>{product.ean}</div>
+            </div>
+          )}
         </div>
       </div>
 

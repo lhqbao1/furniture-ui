@@ -17,10 +17,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CustomPagination } from "@/components/shared/custom-pagination";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CheckOut } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
 import { getDeliveryOrderColumns } from "@/components/layout/cart/columns";
+import { ProductItem } from "@/types/products";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -43,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   hasHeaderBackGround?: boolean;
   renderRowSubComponent?: (row: any) => React.ReactNode;
   isSticky?: boolean;
+  onSelectionChange?: (ids: string[]) => void; // 👈 thêm
 }
 
 export function ProductTable<TData, TValue>({
@@ -65,6 +67,7 @@ export function ProductTable<TData, TValue>({
   hasCount = true,
   hasHeaderBackGround = false,
   isSticky = false,
+  onSelectionChange,
   renderRowSubComponent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -93,6 +96,18 @@ export function ProductTable<TData, TValue>({
       setExpandedRowId,
     },
   });
+
+  const selectedProductIds = React.useMemo(
+    () =>
+      table
+        .getSelectedRowModel()
+        .rows.map((row) => (row.original as ProductItem).id),
+    [rowSelection], // 👈 chỉ đổi khi selection đổi
+  );
+
+  useEffect(() => {
+    onSelectionChange?.(selectedProductIds);
+  }, [selectedProductIds]);
 
   const transformCartItems = (cartItems: CartItem[]): CartItem[] => {
     return cartItems.flatMap((item) => {

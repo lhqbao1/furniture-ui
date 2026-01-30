@@ -54,6 +54,28 @@ interface GetProductByTagParams {
   is_econelo?: boolean;
 }
 
+export async function updateBulkActiveProducts(
+  productIds: string[],
+  isActive: boolean,
+) {
+  const { data } = await apiAdmin.patch(
+    "/products/update-bulk-active",
+    {
+      product_ids: productIds,
+      is_active: isActive,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    },
+  );
+
+  return data;
+}
+
 export async function CreateProduct(input: ProductInput) {
   const { data } = await apiAdmin.post("/products/", input, {
     headers: {

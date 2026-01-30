@@ -119,9 +119,9 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
             setSelectedsellerId={setSelectedsellerId}
           />
           {/* <WarehouseInformation
-            selectedWarehouseId={selectedWarehouseId}
-            setSelectedWarehouseId={setSelectedWarehouseId}
-          /> */}
+              selectedWarehouseId={selectedWarehouseId}
+              setSelectedWarehouseId={setSelectedWarehouseId}
+            /> */}
           <POInformation />
         </div>
         <div className="mt-4 flex gap-2">
