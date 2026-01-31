@@ -716,6 +716,11 @@ export const listChanel = [
     name: "norma",
     icon: "norma.jpg",
   },
+  {
+    id: 11,
+    name: "econelo",
+    icon: "econelo-favicon.png",
+  },
 ];
 
 export const listDE = [
