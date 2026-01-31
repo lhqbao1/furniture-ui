@@ -1,5 +1,8 @@
 import { getProductBySlug, getProductsFeed } from "@/features/products/api";
-import { getProductGroupDetail } from "@/features/product-group/api";
+import {
+  getAllProductsSelect,
+  getProductGroupDetail,
+} from "@/features/product-group/api";
 import type { Metadata } from "next";
 import { StaticFile } from "@/types/products";
 
@@ -31,7 +34,10 @@ interface PageProps {
  * 1) STATIC PARAMS
  * ------------------------------------------------------*/
 export async function generateStaticParams() {
-  const products = await getProductsFeed();
+  const products = await getAllProductsSelect({
+    is_econelo: false,
+    all_products: true,
+  });
   const locales = ["de"];
 
   return products
