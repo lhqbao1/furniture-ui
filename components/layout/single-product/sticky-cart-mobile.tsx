@@ -49,7 +49,7 @@ export default function MobileStickyCart({
       <div className="px-4 py-3">
         {/* Price */}
         <div className="flex gap-2 items-center justify-end">
-          {oldPrice && (
+          {oldPrice && oldPrice > price && (
             <div className="text-sm line-through text-gray-400">
               €
               {(oldPrice * quantity).toLocaleString("de-DE", {
@@ -96,7 +96,7 @@ export default function MobileStickyCart({
             <ShoppingCart className="mr-1 h-4 w-4" />
             {t("addToCart")}
           </Button> */}
-            <Button
+            {/* <Button
               type="button"
               className="px-4 bg-primary hover:bg-primary/90 text-white w-full h-full uppercase text-lg"
               onClick={() => {
@@ -104,8 +104,32 @@ export default function MobileStickyCart({
                 router.push("/cart", { locale });
               }}
             >
-              {t("buyNow")}
-            </Button>
+              {t("addToCart")}
+            </Button> */}
+            {maxStock > 0 ? (
+              <Button
+                className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
+                type="button"
+                onClick={() => {
+                  onAddToCart?.(); // ✅ gọi hàm
+                  router.push("/cart", { locale });
+                }}
+                // disabled={productDetails.stock > 0 ? false : true}
+              >
+                {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
+                {t("addToCart")}
+              </Button>
+            ) : (
+              <Button
+                className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base w-full lg:min-h-[40px] lg:h-fit !h-[40px] bg-gray-500 text-white cursor-not-allowed"
+                type="button"
+                disabled
+                // disabled={productDetails.stock > 0 ? false : true}
+              >
+                {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
+                {t("addToCart")}
+              </Button>
+            )}
           </div>
         </div>
       </div>

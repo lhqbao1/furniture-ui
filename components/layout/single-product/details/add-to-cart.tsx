@@ -61,7 +61,9 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
 
   const maxStock = useMemo(() => {
     return (
-      productDetails.stock + getTotalIncomingStock(productDetails.inventory)
+      productDetails.stock -
+      (productDetails.result_stock ?? 0) +
+      getTotalIncomingStock(productDetails.inventory)
     );
   }, [productDetails.stock, productDetails.inventory]);
 
@@ -109,9 +111,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             </div>
 
             <div className="space-y-2 lg:basis-2/5 basis-3/5 relative flex gap-2">
-              {productDetails.stock > 0 ||
-              (productDetails.stock === 0 &&
-                getTotalIncomingStock(productDetails.inventory) > 0) ? (
+              {maxStock > 0 ? (
                 <Button
                   className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
                   type="submit"
