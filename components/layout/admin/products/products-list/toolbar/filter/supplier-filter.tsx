@@ -62,8 +62,12 @@ const SupplierFilter = () => {
 
     const params = new URLSearchParams(searchParams.toString());
 
+    // supplier filter
     if (!value) params.delete("supplier_id");
     else params.set("supplier_id", value);
+
+    // ✅ reset page
+    params.set("page", "1");
 
     router.push(`?${params.toString()}`, { scroll: false });
   };

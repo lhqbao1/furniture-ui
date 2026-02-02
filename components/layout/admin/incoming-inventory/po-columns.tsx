@@ -132,17 +132,6 @@ export const POColumns: ColumnDef<PurchaseOrderDetail>[] = [
   },
 
   {
-    accessorKey: "note",
-    header: "Note",
-    meta: { width: 200 },
-    cell: ({ row }) => {
-      return (
-        <div className="text-wrap line-clamp-2">{row.original.note ?? "-"}</div>
-      );
-    },
-  },
-
-  {
     id: "actions",
     header: ({}) => <div className="text-center">ACTION</div>,
     cell: ({ row }) => <ActionsCell po={row.original} />,

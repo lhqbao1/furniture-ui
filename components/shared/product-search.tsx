@@ -87,25 +87,6 @@ export default function ProductSearch({
 
   const results = data?.items ?? [];
 
-  /* ----------- SYNC STATE → URL (shop-all only) ----------- */
-
-  // React.useEffect(() => {
-  //   if (!isShopAllPage) return;
-
-  //   const params = new URLSearchParams(searchParams.toString());
-  //   const current = params.get("search") ?? "";
-
-  //   if (current === debouncedQuery) return;
-
-  //   if (debouncedQuery) {
-  //     params.set("search", debouncedQuery);
-  //   } else {
-  //     params.delete("search");
-  //   }
-
-  //   router.replace(`/shop-all?${params.toString()}`, { locale });
-  // }, [debouncedQuery, isShopAllPage]);
-
   /* ---------------- DROPDOWN ---------------- */
 
   const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>(

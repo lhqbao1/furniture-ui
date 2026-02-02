@@ -52,7 +52,7 @@ export const ManualCreateOrderSchema = z
     total_amount_item: z.number().optional(),
     total_shipping: z.number().optional(),
     total_discount: z.number().optional(),
-    carrier: z.string().optional(),
+    carrier: z.string().optional().nullable(),
     tax: z.number().min(0, "Tax is required"),
     payment_term: z.number().optional().nullable(),
 

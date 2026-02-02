@@ -66,6 +66,7 @@ const AdminInventoryList = () => {
         addButtonText="Add Product"
         addButtonUrl="/admin/products/add"
         setPage={setPage}
+        isInventory
       />
 
       {/* <InventoryTimeLine /> */}

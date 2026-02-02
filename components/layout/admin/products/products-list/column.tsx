@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/hover-card";
 import { getCarrierLogo } from "@/lib/getCarrierImage";
 
+const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
+
 function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
   const [editing, setEditing] = useState(false);
@@ -280,12 +282,14 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
 
   const { data: suppliers, isLoading, isError } = useGetSuppliers();
 
-  const handleEditSupplier = (owner_id: string) => {
+  const handleEditSupplier = (ownerValue: string) => {
+    const owner_id = ownerValue === PRESTIGE_OWNER_VALUE ? null : ownerValue;
+
     EditProductMutation.mutate(
       {
         input: {
           ...product,
-          owner_id: owner_id,
+          owner_id,
           ...(product.categories?.length
             ? { category_ids: product.categories.map((c) => c.id) }
             : {}),
@@ -318,7 +322,7 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
     if (product.owner?.id) {
       setValue(product.owner.id.toString());
     } else {
-      setValue("");
+      setValue(PRESTIGE_OWNER_VALUE);
     }
   }, [product.owner]);
 
@@ -342,6 +346,10 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
             <SelectValue placeholder={isLoading ? "Loading..." : ""} />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value={PRESTIGE_OWNER_VALUE}>
+              Prestige Home GmbH
+            </SelectItem>
+
             {suppliers?.map((s) => (
               <SelectItem
                 key={s.id}
