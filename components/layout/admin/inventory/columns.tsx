@@ -22,7 +22,7 @@ import EditInventoryDialog from "./dialog/edit-inventory-dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
 import { useUpdateStockProduct } from "@/features/products/inventory/hook";
 import { useAtom } from "jotai";
@@ -127,16 +127,25 @@ function EditableStockCell({ product }: { product: ProductItem }) {
 }
 
 function EditableEANCell({ product }: { product: ProductItem }) {
-  const [value, setValue] = useState(product.ean);
+  const [value, setValue] = useState(product.ean ?? "");
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
 
+  useEffect(() => {
+    setValue(product.ean ?? "");
+  }, [product.ean]);
+
   const handleEditProductEAN = () => {
+    if (value && value.replace(/\D/g, "").length > 13) {
+      toast.error("EAN must be at most 13 digits");
+      return;
+    }
+
     EditProductMutation.mutate(
       {
         input: {
           ...product,
-          ean: value,
+          ean: value.replace(/\D/g, ""),
           category_ids: product.categories.map((c) => c.id),
           ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
           // 🔹 Thêm bundles
@@ -169,9 +178,11 @@ function EditableEANCell({ product }: { product: ProductItem }) {
       {editing ? (
         <Input
           value={value}
+          placeholder="Enter EAN"
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
-            if (value !== product.ean) {
+            if (value !== (product.ean ?? "")) {
+              handleEditProductEAN();
             } else {
               setEditing(false);
             }
@@ -181,7 +192,7 @@ function EditableEANCell({ product }: { product: ProductItem }) {
               handleEditProductEAN();
             }
             if (e.key === "Escape") {
-              setValue(product.ean);
+              setValue(product.ean ?? "");
               setEditing(false);
             }
           }}
@@ -193,10 +204,16 @@ function EditableEANCell({ product }: { product: ProductItem }) {
         />
       ) : (
         <div
-          className="cursor-pointer"
+          className="cursor-pointer min-h-[24px]"
           onClick={() => setEditing(true)}
         >
-          {product.ean}
+          {product.ean ? (
+            product.ean
+          ) : (
+            <span className="text-muted-foreground italic">
+              Click to add EAN
+            </span>
+          )}
         </div>
       )}
     </div>
