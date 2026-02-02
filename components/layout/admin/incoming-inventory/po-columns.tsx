@@ -60,17 +60,6 @@ export const POColumns: ColumnDef<PurchaseOrderDetail>[] = [
       return <div>{row.original.pi_number}</div>;
     },
   },
-  {
-    accessorKey: "customer_po_order",
-    header: () => <div className="text-center">Customer PO Order</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.customer_po_order ?? "-"}
-        </div>
-      );
-    },
-  },
 
   {
     accessorKey: "buyer",

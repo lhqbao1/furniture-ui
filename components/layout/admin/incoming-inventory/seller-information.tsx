@@ -96,6 +96,7 @@ const SellerInformation = ({
     // =====================
     // Seller info (safe)
     // =====================
+
     setValue("name", data.name ?? "");
     setValue("address", data.address ?? "");
     setValue("city", data.city ?? "");
@@ -174,6 +175,29 @@ const SellerInformation = ({
     setValue("seller_city", data.city);
     setValue("seller_country", data.country);
     setValue("seller_postal_code", data.postal_code);
+
+    if (data.bank_infos && data.bank_infos.length > 0) {
+      setSelectedBankId(data.bank_infos[0].id);
+      setValue("bank_id", data.bank_infos[0].id);
+      setValue("bank_name", data.bank_infos[0].bank_name ?? "");
+      setValue("bank_address", data.bank_infos[0].address ?? "");
+      setValue("bank_account_no", data.bank_infos[0].account_no ?? "");
+      setValue("bank_account_name", data.bank_infos[0].account_name ?? "");
+      setValue("bank_swift", data.bank_infos[0].swift_code ?? "");
+      setValue("bank_currency", data.bank_infos[0].currency ?? "");
+    }
+
+    if (data.contact_persons && data.contact_persons.length > 0) {
+      setSelectedContactPersonId(data.contact_persons[0].id);
+     setValue("contact_person_id", data.contact_persons[0].id ?? "");
+     setValue("contact_person_name", data.contact_persons[0].name ?? "");
+     setValue("contact_person_email", data.contact_persons[0].email ?? "");
+     setValue(
+       "contact_person_phone_number",
+       data.contact_persons[0].phone_number ?? "",
+     );
+      
+    }
   }, [seller, selectedsellerId, setValue]);
 
   // ⛔ CHẶN render Select khi data chưa sẵn sàng

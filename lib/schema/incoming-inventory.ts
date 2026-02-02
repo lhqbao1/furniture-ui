@@ -9,14 +9,9 @@ export const incomingInventorySchema = z.object({
   loading_port: z.string().min(1, "Loading port is required"),
   shipping_method: z.string().min(1, "Shipping method is required"),
 
-  // number_of_containers: z
-  //   .number()
-  //   .int("Number of containers must be an integer")
-  //   .min(0, "Number of containers must be 0 or greater"),
-
   buyer_id: z.string().uuid("You need to choose buyer"),
   seller_id: z.string().uuid("You need to choose seller"),
-  bank_id: z.string().uuid("You need to have a bank data of seller"),
+  // bank_id: z.string().uuid("You need to have a bank data of seller"),
 
   customer_po_order: z.string().optional().nullable(),
 
@@ -37,9 +32,9 @@ export type IncomingInventoryValues = z.infer<typeof incomingInventorySchema>;
 export const containerSchema = z.object({
   size: z.string().min(1, "Container size is required"),
 
-  date_of_inspection: z.string().min(1, "Date of inspection is required"),
+  date_of_inspection: z.string().optional().nullable(),
 
-  date_if_shipment: z.string().min(1, "Date of shipment is required"),
+  date_if_shipment: z.string().optional().nullable(),
 
   date_of_issue: z.string().min(1, "Delivery date is required"),
 });
@@ -48,8 +43,6 @@ export type ContainerValues = z.infer<typeof containerSchema>;
 
 export const containerDefaultValues: ContainerValues = {
   size: "",
-  date_of_inspection: "",
-  date_if_shipment: "",
   date_of_issue: "",
 };
 

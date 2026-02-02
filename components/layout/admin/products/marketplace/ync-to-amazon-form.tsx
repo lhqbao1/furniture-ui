@@ -255,7 +255,10 @@ const SyncToAmazonForm = ({
             unit_count_type: product.unit,
             depth: 0,
             asin: null,
-            stock: product.stock - Math.abs(product.result_stock ?? 0),
+            stock: Math.max(
+              0,
+              product.stock - Math.abs(product.result_stock ?? 0),
+            ),
             carrier: product.carrier,
             brand: product.brand ? product.brand.name : "",
             images: product.static_files?.map((f) => f.url) ?? [],

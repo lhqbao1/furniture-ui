@@ -168,7 +168,7 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         {
-          title: "DS Price",
+          title: "DS Prices",
           url: "/admin/crm/ds/list",
           icon: CornerDownRight,
         },
