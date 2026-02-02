@@ -21,6 +21,7 @@ export const CHANEL_OPTIONS = [
   { key: "praktiker", label: "Praktiker" },
   { key: "netto", label: "Netto" },
   { key: "norma", label: "Norma24" },
+  { key: "check24", label: "Check24" },
   { key: "inprodius", label: "Inprodius" },
 ];
 

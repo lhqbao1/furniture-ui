@@ -721,6 +721,11 @@ export const listChanel = [
     name: "econelo",
     icon: "econelo-favicon.png",
   },
+  {
+    id: 12,
+    name: "check24",
+    icon: "check-24.png",
+  },
 ];
 
 export const listDE = [
@@ -1081,6 +1086,7 @@ export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   waiting_for_return: ["warranty_initiated", "exchange_initiated"],
   exchange_initiated: ["credit_note_created"],
   warranty_initiated: ["credit_note_created"],
+  tock_reserved: ["canceled", "canceled_no_stock", "canceled_wrong_price"],
 };
 
 export const VOUCHER_TYPE = [
