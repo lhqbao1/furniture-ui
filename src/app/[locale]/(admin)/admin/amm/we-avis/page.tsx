@@ -7,7 +7,7 @@ import { useImportAmmProducts } from "@/features/amm/hook";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { ammWeAvisSchema, weAvisDefaultValues } from "@/lib/schema/amm-weavis";
+import { ammWeAvisSchema, weAvisDefaultValues, WeAvisItem } from "@/lib/schema/amm-weavis";
 import {
   Form,
   FormControl,
@@ -66,7 +66,7 @@ const AmmWeAvisPage = () => {
   const removeItem = (productId: string) => {
     form.setValue(
       "items",
-      items.filter((i: any) => i.product_id !== productId),
+      items.filter((i: WeAvisItem) => i.product_id !== productId),
     );
   };
 
@@ -76,7 +76,7 @@ const AmmWeAvisPage = () => {
 
     const payload = {
       kopfdaten: values.kopfdaten,
-      items: values.items.map((item: any, index: number) => {
+      items: values.items.map((item: WeAvisItem, index: number) => {
         const product = products.find((p) => p.id === item.product_id);
 
         return {
@@ -123,7 +123,7 @@ const AmmWeAvisPage = () => {
   const orderedProducts = React.useMemo(() => {
     if (!products) return [];
 
-    const selectedIds = new Set((items || []).map((i: any) => i.product_id));
+    const selectedIds = new Set((items || []).map((i: WeAvisItem) => i.product_id));
 
     const selectedProducts = products.filter((p) => selectedIds.has(p.id));
 
@@ -254,7 +254,7 @@ const AmmWeAvisPage = () => {
           />
           <FormField
             control={form.control}
-            name="kopfdaten.date_of_issue"
+            name="kopfdaten.delivery_date"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Delivery Date</FormLabel>
@@ -313,7 +313,7 @@ const AmmWeAvisPage = () => {
                   <CommandGroup className="max-h-[300px] overflow-y-auto">
                     {orderedProducts?.map((product) => {
                       const selected = items?.some(
-                        (i: any) => i.product_id === product.id,
+                        (i: WeAvisItem) => i.product_id === product.id,
                       );
 
                       return (
@@ -362,7 +362,7 @@ const AmmWeAvisPage = () => {
                 <div className="col-span-1"></div>
               </div>
 
-              {items.map((item: any, index: number) => {
+              {items.map((item: WeAvisItem, index: number) => {
                 const product = products?.find((p) => p.id === item.product_id);
                 return (
                   <div
@@ -389,7 +389,7 @@ const AmmWeAvisPage = () => {
                       <Button
                         type="button"
                         variant="ghost"
-                        onClick={() => removeItem(item.product_id)}
+                        onClick={() => removeItem(item.product_id ?? "")}
                       >
                         ✕
                       </Button>
