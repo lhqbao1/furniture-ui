@@ -21,7 +21,10 @@ import { useGetProductsSelect } from "@/features/product-group/hook";
 import { ProductItem } from "@/types/products";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "@/src/i18n/navigation";
+import { usePathname, useRouter } from "@/src/i18n/navigation";
+import { useSetAtom } from "jotai";
+import { addSearchKeywordAtom } from "@/store/search";
+import { useSearchParams } from "next/navigation";
 
 export default function MobileProductSearch() {
   const [open, setOpen] = React.useState(false);
@@ -30,6 +33,10 @@ export default function MobileProductSearch() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
+  const addSearchKeyword = useSetAtom(addSearchKeywordAtom);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const isShopAllPage = pathname.includes("shop-all");
 
   // debounce query
   React.useEffect(() => {
@@ -45,6 +52,26 @@ export default function MobileProductSearch() {
     all_products: true,
   });
   const results = products ?? [];
+
+  function handleSubmit() {
+    const value = query.trim();
+    if (!value) return;
+
+    addSearchKeyword(value);
+    setOpen(false);
+
+    // clone params hiện tại
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("search", value);
+
+    if (isShopAllPage) {
+      // ✅ đang ở /shop-all → chỉ update query
+      router.replace(`/shop-all?${params.toString()}`, { locale });
+    } else {
+      // ✅ chưa ở /shop-all → điều hướng sang
+      router.push(`/shop-all?${params.toString()}`, { locale });
+    }
+  }
 
   return (
     <div className="lg:hidden">
@@ -84,6 +111,12 @@ export default function MobileProductSearch() {
                 onValueChange={setQuery}
                 autoFocus
                 className="border-b-0"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
               />
             </div>
             <CommandList className="flex-1 overflow-auto pt-2">

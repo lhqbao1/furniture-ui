@@ -9,6 +9,9 @@ import React, { useEffect, useState } from "react";
 import ShopAllFilterSection from "@/components/layout/shop-all/shop-all-filter-section";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
+import FilterSection from "@/components/layout/single-product/filter-section";
+import MobileFilter from "@/components/layout/shop-all/mobile-filter";
+import { X } from "lucide-react";
 
 export default function ShopAllPage() {
   const t = useTranslations();
@@ -84,6 +87,15 @@ export default function ShopAllPage() {
     return <div className="text-center py-10">Something went wrong</div>;
   }
 
+  const handleClearSearch = () => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.delete("search"); // ❌ xóa query
+    params.delete("page"); // (optional) reset về page 1
+
+    router.push(`/shop-all?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <div className="pt-3 xl:pb-16 pb-6 relative">
       <div className="grid grid-cols-12 gap-6">
@@ -98,11 +110,27 @@ export default function ShopAllPage() {
             <ProductGridSkeleton length={12} />
           ) : (
             <>
-              <div className="space-y-4 hidden md:block">
+              <div className="space-y-4 flex justify-between items-center">
                 <div className="text-lg">
                   {data.pagination.total_items} {t("items")}
                 </div>
+                <div className="md:hidden block">
+                  <MobileFilter />
+                </div>
               </div>
+
+              {query && (
+                <div className="py-1 px-3 border rounded-full w-fit  gap-1.5 items-center md:hidden flex">
+                  <span>{query}</span>
+                  <button
+                    onClick={handleClearSearch}
+                    className="hover:bg-red-100 rounded-full p-0.5 transition"
+                    aria-label="Clear search"
+                  >
+                    <X className="size-4 text-red-500 mt-1" />
+                  </button>
+                </div>
+              )}
 
               <ProductsGridLayout
                 hasBadge

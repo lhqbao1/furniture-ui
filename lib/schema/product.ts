@@ -161,7 +161,11 @@ export const addProductSchema = z.object({
   incoterm: z.string().optional().nullable(),
   sku: z.string().min(1, "Product SKU is required"),
   number_of_packages: z.number().optional().nullable(),
-  ean: z.string().optional().nullable(),
+  ean: z
+    .string()
+    .max(13, { message: "EAN must be at most 13 digits" })
+    .optional()
+    .nullable(),
   carrier: z.string().optional().nullable(),
   delivery_time: z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),

@@ -87,9 +87,10 @@ const ImportDialog = ({
             setIsImporting(true);
             setOpen(false);
           },
-          onError: () => {
+          onError: (error) => {
             toast.error("Import products failed", {
               id: toastId,
+              description: error.message,
             });
             setIsImporting(false);
           },
@@ -104,9 +105,10 @@ const ImportDialog = ({
           setIsImporting(true);
           setOpen(false);
         },
-        onError: (e) => {
+        onError: (error) => {
           toast.error("Import products failed", {
             id: toastId,
+            description: error.message,
           });
           setIsImporting(false);
         },
