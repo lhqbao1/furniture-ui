@@ -1,5 +1,4 @@
 import { getAllProductsSelect } from "@/features/product-group/api";
-import { getProductsFeed } from "@/features/products/api";
 import { ProductItem } from "@/types/products";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
