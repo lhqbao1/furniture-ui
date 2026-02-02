@@ -16,7 +16,7 @@ export const weAvisKopfdatenSchema = z.object({
     .min(1, "Supplier postal code is required")
     .max(8, "Postal code must be at most 8 characters"),
   supplier_country: z.string().min(1, "Supplier country is required"),
-  date_of_issue: z.string().min(1, "Delivery date is required"), // YYYYMMDD
+  delivery_date: z.string().min(1, "Delivery date is required"), // YYYYMMDD
   warehouse: z.string().min(1, "Warehouse is required"),
   cancel: z.string().optional(), // backend optional
 });
@@ -48,7 +48,7 @@ export const weAvisDefaultValues: ImportWeAvisPayload = {
     supplier_city: "Röttenbach",
     supplier_postal_code: "91341",
     supplier_country: "DE",
-    date_of_issue: "", // YYYYMMDD
+    delivery_date: "", // YYYYMMDD
     warehouse: "9_1 Amm GmbH",
     cancel: "0",
   },

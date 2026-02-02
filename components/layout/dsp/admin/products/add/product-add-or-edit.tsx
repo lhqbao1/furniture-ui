@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import "react-quill-new/dist/quill.snow.css";
+// import 'quill/dist/quill.snow.css'
 import { Loader2 } from "lucide-react";
 import { ProductItem } from "@/types/products";
 import { toast } from "sonner";
