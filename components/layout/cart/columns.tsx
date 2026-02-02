@@ -348,19 +348,6 @@ export const getDeliveryOrderColumns = ({
     },
   },
   {
-    accessorKey: "delivery_cost",
-    header: () => <div className="text-center">DELIVERY COST</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {is_multiple_delivery
-            ? row.original.products.delivery_cost * row.original.quantity
-            : row.original.products.delivery_cost}
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "quantity",
     header: () => <div className="text-center">QUANTITY</div>,
     cell: ({ row }) => {
