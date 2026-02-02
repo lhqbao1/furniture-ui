@@ -126,6 +126,83 @@ function EditableStockCell({ product }: { product: ProductItem }) {
   );
 }
 
+function EditableEANCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.ean);
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductEAN = () => {
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          ean: value,
+          category_ids: product.categories.map((c) => c.id),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          // 🔹 Thêm bundles
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess(data, variables, context) {
+          toast.success("Update product ean successful");
+          setEditing(false);
+        },
+        onError(error, variables, context) {
+          toast.error("Update product ean fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="text-center">
+      {editing ? (
+        <Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            if (value !== product.ean) {
+            } else {
+              setEditing(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductEAN();
+            }
+            if (e.key === "Escape") {
+              setValue(product.ean);
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
+          {product.ean}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const getInventoryColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,
   is_incoming?: boolean,
@@ -180,6 +257,14 @@ export const getInventoryColumns = (
     header: ({}) => <div className="text-center uppercase">ID</div>,
     cell: ({ row }) => {
       return <div className="text-center">{row.original.id_provider}</div>;
+    },
+  },
+
+  {
+    accessorKey: "ean",
+    header: ({}) => <div className="text-center uppercase">EAN</div>,
+    cell: ({ row }) => {
+      return <EditableEANCell product={row.original} />;
     },
   },
 

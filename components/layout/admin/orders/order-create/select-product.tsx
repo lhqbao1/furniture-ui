@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { ProductItem } from "@/types/products";
 import { useGetAllProducts } from "@/features/products/hook";
+import { toast } from "sonner";
 
 interface SelectedProduct {
   product: ProductItem;
@@ -52,6 +53,11 @@ const SelectOrderItems = ({
   });
 
   const handleSelectProduct = (product: ProductItem) => {
+    if (!product.carrier) {
+      toast.error("Product must has carrier");
+      return;
+    }
+
     setListProducts((prev) => {
       if (prev.some((p) => p.product.id === product.id)) return prev;
       return [

@@ -30,6 +30,7 @@ import {
   getCountryLabelDE,
 } from "@/components/shared/getCountryNameDe";
 import { fromArrayBufferToHex } from "google-auth-library/build/src/crypto/shared";
+import { getCarrierFromItems } from "@/lib/get-carrier";
 
 export interface CartItem {
   id: number;
@@ -73,45 +74,40 @@ export default function CreateOrderPageClient() {
     // guard item empty
     if (!listItems || listItems.length === 0) {
       form.setValue("total_shipping", 0);
+      form.setValue("carrier", undefined); // hoặc "" tùy schema
       return;
     }
 
-    const autoShipping = calculateShippingCostManual(
-      listItems,
-      countryCode,
-      taxId,
-    ).gross;
+    const result = calculateShippingCostManual(listItems, countryCode, taxId);
+
+    console.log(listItems);
+
+    const autoShipping = result.gross;
+    const autoCarrier = getCarrierFromItems(listItems);
 
     const currentShipping = form.getValues("total_shipping");
+    const currentCarrier = form.getValues("carrier");
 
-    // Nếu user chưa nhập thủ công, mới override
+    // chỉ override nếu user chưa nhập
     if (currentShipping == null || currentShipping === 0) {
       form.setValue("total_shipping", autoShipping, { shouldDirty: true });
+    }
+
+    if (currentCarrier && autoCarrier) {
+      console.log(autoCarrier);
+      form.setValue("carrier", autoCarrier, { shouldDirty: true });
     }
   }, [listItems, countryCode, taxId]);
 
   useManualCheckoutLogic(form, setDisabledFields);
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
-    const orderCarrier = listItems.some(
-      (i) =>
-        i.carrier.toLowerCase() === "amm" ||
-        i.carrier.toLowerCase() === "spedition",
-    )
-      ? "spedition"
-      : "dpd";
-
-    if (orderCarrier === "spedition" && !values.phone) {
-      toast.error("Phone number is required for SPEDITION carrier");
-      return;
-    }
-
     createOrderManualMutation.mutate(
       {
         ...values,
         total_shipping:
           values.total_shipping !== shipping ? values.total_shipping : shipping,
-        carrier: orderCarrier,
+        carrier: values.carrier?.toUpperCase(),
         email:
           values.email && values.email?.length > 0 ? values.email : "guest",
         company_name:
@@ -147,6 +143,7 @@ export default function CreateOrderPageClient() {
             handleSubmit(values);
           },
           (errors) => {
+            console.log(errors);
             // Lấy message lỗi đầu tiên nếu có
             const firstError: any = Object.values(errors)[0];
             const message =

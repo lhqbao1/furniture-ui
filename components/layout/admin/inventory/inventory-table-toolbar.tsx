@@ -50,6 +50,7 @@ interface InventoryTableToolbarProps {
   addButtonUrl?: string;
   addButtonModalContent?: React.ReactNode;
   exportData?: ProductItem[];
+  isInventory?: boolean;
 }
 
 type ImageFile = {
@@ -65,6 +66,7 @@ export default function InventoryTableToolbar({
   addButtonUrl,
   addButtonModalContent,
   exportData,
+  isInventory,
 }: InventoryTableToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -168,10 +170,12 @@ export default function InventoryTableToolbar({
           </DropdownMenu>
         </div>
 
-        <div className="flex gap-2 text-sm font-medium">
-          {/* <Button variant="ghost" className="">Export</Button> */}
-          <ImportInventoryDialog setIsImporting={setIsImporting} />
-        </div>
+        {!isInventory && (
+          <div className="flex gap-2 text-sm font-medium">
+            {/* <Button variant="ghost" className="">Export</Button> */}
+            <ImportInventoryDialog setIsImporting={setIsImporting} />
+          </div>
+        )}
       </div>
 
       {/* Search (auto, no button) */}
@@ -249,12 +253,16 @@ export default function InventoryTableToolbar({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button
-          variant={"secondary"}
-          onClick={() => router.push("/admin/logistic/inventory/incoming/add")}
-        >
-          Add PO
-        </Button>
+        {!isInventory && (
+          <Button
+            variant={"secondary"}
+            onClick={() =>
+              router.push("/admin/logistic/inventory/incoming/add")
+            }
+          >
+            Add PO
+          </Button>
+        )}
 
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>

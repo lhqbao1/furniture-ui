@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "lucide-react";
+import Image from "next/image";
 
 interface ManualAdditionalInformationProps {
   isAdmin?: boolean;
@@ -27,6 +28,15 @@ export default function ManualAdditionalInformation({
 }: ManualAdditionalInformationProps) {
   const form = useFormContext();
 
+  const carriers = [
+    { id: "spedition", logo: "/amm.jpeg" },
+    { id: "dpd", logo: "/dpd.jpeg" },
+    { id: "dhl", logo: "/dhl.png" },
+    { id: "gls", logo: "/gls-new.png" },
+    { id: "ups", logo: "/ups.png" },
+    { id: "hermes", logo: "/hermes.png" },
+    { id: "fexed", logo: "/fedex.png" },
+  ];
   return (
     <div className="space-y-4">
       <div className="flex justify-between bg-secondary/10 p-2">
@@ -98,36 +108,6 @@ export default function ManualAdditionalInformation({
           )}
         />
 
-        {/* <FormField
-          control={form.control}
-          name="carrier"
-          render={({ field }) => (
-            <FormItem className="col-span-1">
-              <FormLabel className="text-black font-semibold text-sm">
-                Carrier
-              </FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger
-                    placeholderColor
-                    className="border"
-                  >
-                    <SelectValue placeholder="Select carrier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dpd">DPD</SelectItem>
-                    <SelectItem value="amm">Spedition</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
-
         <FormField
           control={form.control}
           name="status"
@@ -154,38 +134,6 @@ export default function ManualAdditionalInformation({
             </FormItem>
           )}
         />
-        {/* 
-        <FormField
-          control={form.control}
-          name="tax"
-          render={({ field }) => (
-            <FormItem className="flex flex-col col-span-1">
-              <FormLabel className="text-black font-semibold text-sm">
-                Tax
-              </FormLabel>
-              <FormControl>
-                <div className="relative flex items-center w-full">
-                  <Input
-                    {...field}
-                    type="number"
-                    min={0}
-                    className="pl-7"
-                    step="1"
-                    value={field.value ?? ""}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === "" ? null : e.target.valueAsNumber,
-                      )
-                    }
-                    disabled
-                  />
-                  <span className="absolute left-3 text-gray-500">%</span>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
 
         <FormField
           control={form.control}
@@ -289,6 +237,54 @@ export default function ManualAdditionalInformation({
               <FormMessage />
             </FormItem>
           )}
+        />
+        <FormField
+          control={form.control}
+          name="carrier"
+          render={({ field }) => {
+            return (
+              <FormItem className="flex flex-col w-full">
+                <FormLabel className="text-black font-semibold text-sm col-span-2">
+                  Carrier
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value ?? ""}
+                    onValueChange={(val) => {
+                      field.onChange(val);
+                    }}
+                  >
+                    <SelectTrigger
+                      placeholderColor
+                      className="border col-span-4 font-light"
+                    >
+                      <SelectValue placeholder="Select carrier" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {carriers.map((c) => (
+                        <SelectItem
+                          key={c.id}
+                          value={c.id}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={c.logo}
+                              alt={c.id}
+                              width={30}
+                              height={20}
+                              className="object-contain"
+                            />
+                            <span className="uppercase">{c.id}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
       </div>
     </div>
