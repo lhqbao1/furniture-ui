@@ -68,7 +68,7 @@ export default function WhatsAppChatBox() {
             setBubbleVisible(false); // mở chat → ẩn bubble luôn
           }}
           className="
-      fixed bottom-6 right-6 z-[1000]
+      fixed md:bottom-6 bottom-30 md:right-6 right-2 z-[1000]
       w-14 h-14 rounded-full
       flex items-center justify-center
       hover:scale-105 transition-all duration-300 cursor-pointer

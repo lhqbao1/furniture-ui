@@ -233,7 +233,7 @@ const ListPolicy = ({
           );
         })}
 
-        <div className="lg:mt-12 mt-6">
+        {/* <div className="lg:mt-12 mt-6">
           {currentPolicy.name.toLowerCase().includes("widerruf") && (
             <div className="flex justify-center col-span-12">
               {" "}
@@ -286,7 +286,7 @@ const ListPolicy = ({
               </Button>{" "}
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* Version section */}
         <div className="flex flex-col items-end col-span-12 lg:mt-12 mt-4 mb-3 lg:mb-0">

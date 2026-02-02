@@ -36,50 +36,83 @@ const AboutUsPage = () => {
           <p>
             Von gemütlichen Indoor-Arrangements bis hin zu offenen Gartenecken
             verdient jeder Raum das Gefühl, Ihr eigener zu sein. Deshalb bieten
-            wir eine sorgfältig ausgewählte Palette von Produkten für den
-            Innenbereich, den Außenbereich, den Garten und Werkzeuge – direkt
-            von vertrauenswürdigen Herstellern bezogen. Einfach, modern und für
-            das echte Leben gemacht.
+            wir eine sorgfältig kuratierte Auswahl an Produkten für
+            <strong> Innenbereich, Außenbereich, Garten und Werkzeuge</strong> –
+            funktional, modern und für den Alltag gemacht.
           </p>
           <p>
-            Bei Prestihome verkaufen wir nicht nur Möbel oder Werkzeuge – wir
-            bringen Ihnen praktische Stücke, die Ihr tägliches Leben
-            unterstützen. Egal, ob Sie eine neue Wohnung einrichten, Ihren
-            Garten auffrischen oder kleine Akzente setzen, die sich wie „Sie“
-            anfühlen, wir sind hier, um es Ihnen einfach und angenehm zu machen.
+            Bei Prestige Home verkaufen wir nicht einfach Produkte. Wir wählen
+            <strong> praktische und langlebige Lösungen</strong>, die Ihr
+            tägliches Leben erleichtern. Egal, ob Sie eine neue Wohnung
+            einrichten, Ihren Garten auffrischen oder kleine Akzente setzen
+            möchten – wir möchten Ihren Einkauf einfach, transparent und
+            angenehm gestalten.
           </p>
           <h3 className="font-bold text-black">
-            Lassen Sie uns Ihre Version von Zuhause schaffen – Ecke für Ecke.
+            Wie wir arbeiten – unser Geschäftsmodell
           </h3>
-          <p>Eine kurze Geschichte: Von der Idee zu Prestige Home</p>
           <p>
-            Prestige Home entstand aus einer einfachen Idee – Wohnutensilien für
-            jedermann zugänglich und erschwinglich zu machen. Müde vom Aufwand
-            des traditionellen Einkaufens, machten wir es uns zur Aufgabe, eine
-            kuratierte Auswahl an praktischen, stilvollen Produkten für jede
-            Ecke Ihres Zuhauses anzubieten.
+            Um Ihnen <strong>faire Preise</strong> und eine{" "}
+            <strong>große Produktauswahl</strong>
+            anbieten zu können, arbeiten wir direkt mit{" "}
+            <strong>ausgewählten Herstellern und Lieferpartnern</strong>{" "}
+            zusammen.
           </p>
           <p>
-            Heute arbeitet unser Team mit vertrauenswürdigen Herstellern
-            zusammen, um Ihnen hochwertige Produkte für den Innenbereich, den
-            Außenbereich, den Garten und Werkzeuge anzubieten, damit Sie ein
-            Zuhause schaffen können, das Ihren einzigartigen Stil widerspiegelt.
+            Viele unserer Produkte werden{" "}
+            <strong>direkt vom Hersteller an unsere Kunden versendet</strong>.
+            Dadurch entfallen unnötige Zwischenhändler, und wir können Qualität
+            und Preis in Einklang bringen.
           </p>
+          <p>
+            Dieses Modell ermöglicht es uns, flexibel zu bleiben, aktuelle
+            Trends anzubieten und gleichzeitig eine zuverlässige Abwicklung
+            sicherzustellen. Selbstverständlich stehen wir Ihnen während des
+            gesamten Bestellprozesses als{" "}
+            <strong>Ihr direkter Ansprechpartner</strong> zur Verfügung – vom
+            Kauf bis zum Kundenservice.
+          </p>
+
+          <h3 className="font-bold text-black">
+            Eine kurze Geschichte: Von der Idee zu Prestige Home
+          </h3>
+          <p>
+            Prestige Home entstand aus einer einfachen Idee:{" "}
+            <strong>
+              hochwertige Wohn- und Gartenprodukte für jedermann zugänglich zu
+              machen
+            </strong>
+            .
+          </p>
+          <p>
+            Wir wollten eine Alternative zum aufwendigen traditionellen Einkauf
+            schaffen und eine Plattform aufbauen, die eine durchdachte Auswahl
+            an funktionalen und stilvollen Produkten bietet – ohne Kompromisse
+            bei Qualität oder Service.
+          </p>
+          <p>
+            Heute arbeiten wir eng mit unseren Produktions- und Logistikpartnern
+            zusammen, um Ihnen zuverlässige Produkte für Ihr Zuhause zu liefern
+            – transparent, effizient und kundenorientiert.
+          </p>
+
           <h3 className="font-bold text-black">
             Globale Zusammenarbeit: Unsere Partner und Inspiration
           </h3>
           <p>
-            Bei Prestige Home arbeiten wir mit globalen Herstellern zusammen, um
-            Ihnen hochwertige, erschwingliche Produkte für jeden Bereich Ihres
-            Zuhauses – Innenbereich, Außenbereich, Garten & Werkzeuge –
-            anzubieten. Wir kombinieren moderne Designs mit praktischer
-            Funktionalität, um Ihnen zu helfen, einen Raum zu schaffen, der
-            Ihrem Lebensstil entspricht.
+            Prestige Home arbeitet mit{" "}
+            <strong>internationalen Herstellern und Produktionspartnern</strong>
+            , insbesondere aus Asien, zusammen, die für ihre{" "}
+            <strong>Qualität, Erfahrung und moderne Fertigung</strong> bekannt
+            sind.
           </p>
           <p>
-            Durch die Zusammenarbeit mit vertrauenswürdigen Marken und
-            Unternehmen aus Asien stellen wir sicher, dass jedes Produkt Ihre
-            Bedürfnisse erfüllt und gleichzeitig Ihr Budget schont.
+            Alle Produkte werden sorgfältig ausgewählt und geprüft, um unseren
+            Qualitätsansprüchen gerecht zu werden. Durch diese globale
+            Zusammenarbeit können wir{" "}
+            <strong>moderne Designs, praktische Funktionalität</strong>
+            und <strong>attraktive Preise</strong> vereinen – damit Sie Ihr
+            Zuhause nach Ihren eigenen Vorstellungen gestalten können.
           </p>
 
           <div className="w-full space-y-6">

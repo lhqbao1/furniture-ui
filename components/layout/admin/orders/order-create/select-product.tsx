@@ -48,7 +48,7 @@ const SelectOrderItems = ({
     isError,
   } = useGetAllProducts({
     search: queryParams,
-    page_size: 100,
+    page_size: 20,
   });
 
   const handleSelectProduct = (product: ProductItem) => {
