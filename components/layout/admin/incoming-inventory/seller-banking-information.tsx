@@ -65,7 +65,7 @@ const SellerBankingInformation = () => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4 overflow-hidden">
-          {/* ===== Select Seller ===== */}
+          {/* ===== Select Bank ===== */}
           <FormItem className="grid gap-2 col-span-2 min-w-0">
             <FormLabel className="text-sm w-full">Select Bank</FormLabel>
             <div className="flex items-center gap-2 min-w-0">

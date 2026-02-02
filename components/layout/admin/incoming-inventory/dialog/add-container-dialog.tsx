@@ -86,10 +86,10 @@ const AddContainerDialog = ({
       size: container.size ?? "",
       date_of_inspection: container.date_of_inspection
         ? container.date_of_inspection.slice(0, 10)
-        : "",
+        : undefined,
       date_if_shipment: container.date_if_shipment
         ? container.date_if_shipment.slice(0, 10)
-        : "",
+        : undefined,
       date_of_issue: container.date_of_issue
         ? container.date_of_issue.slice(0, 10)
         : "",
@@ -228,14 +228,15 @@ const AddContainerDialog = ({
                   <FormControl>
                     <Input
                       type="date"
-                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* Date of Shipment */}
+
             <FormField
               control={form.control}
               name="date_if_shipment"
@@ -245,13 +246,15 @@ const AddContainerDialog = ({
                   <FormControl>
                     <Input
                       type="date"
-                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             {/* Delivery Date */}
             <FormField
               control={form.control}

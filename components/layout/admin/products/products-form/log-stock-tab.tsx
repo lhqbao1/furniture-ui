@@ -41,7 +41,10 @@ const LogStockTab = ({ productDetail }: LogStockTabProps) => {
               <div className="text-sm">
                 {item.main_checkout ? item.main_checkout.checkout_code : ""}
               </div>
-              <div className="text-sm">{item.quantity}</div>
+              <div className="text-sm">
+                {item.quantity} ({item.current_stock ? item.current_stock : "-"}
+                )
+              </div>
               <div className="text-sm text-wrap truncate">
                 {item.user ? item.user.email : ""}
               </div>

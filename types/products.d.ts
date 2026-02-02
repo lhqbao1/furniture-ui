@@ -156,6 +156,7 @@ export interface ProductStockLog {
   quantity: string;
   user: Customer;
   main_checkout: CheckOutMain;
+  current_stock: number | null;
   created_at: string; // ISO datetime
   updated_at: string; // ISO datetime
 }

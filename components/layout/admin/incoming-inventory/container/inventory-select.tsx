@@ -451,7 +451,10 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                     </td>
 
                     <td className="p-2 font-medium whitespace-nowrap">
-                      €{item.total_cost.toFixed(2)}
+                      {item.total_cost.toLocaleString("de-DE", {
+                        style: "currency",
+                        currency: "EUR",
+                      })}
                     </td>
 
                     <td className="p-2 text-right flex justify-end gap-1 h-full">

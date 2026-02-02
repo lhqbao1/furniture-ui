@@ -226,7 +226,10 @@ const SyncToEbayForm = ({
             const payload: syncToEbayInput = {
               price: ebayData?.final_price ?? product.final_price,
               sku: product.id_provider,
-              stock: product.stock - Math.abs(product.result_stock ?? 0),
+              stock: Math.max(
+                0,
+                product.stock - Math.abs(product.result_stock ?? 0),
+              ),
               tax: product.tax ? product.tax : null,
               product: {
                 description: stripHtmlRegex(
@@ -279,7 +282,10 @@ const SyncToEbayForm = ({
                   f.url.replace(/\s+/g, "%20"),
                 ) ?? [],
               price: kauflandData?.final_price ?? product.final_price,
-              stock: product.stock - Math.abs(product.result_stock ?? 0),
+              stock: Math.max(
+                0,
+                product.stock - Math.abs(product.result_stock ?? 0),
+              ),
               carrier: product.carrier,
               sku: product.id_provider,
               product_id: product.id,
