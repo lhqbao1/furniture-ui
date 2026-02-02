@@ -10,6 +10,15 @@ export function useManualCheckoutLogic(
   const country = form.watch("country");
   const company_name = form.watch("company_name")?.trim();
 
+  const PRESET_FIELDS = [
+    "company_name",
+    "tax_id",
+    "invoice_address",
+    "invoice_city",
+    "invoice_postal_code",
+    "invoice_country",
+  ];
+
   const PRESET_BY_MARKETPLACE: Record<string, any> = {
     netto: {
       company_name: "NeS GmbH",
@@ -49,6 +58,11 @@ export function useManualCheckoutLogic(
   // 1️⃣ Apply marketplace preset + disable fields
   // -------------------------------------------------------------
   useEffect(() => {
+    // 🔄 Clear toàn bộ preset fields trước
+    PRESET_FIELDS.forEach((field) => {
+      form.resetField(field as any);
+    });
+
     if (!marketplace || !PRESET_BY_MARKETPLACE[marketplace]) {
       setDisabledFields([]);
       return;

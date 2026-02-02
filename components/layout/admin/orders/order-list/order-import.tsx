@@ -61,6 +61,7 @@ const PRESET_BY_MARKETPLACE: Record<string, any> = {
   },
   // thêm sau nếu cần:
   praktiker: null,
+  check24: null,
   amazon: null,
   prestige: null,
 };
@@ -244,6 +245,7 @@ const OrderImport = () => {
               <SelectItem value="freakout">FreakOut</SelectItem>
               <SelectItem value="praktiker">Praktiker</SelectItem>
               <SelectItem value="norma">Norma24</SelectItem>
+              <SelectItem value="check24">Check24</SelectItem>
               <SelectItem value="prestige">Prestige Home</SelectItem>
             </SelectContent>
           </Select>

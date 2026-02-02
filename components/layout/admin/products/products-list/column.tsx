@@ -781,12 +781,28 @@ export const getProductColumns = (
     header: () => <div className="text-center">MARGIN</div>,
     cell: ({ row }) => {
       const { final_price, cost, tax } = row.original;
-      const taxRate = parseFloat(tax) / 100;
-      if (!final_price || !cost || final_price <= 0)
-        return <div className="text-center">—</div>;
 
-      const margin = (1 / (1 + taxRate) - cost / final_price) * 100;
-      return <div className="text-right">{margin.toFixed(1)}%</div>;
+      const salePrice = Number(final_price);
+      const purchaseCost = Number(cost);
+      const vatRate = parseFloat(tax) / 100;
+      console.log(vatRate);
+
+      // 🛡️ Guard tất cả case lỗi
+      if (
+        !Number.isFinite(salePrice) ||
+        !Number.isFinite(purchaseCost) ||
+        salePrice <= 0
+      ) {
+        return <div className="text-center">—</div>;
+      }
+
+      const margin = (1 - (purchaseCost * (1 + vatRate)) / salePrice) * 100;
+
+      return (
+        <div className="text-right">
+          {Number.isFinite(margin) ? margin.toFixed(1) : "—"}%
+        </div>
+      );
     },
   },
   {
