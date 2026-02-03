@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useDropzone } from "react-dropzone";
-import { File, Loader2 } from "lucide-react";
+import { File } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
@@ -21,11 +21,60 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { title } from "process";
 import { createManualCheckOut } from "@/features/checkout/api";
+import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import ExportExampleOrderExcelButton from "./export-example-button";
 
-const PRESET_BY_MARKETPLACE: Record<string, any> = {
+type MarketplacePreset = {
+  company_name: string;
+  tax_id: string;
+  invoice_address: string;
+  invoice_city: string;
+  invoice_postal_code: string;
+  invoice_country: string;
+};
+
+type RawOrderRow = Record<string, unknown>;
+
+type NormalizedOrder = {
+  email: string | null;
+  tax_id: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  company_name: string | null;
+  address: string;
+  additional_address: string | null;
+  recipient_name: string | null;
+  city: string;
+  country: string;
+  phone: string | null;
+  postal_code: string;
+  email_shipping: string | null;
+  invoice_address: string;
+  invoice_recipient_name: string | null;
+  invoice_phone: string | null;
+  email_invoice: string | null;
+  invoice_city: string;
+  invoice_postal_code: string;
+  invoice_country: string;
+  from_marketplace: string | null;
+  marketplace_order_id: string | null;
+  id_provider: string | null;
+  quantity: number;
+  title: string | null;
+  sku: string | null;
+  final_price: number;
+  tax: number;
+  status: string;
+  payment_term: number | null;
+  total_shipping: number;
+  vat: number;
+  carrier: string | null;
+};
+
+type GroupedOrder = ManualCreateOrderFormValues;
+
+const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
   netto: {
     company_name: "NeS GmbH",
     tax_id: "DE811205180",
@@ -65,65 +114,97 @@ const PRESET_BY_MARKETPLACE: Record<string, any> = {
   prestige: null,
 };
 
-const normalize = (row: any, preset: any, channel: string) => {
+const toStringOrNull = (value: unknown): string | null =>
+  value == null ? null : String(value);
+
+const toTrimmedStringOrNull = (value: unknown): string | null => {
+  const str = toStringOrNull(value);
+  return str === null ? null : str.trim();
+};
+
+const toNumberOrDefault = (value: unknown, fallback: number): number => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const toNumberOrNull = (value: unknown): number | null => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const toRequiredString = (value: unknown, fallback = ""): string =>
+  toTrimmedStringOrNull(value) ?? fallback;
+
+const normalize = (
+  row: RawOrderRow,
+  preset: MarketplacePreset | null,
+  channel: string,
+): NormalizedOrder => {
   const hasCompany = preset?.company_name ?? row["company_name"];
+  const computedTax =
+    row["country"] === "DE"
+      ? 19
+      : row["country"] === "AT"
+        ? hasCompany
+          ? 0
+          : 20
+        : null;
 
   return {
-    email: row["email"]?.trim() ?? "guest",
-    tax_id: preset?.tax_id ?? row["tax_id"] ?? null,
-    first_name: row["first_name"] ?? null,
-    last_name: row["last_name"]?.trim() ?? null,
+    email: toTrimmedStringOrNull(row["email"]) ?? "guest",
+    tax_id: preset?.tax_id ?? toStringOrNull(row["tax_id"]),
+    first_name: toStringOrNull(row["first_name"]),
+    last_name: toTrimmedStringOrNull(row["last_name"]),
     company_name: preset?.company_name
       ? preset.company_name
-      : row["company_name"] || null,
+      : toStringOrNull(row["company_name"]) || null,
 
-    address: row["address"]?.trim() ?? null,
-    additional_address: row["additional_address"]?.trim() ?? null,
-    recipient_name: row["recipient_name"] ?? null,
-    city: row["city"] ?? null,
-    country: row["country"] ?? null,
-    phone: row["phone"] ?? null,
-    postal_code: row["postal_code"]?.toString().trim() ?? null,
-    email_shipping: row["email_shipping"] ?? null,
+    address: toRequiredString(row["address"]),
+    additional_address: toTrimmedStringOrNull(row["additional_address"]),
+    recipient_name: toStringOrNull(row["recipient_name"]),
+    city: toRequiredString(row["city"]),
+    country: toRequiredString(row["country"], "DE"),
+    phone: toStringOrNull(row["phone"]),
+    postal_code: toRequiredString(row["postal_code"]),
+    email_shipping: toStringOrNull(row["email_shipping"]),
 
-    invoice_address: preset?.invoice_address ?? row["invoice_address"] ?? null,
+    invoice_address: toRequiredString(
+      preset?.invoice_address ?? row["invoice_address"],
+    ),
     invoice_recipient_name:
-      [row["first_name"], row["last_name"]].filter(Boolean).join(" ") ?? null,
-    invoice_phone: row["invoice_phone"] || null,
-    email_invoice: row["email"]?.trim() ?? null,
-    invoice_city: preset?.invoice_city ?? row["invoice_city"] ?? null,
-    invoice_postal_code:
-      preset?.invoice_postal_code ?? row["invoice_postal_code"] ?? null,
-    invoice_country: preset?.invoice_country ?? row["invoice_country"] ?? null,
+      [row["first_name"], row["last_name"]].filter(Boolean).join(" ") || null,
+    invoice_phone: toStringOrNull(row["invoice_phone"]),
+    email_invoice: toTrimmedStringOrNull(row["email"]),
+    invoice_city: toRequiredString(preset?.invoice_city ?? row["invoice_city"]),
+    invoice_postal_code: toRequiredString(
+      preset?.invoice_postal_code ?? row["invoice_postal_code"],
+    ),
+    invoice_country: toRequiredString(
+      preset?.invoice_country ?? row["invoice_country"],
+      "DE",
+    ),
 
     from_marketplace: channel.toLowerCase().trim(),
-    marketplace_order_id:
-      row["marketplace_order_id"]?.toString().trim() ?? null,
+    marketplace_order_id: toTrimmedStringOrNull(row["marketplace_order_id"]),
 
-    id_provider: row["id_provider"]?.toString().trim() ?? null,
+    id_provider: toTrimmedStringOrNull(row["id_provider"]),
     quantity: Number(row["quantity"] ?? 1),
-    title: row["title"] ?? null,
-    sku: row["sku"] ?? null,
+    title: toStringOrNull(row["title"]),
+    sku: toStringOrNull(row["sku"]),
     final_price: Number(row["final_price"] ?? 1),
-    tax:
-      row["country"] === "DE"
-        ? 19
-        : row["country"] === "AT"
-          ? hasCompany
-            ? 0
-            : 20
-          : null,
-    status: row["status"] ?? null,
-    payment_term: row["payment_term"] ?? null,
-    total_shipping: row["total_shipping"] ?? 35.95,
+    tax: computedTax ?? 0,
+    status: toStringOrNull(row["status"]) ?? "PAID",
+    payment_term: toNumberOrNull(row["payment_term"]),
+    total_shipping: toNumberOrDefault(row["total_shipping"], 35.95),
     vat: Number(row["vat"]),
+    carrier: toStringOrNull(row["carrier"]),
   };
 };
 
 const OrderImport = () => {
   const [file, setFile] = useState<File | null>(null);
   const [channel, setChannel] = useState<string | null>(null);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<GroupedOrder[]>([]);
   const [open, setOpen] = useState(false);
 
   const onDrop = (files: File[]) => {
@@ -143,39 +224,43 @@ const OrderImport = () => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
 
-      const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+      const json = XLSX.utils.sheet_to_json(worksheet, {
+        defval: "",
+      }) as RawOrderRow[];
 
       const preset = PRESET_BY_MARKETPLACE[channel] ?? null;
 
-      const normalized = json.map((row: any) =>
-        normalize(row, preset, channel),
-      );
+      const normalized = json.map((row) => normalize(row, preset, channel));
 
-      // ---- thêm phần này ---- //
-      const grouped: Record<string, any> = {};
+      const grouped: Record<string, GroupedOrder> = {};
 
       normalized.forEach((row) => {
-        const id = row.marketplace_order_id;
+        const id = String(row.marketplace_order_id);
 
         if (!grouped[id]) {
+          const {
+            sku,
+            quantity,
+            title,
+            id_provider,
+            final_price,
+            vat,
+            ...rest
+          } = row;
           grouped[id] = {
-            ...row,
+            ...rest,
             items: [],
           };
         }
 
-        console.log(row);
-
         grouped[id].items.push({
           quantity: row.quantity,
-          id_provider: row.id_provider,
-          title: row.title,
-          sku: row.sku,
+          id_provider: row.id_provider ?? "",
+          title: row.title ?? "",
+          sku: row.sku ?? "",
           final_price: row.final_price * (1 + row.vat),
+          carrier: row.carrier ?? "",
         });
-
-        delete grouped[id].sku;
-        delete grouped[id].quantity;
       });
 
       const payload = Object.values(grouped);
@@ -203,8 +288,6 @@ const OrderImport = () => {
       for (const order of orders) {
         await createManualCheckOut(order);
       }
-      console.log(orders);
-
       toast.success("All orders created successfully!", { id: toastId });
     } catch (err) {
       console.error(err);

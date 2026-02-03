@@ -35,11 +35,7 @@ export function LoginDrawer({
   const isMobile = useMediaQuery({ maxWidth: 676 });
 
   return (
-    <Drawer
-      open={openLogin}
-      onOpenChange={setOpenLogin}
-      direction="left"
-    >
+    <Drawer open={openLogin} onOpenChange={setOpenLogin} direction="left">
       {isCheckOut ? (
         ""
       ) : (

@@ -9,6 +9,7 @@ interface ProductsGridLayoutProps {
   data: ProductItem[];
   isSmall?: boolean;
   isProductDetails?: boolean;
+  hideAfterSm?: number;
 }
 
 const ProductsGridLayout = ({
@@ -17,18 +18,24 @@ const ProductsGridLayout = ({
   data,
   isSmall,
   isProductDetails,
+  hideAfterSm,
 }: ProductsGridLayoutProps) => {
   return (
     <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 sm:mt-6 mt-4 gap-8">
       {data
         // .filter((p) => p.stock > 0)
         .map((product, idx) => {
+          const hideOnSmall =
+            hideAfterSm !== undefined && idx >= hideAfterSm
+              ? "hidden md:block"
+              : "";
+
           return (
             <ProductCard
               idx={idx}
               product={product}
               key={product.id}
-              className={isSmall ? "" : ""}
+              className={hideOnSmall}
               isProductDetails={isProductDetails}
               isLCP={idx === 0}
             />

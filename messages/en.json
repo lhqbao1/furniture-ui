@@ -201,9 +201,7 @@
   "createInvoiceAddressFail": "Create invoice address fail",
   "createShippingAddressSuccess": "Create shipping address successfully",
   "createShippingAddressFail": "Create shipping address fail",
-
   "addressName": "Address Name",
-
   "defaultAddress": "Default Address",
   "orderHistory": "Order History",
   "newsletter": "Newsletter",
@@ -479,5 +477,6 @@
   "paymentFailedMessage": "Unfortunately, we could not complete your payment. No amount has been charged. Please try again or choose a different payment method.",
   "retryPayment": "Try payment again",
   "people_also_search": "People also search for",
-  "go_to_page": "Go to page"
+  "go_to_page": "Go to page",
+  "searchPrompt": "Search for a product…"
 }

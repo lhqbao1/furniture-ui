@@ -45,8 +45,6 @@ export default function ProductCard({
 }: ProductCardProps) {
   const cardRefs = useRef<HTMLDivElement[]>([]);
   const t = useTranslations();
-  const isMobile = useMediaQuery({ maxWidth: 650 });
-  const [open, setOpen] = useState(false);
 
   const router = useRouter();
   const locale = useLocale();
@@ -60,37 +58,34 @@ export default function ProductCard({
     addProductToViewMutation.mutate({ productId: productId });
   };
 
-  const handleAddToCart = (currentProduct: ProductItem) => {
-    if (!currentProduct) return;
+  // const handleAddToCart = (currentProduct: ProductItem) => {
+  //   if (!currentProduct) return;
 
-    if (!userId) {
-      addToCartLocalOnly(currentProduct, 1);
-    } else {
-      addToCartMutation.mutate(
-        { productId: currentProduct.id ?? "", quantity: 1 },
-        {
-          onSuccess(data, variables, context) {
-            toast.success(t("addToCartSuccess"));
-          },
-          onError(error, variables, context) {
-            const { status, message } = HandleApiError(error, t);
-            // if (status === 400) {
-            //   toast.error(t("notEnoughStock"));
-            //   return;
-            // }
-            toast.error(message);
-            if (status === 401) router.push("/login", { locale });
-          },
-        },
-      );
-    }
-  };
+  //   if (!userId) {
+  //     addToCartLocalOnly(currentProduct, 1);
+  //   } else {
+  //     addToCartMutation.mutate(
+  //       { productId: currentProduct.id ?? "", quantity: 1 },
+  //       {
+  //         onSuccess(data, variables, context) {
+  //           toast.success(t("addToCartSuccess"));
+  //         },
+  //         onError(error, variables, context) {
+  //           const { status, message } = HandleApiError(error, t);
+  //           // if (status === 400) {
+  //           //   toast.error(t("notEnoughStock"));
+  //           //   return;
+  //           // }
+  //           toast.error(message);
+  //           if (status === 401) router.push("/login", { locale });
+  //         },
+  //       },
+  //     );
+  //   }
+  // };
 
   return (
-    <div
-      className="relative group"
-      key={product.id_provider}
-    >
+    <div className={cn("relative group", className)} key={product.id_provider}>
       <div
         key={product.id}
         className="relative overflow-hidden z-10 h-full"
@@ -98,16 +93,6 @@ export default function ProductCard({
           if (el) cardRefs.current[idx] = el;
         }}
         onClick={() => handleAddProductToViewed(product.id)}
-        style={
-          {
-            // borderTop: isMobile ? undefined : idx < 4 ? "" : "1px solid #e0e0e0",
-            // borderRight: isMobile
-            //   ? undefined
-            //   : idx === 3 || idx === 7
-            //   ? ""
-            //   : "1px solid #e0e0e0",
-          }
-        }
       >
         <div className="bg-white p-0 group z-0">
           <Link
@@ -170,12 +155,7 @@ export default function ProductCard({
               passHref
               className="cursor-pointer"
             >
-              <h3
-                className={cn(
-                  "text-xs md:text-lg text-black text-left line-clamp-2 ",
-                  className ? className : "",
-                )}
-              >
+              <h3 className="text-xs md:text-lg text-black text-left line-clamp-2">
                 {product.name}
               </h3>
             </Link>

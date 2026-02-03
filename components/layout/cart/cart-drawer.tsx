@@ -31,8 +31,13 @@ export function CartDrawerMobile() {
     enabled: !!userId,
   });
   const displayedCart = userId
-    ? cart?.reduce((count, group) => count + group.items.length, 0) ?? 0
-    : localCart.length;
+    ? (cart?.reduce(
+        (count, group) =>
+          count +
+          group.items.reduce((itemCount, item) => itemCount + item.quantity, 0),
+        0,
+      ) ?? 0)
+    : localCart.reduce((count, item) => count + item.quantity, 0);
 
   return (
     <Drawer
@@ -41,18 +46,22 @@ export function CartDrawerMobile() {
       direction="left"
     >
       <DrawerTrigger asChild>
-        <div className="relative">
+        <button
+          type="button"
+          aria-label={t("cart")}
+          className="relative"
+        >
           <ShoppingCart
             stroke="#4D4D4D"
             className="hover:scale-110 transition-all duration-300 w-[20px] h-[20px] md:w-[30px] md:h-[30px]"
           />
           {displayedCart && displayedCart > 0 ? (
-            <span className="absolute -top-1.5 -right-1 flex size-3">
+            <span className="absolute -top-1.5 -right-1 flex size-3 transition-transform duration-300 group-hover:scale-110">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex size-3 rounded-full bg-red-500"></span>
             </span>
           ) : null}
-        </div>
+        </button>
       </DrawerTrigger>
 
       <DrawerContent className="w-full h-full px-4 flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full data-[vaul-drawer-direction=left]:sm:max-w-full duration-500 overflow-y-scroll">
