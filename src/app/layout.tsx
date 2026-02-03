@@ -80,7 +80,6 @@ export default function RootLayout({
     <html lang="de" translate="no">
       <head>
         <meta name="google" content="notranslate" />
-
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__APP_VERSION__ = "${process.env.NEXT_PUBLIC_APP_VERSION}";`,

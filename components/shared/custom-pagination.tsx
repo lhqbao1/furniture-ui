@@ -11,6 +11,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
+import { useTranslations } from "next-intl";
 
 interface CustomPaginationProps {
   page: number;
@@ -24,7 +25,7 @@ export function CustomPagination({
   onPageChange,
 }: CustomPaginationProps) {
   const [inputPage, setInputPage] = useState<string>(String(page));
-
+  const t = useTranslations();
   // sync khi page đổi từ bên ngoài
   useEffect(() => {
     setInputPage(String(page));
@@ -122,7 +123,7 @@ export function CustomPagination({
       {/* 🔢 Jump to page (chỉ hiện khi nhiều trang) */}
       {totalPages > 6 && (
         <div className="flex items-center gap-2 text-sm">
-          <span>Go to page</span>
+          <span>{t("go_to_page")}</span>
           <Input
             type="number"
             min={1}
