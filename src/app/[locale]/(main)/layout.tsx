@@ -11,7 +11,7 @@ export default function MainLayout({
   return (
     <>
       <PageHeader />
-      <main className="relative w-full min-h-screen">
+      <main id="main-content" className="relative w-full min-h-screen">
         <div className="overflow-x-hidden z-0 relative">
           <Banner isHome />
           <div className="flex-1">{children}</div>

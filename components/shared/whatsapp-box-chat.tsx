@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { X, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useAtom } from "jotai";
@@ -73,12 +73,13 @@ export default function WhatsAppChatBox() {
       flex items-center justify-center
       hover:scale-105 transition-all duration-300 cursor-pointer
     "
+          aria-label="Open WhatsApp chat"
         >
           <Image
             src="/whatsapp-logo.png"
             width={56}
             height={56}
-            alt="WhatsApp"
+            alt=""
             className="rounded-full"
           />
         </button>
@@ -100,6 +101,7 @@ export default function WhatsAppChatBox() {
           text-xs flex items-center justify-center
           hover:bg-gray-300
         "
+              aria-label="Close WhatsApp greeting"
             >
               ×
             </button>
@@ -142,10 +144,14 @@ export default function WhatsAppChatBox() {
             </div>
           </div>
 
-          <button onClick={() => setOpen(false)}>
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Close WhatsApp chat"
+          >
             <X
               size={18}
               className="cursor-pointer hover:scale-105 transition-all duration-300"
+              aria-hidden="true"
             />
           </button>
         </div>

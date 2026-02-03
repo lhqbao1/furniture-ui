@@ -25,6 +25,7 @@ import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSetAtom } from "jotai";
 import { addSearchKeywordAtom } from "@/store/search";
 import { useSearchParams } from "next/navigation";
+import { useProductsAlgoliaSearch } from "@/features/products/hook";
 
 export default function MobileProductSearch() {
   const [open, setOpen] = React.useState(false);
@@ -46,12 +47,19 @@ export default function MobileProductSearch() {
     return () => clearTimeout(timeout);
   }, [query]);
 
-  const { data: products, isLoading } = useGetProductsSelect({
-    search: debouncedQuery,
-    is_econelo: false,
-    all_products: true,
-  });
-  const results = products ?? [];
+  const shouldFetch = open && debouncedQuery.length > 0;
+
+  const { data: products, isLoading } = useProductsAlgoliaSearch(
+    shouldFetch
+      ? {
+          query: debouncedQuery,
+          is_econelo: false,
+          is_active: true,
+          page_size: 15,
+        }
+      : undefined,
+  );
+  const results = products?.items ?? [];
 
   function handleSubmit() {
     const value = query.trim();
@@ -75,21 +83,18 @@ export default function MobileProductSearch() {
 
   return (
     <div className="lg:hidden">
-      <Drawer
-        open={open}
-        onOpenChange={setOpen}
-        direction="left"
-      >
+      <Drawer open={open} onOpenChange={setOpen} direction="left">
         <DrawerTrigger asChild>
-          <div
+          <button
+            type="button"
             aria-label={t("searchProduct")}
-            className=""
+            className="cursor-pointer"
           >
             <Search
               stroke="#4D4D4D"
-              className="cursor-pointer hover:scale-110 transition-all duration-300 w-[20px] h-[20px] md:w-[30px] md:h-[30px]"
+              className="hover:scale-110 transition-all duration-300 w-[20px] h-[20px] md:w-[30px] md:h-[30px]"
             />
-          </div>
+          </button>
         </DrawerTrigger>
         <DrawerContent className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500 overflow-hidden">
           <DrawerTitle className="border-b-2 p-4 flex justify-between">
@@ -100,10 +105,7 @@ export default function MobileProductSearch() {
               <X />
             </DrawerClose>
           </DrawerTitle>
-          <Command
-            className="h-full w-full"
-            shouldFilter={false}
-          >
+          <Command className="h-full w-full" shouldFilter={false}>
             <div className="p-2 border-b">
               <CommandInput
                 placeholder={t("searchProduct")}
@@ -122,7 +124,11 @@ export default function MobileProductSearch() {
             <CommandList className="flex-1 overflow-auto pt-2">
               {isLoading && <CommandEmpty>{t("loading")}...</CommandEmpty>}
               {!isLoading && results.length === 0 && (
-                <CommandEmpty>{t("noResult")}</CommandEmpty>
+                <CommandEmpty>
+                  {query.trim().length === 0
+                    ? t("searchPrompt")
+                    : t("noResult")}
+                </CommandEmpty>
               )}
               {results.length > 0 && (
                 <CommandGroup>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ProductSearch from "../../shared/product-search";
 
 import MobileProductSearch from "../../shared/mobile-product-search";
@@ -10,9 +10,21 @@ import HeaderCartIcon from "./header-cart-icon";
 import HeaderUserLogin from "./header-user-login";
 import ExpandDrawer from "./expand-drawer";
 import { getCategoriesWithChildren } from "@/features/category/api";
+import CategoriesSkeleton from "../home/categories-skeleton";
+import { unstable_cache } from "next/cache";
 
-const PageHeader = async () => {
-  const categories = await getCategoriesWithChildren();
+const getHeaderCategories = unstable_cache(
+  async () => getCategoriesWithChildren(),
+  ["header-categories"],
+  { revalidate: 3600 },
+);
+
+const CategoriesNav = async () => {
+  const categories = await getHeaderCategories();
+  return <ListCategoriesHome categories={categories ?? []} />;
+};
+
+const PageHeader = () => {
   return (
     <header className="home-banner-top__content sticky top-0 z-50 bg-white shadow-secondary/10 shadow-xl">
       <div className=" flex flex-row gap-4 w-full py-3 items-center px-4 lg:items-center lg:justify-end lg:px-20 lg:py-3 lg:gap-6 border-b">
@@ -37,7 +49,9 @@ const PageHeader = async () => {
         </div>
       </div>
       <div className="min-h-16 bg-white xl:px-20 hidden lg:block">
-        <ListCategoriesHome categories={categories ?? []} />
+        <Suspense fallback={<CategoriesSkeleton />}>
+          <CategoriesNav />
+        </Suspense>
       </div>
     </header>
   );

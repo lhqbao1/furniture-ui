@@ -22,6 +22,7 @@ import { ProductItem } from "@/types/products";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
 import { useAtomValue, useSetAtom } from "jotai";
 import { addSearchKeywordAtom, searchHistoryAtom } from "@/store/search";
+import { formatEUR } from "@/lib/format-euro";
 
 /* ---------------------------------- */
 
@@ -75,12 +76,15 @@ export default function ProductSearch({
 
   /* ---------------- FETCH ---------------- */
 
+  const shouldSearch = !isShopAllPage && open && debouncedQuery.length > 0;
+
   const { data, isLoading } = useProductsAlgoliaSearch(
-    !isShopAllPage
+    shouldSearch
       ? {
           query: debouncedQuery,
           is_econelo: false,
           is_active: true,
+          page_size: 10,
         }
       : undefined,
   );
@@ -194,10 +198,7 @@ export default function ProductSearch({
             style={dropdownStyle}
             className="z-50 rounded-md bg-white shadow"
           >
-            <Command
-              shouldFilter={false}
-              className="max-h-[300px]"
-            >
+            <Command shouldFilter={false} className="max-h-[300px]">
               <CommandList>
                 {!query && history.length > 0 && (
                   <CommandGroup heading={t("recentSearch")}>
@@ -224,17 +225,13 @@ export default function ProductSearch({
                     </CommandEmpty>
 
                     {results.length > 0 && (
-                      <CommandGroup>
+                      <CommandGroup className="pointer-events-auto">
                         {results.map((p: ProductItem) => (
-                          <CommandItem
-                            key={p.id}
-                            value={p.name}
-                            asChild
-                          >
+                          <CommandItem key={p.id} value={p.name} asChild>
                             <Link
                               href={`/product/${p.url_key}`}
                               locale={locale}
-                              className="flex w-full items-center gap-3"
+                              className="flex w-full items-center gap-3 cursor-pointer"
                               onClick={() => {
                                 setOpen(false);
                                 setQuery("");
@@ -249,8 +246,14 @@ export default function ProductSearch({
                                 height={48}
                                 alt=""
                                 unoptimized
+                                className="w-16 h-16 object-contain"
                               />
-                              <span className="font-medium">{p.name}</span>
+                              <div>
+                                <div className="font-medium">{p.name}</div>
+                                <div className="font-medium">
+                                  {formatEUR(p.final_price)}
+                                </div>
+                              </div>
                             </Link>
                           </CommandItem>
                         ))}

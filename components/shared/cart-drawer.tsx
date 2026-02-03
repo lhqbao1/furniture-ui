@@ -6,7 +6,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import CartTitleSkeleton from "../layout/cart/skeleton/cart-page-heading-skeleton";
 import CartItemSkeleton from "../layout/cart/skeleton/cart-item-card-skeleton";
@@ -35,11 +34,7 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
   const flatItems = flattenCartItems(cart ?? []);
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={onOpenChange}
-      direction="right"
-    >
+    <Drawer open={open} onOpenChange={onOpenChange} direction="right">
       <DrawerContent className="w-[800px] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[800px]  overflow-y-auto overflow-x-hidden">
         {/* HEADER */}
         <DrawerHeader className="border-b">
@@ -51,7 +46,7 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
               <span className="mb-6 capitalize">
                 (
                 {userId
-                  ? cart?.reduce((acc, g) => acc + g.items.length, 0) ?? 0
+                  ? (cart?.reduce((acc, g) => acc + g.items.length, 0) ?? 0)
                   : localCart.length}{" "}
                 <span className="capitalize">{t("items")}</span>)
               </span>
@@ -65,17 +60,11 @@ const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
             <CartItemSkeleton count={2} />
           ) : userId ? (
             flatItems.map((item) => (
-              <CartItemCard
-                cartServer={item}
-                key={item.id}
-              />
+              <CartItemCard cartServer={item} key={item.id} />
             ))
           ) : (
             localCart.map((item) => (
-              <CartItemCard
-                localProducts={item}
-                key={item.product_id}
-              />
+              <CartItemCard localProducts={item} key={item.product_id} />
             ))
           )}
         </div>

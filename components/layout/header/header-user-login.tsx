@@ -27,14 +27,12 @@ const HeaderUserLogin = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
 
-  const {
-    data: user,
-    isLoading: isLoadingUser,
-    isError: isErrorUser,
-  } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ["me", userId],
     queryFn: () => getMe(),
     enabled: !!userId,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 
   const onLogout = () => {

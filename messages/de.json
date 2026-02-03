@@ -458,7 +458,6 @@
   },
   "selectItemsToReturn": "Artikel für Rücksendung auswählen",
   "selectReason": "Grund auswählen",
-
   "returnReasons": {
     "notAsDescribed": "Artikel entspricht nicht der Beschreibung",
     "damaged": "Artikel ist beschädigt oder defekt",
@@ -476,5 +475,6 @@
   "paymentFailedMessage": "Leider konnte Ihre Zahlung nicht abgeschlossen werden. Es wurde kein Betrag abgebucht. Bitte versuchen Sie es erneut oder wählen Sie eine andere Zahlungsmethode.",
   "retryPayment": "Zahlung erneut versuchen",
   "people_also_search": "Andere suchten auch nach",
-  "go_to_page": "Zur Seite gehen"
+  "go_to_page": "Zur Seite gehen",
+  "searchPrompt": "Suche nach einem Produkt…"
 }
