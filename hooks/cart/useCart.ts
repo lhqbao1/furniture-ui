@@ -7,9 +7,8 @@ import { useCartLocal } from "@/hooks/cart";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { toast } from "sonner";
 import { CartResponse } from "@/types/cart";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
-import { useTranslations } from "use-intl";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 

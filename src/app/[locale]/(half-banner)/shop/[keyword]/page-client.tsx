@@ -32,10 +32,7 @@ export default function ShopKeywordClient({
   return (
     <>
       <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
-        <ProductsGridLayout
-          hasBadge
-          data={data.items}
-        />
+        <ProductsGridLayout hasBadge data={data.items} />
       </div>
 
       {data.pagination.total_pages > 1 && (

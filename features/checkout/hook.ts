@@ -136,7 +136,9 @@ export function useGetCheckOutStatistic(params?: {
       params?.to_date ?? null,
     ],
     queryFn: () => getCheckOutStatistics(params),
-    retry: false,
+    placeholderData: (previousData) => previousData,
+    retry: 2,
+    retryDelay: 1000,
   });
 }
 

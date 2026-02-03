@@ -93,29 +93,17 @@ const DSPriceExport = () => {
         {/* Status Filter */}
         <div className="space-y-2">
           <Label>Status</Label>
-          <RadioGroup
-            value={status}
-            onValueChange={(v) => setStatus(v as any)}
-          >
+          <RadioGroup value={status} onValueChange={(v) => setStatus(v as any)}>
             <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="active"
-                id="status-active"
-              />
+              <RadioGroupItem value="active" id="status-active" />
               <Label htmlFor="status-active">Active</Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="inactive"
-                id="status-inactive"
-              />
+              <RadioGroupItem value="inactive" id="status-inactive" />
               <Label htmlFor="status-inactive">Inactive</Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="all"
-                id="status-all"
-              />
+              <RadioGroupItem value="all" id="status-all" />
               <Label htmlFor="status-all">All</Label>
             </div>
           </RadioGroup>
@@ -124,10 +112,7 @@ const DSPriceExport = () => {
 
       {/* Export Button */}
       <div className="flex justify-end">
-        <Button
-          onClick={handleExport}
-          disabled={isFetching}
-        >
+        <Button onClick={handleExport} disabled={isFetching}>
           {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
         </Button>
       </div>

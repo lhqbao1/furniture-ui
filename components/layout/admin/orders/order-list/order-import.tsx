@@ -13,7 +13,6 @@ import { useDropzone } from "react-dropzone";
 import { File, Loader2 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { useImportProductInventory } from "@/features/file/hook";
 
 import {
   Select,
@@ -165,6 +164,8 @@ const OrderImport = () => {
           };
         }
 
+        console.log(row);
+
         grouped[id].items.push({
           quantity: row.quantity,
           id_provider: row.id_provider,
@@ -212,10 +213,7 @@ const OrderImport = () => {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Import</Button>
       </DialogTrigger>
@@ -232,10 +230,7 @@ const OrderImport = () => {
             onValueChange={setChannel}
             defaultValue={channel ?? undefined}
           >
-            <SelectTrigger
-              className="border"
-              placeholderColor
-            >
+            <SelectTrigger className="border" placeholderColor>
               <SelectValue placeholder="Select channel" />
             </SelectTrigger>
             <SelectContent>
@@ -274,16 +269,10 @@ const OrderImport = () => {
         </div>
 
         <div className="mt-6 flex justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-          >
+          <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button
-            disabled={!orders.length}
-            onClick={handleSubmit}
-          >
+          <Button disabled={!orders.length} onClick={handleSubmit}>
             Submit
           </Button>
         </div>

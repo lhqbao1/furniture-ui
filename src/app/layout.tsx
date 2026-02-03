@@ -77,8 +77,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de">
+    <html lang="de" translate="no">
       <head>
+        <meta name="google" content="notranslate" />
+
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__APP_VERSION__ = "${process.env.NEXT_PUBLIC_APP_VERSION}";`,
@@ -91,10 +93,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
 
-        <Script
-          id="gtm-head"
-          strategy="beforeInteractive"
-        >
+        <Script id="gtm-head" strategy="beforeInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -107,10 +106,7 @@ export default function RootLayout({
           name="apple-mobile-web-app-capable"
           content="no"
         /> */}
-        <Script
-          id="gtag-stub"
-          strategy="beforeInteractive"
-        >
+        <Script id="gtag-stub" strategy="beforeInteractive">
           {`
     window.dataLayer = window.dataLayer || [];
     window.gtag = function () {
@@ -135,10 +131,7 @@ export default function RootLayout({
             gtag('config', 'AW-17706586126');
                     `}
         </Script> */}
-        <Script
-          id="gtag-init-safe"
-          strategy="afterInteractive"
-        >
+        <Script id="gtag-init-safe" strategy="afterInteractive">
           {`
     (function () {
       try {
@@ -159,10 +152,7 @@ export default function RootLayout({
   `}
         </Script>
 
-        <Script
-          id="google-ads-conversion-safe"
-          strategy="afterInteractive"
-        >
+        <Script id="google-ads-conversion-safe" strategy="afterInteractive">
           {`
     (function () {
       try {
@@ -205,10 +195,7 @@ export default function RootLayout({
           `}
         </Script> */}
 
-        <Script
-          id="fb-pixel-safe"
-          strategy="afterInteractive"
-        >
+        <Script id="fb-pixel-safe" strategy="afterInteractive">
           {`
     (function () {
       try {

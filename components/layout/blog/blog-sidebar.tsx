@@ -1,4 +1,5 @@
 "use client";
+
 import { BlogByProductResponse } from "@/types/blog";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,16 +18,13 @@ export default function SidebarBlog({
       <div className="space-y-5">
         {items.slice(0, 10).map((post) => {
           return (
-            <div
-              className="flex gap-4"
-              key={post.product.id}
-            >
+            <div className="flex gap-4" key={post.product.id}>
               <Image
                 src={post.product.static_files[0].url}
                 alt={post.product.name}
                 width={90}
                 height={70}
-                className="rounded-md object-cover transition-all hover:scale-110 duration-300"
+                className="rounded-md h-20 w-20 object-contain transition-all hover:scale-110 duration-300"
               />
 
               <div className="flex-1">

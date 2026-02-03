@@ -262,17 +262,10 @@ function ImagePickerInput<T extends FieldValues>({
           </>
         )}
 
-        <Button
-          variant="outline"
-          type="button"
-        >
+        <Button variant="outline" type="button">
           {t("browseFile")}
         </Button>
-        <input
-          {...getInputProps()}
-          className="hidden"
-          multiple
-        />
+        <input {...getInputProps()} className="hidden" multiple />
       </div>
 
       {/* Preview */}

@@ -93,37 +93,21 @@ const SyncToEbayForm = ({
             (i) => i.marketplace === currentMarketplace,
           )?.final_price
         : product.final_price,
-      min_stock: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.min_stock
-        : undefined,
-      max_stock: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.max_stock
-        : undefined,
+      min_stock:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.min_stock ?? undefined,
+      max_stock:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.max_stock ?? undefined,
       sku: product.sku,
-      handling_time: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.handling_time
-        : undefined,
+      handling_time:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.handling_time ?? undefined,
     },
   });
-
-  const marketplace = form.watch("marketplace");
-
-  useEffect(() => {
-    if (isUpdating) return;
-    if (marketplace === "ebay") {
-      form.setValue("min_stock", 0);
-      form.setValue("max_stock", 10);
-    } else {
-      form.setValue("min_stock", null);
-      form.setValue("max_stock", null);
-    }
-  }, [marketplace, form]);
 
   const onSubmit = (values: MarketPlaceFormValues) => {
     if (!product.brand) {
@@ -266,7 +250,13 @@ const SyncToEbayForm = ({
               ebay_offer_id: ebayData?.marketplace_offer_id ?? null,
             };
 
-            syncToEbayMutation.mutate(payload);
+            syncToEbayMutation.mutate(payload, {
+              onError(error, variables, onMutateResult, context) {
+                toast.error("Failed to update marketplace data", {
+                  description: error.message,
+                });
+              },
+            });
           }
 
           if ((isUpdating || isAdd) && currentMarketplace === "kaufland") {
@@ -306,11 +296,21 @@ const SyncToEbayForm = ({
             };
 
             // Hiển thị toast loading
-            syncToKauflandMutation.mutate(payload);
+            syncToKauflandMutation.mutate(payload, {
+              onError(error, variables, onMutateResult, context) {
+                toast.error("Failed to update marketplace data", {
+                  description: error.message,
+                });
+              },
+            });
           }
+
+          toast.success("Update marketplace data success");
         },
-        onError() {
-          toast.error("Failed to update marketplace data");
+        onError(e) {
+          toast.error("Failed to update marketplace data", {
+            description: e.message,
+          });
         },
       },
     );
@@ -318,10 +318,7 @@ const SyncToEbayForm = ({
 
   return (
     <>
-      <Dialog
-        open={open}
-        onOpenChange={setOpen}
-      >
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
             variant="outline"
@@ -341,7 +338,7 @@ const SyncToEbayForm = ({
             )}
           </Button>
         </DialogTrigger>
-        <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
+        <DialogContent className="w-250 overflow-y-scroll h-[calc(100%-3rem)]">
           <DialogHeader>
             <DialogTitle>Update Marketplace</DialogTitle>
           </DialogHeader>
@@ -374,10 +371,7 @@ const SyncToEbayForm = ({
                             <SelectContent>
                               {marketplacesToRender.length > 0 ? (
                                 marketplacesToRender.map((m) => (
-                                  <SelectItem
-                                    key={m}
-                                    value={m}
-                                  >
+                                  <SelectItem key={m} value={m}>
                                     {m.toUpperCase()}
                                   </SelectItem>
                                 ))
@@ -403,10 +397,7 @@ const SyncToEbayForm = ({
                     <FormItem>
                       <FormLabel>Product Name</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter product name"
-                          {...field}
-                        />
+                        <Input placeholder="Enter product name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

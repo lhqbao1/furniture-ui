@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import BlogBreadcrumb from "./blog-breadcrumb";
+import BlogListKeywords from "./list-keyword";
 
 export function stripImagesAndHeadings(content: string): string {
   return (
@@ -55,6 +56,8 @@ export default function BlogDetails({ post }: { post: BlogItem }) {
           {stripImagesAndHeadings(post.content)}
         </ReactMarkdown>
       </div>
+
+      <BlogListKeywords />
     </article>
   );
 }

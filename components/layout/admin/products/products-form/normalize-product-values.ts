@@ -14,7 +14,9 @@ export const normalizeProductValues = (
       productValues.categories?.map((c: CategoryResponse | number) =>
         typeof c === "object" ? String(c.id) : String(c),
       ) || [],
-    brand_id: productValues.brand ? productValues.brand?.id : null,
+brand_id: productValues.brand
+  ? String(productValues.brand.id)
+  : defaultValues.brand_id,
     bundles:
       productValues.bundles?.map((b) => ({
         product_id: b.bundle_item.id,

@@ -60,6 +60,7 @@ const SelectOrderItems = ({
 
     setListProducts((prev) => {
       if (prev.some((p) => p.product.id === product.id)) return prev;
+      form.setValue("carrier", product.carrier)
       return [
         ...prev,
         {
@@ -128,7 +129,7 @@ const SelectOrderItems = ({
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent className="w-[600px] p-0 pointer-events-auto">
+          <PopoverContent className="w-150 p-0 pointer-events-auto">
             <Command shouldFilter={false}>
               <CommandInput
                 placeholder="Search product..."
@@ -136,7 +137,7 @@ const SelectOrderItems = ({
                 onValueChange={(value) => setQueryParams(value)}
               />
               <CommandEmpty>No product found.</CommandEmpty>
-              <CommandGroup className="h-[400px] overflow-y-scroll">
+              <CommandGroup className="h-100 overflow-y-scroll">
                 {isLoading && <CommandItem disabled>Loading...</CommandItem>}
                 {isError && (
                   <CommandItem disabled>Error loading products</CommandItem>

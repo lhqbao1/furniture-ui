@@ -1,13 +1,9 @@
 "use client";
 import { useGetFAQItem, useGetFAQTopic } from "@/features/faq/hook";
-import { Loader2, Mic, Search } from "lucide-react";
 import React, { useState } from "react";
 import { getIcon } from "./icon";
-import { BannerInput } from "@/components/shared/banner-input";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ListFAQQuestion } from "./list-question";
-import { useTranslations } from "next-intl";
 import { FAQQuestionSkeleton } from "./skeleton";
 import { FAQTopicSkeleton } from "./topic-skeleton";
 
@@ -18,7 +14,6 @@ interface ListFAQProps {
 
 const ListFAQ = ({ topic_id, height }: ListFAQProps) => {
   const [currentTopic, setCurrentTopic] = useState(topic_id);
-  const t = useTranslations();
   const {
     data: topic,
     isLoading: isLoadingTopic,
@@ -31,11 +26,11 @@ const ListFAQ = ({ topic_id, height }: ListFAQProps) => {
   } = useGetFAQItem(currentTopic);
 
   return (
-    <div className="grid grid-cols-12 gap-8 lg:pt-12 pt-4 items-start">
-      <div className="col-span-5 grid grid-cols-3 gap-10">
-        <h2 className="text-4xl font-semibold text-secondary col-span-3 text-center">
-          FAQ
-        </h2>
+    <div className="grid grid-cols-12 lg:gap-x-12 gap-x-2 gap-y-8 lg:pt-12 pt-4 items-start xl:w-8/12 w-11/12 mx-auto overflow-x-hidden">
+      <h2 className="text-4xl font-semibold text-secondary text-center col-span-12">
+        FAQ
+      </h2>
+      <div className="lg:col-span-5 col-span-12 grid grid-cols-3 md:gap-10 gap-2">
         {isLoadingTopic ? (
           <FAQTopicSkeleton count={6} />
         ) : (
@@ -56,7 +51,7 @@ const ListFAQ = ({ topic_id, height }: ListFAQProps) => {
           })
         )}
       </div>
-      <div className="col-span-7 space-y-8">
+      <div className="lg:col-span-7 col-span-12 space-y-8">
         {isLoadingQuestion ? (
           <FAQQuestionSkeleton count={2} />
         ) : (

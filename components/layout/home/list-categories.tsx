@@ -38,16 +38,13 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
       {!categories || categories.length === 0 ? (
         <div className="flex gap-6 flex-wrap">
           {[...Array(6)].map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-6 w-20 rounded-md"
-            />
+            <Skeleton key={i} className="h-6 w-20 rounded-md" />
           ))}
         </div>
       ) : (
         <NavigationMenu viewport={isMobile}>
-          <NavigationMenuList className="gap-x-2 gap-y-2 w-[90%] xl:w-full flex-wrap mx-auto">
-            {categories.map((category) => (
+          <NavigationMenuList className="gap-x-2 gap-y-2 w-full flex-wrap mx-auto">
+            {categories.slice(0, 8).map((category) => (
               <NavigationMenuItem key={category.id}>
                 <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2">
                   <Link
@@ -61,7 +58,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
 
                 {category.children?.length > 0 && (
                   <NavigationMenuContent className="rounded-sm border-none ring-0 z-50">
-                    <div className="min-w-[200px]">
+                    <div className="min-w-50">
                       {category.children.map((child) => (
                         <NavigationMenuLink
                           key={child.id}

@@ -184,9 +184,9 @@ const OrderDetailsDrawer = ({ invoice, checkout }: OrderDetailsDrawerProps) => {
                 <span>{t("subtotal")}</span>
                 <span>
                   {(
-                    (invoice?.total_amount_item ?? 0) +
-                    (invoice?.total_shipping ?? 0) +
-                    (invoice?.voucher_amount ?? 0)
+                    (checkout?.total_amount_item ?? 0) +
+                    (checkout?.total_shipping ?? 0) +
+                    (checkout?.voucher_amount ?? 0)
                   ).toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -218,9 +218,9 @@ const OrderDetailsDrawer = ({ invoice, checkout }: OrderDetailsDrawerProps) => {
                 <span>{t("total")}</span>
                 <span>
                   {(
-                    (invoice?.total_amount_item ?? 0) +
-                    (invoice?.total_shipping ?? 0) +
-                    (invoice?.voucher_amount ?? 0)
+                    (checkout?.total_amount_item ?? 0) +
+                    (checkout?.total_shipping ?? 0) +
+                    (checkout?.voucher_amount ?? 0)
                   ).toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,

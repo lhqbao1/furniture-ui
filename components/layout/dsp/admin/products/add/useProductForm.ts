@@ -29,9 +29,11 @@ export const useProductFormDSP = ({
   const addProductMutation = useAddProductDSP();
   const [isLoadingSEO, setIsLoadingSEO] = useState(false);
 
-  const initialValues = normalizeProductValues(
-    productValuesClone || defaultValuesDSP,
-  );
+  type FormValues = z.infer<typeof addProductDSPSchema>;
+
+  const initialValues: FormValues = normalizeProductValues(
+  productValuesClone || defaultValuesDSP,
+);
 
   const form = useForm<z.infer<typeof addProductDSPSchema>>({
     resolver: zodResolver(addProductDSPSchema),

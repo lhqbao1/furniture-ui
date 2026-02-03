@@ -92,11 +92,10 @@ const SyncToAmazonForm = ({
       country_of_origin: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,
       )?.country_of_origin,
-      handling_time: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.handling_time
-        : undefined,
+      handling_time:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.handling_time ?? undefined,
     },
   });
 
@@ -275,10 +274,18 @@ const SyncToAmazonForm = ({
             bullet_point5: product.bullet_point_5 ?? null,
           };
 
-          syncToAmazonMutation.mutate(payload);
+          syncToAmazonMutation.mutate(payload, {
+            onError(error, variables, onMutateResult, context) {
+              toast.error("Failed to update marketplace data", {
+                description: error.message,
+              });
+            },
+          });
         },
-        onError() {
-          toast.error("Failed to update marketplace data");
+        onError(e) {
+          toast.error("Failed to update marketplace data", {
+            description: e.message,
+          });
         },
       },
     );
@@ -286,10 +293,7 @@ const SyncToAmazonForm = ({
 
   return (
     <>
-      <Dialog
-        open={open}
-        onOpenChange={setOpen}
-      >
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
             variant="outline"
@@ -297,7 +301,7 @@ const SyncToAmazonForm = ({
             className={`${
               isUpdating
                 ? "bg-amber-50 border-amber-400"
-                : "bg-white border-gray-500"
+                : "bg-green-50 border-green-400"
             }`}
           >
             {isUpdating ? (
@@ -336,10 +340,7 @@ const SyncToAmazonForm = ({
                     <FormItem>
                       <FormLabel>Product Name</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter product name"
-                          {...field}
-                        />
+                        <Input placeholder="Enter product name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -368,10 +369,7 @@ const SyncToAmazonForm = ({
 
                             <SelectContent className="max-h-80">
                               {COUNTRY_ORIGIN_OPTIONS.map((c) => (
-                                <SelectItem
-                                  key={c.value}
-                                  value={c.value}
-                                >
+                                <SelectItem key={c.value} value={c.value}>
                                   {c.label}
                                 </SelectItem>
                               ))}
