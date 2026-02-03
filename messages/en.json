@@ -478,5 +478,6 @@
   "paymentFailedTitle": "Payment failed",
   "paymentFailedMessage": "Unfortunately, we could not complete your payment. No amount has been charged. Please try again or choose a different payment method.",
   "retryPayment": "Try payment again",
-  "people_also_search": "People also search for"
+  "people_also_search": "People also search for",
+  "go_to_page": "Go to page"
 }

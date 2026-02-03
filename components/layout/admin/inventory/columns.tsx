@@ -318,7 +318,7 @@ export const getInventoryColumns = (
     header: ({}) => <div className="text-center uppercase">SUPPLIER</div>,
     cell: ({ row }) => {
       return (
-        <div className="text-center">
+        <div className="text-center text-wrap">
           {row.original.owner
             ? row.original.owner.business_name
             : "Prestige Home"}

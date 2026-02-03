@@ -206,9 +206,11 @@ const OrderImport = () => {
       console.log(orders);
 
       toast.success("All orders created successfully!", { id: toastId });
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      toast.error("Failed to create one or more orders", { id: toastId });
+      toast.error("Failed to create one or more orders", {
+        id: toastId,
+      });
     }
   };
 
