@@ -13,7 +13,7 @@ export default function BlogCard({ post }: { post: BlogItem }) {
     <article className="rounded-lg overflow-hidden shadow hover:shadow-md transition">
       <Link href={`/blog/${post.slug}`}>
         <Image
-          src={imageUrl ?? ""}
+          src={imageUrl ?? "/blog-placeholder.png"}
           width={500}
           height={300}
           alt={post.title}
@@ -30,10 +30,7 @@ export default function BlogCard({ post }: { post: BlogItem }) {
         </div>
 
         <Link href={`/blog/${post.slug}`}>
-          <Button
-            type="button"
-            variant="secondary"
-          >
+          <Button type="button" variant="secondary">
             Beitrag lesen
           </Button>
         </Link>

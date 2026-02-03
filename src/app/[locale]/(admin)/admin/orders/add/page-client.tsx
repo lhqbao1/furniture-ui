@@ -80,13 +80,13 @@ export default function CreateOrderPageClient() {
 
     const result = calculateShippingCostManual(listItems, countryCode, taxId);
 
-    console.log(listItems);
-
     const autoShipping = result.gross;
     const autoCarrier = getCarrierFromItems(listItems);
 
     const currentShipping = form.getValues("total_shipping");
     const currentCarrier = form.getValues("carrier");
+
+    console.log(currentCarrier)
 
     // chỉ override nếu user chưa nhập
     if (currentShipping == null || currentShipping === 0) {
@@ -145,7 +145,7 @@ export default function CreateOrderPageClient() {
           (errors) => {
             console.log(errors);
             // Lấy message lỗi đầu tiên nếu có
-            const firstError: any = Object.values(errors)[0];
+            const firstError = Object.values(errors)[0];
             const message =
               typeof firstError?.message === "string"
                 ? firstError.message

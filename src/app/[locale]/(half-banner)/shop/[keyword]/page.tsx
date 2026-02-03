@@ -82,10 +82,7 @@ export default async function ShopKeywordPage({
       </div>
 
       {/* Client handles pagination */}
-      <ShopKeywordClient
-        initialData={products}
-        searchText={searchText}
-      />
+      <ShopKeywordClient initialData={products} searchText={searchText} />
     </div>
   );
 }

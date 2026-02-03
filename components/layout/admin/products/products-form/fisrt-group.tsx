@@ -28,9 +28,7 @@ const RichEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="min-h-[200px] border rounded-md p-4">
-        Loading editor...
-      </div>
+      <div className="min-h-50 border rounded-md p-4">Loading editor...</div>
     ),
   },
 );
@@ -119,10 +117,7 @@ const ProductDetailInputs = ({
               Product Name
             </FormLabel>
             <FormControl>
-              <Input
-                placeholder=""
-                {...field}
-              />
+              <Input placeholder="" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -195,10 +190,7 @@ const ProductDetailInputs = ({
 
       <div className="grid lg:grid-cols-4 grid-cols-1 lg:gap-6 gap-4">
         {/*Product Category */}
-        <MultiSelectField
-          fieldName="category_ids"
-          label="Categories"
-        />
+        <MultiSelectField fieldName="category_ids" label="Categories" />
 
         {/* SKU input */}
         <FormField
@@ -265,7 +257,7 @@ const ProductDetailInputs = ({
                     type="number"
                     inputMode="decimal"
                     disabled={!isDSP}
-                    value={isDSP ? field.value ?? "" : computedStock}
+                    value={isDSP ? (field.value ?? "") : computedStock}
                     onChange={
                       isDSP
                         ? (e) =>
@@ -307,24 +299,15 @@ const ProductDetailInputs = ({
               defaultValue="19%"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="19%"
-                  id="19%"
-                />
+                <RadioGroupItem value="19%" id="19%" />
                 <Label htmlFor="19%">19%</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="7%"
-                  id="7%"
-                />
+                <RadioGroupItem value="7%" id="7%" />
                 <Label htmlFor="7%">7%</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="0%"
-                  id="0%"
-                />
+                <RadioGroupItem value="0%" id="0%" />
                 <Label htmlFor="0%">0%</Label>
               </div>
             </RadioGroup>

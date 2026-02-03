@@ -94,7 +94,7 @@ export function MenuBar({
   );
 
   return (
-    <div className="flex flex-wrap gap-2 border-b pb-3">
+    <div className="flex flex-wrap gap-2 pb-3">
       {iconButton(
         () => editor.chain().focus().toggleBold().run(),
         Bold,
@@ -363,7 +363,7 @@ export default function RichEditor({
         <EditorContent
           disabled={disabled}
           editor={editor}
-          className="prose prose-sm max-w-none p-4 border rounded-md min-h-[200px]
+          className="prose prose-sm max-w-none p-4 border rounded-md min-h-50 overflow-hidden
               [&_h2]:mt-6 [&_h2]:mb-3 [&_a]:text-secondary [&_a]:underline font-sans
               [&_*]:bg-transparent [&_p]:font-sans
               [&_span]:font-sans

@@ -231,10 +231,7 @@ export const getInventoryColumns = (
       const image = row.original.static_files?.[0]?.url;
 
       return (
-        <HoverCard
-          openDelay={100}
-          closeDelay={100}
-        >
+        <HoverCard openDelay={100} closeDelay={100}>
           <HoverCardTrigger asChild>
             <div className="w-12 h-12 relative cursor-pointer">
               {image ? (
@@ -279,6 +276,7 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "ean",
+    meta: { width: 150 },
     header: ({}) => <div className="text-center uppercase">EAN</div>,
     cell: ({ row }) => {
       return <EditableEANCell product={row.original} />;
@@ -287,6 +285,7 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "name",
+    meta: { width: 250 },
     header: ({ column }) => (
       <Button
         variant={"ghost"}
@@ -302,20 +301,11 @@ export const getInventoryColumns = (
         </div>
       </Button>
     ),
-    // cell: ({ row }) => <EditableNameCell product={row.original} />,
     cell: ({ row }) => (
-      <div className="max-w-80 w-80 text-wrap">
+      <div className="text-wrap">
         <div>{row.original.name}</div>
         <div className="flex flex-col gap-2 items-start">
           <div>SKU: {row.original.sku}</div>
-
-          {/* <Link
-            href={`/admin/products/${row.original.id}/edit`}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-          >
-            <Pencil className="size-3 text-primary cursor-pointer" />
-          </Link> */}
         </div>
       </div>
     ),
@@ -324,6 +314,7 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "supplier",
+    meta: { width: 200 },
     header: ({}) => <div className="text-center uppercase">SUPPLIER</div>,
     cell: ({ row }) => {
       return (

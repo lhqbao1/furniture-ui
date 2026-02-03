@@ -94,7 +94,13 @@ const OrderList = () => {
     });
   }, [page]);
 
-  if (isError) return <div>No data</div>;
+  if (!data && isLoading) {
+    return <ProductTableSkeleton columnsCount={6} rowsCount={6} />;
+  }
+
+  if (!data && isError) {
+    return <div>No data</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -103,10 +109,7 @@ const OrderList = () => {
         {isLoadingStatistic || !statistic ? (
           <ProductStatisticSkeleton />
         ) : (
-          <OrderStatistic
-            statistic={mergedStatistic}
-            isOrder
-          />
+          <OrderStatistic statistic={mergedStatistic} isOrder />
         )}
         <div className="text-3xl text-secondary font-bold text-center">
           Order List
@@ -118,10 +121,7 @@ const OrderList = () => {
           type={ToolbarType.order}
         />
         {isLoading ? (
-          <ProductTableSkeleton
-            columnsCount={6}
-            rowsCount={6}
-          />
+          <ProductTableSkeleton columnsCount={6} rowsCount={6} />
         ) : (
           <ProductTable
             data={data ? data.items : []}

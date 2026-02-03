@@ -20,6 +20,27 @@ function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   }
 }
 
+const normalizeDescription = (html?: string) => {
+  if (!html) return "";
+
+  return (
+    html
+      // bỏ newline
+      .replace(/\r?\n|\r/g, " ")
+
+      // đổi <br>, <p>, <li>, <h*> thành space
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<\/?(p|div|li|ul|h\d)[^>]*>/gi, " ")
+
+      // dọn HTML còn sót
+      .replace(/<[^>]+>/g, "")
+
+      // dọn khoảng trắng
+      .replace(/\s+/g, " ")
+      .trim()
+  );
+};
+
 export default function ExportExcelButton() {
   const { data, isFetching, refetch } = useQuery({
     queryKey: ["all-products"],
@@ -48,8 +69,8 @@ export default function ExportExcelButton() {
         manufacturing_country: clean(p.manufacture_country),
         customs_tariff_nr: clean(p.tariff_number),
         name: clean(p.name),
-        description: clean(p.description),
-        technical_description: clean(p.technical_description),
+        description: normalizeDescription(p.description),
+        technical_description: normalizeDescription(p.technical_description),
         categories: clean(p.categories?.map((c) => c.code).join(", ")),
         category_name: clean(p.categories?.map((c) => c.name).join(", ")),
         unit: clean(p.unit),
@@ -130,15 +151,11 @@ export default function ExportExcelButton() {
     });
 
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, "export.xlsx");
+    saveAs(blob, `export-${Date.now()}.xlsx`);
   };
 
   return (
-    <Button
-      variant="outline"
-      onClick={handleExport}
-      disabled={isFetching}
-    >
+    <Button variant="outline" onClick={handleExport} disabled={isFetching}>
       {isFetching ? <Loader2 className="animate-spin" /> : "Product Export"}
     </Button>
   );

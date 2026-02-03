@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-// import 'quill/dist/quill.snow.css'
 import {
   addProductSchema,
   defaultValues,
