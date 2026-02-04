@@ -42,15 +42,33 @@ const DeliveryRange = ({ productDetails }: DeliveryRangeProps) => {
     return latest;
   }, [data]);
 
+  const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
+    const result = new Date(startDate);
+    result.setDate(result.getDate() + days);
+    return result;
+  }, []);
+
   const estimatedDeliveryRange = React.useMemo(() => {
     const deliveryRange = getDeliveryDayRange(productDetails.delivery_time);
-    if (!deliveryRange || !latestDeliveryDate) return null;
+    if (!deliveryRange) return null;
+
+    if (!latestDeliveryDate) {
+      const today = new Date();
+      return {
+        from: addCalendarDays(today, deliveryRange.min),
+        to: addCalendarDays(today, deliveryRange.max),
+      };
+    }
 
     return {
       from: addBusinessDays(latestDeliveryDate, deliveryRange.min),
       to: addBusinessDays(latestDeliveryDate, deliveryRange.max),
     };
-  }, [latestDeliveryDate, productDetails.delivery_time]);
+  }, [
+    addCalendarDays,
+    latestDeliveryDate,
+    productDetails.delivery_time,
+  ]);
 
   return (
     <div className="flex flex-row gap-4 items-start">
