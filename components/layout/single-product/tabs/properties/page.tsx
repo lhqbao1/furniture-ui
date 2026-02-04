@@ -87,18 +87,20 @@ const ProductDetailsProperties = ({
         <div className="rounded-md bg-gray-100 font-semibold px-4 py-4 text-lg">
           Hersteller/EU Verantwortliche Person
         </div>
-        {product.brand && (
-          <div className="px-4 space-y-1">
-            <div>{product.brand.company_name}</div>
-            <div>{product.brand.company_address}</div>
-            <div>
-              {product.brand.company_postal_code} {product.brand.company_city}
+        {product.brand &&
+          product.brand.company_name &&
+          !product.brand.company_name.toLowerCase().includes("norma") && (
+            <div className="px-4 space-y-1">
+              <div>{product.brand.company_name}</div>
+              <div>{product.brand.company_address}</div>
+              <div>
+                {product.brand.company_postal_code} {product.brand.company_city}
+              </div>
+              <div>{getCountryLabelDE(product.brand.company_country)}</div>
+              <div>{product.brand.company_email}</div>
+              <div>{product.brand.company_phone ?? ""}</div>
             </div>
-            <div>{getCountryLabelDE(product.brand?.company_country)}</div>
-            <div>{product.brand.company_email}</div>
-            <div>{product.brand.company_phone ?? ""}</div>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );
