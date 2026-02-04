@@ -67,6 +67,7 @@ const AddContainerDialog = ({
 }: AddContainerDialogProps) => {
   const [open, setOpen] = useState(false);
   const isEdit = !!container;
+
   const createContainerMutation = useCreatePOContainer();
   const updateContainerMutation = useUpdatePOContainer();
   const updatePOMutation = useUpdatePONumberOfContainers();
@@ -92,6 +93,9 @@ const AddContainerDialog = ({
         : undefined,
       date_of_issue: container.date_of_issue
         ? container.date_of_issue.slice(0, 10)
+        : "",
+      date_of_delivery: container.date_of_delivery
+        ? container.date_of_delivery.slice(0, 10)
         : "",
     });
   }, [container, form]);
@@ -147,10 +151,7 @@ const AddContainerDialog = ({
       }}
     >
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-        >
+        <Button variant="outline" size="sm">
           {isEdit ? (
             <>
               <Pencil className="h-4 w-4 text-primary" />
@@ -190,25 +191,18 @@ const AddContainerDialog = ({
               name="size"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Size</FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
+                  <FormLabel>
+                    Size <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
-                      <SelectTrigger
-                        className="border"
-                        placeholderColor
-                      >
+                      <SelectTrigger className="border" placeholderColor>
                         <SelectValue placeholder="Select size" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {CONTAINER_SIZES.map((size) => (
-                        <SelectItem
-                          key={size}
-                          value={size}
-                        >
+                        <SelectItem key={size} value={size}>
                           {size}
                         </SelectItem>
                       ))}
@@ -218,6 +212,25 @@ const AddContainerDialog = ({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="container_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Container Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Date of Inspection */}
             <FormField
               control={form.control}
@@ -265,13 +278,34 @@ const AddContainerDialog = ({
                   <FormControl>
                     <Input
                       type="date"
-                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Delivery Date */}
+            <FormField
+              control={form.control}
+              name="date_of_delivery"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of delivery</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Actions */}
             <div className="col-span-2 flex justify-end gap-2 pt-2">
               <Button
@@ -281,11 +315,7 @@ const AddContainerDialog = ({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-fit"
-              >
+              <Button type="submit" disabled={isSubmitting} className="w-fit">
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}

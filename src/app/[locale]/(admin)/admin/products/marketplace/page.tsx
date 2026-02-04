@@ -46,12 +46,13 @@ const ProductMarketplace = () => {
     all_products: filters.all_products,
     search: filters.search,
     sort_by_stock: filters.sort_by_stock,
+    supplier_id: filters.supplier_id,
   });
   const { data: exportData } = useGetProductsSelect();
 
   if (isError) return <div>No data</div>;
   // if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
-  const columns = productMarketplaceColumns(data?.items ?? [], setSortByStock);
+  const columns = productMarketplaceColumns(setSortByStock);
 
   return (
     <div className="space-y-6">

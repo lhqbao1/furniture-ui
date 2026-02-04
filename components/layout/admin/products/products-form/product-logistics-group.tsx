@@ -66,8 +66,6 @@ const ProductLogisticsGroup = ({
     name: "number_of_packages",
   });
 
-  const isLoading = numberOfPackages === undefined || numberOfPackages === null;
-
   // Tạo field array cho packages
   const { fields, append, remove } = useFieldArray({
     control,
@@ -157,10 +155,7 @@ const ProductLogisticsGroup = ({
                     </SelectTrigger>
                     <SelectContent>
                       {mergedCarriers.map((c) => (
-                        <SelectItem
-                          key={c.id}
-                          value={c.id}
-                        >
+                        <SelectItem key={c.id} value={c.id}>
                           <div className="flex items-center gap-2">
                             <Image
                               src={c.logo}
@@ -191,27 +186,46 @@ const ProductLogisticsGroup = ({
                 Delivery time
               </FormLabel>
               <FormControl>
-                <Select
-                  value={field.value ?? ""}
-                  onValueChange={(val) => {
-                    if (val === "Deselect") field.onChange(null);
-                    else field.onChange(val);
-                  }}
-                >
-                  <SelectTrigger className="border col-span-4 font-light">
-                    <SelectValue placeholder="Select delivery time" />
-                  </SelectTrigger>
-                  <SelectContent>
+                <div className="grid grid-cols-2 gap-3">
+                  <Select
+                    value={
+                      deliveryTimes.includes(field.value ?? "")
+                        ? (field.value ?? "")
+                        : ""
+                    }
+                    onValueChange={(val) => {
+                      if (val === "Deselect") field.onChange(null);
+                      else field.onChange(val);
+                    }}
+                  >
+                    <SelectTrigger className="border font-light">
+                      <SelectValue placeholder="Select delivery time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {deliveryTimes.map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t} business days
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="text"
+                    list="delivery-time-options"
+                    placeholder="Custom (e.g. 7-10)"
+                    value={
+                      deliveryTimes.includes(field.value ?? "")
+                        ? ""
+                        : (field.value ?? "")
+                    }
+                    onChange={(e) => field.onChange(e.target.value)}
+                  />
+                  <datalist id="delivery-time-options">
                     {deliveryTimes.map((t) => (
-                      <SelectItem
-                        key={t}
-                        value={t}
-                      >
-                        {t} business days
-                      </SelectItem>
+                      <option key={t} value={t} />
                     ))}
-                  </SelectContent>
-                </Select>
+                  </datalist>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -415,10 +429,7 @@ const PackageSkeleton = () => (
 
     <div className="grid grid-cols-4 gap-3 w-full">
       {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="flex flex-col-reverse items-center flex-1"
-        >
+        <div key={i} className="flex flex-col-reverse items-center flex-1">
           <div className="h-10 w-full bg-gray-300 rounded"></div>
           <div className="h-3 w-10 bg-gray-300 rounded mb-1"></div>
         </div>

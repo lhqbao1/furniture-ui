@@ -5,20 +5,14 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ProductItem } from "@/types/products";
 import { useLocale } from "next-intl";
-import { Link, useRouter } from "@/src/i18n/navigation";
+import { useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getProductById } from "@/features/products/api";
 import {
   HoverCard,
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
-import { formatDate } from "@/lib/date-formated";
-import { formatIOSDate } from "@/lib/ios-to-num";
 import AddOrEditInventoryDialog from "./dialog/add-inventory-dialog";
-import ProductInventoryDeleteDialog from "./dialog/delete-dialog";
-import { Pencil, Trash } from "lucide-react";
-import EditInventoryDialog from "./dialog/edit-inventory-dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -28,25 +22,25 @@ import { useUpdateStockProduct } from "@/features/products/inventory/hook";
 import { useAtom } from "jotai";
 import { adminIdAtom } from "@/store/auth";
 
-function ActionsCell({ product }: { product: ProductItem }) {
-  const locale = useLocale();
-  const router = useRouter();
-  const queryClient = useQueryClient();
+// function ActionsCell({ product }: { product: ProductItem }) {
+//   const locale = useLocale();
+//   const router = useRouter();
+//   const queryClient = useQueryClient();
 
-  return (
-    <div className="flex gap-2 justify-center items-center">
-      {/* <Link href={`/admin/products/${product.id}/edit`}> */}
-      <AddOrEditInventoryDialog
-        productId={product.id}
-        inventoryData={product.inventory}
-        cost={product.cost}
-        stock={product.stock}
-      />
+//   return (
+//     <div className="flex gap-2 justify-center items-center">
+//       {/* <Link href={`/admin/products/${product.id}/edit`}> */}
+//       <AddOrEditInventoryDialog
+//         productId={product.id}
+//         inventoryData={product.inventory}
+//         cost={product.cost}
+//         stock={product.stock}
+//       />
 
-      {/* {product.inventory && product.inventory.length > 0 ? <ProductInventoryDeleteDialog id={}/> : ""} */}
-    </div>
-  );
-}
+//       {/* {product.inventory && product.inventory.length > 0 ? <ProductInventoryDeleteDialog id={}/> : ""} */}
+//     </div>
+//   );
+// }
 
 function EditableStockCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState<number | string>(product.stock);

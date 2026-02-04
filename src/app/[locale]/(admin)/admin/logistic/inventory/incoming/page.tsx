@@ -1,14 +1,10 @@
 "use client";
 
-import { getIncomingInventoryColumns } from "@/components/layout/admin/incoming-inventory/column";
 import { POColumns } from "@/components/layout/admin/incoming-inventory/po-columns";
-import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
-import InventoryTimeLine from "@/components/layout/admin/inventory/time-line";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllPurchaseOrders } from "@/features/incoming-inventory/po/hook";
-import { useGetAllProducts } from "@/features/products/hook";
 import { useProductInventoryFilters } from "@/hooks/admin/inventory/useInventoryFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { sortByStockAtom } from "@/store/product";
@@ -19,11 +15,9 @@ import React, { useEffect, useState } from "react";
 const IncomingInventoryList = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const filters = useProductInventoryFilters();
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {

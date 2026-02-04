@@ -1,16 +1,9 @@
 import { ProductItem } from "@/types/products";
-import { Clock, Info, ShieldCheckIcon, Truck, Undo2 } from "lucide-react";
+import { Truck, Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useDeliveryEstimate } from "@/hooks/get-estimated-shipping";
-import { formatDateDE } from "@/lib/format-date-DE";
 import Link from "next/link";
-import ShippingDrawer from "../shipping-drawer";
+import DeliveryRange from "./delivery-range";
 
 interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
@@ -20,12 +13,6 @@ const ProductDetailsLogistic = ({
   productDetails,
 }: ProductDetailsLogisticProps) => {
   const t = useTranslations();
-
-  const estimatedDeliveryRange = useDeliveryEstimate({
-    stock: productDetails.stock - (productDetails.result_stock ?? 0),
-    inventory: productDetails.inventory,
-    deliveryTime: productDetails.delivery_time,
-  });
 
   const carrier = productDetails?.carrier?.toLowerCase();
 
@@ -88,69 +75,7 @@ const ProductDetailsLogistic = ({
         </span>
       </Link>
 
-      <div className="flex flex-row gap-4 items-start">
-        <Clock
-          size={25}
-          className="mt-1.5"
-        />
-        <div>
-          <span className="text-gray-800 font-medium text-sm">
-            {estimatedDeliveryRange ? (
-              <>
-                {t.rich("deliveryDateRange", {
-                  from: formatDateDE(estimatedDeliveryRange.from),
-                  to: formatDateDE(estimatedDeliveryRange.to),
-                  b: (chunks) => <strong>{chunks}</strong>,
-                })}
-              </>
-            ) : productDetails.delivery_time ? (
-              t("deliveryTime", {
-                days: productDetails.delivery_time,
-              })
-            ) : (
-              t("updating")
-            )}
-          </span>
-
-          <ul className="space-y-1 text-gray-600 text-sm">
-            {(() => {
-              const carrier = productDetails?.carrier?.toLowerCase();
-
-              if (carrier !== "amm" && carrier !== "spedition") return null;
-
-              return (
-                <>
-                  <li className="flex items-start gap-2">
-                    <span className="text-sm leading-5">•</span>
-                    <span className="text-sm text-gray-800">
-                      Lieferung <strong>frei Bordsteinkante</strong>{" "}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="inline-block w-3.5 h-3.5 text-gray-500 ml-1 mb-0.5" />
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-secondary">
-                          <p className="text-white text-sm">
-                            „Frei Bordsteinkante“ bedeutet: Lieferung bis zur
-                            Grundstücksgrenze – kein Transport ins Haus oder zur
-                            Wohnung.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </span>
-                  </li>
-
-                  <li className="flex items-start gap-2">
-                    <span className="text-sm leading-5">•</span>
-                    <span className="text-sm text-gray-800">
-                      Speditionsversand nach Terminabsprache
-                    </span>
-                  </li>
-                </>
-              );
-            })()}
-          </ul>
-        </div>
-      </div>
+      <DeliveryRange productDetails={productDetails} />
 
       <div className="flex flex-row gap-4 items-center">
         <Undo2 size={25} />

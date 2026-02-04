@@ -1,51 +1,20 @@
-import { useRouter } from "@/src/i18n/navigation";
 import { PurchaseOrderDetail } from "@/types/po";
-import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import { BookA, Container, Pencil } from "lucide-react";
-import { useLocale } from "next-intl";
+import { Pencil } from "lucide-react";
 import Link from "next/link";
-import DeletePODialog from "./dialog/delete-po-dialog";
 
 function ActionsCell({ po }: { po: PurchaseOrderDetail }) {
   return (
     <div className="flex gap-3 justify-center items-center">
-      {/* <Link href={`/admin/products/${product.id}/edit`}> */}
-      <Link href={`/admin/logistic/inventory/incoming/${po.id}/container`}>
-        <Container className="text-primary cursor-pointer size-5" />
-      </Link>
       <Link href={`/admin/logistic/inventory/incoming/${po.id}`}>
-        <BookA className="text-primary cursor-pointer size-5" />
+        <Pencil className="text-primary cursor-pointer size-4" />
       </Link>
-      <DeletePODialog poId={po.id} />
-      {/* {product.inventory && product.inventory.length > 0 ? <ProductInventoryDeleteDialog id={}/> : ""} */}
+      {/* <DeletePODialog poId={po.id} /> */}
     </div>
   );
 }
 
 export const POColumns: ColumnDef<PurchaseOrderDetail>[] = [
-  //   {
-  //     id: "select",
-  //     header: ({ table }) => (
-  //       <Checkbox
-  //         checked={
-  //           table.getIsAllPageRowsSelected() ||
-  //           (table.getIsSomePageRowsSelected() && "indeterminate")
-  //         }
-  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //         aria-label="Select all"
-  //       />
-  //     ),
-  //     cell: ({ row }) => (
-  //       <Checkbox
-  //         checked={row.getIsSelected()}
-  //         onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //         aria-label="Select row"
-  //       />
-  //     ),
-  //     enableSorting: false,
-  //     enableHiding: false,
-  //   },
   {
     accessorKey: "po_number",
     header: "PO Number",

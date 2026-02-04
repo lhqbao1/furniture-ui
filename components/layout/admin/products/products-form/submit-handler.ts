@@ -67,8 +67,8 @@ export const submitProduct = async ({
     is_bundle:
       latestValues.bundles && latestValues.bundles?.length > 0 ? true : false,
     tag: latestValues.tag === "" ? undefined : latestValues.tag,
-    is_active: productValuesClone ? false : latestValues.is_active ?? true,
-    brand_id: latestValues.brand_id,
+    is_active: productValuesClone ? false : (latestValues.is_active ?? true),
+    brand_id: latestValues.brand_id ?? null,
     pdf_files: latestValues.pdf_files ?? [],
   };
 

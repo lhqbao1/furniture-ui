@@ -1,4 +1,4 @@
-import { apiAdmin } from "@/lib/axios";
+import { apiAdmin, apiPublic } from "@/lib/axios";
 import { POContainerInventoryDetail } from "@/types/po";
 
 export interface InventoryPoCreateInput {
@@ -8,6 +8,7 @@ export interface InventoryPoCreateInput {
   unit_cost: number;
   total_cost: number;
   description?: string;
+  list_delivery_date?: string;
 }
 
 export async function createInventoryPo(input: InventoryPoCreateInput) {
@@ -68,6 +69,16 @@ export async function getInventoryPoDetail(
       },
       withCredentials: true,
     },
+  );
+
+  return data;
+}
+
+export async function getInventoryPoByProductId(
+  productId: string,
+): Promise<POContainerInventoryDetail[]> {
+  const { data } = await apiPublic.get(
+    `/po/inventory-po/by-product/${productId}`,
   );
 
   return data;

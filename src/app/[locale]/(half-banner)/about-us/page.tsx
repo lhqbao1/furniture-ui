@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
+import ScrollToTop from "@/components/shared/scroll-to-top";
 
 export const metadata: Metadata = {
   title: "Über uns",
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
 const AboutUsPage = () => {
   return (
     <section>
+      <ScrollToTop />
       <div className="section-padding flex flex-col items-center gap-4">
         <h1 className="section-header">Über uns</h1>
         <div className="w-1/2 space-y-4">

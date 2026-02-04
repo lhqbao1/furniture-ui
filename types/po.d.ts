@@ -98,6 +98,7 @@ export type POContainerDetail = {
   date_of_inspection: string; // ISO string
   date_if_shipment: string; // ISO string
   date_of_issue: string; // ISO string
+  date_of_delivery: string; // ISO string
 
   created_at: string; // ISO string
   updated_at: string; // ISO string
@@ -118,6 +119,7 @@ export type POContainerInventoryDetail = {
   unit_cost: number;
   total_cost: number;
   description: string;
+  list_delivery_date?: string;
   product: POContainerInventoryProductDetail;
 
   created_at: string; // ISO string

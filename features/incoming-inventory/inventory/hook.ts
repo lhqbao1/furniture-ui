@@ -4,6 +4,7 @@ import {
   createInventoryPo,
   deleteInventoryPo,
   getContainerInventory,
+  getInventoryPoByProductId,
   getInventoryPoDetail,
   updateInventoryPo,
 } from "./api";
@@ -21,6 +22,14 @@ export const useInventoryPoDetail = (inventoryPoId?: string) => {
     queryKey: inventoryPoId ? inventoryPoKeys.detail(inventoryPoId) : [],
     queryFn: () => getInventoryPoDetail(inventoryPoId!),
     enabled: !!inventoryPoId,
+  });
+};
+
+export const useInventoryPoByProductId = (productId?: string) => {
+  return useQuery({
+    queryKey: productId ? inventoryPoKeys.detail(productId) : [],
+    queryFn: () => getInventoryPoByProductId(productId!),
+    enabled: !!productId,
   });
 };
 

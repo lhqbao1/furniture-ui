@@ -18,9 +18,6 @@ const POContainer = ({ id }: POContainerProps) => {
       <h2 className="text-secondary text-center">
         Containers of {data?.po_number}
       </h2>
-      <div className="text-left mb-2">
-        <AdminBackButton />
-      </div>
       {data && (
         <div className="text-left ">
           <AddContainerDialog

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { email, z } from "zod";
+import { z } from "zod";
 import {
   Form,
   FormField,
@@ -15,10 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import {
-  amazonMarketplaceSchema,
-  marketPlaceSchema,
-} from "@/lib/schema/product";
+import { amazonMarketplaceSchema } from "@/lib/schema/product";
 import { MarketplaceProduct, ProductItem } from "@/types/products";
 import { useEditProduct } from "@/features/products/hook";
 import {
@@ -40,7 +37,7 @@ import {
 
 import { useSyncToAmazon } from "@/features/amazon/hook";
 import { SyncToAmazonInput } from "@/features/amazon/api";
-import { COUNTRY_OPTIONS, COUNTRY_ORIGIN_OPTIONS } from "@/data/data";
+import { COUNTRY_ORIGIN_OPTIONS } from "@/data/data";
 
 interface SyncToAmazonFormProps {
   product: ProductItem;
@@ -74,11 +71,10 @@ const SyncToAmazonForm = ({
       marketplace: currentMarketplace ?? "",
       name: product.name,
       description: product.description,
-      final_price: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.final_price
-        : product.final_price,
+      final_price:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.final_price ?? product.final_price,
       min_stock: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,
       )?.min_stock,
