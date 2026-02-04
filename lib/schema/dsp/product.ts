@@ -107,7 +107,7 @@ export const defaultValuesDSP = {
   ebay: false,
   ean: "",
   sku: "",
-  brand_id: "",
+  // brand_id: "",
   collection: null as string | null,
   is_active: false,
   static_files: [] as StaticFile[],

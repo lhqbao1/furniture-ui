@@ -10,14 +10,14 @@ import z from "zod";
 import BuyerInformation from "./buyer-information";
 import SellerInformation from "./seller-information";
 import POInformation from "./po-information";
-import WarehouseInformation from "./warehouse-information";
 import { Button } from "@/components/ui/button";
 import {
-  useCreatePurchaseOrder,
   useGetPurchaseOrderDetail,
   useUpdatePurchaseOrder,
 } from "@/features/incoming-inventory/po/hook";
 import { useRouter } from "@/src/i18n/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import POContainer from "../incoming-inventory/po-container";
 
 interface EditIncomingInventoryFormProps {
   id: string;
@@ -97,45 +97,56 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit, (errors) => {
-          console.log(errors);
-          const message = getFirstErrorMessage(errors);
+    <Tabs defaultValue="po">
+      <TabsList>
+        <TabsTrigger value="po">Purchase Order</TabsTrigger>
+        <TabsTrigger value="container">Container</TabsTrigger>
+      </TabsList>
+      <TabsContent value="po">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+              console.log(errors);
+              const message = getFirstErrorMessage(errors);
 
-          toast.error("Form validation error", {
-            description:
-              message ?? "Please fix the highlighted fields and try again.",
-          });
-        })}
-      >
-        <div className="grid grid-cols-12 gap-6">
-          <BuyerInformation
-            selectedBuyerId={selectedBuyerId}
-            setSelectedBuyerId={setSelectedBuyerId}
-          />
-          <SellerInformation
-            selectedsellerId={selectedsellerId}
-            setSelectedsellerId={setSelectedsellerId}
-          />
-          {/* <WarehouseInformation
-              selectedWarehouseId={selectedWarehouseId}
-              setSelectedWarehouseId={setSelectedWarehouseId}
-            /> */}
-          <POInformation />
-        </div>
-        <div className="mt-4 flex gap-2">
-          <Button type="submit">Edit PO</Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
+              toast.error("Form validation error", {
+                description:
+                  message ?? "Please fix the highlighted fields and try again.",
+              });
+            })}
           >
-            Back
-          </Button>
-        </div>
-      </form>
-    </Form>
+            <div className="mb-4 flex gap-2">
+              <Button type="submit">Edit PO</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+              >
+                Back
+              </Button>
+            </div>
+            <div className="grid grid-cols-12 gap-6">
+              <BuyerInformation
+                selectedBuyerId={selectedBuyerId}
+                setSelectedBuyerId={setSelectedBuyerId}
+              />
+              <SellerInformation
+                selectedsellerId={selectedsellerId}
+                setSelectedsellerId={setSelectedsellerId}
+              />
+              {/* <WarehouseInformation
+                  selectedWarehouseId={selectedWarehouseId}
+                  setSelectedWarehouseId={setSelectedWarehouseId}
+                /> */}
+              <POInformation />
+            </div>
+          </form>
+        </Form>
+      </TabsContent>
+      <TabsContent value="container">
+        <POContainer id={id} />
+      </TabsContent>
+    </Tabs>
   );
 };
 

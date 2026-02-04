@@ -75,7 +75,7 @@ const AddressList = ({ userId }: AddressListProps) => {
               {address.phone_number && <p>{address.phone_number}</p>}
             </CardContent>
             <CardFooter className="px-2 justify-center">
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Dialog
                   open={editDialogId === address.id}
                   onOpenChange={(open) =>
@@ -83,11 +83,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                   }
                 >
                   <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
-                    >
+                    <Button variant="outline" size="sm" type="button">
                       {t("edit")}
                     </Button>
                   </DialogTrigger>
@@ -113,11 +109,7 @@ const AddressList = ({ userId }: AddressListProps) => {
                   }
                 >
                   <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
-                    >
+                    <Button variant="outline" size="sm" type="button">
                       {t("asDefault")}
                     </Button>
                   </DialogTrigger>

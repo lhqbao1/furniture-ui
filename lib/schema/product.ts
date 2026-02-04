@@ -224,7 +224,7 @@ export const defaultValues = {
   is_active: false,
   static_files: [] as StaticFile[],
   category_ids: [] as string[],
-  brand_id: "",
+  // brand_id: "",
   // carrier: "",
   // delivery_time: "",
   // manufacture_country: "",

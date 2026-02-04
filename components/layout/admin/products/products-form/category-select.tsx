@@ -43,28 +43,6 @@ export function MultiSelectField({
   const { control } = useFormContext();
   const { data: options, isLoading, isError } = useGetCategories();
 
-  // hàm flatten chỉ lấy leaf nodes
-  // const flattenCategories = (
-  //   categories: CategoryResponse[],
-  // ): CategoryResponse[] => {
-  //   let result: CategoryResponse[] = [];
-  //   for (const cat of categories) {
-  //     if (cat.children && cat.children.length > 0) {
-  //       // nếu có children -> lấy children đệ quy
-  //       result = [...result, ...flattenCategories(cat.children)];
-  //     } else {
-  //       // nếu không có children -> leaf node
-  //       result.push(cat);
-  //     }
-  //   }
-  //   return result;
-  // };
-
-  // const leafOptions: CategoryResponse[] = React.useMemo(() => {
-  //   if (!options) return [];
-  //   return flattenCategories(options);
-  // }, [options]);
-
   const flattenCategories = (
     categories: CategoryResponse[],
     level = 0,
@@ -131,10 +109,7 @@ export function MultiSelectField({
             )}
 
             <Popover>
-              <PopoverTrigger
-                asChild
-                className="font-light"
-              >
+              <PopoverTrigger asChild className="font-light">
                 <Button
                   variant="outline"
                   className="w-full justify-between"

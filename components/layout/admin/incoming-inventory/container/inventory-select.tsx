@@ -60,6 +60,7 @@ interface SelectedInventoryItem {
 interface InventorySelectProps {
   containerId: string;
   po_id: string;
+  // delivery_date: string
 }
 
 function useDebounce<T>(value: T, delay = 400): T {
@@ -84,8 +85,6 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
   const { mutate: deleteInventoryPoMutate, isPending } =
     useDeleteInventoryPo(containerId);
-
-  const editPOMutation = useUpdatePurchaseOrder();
 
   const { data: products, isLoading } = useGetAllProducts({
     search: debouncedSearch,
@@ -210,6 +209,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
           unit_cost: item.unit_cost,
           total_cost: item.total_cost,
           description: item.description,
+          // list_delivery_date:
         });
       }
 
@@ -300,15 +300,9 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
   return (
     <div className="w-full">
-      <Popover
-        open={open}
-        onOpenChange={setOpen}
-      >
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="gap-2 w-full"
-          >
+          <Button variant="outline" className="gap-2 w-full">
             <Plus className="h-4 w-4" />
             Add product
           </Button>
@@ -492,10 +486,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
                   {/* DESCRIPTION ROW */}
                   <tr className="bg-muted/40">
-                    <td
-                      colSpan={5}
-                      className="p-2 pt-0"
-                    >
+                    <td colSpan={5} className="p-2 pt-0">
                       <textarea
                         className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm
              focus:outline-none focus:ring-2 focus:ring-ring

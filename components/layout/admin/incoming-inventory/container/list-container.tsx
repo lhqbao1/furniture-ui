@@ -2,7 +2,6 @@ import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -10,12 +9,17 @@ import {
 import { useGetContainersByPurchaseOrder } from "@/features/incoming-inventory/container/hook";
 import React from "react";
 import AddContainerDialog from "../dialog/add-container-dialog";
-import { formatDateDDMMYYYY, formatDateString } from "@/lib/date-formated";
-import { Trash, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import DeleteDialogConfirm from "../dialog/delete-dialog-confirm";
 import InventorySelect from "./inventory-select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { FolderUp } from "lucide-react";
+import { toast } from "sonner";
+import {
+  getContainerInventory,
+  updateInventoryPo,
+} from "@/features/incoming-inventory/inventory/api";
 
 interface ListContainersProps {
   po_id: string;
@@ -48,6 +52,44 @@ const ContainerCardSkeleton = () => {
 const ListContainers = ({ po_id }: ListContainersProps) => {
   const { data, isLoading, isError } = useGetContainersByPurchaseOrder(po_id);
 
+  const handleLogInventory = async (
+    containerId: string,
+    deliveryDate?: string,
+  ) => {
+    if (!deliveryDate) {
+      toast.error("Delivery date is required before loading inventory.");
+      return;
+    }
+
+    try {
+      const inventory = await getContainerInventory(containerId);
+      console.log("Container inventory:", inventory);
+      console.log("Container delivery date:", deliveryDate);
+
+      if (inventory.length === 0) {
+        return;
+      }
+
+      await Promise.all(
+        inventory.map((item) =>
+          updateInventoryPo(item.id, {
+            container_id: containerId,
+            product_id: item.product.id,
+            quantity: item.quantity,
+            unit_cost: item.unit_cost,
+            total_cost: item.total_cost,
+            description: item.description,
+            list_delivery_date: deliveryDate,
+          }),
+        ),
+      );
+      toast.success("Inventory delivery date updated.");
+    } catch (error) {
+      console.error("Failed to load container inventory", error);
+      toast.error("Failed to load container inventory.");
+    }
+  };
+
   if (isLoading || !data) {
     return (
       <div className="grid grid-cols-2 gap-4 mt-6">
@@ -66,10 +108,17 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
             <CardHeader>
               <CardTitle>Size: {item.size}</CardTitle>
               <CardAction className="space-x-2">
-                <AddContainerDialog
-                  purchaseOrderId={po_id}
-                  container={item}
-                />
+                <AddContainerDialog purchaseOrderId={po_id} container={item} />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    handleLogInventory(item.id, item.date_of_delivery)
+                  }
+                  aria-label="Log container inventory"
+                >
+                  <FolderUp className="h-4 w-4 text-secondary" />
+                </Button>
                 <DeleteDialogConfirm containerId={item.id} />
               </CardAction>
             </CardHeader>
@@ -87,9 +136,15 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
                 </span>
               </div>
               <div>
-                Date of Delivery:{" "}
+                Date of issue:{" "}
                 <span className="text-secondary font-semibold">
                   {formatDateDDMMYYYY(item.date_of_issue)}
+                </span>
+              </div>
+              <div>
+                Date of delivery:{" "}
+                <span className="text-secondary font-semibold">
+                  {formatDateDDMMYYYY(item.date_of_delivery)}
                 </span>
               </div>
             </CardContent>
@@ -97,6 +152,7 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
               <InventorySelect
                 containerId={item.id}
                 po_id={po_id}
+                // delivery_date={item.date_if_shipment}
               />
             </CardFooter>
           </Card>

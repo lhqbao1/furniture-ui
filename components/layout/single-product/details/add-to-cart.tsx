@@ -4,7 +4,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useAddToCartHandler } from "@/hooks/single-product/useAddToCartHandler";
@@ -14,14 +13,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import z from "zod";
-import { FormNumberInput } from "../form-number.input";
 import { Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import ListVariant from "../list-variant";
 import { useQuery } from "@tanstack/react-query";
 import { getProductGroupDetail } from "@/features/product-group/api";
 import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
-import { Input } from "@/components/ui/input";
 import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
 import { getTotalIncomingStock } from "@/lib/calculate-inventory";

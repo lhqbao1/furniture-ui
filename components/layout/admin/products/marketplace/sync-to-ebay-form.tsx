@@ -88,11 +88,10 @@ const SyncToEbayForm = ({
       marketplace: currentMarketplace ?? "",
       name: product.name,
       description: product.description,
-      final_price: isUpdating
-        ? product.marketplace_products.find(
-            (i) => i.marketplace === currentMarketplace,
-          )?.final_price
-        : product.final_price,
+      final_price:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.final_price ?? product.final_price,
       min_stock:
         product.marketplace_products.find(
           (i) => i.marketplace === currentMarketplace,
