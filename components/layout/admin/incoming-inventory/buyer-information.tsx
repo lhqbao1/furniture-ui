@@ -25,11 +25,13 @@ import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook"
 interface BuyerInformationProps {
   selectedBuyerId: string | null;
   setSelectedBuyerId: React.Dispatch<React.SetStateAction<string | null>>;
+  syncKey: number;
 }
 
 const BuyerInformation = ({
   selectedBuyerId,
   setSelectedBuyerId,
+  syncKey,
 }: BuyerInformationProps) => {
   const { control, setValue } = useFormContext();
 
@@ -78,7 +80,7 @@ const BuyerInformation = ({
     setValue("buyer_city", data.city);
     setValue("buyer_country", data.country);
     setValue("buyer_postal_code", data.postal_code);
-  }, [buyer, selectedBuyerId, setValue]);
+  }, [buyer, selectedBuyerId, setValue, syncKey]);
   // ⛔ CHẶN render Select khi data chưa sẵn sàng
   if (isLoading || !buyer) {
     return (

@@ -26,10 +26,12 @@ interface EditIncomingInventoryFormProps {
 const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
   const router = useRouter();
 
-  const { data, isLoading, isError } = useGetPurchaseOrderDetail(id);
+  const { data, isLoading, isError, dataUpdatedAt } =
+    useGetPurchaseOrderDetail(id);
 
   const [selectedsellerId, setSelectedsellerId] = useState<string | null>(null);
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
+  const [syncKey, setSyncKey] = useState(0);
 
   const editPOMutation = useUpdatePurchaseOrder();
   const form = useForm<z.infer<typeof incomingInventorySchema>>({
@@ -39,6 +41,7 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       pi_number: "",
       loading_port: "",
       shipping_method: "",
+      customer_po_order: "",
       delivery_conditions: "",
       type_of_bill_of_lading: "",
       destination: "",
@@ -46,6 +49,7 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       buyer_id: "",
       seller_id: "",
       created_by: "admin",
+      note: "",
       bank_id: "",
     },
   });
@@ -59,21 +63,28 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       pi_number: data.pi_number ?? "",
       loading_port: data.loading_port ?? "",
       shipping_method: data.shipping_method ?? "",
+      customer_po_order: data.customer_po_order ?? "",
       delivery_conditions: data.delivery_conditions ?? "",
       type_of_bill_of_lading: data.type_of_bill_of_lading ?? "",
       destination: data.destination ?? "",
       payment_terms: data.payment_terms ?? "",
       buyer_id: data.buyer.id,
       seller_id: data.seller.id,
+      note: data.note,
       created_by: "admin",
       bank_id: data.seller.bank_infos[0]?.id ?? "",
     });
+
+    // inside useEffect after data arrives
+    console.log("data buyer_id", data?.buyer?.id);
+    console.log("data seller_id", data?.seller?.id);
 
     // 2️⃣ sync state cho các select
     setSelectedBuyerId(data.buyer.id);
     setSelectedsellerId(data.seller.id);
     // setSelectedWarehouseId(data.warehouse.id);
-  }, [data, form]);
+    setSyncKey((prev) => prev + 1);
+  }, [data, form, dataUpdatedAt]);
 
   function handleSubmit(data: z.infer<typeof incomingInventorySchema>) {
     editPOMutation.mutate(
@@ -84,10 +95,13 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       {
         onSuccess(data, variables, context) {
           toast.success("Edit purchase order success");
-          //   form.reset();
-          //   setSelectedsellerId(null);
-          //   setSelectedBuyerId(null);
-          //   setSelectedWarehouseId(null);
+          // inside onSuccess
+          console.log("onSuccess buyer_id", form.getValues("buyer_id"));
+          console.log("onSuccess seller_id", form.getValues("seller_id"));
+
+          setSelectedBuyerId(form.getValues("buyer_id") || null);
+          setSelectedsellerId(form.getValues("seller_id") || null);
+          setSyncKey((prev) => prev + 1);
         },
         onError(error, variables, context) {
           toast.error("Edit purchase order fail");
@@ -129,10 +143,12 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
               <BuyerInformation
                 selectedBuyerId={selectedBuyerId}
                 setSelectedBuyerId={setSelectedBuyerId}
+                syncKey={syncKey}
               />
               <SellerInformation
                 selectedsellerId={selectedsellerId}
                 setSelectedsellerId={setSelectedsellerId}
+                syncKey={syncKey}
               />
               {/* <WarehouseInformation
                   selectedWarehouseId={selectedWarehouseId}

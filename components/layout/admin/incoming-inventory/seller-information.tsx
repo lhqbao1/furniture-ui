@@ -23,16 +23,17 @@ import { useGetAllCustomers } from "@/features/incoming-inventory/customer/hook"
 import { Loader2 } from "lucide-react";
 import AddBankDialog from "./dialog/add-bank-dialog";
 import AddContactPersonDialog from "./dialog/add-contact-person-dialog";
-import { toast } from "sonner";
 import { CustomerDetail } from "@/types/po";
 
 interface SellerInformationProps {
   selectedsellerId: string | null;
   setSelectedsellerId: React.Dispatch<React.SetStateAction<string | null>>;
+  syncKey: number;
 }
 const SellerInformation = ({
   selectedsellerId,
   setSelectedsellerId,
+  syncKey,
 }: SellerInformationProps) => {
   const { control, setValue } = useFormContext();
   const [selectedBankId, setSelectedBankId] = useState<string | null>(null);
@@ -189,16 +190,15 @@ const SellerInformation = ({
 
     if (data.contact_persons && data.contact_persons.length > 0) {
       setSelectedContactPersonId(data.contact_persons[0].id);
-     setValue("contact_person_id", data.contact_persons[0].id ?? "");
-     setValue("contact_person_name", data.contact_persons[0].name ?? "");
-     setValue("contact_person_email", data.contact_persons[0].email ?? "");
-     setValue(
-       "contact_person_phone_number",
-       data.contact_persons[0].phone_number ?? "",
-     );
-      
+      setValue("contact_person_id", data.contact_persons[0].id ?? "");
+      setValue("contact_person_name", data.contact_persons[0].name ?? "");
+      setValue("contact_person_email", data.contact_persons[0].email ?? "");
+      setValue(
+        "contact_person_phone_number",
+        data.contact_persons[0].phone_number ?? "",
+      );
     }
-  }, [seller, selectedsellerId, setValue]);
+  }, [seller, selectedsellerId, setValue, syncKey]);
 
   // ⛔ CHẶN render Select khi data chưa sẵn sàng
 
@@ -256,10 +256,7 @@ const SellerInformation = ({
                       </div>
                     ) : (
                       seller.map((b) => (
-                        <SelectItem
-                          key={b.id}
-                          value={b.id}
-                        >
+                        <SelectItem key={b.id} value={b.id}>
                           {b.name} – {b.city}
                         </SelectItem>
                       ))
@@ -281,11 +278,7 @@ const SellerInformation = ({
                 <FormItem className="col-span-6">
                   <FormLabel>Seller Name</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled
-                    />
+                    <Input {...field} value={field.value ?? ""} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -300,11 +293,7 @@ const SellerInformation = ({
                 <FormItem className="col-span-3">
                   <FormLabel>Seller Address</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled
-                    />
+                    <Input {...field} value={field.value ?? ""} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -319,11 +308,7 @@ const SellerInformation = ({
                 <FormItem className="col-span-3">
                   <FormLabel>Seller City</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled
-                    />
+                    <Input {...field} value={field.value ?? ""} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -338,11 +323,7 @@ const SellerInformation = ({
                 <FormItem className="col-span-3">
                   <FormLabel>Seller Country</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled
-                    />
+                    <Input {...field} value={field.value ?? ""} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -357,11 +338,7 @@ const SellerInformation = ({
                 <FormItem className="col-span-3">
                   <FormLabel>Seller Postal Code</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled
-                    />
+                    <Input {...field} value={field.value ?? ""} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -417,10 +394,7 @@ const SellerInformation = ({
                           </div>
                         ) : (
                           selectedSeller.bank_infos.map((b) => (
-                            <SelectItem
-                              key={b.id}
-                              value={b.id}
-                            >
+                            <SelectItem key={b.id} value={b.id}>
                               {b.bank_name}
                             </SelectItem>
                           ))
@@ -442,11 +416,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-3">
                       <FormLabel>Bank Name</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -461,11 +431,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-3">
                       <FormLabel>Bank Address</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -480,11 +446,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-2">
                       <FormLabel>Bank Account Number</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -499,11 +461,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-2">
                       <FormLabel>Bank Swift Code</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -518,11 +476,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-2">
                       <FormLabel>Currecy</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -584,10 +538,7 @@ const SellerInformation = ({
                           </div>
                         ) : (
                           selectedSeller.contact_persons.map((b) => (
-                            <SelectItem
-                              key={b.id}
-                              value={b.id}
-                            >
+                            <SelectItem key={b.id} value={b.id}>
                               {b.name}
                             </SelectItem>
                           ))
@@ -611,11 +562,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-3">
                       <FormLabel>Contact Person Name</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -630,11 +577,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-3">
                       <FormLabel>Contact Person Email</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -649,11 +592,7 @@ const SellerInformation = ({
                     <FormItem className="col-span-3">
                       <FormLabel>Contact Person Phone</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          disabled
-                          value={field.value ?? ""}
-                        />
+                        <Input {...field} disabled value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

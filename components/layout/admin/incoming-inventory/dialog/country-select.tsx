@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { BRAND_COUNTRY_OPTIONS, EN_COUNTRY_OPTIONS } from "@/data/data";
+import { EN_COUNTRY_OPTIONS } from "@/data/data";
 import { cn } from "@/lib/utils";
 
 type CountryFieldProps = {

@@ -1368,6 +1368,7 @@ export const EN_COUNTRY_OPTIONS = [
   { value: "DE", label: "Germany" },
   { value: "CN", label: "China" },
   { value: "VN", label: "Vietnam" },
+  { value: "TW", label: "Taiwan" },
   { value: "HK", label: "Hong Kong" },
   { value: "SG", label: "Singapore" },
   { value: "IN", label: "India" },
