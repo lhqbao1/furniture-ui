@@ -52,6 +52,14 @@ const DeliveryRange = ({ productDetails }: DeliveryRangeProps) => {
     const deliveryRange = getDeliveryDayRange(productDetails.delivery_time);
     if (!deliveryRange) return null;
 
+    if (productDetails.stock && productDetails.stock > 0) {
+      const today = new Date();
+      return {
+        from: addCalendarDays(today, deliveryRange.min),
+        to: addCalendarDays(today, deliveryRange.max),
+      };
+    }
+
     if (!latestDeliveryDate) {
       const today = new Date();
       return {
@@ -68,6 +76,7 @@ const DeliveryRange = ({ productDetails }: DeliveryRangeProps) => {
     addCalendarDays,
     latestDeliveryDate,
     productDetails.delivery_time,
+    productDetails.stock,
   ]);
 
   return (

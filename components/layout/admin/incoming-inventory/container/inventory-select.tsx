@@ -152,12 +152,12 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
 
-      if (!item.image || item.image === "/1.png") {
-        toast.error("Missing product image", {
-          description: `Product "${item.name}" does not have a valid image.`,
-        });
-        return false;
-      }
+      // if (!item.image || item.image === "/1.png") {
+      //   toast.error("Missing product image", {
+      //     description: `Product "${item.name}" does not have a valid image.`,
+      //   });
+      //   return false;
+      // }
 
       if (!item.quantity || item.quantity <= 0) {
         toast.error("Invalid quantity", {
