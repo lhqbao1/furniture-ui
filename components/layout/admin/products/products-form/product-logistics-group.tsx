@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProductItem } from "@/types/products";
+import { ProductItem, ProductPackage } from "@/types/products";
 import Image from "next/image";
 import React, { useEffect } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
@@ -23,7 +23,7 @@ interface ProductLogisticsGroupProps {
   isDSP?: boolean;
 }
 
-function isValidPackage(pkg: any) {
+function isValidPackage(pkg: ProductPackage) {
   return (
     pkg?.length != null &&
     pkg?.width != null &&
@@ -186,46 +186,28 @@ const ProductLogisticsGroup = ({
                 Delivery time
               </FormLabel>
               <FormControl>
-                <div className="grid grid-cols-2 gap-3">
-                  <Select
-                    value={
-                      deliveryTimes.includes(field.value ?? "")
-                        ? (field.value ?? "")
-                        : ""
-                    }
-                    onValueChange={(val) => {
-                      if (val === "Deselect") field.onChange(null);
-                      else field.onChange(val);
-                    }}
-                  >
-                    <SelectTrigger className="border font-light">
-                      <SelectValue placeholder="Select delivery time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {deliveryTimes.map((t) => (
-                        <SelectItem key={t} value={t}>
-                          {t} business days
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="text"
-                    list="delivery-time-options"
-                    placeholder="Custom (e.g. 7-10)"
-                    value={
-                      deliveryTimes.includes(field.value ?? "")
-                        ? ""
-                        : (field.value ?? "")
-                    }
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                  <datalist id="delivery-time-options">
+                <Select
+                  value={
+                    deliveryTimes.includes(field.value ?? "")
+                      ? (field.value ?? "")
+                      : ""
+                  }
+                  onValueChange={(val) => {
+                    if (val === "Deselect") field.onChange(null);
+                    else field.onChange(val);
+                  }}
+                >
+                  <SelectTrigger className="border font-light">
+                    <SelectValue placeholder="Select delivery time" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {deliveryTimes.map((t) => (
-                      <option key={t} value={t} />
+                      <SelectItem key={t} value={t}>
+                        {t} business days
+                      </SelectItem>
                     ))}
-                  </datalist>
-                </div>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

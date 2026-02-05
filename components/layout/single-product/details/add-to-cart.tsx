@@ -21,8 +21,6 @@ import { getProductGroupDetail } from "@/features/product-group/api";
 import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
 import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
-import { useAtom } from "jotai";
-import { openPriceComparisionAtom } from "@/store/price-comparision";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
 
 interface AddToCartFieldProps {
@@ -32,9 +30,7 @@ interface AddToCartFieldProps {
 
 const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   const t = useTranslations();
-  const [openPriceComparision, setOpenPriceComparsion] = useAtom(
-    openPriceComparisionAtom,
-  );
+
   // Form setup
   const form = useForm<z.infer<typeof cartFormSchema>>({
     resolver: zodResolver(cartFormSchema),
@@ -65,11 +61,28 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
         ? [inventoryPo]
         : [];
 
-    return items.reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return items.reduce((sum, item) => {
+      if (item.list_delivery_date) {
+        const deliveryDate = new Date(item.list_delivery_date);
+        if (!Number.isNaN(deliveryDate.getTime())) {
+          deliveryDate.setHours(0, 0, 0, 0);
+          if (deliveryDate < today) {
+            return sum;
+          }
+        }
+      }
+
+      return sum + (item.quantity ?? 0);
+    }, 0);
   }, [inventoryPo]);
 
   const maxStock = useMemo(() => {
-    return productDetails.stock - (productDetails.result_stock ?? 0) + incomingStock;
+    const baseStock = productDetails.stock ?? 0;
+    const usedStock = productDetails.result_stock ?? 0;
+    return baseStock - usedStock + incomingStock;
   }, [productDetails.stock, productDetails.result_stock, incomingStock]);
 
   return (
@@ -138,16 +151,6 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
                 </Button>
               )}
 
-              {/* {productDetails.marketplace_products.length > 0 && (
-                <Button
-                  type="button"
-                  variant={"secondary"}
-                  onClick={() => setOpenPriceComparsion(!openPriceComparision)}
-                  className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
-                >
-                  {t("priceComparison")}
-                </Button>
-              )} */}
               <div className="flex justify-end">
                 <div
                   onClick={(e) => {
