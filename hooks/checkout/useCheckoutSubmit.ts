@@ -270,7 +270,7 @@ export function useCheckoutSubmit({
           const method = data.payment_method;
 
           if (method === "paypal") {
-            router.push(payment.approve_url, { locale });
+            window.location.href = payment.approve_url;
             return;
           }
 
