@@ -20,6 +20,7 @@ import {
   getContainerInventory,
   updateInventoryPo,
 } from "@/features/incoming-inventory/inventory/api";
+import { useGetPurchaseOrderDetail } from "@/features/incoming-inventory/po/hook";
 
 interface ListContainersProps {
   po_id: string;
@@ -51,6 +52,13 @@ const ContainerCardSkeleton = () => {
 
 const ListContainers = ({ po_id }: ListContainersProps) => {
   const { data, isLoading, isError } = useGetContainersByPurchaseOrder(po_id);
+  const {
+    data: purchaseOrder,
+    isLoading: isLoadingPurchaseOrder,
+    isError: isErrorPurchaseOrder,
+  } = useGetPurchaseOrderDetail(po_id);
+
+  console.log(purchaseOrder);
 
   const handleLogInventory = async (
     containerId: string,

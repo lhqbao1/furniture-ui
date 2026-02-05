@@ -21,9 +21,9 @@ import { getProductGroupDetail } from "@/features/product-group/api";
 import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
 import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
-import { getTotalIncomingStock } from "@/lib/calculate-inventory";
 import { useAtom } from "jotai";
 import { openPriceComparisionAtom } from "@/store/price-comparision";
+import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -56,13 +56,21 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   const { handleSubmitToCart, handleAddWishlist } =
     useAddToCartHandler(productDetails);
 
+  const { data: inventoryPo } = useInventoryPoByProductId(productDetails.id);
+
+  const incomingStock = useMemo(() => {
+    const items = Array.isArray(inventoryPo)
+      ? inventoryPo
+      : inventoryPo
+        ? [inventoryPo]
+        : [];
+
+    return items.reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+  }, [inventoryPo]);
+
   const maxStock = useMemo(() => {
-    return (
-      productDetails.stock -
-      (productDetails.result_stock ?? 0) +
-      getTotalIncomingStock(productDetails.inventory)
-    );
-  }, [productDetails.stock, productDetails.inventory]);
+    return productDetails.stock - (productDetails.result_stock ?? 0) + incomingStock;
+  }, [productDetails.stock, productDetails.result_stock, incomingStock]);
 
   return (
     <>

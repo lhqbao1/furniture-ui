@@ -9,7 +9,6 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { toast } from "sonner";
 
 interface ListVariantProps {
   variant: VariantOptionsResponse[];
@@ -25,7 +24,11 @@ const ListVariant = ({
   const { control, setValue } = useFormContext<CartFormValues>();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const router = useRouter();
-  const t = useTranslations();
+
+  console.log(variant);
+  console.log(currentProduct);
+  console.log(parentProduct);
+
   useEffect(() => {
     if (!currentProduct?.options?.length) return;
 
@@ -43,19 +46,22 @@ const ListVariant = ({
   const handleSelect = (variantId: string, optionId: string) => {
     if (!parentProduct) return;
 
-    setSelectedOptions((prev) => {
-      const otherOptions = prev.filter((id) => {
+    const nextSelectedOptions = (() => {
+      const otherOptions = selectedOptions.filter((id) => {
         const isSameVariant = variant.some((g) =>
           g.options.some((o) => o.id === id && g.variant.id === variantId),
         );
         return !isSameVariant;
       });
       return [...otherOptions, optionId];
-    });
+    })();
 
-    const matchedProduct = parentProduct.products.find((product) =>
-      product.options?.some((opt) => opt.id === optionId),
-    );
+    setSelectedOptions(nextSelectedOptions);
+
+    const matchedProduct = parentProduct.products.find((product) => {
+      const optionIds = product.options?.map((opt) => opt.id) ?? [];
+      return nextSelectedOptions.every((id) => optionIds.includes(id));
+    });
 
     if (matchedProduct?.url_key) {
       setTimeout(() => {
@@ -82,10 +88,7 @@ const ListVariant = ({
       render={() => (
         <div className="flex flex-col gap-4">
           {variant.map((group) => (
-            <div
-              key={group.variant.id}
-              className="flex flex-col gap-2"
-            >
+            <div key={group.variant.id} className="flex flex-col gap-2">
               <span className="font-semibold text-gray-700">
                 {group.variant.name}
               </span>

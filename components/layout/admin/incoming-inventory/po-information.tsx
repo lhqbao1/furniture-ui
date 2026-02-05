@@ -43,10 +43,7 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>PO Number</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
 
                 <FormErrorSpace />
@@ -62,10 +59,7 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>PI Number</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormErrorSpace />
               </FormItem>
@@ -80,10 +74,7 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>Loading Port</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormErrorSpace />
               </FormItem>
@@ -134,10 +125,7 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>Customer PO Number (Optional)</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormErrorSpace />
               </FormItem>
@@ -152,10 +140,7 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>Delivery Condition</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormErrorSpace />
               </FormItem>
@@ -170,10 +155,7 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>Type Of Billing</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormErrorSpace />
               </FormItem>
@@ -188,15 +170,14 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>Destination</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormErrorSpace />
               </FormItem>
             )}
           />
+
+          <div></div>
 
           {/* ===== Note ===== */}
           <FormField
@@ -206,10 +187,7 @@ const POInformation = () => {
               <FormItem>
                 <FormLabel>Note (Optional)</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Textarea {...field} rows={4} placeholder={``} />
                 </FormControl>
                 <FormErrorSpace />
               </FormItem>
