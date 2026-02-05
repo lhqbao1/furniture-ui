@@ -87,25 +87,6 @@ export default function MobileStickyCart({
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-2 flex-1">
-            {/* <Button
-            className="h-10 px-4 text-black"
-            onClick={onAddToCart}
-            variant={"outline"}
-            type="button"
-          >
-            <ShoppingCart className="mr-1 h-4 w-4" />
-            {t("addToCart")}
-          </Button> */}
-            {/* <Button
-              type="button"
-              className="px-4 bg-primary hover:bg-primary/90 text-white w-full h-full uppercase text-lg"
-              onClick={() => {
-                onAddToCart?.(); // ✅ gọi hàm
-                router.push("/cart", { locale });
-              }}
-            >
-              {t("addToCart")}
-            </Button> */}
             {maxStock > 0 ? (
               <Button
                 className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
@@ -114,7 +95,6 @@ export default function MobileStickyCart({
                   onAddToCart?.(); // ✅ gọi hàm
                   router.push("/cart", { locale });
                 }}
-                // disabled={productDetails.stock > 0 ? false : true}
               >
                 {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
                 {t("addToCart")}

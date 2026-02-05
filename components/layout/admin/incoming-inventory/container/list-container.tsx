@@ -20,7 +20,8 @@ import {
   getContainerInventory,
   updateInventoryPo,
 } from "@/features/incoming-inventory/inventory/api";
-import { useGetPurchaseOrderDetail } from "@/features/incoming-inventory/po/hook";
+import { useContainerInventory } from "@/features/incoming-inventory/inventory/hook";
+import { POContainerDetail } from "@/types/po";
 
 interface ListContainersProps {
   po_id: string;
@@ -52,42 +53,38 @@ const ContainerCardSkeleton = () => {
 
 const ListContainers = ({ po_id }: ListContainersProps) => {
   const { data, isLoading, isError } = useGetContainersByPurchaseOrder(po_id);
-  const {
-    data: purchaseOrder,
-    isLoading: isLoadingPurchaseOrder,
-    isError: isErrorPurchaseOrder,
-  } = useGetPurchaseOrderDetail(po_id);
 
-  console.log(purchaseOrder);
+  const handleLogInventory = async (container: POContainerDetail) => {
+    const missing: string[] = [];
+    if (!container.container_number) missing.push("container number");
+    if (!container.date_if_shipment) missing.push("date of shipment");
+    if (!container.date_of_inspection) missing.push("date of inspection");
+    if (!container.date_of_issue) missing.push("date of issue");
+    if (!container.date_of_delivery) missing.push("date of delivery");
 
-  const handleLogInventory = async (
-    containerId: string,
-    deliveryDate?: string,
-  ) => {
-    if (!deliveryDate) {
-      toast.error("Delivery date is required before loading inventory.");
+    if (missing.length > 0) {
+      toast.error(`Missing: ${missing.join(", ")}`);
       return;
     }
 
     try {
-      const inventory = await getContainerInventory(containerId);
-      console.log("Container inventory:", inventory);
-      console.log("Container delivery date:", deliveryDate);
+      const inventory = await getContainerInventory(container.id);
 
       if (inventory.length === 0) {
+        toast.error("Please add at least one inventory item first.");
         return;
       }
 
       await Promise.all(
         inventory.map((item) =>
           updateInventoryPo(item.id, {
-            container_id: containerId,
+            container_id: container.id,
             product_id: item.product.id,
             quantity: item.quantity,
             unit_cost: item.unit_cost,
             total_cost: item.total_cost,
             description: item.description,
-            list_delivery_date: deliveryDate,
+            list_delivery_date: container.date_of_delivery!,
           }),
         ),
       );
@@ -110,64 +107,135 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
 
   return (
     <div className="grid grid-cols-2 gap-4 mt-6">
-      {data.map((item, index) => {
-        return (
-          <Card key={item.id}>
-            <CardHeader>
-              <CardTitle>Size: {item.size}</CardTitle>
-              <CardAction className="space-x-2">
-                <AddContainerDialog purchaseOrderId={po_id} container={item} />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    handleLogInventory(item.id, item.date_of_delivery)
-                  }
-                  aria-label="Log container inventory"
-                >
-                  <FolderUp className="h-4 w-4 text-secondary" />
-                </Button>
-                <DeleteDialogConfirm containerId={item.id} />
-              </CardAction>
-            </CardHeader>
-            <CardContent>
-              <div>
-                Date of Shipment:{" "}
-                <span className="text-secondary font-semibold">
-                  {formatDateDDMMYYYY(item.date_if_shipment)}
-                </span>
-              </div>
-              <div>
-                Date of Inspection:{" "}
-                <span className="text-secondary font-semibold">
-                  {formatDateDDMMYYYY(item.date_of_inspection)}
-                </span>
-              </div>
-              <div>
-                Date of issue:{" "}
-                <span className="text-secondary font-semibold">
-                  {formatDateDDMMYYYY(item.date_of_issue)}
-                </span>
-              </div>
-              <div>
-                Date of delivery:{" "}
-                <span className="text-secondary font-semibold">
-                  {formatDateDDMMYYYY(item.date_of_delivery)}
-                </span>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <InventorySelect
-                containerId={item.id}
-                po_id={po_id}
-                // delivery_date={item.date_if_shipment}
-              />
-            </CardFooter>
-          </Card>
-        );
-      })}
+      {data.map((item) => (
+        <ContainerCard
+          key={item.id}
+          item={item}
+          po_id={po_id}
+          onLogInventory={handleLogInventory}
+        />
+      ))}
     </div>
   );
 };
 
 export default ListContainers;
+
+function ContainerCard({
+  item,
+  po_id,
+  onLogInventory,
+}: {
+  item: POContainerDetail;
+  po_id: string;
+  onLogInventory: (container: POContainerDetail) => void;
+}) {
+  const { data: containerInventory } = useContainerInventory(item.id);
+  const hasInventory = (containerInventory?.length ?? 0) > 0;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <div>
+            Container Number:{" "}
+            <span
+              className={
+                item.container_number
+                  ? "text-secondary font-semibold"
+                  : "text-red-500"
+              }
+            >
+              {item.container_number || "Missing"}
+            </span>
+          </div>
+        </CardTitle>
+        <CardAction className="space-x-2">
+          <AddContainerDialog purchaseOrderId={po_id} container={item} />
+          {hasInventory && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onLogInventory(item)}
+              aria-label="Log container inventory"
+            >
+              <FolderUp className="h-4 w-4 text-secondary" />
+            </Button>
+          )}
+          <DeleteDialogConfirm containerId={item.id} />
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <div>
+          Size:{" "}
+          <span
+            className={
+              item.size ? "text-secondary font-semibold" : "text-red-500"
+            }
+          >
+            {item.size || "Missing"}
+          </span>
+        </div>
+        <div>
+          Date of Shipment:{" "}
+          <span
+            className={
+              item.date_if_shipment
+                ? "text-secondary font-semibold"
+                : "text-red-500"
+            }
+          >
+            {item.date_if_shipment
+              ? formatDateDDMMYYYY(item.date_if_shipment)
+              : "Missing"}
+          </span>
+        </div>
+        <div>
+          Date of Inspection:{" "}
+          <span
+            className={
+              item.date_of_inspection
+                ? "text-secondary font-semibold"
+                : "text-red-500"
+            }
+          >
+            {item.date_of_inspection
+              ? formatDateDDMMYYYY(item.date_of_inspection)
+              : "Missing"}
+          </span>
+        </div>
+        <div>
+          Date of issue:{" "}
+          <span
+            className={
+              item.date_of_issue
+                ? "text-secondary font-semibold"
+                : "text-red-500"
+            }
+          >
+            {item.date_of_issue
+              ? formatDateDDMMYYYY(item.date_of_issue)
+              : "Missing"}
+          </span>
+        </div>
+        <div>
+          Date of delivery:{" "}
+          <span
+            className={
+              item.date_of_delivery
+                ? "text-secondary font-semibold"
+                : "text-red-500"
+            }
+          >
+            {item.date_of_delivery
+              ? formatDateDDMMYYYY(item.date_of_delivery)
+              : "Missing"}
+          </span>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <InventorySelect containerId={item.id} po_id={po_id} />
+      </CardFooter>
+    </Card>
+  );
+}
