@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { useSearchParams } from "next/navigation";
 import { useGetSuppliers } from "@/features/supplier/hook";
 import SupplierSelect from "./supplier-select";
 import { SupplierResponse } from "@/types/supplier";
@@ -50,6 +51,8 @@ const normalizeDescription = (html?: string) => {
 const FilterExportForm = () => {
   const [supplier, setSupplier] = useState<string>("");
   const [status, setStatus] = useState<"active" | "inactive" | "all">("all");
+  const [isExportingSearch, setIsExportingSearch] = useState(false);
+  const searchParams = useSearchParams();
 
   const buildParams = () => {
     const params: any = {};
@@ -183,6 +186,32 @@ const FilterExportForm = () => {
     );
   };
 
+  const handleExportExcelWithSearch = async () => {
+    const search = searchParams.get("search") ?? undefined;
+    setIsExportingSearch(true);
+    try {
+      const data = await getAllProductsSelect({ search });
+      if (!data?.length) return;
+
+      const exportData = buildExportData(data);
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      saveAs(
+        new Blob([excelBuffer], { type: "application/octet-stream" }),
+        `export-search-${Date.now()}.xlsx`,
+      );
+    } finally {
+      setIsExportingSearch(false);
+    }
+  };
+
   const handleExportCSV = async () => {
     const res = await refetch();
     const data = res.data;
@@ -280,6 +309,19 @@ const FilterExportForm = () => {
           type="button"
         >
           Export CSV
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleExportExcelWithSearch}
+          disabled={isFetching || isExportingSearch}
+          type="button"
+        >
+          {isExportingSearch ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            "Export with search"
+          )}
         </Button>
       </div>
     </div>
