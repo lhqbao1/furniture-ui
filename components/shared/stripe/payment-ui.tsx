@@ -46,13 +46,10 @@ export default function CheckoutPaymentUI({
                   {paymentOptions.map((option) => (
                     <FormItem
                       key={option.id}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 flex-row"
                     >
                       <FormControl>
-                        <RadioGroupItem
-                          value={option.id}
-                          id={option.id}
-                        />
+                        <RadioGroupItem value={option.id} id={option.id} />
                       </FormControl>
 
                       <FormLabel

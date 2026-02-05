@@ -66,14 +66,13 @@ const ProductDetailInputs = ({
     }
 
     const zip = new JSZip();
-    toast.loading("Preparing images...");
+    const toastId = toast.loading("Preparing images...");
 
     try {
       // Tên folder dựa trên provider ID và product name
-      const folderName = `${id_provider || "unknown"}-${sanitizeFolderName(
+      const folderName = `${id_provider || "unknown"}_${sanitizeFolderName(
         name,
       )}`;
-      const folder = zip.folder(folderName);
 
       let totalCount = 0;
 
@@ -89,7 +88,7 @@ const ProductDetailInputs = ({
               ?.toLowerCase() || "jpg";
           const filename = `image_${index + 1}.${ext}`;
 
-          folder?.file(filename, blob);
+          zip.file(filename, blob, { binary: true });
           totalCount++;
         } catch (error) {
           console.error("Error downloading image:", file.url, error);
@@ -98,10 +97,10 @@ const ProductDetailInputs = ({
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
       saveAs(zipBlob, `${folderName}.zip`);
-      toast.success(`Downloaded ${totalCount} images`);
+      toast.success(`Downloaded ${totalCount} images`, { id: toastId });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to download images");
+      toast.error("Failed to download images", { id: toastId });
     }
   };
 
