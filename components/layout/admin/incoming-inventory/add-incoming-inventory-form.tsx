@@ -10,21 +10,13 @@ import z from "zod";
 import BuyerInformation from "./buyer-information";
 import SellerInformation from "./seller-information";
 import POInformation from "./po-information";
-import SellerBankingInformation from "./seller-banking-information";
-import WarehouseInformation from "./warehouse-information";
-import ContactPersonInformation from "./contact-person";
 import { Button } from "@/components/ui/button";
 import { useCreatePurchaseOrder } from "@/features/incoming-inventory/po/hook";
-
-function getLocalISOString() {
-  const now = new Date();
-  const tzOffset = now.getTimezoneOffset() * 60000; // ms
-  return new Date(now.getTime() - tzOffset).toISOString().slice(0, -1); // ❌ bỏ Z
-}
 
 const AddIncomingInventoryForm = () => {
   const [selectedsellerId, setSelectedsellerId] = useState<string | null>(null);
   const [selectedBuyerId, setSelectedBuyerId] = useState<string | null>(null);
+  const [syncKey, setSyncKey] = useState(0);
 
   const createPOMutation = useCreatePurchaseOrder();
   const form = useForm<z.infer<typeof incomingInventorySchema>>({
@@ -41,6 +33,7 @@ const AddIncomingInventoryForm = () => {
       buyer_id: "",
       seller_id: "",
       created_by: "admin",
+      note: "",
       bank_id: "",
     },
   });
@@ -52,6 +45,7 @@ const AddIncomingInventoryForm = () => {
         form.reset();
         setSelectedsellerId(null);
         setSelectedBuyerId(null);
+        setSyncKey((prev) => prev + 1);
         // setSelectedWarehouseId(null);
       },
       onError(error, variables, context) {
@@ -78,10 +72,12 @@ const AddIncomingInventoryForm = () => {
           <BuyerInformation
             selectedBuyerId={selectedBuyerId}
             setSelectedBuyerId={setSelectedBuyerId}
+            syncKey={syncKey}
           />
           <SellerInformation
             selectedsellerId={selectedsellerId}
             setSelectedsellerId={setSelectedsellerId}
+            syncKey={syncKey}
           />
           {/* <WarehouseInformation
             selectedWarehouseId={selectedWarehouseId}
@@ -89,10 +85,7 @@ const AddIncomingInventoryForm = () => {
           /> */}
           <POInformation />
         </div>
-        <Button
-          type="submit"
-          className="mt-4"
-        >
+        <Button type="submit" className="mt-4">
           Create PO
         </Button>
       </form>

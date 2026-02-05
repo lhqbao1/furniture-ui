@@ -129,10 +129,7 @@ const BuyerInformation = ({
                     </div>
                   ) : (
                     buyer.map((b) => (
-                      <SelectItem
-                        key={b.id}
-                        value={b.id}
-                      >
+                      <SelectItem key={b.id} value={b.id}>
                         {b.name} – {b.city}
                       </SelectItem>
                     ))
@@ -152,11 +149,7 @@ const BuyerInformation = ({
               <FormItem className="col-span-2">
                 <FormLabel>Buyer Name</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    disabled
-                  />
+                  <Input {...field} value={field.value ?? ""} disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -171,11 +164,7 @@ const BuyerInformation = ({
               <FormItem className="col-span-2">
                 <FormLabel>Buyer Address</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    disabled
-                  />
+                  <Input {...field} value={field.value ?? ""} disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -190,11 +179,7 @@ const BuyerInformation = ({
               <FormItem>
                 <FormLabel>Buyer City</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    disabled
-                  />
+                  <Input {...field} value={field.value ?? ""} disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -209,11 +194,7 @@ const BuyerInformation = ({
               <FormItem>
                 <FormLabel>Buyer Country</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    disabled
-                  />
+                  <Input {...field} value={field.value ?? ""} disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -228,11 +209,7 @@ const BuyerInformation = ({
               <FormItem>
                 <FormLabel>Buyer Postal Code</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    disabled
-                  />
+                  <Input {...field} value={field.value ?? ""} disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
