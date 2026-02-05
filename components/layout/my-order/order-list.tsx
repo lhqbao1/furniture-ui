@@ -42,12 +42,8 @@ import { userIdAtom } from "@/store/auth";
 import { getStatusStyle } from "../admin/orders/order-list/status-styles";
 import { canShowCancelButton } from "@/lib/my-order/cancel-button-show";
 
-import {
-  getInvoiceByCheckOut,
-  getInvoiceByUserId,
-} from "@/features/invoice/api";
+import { getInvoiceByUserId } from "@/features/invoice/api";
 import OrderDetailsDrawer from "./details-drawer";
-import { useCancelMainCheckout } from "@/features/checkout/hook";
 import CancelOrderDialog from "./cancel-dialog";
 import { OrderListSkeleton } from "./skeleton";
 
@@ -95,7 +91,6 @@ const OrderList = () => {
           const isDispatched =
             item.status.toLowerCase() === "shipped" ||
             item.status.toLowerCase() === "completed";
-          const canCancel = canShowCancelButton(item.created_at);
 
           return (
             <div key={index}>
@@ -105,10 +100,7 @@ const OrderList = () => {
                 className="w-full rounded-md border border-gray-300"
                 defaultValue={order[0].id}
               >
-                <AccordionItem
-                  value={item.id}
-                  className="border-b-0"
-                >
+                <AccordionItem value={item.id} className="border-b-0">
                   <div
                     className={cn(
                       "border-gray-300 rounded-tr-md rounded-tl-md",
@@ -128,83 +120,6 @@ const OrderList = () => {
                           </div>
                         </AccordionTrigger>
                       </div>
-                      {/* <div>
-                        <DropdownMenu modal={false}>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              aria-label="Open menu"
-                            >
-                              <MoreHorizontalIcon />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            className="w-40"
-                            align="end"
-                          >
-                            <DropdownMenuLabel className="font-bold border-b">
-                              {t("actions")}
-                            </DropdownMenuLabel>
-                            <DropdownMenuGroup>
-                              <DropdownMenuItem>{t("cancel")}</DropdownMenuItem>
-                              <DropdownMenuItem
-                                onSelect={() => setShowContactDialog(true)}
-                              >
-                                {t("feedback")}
-                              </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                        <Dialog
-                          open={showCancelDialog}
-                          onOpenChange={setShowCancelDialog}
-                        >
-                          <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                              <DialogTitle>Create New File</DialogTitle>
-                              <DialogDescription>
-                                Provide a name for your new file. Click create
-                                when you&apos;re done.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                              </DialogClose>
-                              <Button type="submit">Create</Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-
-                        <Dialog
-                          open={showContactDialog}
-                          onOpenChange={setShowContactDialog}
-                        >
-                          <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                              <DialogTitle>{t("feedback_title")}</DialogTitle>
-                              <DialogDescription>
-                                {t("feedback_desc")}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button variant="outline">{t("cancel")}</Button>
-                              </DialogClose>
-                              <Button
-                                onClick={() => {
-                                  setContactOrderId(item.id);
-                                  router.push("/contact", { locale });
-                                  setShowContactDialog(false);
-                                }}
-                                type="button"
-                              >
-                                {t("send")}
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div> */}
                     </div>
                   </div>
                   <AccordionContent className="flex flex-col gap-4 text-balance px-2 py-3">
