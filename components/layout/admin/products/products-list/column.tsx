@@ -3,10 +3,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CopyCheck, Eye, Pencil } from "lucide-react";
+import { CopyCheck, Eye, Loader2, Pencil } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -17,6 +17,8 @@ import { Link, useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getProductById } from "@/features/products/api";
 import { useGetSuppliers } from "@/features/supplier/hook";
+import { useGetBrands } from "@/features/brand/hook";
+import { useGetCategories } from "@/features/category/hook";
 import {
   Select,
   SelectContent,
@@ -25,13 +27,56 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
   HoverCard,
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import { getCarrierLogo } from "@/lib/getCarrierImage";
+import { CategoryResponse } from "@/types/categories";
+import { CARRIERS } from "@/data/data";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
+
+type FlattenCategory = CategoryResponse & {
+  isParent: boolean;
+  depth: number;
+};
+
+const flattenCategories = (
+  categories: CategoryResponse[],
+  depth = 0,
+): FlattenCategory[] => {
+  let result: FlattenCategory[] = [];
+
+  for (const category of categories) {
+    const hasChildren = !!(category.children && category.children.length > 0);
+
+    result.push({
+      ...category,
+      isParent: hasChildren,
+      depth,
+    });
+
+    if (hasChildren) {
+      result = [...result, ...flattenCategories(category.children!, depth + 1)];
+    }
+  }
+
+  return result;
+};
 
 function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
@@ -491,6 +536,87 @@ function EditableCostCell({ product }: { product: ProductItem }) {
   );
 }
 
+function EditableDeliveryCostCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.delivery_cost);
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductDeliveryCost = () => {
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          delivery_cost: value,
+          ...(product.categories?.length
+            ? { category_ids: product.categories.map((c) => c.id) }
+            : {}),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update delivery cost successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update delivery cost fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex justify-center">
+      {editing ? (
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => setValue(e.target.valueAsNumber)}
+          onBlur={() => {
+            setValue(product.delivery_cost);
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductDeliveryCost();
+            }
+            if (e.key === "Escape") {
+              setValue(product.delivery_cost);
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            "w-28",
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+          {product.delivery_cost ? (
+            <div className="text-right">
+              €{product.delivery_cost?.toFixed(2)}
+            </div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EditTableSupplierCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState("");
   const [editing, setEditing] = useState(false);
@@ -577,6 +703,372 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
         <div className="cursor-pointer" onClick={() => setEditing(true)}>
           {product.owner ? product.owner.business_name : "Prestige Home"}
         </div>
+      )}
+    </div>
+  );
+}
+
+function EditableBrandCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.brand?.id ?? "");
+  const [editing, setEditing] = useState(false);
+  const editProductMutation = useEditProduct();
+  const { data: brands, isLoading } = useGetBrands();
+
+  useEffect(() => {
+    setValue(product.brand?.id ?? "");
+  }, [product.brand]);
+
+  const handleEditBrand = (brandId: string) => {
+    const selectedBrand = brands?.find((brand) => brand.id === brandId);
+    const isBrandEconelo = selectedBrand?.name
+      ?.toLowerCase()
+      .includes("econelo");
+
+    editProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          brand_id: brandId || null,
+          is_econelo:
+            typeof isBrandEconelo === "boolean"
+              ? isBrandEconelo
+              : product.is_econelo,
+          ...(product.categories?.length
+            ? { category_ids: product.categories.map((c) => c.id) }
+            : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Brand updated successfully");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update brand failed");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex justify-center text-center w-full">
+      {editing ? (
+        <Select
+          value={value}
+          onOpenChange={(open) => {
+            if (!open && !editProductMutation.isPending) {
+              setEditing(false);
+            }
+          }}
+          onValueChange={(val) => {
+            setValue(val);
+            handleEditBrand(val);
+          }}
+          disabled={editProductMutation.isPending || isLoading}
+        >
+          <SelectTrigger className="w-36 border">
+            <SelectValue placeholder={isLoading ? "Loading..." : ""} />
+          </SelectTrigger>
+          <SelectContent>
+            {brands?.map((brand) => (
+              <SelectItem key={brand.id} value={brand.id}>
+                {brand.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+          {product.brand ? product.brand.name : "—"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditableCategoryCell({ product }: { product: ProductItem }) {
+  const [open, setOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>(
+    product.categories?.map((category) => category.id) ?? [],
+  );
+  const editProductMutation = useEditProduct();
+  const { data: categories, isLoading, isError } = useGetCategories();
+
+  useEffect(() => {
+    setSelectedIds(product.categories?.map((category) => category.id) ?? []);
+  }, [product.categories]);
+
+  const flatOptions = useMemo(() => {
+    if (!categories) return [];
+    return flattenCategories(categories);
+  }, [categories]);
+
+  const selectedNames = useMemo(() => {
+    if (selectedIds.length === 0) return [];
+    const optionMap = new Map(
+      flatOptions.map((option) => [option.id, option.name]),
+    );
+    const fallbackMap = new Map(
+      (product.categories ?? []).map((category) => [
+        category.id,
+        category.name,
+      ]),
+    );
+
+    return selectedIds
+      .map((id) => optionMap.get(id) ?? fallbackMap.get(id))
+      .filter(Boolean) as string[];
+  }, [flatOptions, product.categories, selectedIds]);
+
+  const handleUpdateCategories = (nextSelected: string[]) => {
+    const previous = selectedIds;
+    setSelectedIds(nextSelected);
+
+    editProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          category_ids: nextSelected,
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update categories successful");
+        },
+        onError() {
+          toast.error("Update categories fail");
+          setSelectedIds(previous);
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex justify-center text-center w-full">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            className="w-full justify-center px-2 text-sm  hover:text-foreground"
+            disabled={isLoading || isError || editProductMutation.isPending}
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading...
+              </span>
+            ) : selectedNames.length > 0 ? (
+              <span className="line-clamp-2">{selectedNames.join(", ")}</span>
+            ) : (
+              "—"
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[260px] p-0" align="start">
+          {isLoading ? (
+            <div className="flex items-center justify-center p-4">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : isError ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              Error loading categories
+            </div>
+          ) : (
+            <Command>
+              <CommandInput
+                placeholder="Search categories..."
+                className="h-10"
+              />
+              <CommandList className="max-h-[320px]">
+                <CommandEmpty>No categories available</CommandEmpty>
+                <CommandGroup>
+                  {flatOptions.map((option) => {
+                    const isSelected = selectedIds.includes(option.id);
+
+                    if (option.isParent) {
+                      return (
+                        <div
+                          key={option.id}
+                          className="px-3 py-2 text-sm font-semibold text-muted-foreground cursor-default"
+                          style={{
+                            paddingLeft: `${option.depth * 12 + 12}px`,
+                          }}
+                        >
+                          {option.name}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <CommandItem
+                        key={option.id}
+                        onSelect={() => {
+                          const nextSelected = isSelected
+                            ? selectedIds.filter((id) => id !== option.id)
+                            : [...selectedIds, option.id];
+                          handleUpdateCategories(nextSelected);
+                        }}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => {}}
+                          className="pointer-events-none"
+                        />
+                        <span
+                          className="truncate"
+                          style={{ paddingLeft: `${option.depth * 12}px` }}
+                        >
+                          {option.name}
+                        </span>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          )}
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+function EditableCarrierCell({ product }: { product: ProductItem }) {
+  const [editing, setEditing] = useState(false);
+  const editProductMutation = useEditProduct();
+
+  const normalizedCarrier =
+    product.carrier === "spedition" ? "amm" : product.carrier ?? "";
+
+  const carrierOptions = useMemo(() => {
+    return CARRIERS.filter((carrier) => carrier.id !== "spedition").map(
+      (carrier) => ({
+        ...carrier,
+        label: carrier.id === "amm" ? "Spedition" : carrier.id.toUpperCase(),
+      }),
+    );
+  }, []);
+
+  const handleUpdateCarrier = (value: string) => {
+    const nextCarrier = value === "spedition" ? "amm" : value;
+
+    editProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          carrier: nextCarrier,
+          ...(product.categories?.length
+            ? { category_ids: product.categories.map((c) => c.id) }
+            : {}),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update carrier successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update carrier failed");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex items-center justify-center">
+      {editing ? (
+        <Select
+          value={normalizedCarrier}
+          onOpenChange={(open) => {
+            if (!open && !editProductMutation.isPending) {
+              setEditing(false);
+            }
+          }}
+          onValueChange={(val) => handleUpdateCarrier(val)}
+          disabled={editProductMutation.isPending}
+        >
+          <SelectTrigger className="w-32 border">
+            <SelectValue placeholder="Select carrier" />
+          </SelectTrigger>
+          <SelectContent>
+            {carrierOptions.map((carrier) => (
+              <SelectItem
+                key={carrier.id}
+                value={carrier.id}
+              >
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={carrier.logo}
+                    alt={carrier.id}
+                    width={28}
+                    height={18}
+                    className="object-contain"
+                  />
+                  <span className="uppercase">{carrier.label}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <button
+          type="button"
+          className="flex items-center justify-center cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
+          {(() => {
+            const logo = normalizedCarrier
+              ? getCarrierLogo(normalizedCarrier)
+              : null;
+
+            if (!logo) {
+              return <span className="text-muted-foreground">—</span>;
+            }
+
+            return (
+              <Image
+                src={logo}
+                alt={normalizedCarrier}
+                width={60}
+                height={40}
+                unoptimized
+                className="object-contain"
+              />
+            );
+          })()}
+        </button>
       )}
     </div>
   );
@@ -834,15 +1326,7 @@ export const getProductColumns = (
   {
     accessorKey: "brand",
     header: ({}) => <div className="text-center">Brand</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.brand && row.original.brand.name
-            ? row.original.brand.name
-            : ""}
-        </div>
-      );
-    },
+    cell: ({ row }) => <EditableBrandCell product={row.original} />,
   },
   {
     accessorKey: "ean",
@@ -863,20 +1347,9 @@ export const getProductColumns = (
   },
   {
     accessorKey: "category",
+    meta: { width: 200 },
     header: ({ column }) => <div className="text-center">CATEGORY</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="flex flex-col gap-1 items-center">
-          {row.original.categories.length > 0 ? (
-            row.original.categories.map((item, indx) => {
-              return <div key={item.id}>{item.name}</div>;
-            })
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => <EditableCategoryCell product={row.original} />,
   },
 
   // ✅ Cột STOCK — thêm sort server-side logic ở đây
@@ -956,17 +1429,7 @@ export const getProductColumns = (
   {
     accessorKey: "shipping_cost",
     header: () => <div className="text-center">DELIVERY COST</div>,
-    cell: ({ row }) => (
-      <>
-        {row.original.delivery_cost ? (
-          <div className="text-right">
-            €{row.original.delivery_cost?.toFixed(2)}
-          </div>
-        ) : (
-          <div className="text-center">—</div>
-        )}
-      </>
-    ),
+    cell: ({ row }) => <EditableDeliveryCostCell product={row.original} />,
   },
   {
     accessorKey: "final_price",
@@ -1005,27 +1468,7 @@ export const getProductColumns = (
   {
     id: "carrier",
     header: () => <div className="text-center">CARRIER</div>,
-    cell: ({ row }) => {
-      const carrier = row.original.carrier;
-      const logo = getCarrierLogo(carrier);
-
-      return (
-        <div className="flex items-center justify-center">
-          {logo ? (
-            <Image
-              src={logo}
-              alt={carrier}
-              width={60}
-              height={60}
-              unoptimized
-              className="object-contain"
-            />
-          ) : (
-            <span className="text-muted-foreground">—</span>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => <EditableCarrierCell product={row.original} />,
   },
 
   {
