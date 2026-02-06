@@ -9,13 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   FormField,
   FormItem,
@@ -27,7 +29,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { categorySchema } from "@/lib/schema/category";
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input";
 import {
@@ -37,14 +39,51 @@ import {
 } from "@/features/category/hook";
 import { toast } from "sonner";
 import { CategoryInput } from "@/types/categories";
-import { defaultValues } from "@/lib/schema/product";
 import { Loader2, Pencil } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { CategoryResponse } from "@/types/categories";
 
 interface AddCategoryDrawerProps {
   categoryId?: string;
   categoryValues?: CategoryInput;
 }
+
+type CategoryOption = {
+  id: string;
+  name: string;
+  path: string;
+  depth: number;
+  level: number;
+};
+
+const buildCategoryOptions = (
+  categories: CategoryResponse[],
+  isEconelo: boolean,
+  parentPath: string[] = [],
+  depth = 1,
+): CategoryOption[] => {
+  return categories.flatMap((cat) => {
+    const nextPath = [...parentPath, cat.name];
+    const include = !isEconelo || cat.is_econelo === true;
+    const self: CategoryOption[] = include
+      ? [
+          {
+            id: cat.id.toString(),
+            name: cat.name,
+            path: nextPath.join(" / "),
+            depth,
+            level: cat.level ?? depth,
+          },
+        ]
+      : [];
+
+    const children = cat.children?.length
+      ? buildCategoryOptions(cat.children, isEconelo, nextPath, depth + 1)
+      : [];
+
+    return [...self, ...children];
+  });
+};
 
 export default function AddCategoryDrawer({
   categoryId,
@@ -54,6 +93,7 @@ export default function AddCategoryDrawer({
   const createCategoryMutation = useCreateCategory();
   const updateCategoryMutation = useEditCategory();
   const { data: categories, isLoading, isError } = useGetCategories();
+  const [parentOpen, setParentOpen] = useState(false);
 
   const defaultValues: CategoryInput = {
     name: "",
@@ -70,12 +110,24 @@ export default function AddCategoryDrawer({
   });
 
   const isEconelo = form.watch("is_econelo");
+  const parentId = form.watch("parent_id");
+
+  const categoryOptions = useMemo(() => {
+    return categories ? buildCategoryOptions(categories, isEconelo) : [];
+  }, [categories, isEconelo]);
+
+  const selectedParent = parentId
+    ? categoryOptions.find((option) => option.id === parentId)
+    : null;
 
   const onSubmit = (data: CategoryInput) => {
     const payload: CategoryInput = { ...data };
 
     if (payload.parent_id) {
-      payload.level = 2; // nếu có parent, level = 2
+      const parentOption = categoryOptions.find(
+        (option) => option.id === payload.parent_id,
+      );
+      payload.level = (parentOption?.level ?? 1) + 1;
     } else {
       delete payload.parent_id; // nếu không có parent, remove parent_id
       payload.level = 1; // level mặc định là 1
@@ -181,55 +233,96 @@ export default function AddCategoryDrawer({
               isSingle
             />
 
-            {!categories || isError ? (
-              ""
-            ) : (
-              <FormField
-                control={form.control}
-                name="parent_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Parent category</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || ""} // nếu chưa chọn thì là empty
-                        disabled={isLoading || isError}
+            <FormField
+              control={form.control}
+              name="parent_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parent category</FormLabel>
+                  <FormControl>
+                    <Popover
+                      open={parentOpen}
+                      onOpenChange={setParentOpen}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between"
+                          disabled={isLoading || isError}
+                        >
+                          {isLoading ? (
+                            <span className="flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Loading...
+                            </span>
+                          ) : selectedParent ? (
+                            selectedParent.path
+                          ) : (
+                            "Select parent category"
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-[320px] p-0"
+                        align="start"
                       >
-                        <SelectTrigger className="border">
-                          <SelectValue placeholder="Select parent category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {isLoading && (
-                            <SelectItem value="">Loading...</SelectItem>
-                          )}
-                          {isError && (
-                            <SelectItem value="">Error loading</SelectItem>
-                          )}
-
-                          {/* 🔹 Lọc categories theo is_econelo */}
-                          {categories
-                            ?.filter((cat) => {
-                              // Nếu is_econelo = true, chỉ lấy cat.is_econelo = true
-                              // Nếu is_econelo = false, lấy tất cả
-                              return !isEconelo || cat.is_econelo === true;
-                            })
-                            .map((cat) => (
-                              <SelectItem
-                                key={cat.id}
-                                value={cat.id.toString()}
-                              >
-                                {cat.name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+                        {isLoading ? (
+                          <div className="flex items-center justify-center p-4">
+                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                          </div>
+                        ) : isError ? (
+                          <div className="p-4 text-center text-sm text-muted-foreground">
+                            Error loading categories
+                          </div>
+                        ) : (
+                          <Command>
+                            <CommandInput placeholder="Search categories..." />
+                            <CommandList className="max-h-[320px]">
+                              <CommandEmpty>
+                                No categories found.
+                              </CommandEmpty>
+                              <CommandGroup>
+                                <CommandItem
+                                  value="no-parent"
+                                  onSelect={() => {
+                                    field.onChange(undefined);
+                                    setParentOpen(false);
+                                  }}
+                                >
+                                  No parent
+                                </CommandItem>
+                                {categoryOptions.map((option) => (
+                                  <CommandItem
+                                    key={option.id}
+                                    value={`${option.path}`}
+                                    onSelect={() => {
+                                      field.onChange(option.id);
+                                      setParentOpen(false);
+                                    }}
+                                  >
+                                    <span
+                                      className="truncate"
+                                      style={{
+                                        paddingLeft: `${
+                                          (option.depth - 1) * 12
+                                        }px`,
+                                      }}
+                                    >
+                                      {option.name}
+                                    </span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        )}
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
