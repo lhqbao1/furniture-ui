@@ -63,8 +63,10 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
   const activeClass =
     isSelectable && selectedCategory === category.id ? "text-primary" : "";
 
+  const indentStyle = { paddingLeft: `${level * 16}px` };
+
   return (
-    <div className={`flex flex-col pl-${category.level === 1 ? 0 : 7}`}>
+    <div className="flex flex-col">
       {hasChildren ? (
         <Collapsible
           open={isOpen}
@@ -72,8 +74,11 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
         >
           <CollapsibleTrigger asChild>
             <div className="group gap-4 grid grid-cols-4 cursor-pointer pr-6">
-              <div className="flex items-center gap-1 col-span-3">
-                {category.level === 1 ? (
+              <div
+                className="flex items-center gap-1 col-span-3"
+                style={indentStyle}
+              >
+                {level === 0 ? (
                   <ChevronRight
                     stroke="#00B159"
                     className={`transition-transform duration-300 ${
@@ -117,6 +122,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                 <CategoryItem
                   key={child.id}
                   category={child}
+                  level={level + 1}
                   expandedIds={expandedIds}
                   setExpandedIds={setExpandedIds}
                 />
@@ -129,11 +135,21 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
           className={`group gap-4 grid grid-cols-4 cursor-pointer pr-6 ${activeClass}`}
           onClick={handleClick}
         >
-          <div className="flex gap-1 items-center col-span-3">
-            <ChevronRight
-              stroke="#00B159"
-              size={18}
-            />
+          <div
+            className="flex gap-1 items-center col-span-3"
+            style={indentStyle}
+          >
+            {level === 0 ? (
+              <ChevronRight
+                stroke="#00B159"
+                size={18}
+              />
+            ) : (
+              <CornerDownRight
+                stroke="#00B159"
+                size={18}
+              />
+            )}
             <span>
               {category.name} ({category.code})
             </span>

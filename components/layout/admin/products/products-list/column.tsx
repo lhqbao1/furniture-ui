@@ -78,10 +78,8 @@ function EditableNameCell({ product }: { product: ProductItem }) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
-            if (value !== product.name) {
-            } else {
-              setEditing(false);
-            }
+            setValue(product.name);
+            setEditing(false);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -154,10 +152,8 @@ function EditableSkuCell({ product }: { product: ProductItem }) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
-            if (value !== (product.sku ?? "")) {
-            } else {
-              setEditing(false);
-            }
+            setValue(product.sku ?? "");
+            setEditing(false);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -192,11 +188,12 @@ function EditableEanCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductEan = () => {
+    const sanitizedEan = value.trim();
     EditProductMutation.mutate(
       {
         input: {
           ...product,
-          ean: value,
+          ean: sanitizedEan.length > 0 ? sanitizedEan : null,
           category_ids: product.categories.map((c) => c.id),
           ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
           ...(product.bundles?.length
@@ -230,10 +227,8 @@ function EditableEanCell({ product }: { product: ProductItem }) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
-            if (value !== (product.ean ?? "")) {
-            } else {
-              setEditing(false);
-            }
+            setValue(product.ean ?? "");
+            setEditing(false);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -309,10 +304,8 @@ function EditableStockCell({ product }: { product: ProductItem }) {
           value={value}
           onChange={(e) => setValue(e.target.valueAsNumber)}
           onBlur={() => {
-            if (value !== product.stock) {
-            } else {
-              setEditing(false);
-            }
+            setValue(product.stock);
+            setEditing(false);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -387,10 +380,8 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
           value={value}
           onChange={(e) => setValue(e.target.valueAsNumber)}
           onBlur={() => {
-            if (value !== product.final_price) {
-            } else {
-              setEditing(false);
-            }
+            setValue(product.final_price);
+            setEditing(false);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -468,10 +459,8 @@ function EditableCostCell({ product }: { product: ProductItem }) {
           value={value}
           onChange={(e) => setValue(e.target.valueAsNumber)}
           onBlur={() => {
-            if (value !== product.cost) {
-            } else {
-              setEditing(false);
-            }
+            setValue(product.cost);
+            setEditing(false);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
