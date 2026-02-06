@@ -86,20 +86,6 @@ export function MultiSelectField({
           }
         };
 
-        const orderedOptions = React.useMemo(() => {
-          if (!flatOptions) return [];
-          // Các category đã chọn
-          const selectedItems = flatOptions.filter((opt) =>
-            selected.includes(opt.id),
-          );
-          // Các category chưa chọn
-          const unselectedItems = flatOptions.filter(
-            (opt) => !selected.includes(opt.id),
-          );
-          // Ghép lại: chọn trước, chưa chọn sau
-          return [...selectedItems, ...unselectedItems];
-        }, [flatOptions, selected]);
-
         return (
           <FormItem className="flex flex-col w-full">
             {label && (
