@@ -106,7 +106,7 @@ const OrderList = () => {
     <div className="space-y-6">
       <AdminBackButton />
       <div className="space-y-6 pb-30">
-        {isLoadingStatistic || !statistic ? (
+        {isLoadingStatistic ? (
           <ProductStatisticSkeleton />
         ) : (
           <OrderStatistic statistic={mergedStatistic} isOrder />
@@ -120,7 +120,7 @@ const OrderList = () => {
           setPageSize={setPageSize}
           type={ToolbarType.order}
         />
-        {isLoading ? (
+        {isLoading && !data ? (
           <ProductTableSkeleton columnsCount={6} rowsCount={6} />
         ) : (
           <ProductTable

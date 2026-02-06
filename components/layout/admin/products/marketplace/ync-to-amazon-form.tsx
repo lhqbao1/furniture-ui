@@ -75,12 +75,11 @@ const SyncToAmazonForm = ({
         product.marketplace_products.find(
           (i) => i.marketplace === currentMarketplace,
         )?.final_price ?? product.final_price,
-      min_stock: product.marketplace_products.find(
-        (i) => i.marketplace === currentMarketplace,
-      )?.min_stock,
-      max_stock: product.marketplace_products.find(
-        (i) => i.marketplace === currentMarketplace,
-      )?.max_stock,
+      min_stock:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.min_stock ?? 1,
+      max_stock: product.stock - (product.result_stock ?? 0),
       sku: product.id_provider,
       is_active: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,
@@ -101,6 +100,13 @@ const SyncToAmazonForm = ({
       return;
     }
 
+    const selectedMarketplace = values.marketplace ?? currentMarketplace ?? "";
+
+    if (!selectedMarketplace) {
+      toast.error("Marketplace is missing");
+      return;
+    }
+
     if (!values.handling_time || values.handling_time === 0) {
       toast.error("Handling times is missing from current product");
       return;
@@ -110,7 +116,7 @@ const SyncToAmazonForm = ({
     setOpen(true);
     const normalizedValues: MarketplaceProduct = {
       ...values,
-      marketplace: values.marketplace ?? "",
+      marketplace: selectedMarketplace,
       final_price: values.final_price ?? 0,
       min_stock: values.min_stock ?? 0,
       max_stock: values.max_stock ?? 10,
@@ -134,7 +140,7 @@ const SyncToAmazonForm = ({
 
     // tìm đúng item theo marketplace
     const existing = updatedMarketplaceProducts.find(
-      (m) => m.marketplace === values.marketplace,
+      (m) => m.marketplace === selectedMarketplace,
     );
 
     if (isUpdating) {
@@ -189,94 +195,93 @@ const SyncToAmazonForm = ({
       },
       {
         onSuccess(data) {
-          const amazonData = data.marketplace_products?.find(
-            (m) => m.marketplace === "amazon",
-          );
-          if (!product.sku) {
-            toast.error("sku is missing");
-            return;
-          }
-          if (!product.length) {
-            toast.error("length is missing");
-            return;
-          }
-          if (!product.weight) {
-            toast.error("weight is missing");
-            return;
-          }
-          if (!product.width) {
-            toast.error("width is missing");
-            return;
-          }
-          if (!product.height) {
-            toast.error("height is missing");
-            return;
-          }
-          if (!product.brand) {
-            toast.error("brand is missing");
-            return;
-          }
-          if (product.packages.length === 0) {
-            toast.error("Packages number is missing");
-            return;
-          }
+          if (isUpdating || isAdd) {
+            const amazonData = data.marketplace_products?.find(
+              (m) => m.marketplace === "amazon",
+            );
+            if (!product.sku) {
+              toast.error("sku is missing");
+              return;
+            }
+            if (!product.length) {
+              toast.error("length is missing");
+              return;
+            }
+            if (!product.weight) {
+              toast.error("weight is missing");
+              return;
+            }
+            if (!product.width) {
+              toast.error("width is missing");
+              return;
+            }
+            if (!product.height) {
+              toast.error("height is missing");
+              return;
+            }
+            if (!product.brand) {
+              toast.error("brand is missing");
+              return;
+            }
+            if (product.packages.length === 0) {
+              toast.error("Packages number is missing");
+              return;
+            }
 
-          const payload: SyncToAmazonInput = {
-            sku: amazonData?.sku ?? product.id_provider,
-            title: amazonData?.name ?? product.name,
-            manufacturer: product.brand ? product.brand.company_name : "",
-            description: amazonData?.description ?? product.description,
-            price: amazonData?.final_price ?? product.final_price,
-            ean: product.ean,
-            part_number: product.sku,
-            is_fragile: false,
-            number_of_items: Number(product.amount_unit) || 0,
-            included_components: product.name,
-            weight: product.weight,
-            height: product.height,
-            width: product.width,
-            length: product.length,
-            package_length: Math.max(
-              ...product.packages.map((p) => p.length ?? 0),
-            ),
-            package_height: Math.max(
-              ...product.packages.map((p) => p.height ?? 0),
-            ),
-            package_width: Math.max(
-              ...product.packages.map((p) => p.width ?? 0),
-            ),
-            color: product.color ?? "",
-            unit_count: Number(product.amount_unit ?? 0),
-            unit_count_type: product.unit,
-            depth: 0,
-            asin: null,
-            stock: Math.max(
-              0,
-              product.stock - Math.abs(product.result_stock ?? 0),
-            ),
-            carrier: product.carrier,
-            brand: product.brand ? product.brand.name : "",
-            images: product.static_files?.map((f) => f.url) ?? [],
-            model_number: product.sku,
-            size: `${product.length}x${product.width}x${product.height}`,
-            country_of_origin: values.country_of_origin,
-            min_stock: values.min_stock ?? 0,
-            max_stock: values.max_stock ?? 10,
-            handling_time: values.handling_time ?? 0,
-            bullet_point1: product.bullet_point_1 ?? null,
-            bullet_point2: product.bullet_point_2 ?? null,
-            bullet_point3: product.bullet_point_3 ?? null,
-            bullet_point4: product.bullet_point_4 ?? null,
-            bullet_point5: product.bullet_point_5 ?? null,
-          };
+            const payload: SyncToAmazonInput = {
+              sku: amazonData?.sku ?? product.id_provider,
+              title: amazonData?.name ?? product.name,
+              manufacturer: product.brand ? product.brand.company_name : "",
+              description: amazonData?.description ?? product.description,
+              price: amazonData?.final_price ?? product.final_price,
+              ean: product.ean,
+              part_number: product.sku,
+              is_fragile: false,
+              number_of_items: Number(product.amount_unit) || 0,
+              included_components: product.name,
+              weight: product.weight,
+              height: product.height,
+              width: product.width,
+              length: product.length,
+              package_length: Math.max(
+                ...product.packages.map((p) => p.length ?? 0),
+              ),
+              package_height: Math.max(
+                ...product.packages.map((p) => p.height ?? 0),
+              ),
+              package_width: Math.max(
+                ...product.packages.map((p) => p.width ?? 0),
+              ),
+              color: product.color ?? "",
+              unit_count: Number(product.amount_unit ?? 0),
+              unit_count_type: product.unit,
+              depth: 0,
+              asin: null,
+              stock: values.max_stock ?? 0,
+              carrier: product.carrier,
+              brand: product.brand ? product.brand.name : "",
+              images: product.static_files?.map((f) => f.url) ?? [],
+              model_number: product.sku,
+              size: `${product.length}x${product.width}x${product.height}`,
+              country_of_origin: values.country_of_origin,
+              min_stock: values.min_stock ?? 0,
+              max_stock: values.max_stock ?? 10,
+              handling_time: values.handling_time ?? 0,
+              bullet_point1: product.bullet_point_1 ?? null,
+              bullet_point2: product.bullet_point_2 ?? null,
+              bullet_point3: product.bullet_point_3 ?? null,
+              bullet_point4: product.bullet_point_4 ?? null,
+              bullet_point5: product.bullet_point_5 ?? null,
+            };
 
-          syncToAmazonMutation.mutate(payload, {
-            onError(error, variables, onMutateResult, context) {
-              toast.error("Failed to update marketplace data", {
-                description: error.message,
-              });
-            },
-          });
+            syncToAmazonMutation.mutate(payload, {
+              onError(error) {
+                toast.error("Failed to update marketplace data", {
+                  description: error.message,
+                });
+              },
+            });
+          }
         },
         onError(e) {
           toast.error("Failed to update marketplace data", {
@@ -328,6 +333,29 @@ const SyncToAmazonForm = ({
                 )}
                 className="space-y-6"
               >
+                <div className="flex justify-start">
+                  <Button
+                    type="submit"
+                    className="px-6 py-2 text-lg"
+                    disabled={
+                      isUpdating
+                        ? syncToAmazonMutation.isPending
+                        : updateProductMutation.isPending
+                    }
+                  >
+                    {isUpdating ? (
+                      syncToAmazonMutation.isPending ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        "Update"
+                      )
+                    ) : updateProductMutation.isPending ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      "Add"
+                    )}
+                  </Button>
+                </div>
                 {/* Name */}
                 <FormField
                   control={form.control}
@@ -436,30 +464,6 @@ const SyncToAmazonForm = ({
 
                   <FormField
                     control={form.control}
-                    name="min_stock"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Min Stock</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={field.value ?? ""}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value === ""
-                                  ? null
-                                  : e.target.valueAsNumber,
-                              )
-                            }
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="max_stock"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
@@ -503,31 +507,6 @@ const SyncToAmazonForm = ({
                     </FormItem>
                   )}
                 />
-
-                {/* Submit */}
-                <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    className="px-6 py-2 text-lg"
-                    disabled={
-                      isUpdating
-                        ? syncToAmazonMutation.isPending
-                        : updateProductMutation.isPending
-                    }
-                  >
-                    {isUpdating ? (
-                      syncToAmazonMutation.isPending ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        "Update"
-                      )
-                    ) : updateProductMutation.isPending ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      "Add"
-                    )}
-                  </Button>
-                </div>
               </form>
             </Form>
           </div>

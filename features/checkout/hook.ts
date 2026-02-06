@@ -158,6 +158,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       search ?? null,
     ],
     queryFn: () => getCheckOutMain(params),
+    placeholderData: (previousData) => previousData,
     retry: false,
   });
 }

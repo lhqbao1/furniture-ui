@@ -165,7 +165,7 @@ const AboutUsPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 w-2/3 mt-6">
+        {/* <div className="grid grid-cols-4 gap-4 w-2/3 mt-6">
           {Array.from({ length: 8 }, (_, i) => i + 1).map((i) => (
             <Image
               key={i}
@@ -177,7 +177,7 @@ const AboutUsPage = () => {
               className="object-cover w-full h-full rounded-sm"
             />
           ))}
-        </div>
+        </div> */}
       </div>
     </section>
   );
