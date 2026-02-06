@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { useDebounce } from "use-debounce";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
@@ -57,6 +60,9 @@ interface TableToolbarProps {
   exportData?: ProductItem[];
   type: ToolbarType;
   product_ids?: string[];
+  columnOptions?: { id: string; label: string; alwaysVisible?: boolean }[];
+  columnVisibility?: Record<string, boolean>;
+  onColumnVisibilityChange?: (columnId: string, visible: boolean) => void;
 }
 
 type ImageFile = {
@@ -78,6 +84,9 @@ export default function TableToolbar({
   exportData,
   type,
   product_ids,
+  columnOptions,
+  columnVisibility,
+  onColumnVisibilityChange,
 }: TableToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -308,26 +317,52 @@ export default function TableToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Compact</DropdownMenuItem>
-            <DropdownMenuItem>Comfortable</DropdownMenuItem>
+            {columnOptions && columnOptions.length > 0 ? (
+              <>
+                <DropdownMenuLabel>Columns</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {columnOptions.map((column) => {
+                  const checked = columnVisibility?.[column.id] ?? true;
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      checked={checked}
+                      disabled={column.alwaysVisible}
+                      onCheckedChange={(value) => {
+                        onColumnVisibilityChange?.(column.id, Boolean(value));
+                      }}
+                    >
+                      {column.label}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                <DropdownMenuItem>Compact</DropdownMenuItem>
+                <DropdownMenuItem>Comfortable</DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
-              Columns <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Name</DropdownMenuItem>
-            <DropdownMenuItem>Stock</DropdownMenuItem>
-            <DropdownMenuItem>Price</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!columnOptions?.length && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex items-center gap-1"
+              >
+                Columns <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Name</DropdownMenuItem>
+              <DropdownMenuItem>Stock</DropdownMenuItem>
+              <DropdownMenuItem>Price</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         {addButtonText && (
           <Button

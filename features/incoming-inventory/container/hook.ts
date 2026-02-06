@@ -5,6 +5,7 @@ import {
   createPOContainer,
   deletePOContainer,
   getContainersByPurchaseOrder,
+  sendContainerToAmm,
   updatePOContainer,
 } from "./api";
 
@@ -55,6 +56,21 @@ export function useDeletePOContainer() {
   return useMutation<unknown, Error, { containerId: string }>({
     mutationFn: ({ containerId }) => deletePOContainer(containerId),
     onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["po-containers"],
+      });
+    },
+  });
+}
+
+export function useSendContainerToAmm() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (container_id: string) => sendContainerToAmm(container_id),
+
+    onSuccess: (data, container_id) => {
+      // 🔄 refetch các query liên quan
       queryClient.invalidateQueries({
         queryKey: ["po-containers"],
       });

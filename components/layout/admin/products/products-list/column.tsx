@@ -72,7 +72,7 @@ function EditableNameCell({ product }: { product: ProductItem }) {
   };
 
   return (
-    <div className="w-60 text-wrap">
+    <div className="text-wrap">
       {editing ? (
         <Input
           value={value}
@@ -100,10 +100,162 @@ function EditableNameCell({ product }: { product: ProductItem }) {
         />
       ) : (
         <div
-          className="cursor-pointer"
+          className="cursor-pointer text-wrap"
           onClick={() => setEditing(true)}
         >
           {product.name}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditableSkuCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.sku ?? "");
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductSku = () => {
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          sku: value,
+          category_ids: product.categories.map((c) => c.id),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update product SKU successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update product SKU fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="">
+      {editing ? (
+        <Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            if (value !== (product.sku ?? "")) {
+            } else {
+              setEditing(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductSku();
+            }
+            if (e.key === "Escape") {
+              setValue(product.sku ?? "");
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer text-center"
+          onClick={() => setEditing(true)}
+        >
+          {product.sku || "—"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditableEanCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.ean ?? "");
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductEan = () => {
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          ean: value,
+          category_ids: product.categories.map((c) => c.id),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update product EAN successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update product EAN fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="text-wrap">
+      {editing ? (
+        <Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            if (value !== (product.ean ?? "")) {
+            } else {
+              setEditing(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductEan();
+            }
+            if (e.key === "Escape") {
+              setValue(product.ean ?? "");
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer text-wrap text-center"
+          onClick={() => setEditing(true)}
+        >
+          {product.ean || "—"}
         </div>
       )}
     </div>
@@ -179,10 +331,7 @@ function EditableStockCell({ product }: { product: ProductItem }) {
           )}
         />
       ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
           {product.stock} pcs.
         </div>
       )}
@@ -260,12 +409,90 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
           )}
         />
       ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
           {product.final_price ? (
             <div className="text-right">€{product.final_price?.toFixed(2)}</div>
+          ) : (
+            <div className="text-center">—</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditableCostCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.cost);
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductCost = () => {
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          cost: value,
+          ...(product.categories?.length
+            ? { category_ids: product.categories.map((c) => c.id) }
+            : {}),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update product cost successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update product cost fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="flex justify-center">
+      {editing ? (
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => setValue(e.target.valueAsNumber)}
+          onBlur={() => {
+            if (value !== product.cost) {
+            } else {
+              setEditing(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductCost();
+            }
+            if (e.key === "Escape") {
+              setValue(product.cost);
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            "w-28",
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+          {product.cost ? (
+            <div className="text-right">€{product.cost?.toFixed(2)}</div>
           ) : (
             <div className="text-center">—</div>
           )}
@@ -351,20 +578,14 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
             </SelectItem>
 
             {suppliers?.map((s) => (
-              <SelectItem
-                key={s.id}
-                value={s.id.toString()}
-              >
+              <SelectItem key={s.id} value={s.id.toString()}>
                 {s.business_name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
           {product.owner ? product.owner.business_name : "Prestige Home"}
         </div>
       )}
@@ -507,21 +728,12 @@ function ActionsCell({ product }: { product: ProductItem }) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <Button
-          variant="ghost"
-          size="icon"
-        >
+        <Button variant="ghost" size="icon">
           <Eye className="w-4 h-4 text-secondary" />
         </Button>
       </Link>
-      <Link
-        href={`/admin/products/${product.id}/clone`}
-        prefetch={true}
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-        >
+      <Link href={`/admin/products/${product.id}/clone`} prefetch={true}>
+        <Button variant="ghost" size="icon">
           <CopyCheck className="w-4 h-4 text-secondary" />
         </Button>
       </Link>
@@ -561,10 +773,7 @@ export const getProductColumns = (
       const image = row.original.static_files?.[0]?.url;
 
       return (
-        <HoverCard
-          openDelay={100}
-          closeDelay={100}
-        >
+        <HoverCard openDelay={100} closeDelay={100}>
           <HoverCardTrigger asChild>
             <div className="w-12 h-12 relative cursor-pointer">
               {image ? (
@@ -625,30 +834,31 @@ export const getProductColumns = (
       // </Button>
     ),
     // cell: ({ row }) => <EditableNameCell product={row.original} />,
-    cell: ({ row }) => <div className="text-wrap">{row.original.name}</div>,
+    cell: ({ row }) => <EditableNameCell product={row.original} />,
     enableSorting: true,
   },
   {
     accessorKey: "sku",
     header: ({}) => <div className="text-center">SKU</div>,
+    cell: ({ row }) => <EditableSkuCell product={row.original} />,
+  },
+  {
+    accessorKey: "brand",
+    header: ({}) => <div className="text-center">Brand</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.sku}</div>;
+      return (
+        <div className="text-center">
+          {row.original.brand && row.original.brand.name
+            ? row.original.brand.name
+            : ""}
+        </div>
+      );
     },
   },
   {
     accessorKey: "ean",
     header: ({}) => <div className="text-center">EAN</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.ean ? (
-            row.original.ean
-          ) : (
-            <div className="text-center">—</div>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => <EditableEanCell product={row.original} />,
   },
   {
     accessorKey: "owner",
@@ -710,13 +920,11 @@ export const getProductColumns = (
     },
     cell: ({ row }) => {
       const stock = row.original.stock;
-      const result_stock = row.original.result_stock;
-      const toNum = (v: any) => (isFinite(Number(v)) ? Number(v) : 0);
+      const toNum = (v: unknown) =>
+        typeof v === "number" ? v : Number(v) || 0;
 
-      const s = toNum(stock);
-      const r = toNum(result_stock);
-
-      const computedStock = s - Math.abs(r);
+      const computedStock =
+        toNum(stock) - Math.abs(toNum(row.original.result_stock));
 
       return (
         <div
@@ -753,15 +961,7 @@ export const getProductColumns = (
   {
     accessorKey: "cost",
     header: () => <div className="text-center">COST</div>,
-    cell: ({ row }) => (
-      <>
-        {row.original.cost ? (
-          <div className="text-right">€{row.original.cost.toFixed(2)}</div>
-        ) : (
-          <div className="text-center">—</div>
-        )}
-      </>
-    ),
+    cell: ({ row }) => <EditableCostCell product={row.original} />,
   },
 
   {

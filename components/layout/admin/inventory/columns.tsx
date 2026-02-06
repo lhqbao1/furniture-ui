@@ -48,6 +48,8 @@ function EditableStockCell({ product }: { product: ProductItem }) {
   const [adminId, setAdminId] = useAtom(adminIdAtom);
   const EditProductMutation = useUpdateStockProduct();
   let quantity = 0;
+  const isBundleProduct =
+    product.is_bundle === true || (product.bundles?.length ?? 0) > 0;
 
   const handleEditProductStock = () => {
     if (Number(value) < product.stock) {
@@ -76,8 +78,19 @@ function EditableStockCell({ product }: { product: ProductItem }) {
     );
   };
 
+  if (isBundleProduct) {
+    return (
+      <div
+        className="text-center text-muted-foreground"
+        title="Bundle stock is derived from its components"
+      >
+        {product.stock}
+      </div>
+    );
+  }
+
   return (
-    <div className="">
+    <div>
       {editing ? (
         <Input
           type="number"

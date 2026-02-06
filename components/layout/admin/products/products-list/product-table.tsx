@@ -5,8 +5,10 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  OnChangeFn,
   SortingState,
   useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -22,6 +24,7 @@ import { CheckOut } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
 import { getDeliveryOrderColumns } from "@/components/layout/cart/columns";
 import { ProductItem } from "@/types/products";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,7 +47,10 @@ interface DataTableProps<TData, TValue> {
   hasHeaderBackGround?: boolean;
   renderRowSubComponent?: (row: any) => React.ReactNode;
   isSticky?: boolean;
+  stickyContainerClassName?: string;
   onSelectionChange?: (ids: string[]) => void; // 👈 thêm
+  columnVisibility?: VisibilityState;
+  onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
 }
 
 export function ProductTable<TData, TValue>({
@@ -67,7 +73,10 @@ export function ProductTable<TData, TValue>({
   hasCount = true,
   hasHeaderBackGround = false,
   isSticky = false,
+  stickyContainerClassName,
   onSelectionChange,
+  columnVisibility,
+  onColumnVisibilityChange,
   renderRowSubComponent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -84,6 +93,7 @@ export function ProductTable<TData, TValue>({
       pagination: { pageIndex: page - 1, pageSize },
       sorting,
       rowSelection, // ✅ state lưu selection ở đây
+      ...(columnVisibility ? { columnVisibility } : {}),
     },
     manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
@@ -91,6 +101,7 @@ export function ProductTable<TData, TValue>({
     onSortingChange: setSorting,
     manualSorting: true,
     onRowSelectionChange: setRowSelection, // ✅ cập nhật khi người dùng click
+    onColumnVisibilityChange,
     meta: {
       expandedRowId,
       setExpandedRowId,
@@ -128,12 +139,22 @@ export function ProductTable<TData, TValue>({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      {hasCount ? <p>{totalItems} items found</p> : ""}
-
-      <div className="rounded-md border w-full">
-        <Table className="relative overflow-auto">
-          <TableHeader className={`${isSticky ? "sticky top-0 z-20" : ""}`}>
+    <div className={cn("flex flex-col gap-4", isSticky && "h-full min-h-0")}>
+      <div
+        className={cn("rounded-md border w-full", isSticky && "flex-1 min-h-0")}
+      >
+        <Table
+          className={`${isSticky ? "relative" : "overflow-auto"}`}
+          containerClassName={
+            isSticky
+              ? cn(
+                  "overflow-y-auto h-full",
+                  stickyContainerClassName ?? "max-h-[70vh]",
+                )
+              : stickyContainerClassName
+          }
+        >
+          <TableHeader className={isSticky ? "sticky top-0 z-20" : ""}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -146,7 +167,7 @@ export function ProductTable<TData, TValue>({
                     }}
                     className={`${
                       hasHeaderBackGround ? "bg-secondary/10" : "bg-background"
-                    }`}
+                    } ${isSticky ? "sticky top-0 z-30 shadow-sm bg-green-100" : ""}`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -265,6 +286,7 @@ export function ProductTable<TData, TValue>({
           page={page}
           totalPages={totalPages}
           onPageChange={(newPage) => setPage(newPage)}
+          totalItems={totalItems}
         />
       ) : (
         ""

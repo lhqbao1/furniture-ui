@@ -44,7 +44,6 @@ const ProductDetailInputs = ({
   isDSP = false,
 }: ProductDetailInputsProps) => {
   const form = useFormContext();
-  const bundles = form.watch("bundles");
   const listImages = form.watch("static_files");
   const stock = form.watch("stock");
   const result_stock = form.watch("result_stock");
