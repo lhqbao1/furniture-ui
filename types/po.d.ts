@@ -101,6 +101,8 @@ export type POContainerDetail = {
   date_of_delivery: string; // ISO string
   date_to_warehouse: string;
 
+  is_sended_avis: boolean;
+
   created_at: string; // ISO string
   updated_at: string; // ISO string
 };

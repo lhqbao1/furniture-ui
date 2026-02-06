@@ -342,6 +342,11 @@ input[type="number"] {
   margin-left: 48px;
 }
 
+.product-descriptions,
+.product-descriptions * {
+  font-family: var(--font-sans) !important;
+}
+
 .product-descriptions p {
   margin-bottom: 10px;
   line-height: 25px !important;

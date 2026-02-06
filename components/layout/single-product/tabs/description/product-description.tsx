@@ -18,7 +18,7 @@ const ProductDescription = ({
   return (
     <div className="w-full grid lg:grid-cols-2 grid-cols-1 lg:gap-12 gap-6">
       <div
-        className="product-descriptions"
+        className="product-descriptions font-sans"
         dangerouslySetInnerHTML={{ __html: description ?? "" }}
       />
       <div className="space-y-6">

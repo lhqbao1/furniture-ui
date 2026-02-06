@@ -21,6 +21,20 @@ export async function createPOContainer(
   return data;
 }
 
+export async function sendContainerToAmm(
+  container_id: string,
+): Promise<POContainerDetail> {
+  const { data } = await apiAdmin.post(`/we_avis/${container_id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data;
+}
+
 export async function updatePOContainer({
   containerId,
   input,

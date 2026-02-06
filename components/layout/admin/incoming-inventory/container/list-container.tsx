@@ -2,11 +2,15 @@ import {
   Card,
   CardAction,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useGetContainersByPurchaseOrder } from "@/features/incoming-inventory/container/hook";
+import {
+  useGetContainersByPurchaseOrder,
+  useSendContainerToAmm,
+} from "@/features/incoming-inventory/container/hook";
 import React from "react";
 import AddContainerDialog from "../dialog/add-container-dialog";
 import { formatDateDDMMYYYY } from "@/lib/date-formated";
@@ -16,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { FolderUp } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import {
   getContainerInventory,
   updateInventoryPo,
@@ -53,8 +58,14 @@ const ContainerCardSkeleton = () => {
 
 const ListContainers = ({ po_id }: ListContainersProps) => {
   const { data, isLoading, isError } = useGetContainersByPurchaseOrder(po_id);
+  const sendContainerToAmmMutation = useSendContainerToAmm();
+  const [pendingContainerId, setPendingContainerId] = React.useState<
+    string | null
+  >(null);
+  const pendingContainerIdRef = React.useRef<string | null>(null);
 
   const handleLogInventory = async (container: POContainerDetail) => {
+    if (pendingContainerIdRef.current === container.id) return;
     const missing: string[] = [];
     if (!container.container_number) missing.push("container number");
     if (!container.date_if_shipment) missing.push("date of shipment");
@@ -69,6 +80,8 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
     }
 
     try {
+      pendingContainerIdRef.current = container.id;
+      setPendingContainerId(container.id);
       const inventory = await getContainerInventory(container.id);
 
       if (inventory.length === 0) {
@@ -89,10 +102,14 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
           }),
         ),
       );
+      await sendContainerToAmmMutation.mutateAsync(container.id);
       toast.success("Inventory delivery date updated.");
     } catch (error) {
       console.error("Failed to load container inventory", error);
       toast.error("Failed to load container inventory.");
+    } finally {
+      pendingContainerIdRef.current = null;
+      setPendingContainerId(null);
     }
   };
 
@@ -114,6 +131,7 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
           item={item}
           po_id={po_id}
           onLogInventory={handleLogInventory}
+          isLogging={pendingContainerId === item.id}
         />
       ))}
     </div>
@@ -126,13 +144,16 @@ function ContainerCard({
   item,
   po_id,
   onLogInventory,
+  isLogging,
 }: {
   item: POContainerDetail;
   po_id: string;
   onLogInventory: (container: POContainerDetail) => void;
+  isLogging: boolean;
 }) {
   const { data: containerInventory } = useContainerInventory(item.id);
   const hasInventory = (containerInventory?.length ?? 0) > 0;
+  const canSendAmm = item.is_sended_avis === false;
 
   return (
     <Card>
@@ -151,14 +172,21 @@ function ContainerCard({
             </span>
           </div>
         </CardTitle>
+        {item.is_sended_avis && (
+          <CardDescription>
+            <Badge variant="secondary">Sent to AMM</Badge>
+          </CardDescription>
+        )}
         <CardAction className="space-x-2">
           <AddContainerDialog purchaseOrderId={po_id} container={item} />
-          {hasInventory && (
+          {hasInventory && canSendAmm && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => onLogInventory(item)}
               aria-label="Log container inventory"
+              disabled={isLogging}
+              aria-busy={isLogging}
             >
               <FolderUp className="h-4 w-4 text-secondary" />
             </Button>

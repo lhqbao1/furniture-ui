@@ -17,12 +17,14 @@ interface CustomPaginationProps {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  totalItems?: number;
 }
 
 export function CustomPagination({
   page,
   totalPages,
   onPageChange,
+  totalItems,
 }: CustomPaginationProps) {
   const [inputPage, setInputPage] = useState<string>(String(page));
   const t = useTranslations();
@@ -73,7 +75,9 @@ export function CustomPagination({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-4 w-full justify-center mt-6">
+    <div className="flex flex-wrap items-center gap-4 w-full justify-center mt-2">
+      {totalItems && totalItems > 0 ? <p>{totalItems} items found</p> : ""}
+
       <Pagination className="flex flex-wrap justify-center gap-2">
         <PaginationContent>
           {/* Prev */}

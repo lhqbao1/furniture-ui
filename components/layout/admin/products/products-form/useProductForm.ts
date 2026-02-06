@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { toast } from "sonner";
-import { addProductSchema, defaultValues, ProductInput } from "@/lib/schema/product";
+import { addProductSchema, ProductInput } from "@/lib/schema/product";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useAddProduct, useEditProduct } from "@/features/products/hook";
@@ -12,7 +12,10 @@ import { ProductItem } from "@/types/products";
 import { normalizeProductValues } from "./normalize-product-values";
 import { submitProduct } from "./submit-handler";
 
-export const useProductForm = ({ productValues, productValuesClone }: {
+export const useProductForm = ({
+  productValues,
+  productValuesClone,
+}: {
   productValues?: Partial<ProductItem>;
   productValuesClone?: Partial<ProductItem>;
 }) => {
@@ -22,7 +25,9 @@ export const useProductForm = ({ productValues, productValuesClone }: {
   const editProductMutation = useEditProduct();
   const [isLoadingSEO, setIsLoadingSEO] = useState(false);
 
-  const initialValues = normalizeProductValues(productValuesClone || productValues);
+  const initialValues = normalizeProductValues(
+    productValuesClone || productValues,
+  );
 
   const form = useForm<z.infer<typeof addProductSchema>>({
     resolver: zodResolver(addProductSchema),
@@ -33,10 +38,13 @@ export const useProductForm = ({ productValues, productValuesClone }: {
   useEffect(() => {
     if (productValuesClone) {
       form.reset(normalizeProductValues(productValuesClone));
-    } else if (productValues) {
+    }
+    if (productValues) {
       form.reset(normalizeProductValues(productValues));
     }
   }, [productValuesClone, productValues, form]);
+
+  console.log(productValues?.stock);
 
   const onSubmit = (values: ProductInput) => {
     submitProduct({
@@ -51,5 +59,12 @@ export const useProductForm = ({ productValues, productValuesClone }: {
     });
   };
 
-  return { form, onSubmit, isLoadingSEO, setIsLoadingSEO, addProductMutation, editProductMutation };
+  return {
+    form,
+    onSubmit,
+    isLoadingSEO,
+    setIsLoadingSEO,
+    addProductMutation,
+    editProductMutation,
+  };
 };
