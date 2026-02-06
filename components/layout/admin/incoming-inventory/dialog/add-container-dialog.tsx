@@ -91,6 +91,9 @@ const AddContainerDialog = ({
       date_if_shipment: container.date_if_shipment
         ? container.date_if_shipment.slice(0, 10)
         : undefined,
+      date_to_warehouse: container.date_to_warehouse
+        ? container.date_to_warehouse.slice(0, 10)
+        : undefined,
       date_of_issue: container.date_of_issue
         ? container.date_of_issue.slice(0, 10)
         : "",
@@ -238,6 +241,24 @@ const AddContainerDialog = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Date of Inspection</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="date_to_warehouse"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date to warehouse</FormLabel>
                   <FormControl>
                     <Input
                       type="date"

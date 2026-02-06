@@ -167,12 +167,24 @@ function AddProductMarketplace({
   const [updating, setUpdating] = useState<boolean>(false);
   return (
     <div className="flex justify-center">
-      <SyncToEbayForm
-        setUpdating={setUpdating}
-        product={product}
-        isUpdating={false}
-        currentMarketplace={marketplace}
-      />
+      {marketplace === "amazon" ? (
+        <SyncToAmazonForm
+          updating={updating}
+          setUpdating={setUpdating}
+          product={product}
+          currentMarketplace={marketplace}
+          isActive={false}
+          isAdd
+        />
+      ) : (
+        <SyncToEbayForm
+          isAdd
+          setUpdating={setUpdating}
+          product={product}
+          isUpdating={false}
+          currentMarketplace={marketplace}
+        />
+      )}
     </div>
   );
 }

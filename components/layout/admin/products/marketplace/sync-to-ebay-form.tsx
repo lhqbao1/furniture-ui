@@ -95,11 +95,8 @@ const SyncToEbayForm = ({
       min_stock:
         product.marketplace_products.find(
           (i) => i.marketplace === currentMarketplace,
-        )?.min_stock ?? undefined,
-      max_stock:
-        product.marketplace_products.find(
-          (i) => i.marketplace === currentMarketplace,
-        )?.max_stock ?? undefined,
+        )?.min_stock ?? 1,
+      max_stock: product.stock - (product.result_stock ?? 0),
       sku: product.sku,
       handling_time:
         product.marketplace_products.find(
@@ -108,211 +105,249 @@ const SyncToEbayForm = ({
     },
   });
 
+  useEffect(() => {
+    // Ensure min_stock is registered even when the input is hidden/omitted
+    form.register("min_stock", { valueAsNumber: true });
+    const currentMinStock = form.getValues("min_stock");
+    if (currentMinStock === undefined || currentMinStock === null) {
+      form.setValue("min_stock", 1, { shouldValidate: false });
+    }
+  }, [form]);
+
   const onSubmit = (values: MarketPlaceFormValues) => {
+    console.log("SyncToEbayForm submit", {
+      productId: product.id,
+      marketplace: values.marketplace ?? currentMarketplace ?? "",
+      isUpdating,
+      isAdd,
+      values,
+    });
+
     if (!product.brand) {
       toast.error("Brand is missing from current product");
       return;
     }
 
-    if (
-      currentMarketplace !== "ebay" &&
-      (!values.handling_time || values.handling_time === 0)
-    ) {
-      toast.error("Handling times is missing from current product");
-      return;
-    }
+    try {
+      const selectedMarketplace =
+        values.marketplace ?? currentMarketplace ?? "";
 
-    setUpdating(true);
-    setOpen(true);
-    const normalizedValues: MarketplaceProduct = {
-      ...values,
-      marketplace: values.marketplace ?? "",
-      final_price: values.final_price ?? 0,
-      min_stock: values.min_stock ?? 0,
-      max_stock: values.max_stock ?? 0,
-      current_stock: values.current_stock ?? 0,
-      line_item_id: values.line_item_id ?? "",
-      is_active: values.is_active ?? false,
-      marketplace_offer_id: values.marketplace_offer_id ?? "",
-      name: values.name ?? "",
-      description: values.description ?? "",
-      sku: values.sku ?? "",
-      brand: product.brand ? product.brand.name : "",
-      handling_time: values.handling_time ?? 0,
-    };
-
-    const updatedMarketplaceProducts = [
-      ...(product.marketplace_products || []),
-    ];
-
-    // tìm đúng item theo marketplace
-    const existing = updatedMarketplaceProducts.find(
-      (m) => m.marketplace === values.marketplace,
-    );
-
-    if (isUpdating) {
-      if (existing) {
-        // ⭐ Update item cũ, giữ lại một số field quan trọng
-        Object.assign(existing, {
-          ...normalizedValues,
-          is_active: existing.is_active, // giữ nguyên
-          marketplace_offer_id: existing.marketplace_offer_id,
-          line_item_id: existing.line_item_id,
-          brand: existing.brand,
-        });
-      } else {
-        // ⭐ Không tồn tại → thêm mới
-        updatedMarketplaceProducts.push({
-          ...normalizedValues,
-          // is_active: true,
-        });
+      if (!selectedMarketplace) {
+        toast.error("Marketplace is missing");
+        return;
       }
-    } else {
-      // ⭐ NOT updating → bật active hoặc tạo mới
-      if (existing) {
-        Object.assign(existing, {
-          ...normalizedValues,
-        });
-      } else {
-        updatedMarketplaceProducts.push({
-          ...normalizedValues,
-          // is_active: false,
-        });
+
+      if (
+        selectedMarketplace !== "ebay" &&
+        (!values.handling_time || values.handling_time === 0)
+      ) {
+        toast.error("Handling times is missing from current product");
+        return;
       }
-    }
 
-    updateProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          category_ids: product.categories.map((c) => c.id),
-          marketplace_products: updatedMarketplaceProducts,
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-          brand_id: product.brand ? product.brand.id : null,
-        },
+      setUpdating(true);
+      setOpen(true);
 
-        id: product.id,
-      },
-      {
-        onSuccess(data) {
-          if ((isUpdating || isAdd) && currentMarketplace === "ebay") {
-            const ebayData = data.marketplace_products?.find(
-              (m) => m.marketplace === "ebay",
-            );
-            const payload: syncToEbayInput = {
-              price: ebayData?.final_price ?? product.final_price,
-              sku: product.id_provider,
-              stock: Math.max(
-                0,
-                product.stock - Math.abs(product.result_stock ?? 0),
-              ),
-              tax: product.tax ? product.tax : null,
-              product: {
-                description: stripHtmlRegex(
-                  ebayData?.description ?? product.description,
-                ),
-                title: ebayData?.name ?? product.name,
-                imageUrls:
-                  product.static_files?.map((file) =>
-                    file.url.replace(/\s+/g, "%20"),
-                  ) ?? [],
-                ean: product.ean ? [product.ean] : [],
-              },
-              carrier: product.carrier,
-              brand: product.brand ? product.brand.name : "",
-              ...(ebayData?.min_stock !== undefined && {
-                min_stock: ebayData.min_stock,
-              }),
-              ...(ebayData?.max_stock !== undefined && {
-                max_stock: ebayData.max_stock,
-              }),
-              manufacturer: {
-                name: product.brand.company_name,
-                address: product.brand.company_address,
-                city: product.brand.company_city,
-                country: product.brand.company_country,
-                email: product.brand.company_email,
-                postal_code: product.brand.company_postal_code,
-                phone: product.brand.company_phone ?? "",
-              },
-              documents:
-                product.pdf_files && product.pdf_files.length > 0
-                  ? product.pdf_files
-                  : null,
-              ebay_offer_id: ebayData?.marketplace_offer_id ?? null,
-            };
+      const normalizedValues: MarketplaceProduct = {
+        ...values,
+        marketplace: selectedMarketplace,
+        final_price: values.final_price ?? 0,
+        min_stock: values.min_stock ?? 1,
+        max_stock: values.max_stock ?? 10,
+        current_stock: values.current_stock ?? 0,
+        line_item_id: values.line_item_id ?? "",
+        is_active: values.is_active ?? false,
+        marketplace_offer_id: values.marketplace_offer_id ?? "",
+        name: values.name ?? "",
+        description: values.description ?? "",
+        sku: values.sku ?? product.sku ?? "",
+        brand: product.brand ? product.brand.name : "",
+        handling_time: values.handling_time ?? 0,
+      };
 
-            syncToEbayMutation.mutate(payload, {
-              onError(error, variables, onMutateResult, context) {
-                toast.error("Failed to update marketplace data", {
-                  description: error.message,
-                });
-              },
-            });
-          }
+      const updatedMarketplaceProducts = [
+        ...(product.marketplace_products || []),
+      ];
 
-          if ((isUpdating || isAdd) && currentMarketplace === "kaufland") {
-            const kauflandData = data.marketplace_products?.find(
-              (m) => m.marketplace === "kaufland",
-            );
-            const payload: syncToKauflandInput = {
-              ean: product.ean,
-              title: kauflandData?.name ?? product.name,
-              description: kauflandData?.description ?? product.description,
-              image_urls:
-                product.static_files?.map((f) =>
-                  f.url.replace(/\s+/g, "%20"),
-                ) ?? [],
-              price: kauflandData?.final_price ?? product.final_price,
-              stock: Math.max(
-                0,
-                product.stock - Math.abs(product.result_stock ?? 0),
-              ),
-              carrier: product.carrier,
-              sku: product.id_provider,
-              product_id: product.id,
-              ...(kauflandData?.min_stock !== undefined && {
-                min_stock: kauflandData.min_stock,
-              }),
-              ...(kauflandData?.max_stock !== undefined && {
-                max_stock: kauflandData.max_stock,
-              }),
-              marketplace_offer_id: kauflandData?.marketplace_offer_id,
-              brand: {
-                address: product.brand.company_address,
-                email: product.brand.company_email,
-                name: product.brand.company_name,
-                phone: product.brand.company_phone ?? "",
-              },
-              handling_time: values.handling_time ?? 0,
-            };
+      // tìm đúng item theo marketplace
+      const existing = updatedMarketplaceProducts.find(
+        (m) => m.marketplace === selectedMarketplace,
+      );
 
-            // Hiển thị toast loading
-            syncToKauflandMutation.mutate(payload, {
-              onError(error, variables, onMutateResult, context) {
-                toast.error("Failed to update marketplace data", {
-                  description: error.message,
-                });
-              },
-            });
-          }
-
-          toast.success("Update marketplace data success");
-        },
-        onError(e) {
-          toast.error("Failed to update marketplace data", {
-            description: e.message,
+      if (isUpdating) {
+        if (existing) {
+          // ⭐ Update item cũ, giữ lại một số field quan trọng
+          Object.assign(existing, {
+            ...normalizedValues,
+            is_active: existing.is_active, // giữ nguyên
+            marketplace_offer_id: existing.marketplace_offer_id,
+            line_item_id: existing.line_item_id,
+            brand: existing.brand,
           });
+        } else {
+          // ⭐ Không tồn tại → thêm mới
+          updatedMarketplaceProducts.push({
+            ...normalizedValues,
+            // is_active: true,
+          });
+        }
+      } else {
+        // ⭐ NOT updating → bật active hoặc tạo mới
+        if (existing) {
+          Object.assign(existing, {
+            ...normalizedValues,
+          });
+        } else {
+          updatedMarketplaceProducts.push({
+            ...normalizedValues,
+            // is_active: false,
+          });
+        }
+      }
+
+      const syncMarketplace = (
+        marketplace: string,
+        marketplaceData?: MarketplaceProduct,
+      ) => {
+        if (marketplace === "ebay") {
+          const payload: syncToEbayInput = {
+            price: marketplaceData?.final_price ?? product.final_price,
+            sku: product.id_provider,
+            stock: values.max_stock ?? 0,
+            tax: product.tax ? product.tax : null,
+            product: {
+              description: stripHtmlRegex(
+                marketplaceData?.description ?? product.description,
+              ),
+              title: marketplaceData?.name ?? product.name,
+              imageUrls:
+                product.static_files?.map((file) =>
+                  file.url.replace(/\s+/g, "%20"),
+                ) ?? [],
+              ean: product.ean ? [product.ean] : [],
+            },
+            carrier: product.carrier,
+            brand: product.brand ? product.brand.name : "",
+            ...(marketplaceData?.min_stock !== undefined && {
+              min_stock: marketplaceData.min_stock,
+            }),
+            ...(marketplaceData?.max_stock !== undefined && {
+              max_stock: marketplaceData.max_stock,
+            }),
+            manufacturer: {
+              name: product.brand.company_name,
+              address: product.brand.company_address,
+              city: product.brand.company_city,
+              country: product.brand.company_country,
+              email: product.brand.company_email,
+              postal_code: product.brand.company_postal_code,
+              phone: product.brand.company_phone ?? "",
+            },
+            documents:
+              product.pdf_files && product.pdf_files.length > 0
+                ? product.pdf_files
+                : null,
+            ebay_offer_id: marketplaceData?.marketplace_offer_id ?? null,
+          };
+
+          syncToEbayMutation.mutate(payload, {
+            onError(error) {
+              toast.error("Failed to update marketplace data", {
+                description: error.message,
+              });
+            },
+          });
+        }
+
+        if (marketplace === "kaufland") {
+          const payload: syncToKauflandInput = {
+            ean: product.ean,
+            title: marketplaceData?.name ?? product.name,
+            description: marketplaceData?.description ?? product.description,
+            image_urls:
+              product.static_files?.map((f) => f.url.replace(/\s+/g, "%20")) ??
+              [],
+            price: marketplaceData?.final_price ?? product.final_price,
+            stock: values.max_stock ?? 0,
+            carrier: product.carrier,
+            sku: product.id_provider,
+            product_id: product.id,
+            ...(marketplaceData?.min_stock !== undefined && {
+              min_stock: marketplaceData.min_stock,
+            }),
+            ...(marketplaceData?.max_stock !== undefined && {
+              max_stock: marketplaceData.max_stock,
+            }),
+            marketplace_offer_id: marketplaceData?.marketplace_offer_id,
+            brand: {
+              address: product.brand.company_address,
+              email: product.brand.company_email,
+              name: product.brand.company_name,
+              phone: product.brand.company_phone ?? "",
+            },
+            handling_time: values.handling_time ?? 0,
+          };
+
+          syncToKauflandMutation.mutate(payload, {
+            onError(error) {
+              toast.error("Failed to update marketplace data", {
+                description: error.message,
+              });
+            },
+          });
+        }
+      };
+
+      updateProductMutation.mutate(
+        {
+          input: {
+            ...product,
+            category_ids: product.categories.map((c) => c.id),
+            marketplace_products: updatedMarketplaceProducts,
+            ...(product.bundles?.length
+              ? {
+                  bundles: product.bundles.map((item) => ({
+                    product_id: item.bundle_item.id,
+                    quantity: item.quantity,
+                  })),
+                }
+              : { bundles: [] }),
+            brand_id: product.brand ? product.brand.id : null,
+          },
+
+          id: product.id,
         },
-      },
-    );
+        {
+          onSuccess(data) {
+            console.log(data);
+            console.log(isUpdating);
+            console.log(isAdd);
+            if (isUpdating || isAdd) {
+              const marketplaceData = data.marketplace_products?.find(
+                (m) => m.marketplace === selectedMarketplace,
+              );
+              syncMarketplace(
+                selectedMarketplace,
+                marketplaceData ?? normalizedValues,
+              );
+            }
+
+            toast.success("Sync marketplace data success");
+          },
+          onError(e) {
+            toast.error("Failed to update marketplace data", {
+              description: e.message,
+            });
+          },
+        },
+      );
+    } catch (error) {
+      console.error("SyncToEbayForm submit failed", error);
+      toast.error("Submit failed", {
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
+    }
   };
 
   return (
@@ -344,9 +379,34 @@ const SyncToEbayForm = ({
           <div className="mx-auto space-y-6">
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onSubmit, (errors) => {
+                  console.log("SyncToEbayForm submit errors", errors);
+                  toast.error("Please check the form for errors");
+                })}
                 className="space-y-6"
               >
+                {/* Submit */}
+                <div className="flex justify-start">
+                  <Button
+                    type="submit"
+                    className="px-6 py-2 text-lg"
+                    disabled={
+                      updateProductMutation.isPending ||
+                      syncToEbayMutation.isPending ||
+                      syncToKauflandMutation.isPending
+                    }
+                  >
+                    {updateProductMutation.isPending ||
+                    syncToEbayMutation.isPending ||
+                    syncToKauflandMutation.isPending ? (
+                      <Loader2 className="animate-spin" />
+                    ) : isUpdating ? (
+                      "Update"
+                    ) : (
+                      "Add"
+                    )}
+                  </Button>
+                </div>
                 {/* Marketplace */}
                 {isUpdating || isAdd ? (
                   ""
@@ -460,7 +520,7 @@ const SyncToEbayForm = ({
                     )}
                   />
 
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="min_stock"
                     render={({ field }) => (
@@ -482,14 +542,14 @@ const SyncToEbayForm = ({
                         </FormControl>
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}
                     name="max_stock"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Max Stock</FormLabel>
+                        <FormLabel>Stock</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -529,31 +589,6 @@ const SyncToEbayForm = ({
                     </FormItem>
                   )}
                 />
-
-                {/* Submit */}
-                <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    className="px-6 py-2 text-lg"
-                    disabled={
-                      isUpdating
-                        ? syncToEbayMutation.isPending
-                        : updateProductMutation.isPending
-                    }
-                  >
-                    {isUpdating ? (
-                      syncToEbayMutation.isPending ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        "Update"
-                      )
-                    ) : updateProductMutation.isPending ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      "Add"
-                    )}
-                  </Button>
-                </div>
               </form>
             </Form>
           </div>

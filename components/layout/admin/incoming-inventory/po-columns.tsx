@@ -91,7 +91,7 @@ function ContainersDrawerCell({ po }: { po: PurchaseOrderDetail }) {
                 <div>Size: {container.size || "-"}</div>{" "}
                 <div>
                   Delivery:{" "}
-                  {formatDateDDMMYYYY(container.date_of_delivery) || "-"}
+                  {formatDateDDMMYYYY(container.date_to_warehouse) || "-"}
                 </div>
                 <Separator className="my-3" />
                 <ContainerInventoryList containerId={container.id} />

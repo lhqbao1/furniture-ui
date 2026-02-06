@@ -61,6 +61,7 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
     if (!container.date_of_inspection) missing.push("date of inspection");
     if (!container.date_of_issue) missing.push("date of issue");
     if (!container.date_of_delivery) missing.push("date of delivery");
+    if (!container.date_to_warehouse) missing.push("date to warehouse");
 
     if (missing.length > 0) {
       toast.error(`Missing: ${missing.join(", ")}`);
@@ -84,7 +85,7 @@ const ListContainers = ({ po_id }: ListContainersProps) => {
             unit_cost: item.unit_cost,
             total_cost: item.total_cost,
             description: item.description,
-            list_delivery_date: container.date_of_delivery!,
+            list_delivery_date: container.date_to_warehouse!,
           }),
         ),
       );
@@ -167,29 +168,20 @@ function ContainerCard({
       </CardHeader>
       <CardContent>
         <div>
-          Size:{" "}
+          Date of issue PO:{" "}
           <span
             className={
-              item.size ? "text-secondary font-semibold" : "text-red-500"
-            }
-          >
-            {item.size || "Missing"}
-          </span>
-        </div>
-        <div>
-          Date of Shipment:{" "}
-          <span
-            className={
-              item.date_if_shipment
+              item.date_of_issue
                 ? "text-secondary font-semibold"
                 : "text-red-500"
             }
           >
-            {item.date_if_shipment
-              ? formatDateDDMMYYYY(item.date_if_shipment)
+            {item.date_of_issue
+              ? formatDateDDMMYYYY(item.date_of_issue)
               : "Missing"}
           </span>
         </div>
+
         <div>
           Date of Inspection:{" "}
           <span
@@ -204,22 +196,24 @@ function ContainerCard({
               : "Missing"}
           </span>
         </div>
+
         <div>
-          Date of issue:{" "}
+          Date of Shipment (ETD):{" "}
           <span
             className={
-              item.date_of_issue
+              item.date_if_shipment
                 ? "text-secondary font-semibold"
                 : "text-red-500"
             }
           >
-            {item.date_of_issue
-              ? formatDateDDMMYYYY(item.date_of_issue)
+            {item.date_if_shipment
+              ? formatDateDDMMYYYY(item.date_if_shipment)
               : "Missing"}
           </span>
         </div>
+
         <div>
-          Date of delivery:{" "}
+          Port Arrival Date:{" "}
           <span
             className={
               item.date_of_delivery
@@ -230,6 +224,32 @@ function ContainerCard({
             {item.date_of_delivery
               ? formatDateDDMMYYYY(item.date_of_delivery)
               : "Missing"}
+          </span>
+        </div>
+
+        <div>
+          Warehouse Arrival Date:
+          <span
+            className={
+              item.date_to_warehouse
+                ? "text-secondary font-semibold"
+                : "text-red-500"
+            }
+          >
+            {item.date_to_warehouse
+              ? formatDateDDMMYYYY(item.date_to_warehouse)
+              : "Missing"}
+          </span>
+        </div>
+
+        <div>
+          Size:{" "}
+          <span
+            className={
+              item.size ? "text-secondary font-semibold" : "text-red-500"
+            }
+          >
+            {item.size || "Missing"}
           </span>
         </div>
       </CardContent>

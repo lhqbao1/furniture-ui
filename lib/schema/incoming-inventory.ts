@@ -38,6 +38,8 @@ export const containerSchema = z.object({
 
   date_if_shipment: z.string().optional().nullable(),
 
+  date_to_warehouse: z.string().optional().nullable(),
+
   date_of_issue: z.string().optional().nullable(),
 
   date_of_delivery: z.string().optional().nullable(),
