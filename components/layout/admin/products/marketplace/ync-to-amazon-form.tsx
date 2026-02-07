@@ -210,7 +210,6 @@ const SyncToAmazonForm = ({
                 label: "Packages information",
               },
               { value: product.final_price, label: "Final price" },
-              { value: product.stock, label: "Stock" },
               { value: product.carrier, label: "Carrier" },
               { value: product.brand, label: "Brand" },
               { value: product.length, label: "Length" },

@@ -270,7 +270,7 @@ export const baseColumns = (
   },
   {
     accessorKey: "ean",
-    meta: { width: 120 },
+    meta: { width: 140 },
     header: ({ column }) => <div className="text-center">EAN</div>,
     cell: ({ row }) => {
       return (
@@ -381,8 +381,6 @@ const marketplaceColumns: ColumnDef<ProductItem>[] = MARKETPLACES.map(
         <div className="flex justify-center text-center text-sm font-medium">
           {hasMarketplace ? (
             <SyncToMarketplace product={product} marketplace={marketplace} />
-          ) : !product.is_active ? (
-            <div>Product is inactive</div>
           ) : (
             <AddProductMarketplace
               product={row.original}
