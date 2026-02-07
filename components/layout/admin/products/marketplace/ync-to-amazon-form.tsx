@@ -196,37 +196,35 @@ const SyncToAmazonForm = ({
       {
         onSuccess(data) {
           if (isUpdating || isAdd) {
+            const missingField = [
+              { value: product.ean, label: "EAN" },
+              { value: product.name, label: "Name" },
+              { value: product.sku, label: "SKU" },
+              { value: product.description, label: "Description" },
+              {
+                value: product.static_files && product.static_files.length > 0,
+                label: "Images",
+              },
+              {
+                value: product.packages && product.packages.length > 0,
+                label: "Packages information",
+              },
+              { value: product.final_price, label: "Final price" },
+              { value: product.stock, label: "Stock" },
+              { value: product.carrier, label: "Carrier" },
+              { value: product.brand, label: "Brand" },
+              { value: product.length, label: "Length" },
+              { value: product.width, label: "Width" },
+              { value: product.height, label: "Height" },
+              { value: product.weight, label: "Weight" },
+            ].find((field) => !field.value);
+
+            if (missingField) {
+              return toast.error(`Missing ${missingField.label}`);
+            }
             const amazonData = data.marketplace_products?.find(
               (m) => m.marketplace === "amazon",
             );
-            if (!product.sku) {
-              toast.error("sku is missing");
-              return;
-            }
-            if (!product.length) {
-              toast.error("length is missing");
-              return;
-            }
-            if (!product.weight) {
-              toast.error("weight is missing");
-              return;
-            }
-            if (!product.width) {
-              toast.error("width is missing");
-              return;
-            }
-            if (!product.height) {
-              toast.error("height is missing");
-              return;
-            }
-            if (!product.brand) {
-              toast.error("brand is missing");
-              return;
-            }
-            if (product.packages.length === 0) {
-              toast.error("Packages number is missing");
-              return;
-            }
 
             const payload: SyncToAmazonInput = {
               sku: amazonData?.sku ?? product.id_provider,
