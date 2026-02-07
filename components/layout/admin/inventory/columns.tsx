@@ -404,7 +404,16 @@ export const getInventoryColumns = (
     accessorKey: "physical",
     header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
     cell: ({ row }) => {
-      return <EditableStockCell product={row.original} />;
+      return (
+        <div>
+          {row.original.is_bundle ||
+          (row.original.bundles && row.original.bundles.length > 0) ? (
+            row.original.stock
+          ) : (
+            <EditableStockCell product={row.original} />
+          )}
+        </div>
+      );
     },
   },
 
