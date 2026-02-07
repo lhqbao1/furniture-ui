@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dialog";
 import { syncToKauflandInput } from "@/features/kaufland/api";
 import { useSyncToKaufland } from "@/features/kaufland/hook";
+import { error } from "console";
 
 interface SyncToEbayFormProps {
   product: ProductItem;
@@ -210,6 +211,28 @@ const SyncToEbayForm = ({
         marketplaceData?: MarketplaceProduct,
       ) => {
         if (marketplace === "ebay") {
+          const missingField = [
+            { value: product.ean, label: "EAN" },
+            { value: product.name, label: "Name" },
+            { value: product.sku, label: "SKU" },
+            { value: product.description, label: "Description" },
+            {
+              value: product.static_files && product.static_files.length > 0,
+              label: "Images",
+            },
+            { value: product.final_price, label: "Final price" },
+            { value: product.stock, label: "Stock" },
+            { value: product.carrier, label: "Carrier" },
+            { value: product.brand, label: "Brand" },
+            {
+              value: product.pdf_files && product.pdf_files.length > 0,
+              label: "User Manual",
+            },
+          ].find((field) => !field.value);
+
+          if (missingField) {
+            return toast.error(`Missing ${missingField.label}`);
+          }
           const payload: syncToEbayInput = {
             price: marketplaceData?.final_price ?? product.final_price,
             sku: product.id_provider,
@@ -260,6 +283,24 @@ const SyncToEbayForm = ({
         }
 
         if (marketplace === "kaufland") {
+          const missingField = [
+            { value: product.ean, label: "EAN" },
+            { value: product.name, label: "Name" },
+            { value: product.sku, label: "SKU" },
+            { value: product.description, label: "Description" },
+            {
+              value: product.static_files && product.static_files.length > 0,
+              label: "Images",
+            },
+            { value: product.final_price, label: "Final price" },
+            { value: product.stock, label: "Stock" },
+            { value: product.carrier, label: "Carrier" },
+            { value: product.brand, label: "Brand" },
+          ].find((field) => !field.value);
+
+          if (missingField) {
+            return toast.error(`Missing ${missingField.label}`);
+          }
           const payload: syncToKauflandInput = {
             ean: product.ean,
             title: marketplaceData?.name ?? product.name,
