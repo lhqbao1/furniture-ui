@@ -287,6 +287,7 @@ function EditableEanCell({ product }: { product: ProductItem }) {
           autoFocus
           disabled={EditProductMutation.isPending}
           className={cn(
+            "w-32",
             EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
           )}
         />
@@ -959,7 +960,7 @@ function EditableCarrierCell({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
 
   const normalizedCarrier =
-    product.carrier === "spedition" ? "amm" : product.carrier ?? "";
+    product.carrier === "spedition" ? "amm" : (product.carrier ?? "");
 
   const carrierOptions = useMemo(() => {
     return CARRIERS.filter((carrier) => carrier.id !== "spedition").map(
@@ -1024,10 +1025,7 @@ function EditableCarrierCell({ product }: { product: ProductItem }) {
           </SelectTrigger>
           <SelectContent>
             {carrierOptions.map((carrier) => (
-              <SelectItem
-                key={carrier.id}
-                value={carrier.id}
-              >
+              <SelectItem key={carrier.id} value={carrier.id}>
                 <div className="flex items-center gap-2">
                   <Image
                     src={carrier.logo}

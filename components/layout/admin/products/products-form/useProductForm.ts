@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { toast } from "sonner";
 import { addProductSchema, ProductInput } from "@/lib/schema/product";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
@@ -43,8 +42,6 @@ export const useProductForm = ({
       form.reset(normalizeProductValues(productValues));
     }
   }, [productValuesClone, productValues, form]);
-
-  console.log(productValues?.stock);
 
   const onSubmit = (values: ProductInput) => {
     submitProduct({

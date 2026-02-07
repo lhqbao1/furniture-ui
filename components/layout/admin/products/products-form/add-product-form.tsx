@@ -67,8 +67,6 @@ const ProductForm = ({
     editProductMutation,
   } = useProductForm({ productValues, productValuesClone });
 
-  console.log(form.getValues("stock"));
-
   return (
     <div className="lg:pb-20 lg:px-30 pb-12">
       <Form {...form}>

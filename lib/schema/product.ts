@@ -6,37 +6,36 @@ const StaticFileSchema = z.object({
   url: z.string(),
 });
 
-export const packageSchema = z
-  .object({
-    weight: z.number().nonnegative().optional().nullable(),
-    length: z.number().nonnegative().optional().nullable(),
-    width: z.number().nonnegative().optional().nullable(),
-    height: z.number().nonnegative().optional().nullable(),
-  })
-  .superRefine((pkg, ctx) => {
-    const fields = ["length", "width", "height", "weight"] as const;
+export const packageSchema = z.object({
+  weight: z.number().nonnegative().optional().nullable(),
+  length: z.number().nonnegative().optional().nullable(),
+  width: z.number().nonnegative().optional().nullable(),
+  height: z.number().nonnegative().optional().nullable(),
+});
+// .superRefine((pkg, ctx) => {
+//   const fields = ["length", "width", "height", "weight"] as const;
 
-    const filledFields = fields.filter(
-      (key) => pkg[key] !== null && pkg[key] !== undefined,
-    );
+//   const filledFields = fields.filter(
+//     (key) => pkg[key] !== null && pkg[key] !== undefined,
+//   );
 
-    // ❌ nhập dở dang (1–3 field)
-    if (filledFields.length > 0 && filledFields.length < 4) {
-      fields.forEach((key) => {
-        const value = pkg[key];
+//   // ❌ nhập dở dang (1–3 field)
+//   if (filledFields.length > 0 && filledFields.length < 4) {
+//     fields.forEach((key) => {
+//       const value = pkg[key];
 
-        // 👉 CHỈ báo lỗi cho field còn thiếu
-        if (value === null || value === undefined) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              "If you enter package dimensions, all fields are required.",
-            path: [key], // 👈 field cụ thể
-          });
-        }
-      });
-    }
-  });
+//       // 👉 CHỈ báo lỗi cho field còn thiếu
+//       if (value === null || value === undefined) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           message:
+//             "If you enter package dimensions, all fields are required.",
+//           path: [key], // 👈 field cụ thể
+//         });
+//       }
+//     });
+//   }
+// });
 
 export const marketPlaceSchema = z
   .object({

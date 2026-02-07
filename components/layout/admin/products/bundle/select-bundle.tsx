@@ -1,5 +1,4 @@
 "use client";
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import React, { useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
@@ -142,10 +141,7 @@ const SelectBundleComponent = ({
   return (
     <div className="space-y-6">
       <div className="col-span-2 flex gap-2 items-center">
-        <Popover
-          open={open}
-          onOpenChange={setOpen}
-        >
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
