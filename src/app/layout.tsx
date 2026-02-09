@@ -80,6 +80,10 @@ export default function RootLayout({
     <html lang="de" translate="no">
       <head>
         <meta name="google" content="notranslate" />
+        <meta
+          name="google-site-verification"
+          content="-2RJrCLuu7-ix7PEWO4htQVD0mT7LJNowlLZBZwzRCQ"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__APP_VERSION__ = "${process.env.NEXT_PUBLIC_APP_VERSION}";`,
