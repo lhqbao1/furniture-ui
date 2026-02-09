@@ -1426,7 +1426,6 @@ export const getProductColumns = (
       const salePrice = Number(final_price);
       const purchaseCost = Number(cost);
       const vatRate = parseFloat(tax) / 100;
-      console.log(vatRate);
 
       // 🛡️ Guard tất cả case lỗi
       if (

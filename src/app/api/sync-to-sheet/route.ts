@@ -32,6 +32,7 @@ export async function GET() {
     const products = await getAllProductsSelect({
       is_econelo: false,
       all_products: true,
+      supplier_id: "prestige_home",
     }); // bạn sẽ viết hàm này
 
     // 3️⃣ Lọc sản phẩm đang active và có tồn kho

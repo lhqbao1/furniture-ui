@@ -35,7 +35,8 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
-    padding: 48,
+    paddingHorizontal: 24,
+    paddingVertical: 48,
     fontSize: 11,
     fontFamily: "Figtree",
     fontWeight: "bold",
@@ -143,10 +144,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
 
   return (
     <Document>
-      <Page
-        size="A4"
-        style={styles.page}
-      >
+      <Page size="A4" style={styles.page}>
         {/* Header Logo */}
         <View
           style={{
@@ -177,10 +175,10 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
                 : checkout.checkouts?.[0]?.invoice_address?.recipient_name
-                ? checkout.checkouts[0].invoice_address.recipient_name
-                : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
-                    checkout.checkouts?.[0]?.user?.last_name ?? ""
-                  }`}
+                  ? checkout.checkouts[0].invoice_address.recipient_name
+                  : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
+                      checkout.checkouts?.[0]?.user?.last_name ?? ""
+                    }`}
             </Text>
             <Text>
               {" "}
@@ -207,7 +205,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {getCountryName(
                 checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
                   ? checkout?.checkouts?.[0]?.invoice_address?.country
-                  : checkout?.checkouts?.[0]?.shipping_address?.country ?? "",
+                  : (checkout?.checkouts?.[0]?.shipping_address?.country ?? ""),
               )}
             </Text>
             <Text>{checkout.checkouts[0].user.tax_id}</Text>
@@ -368,14 +366,12 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
-                  €
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>
                   {item.final_price.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
-                  €
                 </Text>
               </View>
             );
