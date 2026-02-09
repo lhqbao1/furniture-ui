@@ -247,6 +247,7 @@ export default function TableToolbar({
               <SelectItem value="10">10 rows</SelectItem>
               <SelectItem value="20">20 rows</SelectItem>
               <SelectItem value="50">50 rows</SelectItem>
+              <SelectItem value="500">500 rows</SelectItem>
             </SelectContent>
           </Select>
         </div>

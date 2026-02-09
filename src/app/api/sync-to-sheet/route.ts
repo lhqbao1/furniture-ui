@@ -92,10 +92,10 @@ export async function GET() {
         p.ean ?? "",
         p.sku,
         imageUrl,
-        shipping,
-        additionalImages,
         "new",
         shippingLabel,
+        shipping,
+        additionalImages,
       ];
     });
     // 4️⃣ Ghi vào Google Sheet (ví dụ từ A2)

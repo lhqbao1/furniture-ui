@@ -303,6 +303,234 @@ function EditableEanCell({ product }: { product: ProductItem }) {
   );
 }
 
+function EditableColorCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.color ?? "");
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductColor = () => {
+    const sanitizedColor = value.trim();
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          color: sanitizedColor.length > 0 ? sanitizedColor : null,
+          category_ids: product.categories.map((c) => c.id),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update product color successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update product color fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="text-wrap">
+      {editing ? (
+        <Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            setValue(product.color ?? "");
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductColor();
+            }
+            if (e.key === "Escape") {
+              setValue(product.color ?? "");
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            "w-32",
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer text-wrap text-center"
+          onClick={() => setEditing(true)}
+        >
+          {product.color || "—"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditableMaterialsCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.materials ?? "");
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductMaterials = () => {
+    const sanitizedMaterials = value.trim();
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          materials: sanitizedMaterials.length > 0 ? sanitizedMaterials : null,
+          category_ids: product.categories.map((c) => c.id),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update product materials successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update product materials fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="text-wrap">
+      {editing ? (
+        <Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            setValue(product.materials ?? "");
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductMaterials();
+            }
+            if (e.key === "Escape") {
+              setValue(product.materials ?? "");
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            "w-32",
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer text-wrap text-center"
+          onClick={() => setEditing(true)}
+        >
+          {product.materials || "—"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EditableComponentCell({ product }: { product: ProductItem }) {
+  const [value, setValue] = useState(product.component ?? "");
+  const [editing, setEditing] = useState(false);
+  const EditProductMutation = useEditProduct();
+
+  const handleEditProductComponent = () => {
+    const sanitizedComponent = value.trim();
+    EditProductMutation.mutate(
+      {
+        input: {
+          ...product,
+          component: sanitizedComponent.length > 0 ? sanitizedComponent : null,
+          category_ids: product.categories.map((c) => c.id),
+          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+          ...(product.bundles?.length
+            ? {
+                bundles: product.bundles.map((item) => ({
+                  product_id: item.bundle_item.id,
+                  quantity: item.quantity,
+                })),
+              }
+            : { bundles: [] }),
+          brand_id: product.brand ? product.brand.id : null,
+        },
+        id: product.id,
+      },
+      {
+        onSuccess() {
+          toast.success("Update product component successful");
+          setEditing(false);
+        },
+        onError() {
+          toast.error("Update product component fail");
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="text-wrap">
+      {editing ? (
+        <Input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            setValue(product.component ?? "");
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleEditProductComponent();
+            }
+            if (e.key === "Escape") {
+              setValue(product.component ?? "");
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          disabled={EditProductMutation.isPending}
+          className={cn(
+            "w-32",
+            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+          )}
+        />
+      ) : (
+        <div
+          className="cursor-pointer text-wrap text-center"
+          onClick={() => setEditing(true)}
+        >
+          {product.component || "—"}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EditableStockCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.stock);
   const [editing, setEditing] = useState(false);
@@ -1388,18 +1616,27 @@ export const getProductColumns = (
     },
     enableSorting: true,
   },
+
   {
     accessorKey: "is_active",
     header: "STATUS",
-    cell: ({ row }) => (
-      // <span
-      //     className={`px-2 py-1 rounded-md text-xs ${row.original.is_active ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-      //         }`}
-      // >
-      //     {row.original.is_active ? "active" : "inactive"}
-      // </span>
-      <ToggleProductStatus product={row.original} />
-    ),
+    cell: ({ row }) => <ToggleProductStatus product={row.original} />,
+  },
+  {
+    accessorKey: "color",
+    header: ({}) => <div className="text-center">Color</div>,
+    cell: ({ row }) => <EditableColorCell product={row.original} />,
+  },
+  {
+    accessorKey: "materials",
+    header: ({}) => <div className="text-center">Materials</div>,
+    cell: ({ row }) => <EditableMaterialsCell product={row.original} />,
+  },
+  {
+    accessorKey: "component",
+    meta: { width: 150 },
+    header: ({}) => <div className="text-center">Component</div>,
+    cell: ({ row }) => <EditableComponentCell product={row.original} />,
   },
   {
     accessorKey: "cost",

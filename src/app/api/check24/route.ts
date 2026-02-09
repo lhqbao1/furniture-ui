@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
 import { getAllProductsSelect } from "@/features/product-group/api";
 

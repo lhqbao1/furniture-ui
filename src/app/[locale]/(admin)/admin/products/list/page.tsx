@@ -34,6 +34,9 @@ const PRODUCT_COLUMN_OPTIONS: {
   { id: "final_price", label: "Final Price" },
   { id: "margin", label: "Margin" },
   { id: "carrier", label: "Carrier" },
+  { id: "color", label: "Color" },
+  { id: "materials", label: "Materials" },
+  { id: "component", label: "Component" },
 ];
 
 const DEFAULT_VISIBLE_PRODUCT_COLUMNS = new Set(
