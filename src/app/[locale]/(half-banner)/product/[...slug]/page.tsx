@@ -254,10 +254,7 @@ export default async function Page({
           <BoughtTogetherSection productDetails={plainProduct} />
 
           <div className="lg:mt-12 mt-0">
-            <ProductDetailsTab
-              reviews={plainReviews}
-              product={plainProduct}
-            />
+            <ProductDetailsTab reviews={plainReviews} product={plainProduct} />
           </div>
         </div>
       </div>
@@ -275,10 +272,7 @@ export default async function Page({
       {plainBlogs?.items?.length > 0 && (
         <div className="lg:mt-16 mt-10 pb-4 md:w-[95%] xl:w-3/4 w-[95%] mx-auto">
           <Suspense fallback={<ProductGridSkeleton length={4} />}>
-            <RelatedBlogs
-              blogs={plainBlogs.items}
-              slug={product.url_key}
-            />
+            <RelatedBlogs blogs={plainBlogs.items} slug={product.url_key} />
           </Suspense>
         </div>
       )}

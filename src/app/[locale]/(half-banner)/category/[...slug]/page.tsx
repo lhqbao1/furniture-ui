@@ -137,10 +137,5 @@ export default async function Page({ params }: PageProps) {
   const category = await getCategoryCached(lastSlug);
   if (!category) return notFound();
 
-  return (
-    <ProductCategory
-      category={category}
-      categorySlugs={slugArray}
-    />
-  );
+  return <ProductCategory category={category} categorySlugs={slugArray} />;
 }
