@@ -44,7 +44,7 @@ const ProductDetailInputs = ({
   isDSP = false,
 }: ProductDetailInputsProps) => {
   const form = useFormContext();
-  const listImages = form.watch("static_files");
+  const listImages = form.watch("static_files") ?? [];
   const stock = form.watch("stock");
   const result_stock = form.watch("result_stock");
 
@@ -101,6 +101,11 @@ const ProductDetailInputs = ({
       console.error(error);
       toast.error("Failed to download images", { id: toastId });
     }
+  };
+
+  const handleRemoveAllImages = () => {
+    if (!listImages.length) return;
+    form.setValue("static_files", [], { shouldDirty: true });
   };
 
   return (
@@ -337,13 +342,22 @@ const ProductDetailInputs = ({
       <div className="flex flex-col gap-4">
         <div className="flex gap-3 items-center justify-between">
           <p className="text-black font-semibold text-sm">Image</p>
-          <Button
-            type="button"
-            variant={"secondary"}
-            onClick={() => handleDownloadZip()}
-          >
-            Download images ({listImages.length})
-          </Button>
+          <div className="space-x-2">
+            <Button
+              type="button"
+              variant={"secondary"}
+              onClick={() => handleDownloadZip()}
+            >
+              Download images ({listImages.length})
+            </Button>
+            <Button
+              type="button"
+              className="bg-red-500 hover:bg-red-600"
+              onClick={handleRemoveAllImages}
+            >
+              Remove all
+            </Button>
+          </div>
         </div>
         <ImagePickerInput
           form={form}

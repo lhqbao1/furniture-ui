@@ -126,10 +126,7 @@ export function AdminCheckOutUserInformation({
             <FormItem>
               <FormLabel>First Name (Optional)</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  value={field.value ?? ""}
-                />
+                <Input {...field} value={field.value ?? ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -143,10 +140,7 @@ export function AdminCheckOutUserInformation({
             <FormItem>
               <FormLabel>Last Name (Optional)</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  value={field.value ?? ""}
-                />
+                <Input {...field} value={field.value ?? ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -196,10 +190,7 @@ export function AdminCheckOutUserInformation({
             <FormItem>
               <FormLabel>Email (Optional)</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  value={field.value ?? ""}
-                />
+                <Input {...field} value={field.value ?? ""} />
               </FormControl>
               <FormMessage />
             </FormItem>

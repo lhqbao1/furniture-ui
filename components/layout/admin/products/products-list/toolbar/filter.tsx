@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import ProductStatusFilter from "./filter/status";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import SupplierFilter from "./filter/supplier-filter";
+import BrandFilter from "./filter/brand/brand-filter";
 
 export default function FilterForm() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function FilterForm() {
       <ProductStatusFilter />
 
       <SupplierFilter />
+
+      <BrandFilter />
 
       {/* <div className="flex items-center justify-between">
                 <Label htmlFor="is-active">Active only</Label>
@@ -72,11 +75,7 @@ export default function FilterForm() {
 
       {/* Reset */}
       <div className="flex justify-end pt-3">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleReset}
-        >
+        <Button variant="outline" size="sm" onClick={handleReset}>
           Reset
         </Button>
       </div>

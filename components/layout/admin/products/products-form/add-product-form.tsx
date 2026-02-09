@@ -267,6 +267,17 @@ const ProductForm = ({
                 >
                   View
                 </Button>
+                <Button
+                  type="button"
+                  className="text-lg px-8 bg-blue-400 hover:bg-blue-500"
+                  onClick={() =>
+                    router.push(`/admin/products/${productValues?.id}/clone`, {
+                      locale,
+                    })
+                  }
+                >
+                  Clone
+                </Button>
                 <div className="col-span-2 lg:mt-4">
                   <FormField
                     control={form.control}

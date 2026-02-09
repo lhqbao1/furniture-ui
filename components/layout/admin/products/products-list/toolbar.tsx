@@ -32,7 +32,6 @@ import ImportDialog from "./toolbar/import";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { ProductItem } from "@/types/products";
-import ExportExcelButton from "./toolbar/export-button";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -143,68 +142,13 @@ export default function TableToolbar({
     }
   }, [debouncedSearch]);
 
-  const handleDownloadZip = async () => {
-    if (!exportData?.length) {
-      toast.error("Không có sản phẩm nào để tải ảnh");
-      return;
-    }
-
-    const zip = new JSZip();
-    toast.loading("Uploading...");
-
-    let totalCount = 0;
-
-    for (const item of exportData) {
-      const folderName = sanitizeFolderName(
-        `${item.id_provider}-${item.name}` || "unknown",
-      );
-      const folder = zip.folder(folderName);
-
-      for (const [index, file] of (item.static_files || []).entries()) {
-        try {
-          const response = await fetch(file.url);
-          const blob = await response.blob();
-
-          const ext =
-            file.url
-              .match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)?.[1]
-              ?.toLowerCase() || "jpg";
-          const filename = `image_${index + 1}.${ext}`;
-
-          folder?.file(filename, blob);
-          totalCount++;
-        } catch (error) {
-          console.error("Lỗi tải ảnh:", file.url, error);
-        }
-      }
-    }
-
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, "images.zip");
-
-    toast.success(
-      `Downloaded ${totalCount} images from ${exportData.length} products`,
-    );
-  };
-
-  // Helper: loại bỏ ký tự đặc biệt trong tên folder
-  function sanitizeFolderName(name: string) {
-    return name
-      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") // loại ký tự không hợp lệ trong tên file
-      .replace(/\s+/g, "_") // đổi khoảng trắng thành _
-      .trim();
-  }
-
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
       <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex items-center gap-1"
-            >
+            <Button variant="outline" className="flex items-center gap-1">
               Group action <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -235,10 +179,7 @@ export default function TableToolbar({
               <FilterExportForm />
             </DropdownMenuContent>
           </DropdownMenu>
-          <ImportDialog
-            setIsImporting={setIsImporting}
-            isSupplier
-          />
+          <ImportDialog setIsImporting={setIsImporting} isSupplier />
         </div>
       </div>
 
@@ -294,10 +235,7 @@ export default function TableToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
+            <Button variant="ghost" className="flex items-center gap-1">
               Filter <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -309,10 +247,7 @@ export default function TableToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
+            <Button variant="ghost" className="flex items-center gap-1">
               View <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -349,10 +284,7 @@ export default function TableToolbar({
         {!columnOptions?.length && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-1"
-              >
+              <Button variant="ghost" className="flex items-center gap-1">
                 Columns <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -387,10 +319,7 @@ export default function TableToolbar({
       </Button> */}
 
       {isAddButtonModal && (
-        <Dialog
-          open={openAddModal}
-          onOpenChange={setOpenAddModal}
-        >
+        <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
           <DialogContent className="w-1/3">
             <DialogHeader>
               <DialogTitle>{addButtonText}</DialogTitle>

@@ -86,6 +86,69 @@ export function MultiSelectField({
           }
         };
 
+        const collectLeaves = (
+          categories: CategoryResponse[],
+          leaves: Record<string, CategoryResponse> = {},
+        ) => {
+          for (const cat of categories) {
+            if (cat.children && cat.children.length > 0) {
+              collectLeaves(cat.children, leaves);
+            } else {
+              leaves[cat.id] = cat;
+            }
+          }
+
+          return leaves;
+        };
+
+        const renderUnselected = (
+          categories: CategoryResponse[],
+        ): React.ReactNode[] => {
+          return categories.flatMap((cat) => {
+            const hasChildren = !!(cat.children && cat.children.length > 0);
+
+            if (hasChildren) {
+              const childNodes = renderUnselected(cat.children);
+              if (childNodes.length === 0) return [];
+
+              return [
+                <div
+                  key={cat.id}
+                  className="px-3 py-2 text-sm font-semibold text-muted-foreground cursor-default"
+                >
+                  {cat.name}
+                </div>,
+                ...childNodes,
+              ];
+            }
+
+            if (selected.includes(cat.id)) return [];
+
+            return [
+              <CommandItem
+                key={cat.id}
+                onSelect={() => toggleSelect(cat.id)}
+                className="flex items-center gap-2 cursor-pointer pl-6"
+              >
+                <Checkbox
+                  checked={selected.includes(cat.id)}
+                  onCheckedChange={() => toggleSelect(cat.id)}
+                  className="pointer-events-none"
+                />
+                <span>{cat.name}</span>
+              </CommandItem>,
+            ];
+          });
+        };
+
+        const selectedLeaves = (() => {
+          if (!options) return [];
+          const leaves = collectLeaves(options);
+          return selected
+            .map((id) => leaves[id])
+            .filter(Boolean) as CategoryResponse[];
+        })();
+
         return (
           <FormItem className="flex flex-col w-full">
             {label && (
@@ -129,37 +192,21 @@ export function MultiSelectField({
                       className="h-10"
                     />
                     <CommandGroup>
-                      {flatOptions.map((opt) => {
-                        const isSelected = selected.includes(opt.id);
-
-                        // 👉 CATEGORY CHA
-                        if (opt.isParent) {
-                          return (
-                            <div
-                              key={opt.id}
-                              className="px-3 py-2 text-sm font-semibold text-muted-foreground cursor-default"
-                            >
-                              {opt.name}
-                            </div>
-                          );
-                        }
-
-                        // 👉 CATEGORY CON (leaf)
-                        return (
-                          <CommandItem
-                            key={opt.id}
-                            onSelect={() => toggleSelect(opt.id)}
-                            className="flex items-center gap-2 cursor-pointer pl-6"
-                          >
-                            <Checkbox
-                              checked={isSelected}
-                              onCheckedChange={() => toggleSelect(opt.id)}
-                              className="pointer-events-none"
-                            />
-                            <span>{opt.name}</span>
-                          </CommandItem>
-                        );
-                      })}
+                      {selectedLeaves.map((cat) => (
+                        <CommandItem
+                          key={cat.id}
+                          onSelect={() => toggleSelect(cat.id)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Checkbox
+                            checked
+                            onCheckedChange={() => toggleSelect(cat.id)}
+                            className="pointer-events-none"
+                          />
+                          <span>{cat.name}</span>
+                        </CommandItem>
+                      ))}
+                      {options ? renderUnselected(options) : null}
                     </CommandGroup>
                   </Command>
                 )}

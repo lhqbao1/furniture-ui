@@ -50,7 +50,6 @@ export function useCheckoutSubmit({
   locale: string; // locale hiện tại
   currentUserId: string;
 }) {
-  const router = useRouter();
   const t = useTranslations();
   const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
   const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
@@ -126,7 +125,6 @@ export function useCheckoutSubmit({
         let invoiceId = invoiceAddress?.id;
         let shippingId = addresses?.find((a: Address) => a.is_default)?.id;
         let cartData: CartResponse = [];
-        let shippingCostCurrent = 0;
         let currentGuestId = null;
 
         if (!userLoginId) {
@@ -237,8 +235,7 @@ export function useCheckoutSubmit({
             userLoginId && cartItems ? cartItems : cartData,
           ),
           note: data.note,
-          total_shipping:
-            shippingCostCurrent > 0 ? shippingCostCurrent : shippingCost,
+          total_shipping: shippingCost,
           carrier: normalized.find(
             (i) =>
               i.carrier.toLowerCase() === "amm" ||
