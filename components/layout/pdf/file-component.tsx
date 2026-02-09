@@ -13,7 +13,6 @@ import { InvoicePDF } from "./file";
 import { Button } from "@/components/ui/button";
 import { getCountryName } from "@/lib/country-name";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
-import { calculateShippingCost } from "@/hooks/caculate-shipping";
 
 interface InvoiceTableProps {
   checkoutId: string;
@@ -76,14 +75,9 @@ export default function InvoiceTable({
   return (
     <div
       id="invoice-table"
-      className="flex flex-col gap-6 items-start w-[894px] h-screen p-12 pb-4 relative"
+      className="flex flex-col gap-6 items-start w-[894px] min-h-screen p-12 pb-4 relative"
     >
-      <Image
-        src="/invoice-logo.png"
-        height={100}
-        width={100}
-        alt=""
-      />
+      <Image src="/invoice-logo.png" height={100} width={100} alt="" />
       <div className="flex justify-between gap-8 w-full">
         <div className="flex flex-col gap-0">
           <span className="text-sm">
@@ -324,12 +318,9 @@ export default function InvoiceTable({
         />
       </div>
 
-      <div className="absolute bottom-0 z-20 grid grid-cols-3 gap-6">
+      <div className="mt-auto z-20 grid grid-cols-3 gap-6 pb-4 w-full">
         <div className="">
-          <div
-            className="font-semibold"
-            translate="no"
-          >
+          <div className="font-semibold" translate="no">
             Prestige Home GmbH
           </div>
           <div>Greifswalder Straße 226</div>
@@ -338,10 +329,7 @@ export default function InvoiceTable({
         </div>
 
         <div className="">
-          <div
-            className="font-semibold"
-            translate="no"
-          >
+          <div className="font-semibold" translate="no">
             Bankverbindung
           </div>
           <div>OLINDA Zweigniederlassung Deutschland</div>
@@ -362,12 +350,7 @@ export default function InvoiceTable({
           <div className="w-full flex justify-center col-span-3">
             <Button variant={"outline"}>
               <PDFDownloadLink
-                document={
-                  <InvoicePDF
-                    checkout={checkout}
-                    invoice={invoice}
-                  />
-                }
+                document={<InvoicePDF checkout={checkout} invoice={invoice} />}
                 fileName={`${invoice.invoice_code}.pdf`}
               >
                 {({ loading }) =>

@@ -33,13 +33,13 @@ import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { ProductItem } from "@/types/products";
 import { toast } from "sonner";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
 import FilterExportForm from "./toolbar/filter-export-dialog";
 import { cn } from "@/lib/utils";
 import UpdateStatusDialog from "./toolbar/bulk-update/status-dialog";
+import ExportSelectedProducts from "./toolbar/bulk-update/export-selected";
+import EANDrawer from "./toolbar/bulk-update/ean-drawer";
 
 export enum ToolbarType {
   product = "product",
@@ -95,6 +95,7 @@ export default function TableToolbar({
   const [isImporting, setIsImporting] = useState(false);
   const [hasShownSpaceToast, setHasShownSpaceToast] = useState(false);
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
+  const [openEanDrawer, setOpenEanDrawer] = useState(false);
 
   const pathname = usePathname();
   const defaultSearch = searchParams.get("search") ?? "";
@@ -153,20 +154,38 @@ export default function TableToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setOpenUpdateStatus(true)}>
+            <DropdownMenuItem
+              onClick={() => setOpenUpdateStatus(true)}
+              className="cursor-pointer"
+            >
               Update Status
             </DropdownMenuItem>
-            <DropdownMenuItem>Export Selected</DropdownMenuItem>
+
+            <DropdownMenuItem>
+              <ExportSelectedProducts product_ids={product_ids ?? []} />
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={() => setOpenEanDrawer(true)}
+            >
+              EAN
+            </DropdownMenuItem>
           </DropdownMenuContent>
+
           <UpdateStatusDialog
             open={openUpdateStatus}
             onOpenChange={setOpenUpdateStatus}
             productIds={product_ids ?? []}
           />
+          <EANDrawer
+            product_ids={product_ids ?? []}
+            open={openEanDrawer}
+            onOpenChange={setOpenEanDrawer}
+          />
         </DropdownMenu>
 
         <div className="flex gap-2 text-sm font-medium">
-          {/* <Button variant="ghost" className="">Export</Button> */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -175,7 +194,6 @@ export default function TableToolbar({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-[600px] p-4 space-y-4">
-              {/* Filter here */}
               <FilterExportForm />
             </DropdownMenuContent>
           </DropdownMenu>

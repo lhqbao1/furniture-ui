@@ -15,7 +15,7 @@ function AdminContent({ children }: { children: ReactNode }) {
   return (
     <div
       className={clsx(
-        "px-8 lg:pt-8 pt-2 pointer-events-auto overflow-auto transition-all duration-300 relative",
+        "md:px-8 px-3 lg:pt-8 pt-2 pointer-events-auto overflow-auto transition-all duration-300 relative",
         open ? "xl:w-[calc(100%-240px)]" : "xl:w-[calc(100%)]", // width khi sidebar collapsed
       )}
     >

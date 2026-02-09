@@ -14,40 +14,6 @@ import SupplierSelect from "./supplier-select";
 import { SupplierResponse } from "@/types/supplier";
 import { ProductItem, StaticFile } from "@/types/products";
 
-function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
-  const range = XLSX.utils.decode_range(worksheet["!ref"]!);
-  for (let r = range.s.r + 1; r <= range.e.r; r++) {
-    columns.forEach((c) => {
-      const addr = `${c}${r + 1}`;
-      if (worksheet[addr]) {
-        worksheet[addr].t = "s"; // string
-        worksheet[addr].z = "@"; // TEXT format (QUAN TRỌNG)
-      }
-    });
-  }
-}
-
-const normalizeDescription = (html?: string) => {
-  if (!html) return "";
-
-  return (
-    html
-      // bỏ newline
-      .replace(/\r?\n|\r/g, " ")
-
-      // đổi <br>, <p>, <li>, <h*> thành space
-      .replace(/<br\s*\/?>/gi, " ")
-      .replace(/<\/?(p|div|li|ul|h\d)[^>]*>/gi, " ")
-
-      // dọn HTML còn sót
-      .replace(/<[^>]+>/g, "")
-
-      // dọn khoảng trắng
-      .replace(/\s+/g, " ")
-      .trim()
-  );
-};
-
 const FilterExportForm = () => {
   const [supplier, setSupplier] = useState<string>("");
   const [status, setStatus] = useState<"active" | "inactive" | "all">("all");

@@ -53,10 +53,7 @@ const UpdateStatusDialog = ({
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle>Update product status</DialogTitle>
@@ -69,18 +66,12 @@ const UpdateStatusDialog = ({
             className="space-y-2"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem
-                value="true"
-                id="status-active"
-              />
+              <RadioGroupItem value="true" id="status-active" />
               <Label htmlFor="status-active">Active</Label>
             </div>
 
             <div className="flex items-center space-x-2">
-              <RadioGroupItem
-                value="false"
-                id="status-inactive"
-              />
+              <RadioGroupItem value="false" id="status-inactive" />
               <Label htmlFor="status-inactive">Inactive</Label>
             </div>
           </RadioGroup>

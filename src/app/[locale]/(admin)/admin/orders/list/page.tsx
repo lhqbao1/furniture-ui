@@ -6,7 +6,6 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
-import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import {
@@ -103,8 +102,7 @@ const OrderList = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <AdminBackButton />
+    <div className="min-h-screen flex flex-col gap-6 pb-6">
       <div className="space-y-6 pb-30">
         {isLoadingStatistic ? (
           <ProductStatisticSkeleton />
@@ -136,6 +134,8 @@ const OrderList = () => {
             hasExpanded
             renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
             hasHeaderBackGround
+            // isSticky
+            // stickyContainerClassName="h-full"
           />
         )}
       </div>
