@@ -64,7 +64,9 @@ export async function GET() {
 
       // 4️⃣ Shipping cost
       const shippingPrice =
-        p.carrier?.toLowerCase() === "dpd" ? "5.95 EUR" : "35.95 EUR";
+        p.carrier?.toLowerCase() === "amm" || "spedition"
+          ? "35.95 EUR"
+          : "5.95 EUR";
       const shipping = `DE:::${shippingPrice}`;
 
       const additionalImages = Array.isArray(p.static_files)
