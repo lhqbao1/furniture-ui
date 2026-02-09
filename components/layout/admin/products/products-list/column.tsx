@@ -1139,13 +1139,6 @@ function ActionsCell({ product }: { product: ProductItem }) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const categories = product.categories || [];
-  const formatName = (name: string) =>
-    name.trim().toLowerCase().replace(/\s+/g, "-");
-
-  const level1 = categories.find((c) => c.level === 1);
-  const level2 = categories.find((c) => c.level === 2);
-
   const handleClick = async (
     e: React.MouseEvent<HTMLButtonElement>,
     id: string,
@@ -1192,16 +1185,6 @@ function ActionsCell({ product }: { product: ProductItem }) {
         <Pencil className="w-4 h-4 text-primary" />
       </Button>
 
-      {/* </Link> */}
-      {/* <DeleteDialog
-        product={product}
-        isEbay={
-          product.marketplace_products.find((i) => i.marketplace === "ebay")
-            ?.is_active
-            ? true
-            : false
-        }
-      /> */}
       <Link
         href={`/product/${product.url_key}`}
         target="_blank"

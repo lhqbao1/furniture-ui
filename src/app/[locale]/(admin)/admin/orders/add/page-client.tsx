@@ -54,6 +54,7 @@ export default function CreateOrderPageClient() {
   const createOrderManualMutation = useCreateCheckOutManual();
   const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);
   const [disabledFields, setDisabledFields] = useState<string[]>([]);
+  const prevProductIdsRef = React.useRef<string[]>([]);
 
   const form = useForm<ManualCreateOrderFormValues>({
     resolver: zodResolver(ManualCreateOrderSchema),
@@ -71,33 +72,50 @@ export default function CreateOrderPageClient() {
   ).gross;
 
   useEffect(() => {
+    const productIds = listProducts.map((item) => item.product.id);
+    const prevIds = prevProductIdsRef.current;
+    const idsChanged =
+      productIds.length !== prevIds.length ||
+      productIds.some((id, index) => id !== prevIds[index]);
+
+    if (!idsChanged) return;
+
+    prevProductIdsRef.current = productIds;
+
     // guard item empty
-    if (!listItems || listItems.length === 0) {
+    if (!listProducts || listProducts.length === 0) {
       form.setValue("total_shipping", 0);
       form.setValue("carrier", undefined); // hoặc "" tùy schema
       return;
     }
 
-    const result = calculateShippingCostManual(listItems, countryCode, taxId);
+    const currentItems = form.getValues("items") ?? [];
+    const result = calculateShippingCostManual(currentItems, countryCode, taxId);
 
     const autoShipping = result.gross;
-    const autoCarrier = getCarrierFromItems(listItems);
+    const autoCarrier = getCarrierFromItems(
+      listProducts.map((item) => ({
+        id_provider: item.product.id_provider,
+        quantity: item.quantity,
+        final_price: item.final_price,
+        carrier: item.carrier,
+        title: item.product.name,
+        sku: item.product.sku ?? "",
+      })),
+    );
 
     const currentShipping = form.getValues("total_shipping");
     const currentCarrier = form.getValues("carrier");
-
-    console.log(currentCarrier)
 
     // chỉ override nếu user chưa nhập
     if (currentShipping == null || currentShipping === 0) {
       form.setValue("total_shipping", autoShipping, { shouldDirty: true });
     }
 
-    if (currentCarrier && autoCarrier) {
-      console.log(autoCarrier);
+    if (autoCarrier && autoCarrier !== currentCarrier) {
       form.setValue("carrier", autoCarrier, { shouldDirty: true });
     }
-  }, [listItems, countryCode, taxId]);
+  }, [listProducts, countryCode, taxId, form]);
 
   useManualCheckoutLogic(form, setDisabledFields);
 
@@ -180,10 +198,7 @@ export default function CreateOrderPageClient() {
               setListProducts={setListProducts}
             />
             <div className="flex lg:justify-end justify-center gap-2">
-              <Button
-                type="submit"
-                className="text-lg lg:w-1/3 w-1/2 py-6"
-              >
+              <Button type="submit" className="text-lg lg:w-1/3 w-1/2 py-6">
                 {t("continue")}
               </Button>
             </div>

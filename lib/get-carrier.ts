@@ -1,5 +1,3 @@
-import { ProductItem } from "@/types/products";
-
 export type listItems = {
   id_provider: string;
   quantity: number;

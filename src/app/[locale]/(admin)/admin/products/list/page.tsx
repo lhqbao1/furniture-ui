@@ -114,7 +114,7 @@ const ProductList = () => {
     updateHeight();
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
-  }, []);
+  }, [data, isLoading]);
 
   if (isError) return <div>No data</div>;
 

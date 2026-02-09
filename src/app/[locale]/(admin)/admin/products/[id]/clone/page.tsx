@@ -1,10 +1,6 @@
 "use client";
 import ProductFormSkeleton from "@/components/layout/admin/products/products-form/product-form-skeleton";
-import {
-  useAddProduct,
-  useEditProduct,
-  useGetProductById,
-} from "@/features/products/hook";
+import { useAddProduct, useGetProductById } from "@/features/products/hook";
 import React from "react";
 import { useRouter } from "@/src/i18n/navigation";
 import { ProductInput } from "@/lib/schema/product";
@@ -34,6 +30,7 @@ const CloneProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
       sku: undefined,
       stock: undefined,
       result_stock: undefined,
+      is_active: false,
     };
   }, [data]);
 

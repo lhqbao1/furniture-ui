@@ -59,12 +59,9 @@ export default function ManualAdditionalInformation({
                   onValueChange={(value) => {
                     field.onChange(value === "prestige" ? null : value);
                   }}
-                  defaultValue={field.value}
+                  value={field.value ?? ""}
                 >
-                  <SelectTrigger
-                    placeholderColor
-                    className="border"
-                  >
+                  <SelectTrigger placeholderColor className="border">
                     <SelectValue placeholder="Select marketplace" />
                   </SelectTrigger>
                   <SelectContent>
@@ -262,10 +259,7 @@ export default function ManualAdditionalInformation({
                     </SelectTrigger>
                     <SelectContent>
                       {carriers.map((c) => (
-                        <SelectItem
-                          key={c.id}
-                          value={c.id}
-                        >
+                        <SelectItem key={c.id} value={c.id}>
                           <div className="flex items-center gap-2">
                             <Image
                               src={c.logo}

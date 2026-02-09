@@ -58,9 +58,11 @@ const SelectOrderItems = ({
       return;
     }
 
+    if (listProducts.some((p) => p.product.id === product.id)) {
+      return;
+    }
+
     setListProducts((prev) => {
-      if (prev.some((p) => p.product.id === product.id)) return prev;
-      form.setValue("carrier", product.carrier)
       return [
         ...prev,
         {
@@ -116,10 +118,7 @@ const SelectOrderItems = ({
   return (
     <div className="space-y-6">
       <div className="flex gap-2 items-center">
-        <Popover
-          open={open}
-          onOpenChange={setOpen}
-        >
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
