@@ -181,7 +181,6 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     }`}
             </Text>
             <Text>
-              {" "}
               {checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
                 ? checkout?.checkouts?.[0]?.invoice_address?.address_line
                 : checkout?.checkouts?.[0]?.shipping_address?.address_line}

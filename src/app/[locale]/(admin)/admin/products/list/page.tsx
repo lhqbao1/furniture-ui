@@ -9,7 +9,13 @@ import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllProducts } from "@/features/products/hook";
 import { sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { VisibilityState } from "@tanstack/react-table";
@@ -97,6 +103,27 @@ const ProductList = () => {
     supplier_id: filters.supplier_id,
   });
 
+  const multiSearchRaw = searchParams.get("multi_search") ?? "";
+  const multiSearchValues = useMemo(
+    () =>
+      multiSearchRaw
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean),
+    [multiSearchRaw],
+  );
+
+  const filteredItems = useMemo(() => {
+    if (!data?.items) return [];
+    if (multiSearchValues.length === 0) return data.items;
+
+    const target = new Set(multiSearchValues);
+    return data.items.filter((item) => {
+      const sku = item.sku ? String(item.sku).trim() : "";
+      return target.has(sku);
+    });
+  }, [data?.items, multiSearchValues]);
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -149,14 +176,22 @@ const ProductList = () => {
           <ProductTableSkeleton />
         ) : (
           <ProductTable
-            data={data ? data.items : []}
+            data={filteredItems}
             columns={getProductColumns(setSortByStock)}
             page={page}
             pageSize={pageSize}
             setPage={handlePageChange}
             setPageSize={setPageSize}
-            totalItems={data?.pagination.total_items ?? 0}
-            totalPages={data?.pagination.total_pages ?? 0}
+            totalItems={
+              multiSearchValues.length > 0
+                ? filteredItems.length
+                : data?.pagination.total_items ?? 0
+            }
+            totalPages={
+              multiSearchValues.length > 0
+                ? 1
+                : data?.pagination.total_pages ?? 0
+            }
             hasHeaderBackGround
             isSticky
             stickyContainerClassName="h-full"

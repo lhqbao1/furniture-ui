@@ -53,7 +53,6 @@ export default function InvoiceTable({
 
     return (
       checkouts
-        // ❌ Loại checkout có status "exchange" hoặc "cancel_exchange"
         .filter((checkout) => {
           const status = checkout.status?.toLowerCase();
           return status !== "exchange" && status !== "cancel_exchange";

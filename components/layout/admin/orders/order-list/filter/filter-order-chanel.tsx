@@ -23,6 +23,7 @@ export const CHANEL_OPTIONS = [
   { key: "norma", label: "Norma24" },
   { key: "check24", label: "Check24" },
   { key: "inprodius", label: "Inprodius" },
+  { key: "econelo", label: "Econelo" },
 ];
 
 export default function OrderChanelFilter() {
@@ -68,7 +69,7 @@ export default function OrderChanelFilter() {
       <Label>Chanel:</Label>
       <Select>
         <SelectTrigger
-          className="w-[200px] cursor-pointer border text-black justify-center"
+          className="w-50 cursor-pointer border text-black justify-center"
           placeholderColor
           iconColor="black"
         >

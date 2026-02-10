@@ -1,5 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import ViewFileDialog from "../../order-list/view-file";
+import DownloadInvoice from "./download-invoice";
 
 // Kiểu dữ liệu cho mỗi row
 export type DocumentRow = {
@@ -30,11 +31,10 @@ export const documentColumns: ColumnDef<DocumentRow>[] = [
     id: "view",
     header: () => <div className="text-center uppercase">View</div>,
     cell: ({ row }) => {
-      const type = row.original.viewType;
       return (
-        <ViewFileDialog
+        <DownloadInvoice
           checkoutId={row.original.checkOutId ?? ""}
-          type={type}
+          type={row.original.viewType ?? ""}
         />
       );
     },
