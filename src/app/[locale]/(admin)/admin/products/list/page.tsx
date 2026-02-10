@@ -198,6 +198,7 @@ const ProductList = () => {
             onSelectionChange={setSelectedProductIds} // 👈 đây
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={setColumnVisibility}
+            enableClientSorting
           />
         )}
       </div>

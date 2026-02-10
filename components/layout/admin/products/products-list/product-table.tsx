@@ -51,6 +51,7 @@ interface DataTableProps<TData, TValue> {
   onSelectionChange?: (ids: string[]) => void; // 👈 thêm
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
+  enableClientSorting?: boolean;
 }
 
 export function ProductTable<TData, TValue>({
@@ -77,6 +78,7 @@ export function ProductTable<TData, TValue>({
   onSelectionChange,
   columnVisibility,
   onColumnVisibilityChange,
+  enableClientSorting = false,
   renderRowSubComponent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -99,7 +101,7 @@ export function ProductTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    manualSorting: true,
+    manualSorting: !enableClientSorting,
     onRowSelectionChange: setRowSelection, // ✅ cập nhật khi người dùng click
     onColumnVisibilityChange,
     meta: {
