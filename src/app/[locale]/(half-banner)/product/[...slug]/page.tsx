@@ -4,7 +4,7 @@ import {
   getProductGroupDetail,
 } from "@/features/product-group/api";
 import type { Metadata } from "next";
-import { StaticFile } from "@/types/products";
+import { ProductItem, StaticFile } from "@/types/products";
 
 import ProductDetails from "@/components/layout/single-product/product-details";
 import { ProductDetailsTab } from "@/components/layout/single-product/product-tab";

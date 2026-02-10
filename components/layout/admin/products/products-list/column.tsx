@@ -466,7 +466,8 @@ function EditableComponentCell({ product }: { product: ProductItem }) {
       {
         input: {
           ...product,
-          component: sanitizedComponent.length > 0 ? sanitizedComponent : null,
+          component:
+            sanitizedComponent.length > 0 ? sanitizedComponent : "null",
           category_ids: product.categories.map((c) => c.id),
           ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
           ...(product.bundles?.length
@@ -525,81 +526,6 @@ function EditableComponentCell({ product }: { product: ProductItem }) {
           onClick={() => setEditing(true)}
         >
           {product.component || "—"}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EditableStockCell({ product }: { product: ProductItem }) {
-  const [value, setValue] = useState(product.stock);
-  const [editing, setEditing] = useState(false);
-  const EditProductMutation = useEditProduct();
-
-  const handleEditProductStock = () => {
-    EditProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          stock: value,
-          ...(product.categories?.length
-            ? { category_ids: product.categories.map((c) => c.id) }
-            : {}),
-          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-          brand_id: product.brand ? product.brand.id : null,
-        },
-        id: product.id,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Update product stock successful");
-          setEditing(false);
-        },
-        onError(error, variables, context) {
-          toast.error("Update product stock fail");
-        },
-      },
-    );
-  };
-
-  return (
-    <div className="">
-      {editing ? (
-        <Input
-          type="number"
-          value={value}
-          onChange={(e) => setValue(e.target.valueAsNumber)}
-          onBlur={() => {
-            setValue(product.stock);
-            setEditing(false);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleEditProductStock();
-            }
-            if (e.key === "Escape") {
-              setValue(product.stock);
-              setEditing(false);
-            }
-          }}
-          autoFocus
-          disabled={EditProductMutation.isPending}
-          className={cn(
-            "w-20",
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
-          )}
-        />
-      ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
-          {product.stock} pcs.
         </div>
       )}
     </div>

@@ -139,6 +139,8 @@ export const addProductSchema = z.object({
     .min(1, { message: "Product name is required" })
     .max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
+  component: z.string().optional().nullable(),
+
   price: z.number().nonnegative().optional().nullable(),
   ds_price: z.number().nonnegative().optional().nullable(),
   delivery_charge: z.number().nonnegative().optional().nullable(),
@@ -211,6 +213,7 @@ export type ProductInput = z.infer<typeof addProductSchema>;
 export const defaultValues = {
   name: "",
   description: "",
+  component: "",
   tax: "19%",
   category: "",
   ebay: false,
