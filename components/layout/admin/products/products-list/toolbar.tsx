@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 import UpdateStatusDialog from "./toolbar/bulk-update/status-dialog";
 import ExportSelectedProducts from "./toolbar/bulk-update/export-selected";
 import EANDrawer from "./toolbar/bulk-update/ean-drawer";
+import MultiSearch from "./toolbar/multi-search";
 
 export enum ToolbarType {
   product = "product",
@@ -193,7 +194,7 @@ export default function TableToolbar({
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="w-[600px] p-4 space-y-4">
+            <DropdownMenuContent className="w-150 p-4 space-y-4">
               <FilterExportForm />
             </DropdownMenuContent>
           </DropdownMenu>
@@ -202,7 +203,8 @@ export default function TableToolbar({
       </div>
 
       {/* Search (auto, no button) */}
-      <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap">
+      <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap gap-2">
+        <MultiSearch />
         <Input
           placeholder="Search"
           className={cn(

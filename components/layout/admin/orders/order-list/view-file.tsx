@@ -29,15 +29,9 @@ const ViewFileDialog = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-        >
+        <Button variant="ghost" size="icon">
           <File className="w-4 h-4 text-secondary" />
         </Button>
       </DialogTrigger>
@@ -47,10 +41,7 @@ const ViewFileDialog = ({
         </DialogHeader>
         {type === "invoice" ? <InvoiceTable checkoutId={checkoutId} /> : ""}
         {type === "credit-node" ? (
-          <InvoiceTable
-            checkoutId={checkoutId}
-            isCreditNode
-          />
+          <InvoiceTable checkoutId={checkoutId} isCreditNode />
         ) : (
           ""
         )}
