@@ -79,6 +79,16 @@ const flattenCategories = (
   return result;
 };
 
+const sortByHasValue = (rowA: any, rowB: any, columnId: string): number => {
+  const a = rowA.getValue(columnId);
+  const b = rowB.getValue(columnId);
+  const aHasValue = a !== null && a !== undefined && String(a).trim() !== "";
+  const bHasValue = b !== null && b !== undefined && String(b).trim() !== "";
+
+  if (aHasValue === bHasValue) return 0;
+  return aHasValue ? 1 : -1;
+};
+
 function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
   const [editing, setEditing] = useState(false);
@@ -1456,18 +1466,66 @@ export const getProductColumns = (
   },
   {
     accessorKey: "sku",
-    header: ({}) => <div className="text-center">SKU</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">SKU</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableSkuCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
   {
     accessorKey: "brand",
-    header: ({}) => <div className="text-center">Brand</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">Brand</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableBrandCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
   {
     accessorKey: "ean",
-    header: ({}) => <div className="text-center">EAN</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">EAN</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableEanCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
   {
     accessorKey: "owner",
@@ -1551,35 +1609,141 @@ export const getProductColumns = (
   },
   {
     accessorKey: "color",
-    header: ({}) => <div className="text-center">Color</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">Color</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableColorCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
   {
     accessorKey: "materials",
-    header: ({}) => <div className="text-center">Materials</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">Materials</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableMaterialsCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
   {
     accessorKey: "component",
     meta: { width: 150 },
-    header: ({}) => <div className="text-center">Component</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-fit mx-auto"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div>Component</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableComponentCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = rowA.getValue(columnId);
+      const b = rowB.getValue(columnId);
+      const aHasValue =
+        a !== null && a !== undefined && String(a).trim() !== "";
+      const bHasValue =
+        b !== null && b !== undefined && String(b).trim() !== "";
+
+      if (aHasValue === bHasValue) return 0;
+      return aHasValue ? 1 : -1;
+    },
   },
   {
     accessorKey: "cost",
-    header: () => <div className="text-center">COST</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">COST</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableCostCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
 
   {
     accessorKey: "shipping_cost",
-    header: () => <div className="text-center">DELIVERY COST</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">DELIVERY COST</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableDeliveryCostCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
   {
     accessorKey: "final_price",
-    header: () => <div className="text-center">FINAL PRICE</div>,
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">FINAL PRICE</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EdittbalePriceCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
   {
     id: "margin",
@@ -1610,9 +1774,25 @@ export const getProductColumns = (
     },
   },
   {
-    id: "carrier",
-    header: () => <div className="text-center">CARRIER</div>,
+    accessorKey: "carrier",
+    header: ({ column }) => {
+      const direction = column.getIsSorted() as "asc" | "desc" | undefined;
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-full"
+          onClick={() => column.toggleSorting(direction === "asc")}
+        >
+          <div className="text-center">CARRIER</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => <EditableCarrierCell product={row.original} />,
+    enableSorting: true,
+    sortingFn: sortByHasValue,
   },
 
   {
