@@ -1,7 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getAllProductsSelect } from "@/features/product-group/api";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -9,42 +7,35 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
-import { useGetSuppliers } from "@/features/supplier/hook";
-import SupplierSelect from "./supplier-select";
-import { SupplierResponse } from "@/types/supplier";
-import { ProductItem, StaticFile } from "@/types/products";
+import { ProductItem } from "@/types/products";
 
 const FilterExportForm = () => {
-  const [supplier, setSupplier] = useState<string>("");
-  const [status, setStatus] = useState<"active" | "inactive" | "all">("all");
   const [isExportingSearch, setIsExportingSearch] = useState(false);
   const searchParams = useSearchParams();
+  const supplierId = searchParams.get("supplier_id") ?? "";
+  const statusParam = searchParams.get("all_products");
 
   const buildParams = () => {
     const params: any = {};
 
-    if (status === "active") {
+    if (statusParam === "true") {
       params.all_products = true;
-    } else if (status === "inactive") {
+    } else if (statusParam === "false") {
       params.all_products = false;
     }
-    // status === "all" => không set all_products
 
-    if (supplier) {
-      params.supplier_id = supplier === "" ? undefined : supplier;
+    if (supplierId) {
+      params.supplier_id = supplierId;
     }
 
     return params;
   };
 
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["all-products", supplier, status],
+    queryKey: ["all-products", supplierId, statusParam ?? "all"],
     queryFn: () => getAllProductsSelect(buildParams()),
     enabled: false,
   });
-
-  const { data: suppliers, isLoading, isError } = useGetSuppliers();
-  if (!suppliers) return <>Loading...</>;
 
   const buildExportData = (data: ProductItem[]) => {
     const clean = (val: any) => (val === null || val === undefined ? "" : val);
@@ -67,7 +58,7 @@ const FilterExportForm = () => {
         ean: clean(p.ean),
         status: p.is_active === true ? "ACTIVE" : "INACTIVE",
         brand_name: clean(p.brand?.name),
-        supplier_name: clean(p.owner?.business_name),
+        supplier_name: clean(p.owner?.business_name ?? "Prestige Home"),
         manufacturer_sku: clean(p.sku),
         manufacturing_country: clean(p.manufacture_country),
         customs_tariff_nr: Number.isFinite(tariff) ? tariff : null,
@@ -201,69 +192,10 @@ const FilterExportForm = () => {
     saveAs(blob, `export-${Date.now()}.csv`);
   };
 
-  // Add prestige home option
-  const extendedSuppliers: SupplierResponse[] = [
-    {
-      id: "",
-      business_name: "All",
-      delivery_multiple: false,
-      vat_id: "",
-      email: "",
-      email_order: "",
-      email_billing: "",
-      phone_number: "",
-      created_at: "",
-      updated_at: "",
-    },
-    {
-      id: "prestige_home",
-      business_name: "Prestige Home",
-      delivery_multiple: false,
-      vat_id: "",
-      email: "",
-      email_order: "",
-      email_billing: "",
-      phone_number: "",
-      created_at: "",
-      updated_at: "",
-    },
-    ...suppliers,
-  ];
-
   return (
     <div>
-      <div className="space-y-4">
-        {/* Supplier Filter */}
-        {suppliers && (
-          <SupplierSelect
-            suppliers={extendedSuppliers}
-            supplier={supplier}
-            setSupplier={setSupplier}
-          />
-        )}
-
-        {/* Status Filter */}
-        <div className="space-y-2">
-          <Label>Status</Label>
-          <RadioGroup value={status} onValueChange={(v) => setStatus(v as any)}>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="active" id="status-active" />
-              <Label htmlFor="status-active">Active</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="inactive" id="status-inactive" />
-              <Label htmlFor="status-inactive">Inactive</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="all" id="status-all" />
-              <Label htmlFor="status-all">All</Label>
-            </div>
-          </RadioGroup>
-        </div>
-      </div>
-
       {/* Export Button */}
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-start gap-2">
         <Button onClick={handleExportExcel} disabled={isFetching} type="button">
           {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
         </Button>

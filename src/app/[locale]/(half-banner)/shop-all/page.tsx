@@ -9,15 +9,13 @@ import React, { useEffect, useState } from "react";
 import ShopAllFilterSection from "@/components/layout/shop-all/shop-all-filter-section";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import FilterSection from "@/components/layout/single-product/filter-section";
 import MobileFilter from "@/components/layout/shop-all/mobile-filter";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 export default function ShopAllPage() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const locale = useLocale();
 
   // 🔹 1. LẤY PARAMS TỪ URL
   const query = searchParams.get("search") ?? undefined;
@@ -84,7 +82,11 @@ export default function ShopAllPage() {
   };
 
   if (isError) {
-    return <div className="text-center py-10">Something went wrong</div>;
+    return (
+      <div className="text-center py-10">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
   }
 
   const handleClearSearch = () => {
@@ -132,11 +134,7 @@ export default function ShopAllPage() {
                 </div>
               )}
 
-              <ProductsGridLayout
-                hasBadge
-                data={data.items}
-                isSmall
-              />
+              <ProductsGridLayout hasBadge data={data.items} isSmall />
               {data.pagination.total_pages > 1 && (
                 <CustomPagination
                   totalPages={data.pagination.total_pages}

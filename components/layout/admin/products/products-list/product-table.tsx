@@ -80,7 +80,7 @@ export function ProductTable<TData, TValue>({
   renderRowSubComponent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
-    { id: "updated_at", desc: true }, // mặc định sort theo updated_at giảm dần
+    { id: "id_provider", desc: false }, // default sort by id_provider asc
   ]);
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
   const [rowSelection, setRowSelection] = useState({});

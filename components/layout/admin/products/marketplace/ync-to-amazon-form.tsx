@@ -64,9 +64,10 @@ const SyncToAmazonForm = ({
   const syncToAmazonMutation = useSyncToAmazon();
 
   const [open, setOpen] = useState<boolean>(false);
-  const marketplaceLabel = (currentMarketplace ?? "")
-    ? `${currentMarketplace[0].toUpperCase()}${currentMarketplace.slice(1)}`
-    : "Marketplace";
+  const marketplaceLabel =
+    (currentMarketplace ?? "")
+      ? `${currentMarketplace[0].toUpperCase()}${currentMarketplace.slice(1)}`
+      : "Marketplace";
 
   const defaultValues = useMemo(
     () => ({
@@ -227,7 +228,7 @@ const SyncToAmazonForm = ({
               { value: product.length, label: "Length" },
               { value: product.width, label: "Width" },
               { value: product.height, label: "Height" },
-              { value: product.weight, label: "Weight" },
+              { value: product.weight, label: "Net Weight" },
             ].find((field) => !field.value);
 
             if (missingField) {
