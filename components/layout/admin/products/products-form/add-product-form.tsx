@@ -30,6 +30,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { toast } from "sonner";
 import LogStockTab from "./log-stock-tab";
+import { cn } from "@/lib/utils";
 
 function getFirstErrorMessage(errors: any): string | undefined {
   for (const key in errors) {
@@ -48,11 +49,13 @@ const ProductForm = ({
   onSubmit,
   isPending,
   productValuesClone,
+  isDrawer,
 }: {
   productValues?: Partial<ProductItem>;
   onSubmit: any;
   isPending?: boolean;
   productValuesClone?: Partial<ProductItem>;
+  isDrawer?: boolean;
 }) => {
   const router = useRouter();
   const locale = useLocale();
@@ -68,7 +71,7 @@ const ProductForm = ({
   } = useProductForm({ productValues, productValuesClone });
 
   return (
-    <div className="lg:pb-20 lg:px-30 pb-12">
+    <div className={cn("lg:pb-20 lg:px-30 pb-12", isDrawer && "!px-4")}>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit, (errors) => {

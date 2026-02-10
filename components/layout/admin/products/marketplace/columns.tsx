@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import SyncToEbayForm from "./sync-to-ebay-form";
 import RemoveFromMarketplaceDialog from "./remove-dialog";
 import SyncToAmazonForm from "./ync-to-amazon-form";
+import EditProductDrawer from "./edit-product-drawer";
 
 const MARKETPLACES = ["kaufland", "ebay", "amazon"] as const;
 type Marketplace = (typeof MARKETPLACES)[number];
@@ -189,8 +190,6 @@ function AddProductMarketplace({
   );
 }
 
-const MARKETPLACE_ORDER = ["kaufland", "ebay", "amazon"];
-
 export const baseColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,
 ): ColumnDef<ProductItem>[] => [
@@ -257,8 +256,7 @@ export const baseColumns = (
         </div>
       </Button>
     ),
-    // cell: ({ row }) => <EditableNameCell product={row.original} />,
-    cell: ({ row }) => <div className="text-wrap">{row.original.name}</div>,
+    cell: ({ row }) => <EditProductDrawer product={row.original} />,
     enableSorting: true,
   },
   {

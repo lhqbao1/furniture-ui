@@ -52,9 +52,11 @@ const DownloadInvoice = ({ checkoutId, type }: DownloadInvoiceProps) => {
         >
           {({ loading }) =>
             loading ? (
-              "Generating PDF..."
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <div className="cursor-pointer">Download Invoice PDF</div>
+              <div className="cursor-pointer">
+                <DownloadCloud />
+              </div>
             )
           }
         </PDFDownloadLink>

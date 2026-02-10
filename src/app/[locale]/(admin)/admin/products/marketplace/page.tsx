@@ -14,7 +14,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { sortByStockAtom } from "@/store/product";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 const ProductMarketplace = () => {
   const router = useRouter();
@@ -50,6 +50,27 @@ const ProductMarketplace = () => {
   });
   const { data: exportData } = useGetProductsSelect();
 
+  const multiSearchRaw = searchParams.get("multi_search") ?? "";
+  const multiSearchValues = useMemo(
+    () =>
+      multiSearchRaw
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean),
+    [multiSearchRaw],
+  );
+
+  const filteredItems = useMemo(() => {
+    if (!data?.items) return [];
+    if (multiSearchValues.length === 0) return data.items;
+
+    const target = new Set(multiSearchValues);
+    return data.items.filter((item) => {
+      const sku = item.sku ? String(item.sku).trim() : "";
+      return target.has(sku);
+    });
+  }, [data?.items, multiSearchValues]);
+
   if (isError) return <div>No data</div>;
   // if (isLoading) return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>
   const columns = productMarketplaceColumns(setSortByStock);
@@ -75,14 +96,22 @@ const ProductMarketplace = () => {
           <ProductTableSkeleton />
         ) : (
           <ProductTable
-            data={data?.items ?? []}
+            data={filteredItems}
             columns={columns}
             page={page}
             pageSize={pageSize}
             setPage={handlePageChange}
             setPageSize={setPageSize}
-            totalItems={data?.pagination.total_items ?? 0}
-            totalPages={data?.pagination.total_pages ?? 0}
+            totalItems={
+              multiSearchValues.length > 0
+                ? filteredItems.length
+                : data?.pagination.total_items ?? 0
+            }
+            totalPages={
+              multiSearchValues.length > 0
+                ? 1
+                : data?.pagination.total_pages ?? 0
+            }
             hasHeaderBackGround
             isSticky
           />
