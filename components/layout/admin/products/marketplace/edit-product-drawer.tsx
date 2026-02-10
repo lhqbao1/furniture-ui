@@ -4,7 +4,7 @@ import { ProductItem } from "@/types/products";
 import React, { useState } from "react";
 import ProductForm from "../products-form/add-product-form";
 import { ProductInput } from "@/lib/schema/product";
-import { useEditProduct } from "@/features/products/hook";
+import { editProduct } from "@/features/products/api";
 import { toast } from "sonner";
 import {
   Drawer,
@@ -12,25 +12,35 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface EditProductDrawerProps {
   product: ProductItem;
 }
 
 const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
-  const editProduct = useEditProduct();
+  const queryClient = useQueryClient();
+  const editProductMutation = useMutation({
+    mutationFn: ({ id, input }: { id: string; input: ProductInput }) =>
+      editProduct(input, id),
+  });
   const [open, setOpen] = useState(false);
 
   const handleEdit = (values: ProductInput) => {
     if (!product?.id) return;
 
     const toastId = toast.loading(`Editing ${product.name}`);
-    editProduct.mutate(
+    editProductMutation.mutate(
       { id: product.id, input: values },
       {
         onSuccess: () => {
           toast.success("Product updated successfully", { id: toastId });
           setOpen(false);
+          setTimeout(() => {
+            queryClient.invalidateQueries({ queryKey: ["all-products"] });
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            queryClient.invalidateQueries({ queryKey: ["product", product.id] });
+          }, 500);
         },
         onError: () => toast.error("Failed to update product", { id: toastId }),
       },
