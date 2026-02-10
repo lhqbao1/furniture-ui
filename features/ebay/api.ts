@@ -38,16 +38,27 @@ export interface syncToEbayInput {
 }
 
 export async function syncToEbay(input: syncToEbayInput) {
-  const { data, status } = await apiAdmin.post("/ebay/publish", input, {
+  const response = await apiAdmin.post("/ebay/publish", input, {
     headers: { "Content-Type": "application/json" },
+    validateStatus: undefined,
   });
 
-  if (status >= 400) {
-    // Throw một lỗi để React Query gọi onError
-    throw new Error(data?.message || "Failed to sync to eBay");
+  if (response.status >= 400) {
+    const detailMessage =
+      response.data?.detail?.errors?.[0]?.message ||
+      response.data?.detail ||
+      response.data?.message ||
+      response.data?.error ||
+      "Failed to sync to eBay";
+
+    const error = new Error(detailMessage) as Error & {
+      response?: typeof response;
+    };
+    error.response = response;
+    throw error;
   }
 
-  return data;
+  return response.data;
 }
 
 export async function removeFromEbay(sku: string) {

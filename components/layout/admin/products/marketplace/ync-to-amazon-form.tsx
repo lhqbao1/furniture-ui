@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -64,10 +64,12 @@ const SyncToAmazonForm = ({
   const syncToAmazonMutation = useSyncToAmazon();
 
   const [open, setOpen] = useState<boolean>(false);
+  const marketplaceLabel = (currentMarketplace ?? "")
+    ? `${currentMarketplace[0].toUpperCase()}${currentMarketplace.slice(1)}`
+    : "Marketplace";
 
-  const form = useForm<MarketPlaceFormValues>({
-    resolver: zodResolver(amazonMarketplaceSchema),
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       marketplace: currentMarketplace ?? "",
       name: product.name,
       description: product.description,
@@ -91,8 +93,18 @@ const SyncToAmazonForm = ({
         product.marketplace_products.find(
           (i) => i.marketplace === currentMarketplace,
         )?.handling_time ?? undefined,
-    },
+    }),
+    [product, currentMarketplace],
+  );
+
+  const form = useForm<MarketPlaceFormValues>({
+    resolver: zodResolver(amazonMarketplaceSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    form.reset(defaultValues);
+  }, [form, defaultValues]);
 
   const handleSubmit = (values: MarketPlaceFormValues) => {
     if (!product.brand) {
@@ -313,7 +325,7 @@ const SyncToAmazonForm = ({
         </DialogTrigger>
         <DialogContent className="w-[1000px] overflow-y-scroll h-[calc(100%-3rem)]">
           <DialogHeader>
-            <DialogTitle>Update Marketplace</DialogTitle>
+            <DialogTitle>Update {marketplaceLabel}</DialogTitle>
             {isUpdating}
           </DialogHeader>
           <div className="mx-auto space-y-6">

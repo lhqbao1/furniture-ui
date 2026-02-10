@@ -216,6 +216,13 @@ export const baseColumns = (
     enableHiding: false,
   },
   {
+    accessorKey: "id",
+    header: ({}) => <div className="text-center">ID</div>,
+    cell: ({ row }) => {
+      return <EditProductDrawer product={row.original} />;
+    },
+  },
+  {
     accessorKey: "static_files",
     header: "IMAGE",
     cell: ({ row }) => {
@@ -256,7 +263,9 @@ export const baseColumns = (
         </div>
       </Button>
     ),
-    cell: ({ row }) => <EditProductDrawer product={row.original} />,
+    cell: ({ row }) => (
+      <div className="text-start text-wrap">{row.original.name}</div>
+    ),
     enableSorting: true,
   },
   {

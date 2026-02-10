@@ -39,7 +39,9 @@ const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
           setTimeout(() => {
             queryClient.invalidateQueries({ queryKey: ["all-products"] });
             queryClient.invalidateQueries({ queryKey: ["products"] });
-            queryClient.invalidateQueries({ queryKey: ["product", product.id] });
+            queryClient.invalidateQueries({
+              queryKey: ["product", product.id],
+            });
           }, 500);
         },
         onError: () => toast.error("Failed to update product", { id: toastId }),
@@ -48,8 +50,11 @@ const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
   };
   return (
     <Drawer direction="right" open={open} onOpenChange={setOpen}>
-      <div className="text-wrap cursor-pointer" onClick={() => setOpen(true)}>
-        {product.name}
+      <div
+        className="text-wrap cursor-pointer hover:underline"
+        onClick={() => setOpen(true)}
+      >
+        {product.id_provider}
       </div>
       <DrawerContent className="p-6 w-[95vw] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[1600px] mx-auto overflow-auto">
         <DrawerHeader>

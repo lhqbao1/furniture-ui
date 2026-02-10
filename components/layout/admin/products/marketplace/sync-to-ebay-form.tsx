@@ -65,6 +65,9 @@ const SyncToEbayForm = ({
   const syncToKauflandMutation = useSyncToKaufland();
 
   const [open, setOpen] = useState<boolean>(false);
+  const marketplaceLabel = (currentMarketplace ?? "")
+    ? `${currentMarketplace[0].toUpperCase()}${currentMarketplace.slice(1)}`
+    : "Marketplace";
   // Danh sách marketplace khả dụng
   const ALL_MARKETPLACES = ["ebay", "amazon", "kaufland"];
 
@@ -83,9 +86,8 @@ const SyncToEbayForm = ({
     [isUpdating, availableMarketplaces],
   );
 
-  const form = useForm<MarketPlaceFormValues>({
-    resolver: zodResolver(marketPlaceSchema),
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       marketplace: currentMarketplace ?? "",
       name: product.name,
       description: product.description,
@@ -103,8 +105,18 @@ const SyncToEbayForm = ({
         product.marketplace_products.find(
           (i) => i.marketplace === currentMarketplace,
         )?.handling_time ?? undefined,
-    },
+    }),
+    [product, currentMarketplace],
+  );
+
+  const form = useForm<MarketPlaceFormValues>({
+    resolver: zodResolver(marketPlaceSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    form.reset(defaultValues);
+  }, [form, defaultValues]);
 
   useEffect(() => {
     // Ensure min_stock is registered even when the input is hidden/omitted
@@ -443,7 +455,7 @@ const SyncToEbayForm = ({
         </DialogTrigger>
         <DialogContent className="w-250 overflow-y-scroll h-[calc(100%-3rem)]">
           <DialogHeader>
-            <DialogTitle>Update Marketplace</DialogTitle>
+            <DialogTitle>Update {marketplaceLabel}</DialogTitle>
           </DialogHeader>
           <div className="mx-auto space-y-6">
             <Form {...form}>
