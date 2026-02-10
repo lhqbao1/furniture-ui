@@ -18,6 +18,7 @@ import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { getBlogsByProductSlug } from "@/features/blog/api";
 import RelatedBlogs from "@/components/layout/single-product/related-blogs";
 import BoughtTogetherSection from "@/components/layout/single-product/bought-together";
+import Script from "next/script";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -81,71 +82,6 @@ export async function generateMetadata({
   const reviews = await getReviewByProduct(product.id);
   const hasReviews = reviews && reviews.length > 0;
 
-  const schema: any = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name,
-    image: product.static_files?.map((f: StaticFile) => f.url),
-    description: product.description,
-    sku: product.sku,
-    gtin13: product.ean,
-    brand: {
-      "@type": "Brand",
-      name: product.brand?.name ?? "Prestige Home",
-    },
-    offers: {
-      "@type": "Offer",
-      url: `https://www.prestige-home.de/de/product/${product.url_key}`,
-      priceCurrency: "EUR",
-      price: String(product.final_price),
-      availability:
-        product.stock > 0
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-      priceValidUntil: "2026-12-31",
-    },
-  };
-
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://www.prestige-home.de/de",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: product.categories?.[0]?.name ?? "Produkte",
-        item: `https://www.prestige-home.de/de/category/${product.categories?.[0]?.slug}`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: product.name,
-        item: `https://www.prestige-home.de/de/product/${product.url_key}`,
-      },
-    ],
-  };
-
-  if (hasReviews) {
-    const ratingValue =
-      reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length;
-
-    schema.aggregateRating = {
-      "@type": "AggregateRating",
-      ratingValue: ratingValue.toFixed(1),
-      reviewCount: reviews.length,
-    };
-  }
-
-  if (product.ean) {
-    schema.gtin13 = product.ean;
-  }
-
   return {
     title: product.meta_title || product.name,
     description: product.meta_description || product.description?.slice(0, 150),
@@ -157,8 +93,15 @@ export async function generateMetadata({
       images:
         product.static_files?.map((f: StaticFile) => ({ url: f.url })) ?? [],
     },
-    other: {
-      "application/ld+json": JSON.stringify([schema, breadcrumbSchema]),
+    twitter: {
+      card: "summary_large_image",
+      title: product.meta_title || product.name,
+      description:
+        product.meta_description || product.description?.slice(0, 150),
+      images: product.static_files?.map((f: StaticFile) => f.url) ?? [],
+    },
+    alternates: {
+      canonical: `/de/product/${product.url_key}`,
     },
   };
 }
@@ -240,8 +183,85 @@ export default async function Page({
   const plainParent = toPlain(parentProduct);
   const plainBlogs = toPlain(relatedBlogs);
 
+  const productSchema: any = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: plainProduct.name,
+    image: plainProduct.static_files?.map((f: StaticFile) => f.url),
+    description: plainProduct.description,
+    sku: plainProduct.sku,
+    brand: {
+      "@type": "Brand",
+      name: plainProduct.brand?.name ?? "Prestige Home",
+    },
+    offers: {
+      "@type": "Offer",
+      url: `https://www.prestige-home.de/de/product/${plainProduct.url_key}`,
+      priceCurrency: "EUR",
+      price: String(plainProduct.final_price),
+      availability:
+        plainProduct.stock > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      priceValidUntil: "2026-12-31",
+    },
+  };
+
+  if (plainProduct.ean) {
+    productSchema.gtin13 = plainProduct.ean;
+  }
+
+  if (plainReviews && plainReviews.length > 0) {
+    const ratingValue =
+      plainReviews.reduce((s: number, r: { rating?: number }) => {
+        return s + (r.rating || 0);
+      }, 0) / plainReviews.length;
+
+    productSchema.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: ratingValue.toFixed(1),
+      reviewCount: plainReviews.length,
+    };
+  }
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.prestige-home.de/de",
+      },
+      ...(plainProduct.categories?.[0]?.slug
+        ? [
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: plainProduct.categories?.[0]?.name ?? "Produkte",
+              item: `https://www.prestige-home.de/de/category/${plainProduct.categories?.[0]?.slug}`,
+            },
+          ]
+        : []),
+      {
+        "@type": "ListItem",
+        position: plainProduct.categories?.[0]?.slug ? 3 : 2,
+        name: plainProduct.name,
+        item: `https://www.prestige-home.de/de/product/${plainProduct.url_key}`,
+      },
+    ],
+  };
+
   return (
     <>
+      <Script
+        id="product-structured-data"
+        type="application/ld+json"
+        strategy="beforeInteractive"
+      >
+        {JSON.stringify([productSchema, breadcrumbSchema])}
+      </Script>
       <div className="flex justify-center items-center">
         <div className="lg:w-10/12 w-full">
           {/* ️🔥 CRITICAL FIRST PAINT → PPR ưu tiên render */}

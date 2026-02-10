@@ -47,6 +47,7 @@ import {
 import { getCarrierLogo } from "@/lib/getCarrierImage";
 import { CategoryResponse } from "@/types/categories";
 import { CARRIERS } from "@/data/data";
+import EditProductDrawer from "../marketplace/edit-product-drawer";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
 
@@ -1427,7 +1428,7 @@ export const getProductColumns = (
     accessorKey: "id",
     header: ({}) => <div className="text-center">ID</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.id_provider}</div>;
+      return <EditProductDrawer product={row.original} />;
     },
   },
   {
@@ -1527,11 +1528,11 @@ export const getProductColumns = (
         <div
           className={cn(
             "text-center text-white rounded-xl px-2 py-1",
-            row.original.stock === 0
+            computedStock === 0
               ? "bg-red-500 text-white"
-              : row.original.stock < 10
+              : computedStock < 10
                 ? "bg-gray-400"
-                : row.original.stock <= 20
+                : computedStock <= 20
                   ? "bg-primary"
                   : "bg-secondary",
           )}

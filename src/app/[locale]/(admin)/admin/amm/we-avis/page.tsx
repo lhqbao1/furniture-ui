@@ -7,7 +7,11 @@ import { useImportAmmProducts } from "@/features/amm/hook";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { ammWeAvisSchema, weAvisDefaultValues, WeAvisItem } from "@/lib/schema/amm-weavis";
+import {
+  ammWeAvisSchema,
+  weAvisDefaultValues,
+  WeAvisItem,
+} from "@/lib/schema/amm-weavis";
 import {
   Form,
   FormControl,
@@ -17,7 +21,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import {
   Popover,
   PopoverContent,
@@ -25,14 +28,18 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import Image from "next/image";
 import { Check } from "lucide-react";
 import { ProductItem } from "@/types/products";
 import { toast } from "sonner";
+import { useGetAllProducts } from "@/features/products/hook";
+import { useDebounce } from "use-debounce";
 
 type FormItem = {
   product_id: string;
@@ -45,6 +52,8 @@ const AmmWeAvisPage = () => {
     defaultValues: weAvisDefaultValues,
   });
   const items = form.watch("items");
+  const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 400);
 
   const addProductAsItem = (product: ProductItem) => {
     const exists = items?.some((i) => i.product_id === product.id);
@@ -77,7 +86,7 @@ const AmmWeAvisPage = () => {
     const payload = {
       kopfdaten: values.kopfdaten,
       items: values.items.map((item: WeAvisItem, index: number) => {
-        const product = products.find((p) => p.id === item.product_id);
+        const product = products?.items.find((p) => p.id === item.product_id);
 
         return {
           position_number: index + 1,
@@ -116,18 +125,26 @@ const AmmWeAvisPage = () => {
     data: products,
     isLoading,
     isError,
-  } = useGetProductsSelect({
-    all_products: true,
+  } = useGetAllProducts({
+    search: debouncedSearch,
+    page: 1,
+    page_size: 50,
   });
 
   const orderedProducts = React.useMemo(() => {
     if (!products) return [];
 
-    const selectedIds = new Set((items || []).map((i: WeAvisItem) => i.product_id));
+    const selectedIds = new Set(
+      (items || []).map((i: WeAvisItem) => i.product_id),
+    );
 
-    const selectedProducts = products.filter((p) => selectedIds.has(p.id));
+    const selectedProducts = products?.items.filter((p) =>
+      selectedIds.has(p.id),
+    );
 
-    const unselectedProducts = products.filter((p) => !selectedIds.has(p.id));
+    const unselectedProducts = products?.items.filter(
+      (p) => !selectedIds.has(p.id),
+    );
 
     return [...selectedProducts, ...unselectedProducts];
   }, [products, items]);
@@ -135,10 +152,7 @@ const AmmWeAvisPage = () => {
   return (
     <Form {...form}>
       <h2 className="section-header mb-12">Import We Avis to AMM</h2>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className=""
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="">
         <div className="grid grid-cols-3 gap-8">
           <FormField
             control={form.control}
@@ -147,10 +161,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Client</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -163,10 +174,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Order Number</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="AZ000000"
-                    {...field}
-                  />
+                  <Input placeholder="AZ000000" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -179,10 +187,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Supplier ID</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -195,10 +200,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Supplier Name</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -211,10 +213,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Supplier City</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -227,10 +226,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Supplier Postal Code</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="shadcn"
-                    {...field}
-                  />
+                  <Input placeholder="shadcn" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -243,10 +239,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Supplier Country</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -284,10 +277,7 @@ const AmmWeAvisPage = () => {
               <FormItem>
                 <FormLabel>Warehouse</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -299,54 +289,58 @@ const AmmWeAvisPage = () => {
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="justify-between h-9"
-                >
+                <Button variant="outline" className="justify-between h-9">
                   Add products
                 </Button>
               </PopoverTrigger>
 
               <PopoverContent className="w-[500px] p-0 pointer-events-auto">
-                <Command>
-                  <CommandInput placeholder="Search products..." />
-                  <CommandGroup className="max-h-[300px] overflow-y-auto">
-                    {orderedProducts?.map((product) => {
-                      const selected = items?.some(
-                        (i: WeAvisItem) => i.product_id === product.id,
-                      );
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder="Search products..."
+                    value={searchValue}
+                    onValueChange={setSearchValue}
+                  />
+                  <CommandList className="max-h-[300px] overflow-y-auto">
+                    <CommandEmpty>No products found.</CommandEmpty>
+                    <CommandGroup>
+                      {orderedProducts?.map((product) => {
+                        const selected = items?.some(
+                          (i: WeAvisItem) => i.product_id === product.id,
+                        );
 
-                      return (
-                        <CommandItem
-                          key={product.id}
-                          onSelect={() => addProductAsItem(product)}
-                          disabled={selected}
-                          className="flex items-center gap-2"
-                        >
-                          <Check
-                            className={`h-4 w-4 ${
-                              selected ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-                          <div className="flex gap-2 items-center">
-                            <Image
-                              src={product.static_files?.[0]?.url ?? "/1.png"}
-                              width={30}
-                              height={30}
-                              alt=""
-                              className="object-contain"
+                        return (
+                          <CommandItem
+                            key={product.id}
+                            onSelect={() => addProductAsItem(product)}
+                            disabled={selected}
+                            className="flex items-center gap-2"
+                          >
+                            <Check
+                              className={`h-4 w-4 ${
+                                selected ? "opacity-100" : "opacity-0"
+                              }`}
                             />
-                            <div>
-                              <div>{product.name}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {product.sku}
+                            <div className="flex gap-2 items-center">
+                              <Image
+                                src={product.static_files?.[0]?.url ?? "/1.png"}
+                                width={30}
+                                height={30}
+                                alt=""
+                                className="object-contain"
+                              />
+                              <div>
+                                <div>{product.name}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {product.sku}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
@@ -363,7 +357,9 @@ const AmmWeAvisPage = () => {
               </div>
 
               {items.map((item: WeAvisItem, index: number) => {
-                const product = products?.find((p) => p.id === item.product_id);
+                const product = products?.items?.find(
+                  (p) => p.id === item.product_id,
+                );
                 return (
                   <div
                     key={item.product_id}
@@ -400,10 +396,7 @@ const AmmWeAvisPage = () => {
             </div>
           )}
         </div>
-        <Button
-          type="submit"
-          className="mt-8 text-lg px-8 py-1.5"
-        >
+        <Button type="submit" className="mt-8 text-lg px-8 py-1.5">
           Submit
         </Button>
       </form>
