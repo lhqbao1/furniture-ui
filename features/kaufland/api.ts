@@ -26,12 +26,22 @@ export interface syncToKauflandInput {
 export async function syncToKaufland(input: syncToKauflandInput) {
   const response = await apiAdmin.post("/kaufland/products/publish", input, {
     headers: { "Content-Type": "application/json" },
-    validateStatus: undefined, // optional: dùng mặc định Axios
+    validateStatus: undefined, // keep default behavior
   });
 
-  // Kiểm tra status manual
   if (response.status >= 400) {
-    throw new Error(response.data?.message || "Failed to sync to Kaufland");
+    const detailMessage =
+      response.data?.detail?.errors?.[0]?.message ||
+      response.data?.detail ||
+      response.data?.message ||
+      response.data?.error ||
+      "Failed to sync to Kaufland";
+
+    const error = new Error(detailMessage) as Error & {
+      response?: typeof response;
+    };
+    error.response = response;
+    throw error;
   }
 
   return response.data;

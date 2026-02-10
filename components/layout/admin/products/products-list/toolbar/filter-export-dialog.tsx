@@ -99,9 +99,9 @@ const FilterExportForm = () => {
         SEO_keywords: clean(p.meta_keywords),
         materials: clean(p.materials),
         color: clean(p.color),
-        log_height: clean(p.packages?.reduce((s, q) => s + (q.height || 0), 0)),
-        log_width: clean(p.packages?.reduce((s, q) => s + (q.width || 0), 0)),
         log_length: clean(p.packages?.reduce((s, q) => s + (q.length || 0), 0)),
+        log_width: clean(p.packages?.reduce((s, q) => s + (q.width || 0), 0)),
+        log_height: clean(p.packages?.reduce((s, q) => s + (q.height || 0), 0)),
         log_weight: clean(p.packages?.reduce((s, q) => s + (q.weight || 0), 0)),
         benutzerhandbuch: clean(
           p.pdf_files
