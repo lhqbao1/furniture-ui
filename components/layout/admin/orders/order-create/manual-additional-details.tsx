@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
+import { useEffect, useState } from "react";
 import {
   FormField,
   FormItem,
@@ -27,6 +28,9 @@ export default function ManualAdditionalInformation({
   isAdmin = false,
 }: ManualAdditionalInformationProps) {
   const form = useFormContext();
+  const [marketplaceDisplay, setMarketplaceDisplay] = useState("");
+  const marketplace = form.watch("from_marketplace");
+  const isDirty = form.formState.isDirty;
 
   const carriers = [
     { id: "spedition", logo: "/amm.jpeg" },
@@ -37,6 +41,17 @@ export default function ManualAdditionalInformation({
     { id: "hermes", logo: "/hermes.png" },
     { id: "fexed", logo: "/fedex.png" },
   ];
+
+  useEffect(() => {
+    if (!isDirty && marketplace == null) {
+      setMarketplaceDisplay("");
+      return;
+    }
+
+    if (marketplace != null) {
+      setMarketplaceDisplay(marketplace);
+    }
+  }, [marketplace, isDirty]);
   return (
     <div className="space-y-4">
       <div className="flex justify-between bg-secondary/10 p-2">
@@ -57,9 +72,16 @@ export default function ManualAdditionalInformation({
               <FormControl>
                 <Select
                   onValueChange={(value) => {
-                    field.onChange(value === "prestige" ? null : value);
+                    if (value === "prestige") {
+                      setMarketplaceDisplay("prestige");
+                      field.onChange(null);
+                      return;
+                    }
+
+                    setMarketplaceDisplay(value);
+                    field.onChange(value);
                   }}
-                  value={field.value ?? ""}
+                  value={marketplaceDisplay}
                 >
                   <SelectTrigger placeholderColor className="border">
                     <SelectValue placeholder="Select marketplace" />

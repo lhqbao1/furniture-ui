@@ -27,7 +27,7 @@ export async function generateMetadata({
       "@type": "CollectionPage",
       name: category.meta_title || category.name,
       description: category.meta_description || "",
-      url: `https://www.prestige-home.de/de/category/${category}`,
+      url: `https://www.prestige-home.de/de/category/${category.slug}`,
       inLanguage: "de",
       isPartOf: {
         "@type": "WebSite",
@@ -77,6 +77,22 @@ export async function generateMetadata({
             },
           })) || [],
       },
+      about: {
+        "@type": "Thing",
+        name: "WPC Sichtschutzzaun",
+      },
+      keywords: "WPC Sichtschutzzaun, Sichtschutz kaufen, WPC Zaun mit Pfosten",
+      offers: {
+        "@type": "AggregateOffer",
+        priceCurrency: "EUR",
+        lowPrice: Math.min(
+          ...category.products.map((p) => p.final_price ?? p.price),
+        ),
+        highPrice: Math.max(
+          ...category.products.map((p) => p.final_price ?? p.price),
+        ),
+        offerCount: category.products?.length || 0,
+      },
     };
 
     const breadcrumbSchema = {
@@ -99,7 +115,7 @@ export async function generateMetadata({
     };
 
     return {
-      title: category.meta_title || category.name,
+      title: `${category.meta_title ?? category.name} kaufen – WPC Sichtschutz & Zäune | Prestige Home`,
       description: category.meta_description || "",
       robots: { index: true, follow: true },
       alternates: {

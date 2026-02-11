@@ -153,10 +153,11 @@ export interface InventoryItem {
 export interface ProductStockLog {
   id: string;
   product_id: string;
-  quantity: string;
+  quantity: number | null;
   user: Customer;
   main_checkout: CheckOutMain;
   current_stock: number | null;
+  note;
   created_at: string; // ISO datetime
   updated_at: string; // ISO datetime
 }

@@ -82,11 +82,18 @@ export async function generateMetadata({
   const reviews = await getReviewByProduct(product.id);
   const hasReviews = reviews && reviews.length > 0;
 
+  const baseTitle = product.meta_title || product.name;
+
+  const title =
+    product.categories?.[0]?.slug === "zaeune-sichtschutz"
+      ? `${baseTitle} kaufen – WPC Sichtschutzzaun | Prestige Home`
+      : baseTitle;
+
   return {
-    title: product.meta_title || product.name,
+    title: title,
     description: product.meta_description || product.description?.slice(0, 150),
     openGraph: {
-      title: product.meta_title || product.name,
+      title: title,
       description:
         product.meta_description || product.description?.slice(0, 150),
       url: `https://www.prestige-home.de/de/product/${product.url_key}`,
@@ -95,7 +102,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: product.meta_title || product.name,
+      title: title,
       description:
         product.meta_description || product.description?.slice(0, 150),
       images: product.static_files?.map((f: StaticFile) => f.url) ?? [],
