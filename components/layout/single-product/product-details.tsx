@@ -62,7 +62,7 @@ const ProductDetails = ({
                 <ProductImageWrapper productDetails={productDetails} />
               </div>
 
-              <div className="xl:col-span-6 col-span-12 flex flex-col gap-6">
+              <div className="xl:col-span-6 col-span-12 flex flex-col gap-2">
                 <AdminView productId={productDetails.id} />
                 <div>
                   <ProductBrand
@@ -74,9 +74,9 @@ const ProductDetails = ({
                     }
                     isProductDetail
                   />
-                  <h2 className="lg:text-3xl text-xl font-semibold text-black">
+                  <h1 className="lg:text-3xl text-xl font-semibold text-black mb-1">
                     {productDetails.name ?? ""}
-                  </h2>
+                  </h1>
                   <div className="text-sm">
                     {t("itemNumber")}: {productDetails.id_provider ?? ""}
                   </div>
@@ -89,6 +89,18 @@ const ProductDetails = ({
                 />
 
                 <ProductDetailsLogistic productDetails={productDetails} />
+                {productDetails.meta_description && (
+                  <div className="seo-content text-sm shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-2xl px-4 py-3 mt-2">
+                    <h2 className="text-sm mb-0.5">
+                      Warum {productDetails.name} wählen?
+                    </h2>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: productDetails.meta_description,
+                      }}
+                    />
+                  </div>
+                )}
                 <AddToCartField
                   productDetails={productDetails}
                   productId={productDetails.id}

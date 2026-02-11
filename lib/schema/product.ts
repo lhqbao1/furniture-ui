@@ -37,44 +37,21 @@ export const packageSchema = z.object({
 //   }
 // });
 
-export const marketPlaceSchema = z
-  .object({
-    marketplace: z.string().optional(),
-    name: z.string().optional(),
-    description: z.string().optional(),
-    final_price: z.number().nonnegative().optional().nullable(),
-    min_stock: z.number().nonnegative().optional().nullable(),
-    max_stock: z.number().nonnegative().optional().nullable(),
-    current_stock: z.number().nonnegative().optional().nullable(),
-    line_item_id: z.string().optional().nullable(),
-    marketplace_offer_id: z.string().optional().nullable(),
-    brand: z.string().optional().nullable(),
-    is_active: z.boolean().optional().nullable(),
-    sku: z.string().optional().nullable(),
-    handling_time: z.number().optional().nullable(),
-  })
-  .refine(
-    (data) => {
-      if (data.marketplace) {
-        return (
-          data.name &&
-          data.description &&
-          data.final_price !== null &&
-          data.final_price !== undefined &&
-          data.min_stock !== null &&
-          data.min_stock !== undefined &&
-          data.max_stock !== null &&
-          data.max_stock !== undefined
-        );
-      }
-      return true;
-    },
-    {
-      message:
-        "If marketplace is provided, all other fields must also be filled in.",
-      path: ["marketplace"],
-    },
-  );
+export const marketPlaceSchema = z.object({
+  marketplace: z.string().optional(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  final_price: z.number().nonnegative().optional().nullable(),
+  min_stock: z.number().nonnegative().optional().nullable(),
+  max_stock: z.number().nonnegative().optional().nullable(),
+  current_stock: z.number().nonnegative().optional().nullable(),
+  line_item_id: z.string().optional().nullable(),
+  marketplace_offer_id: z.string().optional().nullable(),
+  brand: z.string().optional().nullable(),
+  is_active: z.boolean().optional().nullable(),
+  sku: z.string().optional().nullable(),
+  handling_time: z.number().optional().nullable(),
+});
 
 export const amazonMarketplaceSchema = z
   .object({
@@ -100,11 +77,7 @@ export const amazonMarketplaceSchema = z
           data.name &&
           data.description &&
           data.final_price !== null &&
-          data.final_price !== undefined &&
-          data.min_stock !== null &&
-          data.min_stock !== undefined &&
-          data.max_stock !== null &&
-          data.max_stock !== undefined
+          data.final_price !== undefined
         );
       }
       return true;

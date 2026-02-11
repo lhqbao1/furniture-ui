@@ -71,6 +71,7 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                     step="0.01" // hoặc "any" để cho phép mọi số thập phân
                     inputMode="decimal" // hint cho bàn phím mobile
                     value={field.value ?? ""} // tránh uncontrolled / NaN
+                    disabled
                     onChange={(e) =>
                       field.onChange(
                         e.target.value === "" ? null : e.target.valueAsNumber,

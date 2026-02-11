@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { calcDeliveryCost } from "@/lib/shipping/delivery-cost";
 
 function cleanPackages(packages?: any[]) {
   if (!Array.isArray(packages)) return undefined;
@@ -28,6 +29,15 @@ export const submitProduct = async ({
   form,
 }: any) => {
   const latestValues = form.getValues();
+
+  const { error } = calcDeliveryCost(
+    latestValues.packages ?? [],
+    latestValues.carrier,
+  );
+  if (error) {
+    toast.error(`${error} Change to spedition carrier`);
+    return;
+  }
 
   const cleanedPackages = cleanPackages(latestValues.packages);
 
