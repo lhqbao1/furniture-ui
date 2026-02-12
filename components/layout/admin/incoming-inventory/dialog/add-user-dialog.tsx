@@ -10,8 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { Button } from "@/components/ui/button";
 import { Field } from "./field-component";
 import {
@@ -155,10 +154,7 @@ const AddUserDialog = ({ user_id }: AddUserDialogProps) => {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       {/* 🔹 Trigger */}
       <DialogTrigger asChild>
         {userServer ? (
@@ -249,10 +245,7 @@ const AddUserDialog = ({ user_id }: AddUserDialogProps) => {
 
         {/* 🔹 Footer actions (optional) */}
         <div className="flex justify-end gap-2 pt-4">
-          <Button
-            variant="outline"
-            type="button"
-          >
+          <Button variant="outline" type="button">
             Cancel
           </Button>
 

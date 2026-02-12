@@ -1250,6 +1250,7 @@ export const COUNTRY_OPTIONS = [
 export const BRAND_COUNTRY_OPTIONS = [
   { value: "AT", label: "Austria" },
   { value: "DE", label: "Deutschland" },
+  { value: "SK", label: "Slowakei" },
   { value: "CN", label: "China" },
   { value: "VN", label: "VietNam" },
 
@@ -1366,6 +1367,7 @@ export const BRAND_COUNTRY_OPTIONS = [
 export const EN_COUNTRY_OPTIONS = [
   { value: "AT", label: "Austria" },
   { value: "DE", label: "Germany" },
+  { value: "SK", label: "Slovakia" },
   { value: "CN", label: "China" },
   { value: "VN", label: "Vietnam" },
   { value: "TW", label: "Taiwan" },
