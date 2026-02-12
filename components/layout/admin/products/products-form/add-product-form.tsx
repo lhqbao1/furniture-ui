@@ -32,7 +32,10 @@ import { toast } from "sonner";
 import LogStockTab from "./log-stock-tab";
 import { cn } from "@/lib/utils";
 import { useWatch } from "react-hook-form";
-import { calcDeliveryCost } from "@/lib/shipping/delivery-cost";
+import {
+  aggregatePackages,
+  calcDeliveryCost,
+} from "@/lib/shipping/delivery-cost";
 
 function getFirstErrorMessage(errors: any): string | undefined {
   for (const key in errors) {
@@ -76,13 +79,21 @@ const ProductForm = ({
     control: form.control,
     name: "packages",
   });
+  const bundles = useWatch({
+    control: form.control,
+    name: "bundles",
+  });
   const carrier = useWatch({
     control: form.control,
     name: "carrier",
   });
 
   useEffect(() => {
-    const { cost, error } = calcDeliveryCost(packages ?? [], carrier);
+    const mergedPackage = aggregatePackages(packages ?? [], bundles ?? []);
+    const { cost, error } = calcDeliveryCost(
+      mergedPackage ? [mergedPackage] : [],
+      carrier,
+    );
     const current = form.getValues("delivery_cost");
 
     if (error) {
@@ -107,7 +118,7 @@ const ProductForm = ({
         shouldValidate: true,
       });
     }
-  }, [form, packages, carrier]);
+  }, [form, packages, bundles, carrier]);
 
   return (
     <div className={cn("lg:pb-20 lg:px-30 pb-12", isDrawer && "!px-4")}>
