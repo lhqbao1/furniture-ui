@@ -94,6 +94,15 @@ const IncomingInventoryList = () => {
       },
     },
     {
+      accessorKey: "product.id_provider",
+      header: () => <div className="text-center">ID</div>,
+      cell: ({ row }) => (
+        <div className="text-center">
+          {row.original.product?.id_provider ?? "—"}
+        </div>
+      ),
+    },
+    {
       accessorKey: "product.name",
       meta: { width: 200 },
       header: () => <div className="text-center">Product</div>,
@@ -103,15 +112,7 @@ const IncomingInventoryList = () => {
         </div>
       ),
     },
-    {
-      accessorKey: "product.id_provider",
-      header: () => <div className="text-center">ID</div>,
-      cell: ({ row }) => (
-        <div className="text-center">
-          {row.original.product?.id_provider ?? "—"}
-        </div>
-      ),
-    },
+
     {
       accessorKey: "product.sku",
       header: () => <div className="text-center">SKU</div>,
