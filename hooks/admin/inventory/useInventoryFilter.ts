@@ -10,5 +10,6 @@ export function useProductInventoryFilters() {
     search: searchParams.get("search") || "",
     is_inventory: searchParams.get("is_inventory") || "true",
     supplier_id: searchParams.get("supplier_id") || "",
+    brand: searchParams.get("brand_id") || "",
   };
 }

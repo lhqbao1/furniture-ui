@@ -47,6 +47,7 @@ const ProductMarketplace = () => {
     search: filters.search,
     sort_by_stock: filters.sort_by_stock,
     supplier_id: filters.supplier_id,
+    brand_id: filters.brand,
   });
   const { data: exportData } = useGetProductsSelect();
 
@@ -105,12 +106,12 @@ const ProductMarketplace = () => {
             totalItems={
               multiSearchValues.length > 0
                 ? filteredItems.length
-                : data?.pagination.total_items ?? 0
+                : (data?.pagination.total_items ?? 0)
             }
             totalPages={
               multiSearchValues.length > 0
                 ? 1
-                : data?.pagination.total_pages ?? 0
+                : (data?.pagination.total_pages ?? 0)
             }
             hasHeaderBackGround
             isSticky

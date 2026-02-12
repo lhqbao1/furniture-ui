@@ -31,6 +31,82 @@ export const submitProduct = async ({
   locale,
   form,
 }: any) => {
+  let loadingToastId: string | number | undefined;
+  const startLoadingToast = (message: string) => {
+    loadingToastId = toast.loading(message);
+  };
+  const showErrorToast = (message: string, description?: string) => {
+    toast.error(message, {
+      id: loadingToastId,
+      description,
+    });
+  };
+  const showSuccessToast = (message: string) => {
+    toast.success(message, { id: loadingToastId });
+  };
+  const getErrorMessage = (error: any) => {
+    const fallback = "Something went wrong. Please try again.";
+
+    if (!error) return { message: fallback };
+
+    const detail =
+      error?.response?.data?.detail ??
+      error?.response?.data?.message ??
+      error?.message ??
+      "";
+
+    if (typeof detail === "string") {
+      const lower = detail.toLowerCase();
+      if (
+        lower.includes("unique") ||
+        lower.includes("duplicate") ||
+        lower.includes("integrityerror") ||
+        lower.includes("uniqueviolation")
+      ) {
+        const keyMatch = detail.match(/Key\s+\(([^)]+)\)=\(([^)]+)\)/i);
+        if (keyMatch?.[1]) {
+          const field = keyMatch[1].toUpperCase();
+          const value = keyMatch[2];
+          return {
+            message: `Duplicate ${field}`,
+            description: `Duplication in ${field}${
+              value ? ` (${value})` : ""
+            }`,
+          };
+        }
+
+        const constraintMatch = detail.match(/products_([a-z0-9_]+)_key/i);
+        if (constraintMatch?.[1]) {
+          const field = constraintMatch[1].toUpperCase();
+          return {
+            message: `Duplicate ${field}`,
+            description: `Duplication in ${field}`,
+          };
+        }
+
+        return {
+          message: "Duplicate SKU or EAN",
+          description:
+            "Please check existing products and ensure SKU/EAN are unique.",
+        };
+      }
+
+      return { message: "Failed to save product", description: detail };
+    }
+
+    if (Array.isArray(detail?.errors) && detail.errors.length > 0) {
+      return {
+        message: "Failed to save product",
+        description:
+          detail.errors[0]?.message ??
+          detail.errors[0]?.detail ??
+          fallback,
+      };
+    }
+
+    return { message: "Failed to save product", description: fallback };
+  };
+
   const latestValues = form.getValues();
 
   const mergedPackage = aggregatePackages(
@@ -107,45 +183,47 @@ export const submitProduct = async ({
       ebay: false,
     };
 
+    startLoadingToast("Creating product...");
     addProductMutation.mutate(finalPayload, {
       onSuccess: () => {
-        toast.success("Product add successfully");
+        showSuccessToast("Product add successfully");
         form.reset();
         router.push("/admin/products/list", { locale });
       },
-      onError: () => {
-        toast.error(
-          "Failed to add product. Please check duplication for SKU or EAN",
-        );
+      onError: (error: any) => {
+        const { message, description } = getErrorMessage(error);
+        showErrorToast(message, description);
       },
     });
     return;
   }
 
   if (productValues) {
+    startLoadingToast("Updating product...");
     editProductMutation.mutate(
       { id: productValues.id ?? "", input: payload },
       {
         onSuccess: () => {
-          toast.success("Updated product successfully");
+          showSuccessToast("Updated product successfully");
         },
-        onError: () => {
-          toast.error("Updated product fail");
+        onError: (error: any) => {
+          const { message, description } = getErrorMessage(error);
+          showErrorToast(message, description);
         },
       },
     );
     return;
   }
 
+  startLoadingToast("Creating product...");
   addProductMutation.mutate(payload, {
     onSuccess: () => {
-      toast.success("Add product successfully");
+      showSuccessToast("Add product successfully");
       form.reset();
     },
-    onError: () => {
-      toast.error(
-        "Failed to add product. Please check duplication for SKU or EAN",
-      );
+    onError: (error: any) => {
+      const { message, description } = getErrorMessage(error);
+      showErrorToast(message, description);
     },
   });
 };

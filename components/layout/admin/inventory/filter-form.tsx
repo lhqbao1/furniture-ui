@@ -4,6 +4,7 @@ import React from "react";
 import ProductStatusFilter from "../products/products-list/toolbar/filter/status";
 import ProductHasInventoryFilter from "./filter/hasInventoryFilter";
 import SupplierFilter from "../products/products-list/toolbar/filter/supplier-filter";
+import BrandFilter from "../products/products-list/toolbar/filter/brand/brand-filter";
 
 const InventoryFilterForm = () => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const InventoryFilterForm = () => {
         <ProductStatusFilter />
         {/* <ProductHasInventoryFilter /> */}
         <SupplierFilter />
+        <BrandFilter />
       </div>
       <div className="flex justify-end pt-3 col-span-3">
         <Button

@@ -10,5 +10,6 @@ export function useProductListFilters() {
     search: searchParams.get("search") || "",
     sort_by_stock: searchParams.get("sort_by_stock") || undefined,
     supplier_id: searchParams.get("supplier_id") || "",
+    brand: searchParams.get("brand_id") || "",
   };
 }

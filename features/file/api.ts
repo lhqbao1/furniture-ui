@@ -1,4 +1,4 @@
-import { apiPublic } from "@/lib/axios";
+import { apiAdmin, apiPublic } from "@/lib/axios";
 import { StaticFileResponse } from "@/types/products";
 
 export async function uploadStaticFile(file: FormData) {
@@ -41,5 +41,24 @@ export async function importProductSupplier(
       },
     },
   );
+  return data;
+}
+
+export async function updateStockSupplier(
+  file: FormData,
+  supplier_id: string,
+) {
+  const { data } = await apiAdmin.post(
+    `/update-stock-supplier/${supplier_id}`,
+    file,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    },
+  );
+
   return data;
 }

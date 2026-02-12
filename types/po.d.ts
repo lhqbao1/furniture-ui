@@ -129,3 +129,59 @@ export type POContainerInventoryDetail = {
   created_at: string; // ISO string
   updated_at: string; // ISO string
 };
+
+export type InventoryPOItem = {
+  id: string;
+  quantity: number;
+  unit_cost: number;
+  total_cost: number;
+  description: string;
+  list_delivery_date: string;
+  product: {
+    name: string;
+    sku: string;
+    id_provider: string;
+    ean: string;
+    static_files_po: {
+      file_type: string;
+      url: string;
+      id: string;
+      created_at: string;
+      updated_at: string;
+    };
+    id: string;
+  };
+  created_at: string;
+  updated_at: string;
+  container: {
+    container_number: string;
+    purchase_order_id: string;
+    size: string;
+    date_of_inspection: string;
+    date_if_shipment: string;
+    date_of_delivery: string;
+    date_of_issue: string;
+    date_to_warehouse: string;
+    is_sended_avis: boolean;
+    purchase_order: {
+      po_number: string;
+      pi_number: string;
+      created_by: string;
+      loading_port: string;
+      shipping_method: string;
+      number_of_containers: number;
+      buyer_id: string;
+      seller_id: string;
+      warehouse_id: string;
+      customer_po_order: string;
+      payment_terms: string;
+      delivery_conditions: string;
+      type_of_bill_of_lading: string;
+      destination: string;
+      note: string;
+      hs_code: string;
+    };
+  };
+};
+
+export type ListInventoryPO = InventoryPOItem[];
