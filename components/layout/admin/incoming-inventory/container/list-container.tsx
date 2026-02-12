@@ -22,12 +22,20 @@ import { FolderUp } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   getContainerInventory,
   updateInventoryPo,
 } from "@/features/incoming-inventory/inventory/api";
 import { useContainerInventory } from "@/features/incoming-inventory/inventory/hook";
 import { POContainerDetail } from "@/types/po";
-
 interface ListContainersProps {
   po_id: string;
 }
@@ -153,7 +161,9 @@ function ContainerCard({
 }) {
   const { data: containerInventory } = useContainerInventory(item.id);
   const hasInventory = (containerInventory?.length ?? 0) > 0;
-  const canSendAmm = item.is_sended_avis === false;
+  const canSendAmm =
+    item.is_sended_avis === false || item.is_sended_avis === null;
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
 
   return (
     <Card>
@@ -174,22 +184,56 @@ function ContainerCard({
         </CardTitle>
         {item.is_sended_avis && (
           <CardDescription>
-            <Badge variant="secondary">Sent to AMM</Badge>
+            <Badge variant="secondary" className="text-white">
+              Sent to AMM: {item.avis_code}
+            </Badge>
           </CardDescription>
         )}
         <CardAction className="space-x-2">
           <AddContainerDialog purchaseOrderId={po_id} container={item} />
           {hasInventory && canSendAmm && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onLogInventory(item)}
-              aria-label="Log container inventory"
-              disabled={isLogging}
-              aria-busy={isLogging}
-            >
-              <FolderUp className="h-4 w-4 text-secondary" />
-            </Button>
+            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-label="Log container inventory"
+                  disabled={isLogging}
+                  aria-busy={isLogging}
+                >
+                  <FolderUp className="h-4 w-4 text-secondary" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-100">
+                <DialogHeader>
+                  <DialogTitle className="text-lg">Send PO to AMM</DialogTitle>
+                  <DialogDescription className="text-base">
+                    This will update inventory delivery dates and send the
+                    container to AMM.This action can not be undo, Continue?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setConfirmOpen(false)}
+                    disabled={isLogging}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      onLogInventory(item);
+                      setConfirmOpen(false);
+                    }}
+                    disabled={isLogging}
+                  >
+                    Confirm
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           )}
           <DeleteDialogConfirm containerId={item.id} />
         </CardAction>
