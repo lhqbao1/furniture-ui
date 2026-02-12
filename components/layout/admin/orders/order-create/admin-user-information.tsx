@@ -17,7 +17,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { COUNTRY_OPTIONS } from "@/data/data";
+import { BRAND_COUNTRY_OPTIONS, COUNTRY_OPTIONS } from "@/data/data";
 import {
   Command,
   CommandEmpty,
@@ -323,8 +323,9 @@ export function AdminCheckOutUserInformation({
                         disabled={isDisabled} // 🔥 Disable UI
                       >
                         {field.value
-                          ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
-                              ?.label
+                          ? BRAND_COUNTRY_OPTIONS.find(
+                              (c) => c.value === field.value,
+                            )?.label
                           : "Select country"}
                       </Button>
                     </FormControl>
@@ -337,7 +338,7 @@ export function AdminCheckOutUserInformation({
                         <CommandList>
                           <CommandEmpty>No country found.</CommandEmpty>
                           <CommandGroup>
-                            {COUNTRY_OPTIONS.map((c) => (
+                            {BRAND_COUNTRY_OPTIONS.map((c) => (
                               <CommandItem
                                 key={c.value}
                                 value={c.label}
