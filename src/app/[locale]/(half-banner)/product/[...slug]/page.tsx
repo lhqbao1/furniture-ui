@@ -13,7 +13,6 @@ import RelatedCategoryProducts from "@/components/layout/single-product/related-
 import { getReviewByProduct } from "@/features/review/api";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { getBlogsByProductSlug } from "@/features/blog/api";
 import RelatedBlogs from "@/components/layout/single-product/related-blogs";

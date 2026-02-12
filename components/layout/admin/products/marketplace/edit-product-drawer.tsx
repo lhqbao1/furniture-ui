@@ -49,7 +49,12 @@ const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
     );
   };
   return (
-    <Drawer direction="right" open={open} onOpenChange={setOpen}>
+    <Drawer
+      direction="right"
+      open={open}
+      onOpenChange={setOpen}
+      handleOnly
+    >
       <div
         className="text-wrap cursor-pointer hover:underline"
         onClick={() => setOpen(true)}

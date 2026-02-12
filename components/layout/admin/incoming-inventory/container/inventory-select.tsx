@@ -394,6 +394,12 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                           <div className="text-xs text-muted-foreground">
                             {item.provider_id}
                           </div>
+                          {/* <div className="text-xs text-muted-foreground">
+                            {item. ??""}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {item.sk}
+                          </div> */}
                         </div>
                       </div>
                     </td>
