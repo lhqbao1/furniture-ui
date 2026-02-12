@@ -1,5 +1,5 @@
 import { apiAdmin, apiPublic } from "@/lib/axios";
-import { POContainerInventoryDetail } from "@/types/po";
+import { ListInventoryPO, POContainerInventoryDetail } from "@/types/po";
 
 export interface InventoryPoCreateInput {
   container_id: string;
@@ -90,6 +90,20 @@ export async function deleteInventoryPo(inventoryPoId: string) {
       Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
     },
     withCredentials: true,
+  });
+
+  return data;
+}
+
+export async function getAllInventoryPo(
+  search?: string,
+): Promise<ListInventoryPO> {
+  const { data } = await apiAdmin.get("/po/inventory-po/all", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+    params: search ? { search } : undefined,
   });
 
   return data;

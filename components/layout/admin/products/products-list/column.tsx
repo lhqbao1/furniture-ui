@@ -89,12 +89,51 @@ const sortByHasValue = (rowA: any, rowB: any, columnId: string): number => {
   return aHasValue ? 1 : -1;
 };
 
+const getErrorDescription = (error: any) => {
+  const detail =
+    error?.response?.data?.detail ??
+    error?.response?.data?.message ??
+    error?.message ??
+    "";
+
+  if (typeof detail === "string" && detail.trim().length > 0) {
+    const lower = detail.toLowerCase();
+    if (lower.includes("duplicate") || lower.includes("unique")) {
+      const keyMatch = detail.match(/Key\s+\(([^)]+)\)=\(([^)]+)\)/i);
+      if (keyMatch?.[1]) {
+        const field = keyMatch[1].toUpperCase();
+        const value = keyMatch[2];
+        return `Duplication in ${field}${value ? ` (${value})` : ""}`;
+      }
+
+      const constraintMatch = detail.match(/products_([a-z0-9_]+)_key/i);
+      if (constraintMatch?.[1]) {
+        const field = constraintMatch[1].toUpperCase();
+        return `Duplication in ${field}`;
+      }
+    }
+
+    return detail;
+  }
+
+  if (Array.isArray(detail?.errors) && detail.errors.length > 0) {
+    return (
+      detail.errors[0]?.message ??
+      detail.errors[0]?.detail ??
+      "Please try again."
+    );
+  }
+
+  return "Please try again.";
+};
+
 function EditableNameCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.name);
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
 
   const handleEditProductName = () => {
+    const toastId = toast.loading("Updating product name...");
     EditProductMutation.mutate(
       {
         input: {
@@ -116,12 +155,15 @@ function EditableNameCell({ product }: { product: ProductItem }) {
         id: product.id,
       },
       {
-        onSuccess(data, variables, context) {
-          toast.success("Update product name successful");
+        onSuccess() {
+          toast.success("Update product name successful", { id: toastId });
           setEditing(false);
         },
-        onError(error, variables, context) {
-          toast.error("Update product name fail");
+        onError(error) {
+          toast.error("Update product name fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -170,6 +212,7 @@ function EditableSkuCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductSku = () => {
+    const toastId = toast.loading("Updating product SKU...");
     EditProductMutation.mutate(
       {
         input: {
@@ -191,11 +234,14 @@ function EditableSkuCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update product SKU successful");
+          toast.success("Update product SKU successful", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update product SKU fail");
+        onError(error) {
+          toast.error("Update product SKU fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -244,12 +290,22 @@ function EditableEanCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductEan = () => {
+    const toastId = toast.loading("Updating product EAN...");
     const sanitizedEan = value.trim();
+    const digitsOnly = sanitizedEan.replace(/\D/g, "");
+    if (
+      digitsOnly.length > 0 &&
+      digitsOnly.length !== 8 &&
+      digitsOnly.length !== 13
+    ) {
+      toast.error("EAN must be 8 or 13 characters", { id: toastId });
+      return;
+    }
     EditProductMutation.mutate(
       {
         input: {
           ...product,
-          ean: sanitizedEan.length > 0 ? sanitizedEan : null,
+          ean: digitsOnly.length > 0 ? digitsOnly : null,
           category_ids: product.categories.map((c) => c.id),
           ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
           ...(product.bundles?.length
@@ -266,11 +322,14 @@ function EditableEanCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update product EAN successful");
+          toast.success("Update product EAN successful", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update product EAN fail");
+        onError(error) {
+          toast.error("Update product EAN fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -320,6 +379,7 @@ function EditableColorCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductColor = () => {
+    const toastId = toast.loading("Updating product color...");
     const sanitizedColor = value.trim();
     EditProductMutation.mutate(
       {
@@ -342,11 +402,14 @@ function EditableColorCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update product color successful");
+          toast.success("Update product color successful", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update product color fail");
+        onError(error) {
+          toast.error("Update product color fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -396,6 +459,7 @@ function EditableMaterialsCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductMaterials = () => {
+    const toastId = toast.loading("Updating product materials...");
     const sanitizedMaterials = value.trim();
     EditProductMutation.mutate(
       {
@@ -418,11 +482,16 @@ function EditableMaterialsCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update product materials successful");
+          toast.success("Update product materials successful", {
+            id: toastId,
+          });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update product materials fail");
+        onError(error) {
+          toast.error("Update product materials fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -472,6 +541,7 @@ function EditableComponentCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductComponent = () => {
+    const toastId = toast.loading("Updating product component...");
     const sanitizedComponent = value.trim();
     EditProductMutation.mutate(
       {
@@ -495,11 +565,16 @@ function EditableComponentCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update product component successful");
+          toast.success("Update product component successful", {
+            id: toastId,
+          });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update product component fail");
+        onError(error) {
+          toast.error("Update product component fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -549,6 +624,7 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductPrice = () => {
+    const toastId = toast.loading("Updating product price...");
     EditProductMutation.mutate(
       {
         input: {
@@ -572,12 +648,15 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
         id: product.id,
       },
       {
-        onSuccess(data, variables, context) {
-          toast.success("Update product price successful");
+        onSuccess() {
+          toast.success("Update product price successful", { id: toastId });
           setEditing(false);
         },
-        onError(error, variables, context) {
-          toast.error("Update product price fail");
+        onError(error) {
+          toast.error("Update product price fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -629,6 +708,7 @@ function EditableCostCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductCost = () => {
+    const toastId = toast.loading("Updating product cost...");
     EditProductMutation.mutate(
       {
         input: {
@@ -652,11 +732,14 @@ function EditableCostCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update product cost successful");
+          toast.success("Update product cost successful", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update product cost fail");
+        onError(error) {
+          toast.error("Update product cost fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -708,6 +791,7 @@ function EditableDeliveryCostCell({ product }: { product: ProductItem }) {
   const EditProductMutation = useEditProduct();
 
   const handleEditProductDeliveryCost = () => {
+    const toastId = toast.loading("Updating delivery cost...");
     EditProductMutation.mutate(
       {
         input: {
@@ -731,11 +815,14 @@ function EditableDeliveryCostCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update delivery cost successful");
+          toast.success("Update delivery cost successful", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update delivery cost fail");
+        onError(error) {
+          toast.error("Update delivery cost fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -791,6 +878,7 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
   const { data: suppliers, isLoading, isError } = useGetSuppliers();
 
   const handleEditSupplier = (ownerValue: string) => {
+    const toastId = toast.loading("Updating supplier...");
     const owner_id = ownerValue === PRESTIGE_OWNER_VALUE ? null : ownerValue;
 
     EditProductMutation.mutate(
@@ -816,11 +904,14 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Supplier updated successfully");
+          toast.success("Supplier updated successfully", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update failed");
+        onError(error) {
+          toast.error("Update failed", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -885,6 +976,7 @@ function EditableBrandCell({ product }: { product: ProductItem }) {
   }, [product.brand]);
 
   const handleEditBrand = (brandId: string) => {
+    const toastId = toast.loading("Updating brand...");
     const selectedBrand = brands?.find((brand) => brand.id === brandId);
     const isBrandEconelo = selectedBrand?.name
       ?.toLowerCase()
@@ -915,11 +1007,14 @@ function EditableBrandCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Brand updated successfully");
+          toast.success("Brand updated successfully", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update brand failed");
+        onError(error) {
+          toast.error("Update brand failed", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -999,6 +1094,7 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
     const previous = selectedIds;
     setSelectedIds(nextSelected);
 
+    const toastId = toast.loading("Updating categories...");
     editProductMutation.mutate(
       {
         input: {
@@ -1019,10 +1115,13 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update categories successful");
+          toast.success("Update categories successful", { id: toastId });
         },
-        onError() {
-          toast.error("Update categories fail");
+        onError(error) {
+          toast.error("Update categories fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
           setSelectedIds(previous);
         },
       },
@@ -1139,6 +1238,7 @@ function EditableCarrierCell({ product }: { product: ProductItem }) {
   const handleUpdateCarrier = (value: string) => {
     const nextCarrier = value === "spedition" ? "amm" : value;
 
+    const toastId = toast.loading("Updating carrier...");
     editProductMutation.mutate(
       {
         input: {
@@ -1162,11 +1262,14 @@ function EditableCarrierCell({ product }: { product: ProductItem }) {
       },
       {
         onSuccess() {
-          toast.success("Update carrier successful");
+          toast.success("Update carrier successful", { id: toastId });
           setEditing(false);
         },
-        onError() {
-          toast.error("Update carrier failed");
+        onError(error) {
+          toast.error("Update carrier failed", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );
@@ -1260,6 +1363,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
       return;
     }
 
+    const toastId = toast.loading("Updating product status...");
     editProductMutation.mutate(
       {
         input: {
@@ -1279,11 +1383,14 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
         id: product.id,
       },
       {
-        onSuccess(data, variables, context) {
-          toast.success("Update product status successful");
+        onSuccess() {
+          toast.success("Update product status successful", { id: toastId });
         },
-        onError(error, variables, context) {
-          toast.error("Update product status fail");
+        onError(error) {
+          toast.error("Update product status fail", {
+            id: toastId,
+            description: getErrorDescription(error),
+          });
         },
       },
     );

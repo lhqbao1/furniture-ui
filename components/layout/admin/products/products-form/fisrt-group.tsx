@@ -140,7 +140,7 @@ const ProductDetailInputs = ({
             name="is_active"
             render={({ field }) => (
               <FormItem className="flex items-center space-x-2">
-                <FormLabel className="!mt-0 text-black font-semibold">
+                <FormLabel className="mt-0! text-black font-semibold">
                   Active
                 </FormLabel>
                 <FormControl>
@@ -209,7 +209,10 @@ const ProductDetailInputs = ({
                   type="text"
                   {...field}
                   value={field.value ?? ""}
-                  onChange={(e) => field.onChange(e.target.value)}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    field.onChange(next === "" ? null : next);
+                  }}
                 />
               </FormControl>
               <FormMessage></FormMessage>

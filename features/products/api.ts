@@ -15,6 +15,7 @@ export interface GetAllProductsParams {
   brand?: string;
   sort_by_marketplace?: string;
   supplier_id?: string;
+  brand_id?: string;
 }
 
 export type GetProductsSearchParams = {
@@ -94,6 +95,9 @@ export async function getAllProducts(params?: GetAllProductsParams) {
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
       ...(params?.supplier_id !== undefined && {
         supplier_id: params.supplier_id,
+      }),
+      ...(params?.brand_id !== undefined && {
+        brand_id: params.brand_id,
       }),
       ...(params?.all_products !== undefined && {
         all_products: params.all_products,

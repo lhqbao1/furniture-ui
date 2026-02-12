@@ -4,6 +4,7 @@ import {
   createInventoryPo,
   deleteInventoryPo,
   getContainerInventory,
+  getAllInventoryPo,
   getInventoryPoByProductId,
   getInventoryPoDetail,
   updateInventoryPo,
@@ -14,6 +15,13 @@ export const useContainerInventory = (containerId?: string) => {
     queryKey: containerId ? inventoryPoKeys.container(containerId) : [],
     queryFn: () => getContainerInventory(containerId!),
     enabled: !!containerId,
+  });
+};
+
+export const useAllInventoryPo = (search?: string) => {
+  return useQuery({
+    queryKey: [...inventoryPoKeys.all, "list", search ?? ""] as const,
+    queryFn: () => getAllInventoryPo(search),
   });
 };
 

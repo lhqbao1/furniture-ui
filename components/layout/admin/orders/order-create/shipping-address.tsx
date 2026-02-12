@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { COUNTRY_OPTIONS } from "@/data/data";
+import { BRAND_COUNTRY_OPTIONS, COUNTRY_OPTIONS } from "@/data/data";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useTranslations } from "next-intl";
@@ -167,10 +167,7 @@ export default function ManualCheckOutShippingAddress({
                     Recipient Name
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder=""
-                      {...field}
-                    />
+                    <Input placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,10 +182,7 @@ export default function ManualCheckOutShippingAddress({
                     Recipient Phone Number
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder=""
-                      {...field}
-                    />
+                    <Input placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -205,10 +199,7 @@ export default function ManualCheckOutShippingAddress({
                   Street and House number
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -224,10 +215,7 @@ export default function ManualCheckOutShippingAddress({
                   Additional Address Line
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -244,10 +232,7 @@ export default function ManualCheckOutShippingAddress({
                   Postal Code
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -264,10 +249,7 @@ export default function ManualCheckOutShippingAddress({
                   City
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -283,10 +265,7 @@ export default function ManualCheckOutShippingAddress({
                   Country
                 </FormLabel>
 
-                <Popover
-                  open={open}
-                  onOpenChange={setOpen}
-                >
+                <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
@@ -296,8 +275,9 @@ export default function ManualCheckOutShippingAddress({
                         onClick={() => setOpen(!open)}
                       >
                         {field.value
-                          ? COUNTRY_OPTIONS.find((c) => c.value === field.value)
-                              ?.label
+                          ? BRAND_COUNTRY_OPTIONS.find(
+                              (c) => c.value === field.value,
+                            )?.label
                           : "Select country"}
                       </Button>
                     </FormControl>
@@ -309,7 +289,7 @@ export default function ManualCheckOutShippingAddress({
                       <CommandList>
                         <CommandEmpty>No country found.</CommandEmpty>
                         <CommandGroup>
-                          {COUNTRY_OPTIONS.map((c) => (
+                          {BRAND_COUNTRY_OPTIONS.map((c) => (
                             <CommandItem
                               key={c.value}
                               value={c.label}
@@ -340,10 +320,7 @@ export default function ManualCheckOutShippingAddress({
               <FormItem>
                 <FormLabel>Email (Optional)</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

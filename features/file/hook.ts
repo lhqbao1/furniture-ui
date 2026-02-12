@@ -4,6 +4,7 @@ import {
   importProductInventory,
   importProductSupplier,
   uploadStaticFile,
+  updateStockSupplier,
 } from "./api";
 
 export function useUploadStaticFile() {
@@ -45,6 +46,22 @@ export function useImportProductsSupplier() {
       file: FormData;
       supplier_id: string;
     }) => importProductSupplier(file, supplier_id),
+    onSuccess: () => {
+      qc.refetchQueries({ queryKey: ["products"] });
+    },
+  });
+}
+
+export function useUpdateStockSupplier() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      file,
+      supplier_id,
+    }: {
+      file: FormData;
+      supplier_id: string;
+    }) => updateStockSupplier(file, supplier_id),
     onSuccess: () => {
       qc.refetchQueries({ queryKey: ["products"] });
     },

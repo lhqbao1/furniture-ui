@@ -43,6 +43,7 @@ const AdminInventoryList = () => {
     search: filters.search,
     is_inventory: "false",
     supplier_id: filters.supplier_id,
+    brand_id: filters.brand,
   });
 
   useEffect(() => {
@@ -68,8 +69,6 @@ const AdminInventoryList = () => {
         setPage={setPage}
         isInventory
       />
-
-      {/* <InventoryTimeLine /> */}
 
       {isLoading ? (
         <ProductTableSkeleton />

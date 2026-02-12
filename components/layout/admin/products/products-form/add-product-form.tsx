@@ -26,7 +26,7 @@ import { useProductForm } from "./useProductForm";
 import { ProductItem } from "@/types/products";
 import ProductManual from "./product-manual";
 import { Textarea } from "@/components/ui/textarea";
-import { useRouter } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { toast } from "sonner";
 import LogStockTab from "./log-stock-tab";
@@ -307,19 +307,33 @@ const ProductForm = ({
                     "Add"
                   )}
                 </Button>
-                <AdminBackButton />
-                <Button
-                  type="button"
-                  variant={"secondary"}
-                  className="text-lg px-8"
-                  onClick={() =>
-                    router.push(`/product/${productValues?.url_key}`, {
-                      locale,
-                    })
-                  }
-                >
-                  View
-                </Button>
+                {!isDrawer && <AdminBackButton />}
+                {productValues?.url_key ? (
+                  <Button
+                    type="button"
+                    variant={"secondary"}
+                    className="text-lg px-8"
+                    asChild
+                  >
+                    <Link
+                      href={`/product/${productValues.url_key}`}
+                      target="_blank"
+                      rel="nofollow noopener noreferrer"
+                      locale={locale}
+                    >
+                      View
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant={"secondary"}
+                    className="text-lg px-8"
+                    disabled
+                  >
+                    View
+                  </Button>
+                )}
                 <Button
                   type="button"
                   className="text-lg px-8 bg-blue-400 hover:bg-blue-500"
