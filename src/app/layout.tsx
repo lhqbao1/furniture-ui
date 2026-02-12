@@ -50,7 +50,8 @@ const structuredData = [
     url: "https://www.prestige-home.de",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://www.prestige-home.de/de/shop-all?search={search_term_string}",
+      target:
+        "https://www.prestige-home.de/de/shop-all?search={search_term_string}",
       "query-input": "required name=search_term_string",
     },
   },
@@ -154,7 +155,7 @@ export default function RootLayout({
         </Script>
 
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17706586126"
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17948582301"
           strategy="lazyOnload"
         />
 
@@ -166,7 +167,7 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'AW-17706586126');
+            gtag('config', 'AW-17948582301');
                     `}
         </Script> */}
         <Script id="gtag-init-safe" strategy="afterInteractive">
@@ -175,7 +176,7 @@ export default function RootLayout({
       try {
         const run = () => {
           gtag('js', new Date());
-          gtag('config', 'AW-17706586126');
+          gtag('config', 'AW-17948582301');
         };
 
         if ('requestIdleCallback' in window) {

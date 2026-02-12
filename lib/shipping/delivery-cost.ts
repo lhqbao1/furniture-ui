@@ -5,7 +5,14 @@ export type PackageInput = {
   height?: number | null;
 };
 
-export type CarrierType = "dpd" | "amm" | "spedition" | string | null | undefined;
+export type CarrierType =
+  | "dpd"
+  | "amm"
+  | "spedition"
+  | string
+  | null
+  | undefined;
+export type BundleInput = { quantity?: number | null } | null | undefined;
 
 const DPD_LIMITS = {
   maxWeightKg: 31,
@@ -92,7 +99,7 @@ function calcPackageCost(pkg: PackageInput) {
     return { cost: null, error: "Spedition rate not available over 3000 kg." };
   }
 
-  return { cost: rate.price };
+  return { cost: rate.price + 6 };
 }
 
 function calcPackageCostDpd(pkg: PackageInput) {
@@ -136,7 +143,10 @@ export function calcDeliveryCost(
   carrier: CarrierType,
 ) {
   if (!packages?.length) {
-    return { cost: null as number | null, error: undefined as string | undefined };
+    return {
+      cost: null as number | null,
+      error: undefined as string | undefined,
+    };
   }
 
   const normalizedCarrier = carrier === "spedition" ? "amm" : carrier;
@@ -146,12 +156,59 @@ export function calcDeliveryCost(
 
   for (const pkg of packages) {
     const result = isDpd ? calcPackageCostDpd(pkg) : calcPackageCost(pkg);
-    if (result.error) return { cost: null as number | null, error: result.error };
+    if (result.error)
+      return { cost: null as number | null, error: result.error };
     if (result.cost == null) {
-      return { cost: null as number | null, error: undefined as string | undefined };
+      return {
+        cost: null as number | null,
+        error: undefined as string | undefined,
+      };
     }
     total += result.cost;
   }
 
-  return { cost: Number(total.toFixed(2)), error: undefined as string | undefined };
+  return {
+    cost: Number(total.toFixed(2)),
+    error: undefined as string | undefined,
+  };
+}
+
+export function aggregatePackages(
+  packages: PackageInput[] | null | undefined,
+  bundles?: BundleInput[],
+) {
+  if (!packages || packages.length === 0) return null;
+
+  let totalWeight = 0;
+  let totalLength = 0;
+  let totalWidth = 0;
+  let totalHeight = 0;
+
+  for (let index = 0; index < packages.length; index += 1) {
+    const pkg = packages[index] ?? {};
+    const rawQuantity = Number(bundles?.[index]?.quantity ?? 1);
+    const quantity =
+      Number.isFinite(rawQuantity) && rawQuantity > 0 ? rawQuantity : 1;
+
+    if (
+      pkg.weight == null ||
+      pkg.length == null ||
+      pkg.width == null ||
+      pkg.height == null
+    ) {
+      return null;
+    }
+
+    totalWeight += pkg.weight * quantity;
+    totalLength += pkg.length * quantity;
+    totalWidth += pkg.width * quantity;
+    totalHeight += pkg.height * quantity;
+  }
+
+  return {
+    weight: totalWeight,
+    length: totalLength,
+    width: totalWidth,
+    height: totalHeight,
+  };
 }
