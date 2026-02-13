@@ -15,7 +15,7 @@ import {
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import OrderStatistic from "@/components/layout/admin/orders/order-list/statistics";
 
 const OrderList = () => {
@@ -25,7 +25,8 @@ const OrderList = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const filters = useOrderListFilters();
-
+  const tableWrapRef = useRef<HTMLDivElement | null>(null);
+  const [tableHeight, setTableHeight] = useState<number | null>(null);
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -93,6 +94,21 @@ const OrderList = () => {
     });
   }, [page]);
 
+  useLayoutEffect(() => {
+    const updateHeight = () => {
+      const wrapper = tableWrapRef.current;
+      if (!wrapper) return;
+      const rect = wrapper.getBoundingClientRect();
+      const bottomPadding = 24; // matches pb-6
+      const available = window.innerHeight - rect.top - bottomPadding;
+      setTableHeight(Math.max(240, available));
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, [data, isLoading]);
+
   if (!data && isLoading) {
     return <ProductTableSkeleton columnsCount={6} rowsCount={6} />;
   }
@@ -102,8 +118,8 @@ const OrderList = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col gap-6 pb-6">
-      <div className="space-y-6 pb-30">
+    <div className="h-screen flex flex-col gap-6 overflow-hidden">
+      <div className="space-y-6">
         {isLoadingStatistic ? (
           <ProductStatisticSkeleton />
         ) : (
@@ -121,22 +137,28 @@ const OrderList = () => {
         {isLoading && !data ? (
           <ProductTableSkeleton columnsCount={6} rowsCount={6} />
         ) : (
-          <ProductTable
-            data={data ? data.items : []}
-            columns={orderColumns}
-            page={page}
-            setPage={handlePageChange}
-            pageSize={pageSize}
-            setPageSize={setPageSize}
-            totalItems={data?.pagination.total_items ?? 0}
-            totalPages={data?.pagination.total_pages ?? 0}
-            hasBackground
-            hasExpanded
-            renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
-            hasHeaderBackGround
-            // isSticky
-            // stickyContainerClassName="h-full"
-          />
+          <div
+            ref={tableWrapRef}
+            className="min-h-0"
+            style={tableHeight ? { height: `${tableHeight}px` } : undefined}
+          >
+            <ProductTable
+              data={data ? data.items : []}
+              columns={orderColumns}
+              page={page}
+              setPage={handlePageChange}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              totalItems={data?.pagination.total_items ?? 0}
+              totalPages={data?.pagination.total_pages ?? 0}
+              hasBackground
+              hasExpanded
+              renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
+              hasHeaderBackGround
+              isSticky
+              stickyContainerClassName="h-full"
+            />
+          </div>
         )}
       </div>
     </div>
