@@ -29,9 +29,6 @@ const SupplierOrderDetails = () => {
   if (isError) return <div>Error loading order</div>;
   if (!order) return <div>Error loading order</div>;
 
-  const createdAt = formatDate(order.created_at);
-  const updatedAt = formatDateTimeString(order.updated_at);
-
   return (
     <div className="space-y-12 pb-20 mt-6">
       <div>
@@ -64,8 +61,8 @@ const SupplierOrderDetails = () => {
         hasHeaderBackGround
       />
 
-      {!order.shipment && (
-        <div className="col-span-4">
+      {!order.shipment && order.status !== "PENDING" && (
+        <div className="w-full md:w-1/2">
           <ShipmentInput checkoutId={order.id} />
         </div>
       )}

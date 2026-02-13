@@ -46,7 +46,9 @@ const PRODUCT_COLUMN_OPTIONS: {
 ];
 
 const DEFAULT_VISIBLE_PRODUCT_COLUMNS = new Set(
-  PRODUCT_COLUMN_OPTIONS.map((column) => column.id),
+  PRODUCT_COLUMN_OPTIONS.map((column) => column.id).filter(
+    (id) => !["color", "materials", "component"].includes(id),
+  ),
 );
 
 const ProductList = () => {
@@ -63,6 +65,7 @@ const ProductList = () => {
         ]),
       ) as VisibilityState,
   );
+  const hasInitializedColumnVisibility = useRef(false);
 
   const handleColumnVisibilityChange = (columnId: string, visible: boolean) => {
     setColumnVisibility((prev) => ({
@@ -93,6 +96,17 @@ const ProductList = () => {
       setPage(Number(param));
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (hasInitializedColumnVisibility.current) return;
+    hasInitializedColumnVisibility.current = true;
+    setColumnVisibility((prev) => ({
+      ...prev,
+      color: false,
+      materials: false,
+      component: false,
+    }));
+  }, []);
 
   const { data, isLoading, isError } = useGetAllProducts({
     page,
