@@ -11,19 +11,20 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 export const CHANEL_OPTIONS = [
-  { key: "prestige_home", label: "Prestige Home" },
-  { key: "amazon", label: "Amazon" },
-  { key: "kaufland", label: "Kaufland" },
-  { key: "ebay", label: "Ebay" },
-  { key: "freakout", label: "Freakout" },
-  { key: "praktiker", label: "Praktiker" },
-  { key: "netto", label: "Netto" },
-  { key: "norma", label: "Norma24" },
-  { key: "check24", label: "Check24" },
-  { key: "inprodius", label: "Inprodius" },
-  { key: "econelo", label: "Econelo" },
+  { key: "prestige_home", label: "Prestige Home", icon: "new-logo.svg" },
+  { key: "amazon", label: "Amazon", icon: "amazon.png" },
+  { key: "kaufland", label: "Kaufland", icon: "kau.png" },
+  { key: "ebay", label: "Ebay", icon: "ebay.png" },
+  { key: "freakout", label: "Freakout", icon: "freakout.png" },
+  { key: "praktiker", label: "Praktiker", icon: "praktiker.jpg" },
+  { key: "netto", label: "Netto", icon: "netto-logo.svg" },
+  { key: "norma", label: "Norma24", icon: "norma.png" },
+  { key: "check24", label: "Check24", icon: "check-24.png" },
+  { key: "inprodius", label: "Inprodius", icon: "inprodius.png" },
+  { key: "econelo", label: "Econelo", icon: "econelo-favicon.png" },
 ];
 
 export default function OrderChanelFilter() {
@@ -84,6 +85,15 @@ export default function OrderChanelFilter() {
               onClick={() => toggleStatus(item.key)}
             >
               <Checkbox checked={selected.includes(item.key)} />
+              {item.icon && (
+                <Image
+                  src={`/${item.icon}`}
+                  alt={item.label}
+                  width={18}
+                  height={18}
+                  className="shrink-0"
+                />
+              )}
               <span>{item.label}</span>
             </div>
           ))}

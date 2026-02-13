@@ -46,7 +46,9 @@ const PRODUCT_COLUMN_OPTIONS: {
 ];
 
 const DEFAULT_VISIBLE_PRODUCT_COLUMNS = new Set(
-  PRODUCT_COLUMN_OPTIONS.map((column) => column.id),
+  PRODUCT_COLUMN_OPTIONS.map((column) => column.id).filter(
+    (id) => !["color", "materials", "component"].includes(id),
+  ),
 );
 
 const ProductList = () => {
