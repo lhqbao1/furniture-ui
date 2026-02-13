@@ -1122,13 +1122,15 @@ export const CARRIERS = [
 ] as const;
 
 export const SHIPMENT_CARRIERS = [
-  { id: "spedition", logo: "/amm.jpeg" },
-  { id: "dpd", logo: "/dpd.jpeg" },
-  { id: "dhl", logo: "/dhl.png" },
-  { id: "gls", logo: "/gls-new.png" },
-  { id: "ups", logo: "/ups.png" },
-  { id: "hermes", logo: "/hermes.png" },
-  { id: "fedex", logo: "/fedex.png" },
+  { id: "spedition", logo: "/amm.jpeg", label: "Spedition" },
+  { id: "dpd", logo: "/dpd.jpeg", label: "DPD" },
+  { id: "dhl", logo: "/dhl.png", label: "DHL" },
+  { id: "gls", logo: "/gls-new.png", label: "GLS" },
+  { id: "ups", logo: "/ups.png", label: "UPS" },
+  { id: "hermes", logo: "/hermes.png", label: "Hermes" },
+  { id: "spedition", logo: "/dsv.png", label: "DSV" },
+  { id: "spedition", logo: "/schenker.png", label: "DB Schenker" },
+  { id: "spedition", logo: "/kunel.webp", label: "Kühne + Nagel" },
 ] as const;
 
 export const COUNTRY_OPTIONS = [

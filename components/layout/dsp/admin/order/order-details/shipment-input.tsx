@@ -28,16 +28,21 @@ const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
     defaultValues: {
       tracking_number: "",
       shipping_carrier: "",
-      shipped_date: "",
     },
   });
 
   const { mutate, isPending } = useSendSupplierTracking();
 
   const onSubmit = (values: ShipmentFormValues) => {
+    const shippedDate = new Date().toISOString().replace("Z", "");
+    const payload = {
+      ...values,
+      shipped_date: shippedDate,
+    };
+
     mutate({
       checkoutId,
-      payload: values,
+      payload,
     });
   };
 
@@ -50,7 +55,13 @@ const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
       <CardContent>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              console.log("Shipment form errors", errors);
+              const firstError = Object.values(errors)[0];
+              if (firstError?.message) {
+                alert(firstError.message);
+              }
+            })}
             className="space-y-4"
           >
             {/* Tracking number */}
@@ -61,10 +72,7 @@ const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
                 <FormItem>
                   <FormLabel>Tracking Number</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Enter tracking number"
-                      {...field}
-                    />
+                    <Input placeholder="Enter tracking number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -89,39 +97,7 @@ const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
               )}
             />
 
-            {/* Shipped date */}
-            {/* <FormField
-              control={form.control}
-              name="shipped_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Shipped Date</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      value={field.value?.split("T")[0] ?? ""}
-                      onChange={(e) => {
-                        const date = e.target.value;
-
-                        // Convert to ISO without Z
-                        const localISO = new Date(date + "T00:00:00")
-                          .toISOString()
-                          .replace("Z", "");
-
-                        field.onChange(localISO);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="w-full"
-            >
+            <Button type="submit" disabled={isPending} className="w-full">
               {isPending ? "Sending..." : "Send Tracking"}
             </Button>
           </form>
