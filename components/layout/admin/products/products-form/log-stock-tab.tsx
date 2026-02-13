@@ -42,7 +42,7 @@ const LogStockTab = ({ productDetail }: LogStockTabProps) => {
                 {item.current_stock ? item.current_stock : "-"})
               </div>
               <div className="text-sm">{item.user ? item.user.email : ""}</div>
-              <div className="text-sm">{item.note ? item.note : "hehe"}</div>
+              <div className="text-sm">{item.note ? item.note : ""}</div>
             </React.Fragment>
           ))}
         </div>

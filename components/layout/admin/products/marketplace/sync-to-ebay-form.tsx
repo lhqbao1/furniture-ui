@@ -39,7 +39,6 @@ import {
 } from "@/components/ui/dialog";
 import { syncToKauflandInput } from "@/features/kaufland/api";
 import { useSyncToKaufland } from "@/features/kaufland/hook";
-import { error } from "console";
 
 interface SyncToEbayFormProps {
   product: ProductItem;
@@ -65,9 +64,10 @@ const SyncToEbayForm = ({
   const syncToKauflandMutation = useSyncToKaufland();
 
   const [open, setOpen] = useState<boolean>(false);
-  const marketplaceLabel = (currentMarketplace ?? "")
-    ? `${currentMarketplace[0].toUpperCase()}${currentMarketplace.slice(1)}`
-    : "Marketplace";
+  const marketplaceLabel =
+    (currentMarketplace ?? "")
+      ? `${currentMarketplace[0].toUpperCase()}${currentMarketplace.slice(1)}`
+      : "Marketplace";
   // Danh sách marketplace khả dụng
   const ALL_MARKETPLACES = ["ebay", "amazon", "kaufland"];
 
@@ -86,28 +86,26 @@ const SyncToEbayForm = ({
     [isUpdating, availableMarketplaces],
   );
 
-  const defaultValues = useMemo(
-    () => ({
+  const defaultValues = useMemo(() => {
+    const marketplaceRecord = product.marketplace_products?.find(
+      (i) => i.marketplace === currentMarketplace,
+    );
+
+    return {
       marketplace: currentMarketplace ?? "",
       name: product.name,
       description: product.description,
-      final_price:
-        product.marketplace_products.find(
-          (i) => i.marketplace === currentMarketplace,
-        )?.final_price ?? product.final_price,
-      min_stock:
-        product.marketplace_products.find(
-          (i) => i.marketplace === currentMarketplace,
-        )?.min_stock ?? 1,
+      final_price: marketplaceRecord?.final_price ?? product.final_price,
+      min_stock: marketplaceRecord?.min_stock ?? 1,
       max_stock: product.stock - (product.result_stock ?? 0),
       sku: product.sku,
-      handling_time:
-        product.marketplace_products.find(
-          (i) => i.marketplace === currentMarketplace,
-        )?.handling_time ?? undefined,
-    }),
-    [product, currentMarketplace],
-  );
+      handling_time: marketplaceRecord?.handling_time ?? undefined,
+      marketplace_offer_id: marketplaceRecord?.marketplace_offer_id ?? "",
+      line_item_id: marketplaceRecord?.line_item_id ?? "",
+      current_stock: marketplaceRecord?.current_stock ?? 0,
+      is_active: marketplaceRecord?.is_active ?? false,
+    };
+  }, [product, currentMarketplace]);
 
   const form = useForm<MarketPlaceFormValues>({
     resolver: zodResolver(marketPlaceSchema),
@@ -166,31 +164,31 @@ const SyncToEbayForm = ({
       setUpdating(true);
       setOpen(true);
 
+      const updatedMarketplaceProducts = [
+        ...(product.marketplace_products || []),
+      ];
+
+      const existing = updatedMarketplaceProducts.find(
+        (m) => m.marketplace === selectedMarketplace,
+      );
+
       const normalizedValues: MarketplaceProduct = {
         ...values,
         marketplace: selectedMarketplace,
         final_price: values.final_price ?? 0,
         min_stock: values.min_stock ?? 1,
         max_stock: values.max_stock ?? 10,
-        current_stock: values.current_stock ?? 0,
-        line_item_id: values.line_item_id ?? "",
-        is_active: values.is_active ?? false,
-        marketplace_offer_id: values.marketplace_offer_id ?? "",
+        current_stock: values.current_stock ?? existing?.current_stock ?? 0,
+        line_item_id: values.line_item_id ?? existing?.line_item_id ?? "",
+        is_active: values.is_active ?? existing?.is_active ?? false,
+        marketplace_offer_id:
+          values.marketplace_offer_id ?? existing?.marketplace_offer_id ?? "",
         name: values.name ?? "",
         description: values.description ?? "",
         sku: values.sku ?? product.sku ?? "",
-        brand: product.brand ? product.brand.name : "",
+        brand: product.brand ? product.brand.name : (existing?.brand ?? ""),
         handling_time: values.handling_time ?? 0,
       };
-
-      const updatedMarketplaceProducts = [
-        ...(product.marketplace_products || []),
-      ];
-
-      // tìm đúng item theo marketplace
-      const existing = updatedMarketplaceProducts.find(
-        (m) => m.marketplace === selectedMarketplace,
-      );
 
       if (isUpdating) {
         if (existing) {
@@ -287,22 +285,25 @@ const SyncToEbayForm = ({
             ebay_offer_id: marketplaceData?.marketplace_offer_id ?? null,
           };
 
-          syncToEbayMutation.mutate(payload, {
-            onSuccess() {
-              toast.success("Sync marketplace data success", {
-                id: loadingToastId,
-              });
-              setUpdating(false);
-              setOpen(false);
+          syncToEbayMutation.mutate(
+            { ...payload, __silent: true },
+            {
+              onSuccess() {
+                toast.success("Sync marketplace data success", {
+                  id: loadingToastId,
+                });
+                setUpdating(false);
+                setOpen(false);
+              },
+              onError(error) {
+                toast.error("Failed to update marketplace data", {
+                  id: loadingToastId,
+                  description: error.message,
+                });
+                setUpdating(false);
+              },
             },
-            onError(error) {
-              toast.error("Failed to update marketplace data", {
-                id: loadingToastId,
-                description: error.message,
-              });
-              setUpdating(false);
-            },
-          });
+          );
         }
 
         if (marketplace === "kaufland") {
@@ -353,23 +354,26 @@ const SyncToEbayForm = ({
             handling_time: values.handling_time ?? 0,
           };
 
-          syncToKauflandMutation.mutate(payload, {
-            onSuccess() {
-              toast.success("Sync marketplace data success", {
-                id: loadingToastId,
-              });
-              setUpdating(false);
-              setOpen(false);
+          syncToKauflandMutation.mutate(
+            { ...payload, __silent: true },
+            {
+              onSuccess() {
+                toast.success("Sync marketplace data success", {
+                  id: loadingToastId,
+                });
+                setUpdating(false);
+                setOpen(false);
+              },
+              onError(error) {
+                console.log(error);
+                toast.error("Failed to update marketplace data", {
+                  id: loadingToastId,
+                  description: error.message,
+                });
+                setUpdating(false);
+              },
             },
-            onError(error) {
-              console.log(error);
-              toast.error("Failed to update marketplace data", {
-                id: loadingToastId,
-                description: error.message,
-              });
-              setUpdating(false);
-            },
-          });
+          );
         }
       };
 
@@ -421,7 +425,6 @@ const SyncToEbayForm = ({
         },
       );
     } catch (error) {
-      console.error("SyncToEbayForm submit failed", error);
       toast.error("Submit failed", {
         id: loadingToastId,
         description:
