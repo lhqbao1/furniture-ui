@@ -88,7 +88,6 @@ function SyncToMarketplace({
   marketplace: string;
 }) {
   const [updating, setUpdating] = useState<boolean>(false);
-
   // ✅ Tách marketplace cụ thể ra, tránh find() lặp
   const marketplaceProduct = product.marketplace_products?.find(
     (p) => p.marketplace === marketplace,
@@ -357,12 +356,6 @@ const MARKETPLACE_ICONS: Record<Marketplace, string> = {
   ebay: "/ebay.png",
 };
 
-// const marketplaceBaseColumn: ColumnDef<ProductItem> = {
-//   id: "marketplace",
-//   header: () => <div className="text-center uppercase">MARKETPLACE</div>,
-//   cell: ({ row }) => <AddProductMarketplace product={row.original} />,
-// };
-
 const marketplaceColumns: ColumnDef<ProductItem>[] = MARKETPLACES.map(
   (marketplace) => ({
     id: marketplace,
@@ -399,103 +392,6 @@ const marketplaceColumns: ColumnDef<ProductItem>[] = MARKETPLACES.map(
     },
   }),
 );
-
-// export const productMarketplaceColumns = (
-//   products: ProductItem[],
-//   setSortByStock: (val?: "asc" | "desc") => void,
-// ): ColumnDef<ProductItem>[] => {
-//   // Lấy danh sách marketplace duy nhất từ toàn bộ product
-//   const marketplaces = Array.from(
-//     new Set(
-//       products
-//         .flatMap((p) => p.marketplace_products?.map((m) => m.marketplace))
-//         .filter(Boolean),
-//     ),
-//   );
-
-//   // Cột cố định cho marketplace
-//   const fixedMarketplaceColumn: ColumnDef<ProductItem> = {
-//     id: "marketplace",
-//     header: () => <div className="text-center  uppercase">MARKETPLACE</div>,
-//     cell: ({ row }) => {
-//       const product = row.original;
-//       return <AddProductMarketplace product={product} />;
-//     },
-//   };
-
-//   const safeMarketplaces = Array.isArray(marketplaces)
-//     ? marketplaces.filter(
-//         (m): m is string => typeof m === "string" && m.trim().length > 0,
-//       )
-//     : [];
-
-//   // Các cột động theo marketplace thực tế
-//   const dynamicMarketplaceColumns: ColumnDef<ProductItem>[] = safeMarketplaces
-//     .sort((a, b) => {
-//       const indexA = MARKETPLACE_ORDER.indexOf(a.toLowerCase());
-//       const indexB = MARKETPLACE_ORDER.indexOf(b.toLowerCase());
-
-//       // marketplace không nằm trong list → đẩy xuống cuối
-//       return (
-//         (indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA) -
-//         (indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB)
-//       );
-//     })
-//     .map((marketplace) => ({
-//       id: marketplace,
-//       header: () => {
-//         const key = marketplace.toLowerCase();
-
-//         const icons: Record<string, string> = {
-//           amazon: "/amazon.png",
-//           kaufland: "/kau.png",
-//           ebay: "/ebay.png",
-//         };
-
-//         const iconSrc = icons[key];
-
-//         return (
-//           <div className="flex justify-center items-center uppercase">
-//             {iconSrc ? (
-//               <Image
-//                 src={iconSrc}
-//                 alt={marketplace}
-//                 width={60}
-//                 height={50}
-//                 className="object-contain h-full"
-//               />
-//             ) : (
-//               marketplace
-//             )}
-//           </div>
-//         );
-//       },
-//       cell: ({ row }) => {
-//         const product = row.original;
-//         const hasMarketplace = product.marketplace_products?.some(
-//           (m) => m.marketplace === marketplace,
-//         );
-
-//         return (
-//           <div className="flex justify-center text-center text-sm font-medium">
-//             {hasMarketplace ? (
-//               <SyncToMarketplace product={product} marketplace={marketplace} />
-//             ) : !product.is_active ? (
-//               <div>Product is inactive</div>
-//             ) : (
-//               <div>No {marketplace} data</div>
-//             )}
-//           </div>
-//         );
-//       },
-//     }));
-
-//   return [
-//     ...baseColumns(setSortByStock), // ✅ gọi hàm để lấy array
-//     fixedMarketplaceColumn,
-//     ...dynamicMarketplaceColumns,
-//   ];
-// };
 
 export const productMarketplaceColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,

@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import { toast } from "sonner";
 
 type SyncErrorResponse = EbaySyncErrorResponse | AuthError | GenericError;
+type SyncToEbayInputWithMeta = syncToEbayInput & { __silent?: boolean };
 
 export function useRemoveFormEbay() {
   const qc = useQueryClient();
@@ -21,23 +22,27 @@ export function useSyncToEbay() {
   return useMutation<
     unknown,
     AxiosError<SyncErrorResponse>,
-    syncToEbayInput,
+    SyncToEbayInputWithMeta,
     string | number
   >({
-    mutationFn: (input: syncToEbayInput) => syncToEbay(input),
+    mutationFn: (input: SyncToEbayInputWithMeta) => {
+      const { __silent, ...payload } = input;
+      return syncToEbay(payload as syncToEbayInput);
+    },
 
     onMutate: (variables) => {
-      // show toast loading khi bắt đầu
+      if (variables.__silent) return;
       return toast.loading("Syncing data to Ebay...");
     },
 
-    onSuccess: (data, variables, toastId) => {
-      // cập nhật toast loading thành success
+    onSuccess: (_data, variables, toastId) => {
+      if (variables.__silent) return;
       toast.success("Update data to eBay successfully", { id: toastId });
       qc.invalidateQueries({ queryKey: ["products"] });
     },
 
-    onError: (error, _vars, toastId) => {
+    onError: (error, variables, toastId) => {
+      if (variables.__silent) return;
       let message = "Update to Ebay failed";
 
       try {

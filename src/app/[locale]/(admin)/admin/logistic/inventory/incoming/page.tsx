@@ -44,12 +44,13 @@ const IncomingInventoryList = () => {
     setPage(urlPage);
   }, [searchParams]);
 
+  const search = searchParams.get("search") ?? undefined;
   const { data, isLoading, isError } = useGetAllPurchaseOrders();
   const {
     data: inventoryPoData,
     isLoading: isInventoryPoLoading,
     isError: isInventoryPoError,
-  } = useAllInventoryPo();
+  } = useAllInventoryPo(search);
 
   const inventoryPoColumns: ColumnDef<InventoryPOItem>[] = [
     {
@@ -144,37 +145,6 @@ const IncomingInventoryList = () => {
         </div>
       ),
     },
-    {
-      accessorKey: "container.container_number",
-      header: () => <div className="text-center">Container Number</div>,
-      cell: ({ row }) => (
-        <div className="text-center">
-          {row.original.container?.container_number ?? "—"}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "container.purchase_order.po_number",
-      header: () => <div className="text-center">PO Number</div>,
-      cell: ({ row }) => (
-        <div className="text-center">
-          {row.original.container?.purchase_order?.po_number ?? "—"}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "container.is_sended_avis",
-      header: () => <div className="text-center">Sent to AMM</div>,
-      cell: ({ row }) => (
-        <div className="text-center">
-          {row.original.container?.is_sended_avis ? (
-            <Check className="inline-flex h-4 w-4 text-green-600" />
-          ) : (
-            <X className="inline-flex h-4 w-4 text-red-500" />
-          )}
-        </div>
-      ),
-    },
   ];
 
   const inventoryPoItems = inventoryPoData ?? [];
@@ -222,6 +192,14 @@ const IncomingInventoryList = () => {
         Purchase Orders
       </div>
 
+      <InventoryTableToolbar
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        addButtonText="Add Product"
+        addButtonUrl="/admin/products/add"
+        setPage={setPage}
+      />
+
       <Tabs defaultValue="purchase-orders">
         <TabsList>
           <TabsTrigger value="purchase-orders">Purchase Orders</TabsTrigger>
@@ -229,14 +207,6 @@ const IncomingInventoryList = () => {
         </TabsList>
 
         <TabsContent value="purchase-orders">
-          <InventoryTableToolbar
-            pageSize={pageSize}
-            setPageSize={setPageSize}
-            addButtonText="Add Product"
-            addButtonUrl="/admin/products/add"
-            setPage={setPage}
-          />
-
           {isLoading ? (
             <ProductTableSkeleton />
           ) : (

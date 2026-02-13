@@ -4,6 +4,7 @@ import { removeFromKaufland, syncToKaufland, syncToKauflandInput } from "./api";
 import { toast } from "sonner";
 
 type SyncErrorResponse = KauflandError | AuthError | GenericError;
+type SyncToKauflandInputWithMeta = syncToKauflandInput & { __silent?: boolean };
 
 export function useRemoveFormKaufland() {
   const qc = useQueryClient();
@@ -20,19 +21,27 @@ export function useSyncToKaufland() {
   return useMutation<
     unknown,
     AxiosError<SyncErrorResponse>,
-    syncToKauflandInput,
+    SyncToKauflandInputWithMeta,
     string | number
   >({
-    mutationFn: (input) => syncToKaufland(input),
+    mutationFn: (input) => {
+      const { __silent, ...payload } = input;
+      return syncToKaufland(payload as syncToKauflandInput);
+    },
 
-    onMutate: () => toast.loading("Syncing data to Kaufland..."),
+    onMutate: (variables) => {
+      if (variables.__silent) return;
+      return toast.loading("Syncing data to Kaufland...");
+    },
 
-    onSuccess: (_data, _vars, toastId) => {
+    onSuccess: (_data, variables, toastId) => {
+      if (variables.__silent) return;
       toast.success("Update data to Kaufland successfully", { id: toastId });
       qc.invalidateQueries({ queryKey: ["products"] });
     },
 
-    onError: (error, _vars, toastId) => {
+    onError: (error, variables, toastId) => {
+      if (variables.__silent) return;
       let message = "Update to Kaufland failed";
 
       try {
