@@ -203,7 +203,7 @@ export default function TableToolbar({
       </div>
 
       {/* Search (auto, no button) */}
-      <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap gap-2">
+      <div className="flex items-center w-full flex-1 flex-nowrap gap-2">
         <MultiSearch />
         <Input
           placeholder="Search"

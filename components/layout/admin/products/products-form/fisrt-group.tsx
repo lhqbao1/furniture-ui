@@ -157,8 +157,6 @@ const ProductDetailInputs = ({
                         if (!values.final_price)
                           missingFields.push("final_price");
                         if (!values.cost) missingFields.push("cost");
-                        if (!values.delivery_cost)
-                          missingFields.push("delivery_cost");
                         // if (!values.stock) missingFields.push("stock");
                         if (!values.static_files?.length)
                           missingFields.push("images");
