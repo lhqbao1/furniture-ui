@@ -101,7 +101,8 @@ const OrderList = () => {
       const rect = wrapper.getBoundingClientRect();
       const bottomPadding = 24; // matches pb-6
       const available = window.innerHeight - rect.top - bottomPadding;
-      setTableHeight(Math.max(240, available));
+      const isMobile = window.innerWidth < 768;
+      setTableHeight(isMobile ? 500 : Math.max(240, available));
     };
 
     updateHeight();
@@ -118,7 +119,7 @@ const OrderList = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col gap-6 overflow-hidden">
+    <div className="md:h-screen h-full flex flex-col gap-6 pb-4">
       <div className="space-y-6">
         {isLoadingStatistic ? (
           <ProductStatisticSkeleton />

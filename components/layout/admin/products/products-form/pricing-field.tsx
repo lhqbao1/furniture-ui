@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -9,6 +9,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  aggregatePackages,
+  calcDeliveryCost,
+} from "@/lib/shipping/delivery-cost";
 
 interface ProductPricingFieldsProps {
   isDsp?: boolean;
@@ -16,6 +20,23 @@ interface ProductPricingFieldsProps {
 
 export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
   const form = useFormContext();
+  const packages = useWatch({
+    control: form.control,
+    name: "packages",
+  });
+  const bundles = useWatch({
+    control: form.control,
+    name: "bundles",
+  });
+  const carrier = useWatch({
+    control: form.control,
+    name: "carrier",
+  });
+  const mergedPackage = aggregatePackages(packages ?? [], bundles ?? []);
+  const { cost, error } = calcDeliveryCost(
+    mergedPackage ? [mergedPackage] : [],
+    carrier,
+  );
 
   return (
     <div className="grid grid-cols-12 gap-6">
@@ -71,7 +92,6 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                     step="0.01" // hoặc "any" để cho phép mọi số thập phân
                     inputMode="decimal" // hint cho bàn phím mobile
                     value={field.value ?? ""} // tránh uncontrolled / NaN
-                    disabled
                     onChange={(e) =>
                       field.onChange(
                         e.target.value === "" ? null : e.target.valueAsNumber,
@@ -81,6 +101,19 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
               </FormControl>
+              <p
+                className={
+                  error
+                    ? "text-xs text-red-600"
+                    : "text-xs text-muted-foreground"
+                }
+              >
+                {error
+                  ? error
+                  : cost != null
+                    ? `Suggested: €${cost}`
+                    : "Suggested: —"}
+              </p>
               <FormMessage />
             </FormItem>
           )}
