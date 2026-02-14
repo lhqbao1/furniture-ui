@@ -118,7 +118,7 @@ const OrderList = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col gap-6 overflow-hidden">
+    <div className="md-h-screen h-full flex flex-col gap-6 overflow-hidden">
       <div className="space-y-6">
         {isLoadingStatistic ? (
           <ProductStatisticSkeleton />
