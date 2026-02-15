@@ -50,7 +50,28 @@ interface SyncToEbayFormProps {
 }
 
 type MarketPlaceFormValues = z.infer<typeof marketPlaceSchema>;
+export function parseError(error: unknown): string {
+  if (!error) return "Unknown error";
 
+  if (typeof error === "string") return error;
+
+  if (error instanceof Error) return error.message;
+
+  if (typeof error === "object") {
+    const e = error as any;
+
+    return (
+      e?.response?.data?.detail ||
+      e?.response?.data?.message ||
+      e?.data?.message ||
+      e?.error?.message ||
+      e?.message ||
+      JSON.stringify(e)
+    );
+  }
+
+  return String(error);
+}
 const SyncToEbayForm = ({
   product,
   isUpdating = false,
@@ -418,12 +439,7 @@ const SyncToEbayForm = ({
           onError(e) {
             toast.error("Failed to update marketplace data", {
               id: loadingToastId,
-              description:
-  e instanceof Error
-    ? e.message
-    : typeof e === "object"
-    ? JSON.stringify(e, null, 2)
-    : String(e),
+              description: parseError(e)
             });
             setUpdating(false);
           },
