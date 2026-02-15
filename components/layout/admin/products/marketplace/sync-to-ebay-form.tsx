@@ -418,7 +418,12 @@ const SyncToEbayForm = ({
           onError(e) {
             toast.error("Failed to update marketplace data", {
               id: loadingToastId,
-              description: e.message,
+              description:
+  e instanceof Error
+    ? e.message
+    : typeof e === "object"
+    ? JSON.stringify(e, null, 2)
+    : String(e),
             });
             setUpdating(false);
           },
