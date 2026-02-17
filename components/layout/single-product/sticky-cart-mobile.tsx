@@ -49,15 +49,17 @@ export default function MobileStickyCart({
       <div className="px-4 py-3">
         {/* Price */}
         <div className="flex gap-2 items-center justify-end">
-          {oldPrice && oldPrice > price && (
-            <div className="text-sm line-through text-gray-400">
-              €
-              {(oldPrice * quantity).toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </div>
-          )}
+       {/*
+{oldPrice && oldPrice > price && (
+  <div className="text-sm line-through text-gray-400">
+    €
+    {(oldPrice * quantity).toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}
+  </div>
+)}
+*/}
           <div className="text-lg font-semibold text-secondary">
             €
             {(price * quantity).toLocaleString("de-DE", {
