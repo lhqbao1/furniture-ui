@@ -53,6 +53,18 @@ const FilterExportForm = () => {
           ? Number(rawVat.replace("%", "").trim())
           : null;
 
+      const getMarketplaceStatus = (
+  marketplaces: any[] | undefined,
+  name: string
+) => {
+  if (!Array.isArray(marketplaces)) return "not synced";
+  const found = marketplaces.find(
+    (m) => m.marketplace?.toLowerCase() === name
+  );
+  if (!found) return "not synced";
+  return found.is_active ? "synced" : "not synced";
+};
+
       return {
         id: Number(clean(p.id_provider)),
         ean: clean(p.ean),
@@ -117,7 +129,11 @@ const FilterExportForm = () => {
             .join("|"),
         ),
         product_link: `https://www.prestige-home.de/de/product/${p.url_key}`,
+    amazon: getMarketplaceStatus(p.marketplace_products, "amazon"),
+kaufland: getMarketplaceStatus(p.marketplace_products, "kaufland"),
+ebay: getMarketplaceStatus(p.marketplace_products, "ebay"),
       };
+      
     });
   };
 
