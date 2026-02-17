@@ -68,16 +68,18 @@ const ProductPricingField = ({
             </span>
           )}
         </div>
-        {!isProductDetails &&
-          product.price &&
-          product.price > product.final_price && (
-            <p className="text-[10px] md:text-sm min-h-0 mb-0.5 text-gray-700 font-light">
-              {!product.owner || product.owner.business_name === "Prestige Home"
-                ? t("ogPrice")
-                : t("ogPriceSupplier")}
-              :{formatEUR(product.price)}
-            </p>
-          )}
+       {/*
+{!isProductDetails &&
+  product.price &&
+  product.price > product.final_price && (
+    <p className="text-[10px] md:text-sm min-h-0 mb-0.5 text-gray-700 font-light">
+      {!product.owner || product.owner.business_name === "Prestige Home"
+        ? t("ogPrice")
+        : t("ogPriceSupplier")}
+      :{formatEUR(product.price)}
+    </p>
+  )}
+*/}
       </div>
 
       {!isProductDetails && (
