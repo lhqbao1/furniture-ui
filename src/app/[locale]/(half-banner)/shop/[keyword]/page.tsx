@@ -59,13 +59,18 @@ export default async function ShopKeywordPage({
   const searchText = keywordSlug.replaceAll("-", " ");
 
   // 🔹 fetch song song (tối ưu)
-  const [products, keywords] = await Promise.all([
-    getAllProducts({
-      search: searchText,
-      page: 1,
-    }),
-    getAllKeywords(),
-  ]);
+  const [productsRaw, keywords] = await Promise.all([
+  getAllProducts({
+    search: searchText,
+    page: 1,
+  }),
+  getAllKeywords(),
+]);
+
+const products = {
+  ...productsRaw,
+  items: productsRaw.items.filter(p => p.is_active),
+};
 
   // 🔍 tìm keyword tương ứng
   const matchedKeyword = keywords.find(
