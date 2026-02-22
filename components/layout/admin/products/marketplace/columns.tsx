@@ -13,6 +13,7 @@ import SyncToEbayForm from "./sync-to-ebay-form";
 import RemoveFromMarketplaceDialog from "./remove-dialog";
 import SyncToAmazonForm from "./ync-to-amazon-form";
 import EditProductDrawer from "./edit-product-drawer";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 const MARKETPLACES = ["kaufland", "ebay", "amazon"] as const;
 type Marketplace = (typeof MARKETPLACES)[number];
@@ -325,7 +326,9 @@ export const baseColumns = (
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.original.stock} pcs.</div>,
+    cell: ({ row }) => (
+      <div>{calculateAvailableStock(row.original)} pcs.</div>
+    ),
     enableSorting: true,
   },
   {

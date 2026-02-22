@@ -22,6 +22,7 @@ import ListVariantSkeleton from "../skeleton/list-variant-skeleton";
 import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -80,10 +81,9 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   }, [inventoryPo]);
 
   const maxStock = useMemo(() => {
-    const baseStock = productDetails.stock ?? 0;
-    const usedStock = productDetails.result_stock ?? 0;
-    return baseStock - usedStock + incomingStock;
-  }, [productDetails.stock, productDetails.result_stock, incomingStock]);
+    const baseStock = calculateAvailableStock(productDetails);
+    return baseStock + incomingStock;
+  }, [productDetails, incomingStock]);
 
   return (
     <>

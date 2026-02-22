@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import React from "react";
 import Link from "next/link";
 import DeliveryRange from "./delivery-range";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
@@ -19,20 +20,21 @@ const ProductDetailsLogistic = ({
   const isSpedition = carrier === "amm" || carrier === "spedition";
 
   const shippingCost = isSpedition ? "35,95€" : "5,95€";
+  const availableStock = calculateAvailableStock(productDetails);
 
   return (
     <div className="space-y-2">
       {/* <div>{t("includeVatAndShipping")}</div> */}
       <div className="flex gap-2 py-0 lg:py-3 items-center ">
-        <div>{t("inStock")}:</div>
+        <div>{availableStock <= 0 ? t("outStock") : t("inStock")}:</div>
         <div className="grid grid-cols-3 w-1/3 gap-1">
           <span
             className={`w-full h-2 rounded-xs ${
-              productDetails.stock === 0
+              availableStock <= 0
                 ? "bg-gray-300"
-                : productDetails.stock < 10
+                : availableStock < 10
                   ? "bg-red-500"
-                  : productDetails.stock <= 20
+                  : availableStock <= 20
                     ? "bg-primary"
                     : "bg-secondary"
             }`}
@@ -40,11 +42,11 @@ const ProductDetailsLogistic = ({
 
           <span
             className={`w-full h-2 rounded-xs ${
-              productDetails.stock === 0
+              availableStock <= 0
                 ? "bg-gray-300"
-                : productDetails.stock < 10
+                : availableStock < 10
                   ? "bg-gray-300"
-                  : productDetails.stock <= 20
+                  : availableStock <= 20
                     ? "bg-primary"
                     : "bg-secondary"
             }`}
@@ -52,11 +54,11 @@ const ProductDetailsLogistic = ({
 
           <span
             className={`w-full h-2 rounded-xs ${
-              productDetails.stock === 0
+              availableStock <= 0
                 ? "bg-gray-300"
-                : productDetails.stock < 10
+                : availableStock < 10
                   ? "bg-gray-300"
-                  : productDetails.stock <= 20
+                  : availableStock <= 20
                     ? "bg-gray-400"
                     : "bg-secondary"
             }`}

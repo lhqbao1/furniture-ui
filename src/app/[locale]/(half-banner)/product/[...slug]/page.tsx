@@ -18,6 +18,7 @@ import { getBlogsByProductSlug } from "@/features/blog/api";
 import RelatedBlogs from "@/components/layout/single-product/related-blogs";
 import BoughtTogetherSection from "@/components/layout/single-product/bought-together";
 import Script from "next/script";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -189,6 +190,8 @@ export default async function Page({
   const plainParent = toPlain(parentProduct);
   const plainBlogs = toPlain(relatedBlogs);
 
+  const availableStock = calculateAvailableStock(plainProduct);
+
   const productSchema: any = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -206,7 +209,7 @@ export default async function Page({
       priceCurrency: "EUR",
       price: String(plainProduct.final_price),
       availability:
-        plainProduct.stock > 0
+        availableStock > 0
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
       priceValidUntil: "2026-12-31",

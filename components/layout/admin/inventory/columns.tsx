@@ -21,6 +21,7 @@ import { useEditProduct } from "@/features/products/hook";
 import { useUpdateStockProduct } from "@/features/products/inventory/hook";
 import { useAtom } from "jotai";
 import { adminIdAtom } from "@/store/auth";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // function ActionsCell({ product }: { product: ProductItem }) {
 //   const locale = useLocale();
@@ -386,7 +387,7 @@ export const getInventoryColumns = (
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          {row.original.stock - (row.original.result_stock ?? 0)}
+          {calculateAvailableStock(row.original)}
         </div>
       );
     },
@@ -423,7 +424,7 @@ export const getInventoryColumns = (
       <div className="text-center uppercase">Available Purchase Value</div>
     ),
     cell: ({ row }) => {
-      const available = row.original.stock - (row.original.result_stock ?? 0);
+      const available = calculateAvailableStock(row.original);
       return (
         <div className="text-center">
           {row.original.cost ? (
@@ -502,7 +503,7 @@ export const getInventoryColumns = (
       <div className="text-center uppercase">Available Sale Value</div>
     ),
     cell: ({ row }) => {
-      const available = row.original.stock - (row.original.result_stock ?? 0);
+      const available = calculateAvailableStock(row.original);
 
       return (
         <div className="text-center">

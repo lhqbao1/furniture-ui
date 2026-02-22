@@ -126,7 +126,6 @@ const AddContainerDialog = ({
         },
       );
     } else {
-      console.log(currentContainer);
       createContainerMutation.mutate(payload, {
         onSuccess: () => {
           toast.success("Container created successfully");
