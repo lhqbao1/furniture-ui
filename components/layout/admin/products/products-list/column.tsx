@@ -47,6 +47,7 @@ import {
 import { getCarrierLogo } from "@/lib/getCarrierImage";
 import { CategoryResponse } from "@/types/categories";
 import { CARRIERS } from "@/data/data";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
@@ -1682,12 +1683,7 @@ export const getProductColumns = (
       );
     },
     cell: ({ row }) => {
-      const stock = row.original.stock;
-      const toNum = (v: unknown) =>
-        typeof v === "number" ? v : Number(v) || 0;
-
-      const computedStock =
-        toNum(stock) - Math.abs(toNum(row.original.result_stock));
+      const computedStock = calculateAvailableStock(row.original);
 
       return (
         <div

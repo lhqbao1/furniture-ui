@@ -21,6 +21,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { ProductItem } from "@/types/products";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // import RichEditor dynamically to avoid SSR issues
 const RichEditor = dynamic(
@@ -36,12 +38,14 @@ interface ProductDetailInputsProps {
   isEdit?: boolean;
   productId?: string | null;
   isDSP?: boolean;
+  productDetails?: Partial<ProductItem>;
 }
 
 const ProductDetailInputs = ({
   isEdit,
   productId,
   isDSP = false,
+  productDetails,
 }: ProductDetailInputsProps) => {
   const form = useFormContext();
   const listImages = form.watch("static_files") ?? [];
@@ -245,10 +249,9 @@ const ProductDetailInputs = ({
           control={form.control}
           name="stock"
           render={({ field }) => {
-            const computedStock =
-              typeof stock === "number" && typeof result_stock === "number"
-                ? stock - Math.abs(result_stock ?? 0)
-                : "";
+            const computedStock = calculateAvailableStock(
+              productDetails ?? (form.getValues() as ProductItem),
+            );
 
             return (
               <FormItem className="flex flex-col w-full">

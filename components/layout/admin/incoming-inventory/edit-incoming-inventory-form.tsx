@@ -75,10 +75,6 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
       bank_id: data.seller.bank_infos[0]?.id ?? "",
     });
 
-    // inside useEffect after data arrives
-    console.log("data buyer_id", data?.buyer?.id);
-    console.log("data seller_id", data?.seller?.id);
-
     // 2️⃣ sync state cho các select
     setSelectedBuyerId(data.buyer.id);
     setSelectedsellerId(data.seller.id);
@@ -96,8 +92,6 @@ const EditIncomingInventoryForm = ({ id }: EditIncomingInventoryFormProps) => {
         onSuccess(data, variables, context) {
           toast.success("Edit purchase order success");
           // inside onSuccess
-          console.log("onSuccess buyer_id", form.getValues("buyer_id"));
-          console.log("onSuccess seller_id", form.getValues("seller_id"));
 
           setSelectedBuyerId(form.getValues("buyer_id") || null);
           setSelectedsellerId(form.getValues("seller_id") || null);

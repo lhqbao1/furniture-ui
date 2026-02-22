@@ -108,8 +108,7 @@ export default function MobileStickyCart({
                 disabled
                 // disabled={productDetails.stock > 0 ? false : true}
               >
-                {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
-                {t("addToCart")}
+                {t("outStock")}
               </Button>
             )}
           </div>

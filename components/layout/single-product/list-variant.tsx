@@ -25,10 +25,6 @@ const ListVariant = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const router = useRouter();
 
-  console.log(variant);
-  console.log(currentProduct);
-  console.log(parentProduct);
-
   useEffect(() => {
     if (!currentProduct?.options?.length) return;
 
