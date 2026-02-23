@@ -36,16 +36,22 @@ const PageHeader = () => {
 
         <div className="flex h-full items-center justify-end lg:w-fit w-full gap-3 lg:items-end lg:gap-6">
           {/*Mobile Search */}
-          <MobileProductSearch />
+          <div className="w-[20px] h-[20px] md:w-[30px] md:h-[30px]">
+            <MobileProductSearch />
+          </div>
           {/*Shopping cart */}
-          <div className="lg:hidden">
+          <div className="lg:hidden w-[20px] h-[20px] md:w-[30px] md:h-[30px]">
             <CartDrawerMobile />
           </div>
-          <div className="hidden lg:block relative">
+          <div className="hidden lg:block relative w-[20px] h-[20px] md:w-[30px] md:h-[30px]">
             <HeaderCartIcon />
           </div>
-          <HeaderUserLogin />
-          <ExpandDrawer />
+          <div className="w-[20px] h-[20px] md:w-[30px] md:h-[30px]">
+            <HeaderUserLogin />
+          </div>
+          <div className="w-[20px] h-[20px] md:w-[30px] md:h-[30px]">
+            <ExpandDrawer />
+          </div>
         </div>
       </div>
       <div className="min-h-16 bg-white xl:px-20 hidden lg:block">
