@@ -31,6 +31,47 @@ interface PageProps {
   params: Promise<{ slug: string[]; locale: string }>;
 }
 
+function isPublishableProduct(product?: Partial<ProductItem> | null) {
+  if (!product) return false;
+
+  const hasSku =
+    typeof product.sku === "string" && product.sku.trim().length > 0;
+  const hasEan =
+    typeof product.ean === "string" && product.ean.trim().length > 0;
+  const hasCarrier =
+    typeof product.carrier === "string" && product.carrier.trim().length > 0;
+  const hasImages =
+    Array.isArray(product.static_files) && product.static_files.length > 0;
+  const hasDescription =
+    typeof product.description === "string" &&
+    product.description.trim().length > 0;
+  const hasCategory =
+    Array.isArray(product.categories) && product.categories.length > 0;
+  const hasBrand =
+    typeof product.brand?.name === "string" &&
+    product.brand.name.trim().length > 0;
+  const hasFinalPrice =
+    product.final_price !== null &&
+    product.final_price !== undefined &&
+    Number.isFinite(Number(product.final_price));
+  const hasStock =
+    product.stock !== null &&
+    product.stock !== undefined;
+
+  return (
+    product.is_active === true &&
+    hasSku &&
+    hasEan &&
+    hasImages &&
+    hasCarrier &&
+    hasDescription &&
+    hasCategory &&
+    hasBrand &&
+    hasFinalPrice &&
+    hasStock
+  );
+}
+
 /* --------------------------------------------------------
  * 1) STATIC PARAMS
  * ------------------------------------------------------*/
@@ -44,7 +85,10 @@ export async function generateStaticParams() {
   return products
     .filter(
       (p) =>
-        p?.url_key && typeof p.url_key === "string" && p.url_key.length > 0,
+        p?.url_key &&
+        typeof p.url_key === "string" &&
+        p.url_key.length > 0 &&
+        isPublishableProduct(p),
     )
     .flatMap((p) =>
       locales.map((locale) => ({
@@ -78,6 +122,7 @@ export async function generateMetadata({
 
   // SAFE JSON
   product = JSON.parse(JSON.stringify(product));
+  if (!isPublishableProduct(product)) return notFound();
 
   const reviews = await getReviewByProduct(product.id);
   const hasReviews = reviews && reviews.length > 0;
@@ -147,6 +192,7 @@ export default async function Page({
 
   // ⭐ Convert to JSON to avoid "function passed to client component"
   product = JSON.parse(JSON.stringify(product));
+  if (!isPublishableProduct(product)) return notFound();
 
   /* ----------------------------------------------------
    * 2) PARALLEL REQUESTS (SAFE WRAPPED)

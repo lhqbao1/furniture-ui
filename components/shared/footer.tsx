@@ -258,6 +258,9 @@ const Footer = () => {
               src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
               loading="lazy"
               alt="zu www.idealo.de"
+              width="120"
+              height="40"
+              className="h-10 w-auto object-contain"
             />
           </a>
           <a
@@ -270,6 +273,9 @@ const Footer = () => {
               src="https://cdn.billiger.com/partnerbutton/light/30588"
               alt="billiger.de - The price-comparison"
               title="billiger.de - The price-comparison"
+              width="120"
+              height="40"
+              className="h-10 w-auto object-contain"
             />{" "}
           </a>
           {/* <a

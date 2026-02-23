@@ -23,7 +23,7 @@ export function AdminSideBar() {
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
-  const { isMobile, setOpenMobile } = useSidebar();
+  const { isMobile, setOpenMobile, setOpen } = useSidebar();
 
   const items = [
     {
@@ -194,7 +194,11 @@ export function AdminSideBar() {
   const withLocale = (url: string) => `${url}`;
   const handleNavigate = (url: string) => {
     router.push(url, { locale });
-    if (isMobile) setOpenMobile(false);
+    if (isMobile) {
+      setOpenMobile(false);
+    } else {
+      setOpen(false);
+    }
   };
   const handleCloseMobile = () => {
     if (isMobile) setOpenMobile(false);

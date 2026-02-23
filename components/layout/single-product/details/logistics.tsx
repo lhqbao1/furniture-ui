@@ -71,7 +71,7 @@ const ProductDetailsLogistic = ({
         href={"https://www.prestige-home.de/de/versandbedingungen"}
         className="flex flex-row gap-4 items-center"
       >
-        <Truck size={25} />
+        <Truck size={25} aria-hidden="true" />
         <span className="text-gray-800 font-medium text-sm cursor-pointer hover:underline">
           {t("shippingCost", { shippingCost })}
         </span>
@@ -80,7 +80,7 @@ const ProductDetailsLogistic = ({
       <DeliveryRange productDetails={productDetails} />
 
       <div className="flex flex-row gap-4 items-center">
-        <Undo2 size={25} />
+        <Undo2 size={25} aria-hidden="true" />
         <Link
           href={"https://www.prestige-home.de/de/widerrufsbelehrung"}
           className="text-gray-800 font-medium text-sm hover:underline"
