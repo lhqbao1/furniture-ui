@@ -51,41 +51,41 @@ const OrderList = () => {
     search: filters.search,
   });
 
-  const {
-    data: statistic,
-    isLoading: isLoadingStatistic,
-    isError: isErrorStatistic,
-  } = useGetCheckOutStatistic({
-    from_date: filters.fromDate,
-    to_date: filters.toDate,
-  });
+  // const {
+  //   data: statistic,
+  //   isLoading: isLoadingStatistic,
+  //   isError: isErrorStatistic,
+  // } = useGetCheckOutStatistic({
+  //   from_date: filters.fromDate,
+  //   to_date: filters.toDate,
+  // });
 
-  const mergedStatistic = [
-    {
-      count: statistic?.count_dispatched_order,
-      total: statistic?.total_dispatched_order ?? 0,
-      label: "Dispatched",
-      textColor: "#39B54A",
-    },
-    {
-      count: statistic?.count_waiting_payment_order,
-      total: statistic?.total_waiting_payment_order ?? 0,
-      label: "Waiting for payment",
-      textColor: "#9b59ff",
-    },
-    {
-      count: statistic?.count_preparing_shipping_order,
-      total: statistic?.total_preparing_shipping_order ?? 0,
-      label: "Preparing Shipping",
-      textColor: "#29ABE2",
-    },
-    {
-      count: statistic?.count_stock_reserved_order,
-      total: statistic?.total_stock_reserved_order ?? 0,
-      label: "Stock Reserved",
-      textColor: "#ff4f7b",
-    },
-  ];
+  // const mergedStatistic = [
+  //   {
+  //     count: statistic?.count_dispatched_order,
+  //     total: statistic?.total_dispatched_order ?? 0,
+  //     label: "Dispatched",
+  //     textColor: "#39B54A",
+  //   },
+  //   {
+  //     count: statistic?.count_waiting_payment_order,
+  //     total: statistic?.total_waiting_payment_order ?? 0,
+  //     label: "Waiting for payment",
+  //     textColor: "#9b59ff",
+  //   },
+  //   {
+  //     count: statistic?.count_preparing_shipping_order,
+  //     total: statistic?.total_preparing_shipping_order ?? 0,
+  //     label: "Preparing Shipping",
+  //     textColor: "#29ABE2",
+  //   },
+  //   {
+  //     count: statistic?.count_stock_reserved_order,
+  //     total: statistic?.total_stock_reserved_order ?? 0,
+  //     label: "Stock Reserved",
+  //     textColor: "#ff4f7b",
+  //   },
+  // ];
 
   useEffect(() => {
     window.scrollTo({
@@ -102,7 +102,7 @@ const OrderList = () => {
       const bottomPadding = 24; // matches pb-6
       const available = window.innerHeight - rect.top - bottomPadding;
       const isMobile = window.innerWidth < 768;
-      setTableHeight(isMobile ? 500 : Math.max(240, available));
+      setTableHeight(isMobile ? 580 : Math.max(500, available));
     };
 
     updateHeight();
@@ -119,13 +119,13 @@ const OrderList = () => {
   }
 
   return (
-    <div className="md:h-screen h-full flex flex-col gap-6 pb-4">
+    <div className="flex flex-col gap-6 pb-4">
       <div className="space-y-6">
-        {isLoadingStatistic ? (
+        {/* {isLoadingStatistic ? (
           <ProductStatisticSkeleton />
         ) : (
           <OrderStatistic statistic={mergedStatistic} isOrder />
-        )}
+        )} */}
         <div className="text-3xl text-secondary font-bold text-center">
           Order List
         </div>
@@ -138,28 +138,29 @@ const OrderList = () => {
         {isLoading && !data ? (
           <ProductTableSkeleton columnsCount={6} rowsCount={6} />
         ) : (
-          <div
-            ref={tableWrapRef}
-            className="min-h-0"
-            style={tableHeight ? { height: `${tableHeight}px` } : undefined}
-          >
-            <ProductTable
-              data={data ? data.items : []}
-              columns={orderColumns}
-              page={page}
-              setPage={handlePageChange}
-              pageSize={pageSize}
-              setPageSize={setPageSize}
-              totalItems={data?.pagination.total_items ?? 0}
-              totalPages={data?.pagination.total_pages ?? 0}
-              hasBackground
-              hasExpanded
-              renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
-              hasHeaderBackGround
-              isSticky
-              stickyContainerClassName="h-full"
-            />
-          </div>
+          // <div
+          //   ref={tableWrapRef}
+          //   className="min-h-0"
+          //   style={tableHeight ? { height: `${tableHeight}px` } : undefined}
+          // >
+
+          // </div>
+          <ProductTable
+            data={data ? data.items : []}
+            columns={orderColumns}
+            page={page}
+            setPage={handlePageChange}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            totalItems={data?.pagination.total_items ?? 0}
+            totalPages={data?.pagination.total_pages ?? 0}
+            hasBackground
+            hasExpanded
+            renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
+            hasHeaderBackGround
+            isSticky
+            stickyContainerClassName="h-full"
+          />
         )}
       </div>
     </div>

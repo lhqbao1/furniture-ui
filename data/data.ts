@@ -712,6 +712,11 @@ export const listChanel = [
     icon: "inprodius.png",
   },
   {
+    id: 13,
+    name: "euro-tops",
+    icon: "euro-top.png",
+  },
+  {
     id: 10,
     name: "norma",
     icon: "norma.png",

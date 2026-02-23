@@ -11,16 +11,25 @@ export const calculateAvailableStock = (
   const bundles = product.bundles ?? [];
 
   if (bundles.length > 0) {
-    const bundleStocks = bundles.map((bundle) => {
+    const bundleStocks = bundles
+      .map((bundle) => {
       const qty = toNumber(bundle.quantity);
-      if (qty <= 0) return 0;
+      if (qty <= 0) return Number.NaN;
+
+        const hasChildStockData =
+          bundle.bundle_item.stock != null ||
+          bundle.bundle_item.result_stock != null;
+        if (!hasChildStockData) return Number.NaN;
 
       const childStock = calculateAvailableStock(bundle.bundle_item);
       const ratio = childStock / qty;
       return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
-    });
+      })
+      .filter((value) => !Number.isNaN(value));
 
-    return Math.min(...bundleStocks);
+    if (bundleStocks.length > 0) {
+      return Math.min(...bundleStocks);
+    }
   }
 
   const stock = toNumber(product.stock);

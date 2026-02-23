@@ -49,10 +49,7 @@ const ActionCell = ({
         size="icon"
         onClick={() => router.push(`/admin/orders/${id}`, { locale })}
       >
-        <Eye
-          className="w-4 h-4"
-          stroke="#F7941D"
-        />
+        <Eye className="w-4 h-4" stroke="#F7941D" />
       </Button>
 
       {/* Expand button */}
@@ -99,11 +96,7 @@ const ActionCellChild = ({
       {!isSupplier && (
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-amber-50"
-            >
+            <Button variant="ghost" size="icon" className="hover:bg-amber-50">
               <Eye className="w-4 h-4 text-amber-500" />
             </Button>
           </DialogTrigger>
@@ -134,10 +127,7 @@ const ActionCellChild = ({
       /> */}
 
       {status?.toLowerCase() === "exchange" && (
-        <CancelExchangeDialog
-          id={checkoutId}
-          main_checkout_id={checkoutId}
-        />
+        <CancelExchangeDialog id={checkoutId} main_checkout_id={checkoutId} />
       )}
 
       {/* Expand button */}
@@ -325,10 +315,10 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
               maximumFractionDigits: 2,
             })}
           </div>
-          <ViewFileDialog
+          {/* <ViewFileDialog
             checkoutId={row.original.id}
             type="invoice"
-          />
+          /> */}
         </div>
       );
     },
@@ -469,14 +459,11 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
               maximumFractionDigits: 2,
             })}
           </div>
-          {row.original.status === "Pending" ? (
+          {/* {row.original.status === "Pending" ? (
             ""
           ) : (
-            <ViewFileDialog
-              checkoutId={row.original.id}
-              type="invoice"
-            />
-          )}
+            <ViewFileDialog checkoutId={row.original.id} type="invoice" />
+          )} */}
         </div>
       );
     },

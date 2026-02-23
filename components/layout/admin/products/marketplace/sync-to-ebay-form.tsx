@@ -29,6 +29,7 @@ import { Loader2, Pencil, Plus, RefreshCw } from "lucide-react";
 import { useSyncToEbay } from "@/features/ebay/hook";
 import { syncToEbayInput } from "@/features/ebay/api";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import RichEditor from "@/components/shared/tiptap/tiptap-editor";
 import {
   Dialog,
@@ -118,7 +119,7 @@ const SyncToEbayForm = ({
       description: product.description,
       final_price: marketplaceRecord?.final_price ?? product.final_price,
       min_stock: marketplaceRecord?.min_stock ?? 1,
-      max_stock: product.stock - (product.result_stock ?? 0),
+      max_stock: calculateAvailableStock(product),
       sku: product.sku,
       handling_time: marketplaceRecord?.handling_time ?? undefined,
       marketplace_offer_id: marketplaceRecord?.marketplace_offer_id ?? "",

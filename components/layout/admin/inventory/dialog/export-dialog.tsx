@@ -11,6 +11,7 @@ import { saveAs } from "file-saver";
 import { useGetSuppliers } from "@/features/supplier/hook";
 import { SupplierResponse } from "@/types/supplier";
 import SupplierSelect from "../../products/products-list/toolbar/supplier-select";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -63,7 +64,10 @@ const ExportInventoryDialog = () => {
 
     const clean = (val: any) => (val === null || val === undefined ? "" : val);
 
-    const exportData = data.map((p) => ({
+    const exportData = data.map((p) => {
+      const available = calculateAvailableStock(p);
+
+      return {
       id: p.id_provider ?? undefined, // text
       name: p.name ?? undefined, // text
       ean: p.ean ?? undefined, // text
@@ -76,10 +80,7 @@ const ExportInventoryDialog = () => {
       sale_price: typeof p.final_price === "number" ? p.final_price : undefined,
 
       // === stock === (value)
-      available_stock:
-        typeof p.stock === "number"
-          ? p.stock - (p.result_stock ?? 0)
-          : undefined,
+      available_stock: available,
 
       reserved_stock:
         typeof p.result_stock === "number" ? p.result_stock : undefined,
@@ -88,9 +89,7 @@ const ExportInventoryDialog = () => {
 
       // === purchase value ===
       available_purchase_value:
-        typeof p.cost === "number" && typeof p.stock === "number"
-          ? (p.stock - (p.result_stock ?? 0)) * p.cost
-          : undefined,
+        typeof p.cost === "number" ? available * p.cost : undefined,
 
       reserved_purchase_value:
         typeof p.cost === "number" && typeof p.result_stock === "number"
@@ -104,10 +103,11 @@ const ExportInventoryDialog = () => {
 
       // === sale value ===
       available_sale_value:
-        typeof p.final_price === "number" && typeof p.stock === "number"
-          ? (p.stock - (p.result_stock ?? 0)) * p.final_price
+        typeof p.final_price === "number"
+          ? available * p.final_price
           : undefined,
-    }));
+    };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
 
