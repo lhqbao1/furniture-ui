@@ -38,6 +38,7 @@ import {
 import { useSyncToAmazon } from "@/features/amazon/hook";
 import { SyncToAmazonInput } from "@/features/amazon/api";
 import { COUNTRY_ORIGIN_OPTIONS } from "@/data/data";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 interface SyncToAmazonFormProps {
   product: ProductItem;
@@ -82,7 +83,7 @@ const SyncToAmazonForm = ({
         product.marketplace_products.find(
           (i) => i.marketplace === currentMarketplace,
         )?.min_stock ?? 1,
-      max_stock: product.stock - (product.result_stock ?? 0),
+      max_stock: calculateAvailableStock(product),
       sku: product.id_provider,
       is_active: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,

@@ -326,6 +326,7 @@ const OrderImport = () => {
               <SelectItem value="praktiker">Praktiker</SelectItem>
               <SelectItem value="norma">Norma24</SelectItem>
               <SelectItem value="check24">Check24</SelectItem>
+              <SelectItem value="euro-tops">Euro Tops</SelectItem>
               <SelectItem value="prestige">Prestige Home</SelectItem>
             </SelectContent>
           </Select>

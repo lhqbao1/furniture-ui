@@ -102,7 +102,7 @@ const OrderList = () => {
       const bottomPadding = 24; // matches pb-6
       const available = window.innerHeight - rect.top - bottomPadding;
       const isMobile = window.innerWidth < 768;
-      setTableHeight(isMobile ? 500 : Math.max(240, available));
+      setTableHeight(isMobile ? 500 : Math.max(500, available));
     };
 
     updateHeight();
@@ -121,11 +121,11 @@ const OrderList = () => {
   return (
     <div className="md:h-screen h-full flex flex-col gap-6 pb-4">
       <div className="space-y-6">
-        {isLoadingStatistic ? (
+        {/* {isLoadingStatistic ? (
           <ProductStatisticSkeleton />
         ) : (
           <OrderStatistic statistic={mergedStatistic} isOrder />
-        )}
+        )} */}
         <div className="text-3xl text-secondary font-bold text-center">
           Order List
         </div>

@@ -228,6 +228,53 @@ function EditableEANCell({ product }: { product: ProductItem }) {
   );
 }
 
+const toNumber = (value: unknown): number =>
+  typeof value === "number" ? value : Number(value) || 0;
+
+const calculateBundlePhysicalStock = (product: ProductItem): number => {
+  const bundles = product.bundles ?? [];
+  if (bundles.length === 0) return toNumber(product.stock);
+
+  const bundleStocks = bundles
+    .map((bundle) => {
+      const qty = toNumber(bundle.quantity);
+      if (qty <= 0) return Number.NaN;
+
+      const childStock = toNumber(bundle.bundle_item.stock);
+      const ratio = childStock / qty;
+      return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
+    })
+    .filter((value) => !Number.isNaN(value));
+
+  if (bundleStocks.length > 0) {
+    return Math.min(...bundleStocks);
+  }
+
+  return toNumber(product.stock);
+};
+
+const calculateBundleReservedStock = (product: ProductItem): number => {
+  const bundles = product.bundles ?? [];
+  if (bundles.length === 0) return toNumber(product.result_stock);
+
+  const bundleStocks = bundles
+    .map((bundle) => {
+      const qty = toNumber(bundle.quantity);
+      if (qty <= 0) return Number.NaN;
+
+      const childReserved = toNumber(bundle.bundle_item.result_stock);
+      const ratio = childReserved / qty;
+      return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
+    })
+    .filter((value) => !Number.isNaN(value));
+
+  if (bundleStocks.length > 0) {
+    return Math.min(...bundleStocks);
+  }
+
+  return toNumber(product.result_stock);
+};
+
 export const getInventoryColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,
   is_incoming?: boolean,
@@ -385,11 +432,18 @@ export const getInventoryColumns = (
     accessorKey: "available",
     header: ({}) => <div className="text-center uppercase">Available</div>,
     cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {calculateAvailableStock(row.original)}
-        </div>
-      );
+      const isBundle =
+        row.original.is_bundle ||
+        (row.original.bundles && row.original.bundles.length > 0);
+      const reserved = isBundle
+        ? calculateBundleReservedStock(row.original)
+        : toNumber(row.original.result_stock);
+      const physical = isBundle
+        ? calculateBundlePhysicalStock(row.original)
+        : toNumber(row.original.stock);
+      const available = physical - Math.abs(reserved);
+
+      return <div className="text-center">{available}</div>;
     },
   },
 
@@ -397,7 +451,14 @@ export const getInventoryColumns = (
     accessorKey: "reserved",
     header: ({}) => <div className="text-center uppercase">Reserved</div>,
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.result_stock} </div>;
+      return (
+        <div className="text-center">
+          {row.original.is_bundle ||
+          (row.original.bundles && row.original.bundles.length > 0)
+            ? calculateBundleReservedStock(row.original)
+            : row.original.result_stock}
+        </div>
+      );
     },
   },
 
@@ -406,10 +467,10 @@ export const getInventoryColumns = (
     header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
     cell: ({ row }) => {
       return (
-        <div>
+        <div className="text-center">
           {row.original.is_bundle ||
           (row.original.bundles && row.original.bundles.length > 0) ? (
-            row.original.stock
+            calculateBundlePhysicalStock(row.original)
           ) : (
             <EditableStockCell product={row.original} />
           )}
@@ -424,7 +485,16 @@ export const getInventoryColumns = (
       <div className="text-center uppercase">Available Purchase Value</div>
     ),
     cell: ({ row }) => {
-      const available = calculateAvailableStock(row.original);
+      const isBundle =
+        row.original.is_bundle ||
+        (row.original.bundles && row.original.bundles.length > 0);
+      const reserved = isBundle
+        ? calculateBundleReservedStock(row.original)
+        : toNumber(row.original.result_stock);
+      const physical = isBundle
+        ? calculateBundlePhysicalStock(row.original)
+        : toNumber(row.original.stock);
+      const available = physical - Math.abs(reserved);
       return (
         <div className="text-center">
           {row.original.cost ? (
@@ -503,7 +573,16 @@ export const getInventoryColumns = (
       <div className="text-center uppercase">Available Sale Value</div>
     ),
     cell: ({ row }) => {
-      const available = calculateAvailableStock(row.original);
+      const isBundle =
+        row.original.is_bundle ||
+        (row.original.bundles && row.original.bundles.length > 0);
+      const reserved = isBundle
+        ? calculateBundleReservedStock(row.original)
+        : toNumber(row.original.result_stock);
+      const physical = isBundle
+        ? calculateBundlePhysicalStock(row.original)
+        : toNumber(row.original.stock);
+      const available = physical - Math.abs(reserved);
 
       return (
         <div className="text-center">

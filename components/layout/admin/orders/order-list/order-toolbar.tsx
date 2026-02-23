@@ -117,13 +117,10 @@ export default function OrderToolbar({
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
-      <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
+      <div className="flex items-center lg:gap-4 gap-2 flex-nowrap">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex items-center gap-1"
-            >
+            <Button variant="outline" className="flex items-center gap-1">
               Group action <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -170,10 +167,7 @@ export default function OrderToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
+            <Button variant="ghost" className="flex items-center gap-1">
               Filter <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -185,10 +179,7 @@ export default function OrderToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
+            <Button variant="ghost" className="flex items-center gap-1">
               View <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -200,10 +191,7 @@ export default function OrderToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
+            <Button variant="ghost" className="flex items-center gap-1">
               Columns <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -231,10 +219,7 @@ export default function OrderToolbar({
       </div>
 
       {isAddButtonModal && (
-        <Dialog
-          open={openAddModal}
-          onOpenChange={setOpenAddModal}
-        >
+        <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
           <DialogContent className="w-1/3">
             <DialogHeader>
               <DialogTitle>{addButtonText}</DialogTitle>
