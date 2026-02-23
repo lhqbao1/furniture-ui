@@ -11,9 +11,12 @@ const escapeCsv = (value?: string | number) => {
 
 export async function GET() {
   try {
-    const products = await getProductsFeed();
+    const products = (await getProductsFeed()) ?? [];
 
-    // Header CSV
+    if (!Array.isArray(products)) {
+      throw new Error("Products is not array");
+    }
+
     const headers = [
       "eans",
       "sku",
@@ -22,7 +25,6 @@ export async function GET() {
       "categoryPath",
       "url",
       "hans",
-      // "description",
       "imageUrls",
       "price",
       "delivery",
@@ -34,63 +36,76 @@ export async function GET() {
     ];
 
     const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0 && p.brand)
+      .filter(
+        (p) =>
+          p &&
+          Number(p.final_price) > 0 &&
+          p.is_active === true &&
+          Number(p.stock) > 0
+      )
       .map((p) => {
-        const categories =
-          p.categories
-            ?.map((c) => {
-              const parent = c.name;
-              const child = c.children?.[0]?.name;
-
+        try {
+          const categories =
+            p.categories?.map((c: any) => {
+              const parent = c?.name ?? "";
+              const child = c?.children?.[0]?.name;
               return child ? `${parent} > ${child}` : parent;
-            })
-            .join(", ") || "";
-        return [
-          escapeCsv(p.ean),
-          escapeCsv(p.id_provider),
-          escapeCsv(p.brand.company_name ?? "Prestige Home"),
-          escapeCsv(p.name),
-          escapeCsv(categories),
-          escapeCsv(
-            p.brand
-              ? p.brand.name.toLowerCase() === "econelo"
-                ? `https://econelo.de/produkt/${p.url_key}`
-                : `https://prestige-home.de/de/product/${p.url_key}`
-              : `https://prestige-home.de/de/product/${p.url_key}`,
-          ),
-          escapeCsv(p.sku),
-          // escapeCsv(cleanDescription(p.description)),
-          escapeCsv(
-            (p.static_files || [])
-              .map((f) => cleanImageLink(f?.url || ""))
+            }).join(", ") ?? "";
+
+          const url =
+            p.brand?.name?.toLowerCase() === "econelo"
+              ? `https://econelo.de/produkt/${p.url_key ?? ""}`
+              : `https://prestige-home.de/de/product/${p.url_key ?? ""}`;
+
+          const images =
+            p.static_files
+              ?.map((f: any) => cleanImageLink(f?.url ?? ""))
               .filter(Boolean)
-              .join(", "),
-          ),
-          escapeCsv(p.final_price.toFixed(2)),
-          escapeCsv(
-            `Lieferung innerhalb von ${p.delivery_time} Werktagen nach Zahlungseingang`,
-          ),
-          "NEW",
-          escapeCsv(p.number_of_packages ?? 1),
-          escapeCsv(p.carrier === "dpd" ? 5.95 : 35.95),
-          escapeCsv(p.color ?? ""),
-          escapeCsv(p.materials ?? ""),
-        ].join(",");
-      });
+              .join(", ") ?? "";
+
+          return [
+            escapeCsv(p.ean),
+            escapeCsv(p.id_provider),
+            escapeCsv(p.brand?.company_name ?? "Prestige Home"),
+            escapeCsv(p.name ?? ""),
+            escapeCsv(categories),
+            escapeCsv(url),
+            escapeCsv(p.sku),
+            escapeCsv(images),
+            escapeCsv(Number(p.final_price ?? 0).toFixed(2)),
+            escapeCsv(
+              `Lieferung innerhalb von ${p.delivery_time ?? 0} Werktagen nach Zahlungseingang`
+            ),
+            "NEW",
+            escapeCsv(p.number_of_packages ?? 1),
+            escapeCsv(p.carrier === "dpd" ? 5.95 : 35.95),
+            escapeCsv(p.color ?? ""),
+            escapeCsv(p.materials ?? ""),
+          ].join(",");
+        } catch (rowErr) {
+          console.error("Row error:", rowErr, p?.id);
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     const csv = [headers.join(","), ...rows].join("\n");
 
     return new Response(csv, {
       headers: {
-        "Content-Type": "text/csv",
+        "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": "attachment; filename=feed.csv",
       },
     });
   } catch (err) {
-    console.error(err);
+    console.error("Feed error:", err);
+
     return NextResponse.json(
-      { success: false, error: "Failed to generate CSV feed" },
-      { status: 500 },
+      {
+        success: false,
+        error: "Feed generation failed",
+      },
+      { status: 200 } // 👈 tránh 500 để bot không mark feed fail
     );
   }
 }
