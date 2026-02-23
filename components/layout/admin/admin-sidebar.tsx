@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { Button } from "../../ui/button";
@@ -22,6 +23,7 @@ export function AdminSideBar() {
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const items = [
     {
@@ -190,6 +192,13 @@ export function AdminSideBar() {
 
   // prepend locale vào url
   const withLocale = (url: string) => `${url}`;
+  const handleNavigate = (url: string) => {
+    router.push(url, { locale });
+    if (isMobile) setOpenMobile(false);
+  };
+  const handleCloseMobile = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
     <Sidebar className="app-sidebar custom-scroll pointer-events-auto">
@@ -201,7 +210,10 @@ export function AdminSideBar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <Link href={`/admin`}>
+          <Link
+            href={`/admin`}
+            onClick={handleCloseMobile}
+          >
             <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
               <Image
                 src="/new-logo.svg"
@@ -257,7 +269,7 @@ export function AdminSideBar() {
                           return (
                             <Button
                               key={child.title}
-                              onClick={() => router.push(childUrl, { locale })}
+                              onClick={() => handleNavigate(childUrl)}
                               onMouseEnter={() => router.prefetch(childUrl)} // 👈 prefetch trước
                               variant="ghost"
                               className={`relative flex flex-row items-center justify-start pl-12 gap-3 rounded-md py-1 text-base transition-colors ${
@@ -281,9 +293,9 @@ export function AdminSideBar() {
 
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <Button
-                        onClick={() => router.push(item.url, { locale })}
+                  <SidebarMenuButton asChild>
+                    <Button
+                        onClick={() => handleNavigate(item.url)}
                         className={`relative flex flex-row items-center justify-start gap-3 px-4 py-6 transition-colors ${
                           isActive
                             ? "bg-secondary/20 text-[#4D4D4D] hover:text-black"

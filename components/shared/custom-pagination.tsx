@@ -75,8 +75,10 @@ export function CustomPagination({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-4 w-full justify-center mt-2">
-      {totalItems && totalItems > 0 ? <p>{totalItems} items found</p> : ""}
+    <div className="flex items-center gap-4 w-full justify-center mt-2">
+      <div className="">
+        {totalItems && totalItems > 0 ? <p>{totalItems} items found</p> : ""}
+      </div>
 
       <Pagination className="flex flex-wrap justify-center gap-2">
         <PaginationContent>
@@ -125,7 +127,7 @@ export function CustomPagination({
       </Pagination>
 
       {/* 🔢 Jump to page (chỉ hiện khi nhiều trang) */}
-      {totalPages > 6 && (
+      {/* {totalPages > 6 && (
         <div className="flex items-center gap-2 text-sm">
           <span>{t("go_to_page")}</span>
           <Input
@@ -151,7 +153,7 @@ export function CustomPagination({
           />
           <span className="text-muted-foreground">/ {totalPages}</span>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

@@ -117,7 +117,7 @@ export default function OrderToolbar({
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
-      <div className="flex items-center lg:gap-4 gap-2 flex-nowrap">
+      <div className="lg:flex items-center lg:gap-4 gap-2 flex-nowrap hidden">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-1">
@@ -177,7 +177,7 @@ export default function OrderToolbar({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-1">
               View <ChevronDown className="h-4 w-4" />
@@ -187,7 +187,7 @@ export default function OrderToolbar({
             <DropdownMenuItem>Compact</DropdownMenuItem>
             <DropdownMenuItem>Comfortable</DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

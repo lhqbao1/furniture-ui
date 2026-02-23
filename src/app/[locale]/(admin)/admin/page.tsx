@@ -39,6 +39,33 @@ const AdminPage = () => {
       textColor: "#FF0000",
     },
   ];
+
+  const mergedStatisticOrder = [
+    {
+      count: statistic?.count_dispatched_order,
+      total: statistic?.total_dispatched_order ?? 0,
+      label: "Dispatched",
+      textColor: "#39B54A",
+    },
+    {
+      count: statistic?.count_waiting_payment_order,
+      total: statistic?.total_waiting_payment_order ?? 0,
+      label: "Waiting for payment",
+      textColor: "#9b59ff",
+    },
+    {
+      count: statistic?.count_preparing_shipping_order,
+      total: statistic?.total_preparing_shipping_order ?? 0,
+      label: "Preparing Shipping",
+      textColor: "#29ABE2",
+    },
+    {
+      count: statistic?.count_stock_reserved_order,
+      total: statistic?.total_stock_reserved_order ?? 0,
+      label: "Stock Reserved",
+      textColor: "#ff4f7b",
+    },
+  ];
   return (
     <div className="space-y-6 pb-6">
       <div className="mt-6">
@@ -47,11 +74,14 @@ const AdminPage = () => {
       {isLoadingStatistic || !statistic ? (
         <ProductStatisticSkeleton />
       ) : (
-        <OrderStatistic
-          statistic={mergedStatistic}
-          isOrder
-          isDashBoard
-        />
+        <div className="space-y-4">
+          <OrderStatistic statistic={mergedStatistic} isOrder isDashBoard />
+          {isLoadingStatistic ? (
+            <ProductStatisticSkeleton />
+          ) : (
+            <OrderStatistic statistic={mergedStatisticOrder} isOrder />
+          )}
+        </div>
       )}
       <OverViewTab />
     </div>

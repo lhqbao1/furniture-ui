@@ -284,17 +284,54 @@ const OrderImport = () => {
     // đóng dialog ngay khi submit
     setOpen(false);
 
-    try {
-      for (const order of orders) {
-        await createManualCheckOut(order);
+    const failures: {
+      index: number;
+      error: unknown;
+      id?: string | null;
+      message?: string;
+    }[] = [];
+    let successCount = 0;
+
+    for (let index = 0; index < orders.length; index += 1) {
+      try {
+        await createManualCheckOut(orders[index]);
+        successCount += 1;
+      } catch (error: any) {
+        console.error("Failed to create order", { index, error });
+        const failedId = (orders[index] as { marketplace_order_id?: string })
+          ?.marketplace_order_id;
+        const detail =
+          error?.response?.data?.detail ??
+          error?.response?.data?.message ??
+          error?.message ??
+          "Unknown error";
+        failures.push({
+          index,
+          error,
+          id: failedId,
+          message: typeof detail === "string" ? detail : "Unknown error",
+        });
       }
-      toast.success("All orders created successfully!", { id: toastId });
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to create one or more orders", {
-        id: toastId,
-      });
     }
+
+    if (failures.length === 0) {
+      toast.success("All orders created successfully!", { id: toastId });
+      return;
+    }
+
+    const failedDetails = failures
+      .map((item) => {
+        if (item.id) {
+          return `${item.id}: ${item.message ?? "Unknown error"}`;
+        }
+        return `Row ${item.index + 1}: ${item.message ?? "Unknown error"}`;
+      })
+      .join("\n");
+
+    toast.error("Some orders failed to create", {
+      id: toastId,
+      description: `${successCount}/${orders.length} created. ${failures.length} failed.\n${failedDetails}`,
+    });
   };
 
   return (

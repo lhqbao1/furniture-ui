@@ -34,7 +34,7 @@ export default function ClientAdminLayout({
     <main>
       <Protected>
         <div className="flex">
-          <SidebarProvider defaultOpen>
+          <SidebarProvider defaultOpen={false}>
             <AdminSideBar />
             <AdminContent>{children}</AdminContent>
           </SidebarProvider>
