@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // Escape CSV value
 const escapeCsv = (value?: string | number) => {
@@ -34,7 +35,13 @@ export async function GET() {
     ];
 
     const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0 && p.brand)
+      .filter(
+        (p) =>
+          p.final_price > 0 &&
+          p.is_active &&
+          calculateAvailableStock(p) > 0 &&
+          p.brand,
+      )
       .map((p) => {
         const categories =
           p.categories

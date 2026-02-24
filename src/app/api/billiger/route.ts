@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // Escape CSV value
 const escapeCsv = (value?: string | number) => {
@@ -62,7 +63,7 @@ export async function GET() {
         (p) =>
           p.final_price > 0 &&
           p.is_active &&
-          p.stock > 0 &&
+          calculateAvailableStock(p) > 0 &&
           p.brand &&
           p.component &&
           p.carrier,
@@ -110,7 +111,7 @@ export async function GET() {
           escapeCsv(p.static_files.length > 8 ? p.static_files[8].url : ""),
           escapeCsv(p.static_files.length > 9 ? p.static_files[9].url : ""),
           escapeCsv(p.component),
-          escapeCsv(p.stock ?? ""),
+          escapeCsv(calculateAvailableStock(p) ?? ""),
           escapeCsv(`${formatEuro(p.final_price)} €`),
           escapeCsv(`${p.delivery_time} Werktage`),
           escapeCsv(

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 const escapeXml = (str?: string) =>
   str
@@ -41,7 +42,7 @@ export async function GET() {
 
         return `
   <product weboffer="no" preorder="no" instock="${
-    p.stock > 0 ? "yes" : "no"
+    calculateAvailableStock(p) > 0 ? "yes" : "no"
   }" forsale="${p.is_active ? "yes" : "no"}">
     <name><![CDATA[${escapeCDATA(p.name.trim())}]]></name>
     <pid>${escapeXml(p.id_provider || p.id)}</pid>
@@ -78,7 +79,7 @@ export async function GET() {
         ? `Standard delivery in ${p.delivery_time} working days`
         : `Standard delivery in 3-5 working days`
     }</deltime>
-    <stockquant>${p.stock}</stockquant>
+    <stockquant>${calculateAvailableStock(p)}</stockquant>
     <alternate_image>${escapeXml(encodeURI(alternateImage))}</alternate_image>
     <large_image>${escapeXml(encodeURI(largeImage))}</large_image>
     <thumburl>${escapeXml(encodeURI(largeImage))}</thumburl>
