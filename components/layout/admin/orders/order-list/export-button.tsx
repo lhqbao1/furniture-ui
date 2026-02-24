@@ -153,6 +153,9 @@ export default function ExportOrderExcelButton() {
             ? checkout.shipment.ship_code
             : "",
         ),
+        // delivery_order_id: clean(
+        //  checkout.
+        // ),
       };
     });
 

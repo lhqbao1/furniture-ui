@@ -37,7 +37,7 @@ export async function generateMetadata({
     `Buy ${readable} online at Prestige Home. Discover high-quality furniture and home accessories with fast delivery.`;
 
   return {
-    title: `${readable} kaufen online | Prestige Home`,
+    title: `${readable} kaufen online`,
     description,
     robots: {
       index: true,
@@ -60,17 +60,17 @@ export default async function ShopKeywordPage({
 
   // 🔹 fetch song song (tối ưu)
   const [productsRaw, keywords] = await Promise.all([
-  getAllProducts({
-    search: searchText,
-    page: 1,
-  }),
-  getAllKeywords(),
-]);
+    getAllProducts({
+      search: searchText,
+      page: 1,
+    }),
+    getAllKeywords(),
+  ]);
 
-const products = {
-  ...productsRaw,
-  items: productsRaw.items.filter(p => p.is_active),
-};
+  const products = {
+    ...productsRaw,
+    items: productsRaw.items.filter((p) => p.is_active),
+  };
 
   // 🔍 tìm keyword tương ứng
   const matchedKeyword = keywords.find(

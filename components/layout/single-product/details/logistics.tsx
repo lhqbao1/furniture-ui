@@ -77,7 +77,10 @@ const ProductDetailsLogistic = ({
         </span>
       </Link>
 
-      <DeliveryRange productDetails={productDetails} />
+      <DeliveryRange
+        productDetails={productDetails}
+        available_stock={availableStock}
+      />
 
       <div className="flex flex-row gap-4 items-center">
         <Undo2 size={25} aria-hidden="true" />

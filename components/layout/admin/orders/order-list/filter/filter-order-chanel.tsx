@@ -25,6 +25,7 @@ export const CHANEL_OPTIONS = [
   { key: "check24", label: "Check24", icon: "check-24.png" },
   { key: "inprodius", label: "Inprodius", icon: "inprodius.png" },
   { key: "euro-tops", label: "Euro Tops", icon: "euro-top.png" },
+  { key: "XXXLUTZ", label: "XXXLUTZ", icon: "xxxlutz.png" },
   { key: "econelo", label: "Econelo", icon: "econelo-favicon.png" },
 ];
 
