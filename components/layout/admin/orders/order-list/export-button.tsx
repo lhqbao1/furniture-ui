@@ -128,9 +128,29 @@ export default function ExportOrderExcelButton() {
         carrier: clean(
           checkout?.shipment ? checkout.shipment.shipping_carrier : "",
         ),
+        suppliers: clean(
+          allItems
+            .map((i) =>
+              i.products.owner && i.products.owner.business_name
+                ? i.products.owner.business_name
+                : "Prestige Home",
+            )
+            .filter(Boolean)
+            .join(" | "),
+        ),
         shipping_date: clean(
           checkout?.shipment
             ? formatDateDDMMYYYY(checkout.shipment.shipper_date)
+            : "",
+        ),
+        tracking_number: clean(
+          checkout?.shipment && checkout.shipment.tracking_number
+            ? checkout.shipment.tracking_number
+            : "",
+        ),
+        shipping_code: clean(
+          checkout?.shipment && checkout.shipment.ship_code
+            ? checkout.shipment.ship_code
             : "",
         ),
       };
@@ -160,22 +180,13 @@ export default function ExportOrderExcelButton() {
       <DropdownMenuContent className="w-64 p-3 space-y-4">
         {/* Marketplace Filter */}
         <div className="space-y-1">
-          <Select
-            value={marketplace}
-            onValueChange={setMarketplace}
-          >
-            <SelectTrigger
-              placeholderColor
-              className="border"
-            >
+          <Select value={marketplace} onValueChange={setMarketplace}>
+            <SelectTrigger placeholderColor className="border">
               <SelectValue placeholder="All Marketplace" />
             </SelectTrigger>
             <SelectContent>
               {CHANEL_OPTIONS.map((item) => (
-                <SelectItem
-                  key={item.key}
-                  value={item.key}
-                >
+                <SelectItem key={item.key} value={item.key}>
                   {item.label}
                 </SelectItem>
               ))}
@@ -184,11 +195,7 @@ export default function ExportOrderExcelButton() {
         </div>
 
         {/* Export Button */}
-        <Button
-          onClick={handleExport}
-          className="w-full"
-          disabled={isFetching}
-        >
+        <Button onClick={handleExport} className="w-full" disabled={isFetching}>
           {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
         </Button>
       </DropdownMenuContent>
