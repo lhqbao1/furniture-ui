@@ -8,6 +8,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
 import { ProductItem } from "@/types/products";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 const FilterExportForm = () => {
   const [isExportingSearch, setIsExportingSearch] = useState(false);
@@ -54,16 +55,16 @@ const FilterExportForm = () => {
           : null;
 
       const getMarketplaceStatus = (
-  marketplaces: any[] | undefined,
-  name: string
-) => {
-  if (!Array.isArray(marketplaces)) return "not synced";
-  const found = marketplaces.find(
-    (m) => m.marketplace?.toLowerCase() === name
-  );
-  if (!found) return "not synced";
-  return found.is_active ? "synced" : "not synced";
-};
+        marketplaces: any[] | undefined,
+        name: string,
+      ) => {
+        if (!Array.isArray(marketplaces)) return "not synced";
+        const found = marketplaces.find(
+          (m) => m.marketplace?.toLowerCase() === name,
+        );
+        if (!found) return "not synced";
+        return found.is_active ? "synced" : "not synced";
+      };
 
       return {
         id: Number(clean(p.id_provider)),
@@ -89,7 +90,7 @@ const FilterExportForm = () => {
         original_price: clean(p.price),
         sale_price: clean(p.final_price),
         vat: vat,
-        stock: clean(p.stock),
+        stock: clean(calculateAvailableStock(p)),
         img_url: clean(
           p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
         ),
@@ -129,11 +130,10 @@ const FilterExportForm = () => {
             .join("|"),
         ),
         product_link: `https://www.prestige-home.de/de/product/${p.url_key}`,
-    amazon: getMarketplaceStatus(p.marketplace_products, "amazon"),
-kaufland: getMarketplaceStatus(p.marketplace_products, "kaufland"),
-ebay: getMarketplaceStatus(p.marketplace_products, "ebay"),
+        amazon: getMarketplaceStatus(p.marketplace_products, "amazon"),
+        kaufland: getMarketplaceStatus(p.marketplace_products, "kaufland"),
+        ebay: getMarketplaceStatus(p.marketplace_products, "ebay"),
       };
-      
     });
   };
 
@@ -164,6 +164,8 @@ ebay: getMarketplaceStatus(p.marketplace_products, "ebay"),
     setIsExportingSearch(true);
     try {
       const data = await getAllProductsSelect({ search });
+      console.log(data);
+      console.log(search);
       if (!data?.length) return;
 
       const exportData = buildExportData(data);
