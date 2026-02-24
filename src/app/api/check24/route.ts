@@ -67,7 +67,7 @@ export async function GET() {
         (p) =>
           p.final_price > 0 &&
           p.is_active &&
-          p.stock > 0 &&
+          calculateAvailableStock(p) > 0 &&
           p.brand &&
           p.brand.name.toLowerCase() !== "prestige works" &&
           p.component &&
