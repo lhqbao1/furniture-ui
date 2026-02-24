@@ -79,7 +79,7 @@ export async function GET() {
         ? `Standard delivery in ${p.delivery_time} working days`
         : `Standard delivery in 3-5 working days`
     }</deltime>
-    <stockquant>${calculateAvailableStock(p)}</stockquant>
+    <stockquant>${calculateAvailableStock(p) < 0 ? 0 : calculateAvailableStock(p)}</stockquant>
     <alternate_image>${escapeXml(encodeURI(alternateImage))}</alternate_image>
     <large_image>${escapeXml(encodeURI(largeImage))}</large_image>
     <thumburl>${escapeXml(encodeURI(largeImage))}</thumburl>
