@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 export async function GET() {
   try {
     const products = await getProductsFeed();
 
     const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active)
+      .filter(
+        (p) =>
+          p.final_price > 0 && p.is_active && calculateAvailableStock(p) > 0,
+      )
       .map((p) => {
         const images = p.static_files || [];
         const largeImage = images[0] ? cleanImageLink(images[0].url) : "";

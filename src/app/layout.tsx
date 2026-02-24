@@ -108,6 +108,21 @@ export default function RootLayout({
   return (
     <html lang="de" translate="no">
       <head>
+        <link
+          rel="preconnect"
+          href="https://cdn.billiger.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://img.idealo.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://gzhls.at"
+          crossOrigin="anonymous"
+        />
         <meta name="google" content="notranslate" />
         <meta
           name="google-site-verification"

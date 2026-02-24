@@ -27,6 +27,7 @@ import {
   getLatestInventory,
 } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 interface CartItemProps {
   cartServer?: CartItem;
@@ -83,34 +84,34 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         result_stock: cartServer.products.result_stock ?? 0,
       }
     : localProducts
-    ? {
-        id: localProducts.product_id,
-        name: localProducts.product_name,
-        image: localProducts.img_url,
-        price: localProducts.final_price,
-        quantity: localProducts.quantity,
-        brand: localProducts.brand_name,
-        // variant: localProducts.variant,
-        // deliveryText: `Lieferung vor Weihnachten: ${localProducts.delivery_time} Werktage`,
-        deliveryText: localProducts.delivery_time,
-        length: localProducts.length,
-        width: localProducts.width,
-        height: localProducts.height,
-        color: localProducts.color,
-        stock: localProducts.stock,
-        inventory: localProducts.inventory,
-        url_key: localProducts.url_key,
-        id_provider: localProducts.id_provider,
-        result_stock: localProducts.result_stock ?? 0,
-      }
-    : null;
+      ? {
+          id: localProducts.product_id,
+          name: localProducts.product_name,
+          image: localProducts.img_url,
+          price: localProducts.final_price,
+          quantity: localProducts.quantity,
+          brand: localProducts.brand_name,
+          // variant: localProducts.variant,
+          // deliveryText: `Lieferung vor Weihnachten: ${localProducts.delivery_time} Werktage`,
+          deliveryText: localProducts.delivery_time,
+          length: localProducts.length,
+          width: localProducts.width,
+          height: localProducts.height,
+          color: localProducts.color,
+          stock: localProducts.stock,
+          inventory: localProducts.inventory,
+          url_key: localProducts.url_key,
+          id_provider: localProducts.id_provider,
+          result_stock: localProducts.result_stock ?? 0,
+        }
+      : null;
 
-  if (!item) return null;
-
-  const [uiQuantity, setUiQuantity] = useState<number>(item.quantity ?? 1);
+  const [uiQuantity, setUiQuantity] = useState<number>(item?.quantity ?? 1);
   React.useEffect(() => {
-    setUiQuantity(item.quantity);
-  }, [item.quantity]);
+    if (item?.quantity != null) {
+      setUiQuantity(item.quantity);
+    }
+  }, [item?.quantity]);
   const { updateQuantity } = useCartLocal();
   const { removeItem } = useCartLocal();
   const updateCartItemQuantityMutation = useUpdateCartItemQuantity();
@@ -131,12 +132,12 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         {
           onError: () => {
             toast.error(t("updateCartFail"));
-            setUiQuantity(item.quantity); // 🔁 rollback
+            setUiQuantity(item?.quantity ?? 1); // 🔁 rollback
           },
         },
       );
     }, 500),
-    [item.quantity],
+    [item?.quantity],
   );
 
   const handleUpdateCartItemQuantity = (
@@ -189,6 +190,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   };
 
   const handleIncrease = () => {
+    if (!item) return;
     const newQty = uiQuantity + 1; // ✅ ĐÚNG
 
     setUiQuantity(newQty); // ✅ UI update ngay
@@ -201,6 +203,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   };
 
   const handleDecrease = () => {
+    if (!item) return;
     const newQty = uiQuantity - 1; // ✅ ĐÚNG
 
     if (newQty <= 0) {
@@ -228,18 +231,31 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   };
 
   const latestInventory = React.useMemo(
-    () => getLatestInventory(item.inventory),
-    [item.inventory],
+    () => getLatestInventory(item?.inventory ?? []),
+    [item?.inventory],
   );
 
   const deliveryDayRange = React.useMemo(
-    () => getDeliveryDayRange(item.deliveryText),
-    [item.deliveryText],
+    () => getDeliveryDayRange(item?.deliveryText),
+    [item?.deliveryText],
+  );
+
+  const availableStock = React.useMemo(
+    () =>
+      calculateAvailableStock(
+        item
+          ? {
+              stock: item.stock,
+              result_stock: item.result_stock,
+            }
+          : null,
+      ),
+    [item?.stock, item?.result_stock],
   );
 
   const estimatedDeliveryRange = React.useMemo(() => {
     if (!deliveryDayRange) return null;
-    const stock = item.stock - item.result_stock;
+    const stock = availableStock;
 
     let startDate: Date | null = null;
 
@@ -260,7 +276,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
       from: addBusinessDays(startDate ?? new Date(), deliveryDayRange.min),
       to: addBusinessDays(startDate ?? new Date(), deliveryDayRange.max),
     };
-  }, [deliveryDayRange, item.stock, latestInventory]);
+  }, [deliveryDayRange, availableStock, latestInventory]);
 
   const handleAddToWishlist = (id: string) => {
     if (!id) return;
@@ -282,6 +298,8 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   /* -------------------------------------------------
    * UI
    * -------------------------------------------------*/
+  if (!item) return null;
+
   return (
     <div className="flex gap-6 border-b py-6 items-center">
       {/* IMAGE */}

@@ -67,7 +67,7 @@ export async function GET() {
         (p) =>
           p.final_price > 0 &&
           p.is_active &&
-          p.stock > 0 &&
+          calculateAvailableStock(p) > 0 &&
           p.brand &&
           p.brand.name.toLowerCase() !== "prestige works" &&
           p.component &&
@@ -118,7 +118,9 @@ export async function GET() {
           escapeCsv(p.static_files.length > 8 ? p.static_files[8].url : ""),
           escapeCsv(p.static_files.length > 9 ? p.static_files[9].url : ""),
           escapeCsv(p.component),
-          escapeCsv(calculateAvailableStock(p) ?? ""),
+          escapeCsv(
+            calculateAvailableStock(p) < 0 ? 0 : calculateAvailableStock(p),
+          ),
           escapeCsv(`${formatEuro(p.final_price)} €`),
           escapeCsv(`${p.delivery_time} Werktage`),
           escapeCsv(
