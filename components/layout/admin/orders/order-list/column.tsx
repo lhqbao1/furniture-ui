@@ -195,9 +195,13 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
           <div>
             {row.original.checkouts[0]?.user && (
               <div>
-                {row.original.checkouts[0]?.shipping_address?.recipient_name ??
-                  row.original.checkouts[0]?.shipping_address?.recipient_name ??
-                  ""}
+                {row.original.checkouts[0]?.shipping_address?.recipient_name
+                  ? row.original.checkouts[0]?.shipping_address?.recipient_name
+                  : row.original.checkouts[0]?.user?.company_name
+                    ? row.original.checkouts[0]?.user?.company_name
+                    : row.original.checkouts[0]?.invoice_address?.recipient_name
+                      ? row.original.checkouts[0].invoice_address.recipient_name
+                      : ""}
               </div>
             )}
           </div>

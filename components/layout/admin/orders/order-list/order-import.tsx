@@ -207,6 +207,11 @@ const OrderImport = () => {
   const [orders, setOrders] = useState<GroupedOrder[]>([]);
   const [open, setOpen] = useState(false);
 
+  const clearFormState = () => {
+    setFile(null);
+    setOrders([]);
+  };
+
   const onDrop = (files: File[]) => {
     if (!channel) {
       toast.error("Please select marketplace first");
@@ -316,6 +321,7 @@ const OrderImport = () => {
 
     if (failures.length === 0) {
       toast.success("All orders created successfully!", { id: toastId });
+      clearFormState();
       return;
     }
 
@@ -332,10 +338,17 @@ const OrderImport = () => {
       id: toastId,
       description: `${successCount}/${orders.length} created. ${failures.length} failed.\n${failedDetails}`,
     });
+    clearFormState();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) clearFormState();
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">Import</Button>
       </DialogTrigger>

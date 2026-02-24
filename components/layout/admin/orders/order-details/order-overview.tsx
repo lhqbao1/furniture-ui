@@ -41,7 +41,8 @@ const OrderDetailOverView = ({
           translate="no"
           className="capitalize"
         >
-          {order.from_marketplace
+          {order.from_marketplace &&
+          order.from_marketplace.toLowerCase() !== "econelo"
             ? `${order.from_marketplace} Managed Payments`
             : order.payment_method}
         </div>

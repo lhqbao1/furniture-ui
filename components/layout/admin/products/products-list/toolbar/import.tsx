@@ -45,6 +45,7 @@ const ImportDialog = ({
   const [open, setOpen] = useState(false);
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [openSupplier, setOpenSupplier] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
 
   const { data: listSuppliers, isLoading, isError } = useGetSuppliers();
 
@@ -62,12 +63,43 @@ const ImportDialog = ({
     multiple: false,
   });
 
+  const getErrorDescription = (error: any) => {
+    const detail =
+      error?.response?.data?.detail ??
+      error?.response?.data?.message ??
+      error?.message;
+
+    if (!detail) return "Unknown error";
+    if (typeof detail === "string") {
+      const duplicateMatch = detail.match(
+        /duplicate key value violates unique constraint[\s\S]*?already exists\./i,
+      );
+      if (duplicateMatch?.[0]) return duplicateMatch[0];
+
+      const detailLineMatch = detail.match(/DETAIL:\s*Key\s*\([^)]+\)=\([^)]+\)\s*already exists\./i);
+      if (detailLineMatch?.[0]) return detailLineMatch[0];
+
+      return detail;
+    }
+    try {
+      return JSON.stringify(detail);
+    } catch {
+      return "Unknown error";
+    }
+  };
+
+  const clearFormState = () => {
+    setFile(null);
+    setImportError(null);
+  };
+
   const handleSubmit = () => {
     if (!file) {
       toast.error("You need to choose at least one file");
       return;
     }
 
+    setImportError(null);
     const toastId = toast.loading("Importing products, please wait...");
 
     const formData = new FormData();
@@ -85,14 +117,18 @@ const ImportDialog = ({
               id: toastId,
             });
             setIsImporting(true);
+            clearFormState();
             setOpen(false);
           },
           onError: (error) => {
+            const description = getErrorDescription(error);
             toast.error("Import products failed", {
               id: toastId,
-              description: error.message,
+              description,
             });
+            setImportError(description);
             setIsImporting(false);
+            setFile(null);
           },
         },
       );
@@ -103,14 +139,18 @@ const ImportDialog = ({
             id: toastId,
           });
           setIsImporting(true);
+          clearFormState();
           setOpen(false);
         },
         onError: (error) => {
+          const description = getErrorDescription(error);
           toast.error("Import products failed", {
             id: toastId,
-            description: error.message,
+            description,
           });
+          setImportError(description);
           setIsImporting(false);
+          setFile(null);
         },
       });
     }
@@ -119,7 +159,10 @@ const ImportDialog = ({
   return (
     <Dialog
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) clearFormState();
+      }}
     >
       <DialogTrigger asChild>
         <Button
@@ -239,6 +282,9 @@ const ImportDialog = ({
             </p>
           )}
         </div>
+        {importError && (
+          <p className="mt-2 text-sm text-red-600">{importError}</p>
+        )}
 
         {/* Action buttons */}
         <div className="mt-6 flex justify-end gap-2">
