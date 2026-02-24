@@ -4,7 +4,7 @@ import {
   getDeliveryDayRange,
 } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
-import { ProductItem } from "@/types/products";
+import { InventoryItem, ProductItem } from "@/types/products";
 import { Clock, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -17,30 +17,50 @@ import { useInventoryPoByProductId } from "@/features/incoming-inventory/invento
 
 interface DeliveryRangeProps {
   productDetails: ProductItem;
+  available_stock: number;
 }
 
-const DeliveryRange = ({ productDetails }: DeliveryRangeProps) => {
+const DeliveryRange = ({
+  productDetails,
+  available_stock,
+}: DeliveryRangeProps) => {
   const t = useTranslations();
   const { data, isLoading, isError } = useInventoryPoByProductId(
     productDetails.id,
   );
 
-  const latestDeliveryDate = React.useMemo(() => {
-    const items = Array.isArray(data) ? data : data ? [data] : [];
-    let latest: Date | null = null;
+  const nextIncomingDate = React.useMemo(() => {
+    const today = new Date();
+    const candidates: Date[] = [];
 
-    for (const item of items) {
-      if (!item.list_delivery_date) continue;
-      const date = new Date(item.list_delivery_date);
-      if (Number.isNaN(date.getTime())) continue;
+    const inventoryItems: InventoryItem[] = Array.isArray(
+      productDetails.inventory,
+    )
+      ? productDetails.inventory
+      : [];
 
-      if (!latest || date > latest) {
-        latest = date;
-      }
+    for (const item of inventoryItems) {
+      if (!item?.date_received) continue;
+      const date = new Date(item.date_received);
+      if (!Number.isNaN(date.getTime())) candidates.push(date);
     }
 
-    return latest;
-  }, [data]);
+    const poItems = Array.isArray(data) ? data : data ? [data] : [];
+    for (const item of poItems) {
+      if (!item?.list_delivery_date) continue;
+      const date = new Date(item.list_delivery_date);
+      if (!Number.isNaN(date.getTime())) candidates.push(date);
+    }
+
+    if (candidates.length === 0) return null;
+
+    const futureDates = candidates.filter((date) => date >= today);
+    if (futureDates.length > 0) {
+      return futureDates.sort((a, b) => a.getTime() - b.getTime())[0];
+    }
+
+    return candidates.sort((a, b) => b.getTime() - a.getTime())[0];
+  }, [data, productDetails.inventory]);
 
   const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
     const result = new Date(startDate);
@@ -52,7 +72,7 @@ const DeliveryRange = ({ productDetails }: DeliveryRangeProps) => {
     const deliveryRange = getDeliveryDayRange(productDetails.delivery_time);
     if (!deliveryRange) return null;
 
-    if (productDetails.stock && productDetails.stock > 0) {
+    if (available_stock > 0) {
       const today = new Date();
       return {
         from: addCalendarDays(today, deliveryRange.min),
@@ -60,7 +80,7 @@ const DeliveryRange = ({ productDetails }: DeliveryRangeProps) => {
       };
     }
 
-    if (!latestDeliveryDate) {
+    if (!nextIncomingDate) {
       const today = new Date();
       return {
         from: addCalendarDays(today, deliveryRange.min),
@@ -69,14 +89,14 @@ const DeliveryRange = ({ productDetails }: DeliveryRangeProps) => {
     }
 
     return {
-      from: addBusinessDays(latestDeliveryDate, deliveryRange.min),
-      to: addBusinessDays(latestDeliveryDate, deliveryRange.max),
+      from: addBusinessDays(nextIncomingDate, deliveryRange.min),
+      to: addBusinessDays(nextIncomingDate, deliveryRange.max),
     };
   }, [
     addCalendarDays,
-    latestDeliveryDate,
+    available_stock,
+    nextIncomingDate,
     productDetails.delivery_time,
-    productDetails.stock,
   ]);
 
   return (
