@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
 import { getAllProductsSelect } from "@/features/product-group/api";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 const escapeXml = (str?: string) =>
   str
@@ -26,9 +27,7 @@ export async function GET() {
     const itemsXml = products
       .filter(
         (p) =>
-          p.final_price > 0 &&
-          p.stock - (p.result_stock ?? 0) > 0 &&
-          p.is_active,
+          p.final_price > 0 && calculateAvailableStock(p) > 0 && p.is_active,
       )
       .map((p) => {
         const images = p.static_files || [];

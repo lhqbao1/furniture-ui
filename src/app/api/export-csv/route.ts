@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // Escape CSV value
 const escapeCsv = (value?: string | number) => {
@@ -62,8 +63,10 @@ export async function GET() {
               : `https://prestige-home.de/de/product/${p.url_key}`,
           ),
           escapeCsv(cleanImageLink(p.static_files[0]?.url)),
-          escapeCsv(p.stock > 0 ? "in_stock" : "out_of_stock"),
-          escapeCsv(p.stock ?? ""),
+          escapeCsv(
+            calculateAvailableStock(p) > 0 ? "in_stock" : "out_of_stock",
+          ),
+          escapeCsv(calculateAvailableStock(p) ?? ""),
           escapeCsv(p.final_price.toFixed(2) + " EUR"),
           escapeCsv(p.ean),
           "new",

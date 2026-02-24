@@ -1,4 +1,5 @@
 import { getAllProductsSelect } from "@/features/product-group/api";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { ProductItem } from "@/types/products";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
@@ -37,7 +38,8 @@ export async function GET() {
 
     // 3️⃣ Lọc sản phẩm đang active và có tồn kho
     const activeProducts = products.filter(
-      (p: ProductItem) => p.is_active === true && p.stock > 0,
+      (p: ProductItem) =>
+        p.is_active === true && calculateAvailableStock(p) > 0,
     );
 
     const values = activeProducts.map((p) => {
@@ -85,7 +87,7 @@ export async function GET() {
         p.id_provider ?? "",
         p.name ?? "",
         cleanDescription ?? "",
-        p.stock > 0 ? "in_stock" : "out_of_stock",
+        calculateAvailableStock(p) > 0 ? "in_stock" : "out_of_stock",
         productUrl,
         price,
         // p.ean ? "yes" : "no",

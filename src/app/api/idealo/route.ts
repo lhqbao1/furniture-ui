@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // Escape CSV value
 const escapeCsv = (value?: string | number) => {
@@ -38,19 +39,21 @@ export async function GET() {
     const rows = products
       .filter(
         (p) =>
-          p &&
-          Number(p.final_price) > 0 &&
-          p.is_active === true &&
-          Number(p.stock) > 0
+          p.final_price > 0 &&
+          p.is_active &&
+          calculateAvailableStock(p) > 0 &&
+          p.brand,
       )
       .map((p) => {
         try {
           const categories =
-            p.categories?.map((c: any) => {
-              const parent = c?.name ?? "";
-              const child = c?.children?.[0]?.name;
-              return child ? `${parent} > ${child}` : parent;
-            }).join(", ") ?? "";
+            p.categories
+              ?.map((c: any) => {
+                const parent = c?.name ?? "";
+                const child = c?.children?.[0]?.name;
+                return child ? `${parent} > ${child}` : parent;
+              })
+              .join(", ") ?? "";
 
           const url =
             p.brand?.name?.toLowerCase() === "econelo"
@@ -74,7 +77,7 @@ export async function GET() {
             escapeCsv(images),
             escapeCsv(Number(p.final_price ?? 0).toFixed(2)),
             escapeCsv(
-              `Lieferung innerhalb von ${p.delivery_time ?? 0} Werktagen nach Zahlungseingang`
+              `Lieferung innerhalb von ${p.delivery_time ?? 0} Werktagen nach Zahlungseingang`,
             ),
             "NEW",
             escapeCsv(p.number_of_packages ?? 1),
@@ -105,7 +108,7 @@ export async function GET() {
         success: false,
         error: "Feed generation failed",
       },
-      { status: 200 } // 👈 tránh 500 để bot không mark feed fail
+      { status: 200 }, // 👈 tránh 500 để bot không mark feed fail
     );
   }
 }
