@@ -164,6 +164,8 @@ const FilterExportForm = () => {
     setIsExportingSearch(true);
     try {
       const data = await getAllProductsSelect({ search });
+      console.log(data);
+      console.log(search);
       if (!data?.length) return;
 
       const exportData = buildExportData(data);
