@@ -2,15 +2,22 @@ import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { getCategoryBySlug } from "@/features/category/api";
 import React from "react";
+import { unstable_cache } from "next/cache";
 
 interface CategorySectionProps {
   slug: string;
 }
 
 const CategorySection = async ({ slug }: CategorySectionProps) => {
-  const products = await getCategoryBySlug(slug).catch((err) => {
-    return null;
-  });
+  const getCategoryCached = unstable_cache(
+    async () =>
+      getCategoryBySlug(slug, {
+        page_size: 4,
+      }).catch(() => null),
+    ["home-category", slug],
+    { revalidate: 600 },
+  );
+  const products = await getCategoryCached();
 
   if (!products) return <ProductGridSkeleton length={4} />;
   return (
