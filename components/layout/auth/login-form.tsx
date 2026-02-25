@@ -149,7 +149,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             // Giả sử backend trả về token
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
-            router.push("/admin/orders/list", { locale });
+            router.push("/admin", { locale });
             setAdminUserId(data.id);
 
             // Có thể lưu userId nếu cần
@@ -197,7 +197,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
             const token = data.access_token;
             localStorage.setItem("admin_access_token", token);
             setAdminUserId(data.id);
-            router.push("/admin/orders/list", { locale });
+            router.push("/admin", { locale });
             toast.success(t("loginSuccess"));
           },
           onError(error) {
@@ -212,18 +212,10 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     <div className="p-6 bg-white rounded-2xl lg:w-3/4 w-full">
       <div className="flex flex-col items-center mb-12 gap-3">
         {/* Logo giả */}
-        <Image
-          src={"/new-logo.svg"}
-          width={100}
-          height={100}
-          alt=""
-        />
+        <Image src={"/new-logo.svg"} width={100} height={100} alt="" />
         <h1 className="text-3xl font-semibold text-secondary text-center space-x-2 lg:block flex flex-col">
           <span>{t("welcomeTo")}</span>
-          <span
-            className="text-primary"
-            translate="no"
-          >
+          <span className="text-primary" translate="no">
             Prestige Home
           </span>
         </h1>

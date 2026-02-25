@@ -142,9 +142,9 @@ function ImagePickerInput<T extends FieldValues>({
           return;
         }
 
-        // ❌ BLOCK FILE > 5MB
-        if (fileSizeMB > 5) {
-          toast.error(`File "${file.name}" exceeds the 5MB limit.`);
+        // ❌ BLOCK FILE > 10MB
+        if (fileSizeMB > 10) {
+          toast.error(`File "${file.name}" exceeds the 10MB limit.`);
           return;
         }
       }
