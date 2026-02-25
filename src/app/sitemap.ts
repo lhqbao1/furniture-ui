@@ -143,7 +143,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const res = await apiPublic.get("/products/all", {
       params: {
         all_products: false,
-        is_econelo: false,
+        is_econelo: undefined,
       },
     });
 

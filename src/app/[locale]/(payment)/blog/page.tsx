@@ -6,6 +6,7 @@ import { getBlogs, getBlogsByProduct } from "@/features/blog/api";
 import { safeRequest } from "@/lib/safe-fetch-server";
 import { BlogItem } from "@/types/blog";
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 
 /* PPR */
 export const experimental_ppr = true;
@@ -25,37 +26,31 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  // Chạy song song để nhanh hơn
-  // const mainData = await getBlogs({
-  //   pageSize: 16,
-  // });
+  const getMainBlogsCached = unstable_cache(
+    async () =>
+      safeRequest(getBlogs({ pageSize: 16 }), {
+        items: [],
+        pagination: {
+          page: 1,
+          page_size: 16,
+          total_items: 0,
+          total_pages: 0,
+        },
+      }),
+    ["blog-main", "page-size-16"],
+    { revalidate: 600 },
+  );
 
-  // const mainData = await safeRequest(
-  //   getBlogs({
-  //     pageSize: 16,
-  //   }),
-  //   {
-  //     items: [],
-  //     pagination: {
-  //       page: 0,
-  //       page_size: 0,
-  //       total_items: 0,
-  //       total_pages: 0,
-  //     },
-  //   },
-  // );
-  // const sideBarData = await getBlogsByProduct();
-  const mainData = await safeRequest(getBlogs({ pageSize: 16 }), {
-    items: [],
-    pagination: {
-      page: 1,
-      page_size: 16,
-      total_items: 0,
-      total_pages: 0,
-    },
-  });
+  const getSidebarBlogsCached = unstable_cache(
+    async () => safeRequest(getBlogsByProduct(), []),
+    ["blog-sidebar-products"],
+    { revalidate: 600 },
+  );
 
-  const sideBarData = await safeRequest(getBlogsByProduct(), []);
+  const [mainData, sideBarData] = await Promise.all([
+    getMainBlogsCached(),
+    getSidebarBlogsCached(),
+  ]);
 
   const featured = mainData.items.length > 0 ? mainData.items[0] : null;
 

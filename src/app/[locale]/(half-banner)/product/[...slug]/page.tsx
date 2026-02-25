@@ -54,9 +54,7 @@ function isPublishableProduct(product?: Partial<ProductItem> | null) {
     product.final_price !== null &&
     product.final_price !== undefined &&
     Number.isFinite(Number(product.final_price));
-  const hasStock =
-    product.stock !== null &&
-    product.stock !== undefined;
+  const hasStock = product.stock !== null && product.stock !== undefined;
 
   return (
     product.is_active === true &&
@@ -77,7 +75,7 @@ function isPublishableProduct(product?: Partial<ProductItem> | null) {
  * ------------------------------------------------------*/
 export async function generateStaticParams() {
   const products = await getAllProductsSelect({
-    is_econelo: false,
+    is_econelo: undefined,
     all_products: true,
   });
   const locales = ["de"];

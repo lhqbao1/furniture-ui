@@ -14,14 +14,21 @@ export default async function HomePage() {
   const getBestSellerCached = unstable_cache(
     async () =>
       getProductByTag("BEST_SELLER", {
-        is_econelo: false,
+        is_econelo: undefined,
         is_customer: true,
       }).catch(() => []),
     ["home-best-seller"],
     { revalidate: 600 },
   );
 
-  const [allProducts] = await Promise.all([getBestSellerCached()]);
+  const [cachedBestSeller] = await Promise.all([getBestSellerCached()]);
+  const allProducts =
+    cachedBestSeller && cachedBestSeller.length > 0
+      ? cachedBestSeller
+      : await getProductByTag("BEST_SELLER", {
+          is_econelo: undefined,
+          is_customer: true,
+        }).catch(() => []);
 
   return (
     <div id="home" className="w-full min-h-[200vh] flex flex-col items-center">

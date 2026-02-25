@@ -82,7 +82,7 @@ export default function ProductSearch({
     shouldSearch
       ? {
           query: debouncedQuery,
-          is_econelo: false,
+          is_econelo: undefined,
           is_active: true,
           page_size: 10,
         }

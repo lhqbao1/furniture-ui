@@ -14,7 +14,7 @@ const FlashSale = () => {
     isLoading,
     isError,
   } = useGetProductByTag("Trending", {
-    is_econelo: false,
+    is_econelo: undefined,
   });
 
   return (

@@ -1,5 +1,3 @@
-"use client";
-
 import { BlogByProductResponse } from "@/types/blog";
 import Image from "next/image";
 import Link from "next/link";
