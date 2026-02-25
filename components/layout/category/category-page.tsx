@@ -90,7 +90,7 @@ const ProductCategory = ({
       page,
       page_size: pageSize,
       is_active: true,
-      is_econelo: false,
+      is_econelo: undefined,
       query,
       brand: brands,
       brandsKey,

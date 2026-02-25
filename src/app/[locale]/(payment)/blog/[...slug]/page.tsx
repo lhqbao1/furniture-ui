@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import SidebarBlog from "@/components/layout/blog/blog-sidebar";
 import BlogDetails from "@/components/layout/blog/blog-details";
 import { getBlogDetailsBySlug, getBlogsByProduct } from "@/features/blog/api";
+import { unstable_cache } from "next/cache";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -15,6 +16,17 @@ export const experimental_ppr = true;
 export const revalidate = 3600;
 export const dynamicParams = true;
 
+const getBlogDetailCached = (slug: string) =>
+  unstable_cache(() => getBlogDetailsBySlug(slug), ["blog-detail", slug], {
+    revalidate: 600,
+  })();
+
+const getSidebarBlogsCached = unstable_cache(
+  () => getBlogsByProduct(),
+  ["blog-sidebar-products"],
+  { revalidate: 600 },
+);
+
 /* --------------------------------------------------------
  * 2) GENERATE METADATA
  * ------------------------------------------------------*/
@@ -24,7 +36,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const lastSlug = slug[0];
 
-  const post = await getBlogDetailsBySlug(lastSlug);
+  let post = await getBlogDetailCached(lastSlug);
+  if (!post) {
+    post = await getBlogDetailsBySlug(lastSlug);
+  }
   if (!post) return {};
 
   const schema = {
@@ -83,10 +98,19 @@ export default async function BlogDetailPage({
   const { slug } = await params;
   const blogSlug = slug[0];
 
-  const post = await getBlogDetailsBySlug(blogSlug);
+  let [post, sidebarData] = await Promise.all([
+    getBlogDetailCached(blogSlug),
+    getSidebarBlogsCached(),
+  ]);
+
+  if (!post) {
+    post = await getBlogDetailsBySlug(blogSlug);
+  }
   if (!post) return notFound();
 
-  const sidebarData = await getBlogsByProduct();
+  if (!sidebarData || sidebarData.length === 0) {
+    sidebarData = await getBlogsByProduct().catch(() => []);
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16">

@@ -31,7 +31,7 @@ const SelectRelatedProducts = () => {
   const form = useFormContext();
 
   const { data: listProducts, isLoading } = useGetProductsSelect({
-    is_econelo: false,
+    is_econelo: undefined,
     all_products: true,
   });
 

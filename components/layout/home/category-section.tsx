@@ -17,7 +17,12 @@ const CategorySection = async ({ slug }: CategorySectionProps) => {
     ["home-category", slug],
     { revalidate: 600 },
   );
-  const products = await getCategoryCached();
+  let products = await getCategoryCached();
+  if (!products) {
+    products = await getCategoryBySlug(slug, { page_size: 4 }).catch(
+      () => null,
+    );
+  }
 
   if (!products) return <ProductGridSkeleton length={4} />;
   return (
