@@ -1,22 +1,16 @@
-"use client";
-
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { ProductItem } from "@/types/products";
-import { useTranslations } from "next-intl";
-import React, { useMemo } from "react";
+import { getTranslations } from "next-intl/server";
+import React from "react";
 
 interface FeaturedProductsProps {
   products: ProductItem[];
 }
 
-const FeaturedProducts = ({ products }: FeaturedProductsProps) => {
-  const t = useTranslations();
+const FeaturedProducts = async ({ products }: FeaturedProductsProps) => {
+  const t = await getTranslations();
 
-  // ✅ Lọc sản phẩm chỉ 1 lần
-  const filteredProducts = useMemo(
-    () => products.filter((item) => item.is_active),
-    [products],
-  );
+  const filteredProducts = products.filter((item) => item.is_active);
 
   return (
     <div className="section-padding mt-4 lg:mt-6">
