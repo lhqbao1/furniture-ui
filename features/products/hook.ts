@@ -18,6 +18,7 @@ import {
   getProductByTag,
   getProductsAlgoliaSearch,
   GetProductsSearchParams,
+  EditProductInput,
   updateBulkActiveProducts,
 } from "./api";
 import { ProductInput } from "@/lib/schema/product";
@@ -187,7 +188,7 @@ export function useAddProduct() {
 export function useEditProduct() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: ProductInput }) =>
+    mutationFn: ({ id, input }: { id: string; input: EditProductInput }) =>
       editProduct(input, id),
     onSuccess: (res, variables) => {
       qc.invalidateQueries({ queryKey: ["all-products"] });

@@ -69,9 +69,7 @@ export const submitProduct = async ({
           const value = keyMatch[2];
           return {
             message: `Duplicate ${field}`,
-            description: `Duplication in ${field}${
-              value ? ` (${value})` : ""
-            }`,
+            description: `Duplication in ${field}${value ? ` (${value})` : ""}`,
           };
         }
 
@@ -98,9 +96,7 @@ export const submitProduct = async ({
       return {
         message: "Failed to save product",
         description:
-          detail.errors[0]?.message ??
-          detail.errors[0]?.detail ??
-          fallback,
+          detail.errors[0]?.message ?? detail.errors[0]?.detail ?? fallback,
       };
     }
 

@@ -44,7 +44,7 @@ import { useSyncToKaufland } from "@/features/kaufland/hook";
 interface SyncToEbayFormProps {
   product: ProductItem;
   isUpdating?: boolean;
-  currentMarketplace?: string;
+  currentMarketplace: string;
   updating?: boolean;
   setUpdating: React.Dispatch<React.SetStateAction<boolean>>;
   isAdd?: boolean;
@@ -399,21 +399,31 @@ const SyncToEbayForm = ({
         }
       };
 
+      const {
+        static_files,
+        categories,
+        marketplace_products,
+        bundles,
+        brand,
+        ...productBase
+      } = product;
+
       updateProductMutation.mutate(
         {
           input: {
-            ...product,
-            category_ids: product.categories.map((c) => c.id),
+            ...productBase,
+            category_ids: categories.map((c) => c.id),
             marketplace_products: updatedMarketplaceProducts,
-            ...(product.bundles?.length
+            static_files: static_files?.map((file) => ({ url: file.url })) ?? [],
+            ...(bundles?.length
               ? {
-                  bundles: product.bundles.map((item) => ({
+                  bundles: bundles.map((item) => ({
                     product_id: item.bundle_item.id,
                     quantity: item.quantity,
                   })),
                 }
               : { bundles: [] }),
-            brand_id: product.brand ? product.brand.id : null,
+            brand_id: brand ? brand.id : null,
           },
 
           id: product.id,
@@ -440,7 +450,7 @@ const SyncToEbayForm = ({
           onError(e) {
             toast.error("Failed to update marketplace data", {
               id: loadingToastId,
-              description: parseError(e)
+              description: parseError(e),
             });
             setUpdating(false);
           },
