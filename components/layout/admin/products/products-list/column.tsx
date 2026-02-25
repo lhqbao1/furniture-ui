@@ -1850,7 +1850,7 @@ export const getProductColumns = (
   },
   {
     id: "margin",
-    header: () => <div className="text-center">MARGIN</div>,
+    header: () => <div className="text-center uppercase">prod. Margin</div>,
     cell: ({ row }) => {
       const { final_price, cost, tax } = row.original;
 
@@ -1868,6 +1868,43 @@ export const getProductColumns = (
       }
 
       const margin = (1 - (purchaseCost * (1 + vatRate)) / salePrice) * 100;
+
+      return (
+        <div className="text-right">
+          {Number.isFinite(margin) ? margin.toFixed(1) : "—"}%
+        </div>
+      );
+    },
+  },
+  {
+    id: "log_margin",
+    header: () => <div className="text-center uppercase">log. Margin</div>,
+    cell: ({ row }) => {
+      const { final_price, cost, tax, delivery_cost, carrier } = row.original;
+
+      const salePrice = Number(final_price);
+      const purchaseCost = Number(cost);
+      const shippingCost = Number(delivery_cost ?? 0);
+      const vatRate = Number.parseFloat(String(tax ?? "")) / 100;
+
+      const normalizedCarrier = String(carrier ?? "").toLowerCase();
+      const shippingCharge =
+        normalizedCarrier === "spedition" || normalizedCarrier === "amm"
+          ? 35.95
+          : 5.95;
+
+      if (
+        !Number.isFinite(salePrice) ||
+        salePrice <= 0 ||
+        !Number.isFinite(purchaseCost)
+      ) {
+        return <div className="text-center">—</div>;
+      }
+
+      const numerator =
+        salePrice - (purchaseCost * (1 + vatRate) + shippingCost * 1.19);
+      const denominator = salePrice + shippingCharge;
+      const margin = (numerator / denominator) * 100;
 
       return (
         <div className="text-right">
