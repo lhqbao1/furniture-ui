@@ -200,7 +200,11 @@ export async function deleteProduct(id: string) {
   return data;
 }
 
-export async function editProduct(input: ProductInput, id: string) {
+export type EditProductInput = Partial<ProductInput> & {
+  static_files?: ProductInput["static_files"];
+};
+
+export async function editProduct(input: EditProductInput, id: string) {
   const { data } = await apiAdmin.put(`/products/${id}`, input, {
     headers: {
       "Content-Type": "application/json",
