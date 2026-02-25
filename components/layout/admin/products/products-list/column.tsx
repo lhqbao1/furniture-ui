@@ -1876,11 +1876,26 @@ export const getProductColumns = (
               : null;
             const formattedDate =
               date && !Number.isNaN(date.getTime())
-                ? date.toLocaleDateString("de-DE")
+                ? new Intl.DateTimeFormat("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  }).format(date)
                 : item.list_delivery_date;
 
+            const sixWeeksFromNow = new Date(today);
+            sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
+            const isSoon =
+              date &&
+              !Number.isNaN(date.getTime()) &&
+              date > today &&
+              date <= sixWeeksFromNow;
+
             return (
-              <div key={item.id}>
+              <div
+                key={item.id}
+                className={isSoon ? "text-secondary" : undefined}
+              >
                 {item.quantity ?? 0} | {formattedDate ?? "—"}
               </div>
             );
