@@ -1849,6 +1849,47 @@ export const getProductColumns = (
     sortingFn: sortByHasValue,
   },
   {
+    id: "incoming_stock",
+    header: () => <div className="text-center uppercase">incoming stock</div>,
+    cell: ({ row }) => {
+      const inventoryPos = row.original.inventory_pos ?? [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const upcoming = inventoryPos.filter((item) => {
+        if (!item.list_delivery_date) return false;
+        const date = new Date(item.list_delivery_date);
+        if (Number.isNaN(date.getTime())) return false;
+        date.setHours(0, 0, 0, 0);
+        return date > today;
+      });
+
+      if (!upcoming.length) {
+        return <div className="text-center">—</div>;
+      }
+
+      return (
+        <div className="space-y-1.5 text-sm text-center">
+          {upcoming.map((item) => {
+            const date = item.list_delivery_date
+              ? new Date(item.list_delivery_date)
+              : null;
+            const formattedDate =
+              date && !Number.isNaN(date.getTime())
+                ? date.toLocaleDateString("de-DE")
+                : item.list_delivery_date;
+
+            return (
+              <div key={item.id}>
+                {item.quantity ?? 0} | {formattedDate ?? "—"}
+              </div>
+            );
+          })}
+        </div>
+      );
+    },
+  },
+  {
     id: "margin",
     header: () => <div className="text-center uppercase">prod. Margin</div>,
     cell: ({ row }) => {
@@ -1901,8 +1942,9 @@ export const getProductColumns = (
         return <div className="text-center">—</div>;
       }
 
+      const shippingCostWithVat = shippingCost * 1.19;
       const numerator =
-        salePrice - (purchaseCost * (1 + vatRate) + shippingCost * 1.19);
+        salePrice - (purchaseCost * (1 + vatRate) + shippingCostWithVat);
       const denominator = salePrice + shippingCharge;
       const margin = (numerator / denominator) * 100;
 
