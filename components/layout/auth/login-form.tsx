@@ -272,7 +272,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                             key={idx}
                             id={`otp-${idx}`}
                             value={field.value?.[idx] ?? ""}
-                            // ref={(el) => (inputRefs.current[idx] = el)}
+                            ref={(el) => (inputRefs.current[idx] = el)}
                             onChange={(e) => {
                               const val = e.target.value
                                 .replace(/\D/g, "")
@@ -295,6 +295,32 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
                               if (idx === 5) {
                                 handleAutoSubmitOtp(newValue);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key !== "Backspace") return;
+                              const current = field.value ?? "";
+                              const hasValue = current[idx];
+
+                              if (hasValue) {
+                                const newValue =
+                                  current.substring(0, idx) +
+                                  "" +
+                                  current.substring(idx + 1);
+                                field.onChange(newValue);
+                                e.preventDefault();
+                                return;
+                              }
+
+                              if (idx > 0) {
+                                const prevIndex = idx - 1;
+                                const newValue =
+                                  current.substring(0, prevIndex) +
+                                  "" +
+                                  current.substring(prevIndex + 1);
+                                field.onChange(newValue);
+                                inputRefs.current[prevIndex]?.focus();
+                                e.preventDefault();
                               }
                             }}
                             onPaste={(e) => {
