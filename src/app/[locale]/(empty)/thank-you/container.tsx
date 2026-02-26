@@ -347,7 +347,7 @@ const OrderPlaced = () => {
       checkout?.checkouts.flatMap((c) =>
         c.cart.items.map((item) => ({
           stock: item.products.stock,
-          inventory: item.products.inventory,
+          inventory: item.products.inventory_pos,
           deliveryTime: item.products.delivery_time,
         })),
       ) ?? [],

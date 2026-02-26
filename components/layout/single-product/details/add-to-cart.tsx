@@ -66,15 +66,12 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
     today.setHours(0, 0, 0, 0);
 
     return items.reduce((sum, item) => {
-      if (item.list_delivery_date) {
-        const deliveryDate = new Date(item.list_delivery_date);
-        if (!Number.isNaN(deliveryDate.getTime())) {
-          deliveryDate.setHours(0, 0, 0, 0);
-          if (deliveryDate < today) {
-            return sum;
-          }
-        }
-      }
+      if ((item.quantity ?? 0) <= 0) return sum;
+      if (!item.list_delivery_date) return sum;
+      const deliveryDate = new Date(item.list_delivery_date);
+      if (Number.isNaN(deliveryDate.getTime())) return sum;
+      deliveryDate.setHours(0, 0, 0, 0);
+      if (deliveryDate < today) return sum;
 
       return sum + (item.quantity ?? 0);
     }, 0);
@@ -82,15 +79,27 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
 
   const maxStock = useMemo(() => {
     const baseStock = calculateAvailableStock(productDetails);
-    return baseStock + incomingStock;
+    return Math.max(0, baseStock + incomingStock);
   }, [productDetails, incomingStock]);
+
+  const handleSubmitWithStockCheck = React.useCallback(
+    (values: z.infer<typeof cartFormSchema>) => {
+      if (maxStock <= 0 || values.quantity > maxStock) {
+        console.error("Not enough stock to add to cart.");
+        return;
+      }
+
+      handleSubmitToCart(values);
+    },
+    [handleSubmitToCart, maxStock],
+  );
 
   return (
     <>
       <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(
-            (values) => handleSubmitToCart(values),
+            (values) => handleSubmitWithStockCheck(values),
             (e) => console.error("Please check the form for errors", e),
           )}
         >
@@ -167,7 +176,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
           <MobileStickyCart
             onAddToCart={() =>
               form.handleSubmit((values) => {
-                handleSubmitToCart(values);
+                handleSubmitWithStockCheck(values);
               })()
             }
             price={productDetails.final_price}

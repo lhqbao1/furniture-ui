@@ -5,11 +5,25 @@ import { useMemo } from "react";
 export function getLatestInventory(inventory: any[]) {
   if (!inventory || inventory.length === 0) return null;
 
-  return inventory.reduce((latest, item) => {
-    if (!latest) return item;
-    return new Date(item.date_received) > new Date(latest.date_received)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const futureItems = inventory.filter((item) => {
+    if ((item?.quantity ?? 0) <= 0) return false;
+    if (!item?.list_delivery_date) return false;
+    const date = new Date(item.list_delivery_date);
+    if (Number.isNaN(date.getTime())) return false;
+    date.setHours(0, 0, 0, 0);
+    return date >= today;
+  });
+
+  if (futureItems.length === 0) return null;
+
+  return futureItems.reduce((nearest, item) => {
+    if (!nearest) return item;
+    return new Date(item.list_delivery_date) < new Date(nearest.list_delivery_date)
       ? item
-      : latest;
+      : nearest;
   }, null);
 }
 
@@ -80,7 +94,7 @@ export const useDeliveryEstimate = ({
     }
     // CASE 2: hết hàng nhưng có inventory sắp về
     else if (latestInventory) {
-      startDate = new Date(latestInventory.date_received);
+      startDate = new Date(latestInventory.list_delivery_date);
     }
     // CASE 3: hết hàng & không có inventory → vẫn tính (fallback)
     else {
@@ -113,7 +127,7 @@ export function calculateDeliveryEstimate({
 
   // CASE 2: hết hàng nhưng có inventory sắp về
   if (stock === 0 && latestInventory) {
-    startDate = new Date(latestInventory.date_received);
+    startDate = new Date(latestInventory.list_delivery_date);
   }
 
   if (!startDate) return null;

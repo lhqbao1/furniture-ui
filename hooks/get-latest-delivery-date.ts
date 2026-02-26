@@ -2,7 +2,7 @@ import { calculateDeliveryEstimate } from "./get-estimated-shipping";
 
 interface ProductForDeliveryEstimate {
   stock: number;
-  inventory?: any[];
+  inventory?: { list_delivery_date?: string }[];
   deliveryTime?: string;
 }
 

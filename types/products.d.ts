@@ -150,6 +150,17 @@ export interface InventoryItem {
   updated_at: string; // ISO datetime
 }
 
+export interface InventoryPosItem {
+  id: string;
+  quantity: number;
+  unit_cost: number;
+  total_cost: number;
+  description: string;
+  list_delivery_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ProductStockLog {
   id: string;
   product_id: string;
@@ -239,16 +250,7 @@ export type ProductItem = {
 
   inventory: InventoryItem[];
   log_stocks: ProductStockLog[];
-  inventory_pos: {
-    id: string;
-    quantity: number;
-    unit_cost: number;
-    total_cost: number;
-    description: string;
-    list_delivery_date: string;
-    created_at: string;
-    updated_at: string;
-  }[];
+  inventory_pos: InventoryPosItem[];
   vouchers: VoucherItem[];
 
   faqs: ProductFAQ[];
