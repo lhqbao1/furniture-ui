@@ -176,6 +176,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 ? "" // Nếu company_name có → không hiện dòng này
                 : checkout.checkouts?.[0]?.invoice_address?.recipient_name
                   ? checkout.checkouts[0].invoice_address.recipient_name
+                  : checkout.checkouts?.[0]?.shipping_address?.recipient_name
+                    ? checkout.checkouts[0].shipping_address.recipient_name
                   : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
                       checkout.checkouts?.[0]?.user?.last_name ?? ""
                     }`}

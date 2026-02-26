@@ -45,6 +45,10 @@ import {
   useUpdatePONumberOfContainers,
   useUpdatePurchaseOrder,
 } from "@/features/incoming-inventory/po/hook";
+import {
+  getContainerInventory,
+  updateInventoryPo,
+} from "@/features/incoming-inventory/inventory/api";
 
 const CONTAINER_SIZES = [
   "01X40GP",
@@ -103,9 +107,41 @@ const AddContainerDialog = ({
     });
   }, [container, form]);
 
+  const updateInventoryDeliveryDate = async (
+    containerId: string,
+    dateToWarehouse?: string,
+  ) => {
+    if (!dateToWarehouse) return;
+    try {
+      const inventory = await getContainerInventory(containerId);
+      if (!inventory.length) return;
+
+      await Promise.all(
+        inventory.map((item) =>
+          updateInventoryPo(item.id, {
+            container_id: containerId,
+            product_id: item.product.id,
+            quantity: item.quantity,
+            unit_cost: item.unit_cost,
+            total_cost: item.total_cost,
+            description: item.description,
+            list_delivery_date: dateToWarehouse,
+          }),
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to update inventory delivery date", error);
+      toast.error("Failed to update inventory delivery date.");
+    }
+  };
+
   const handleSubmit = (values: ContainerValues) => {
-    const payload = {
+    const normalizedValues = {
       ...values,
+      date_of_issue: values.date_of_issue ? values.date_of_issue : null,
+    };
+    const payload = {
+      ...normalizedValues,
       purchase_order_id: purchaseOrderId,
     };
 
@@ -116,8 +152,12 @@ const AddContainerDialog = ({
           input: payload,
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             toast.success("Container updated successfully");
+            await updateInventoryDeliveryDate(
+              container!.id,
+              values.date_to_warehouse,
+            );
             setOpen(false);
           },
           onError: () => {
@@ -127,7 +167,7 @@ const AddContainerDialog = ({
       );
     } else {
       createContainerMutation.mutate(payload, {
-        onSuccess: () => {
+        onSuccess: async (created) => {
           toast.success("Container created successfully");
           updatePOMutation.mutate({
             input: {
@@ -135,6 +175,10 @@ const AddContainerDialog = ({
             },
             purchaseOrderId: purchaseOrderId,
           });
+          await updateInventoryDeliveryDate(
+            created.id,
+            values.date_to_warehouse,
+          );
           setOpen(false);
         },
         onError: () => {

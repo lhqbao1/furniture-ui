@@ -1,6 +1,6 @@
 // utils/cart.ts
 
-import { InventoryItem } from "@/types/products";
+import { InventoryPosItem } from "@/types/products";
 
 export type CartItemLocal = {
   id?: string;
@@ -20,7 +20,7 @@ export type CartItemLocal = {
   width?: number;
   height?: number;
   color?: string;
-  inventory: InventoryItem[];
+  inventory: InventoryPosItem[];
   url_key: string;
   result_stock: number;
 };

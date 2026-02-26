@@ -16,18 +16,16 @@ import { userIdAtom } from "@/store/auth";
 import QuantityControl from "./quantity-input";
 
 import { addBusinessDays } from "date-fns";
-import { InventoryItem } from "@/types/products";
+import { InventoryPosItem } from "@/types/products";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useAddToWishList } from "@/features/wishlist/hook";
 import { HandleApiError } from "@/lib/api-helper";
 import ProductBrand from "../single-product/product-brand";
-import {
-  getDeliveryDayRange,
-  getLatestInventory,
-} from "@/hooks/get-estimated-shipping";
+import { getDeliveryDayRange } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
 
 interface CartItemProps {
   cartServer?: CartItem;
@@ -48,7 +46,7 @@ type CartItemUI = {
   height?: number;
   color?: string;
   stock: number;
-  inventory: InventoryItem[];
+  inventory: InventoryPosItem[];
   url_key: string;
   id_provider?: string;
   result_stock: number;
@@ -78,7 +76,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         height: cartServer.products.height,
         color: cartServer.products.color,
         stock: cartServer.products.stock,
-        inventory: cartServer.products.inventory,
+        inventory: cartServer.products.inventory_pos,
         url_key: cartServer.products.url_key,
         id_provider: cartServer.products.id_provider,
         result_stock: cartServer.products.result_stock ?? 0,
@@ -99,7 +97,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
           height: localProducts.height,
           color: localProducts.color,
           stock: localProducts.stock,
-          inventory: localProducts.inventory,
+        inventory: localProducts.inventory,
           url_key: localProducts.url_key,
           id_provider: localProducts.id_provider,
           result_stock: localProducts.result_stock ?? 0,
@@ -150,10 +148,16 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     }
 
     const totalIncomingStock =
-      item.products.inventory?.reduce(
-        (sum, inv) => sum + (inv.incoming_stock ?? 0),
-        0,
-      ) ?? 0;
+      item.products.inventory_pos?.reduce((sum, inv) => {
+        if (!inv.list_delivery_date) return sum;
+        const date = new Date(inv.list_delivery_date);
+        if (Number.isNaN(date.getTime())) return sum;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        date.setHours(0, 0, 0, 0);
+        if (date < today) return sum;
+        return sum + (inv.quantity ?? 0);
+      }, 0) ?? 0;
 
     if (newQuantity > item.products.stock + totalIncomingStock) {
       toast.error(t("notEnoughStock"));
@@ -230,10 +234,9 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     }
   };
 
-  const latestInventory = React.useMemo(
-    () => getLatestInventory(item?.inventory ?? []),
-    [item?.inventory],
-  );
+  const productIdForInventoryPo =
+    cartServer?.products?.id ?? localProducts?.product_id;
+  const { data: inventoryPo } = useInventoryPoByProductId(productIdForInventoryPo);
 
   const deliveryDayRange = React.useMemo(
     () => getDeliveryDayRange(item?.deliveryText),
@@ -253,30 +256,87 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     [item?.stock, item?.result_stock],
   );
 
+  const incomingStock = React.useMemo(() => {
+    const items = Array.isArray(inventoryPo)
+      ? inventoryPo
+      : inventoryPo
+        ? [inventoryPo]
+        : [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return items.reduce((sum, inv) => {
+      if ((inv.quantity ?? 0) <= 0) return sum;
+      if (!inv.list_delivery_date) return sum;
+      const date = new Date(inv.list_delivery_date);
+      if (Number.isNaN(date.getTime())) return sum;
+      date.setHours(0, 0, 0, 0);
+      if (date < today) return sum;
+      return sum + (inv.quantity ?? 0);
+    }, 0);
+  }, [inventoryPo]);
+
+  const totalStock = availableStock + incomingStock;
+
+  const nextIncomingDate = React.useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const items = Array.isArray(inventoryPo)
+      ? inventoryPo
+      : inventoryPo
+        ? [inventoryPo]
+        : [];
+
+    const futureDates = items
+      .filter((inv) => (inv.quantity ?? 0) > 0 && inv.list_delivery_date)
+      .map((inv) => new Date(inv.list_delivery_date))
+      .filter((date) => {
+        if (Number.isNaN(date.getTime())) return false;
+        date.setHours(0, 0, 0, 0);
+        return date >= today;
+      })
+      .sort((a, b) => a.getTime() - b.getTime());
+
+    if (futureDates.length === 0) return null;
+    return futureDates[0];
+  }, [inventoryPo]);
+
+  const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
+    const result = new Date(startDate);
+    result.setDate(result.getDate() + days);
+    return result;
+  }, []);
+
   const estimatedDeliveryRange = React.useMemo(() => {
     if (!deliveryDayRange) return null;
-    const stock = availableStock;
-
-    let startDate: Date | null = null;
-
-    // CASE 1: hết hàng + có inventory
-    if (stock === 0 && latestInventory) {
-      startDate = new Date(latestInventory.date_received);
+    if (totalStock > 0) {
+      const today = new Date();
+      return {
+        from: addCalendarDays(today, deliveryDayRange.min),
+        to: addCalendarDays(today, deliveryDayRange.max),
+      };
     }
 
-    // CASE 2: còn hàng
-    if (stock > 0) {
-      startDate = new Date();
+    if (!nextIncomingDate) {
+      const today = new Date();
+      return {
+        from: addCalendarDays(today, deliveryDayRange.min),
+        to: addCalendarDays(today, deliveryDayRange.max),
+      };
     }
-
-    // CASE 3: stock = 0 & không inventory
-    // if (!startDate) return null;
 
     return {
-      from: addBusinessDays(startDate ?? new Date(), deliveryDayRange.min),
-      to: addBusinessDays(startDate ?? new Date(), deliveryDayRange.max),
+      from: addBusinessDays(nextIncomingDate, deliveryDayRange.min),
+      to: addBusinessDays(nextIncomingDate, deliveryDayRange.max),
     };
-  }, [deliveryDayRange, availableStock, latestInventory]);
+  }, [
+    deliveryDayRange,
+    totalStock,
+    nextIncomingDate,
+    addCalendarDays,
+  ]);
 
   const handleAddToWishlist = (id: string) => {
     if (!id) return;

@@ -22,8 +22,6 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
 import AddOrEditInventoryDialog from "../inventory/dialog/add-inventory-dialog";
-import EditInventoryDialog from "../inventory/dialog/edit-inventory-dialog";
-import ProductInventoryDeleteDialog from "../inventory/dialog/delete-dialog";
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -35,7 +33,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
       {/* <Link href={`/admin/products/${product.id}/edit`}> */}
       <AddOrEditInventoryDialog
         productId={product.id}
-        inventoryData={product.inventory}
+        inventoryData={product.inventory_pos}
         cost={product.cost}
         stock={product.stock}
       />
@@ -290,7 +288,7 @@ export const getIncomingInventoryColumns = (
       </div>
     ),
     cell: ({ row }) => {
-      const inventoryData = row.original.inventory;
+      const inventoryData = row.original.inventory_pos;
 
       if (!inventoryData || inventoryData.length === 0) {
         return <div className="text-center">Updating</div>;
@@ -305,27 +303,15 @@ export const getIncomingInventoryColumns = (
             >
               {/* INFO */}
               <div className="grid grid-cols-3 gap-2 text-sm w-[280px]">
-                <div className="">{item.incoming_stock} pcs</div>
-                <div className="">{formatIOSDate(item.date_received)}</div>
+                <div className="">{item.quantity} pcs</div>
+                <div className="">{formatIOSDate(item.list_delivery_date)}</div>
                 <div className="">
                   €
-                  {item.cost_received.toLocaleString("de-DE", {
+                  {item.unit_cost.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </div>
-              </div>
-
-              {/* ACTIONS */}
-              <div className="flex gap-2">
-                <EditInventoryDialog
-                  cost={row.original.cost}
-                  productId={row.original.id}
-                  stock={row.original.stock}
-                  inventoryData={item}
-                />
-
-                <ProductInventoryDeleteDialog id={item.id} />
               </div>
             </div>
           ))}

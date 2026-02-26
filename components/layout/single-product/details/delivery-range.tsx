@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 interface DeliveryRangeProps {
   productDetails: ProductItem;
@@ -29,38 +30,34 @@ const DeliveryRange = ({
     productDetails.id,
   );
 
+  const currentStock = React.useMemo(
+    () => calculateAvailableStock(productDetails),
+    [productDetails],
+  );
+
+  console.log(data);
+
   const nextIncomingDate = React.useMemo(() => {
     const today = new Date();
-    const candidates: Date[] = [];
-
-    const inventoryItems: InventoryItem[] = Array.isArray(
-      productDetails.inventory,
-    )
-      ? productDetails.inventory
-      : [];
-
-    for (const item of inventoryItems) {
-      if (!item?.date_received) continue;
-      const date = new Date(item.date_received);
-      if (!Number.isNaN(date.getTime())) candidates.push(date);
-    }
+    today.setHours(0, 0, 0, 0);
 
     const poItems = Array.isArray(data) ? data : data ? [data] : [];
-    for (const item of poItems) {
-      if (!item?.list_delivery_date) continue;
-      const date = new Date(item.list_delivery_date);
-      if (!Number.isNaN(date.getTime())) candidates.push(date);
-    }
+    const futureDates = poItems
+      .filter((item) => (item?.quantity ?? 0) > 0)
+      .map((item) =>
+        item?.list_delivery_date ? new Date(item.list_delivery_date) : null,
+      )
+      .filter((date): date is Date => {
+        if (!date || Number.isNaN(date.getTime())) return false;
+        const normalized = new Date(date);
+        normalized.setHours(0, 0, 0, 0);
+        return normalized >= today;
+      })
+      .sort((a, b) => a.getTime() - b.getTime());
 
-    if (candidates.length === 0) return null;
-
-    const futureDates = candidates.filter((date) => date >= today);
-    if (futureDates.length > 0) {
-      return futureDates.sort((a, b) => a.getTime() - b.getTime())[0];
-    }
-
-    return candidates.sort((a, b) => b.getTime() - a.getTime())[0];
-  }, [data, productDetails.inventory]);
+    if (futureDates.length === 0) return null;
+    return futureDates[0];
+  }, [data]);
 
   const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
     const result = new Date(startDate);
@@ -72,7 +69,7 @@ const DeliveryRange = ({
     const deliveryRange = getDeliveryDayRange(productDetails.delivery_time);
     if (!deliveryRange) return null;
 
-    if (available_stock > 0) {
+    if (currentStock > 0) {
       const today = new Date();
       return {
         from: addCalendarDays(today, deliveryRange.min),
@@ -94,7 +91,7 @@ const DeliveryRange = ({
     };
   }, [
     addCalendarDays,
-    available_stock,
+    currentStock,
     nextIncomingDate,
     productDetails.delivery_time,
   ]);

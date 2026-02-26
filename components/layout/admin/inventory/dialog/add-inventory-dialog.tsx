@@ -42,14 +42,7 @@ interface AddOrEditInventoryDialogProps {
   productId: string;
   cost: number; // 👈 thêm
   stock: number; // 👈 thêm
-  inventoryData?: {
-    id: string;
-    product_id: string;
-    incoming_stock: number;
-    date_received: string;
-    cost_received: number;
-    total_cost: number;
-  }[];
+  inventoryData?: { id?: string }[];
 }
 
 function toIsoWithoutZ(date: Date) {

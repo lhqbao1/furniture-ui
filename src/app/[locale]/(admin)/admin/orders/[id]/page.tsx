@@ -106,10 +106,7 @@ const OrderDetails = () => {
       <div className="flex justify-between w-full">
         {order.status !== "Pending" ? (
           <div className="flex gap-12">
-            <DocumentTable
-              order={order}
-              invoiceCode={invoice?.invoice_code}
-            />
+            <DocumentTable order={order} invoiceCode={invoice?.invoice_code} />
             {/* <DocumentTable /> */}
           </div>
         ) : (
