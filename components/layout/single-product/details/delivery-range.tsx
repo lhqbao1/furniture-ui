@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 interface DeliveryRangeProps {
   productDetails: ProductItem;
@@ -28,22 +29,14 @@ const DeliveryRange = ({
   const { data, isLoading, isError } = useInventoryPoByProductId(
     productDetails.id,
   );
+  const currentStock = React.useMemo(
+    () => calculateAvailableStock(productDetails),
+    [productDetails],
+  );
 
   const nextIncomingDate = React.useMemo(() => {
     const today = new Date();
     const candidates: Date[] = [];
-
-    const inventoryItems: InventoryItem[] = Array.isArray(
-      productDetails.inventory,
-    )
-      ? productDetails.inventory
-      : [];
-
-    for (const item of inventoryItems) {
-      if (!item?.date_received) continue;
-      const date = new Date(item.date_received);
-      if (!Number.isNaN(date.getTime())) candidates.push(date);
-    }
 
     const poItems = Array.isArray(data) ? data : data ? [data] : [];
     for (const item of poItems) {
@@ -60,7 +53,7 @@ const DeliveryRange = ({
     }
 
     return candidates.sort((a, b) => b.getTime() - a.getTime())[0];
-  }, [data, productDetails.inventory]);
+  }, [data]);
 
   const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
     const result = new Date(startDate);
@@ -72,7 +65,7 @@ const DeliveryRange = ({
     const deliveryRange = getDeliveryDayRange(productDetails.delivery_time);
     if (!deliveryRange) return null;
 
-    if (available_stock > 0) {
+    if (currentStock > 0) {
       const today = new Date();
       return {
         from: addCalendarDays(today, deliveryRange.min),
@@ -94,7 +87,7 @@ const DeliveryRange = ({
     };
   }, [
     addCalendarDays,
-    available_stock,
+    currentStock,
     nextIncomingDate,
     productDetails.delivery_time,
   ]);
