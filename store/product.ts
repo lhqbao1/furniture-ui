@@ -7,3 +7,7 @@ export const sortByStockAtom = atomWithStorage<"asc" | "desc" | undefined>(
   "sortByStock", // key lưu trong localStorage
   undefined
 )
+
+export const productListColumnVisibilityByUserAtom = atomWithStorage<
+  Record<string, Record<string, boolean>>
+>("product_list_column_visibility_by_user", {})

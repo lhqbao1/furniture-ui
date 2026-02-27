@@ -28,7 +28,7 @@ export default function ContactPage() {
         <span className="text-secondary">{t("contact")}</span>
         <span className="text-primary">Prestige Home</span>
       </h1>
-      <ContactInfo />
+      {/* <ContactInfo /> */}
       <div className="lg:w-2/5 mx-auto section-padding lg:space-y-12 w-full space-y-4">
         <ContactFormSection />
       </div>

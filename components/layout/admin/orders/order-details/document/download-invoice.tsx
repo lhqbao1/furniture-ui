@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { DownloadCloud, Loader2 } from "lucide-react";
 import { PackageSlipPdf } from "@/components/layout/pdf/package-slip-pdf";
+import { BauhausReturnSlipPdf } from "@/components/layout/pdf/bauhaus-return-slip";
 
 interface DownloadInvoiceProps {
   checkoutId: string;
@@ -43,11 +44,19 @@ const DownloadInvoice = ({ checkoutId, type }: DownloadInvoiceProps) => {
     );
   }
 
+  console.log(checkout.from_marketplace);
+
   return (
     <Button variant={"outline"}>
       {type === "package" ? (
         <PDFDownloadLink
-          document={<PackageSlipPdf checkout={checkout} invoice={invoice} />}
+          document={
+            checkout.from_marketplace?.toLowerCase() === "bauhaus" ? (
+              <BauhausReturnSlipPdf checkout={checkout} invoice={invoice} />
+            ) : (
+              <PackageSlipPdf checkout={checkout} invoice={invoice} />
+            )
+          }
           fileName={`${invoice.invoice_code}.pdf`}
         >
           {({ loading }) =>

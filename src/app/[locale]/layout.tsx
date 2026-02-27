@@ -5,10 +5,7 @@ import { routing } from "@/src/i18n/routing";
 import type { Metadata } from "next";
 import IntlClientProviderWithAuth from "./intlProviderWithAuth";
 import { getMessages } from "next-intl/server";
-import { AuthSanity } from "@/hooks/auth/auth-sanity";
-import { AwinTracker } from "@/components/shared/awin-tracker";
-import WhatsAppChatBox from "@/components/shared/whatsapp-box-chat";
-import { AwinAttribution } from "@/components/shared/awin/awin-attribution";
+import LocaleClientBoot from "@/components/shared/locale-client-boot";
 
 type Props = {
   children: React.ReactNode;
@@ -55,11 +52,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       messages={messages} // ✅ BẮT BUỘC
       timeZone="Europe/Berlin"
     >
-      <AwinTracker />
-      <AwinAttribution />
-      <AuthSanity />
-      {/* <TawkChat /> */}
-      <WhatsAppChatBox />
+      <LocaleClientBoot />
 
       {/* <SaleFixedIcon /> */}
       {children}

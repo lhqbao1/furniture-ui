@@ -7,7 +7,6 @@ import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAllInventoryPo } from "@/features/incoming-inventory/inventory/hook";
 import { useGetAllPurchaseOrders } from "@/features/incoming-inventory/po/hook";
-import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import { useRouter } from "@/src/i18n/navigation";
 import { ColumnDef } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
@@ -19,7 +18,17 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
-import { Check, X } from "lucide-react";
+import { getISOWeek, getISOWeekYear } from "date-fns";
+
+const formatISOWeek = (value?: string | null) => {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  const week = getISOWeek(date);
+  const year = getISOWeekYear(date);
+  const shortYear = String(year).slice(-2);
+  return `CW ${String(week).padStart(2, "0")} - ${shortYear}`;
+};
 
 const IncomingInventoryList = () => {
   const [page, setPage] = useState(1);
@@ -105,12 +114,10 @@ const IncomingInventoryList = () => {
     },
     {
       accessorKey: "product.name",
-      meta: { width: 200 },
+      // meta: { width: 400 },
       header: () => <div className="text-center">Product</div>,
       cell: ({ row }) => (
-        <div className="text-start text-wrap">
-          {row.original.product?.name ?? "—"}
-        </div>
+        <div className="text-start">{row.original.product?.name ?? "—"}</div>
       ),
     },
 
@@ -126,6 +133,15 @@ const IncomingInventoryList = () => {
       header: () => <div className="text-center">EAN</div>,
       cell: ({ row }) => (
         <div className="text-center">{row.original.product?.ean ?? "—"}</div>
+      ),
+    },
+    {
+      accessorKey: "container.date_to_warehouse",
+      header: () => <div className="text-center">Estimated arrived date</div>,
+      cell: ({ row }) => (
+        <div className="text-center">
+          {formatISOWeek(row.original.container?.date_to_warehouse)}
+        </div>
       ),
     },
     {

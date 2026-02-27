@@ -1,36 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { ProductItem } from "@/types/products";
-import { Heart, ShoppingBasket, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAtom } from "jotai";
-import { currentVoucherAtom, lastVoucherAtom } from "@/store/voucher";
-import { Link, useRouter } from "@/src/i18n/navigation";
-import { useLocale, useTranslations } from "next-intl";
-import { userIdAtom } from "@/store/auth";
-import { useAddToCart } from "@/features/cart/hook";
-import { useAddToWishList } from "@/features/wishlist/hook";
-import { useCartLocal } from "@/hooks/cart";
+import { Link } from "@/src/i18n/navigation";
+import { useLocale } from "next-intl";
 import { useAddViewedProduct } from "@/features/viewed/hook";
-import { CartItemLocal } from "@/lib/utils/cart";
-import { toast } from "sonner";
-import { HandleApiError } from "@/lib/api-helper";
-import { useMediaQuery } from "react-responsive";
-import { usePrevious } from "@uidotdev/usehooks";
-import CountUp from "../CountUp";
 import ProductPricingField from "./product-pricing-field";
 import ProductBrand from "../layout/single-product/product-brand";
-import CartDrawer from "./cart-drawer";
-import { useAddToCartLocalEnhanced } from "@/hooks/cart/add-to-cart-enhanched";
 
 interface ProductCardProps {
   product: ProductItem;
   className?: string;
-  idx: number;
-  isSmall?: boolean;
   isProductDetails?: boolean;
   isLCP?: boolean;
 }
@@ -38,60 +19,21 @@ interface ProductCardProps {
 export default function ProductCard({
   product,
   className,
-  idx,
-  isSmall,
   isProductDetails,
   isLCP,
 }: ProductCardProps) {
-  const cardRefs = useRef<HTMLDivElement[]>([]);
-  const t = useTranslations();
-
-  const router = useRouter();
   const locale = useLocale();
-  const [userId, setUserId] = useAtom(userIdAtom);
-  const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
-
-  const addToCartMutation = useAddToCart();
   const addProductToViewMutation = useAddViewedProduct();
 
   const handleAddProductToViewed = (productId: string) => {
     addProductToViewMutation.mutate({ productId: productId });
   };
 
-  // const handleAddToCart = (currentProduct: ProductItem) => {
-  //   if (!currentProduct) return;
-
-  //   if (!userId) {
-  //     addToCartLocalOnly(currentProduct, 1);
-  //   } else {
-  //     addToCartMutation.mutate(
-  //       { productId: currentProduct.id ?? "", quantity: 1 },
-  //       {
-  //         onSuccess(data, variables, context) {
-  //           toast.success(t("addToCartSuccess"));
-  //         },
-  //         onError(error, variables, context) {
-  //           const { status, message } = HandleApiError(error, t);
-  //           // if (status === 400) {
-  //           //   toast.error(t("notEnoughStock"));
-  //           //   return;
-  //           // }
-  //           toast.error(message);
-  //           if (status === 401) router.push("/login", { locale });
-  //         },
-  //       },
-  //     );
-  //   }
-  // };
-
   return (
     <div className={cn("relative group", className)} key={product.id_provider}>
       <div
         key={product.id}
         className="relative overflow-hidden z-10 h-full"
-        ref={(el) => {
-          if (el) cardRefs.current[idx] = el;
-        }}
         onClick={() => handleAddProductToViewed(product.id)}
       >
         <div className="bg-white p-0 group z-0">
@@ -99,6 +41,7 @@ export default function ProductCard({
             href={`/product/${product.url_key}`}
             locale={locale}
             passHref
+            prefetch={false}
             className="cursor-pointer"
           >
             <div className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group flex items-center">
@@ -130,6 +73,7 @@ export default function ProductCard({
                   width={800}
                   height={800}
                   loading="lazy"
+                  sizes="(max-width: 768px) 50vw, 25vw"
                   className="
                     object-contain
                     absolute rounded-xl
@@ -153,6 +97,7 @@ export default function ProductCard({
               href={`/product/${product.url_key}`}
               locale={locale}
               passHref
+              prefetch={false}
               className="cursor-pointer"
             >
               <h3 className="text-xs md:text-lg text-black text-left line-clamp-2">

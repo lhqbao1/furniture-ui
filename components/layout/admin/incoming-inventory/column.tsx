@@ -7,15 +7,12 @@ import { ProductItem } from "@/types/products";
 import { useLocale } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getProductById } from "@/features/products/api";
 import {
   HoverCard,
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
-import { formatDate } from "@/lib/date-formated";
 import { formatIOSDate } from "@/lib/ios-to-num";
-import { Pencil, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -24,10 +21,6 @@ import { useEditProduct } from "@/features/products/hook";
 import AddOrEditInventoryDialog from "../inventory/dialog/add-inventory-dialog";
 
 function ActionsCell({ product }: { product: ProductItem }) {
-  const locale = useLocale();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-
   return (
     <div className="flex gap-2 justify-center items-center">
       {/* <Link href={`/admin/products/${product.id}/edit`}> */}
@@ -43,89 +36,6 @@ function ActionsCell({ product }: { product: ProductItem }) {
   );
 }
 
-function EditableStockCell({ product }: { product: ProductItem }) {
-  const [value, setValue] = useState<number | string>(product.stock);
-  const [editing, setEditing] = useState(false);
-  const EditProductMutation = useEditProduct();
-
-  const handleEditProductStock = () => {
-    EditProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          stock: Number(value),
-          ...(product.categories?.length
-            ? { category_ids: product.categories.map((c) => c.id) }
-            : {}),
-          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-          brand_id: product.brand ? product.brand.id : null,
-        },
-        id: product.id,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Update product stock successful");
-          setEditing(false);
-        },
-        onError(error, variables, context) {
-          toast.error("Update product stock fail");
-        },
-      },
-    );
-  };
-
-  return (
-    <div className="">
-      {editing ? (
-        <Input
-          type="number"
-          value={value}
-          onChange={(e) => {
-            const v = e.target.value;
-            setValue(v === "" ? "" : Number(v));
-          }}
-          onBlur={() => {
-            if (value !== product.stock) {
-            } else {
-              setEditing(false);
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleEditProductStock();
-            }
-            if (e.key === "Escape") {
-              setValue(product.stock);
-              setEditing(false);
-            }
-          }}
-          autoFocus
-          disabled={EditProductMutation.isPending}
-          className={cn(
-            "w-20",
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
-          )}
-        />
-      ) : (
-        <div
-          className="cursor-pointer text-center"
-          onClick={() => setEditing(true)}
-        >
-          {product.stock}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export const getIncomingInventoryColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,
   is_incoming?: boolean,
@@ -137,10 +47,7 @@ export const getIncomingInventoryColumns = (
       const image = row.original.static_files?.[0]?.url;
 
       return (
-        <HoverCard
-          openDelay={100}
-          closeDelay={100}
-        >
+        <HoverCard openDelay={100} closeDelay={100}>
           <HoverCardTrigger asChild>
             <div className="w-12 h-12 relative cursor-pointer">
               {image ? (

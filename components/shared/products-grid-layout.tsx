@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import { ProductItem } from "@/types/products";
 import ProductCard from "./product-grid-card";
@@ -7,7 +6,6 @@ interface ProductsGridLayoutProps {
   hasBadge?: boolean;
   hasPagination?: boolean;
   data: ProductItem[];
-  isSmall?: boolean;
   isProductDetails?: boolean;
   hideAfterSm?: number;
 }
@@ -16,7 +14,6 @@ const ProductsGridLayout = ({
   hasBadge,
   hasPagination = false,
   data,
-  isSmall,
   isProductDetails,
   hideAfterSm,
 }: ProductsGridLayoutProps) => {
@@ -32,7 +29,6 @@ const ProductsGridLayout = ({
 
           return (
             <ProductCard
-              idx={idx}
               product={product}
               key={product.id}
               className={hideOnSmall}

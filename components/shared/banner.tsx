@@ -6,6 +6,8 @@ interface BannerProps {
 }
 
 const Banner = ({ height, isHome = false }: BannerProps) => {
+  const isPriority = Boolean(isHome);
+
   return (
     <div
       className="relative w-full flex-shrink-0 z-0 h-[200px] lg:h-[300px] 2xl:h-[550px] block"
@@ -16,10 +18,11 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
         src="/home-banner1.webp"
         alt="Banner"
         fill
-        priority
-        fetchPriority="high"
-        // sizes="(min-width: 1024px) 100vw"
+        priority={isPriority}
+        fetchPriority={isPriority ? "high" : "auto"}
+        loading={isPriority ? "eager" : "lazy"}
         className="object-cover"
+        quality={80}
         unoptimized
         sizes="
           (max-width: 640px) 100vw,

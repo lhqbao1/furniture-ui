@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import {
   FormField,
@@ -13,6 +14,7 @@ import {
   aggregatePackages,
   calcDeliveryCost,
 } from "@/lib/shipping/delivery-cost";
+import { BundleInput } from "@/lib/schema/product";
 
 interface ProductPricingFieldsProps {
   isDsp?: boolean;
@@ -28,6 +30,10 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
     control: form.control,
     name: "bundles",
   });
+  const costValue = useWatch({
+    control: form.control,
+    name: "cost",
+  });
   const carrier = useWatch({
     control: form.control,
     name: "carrier",
@@ -37,6 +43,36 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
     mergedPackage ? [mergedPackage] : [],
     carrier,
   );
+  const hasBundles = Array.isArray(bundles) && bundles.length > 0;
+
+  const bundleCost = useMemo(() => {
+    if (!hasBundles) return null;
+
+    return bundles.reduce((sum: number, item: BundleInput) => {
+      if (!item) return sum;
+      const quantity =
+        typeof item.quantity === "number"
+          ? item.quantity
+          : Number(item.quantity ?? 0);
+      const unitCost =
+        typeof item.cost === "number" ? item.cost : Number(item.cost ?? 0);
+      if (!Number.isFinite(quantity) || !Number.isFinite(unitCost)) return sum;
+      if (quantity <= 0 || unitCost <= 0) return sum;
+      return sum + unitCost * quantity;
+    }, 0);
+  }, [bundles, hasBundles]);
+
+  useEffect(() => {
+    if (bundleCost == null) return;
+    const nextCost = Math.round(bundleCost * 100) / 100;
+    const current = Number(costValue ?? 0) || 0;
+    if (Math.abs(current - nextCost) < 0.005) return;
+
+    form.setValue("cost", nextCost, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [bundleCost, costValue, form]);
 
   return (
     <div className="grid grid-cols-12 gap-6">
@@ -58,6 +94,8 @@ export function ProductPricingFields({ isDsp }: ProductPricingFieldsProps) {
                     className="pl-7"
                     step="0.01"
                     value={field.value ?? ""}
+                    disabled={hasBundles}
+                    aria-disabled={hasBundles}
                     onChange={(e) =>
                       field.onChange(
                         e.target.value === "" ? null : e.target.valueAsNumber,

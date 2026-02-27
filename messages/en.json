@@ -478,5 +478,21 @@
   "retryPayment": "Try payment again",
   "people_also_search": "People also search for",
   "go_to_page": "Go to page",
-  "searchPrompt": "Search for a product…"
+  "searchPrompt": "Search for a product…",
+  "home_blocks": {
+    "value_title": "Why Prestige Home",
+    "value_1_title": "Fast delivery",
+    "value_1_body": "Parcel or freight right to your door",
+    "value_2_title": "Secure payment",
+    "value_2_body": "Trusted providers and encrypted checkout",
+    "value_3_title": "Welcome perks",
+    "value_3_body": "Promos, vouchers, and exclusive deals",
+    "value_4_title": "Quality selected",
+    "value_4_body": "Curated brands and materials",
+    "story_title": "Discover living worlds",
+    "story_body": "Mix indoor and outdoor highlights for a home with character.",
+    "story_cta": "View collections",
+    "logo_title": "Popular payment methods",
+    "logo_hint": "Fast. Secure. Trusted."
+  }
 }

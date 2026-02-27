@@ -23,6 +23,14 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { ProductItem } from "@/types/products";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // import RichEditor dynamically to avoid SSR issues
 const RichEditor = dynamic(
@@ -51,6 +59,7 @@ const ProductDetailInputs = ({
   const listImages = form.watch("static_files") ?? [];
   const stock = form.watch("stock");
   const result_stock = form.watch("result_stock");
+  const [isRemoveImagesOpen, setIsRemoveImagesOpen] = useState(false);
 
   function sanitizeFolderName(name: string) {
     return name
@@ -357,12 +366,43 @@ const ProductDetailInputs = ({
             <Button
               type="button"
               className="bg-red-500 hover:bg-red-600"
-              onClick={handleRemoveAllImages}
+              onClick={() => setIsRemoveImagesOpen(true)}
+              disabled={!listImages.length}
             >
               Remove all
             </Button>
           </div>
         </div>
+        <Dialog open={isRemoveImagesOpen} onOpenChange={setIsRemoveImagesOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Remove all images?</DialogTitle>
+              <DialogDescription>
+                This will remove all images from the product. This action cannot
+                be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setIsRemoveImagesOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="bg-red-500 hover:bg-red-600"
+                onClick={() => {
+                  handleRemoveAllImages();
+                  setIsRemoveImagesOpen(false);
+                }}
+              >
+                Remove all
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <ImagePickerInput
           form={form}
           fieldName="static_files"

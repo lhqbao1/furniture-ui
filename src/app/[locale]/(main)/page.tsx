@@ -1,6 +1,9 @@
 import CategorySection from "@/components/layout/home/category-section";
 import NewsletterVoucherSection from "@/components/layout/home/contact-voucher-section";
 import FeaturedProducts from "@/components/layout/home/featured-products";
+import HomeCollectionHighlight from "@/components/layout/home/home-collection-highlight";
+import HomeLogoStrip from "@/components/layout/home/home-logo-strip";
+import HomeValueProps from "@/components/layout/home/home-value-props";
 
 import { getProductByTag } from "@/features/products/api";
 import { Suspense } from "react";
@@ -37,6 +40,8 @@ export default async function HomePage() {
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <FeaturedProducts products={allProducts.slice(0, 8)} />
         </Suspense>
+        <HomeValueProps />
+        <HomeCollectionHighlight />
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           {" "}
           <NewsletterVoucherSection />

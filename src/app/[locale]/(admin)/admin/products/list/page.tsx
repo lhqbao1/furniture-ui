@@ -7,8 +7,11 @@ import TableToolbar, {
 } from "@/components/layout/admin/products/products-list/toolbar";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllProducts } from "@/features/products/hook";
-import { sortByStockAtom } from "@/store/product";
-import { useAtom } from "jotai";
+import {
+  productListColumnVisibilityByUserAtom,
+  sortByStockAtom,
+} from "@/store/product";
+import { useAtom, useAtomValue } from "jotai";
 import React, {
   useEffect,
   useLayoutEffect,
@@ -18,7 +21,8 @@ import React, {
 } from "react";
 import { getProductColumns } from "@/components/layout/admin/products/products-list/column";
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
-import { VisibilityState } from "@tanstack/react-table";
+import { OnChangeFn, VisibilityState } from "@tanstack/react-table";
+import { adminIdAtom } from "@/store/auth";
 
 const PRODUCT_COLUMN_OPTIONS: {
   id: string;
@@ -39,6 +43,7 @@ const PRODUCT_COLUMN_OPTIONS: {
   { id: "shipping_cost", label: "Delivery Cost" },
   { id: "final_price", label: "Final Price" },
   { id: "margin", label: "Margin" },
+  { id: "incoming_stock", label: "Incoming Stock" },
   { id: "carrier", label: "Carrier" },
   { id: "color", label: "Color" },
   { id: "materials", label: "Materials" },
@@ -56,7 +61,12 @@ const ProductList = () => {
   const [pageSize, setPageSize] = useState(50);
   const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+  const adminId = useAtomValue(adminIdAtom);
+  const [columnVisibilityByUser, setColumnVisibilityByUser] = useAtom(
+    productListColumnVisibilityByUserAtom,
+  );
+  const visibilityKey = adminId ?? "anonymous";
+  const defaultVisibility = useMemo(
     () =>
       Object.fromEntries(
         PRODUCT_COLUMN_OPTIONS.map((column) => [
@@ -64,14 +74,42 @@ const ProductList = () => {
           DEFAULT_VISIBLE_PRODUCT_COLUMNS.has(column.id),
         ]),
       ) as VisibilityState,
+    [],
   );
-  const hasInitializedColumnVisibility = useRef(false);
+  const storedVisibility = columnVisibilityByUser[visibilityKey];
+  const columnVisibility = useMemo(
+    () => ({ ...defaultVisibility, ...(storedVisibility ?? {}) }),
+    [defaultVisibility, storedVisibility],
+  );
 
   const handleColumnVisibilityChange = (columnId: string, visible: boolean) => {
-    setColumnVisibility((prev) => ({
-      ...prev,
-      [columnId]: visible,
-    }));
+    setColumnVisibilityByUser((prev) => {
+      const current = {
+        ...defaultVisibility,
+        ...(prev[visibilityKey] ?? {}),
+      };
+      return {
+        ...prev,
+        [visibilityKey]: {
+          ...current,
+          [columnId]: visible,
+        },
+      };
+    });
+  };
+
+  const handleTableColumnVisibilityChange: OnChangeFn<VisibilityState> = (
+    updater,
+  ) => {
+    setColumnVisibilityByUser((prev) => {
+      const current = {
+        ...defaultVisibility,
+        ...(prev[visibilityKey] ?? {}),
+      };
+      const next =
+        typeof updater === "function" ? updater(current) : updater;
+      return { ...prev, [visibilityKey]: next };
+    });
   };
 
   const router = useRouter();
@@ -96,17 +134,6 @@ const ProductList = () => {
       setPage(Number(param));
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (hasInitializedColumnVisibility.current) return;
-    hasInitializedColumnVisibility.current = true;
-    setColumnVisibility((prev) => ({
-      ...prev,
-      color: false,
-      materials: false,
-      component: false,
-    }));
-  }, []);
 
   const { data, isLoading, isError } = useGetAllProducts({
     page,
@@ -190,11 +217,11 @@ const ProductList = () => {
         {isLoading ? (
           <ProductTableSkeleton />
         ) : (
-          <ProductTable
-            data={filteredItems}
-            columns={getProductColumns(setSortByStock)}
-            page={page}
-            pageSize={pageSize}
+        <ProductTable
+          data={filteredItems}
+          columns={getProductColumns(setSortByStock)}
+          page={page}
+          pageSize={pageSize}
             setPage={handlePageChange}
             setPageSize={setPageSize}
             totalItems={
@@ -212,7 +239,7 @@ const ProductList = () => {
             stickyContainerClassName="h-full"
             onSelectionChange={setSelectedProductIds} // 👈 đây
             columnVisibility={columnVisibility}
-            onColumnVisibilityChange={setColumnVisibility}
+            onColumnVisibilityChange={handleTableColumnVisibilityChange}
             enableClientSorting
           />
         )}
