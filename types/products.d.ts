@@ -259,6 +259,8 @@ export type ProductItem = {
   bullet_point_3: string;
   bullet_point_4: string;
   bullet_point_5: string;
+
+  is_import_to_amm: boolean;
 };
 
 export type ProductResponse = {

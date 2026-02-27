@@ -22,6 +22,7 @@ import { useUpdateStockProduct } from "@/features/products/inventory/hook";
 import { useAtom } from "jotai";
 import { adminIdAtom } from "@/store/auth";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { getISOWeek, getISOWeekYear } from "date-fns";
 
 // function ActionsCell({ product }: { product: ProductItem }) {
 //   const locale = useLocale();
@@ -474,6 +475,60 @@ export const getInventoryColumns = (
           ) : (
             <EditableStockCell product={row.original} />
           )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "incoming_stock",
+    header: () => <div className="text-center uppercase">incoming stock</div>,
+    cell: ({ row }) => {
+      const inventoryPos = row.original.inventory_pos ?? [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const upcoming = inventoryPos.filter((item) => {
+        if (!item.list_delivery_date) return false;
+        const date = new Date(item.list_delivery_date);
+        if (Number.isNaN(date.getTime())) return false;
+        date.setHours(0, 0, 0, 0);
+        return date > today;
+      });
+
+      if (!upcoming.length) {
+        return <div className="text-center">—</div>;
+      }
+
+      return (
+        <div className="space-y-1.5 text-sm text-center">
+          {upcoming.map((item) => {
+            const date = item.list_delivery_date
+              ? new Date(item.list_delivery_date)
+              : null;
+            const formattedDate =
+              date && !Number.isNaN(date.getTime())
+                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${String(
+                    getISOWeekYear(date),
+                  ).slice(-2)}`
+                : "—";
+
+            const sixWeeksFromNow = new Date(today);
+            sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
+            const isSoon =
+              date &&
+              !Number.isNaN(date.getTime()) &&
+              date > today &&
+              date <= sixWeeksFromNow;
+
+            return (
+              <div
+                key={item.id}
+                className={isSoon ? "text-secondary" : undefined}
+              >
+                {item.quantity ?? 0} | {formattedDate ?? "—"}
+              </div>
+            );
+          })}
         </div>
       );
     },

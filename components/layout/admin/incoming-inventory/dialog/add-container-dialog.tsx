@@ -139,6 +139,10 @@ const AddContainerDialog = ({
     const normalizedValues = {
       ...values,
       date_of_issue: values.date_of_issue ? values.date_of_issue : null,
+      date_of_delivery: values.date_of_delivery ? values.date_of_delivery : null,
+      date_of_inspection: values.date_of_inspection
+        ? values.date_of_inspection
+        : null,
     };
     const payload = {
       ...normalizedValues,

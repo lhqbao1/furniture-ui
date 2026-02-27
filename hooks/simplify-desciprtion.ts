@@ -46,3 +46,32 @@ export function cleanDescription(desc: string) {
     .replace(/\s+/g, " ")          // gom khoảng trắng
     .trim()
 }
+
+export function formatHtmlDescription(desc: string): string {
+  if (!desc) return "";
+
+  return desc
+    .replace(/<\s*br\s*\/?>/gi, "\n")
+    .replace(/<\s*\/\s*p\s*>/gi, "\n\n")
+    .replace(/<\s*p[^>]*>/gi, "")
+    .replace(/<\s*\/\s*div\s*>/gi, "\n")
+    .replace(/<\s*div[^>]*>/gi, "")
+    .replace(/<\s*h([1-6])[^>]*>([\s\S]*?)<\s*\/\s*h\1\s*>/gi, "\n$2\n")
+    .replace(/<\s*li[^>]*>/gi, "\n- ")
+    .replace(/<\s*\/\s*li\s*>/gi, "")
+    .replace(/<\s*\/?\s*(ul|ol)[^>]*>/gi, "\n")
+    .replace(/<\s*(strong|b)[^>]*>([\s\S]*?)<\s*\/\s*(strong|b)\s*>/gi, "**$2**")
+    .replace(/<\s*(em|i)[^>]*>([\s\S]*?)<\s*\/\s*(em|i)\s*>/gi, "_$2_")
+    .replace(/<\s*script[^>]*>[\s\S]*?<\s*\/\s*script\s*>/gi, "")
+    .replace(/<\s*style[^>]*>[\s\S]*?<\s*\/\s*style\s*>/gi, "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}

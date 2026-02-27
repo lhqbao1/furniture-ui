@@ -156,7 +156,7 @@ export default function MobileProductSearch() {
                             width={50}
                             alt=""
                             className="h-12 w-12"
-                            unoptimized
+                            sizes="48px"
                           />
                           <div className="font-semibold line-clamp-2">
                             {product.name}

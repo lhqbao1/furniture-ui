@@ -245,8 +245,8 @@ export default function ProductSearch({
                                 width={48}
                                 height={48}
                                 alt=""
-                                unoptimized
                                 className="w-16 h-16 object-contain"
+                                sizes="64px"
                               />
                               <div>
                                 <div className="font-medium">{p.name}</div>

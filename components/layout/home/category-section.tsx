@@ -3,6 +3,7 @@ import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { getCategoryBySlug } from "@/features/category/api";
 import React from "react";
 import { unstable_cache } from "next/cache";
+import Link from "next/link";
 
 interface CategorySectionProps {
   slug: string;
@@ -26,8 +27,15 @@ const CategorySection = async ({ slug }: CategorySectionProps) => {
 
   if (!products) return <ProductGridSkeleton length={4} />;
   return (
-    <div className="section-padding mt-4 lg:mt-6">
-      <h2 className="section-header">{products.name}</h2>
+    <div
+      className="section-padding mt-4 lg:mt-6"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
+    >
+      <h2 className="section-header">
+        <Link href={"/shop-all?categories=Zäune+%26+Sichtschutz"}>
+          {products.name}
+        </Link>
+      </h2>
       <ProductsGridLayout
         data={products.products.filter((item) => item.is_active).slice(0, 4)}
       />

@@ -49,6 +49,7 @@ import { CategoryResponse } from "@/types/categories";
 import { CARRIERS } from "@/data/data";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
+import { getISOWeek, getISOWeekYear } from "date-fns";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
 
@@ -707,6 +708,7 @@ function EditableCostCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.cost);
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
+  const hasBundles = (product.bundles?.length ?? 0) > 0;
 
   const handleEditProductCost = () => {
     const toastId = toast.loading("Updating product cost...");
@@ -767,14 +769,23 @@ function EditableCostCell({ product }: { product: ProductItem }) {
             }
           }}
           autoFocus
-          disabled={EditProductMutation.isPending}
+          disabled={EditProductMutation.isPending || hasBundles}
           className={cn(
             "w-28",
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
+            EditProductMutation.isPending || hasBundles
+              ? "cursor-not-allowed"
+              : "cursor-text",
           )}
         />
       ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+        <div
+          className={cn(
+            hasBundles ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+          )}
+          onClick={() => {
+            if (!hasBundles) setEditing(true);
+          }}
+        >
           {product.cost ? (
             <div className="text-right">€{product.cost?.toFixed(2)}</div>
           ) : (
@@ -1876,12 +1887,10 @@ export const getProductColumns = (
               : null;
             const formattedDate =
               date && !Number.isNaN(date.getTime())
-                ? new Intl.DateTimeFormat("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  }).format(date)
-                : item.list_delivery_date;
+                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${String(
+                    getISOWeekYear(date),
+                  ).slice(-2)}`
+                : "—";
 
             const sixWeeksFromNow = new Date(today);
             sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);

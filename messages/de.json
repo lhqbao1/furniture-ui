@@ -476,5 +476,21 @@
   "retryPayment": "Zahlung erneut versuchen",
   "people_also_search": "Andere suchten auch nach",
   "go_to_page": "Zur Seite gehen",
-  "searchPrompt": "Suche nach einem Produkt…"
+  "searchPrompt": "Suche nach einem Produkt…",
+  "home_blocks": {
+    "value_title": "Darum Prestige Home",
+    "value_1_title": "Schneller Versand",
+    "value_1_body": "Spedition oder Paketdienst bis zur Haustür",
+    "value_2_title": "Sichere Zahlung",
+    "value_2_body": "Bekannte Anbieter & verschlüsselte Abwicklung",
+    "value_3_title": "Willkommensvorteile",
+    "value_3_body": "Aktionen, Gutscheine und exklusive Deals",
+    "value_4_title": "Qualität geprüft",
+    "value_4_body": "Ausgewählte Marken und Materialien",
+    "story_title": "Wohnwelten entdecken",
+    "story_body": "Kombiniere Indoor- und Outdoor-Highlights für ein Zuhause mit Charakter.",
+    "story_cta": "Kollektionen ansehen",
+    "logo_title": "Beliebte Zahlungsarten",
+    "logo_hint": "Schnell. Sicher. Vertraut."
+  }
 }

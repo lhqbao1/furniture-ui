@@ -134,7 +134,7 @@ export default function ShopAllPage() {
                 </div>
               )}
 
-              <ProductsGridLayout hasBadge data={data.items} isSmall />
+              <ProductsGridLayout hasBadge data={data.items} />
               {data.pagination.total_pages > 1 && (
                 <CustomPagination
                   totalPages={data.pagination.total_pages}
