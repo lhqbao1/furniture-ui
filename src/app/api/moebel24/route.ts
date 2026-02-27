@@ -149,7 +149,7 @@ export async function GET() {
     return new Response(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": "attachment; filename=home-tiger.csv",
+        "Content-Disposition": "attachment; filename=moebel24.csv",
       },
     });
   } catch (err) {
