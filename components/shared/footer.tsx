@@ -124,19 +124,11 @@ const Footer = () => {
 
         <div className="grid grid-cols-2 gap-6 items-start">
           <ul className="space-y-2 text-black-700 text-sm">
-            <li className="font-bold">Büro </li>
             <li>Prestige Home GmbH</li>
             <li>Greifswalder Straße 226, 10405 Berlin</li>
             <li>{t("phone_number")}: +49 30 814 537 080</li>
             <li>{t("email")}: info@prestige-home.de</li>
             <li>Mo – Fr: 09:00 – 17:00 Uhr</li>
-          </ul>
-          <ul className="space-y-2 text-black-700 text-sm">
-            <li className="font-bold">Lager</li>
-            <li>Prestige Home</li>
-            <li>Amm GmbH & Co KG Spedition</li>
-            <li>Hamburger Straße 99</li>
-            <li>90451 Nuremberg</li>
           </ul>
         </div>
       </div>
@@ -263,11 +255,7 @@ const Footer = () => {
               className="h-10 w-auto object-contain"
             />
           </a>
-          <a
-            href="https://www.billiger.de"
-            target="_blank"
-            rel="noopener"
-          >
+          <a href="https://www.billiger.de" target="_blank" rel="noopener">
             {" "}
             <img
               src="https://cdn.billiger.com/partnerbutton/light/30588"
@@ -364,7 +352,7 @@ const Footer = () => {
               unoptimized
             />
           </Link> */}
-          <Link
+          {/* <Link
             href="https://www.pinterest.com/prestigehomegmbh/"
             target="_blank"
           >
@@ -376,7 +364,7 @@ const Footer = () => {
               className="w-12 h-12 object-fill hover:scale-110 duration-300 transition-all"
               unoptimized
             />
-          </Link>
+          </Link> */}
         </div>
 
         <div className="text-sm mt-2 text-center">

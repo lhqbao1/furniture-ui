@@ -1,82 +1,53 @@
-'use client'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { Star } from 'lucide-react'
-import Image from 'next/image'
-import React, { useCallback, useMemo, useState } from 'react'
-import YouTube, { YouTubeProps } from "react-youtube"
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
-import { allProducts, listComments } from '@/data/data'
-import ListComments from './review/list-comments'
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import GiveCommentSection from './review/give-comment-section'
-import { useMediaQuery } from 'react-responsive'
-import { useTranslations } from 'next-intl'
+"use client";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Star } from "lucide-react";
+import React, { useEffect, useState } from "react";
+
+import ListComments from "./review/list-comments";
+
+import GiveCommentSection from "./review/give-comment-section";
+import { useMediaQuery } from "react-responsive";
+import { useTranslations } from "next-intl";
+import { useAtom } from "jotai";
+import { reviewRatingFilterAtom } from "@/store/review";
 
 const reviewCount = [
-    { title: 5, percent: 70 },
-    { title: 4, percent: 18 },
-    { title: 3, percent: 10 },
-    { title: 2, percent: 0 },
-    { title: 1, percent: 2 }
-]
+  { title: 5, percent: 70 },
+  { title: 4, percent: 18 },
+  { title: 3, percent: 10 },
+  { title: 2, percent: 0 },
+  { title: 1, percent: 2 },
+];
 
 interface ProductReviewTabProps {
-    productId: string
+  productId: string;
 }
 
 const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
-    const t = useTranslations()
-    const [selectedRate, setSelectedRate] = useState<number>()
-    const [showPic, setShowPic] = useState(true)
-    const [showComments, setShowComments] = useState(true)
-    const [videos, setVideos] = useState([
-        "wQZQD5VIOoQ", "PNKb4AadnpM", "dQw4w9WgXcQ", "kXYiU_JCYtU",
-        "3JZ_D3ELwOQ", "9bZkp7q19f0", "L_jWHffIx5E", "eY52Zsg-KVI",
-    ])
+  const t = useTranslations();
+  const [selectedRate, setSelectedRate] = useAtom(reviewRatingFilterAtom);
+  const [showPic, setShowPic] = useState(true);
+  const [showComments, setShowComments] = useState(true);
 
-    const mainVideoOpts = useMemo<YouTubeProps["opts"]>(() => ({
-        width: "100%",
-        height: "100%",
-        playerVars: { autoplay: 1, mute: 1 }
-    }), [])
+  const isMobile = useMediaQuery({ maxWidth: 640 });
 
-    const sideVideoOpts = useMemo<YouTubeProps["opts"]>(() => ({
-        width: "100%",
-        height: "100%",
-        playerVars: { modestbranding: 1, rel: 0, showinfo: 0, control: 0 }
-    }), [])
+  useEffect(() => {
+    setSelectedRate(undefined);
+  }, [productId, setSelectedRate]);
 
-    const handleSwap = useCallback((index: number) => {
-        setVideos(prev => {
-            const newVideos = [...prev]
-            const temp = newVideos[0]
-            newVideos[0] = newVideos[index]
-            newVideos[index] = temp
-            return newVideos
-        })
-    }, [])
+  return (
+    <div className="space-y-2 md:space-y-4 xl:space-y-6">
+      <h3 className="col-span-12 text-primary">{t("review")}</h3>
 
-    const isMobile = useMediaQuery({ maxWidth: 640 })
-
-    return (
-        <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-12 lg:gap-28'}`}>
-            {/* LEFT: Reviews */}
-            <div className={`${isMobile ? 'col-span-1' : 'lg:col-span-7 col-span-12'} flex flex-col gap-6`}>
-                {/* <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
+      <div
+        className={`grid gap-6 ${isMobile ? "grid-cols-1" : "grid-cols-12 lg:gap-28"}`}
+      >
+        {/* LEFT: Reviews */}
+        <div
+          className={`${isMobile ? "col-span-1" : "lg:col-span-7 col-span-12"} flex flex-col gap-6`}
+        >
+          {/* <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
                     <div className={`${isMobile ? 'flex flex-row justify-between' : 'col-span-2 flex flex-col items-center justify-center gap-2'}`}>
                         <h3 className='flex flex-row gap-1 items-center'>4.8 <Star /></h3>
                         <p className='text-center'><span className='text-primary font-semibold'>120</span> {t('happyCustomer')}</p>
@@ -131,42 +102,71 @@ const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
                     </div>
                 </div> */}
 
-                <div className={`grid gap-4 border-b border-gray-300 pb-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-12'}`}>
-                    <div className={`${isMobile ? 'flex flex-row justify-between items-center' : 'col-span-6 flex flex-row justify-between'}`}>
-                        <p>{t('all')}</p>
-                        {[...reviewCount].reverse().map((item, index) => (
-                            <div key={index} className='flex gap-1 items-center'>
-                                <p>{item.title}</p>
-                                <Star
-                                    stroke='#f15a24'
-                                    onClick={() => setSelectedRate(item.title)}
-                                    fill={selectedRate === item.title ? "#f15a24" : "white"}
-                                />
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className={`${isMobile ? 'flex gap-4' : 'col-span-6 flex gap-8'}`}>
-                        <div className="flex flex-row-reverse items-center gap-2">
-                            <Checkbox id="pic" checked={showPic} onCheckedChange={(val) => setShowPic(!!val)} />
-                            <Label htmlFor="pic">{t('picOrVid')}</Label>
-                        </div>
-                        <div className="flex flex-row-reverse items-center gap-2">
-                            <Checkbox id="comments" checked={showComments} onCheckedChange={(val) => setShowComments(!!val)} />
-                            <Label htmlFor="comments">{t('comments')}</Label>
-                        </div>
-                    </div>
+          <div
+            className={`grid gap-4 border-b border-gray-300 pb-4 ${isMobile ? "grid-cols-1" : "grid-cols-12"}`}
+          >
+            <div
+              className={`${isMobile ? "flex flex-row justify-between items-center" : "col-span-6 flex flex-row justify-between"}`}
+            >
+              <p
+                onClick={() => setSelectedRate(undefined)}
+                className={`cursor-pointer ${!selectedRate ? "text-primary font-semibold" : ""}`}
+              >
+                {t("all")}
+              </p>
+              {[...reviewCount].reverse().map((item, index) => (
+                <div key={index} className="flex gap-1 items-center">
+                  <p>{item.title}</p>
+                  <Star
+                    stroke="#f15a24"
+                    className="cursor-pointer"
+                    onClick={() =>
+                      setSelectedRate(selectedRate === item.title ? undefined : item.title)
+                    }
+                    fill={selectedRate === item.title ? "#f15a24" : "white"}
+                  />
                 </div>
-
-                <ListComments showComments={showComments} showPic={showPic} productId={productId} />
+              ))}
             </div>
 
-            {/* RIGHT: Videos + Write Review */}
-            <div className={`${isMobile ? 'col-span-1' : 'md:col-span-5 col-span-12'} flex flex-col gap-6`}>
-                <GiveCommentSection productId={productId} />
-            </div>
+            {/* <div
+              className={`${isMobile ? "flex gap-4" : "col-span-6 flex gap-8"}`}
+            >
+              <div className="flex flex-row-reverse items-center gap-2">
+                <Checkbox
+                  id="pic"
+                  checked={showPic}
+                  onCheckedChange={(val) => setShowPic(!!val)}
+                />
+                <Label htmlFor="pic">{t("picOrVid")}</Label>
+              </div>
+              <div className="flex flex-row-reverse items-center gap-2">
+                <Checkbox
+                  id="comments"
+                  checked={showComments}
+                  onCheckedChange={(val) => setShowComments(!!val)}
+                />
+                <Label htmlFor="comments">{t("comments")}</Label>
+              </div>
+            </div> */}
+          </div>
+
+          <ListComments
+            showComments={showComments}
+            showPic={showPic}
+            productId={productId}
+          />
         </div>
-    )
-}
 
-export default ProductReviewTab
+        {/* RIGHT: Videos + Write Review */}
+        <div
+          className={`${isMobile ? "col-span-1" : "md:col-span-5 col-span-12"} flex flex-col gap-6`}
+        >
+          <GiveCommentSection productId={productId} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductReviewTab;

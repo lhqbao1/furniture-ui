@@ -42,7 +42,6 @@ export function getOrderDetailColumns({
       ),
     },
 
-    // ✅ VAT COLUMN (DÙNG LOGIC MỚI)
     {
       id: "vat",
       header: () => <div className="text-center w-full">VAT</div>,

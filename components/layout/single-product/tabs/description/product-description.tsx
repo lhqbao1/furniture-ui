@@ -16,15 +16,11 @@ const ProductDescription = ({
   question,
 }: ProductDescriptionProps) => {
   return (
-    <div className="w-full grid lg:grid-cols-2 grid-cols-1 lg:gap-12 gap-6">
+    <div className="w-full lg:w-2/3">
       <div
         className="product-descriptions font-sans"
         dangerouslySetInnerHTML={{ __html: description ?? "" }}
       />
-      <div className="space-y-6">
-        <ProductFAQSection question={question} />
-        <QAInput productId={productId} />
-      </div>
     </div>
   );
 };

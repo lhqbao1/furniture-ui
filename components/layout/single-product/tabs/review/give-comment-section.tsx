@@ -35,19 +35,8 @@ const GiveCommentSection = ({ productId }: GiveCommentSectionProps) => {
   return (
     <div className="flex flex-col gap-4">
       <div className="text-gray-600 text-lg font-bold">{t("writeReview")}</div>
-      <div className="flex justify-between items-center">
-        {/* <div className='flex gap-2 items-center'>
-                    <Image src={'/people.webp'} height={100} width={100} alt='' className='rounded-full size-16' unoptimized />
-                    <div>
-                        <p className='text-lg text-gray-600 font-bold'></p>
-                        <p className='text-sm text-secondary font-semibold'>Purchased</p>
-                    </div>
-                </div> */}
-      </div>
-      <CommentForm
-        productId={productId}
-        userId={userId ?? ""}
-      />
+
+      <CommentForm productId={productId} userId={userId ?? ""} />
     </div>
   );
 };

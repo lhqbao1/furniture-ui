@@ -14,6 +14,8 @@ import ProductDetailsProperties from "./tabs/properties/page";
 import { ReviewResponse } from "@/types/review";
 import UserManualTab from "./tabs/user-manual/user-manual-tab";
 import ProductDescription from "./tabs/description/product-description";
+import QAInput from "./tabs/q&a/q&a-input";
+import { ProductFAQSection } from "./tabs/description/faq-accordion";
 
 interface ProductDetailsTabProps {
   product: ProductItem;
@@ -49,16 +51,21 @@ export function ProductDetailsTab({
       label: "Aufbau & Details",
       content: <UserManualTab files={product.pdf_files} />,
     },
-    {
-      value: "review",
-      label: t("review"),
-      content: <ProductReviewTab productId={product.id} />,
-    },
     // {
-    //   value: "q&a",
-    //   label: "häufig gestellte Frage",
-    //   content: <QASection productId={product.id} />,
+    //   value: "review",
+    //   label: t("review"),
+    //   content: <ProductReviewTab productId={product.id} />,
     // },
+    {
+      value: "q&a",
+      label: "häufig gestellte Frage",
+      content: (
+        <div className="space-y-6 w-full md:w-2/3 xl:w-1/2">
+          <ProductFAQSection question={product.faqs} />
+          <QAInput productId={product.id} />
+        </div>
+      ),
+    },
   ];
 
   if (isMobile) {
@@ -70,10 +77,7 @@ export function ProductDetailsTab({
         defaultValue={["description"]}
       >
         {sections.map((section) => (
-          <AccordionItem
-            value={section.value}
-            key={section.value}
-          >
+          <AccordionItem value={section.value} key={section.value}>
             <AccordionTrigger>{section.label}</AccordionTrigger>
             <AccordionContent>{section.content}</AccordionContent>
           </AccordionItem>

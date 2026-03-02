@@ -16,7 +16,7 @@ export const getReviewByProduct = async (product_id: string) => {
   try {
     const { data } = await api.get(`/review/review-product/${product_id}`);
 
-    return Array.isArray(data) ? data : []; // ⚠️ bắt buộc
+    return Array.isArray(data) ? (data as ReviewResponse[]) : []; // ⚠️ bắt buộc
   } catch (error: any) {
     if (error.response?.status === 404) {
       return []; // ⬅️ Không có review → trả về mảng rỗng

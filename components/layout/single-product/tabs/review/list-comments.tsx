@@ -9,6 +9,8 @@ import { Comment } from "@/types/comment";
 import { useTranslations } from "next-intl";
 import { useGetReviewsByProduct } from "@/features/review/hook";
 import { formatDate, formatDateTime } from "@/lib/date-formated";
+import { useAtomValue } from "jotai";
+import { reviewRatingFilterAtom } from "@/store/review";
 
 interface ListCommentsProps {
   showComments: boolean;
@@ -22,6 +24,7 @@ const ListComments = ({
   productId,
 }: ListCommentsProps) => {
   const t = useTranslations();
+  const selectedRate = useAtomValue(reviewRatingFilterAtom);
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [expandedIndexes, setExpandedIndexes] = useState<number[]>([]);
   const [showButtonIndexes, setShowButtonIndexes] = useState<number[]>([]);
@@ -30,6 +33,13 @@ const ListComments = ({
     isLoading,
     isError,
   } = useGetReviewsByProduct(productId);
+  const filteredComments = React.useMemo(() => {
+    if (!listComments) return [];
+    if (!selectedRate) return listComments;
+    return listComments.filter(
+      (comment) => Math.round(Number(comment.rating ?? 0)) === selectedRate,
+    );
+  }, [listComments, selectedRate]);
 
   const toggleExpand = (idx: number) => {
     setExpandedIndexes((prev) =>
@@ -49,21 +59,25 @@ const ListComments = ({
     });
   }, []);
 
-  if (!listComments || isLoading) return <div>{t("noComment")}</div>;
+  if (!filteredComments || filteredComments.length === 0 || isLoading)
+    return <div>{t("noComment")}</div>;
+
   return (
     <div className="pt-0">
       <Collapsible open={showComments}>
         <CollapsibleContent>
           <div className="pt-0">
-            {listComments.map((item, index) => (
-              <div
-                key={index}
-                className="border-b border-gray-300 pt-4 pb-6"
-              >
+            {filteredComments.map((item, index) => (
+              <div key={index} className="border-b border-gray-300 pt-4 pb-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-gray-600 font-bold">{t("customer")}</p>
+                      <p className="text-gray-600 font-bold">
+                        {t("customer")}:{" "}
+                        {item.user
+                          ? item.user.first_name + " " + item.user.last_name
+                          : item.customer}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <p className="text-secondary font-semibold text-sm">
@@ -105,7 +119,7 @@ const ListComments = ({
                   item.static_files?.length > 0 &&
                   showPic ? (
                     <CommentImageDialog
-                      listComments={listComments}
+                      listComments={filteredComments}
                       comment={item}
                     />
                   ) : (
