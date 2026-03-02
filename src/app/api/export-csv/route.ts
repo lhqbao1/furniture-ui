@@ -47,11 +47,45 @@ export async function GET() {
       "delivery_time",
     ];
 
-    const rows = products
-      .filter((p) => p.final_price > 0 && p.is_active && p.stock > 0 && p.brand)
-      .map((p) => {
+    const hasRequiredFields = (p: unknown) => {
+      if (!p || typeof p !== "object") return false;
+      const product = p as {
+        id_provider?: string;
+        name?: string;
+        url_key?: string;
+        brand?: { name?: string };
+        static_files?: unknown[];
+      };
+      return (
+        typeof product.id_provider === "string" &&
+        product.id_provider.trim().length > 0 &&
+        typeof product.name === "string" &&
+        product.name.trim().length > 0 &&
+        typeof product.url_key === "string" &&
+        product.url_key.trim().length > 0 &&
+        typeof product.brand?.name === "string" &&
+        product.brand.name.trim().length > 0 &&
+        Array.isArray(product.static_files)
+      );
+    };
+
+    let skippedProducts = 0;
+
+    const rows = products.flatMap((p) => {
+      if (!hasRequiredFields(p) || p.final_price <= 0 || !p.is_active) {
+        skippedProducts += 1;
+        return [];
+      }
+
+      try {
+        const availableStock = calculateAvailableStock(p);
+        if (availableStock <= 0) {
+          skippedProducts += 1;
+          return [];
+        }
+
         const categories = p.categories?.map((c) => c.name).join(", ") || "";
-        return [
+        return [[
           escapeCsv(p.id_provider),
           escapeCsv(p.name),
           escapeCsv(cleanDescription(p.description)),
@@ -64,9 +98,9 @@ export async function GET() {
           ),
           escapeCsv(cleanImageLink(p.static_files[0]?.url)),
           escapeCsv(
-            calculateAvailableStock(p) > 0 ? "in_stock" : "out_of_stock",
+            availableStock > 0 ? "in_stock" : "out_of_stock",
           ),
-          escapeCsv(calculateAvailableStock(p) ?? ""),
+          escapeCsv(availableStock ?? ""),
           escapeCsv(p.final_price.toFixed(2) + " EUR"),
           escapeCsv(p.ean),
           "new",
@@ -88,8 +122,20 @@ export async function GET() {
           escapeCsv(p.brand.company_address ?? ""),
           escapeCsv(p.brand.company_email ?? ""),
           escapeCsv(p.delivery_time ?? ""),
-        ].join(",");
-      });
+        ].join(",")];
+      } catch (error) {
+        skippedProducts += 1;
+        console.warn("Skip invalid export-csv product row:", {
+          id_provider: p?.id_provider,
+          error,
+        });
+        return [];
+      }
+    });
+
+    if (skippedProducts > 0) {
+      console.warn(`Export CSV skipped ${skippedProducts} invalid products.`);
+    }
 
     const csv = [headers.join(","), ...rows].join("\n");
 

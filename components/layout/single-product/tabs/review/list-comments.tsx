@@ -4,11 +4,9 @@ import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import CommentImageDialog from "./comment-image-dialog";
-import { Button } from "@/components/ui/button";
-import { Comment } from "@/types/comment";
 import { useTranslations } from "next-intl";
 import { useGetReviewsByProduct } from "@/features/review/hook";
-import { formatDate, formatDateTime } from "@/lib/date-formated";
+import { formatDateTime } from "@/lib/date-formated";
 import { useAtomValue } from "jotai";
 import { reviewRatingFilterAtom } from "@/store/review";
 
@@ -17,6 +15,15 @@ interface ListCommentsProps {
   showPic: boolean;
   productId: string;
 }
+
+const safeFormatDateTime = (value: unknown) => {
+  if (!value) return "";
+  try {
+    return formatDateTime(value as Date);
+  } catch {
+    return "";
+  }
+};
 
 const ListComments = ({
   showComments,
@@ -31,15 +38,18 @@ const ListComments = ({
   const {
     data: listComments,
     isLoading,
-    isError,
   } = useGetReviewsByProduct(productId);
+  const safeComments = React.useMemo(
+    () => (Array.isArray(listComments) ? listComments : []),
+    [listComments],
+  );
+
   const filteredComments = React.useMemo(() => {
-    if (!listComments) return [];
-    if (!selectedRate) return listComments;
-    return listComments.filter(
+    if (!selectedRate) return safeComments;
+    return safeComments.filter(
       (comment) => Math.round(Number(comment.rating ?? 0)) === selectedRate,
     );
-  }, [listComments, selectedRate]);
+  }, [safeComments, selectedRate]);
 
   const toggleExpand = (idx: number) => {
     setExpandedIndexes((prev) =>
@@ -48,16 +58,21 @@ const ListComments = ({
   };
 
   useEffect(() => {
+    const nextShowButtonIndexes: number[] = [];
+
     textRefs.current.forEach((el, idx) => {
       if (el) {
-        const lineHeight = parseInt(getComputedStyle(el).lineHeight);
+        const lineHeight = Number.parseFloat(getComputedStyle(el).lineHeight);
+        if (!Number.isFinite(lineHeight) || lineHeight <= 0) return;
         const lines = el.scrollHeight / lineHeight;
         if (lines > 5) {
-          setShowButtonIndexes((prev) => [...prev, idx]);
+          nextShowButtonIndexes.push(idx);
         }
       }
     });
-  }, []);
+
+    setShowButtonIndexes(nextShowButtonIndexes);
+  }, [filteredComments]);
 
   if (!filteredComments || filteredComments.length === 0 || isLoading)
     return <div>{t("noComment")}</div>;
@@ -67,89 +82,105 @@ const ListComments = ({
       <Collapsible open={showComments}>
         <CollapsibleContent>
           <div className="pt-0">
-            {filteredComments.map((item, index) => (
-              <div key={index} className="border-b border-gray-300 pt-4 pb-6">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-gray-600 font-bold">
-                        {t("customer")}:{" "}
-                        {item.user
-                          ? item.user.first_name + " " + item.user.last_name
-                          : item.customer}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <p className="text-secondary font-semibold text-sm">
-                        {t("purchased")}
-                      </p>
-                      <p className="text-gray-400 text-sm">
-                        {formatDateTime(item.created_at)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-1">
-                    <ListStars rating={item.rating} />
-                  </div>
-                </div>
+            {filteredComments.map((item, index) => {
+              const fullName = [
+                item?.user?.first_name ?? "",
+                item?.user?.last_name ?? "",
+              ]
+                .join(" ")
+                .trim();
+              const customerName = fullName || item?.customer || "Anonymous";
+              const createdAt = safeFormatDateTime(item?.created_at);
+              const commentText = item?.comment ?? "";
+              const rating = Number(item?.rating ?? 0);
+              const imageFiles = Array.isArray(item?.static_files)
+                ? item.static_files
+                : [];
+              const firstReply =
+                Array.isArray(item?.replies) && item.replies.length > 0
+                  ? item.replies[0]
+                  : null;
 
-                <div>
-                  <div
-                    ref={(el) => {
-                      textRefs.current[index] = el;
-                    }}
-                    className={`mt-2 ${
-                      !expandedIndexes.includes(index) ? "line-clamp-5" : ""
-                    }`}
-                  >
-                    {item.comment}
-                  </div>
-                  {showButtonIndexes.includes(index) && (
-                    <button
-                      className="text-primary mt-1 cursor-pointer font-bold text-sm"
-                      onClick={() => toggleExpand(index)}
-                    >
-                      {expandedIndexes.includes(index)
-                        ? "See less"
-                        : "Read more"}
-                    </button>
-                  )}
-
-                  {item.static_files &&
-                  item.static_files?.length > 0 &&
-                  showPic ? (
-                    <CommentImageDialog
-                      listComments={filteredComments}
-                      comment={item}
-                    />
-                  ) : (
-                    ""
-                  )}
-                </div>
-
-                {item.replies && (
-                  <div className="pl-12 pt-2 relative">
-                    <div className="flex gap-2 items-center">
-                      <p className="text-gray-600 font-bold">
-                        {item.replies[0].comment}
-                      </p>
-                      <div className="flex gap-1 items-center">
-                        <Image
-                          src={"/logo.svg"}
-                          height={30}
-                          width={30}
-                          alt=""
-                          className="size-4"
-                          unoptimized
-                        />
+              return (
+                <div
+                  key={item?.id ?? index}
+                  className="border-b border-gray-300 pt-4 pb-6"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-gray-600 font-bold">
+                          {t("customer")}: {customerName}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <p className="text-secondary font-semibold text-sm">
+                          {t("purchased")}
+                        </p>
+                        <p className="text-gray-400 text-sm">{createdAt}</p>
                       </div>
                     </div>
-                    <p>{item.replies[0].comment}</p>
-                    <div className="absolute w-6 h-14 left-4  border-l border-b top-0"></div>
+                    <div className="flex flex-row gap-1">
+                      <ListStars rating={rating} />
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  <div>
+                    <div
+                      ref={(el) => {
+                        textRefs.current[index] = el;
+                      }}
+                      className={`mt-2 ${
+                        !expandedIndexes.includes(index) ? "line-clamp-5" : ""
+                      }`}
+                    >
+                      {commentText}
+                    </div>
+                    {showButtonIndexes.includes(index) && (
+                      <button
+                        className="text-primary mt-1 cursor-pointer font-bold text-sm"
+                        onClick={() => toggleExpand(index)}
+                      >
+                        {expandedIndexes.includes(index)
+                          ? "See less"
+                          : "Read more"}
+                      </button>
+                    )}
+
+                    {imageFiles.length > 0 && showPic ? (
+                      <CommentImageDialog
+                        listComments={filteredComments}
+                        comment={item}
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </div>
+
+                  {firstReply && (
+                    <div className="pl-12 pt-2 relative">
+                      <div className="flex gap-2 items-center">
+                        <p className="text-gray-600 font-bold">
+                          {firstReply.comment ?? ""}
+                        </p>
+                        <div className="flex gap-1 items-center">
+                          <Image
+                            src={"/logo.svg"}
+                            height={30}
+                            width={30}
+                            alt=""
+                            className="size-4"
+                            unoptimized
+                          />
+                        </div>
+                      </div>
+                      <p>{firstReply.comment ?? ""}</p>
+                      <div className="absolute w-6 h-14 left-4  border-l border-b top-0"></div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
             {/* <div className="py-6 text-center"> */}
             {/* <Button hasEffect className='rounded-full font-bold'>{t('loadMore')}</Button> */}
             {/* </div> */}

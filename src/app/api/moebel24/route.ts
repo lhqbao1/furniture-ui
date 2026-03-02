@@ -5,6 +5,7 @@ import {
   formatHtmlDescription,
 } from "@/hooks/simplify-desciprtion";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { ProductItem } from "@/types/products";
 
 function parseTaxRate(tax: unknown): number {
   if (typeof tax === "number") {
@@ -54,24 +55,43 @@ export async function GET() {
       "Delivery_Type",
     ] as const;
 
-    const rows = products
-      .filter(
-        (p) =>
-          Number(p?.final_price ?? 0) > 0 &&
-          Boolean(p?.is_active) &&
-          calculateAvailableStock(p) > 0 &&
-          p.final_price > 0 &&
-          p.is_active &&
-          p.brand &&
-          p.carrier &&
-          p.color &&
-          p.materials,
-      )
-      .map((p) => {
+    const hasRequiredFields = (p: ProductItem) =>
+      p &&
+      typeof p.name === "string" &&
+      p.name.trim().length > 0 &&
+      typeof p.sku === "string" &&
+      p.sku.trim().length > 0 &&
+      typeof p.url_key === "string" &&
+      p.url_key.trim().length > 0 &&
+      typeof p.color === "string" &&
+      p.color.trim().length > 0 &&
+      !!p.brand &&
+      typeof p.brand.name === "string" &&
+      p.brand.name.trim().length > 0 &&
+      typeof p.carrier === "string" &&
+      p.carrier.trim().length > 0;
+
+    let skippedProducts = 0;
+
+    const rows = products.flatMap((p) => {
+      if (
+        !hasRequiredFields(p) ||
+        Number(p?.final_price ?? 0) <= 0 ||
+        !Boolean(p?.is_active)
+      ) {
+        skippedProducts += 1;
+        return [];
+      }
+
+      try {
         const images = Array.isArray(p?.static_files) ? p.static_files : [];
         const safePrice = Number(p?.final_price ?? 0);
         const safeTax = parseTaxRate(p?.tax);
         const safeStock = calculateAvailableStock(p);
+        if (safeStock <= 0) {
+          skippedProducts += 1;
+          return [];
+        }
 
         const categoryPath =
           p.categories
@@ -81,59 +101,75 @@ export async function GET() {
             })
             .join(", ") ?? "";
 
-        return {
-          Title: p?.name?.trim() ?? "",
-          SKU_ID: p?.sku ?? "",
-          Alternate_Price: safePrice.toFixed(2),
-          Tax: (safePrice * safeTax).toFixed(2),
-          Delivery_Cost:
-            p.carrier === "amm" || p.carrier === "spedition" ? 35.95 : 5.95,
-          Delivery_Time: p?.delivery_time ?? "",
-          Category_Path: categoryPath,
-          Description: formatHtmlDescription(p?.description ?? ""),
-          Product_URL: p?.url_key
-            ? `https://prestige-home.de/de/product/${p.url_key}`
-            : "",
-          Clean_URL: p?.url_key ?? "",
-          Color: p?.color ?? "",
-          Material: Array.isArray(p?.materials)
-            ? p.materials
-                .map((material) => material?.name ?? "")
-                .filter(Boolean)
-                .join(", ")
-            : typeof p?.materials === "string"
-              ? p.materials
+        return [
+          {
+            Title: p?.name?.trim() ?? "",
+            SKU_ID: p?.sku ?? "",
+            Alternate_Price: safePrice.toFixed(2),
+            Tax: (safePrice * safeTax).toFixed(2),
+            Delivery_Cost:
+              p.carrier === "amm" || p.carrier === "spedition" ? 35.95 : 5.95,
+            Delivery_Time: p?.delivery_time ?? "",
+            Category_Path: categoryPath,
+            Description: formatHtmlDescription(p?.description ?? ""),
+            Product_URL: p?.url_key
+              ? `https://prestige-home.de/de/product/${p.url_key}`
               : "",
-          Length: Number(p?.length ?? 0) > 0 ? Number(p?.length) * 10 : "",
-          Width: Number(p?.width ?? 0) > 0 ? Number(p?.width) * 10 : "",
-          Height: Number(p?.height ?? 0) > 0 ? Number(p?.height) * 10 : "",
-          Weight: Number(p?.weight ?? 0) > 0 ? Number(p?.weight) * 1000 : "",
-          Product_Image_URL_1: images[0]?.url
-            ? cleanImageLink(images[0].url)
-            : "",
-          Product_Image_URL_2: images[1]?.url
-            ? cleanImageLink(images[1].url)
-            : "",
-          Product_Image_URL_3: images[2]?.url
-            ? cleanImageLink(images[2].url)
-            : "",
-          Product_Image_URL_4: images[3]?.url
-            ? cleanImageLink(images[3].url)
-            : "",
-          Product_Image_URL_5: images[4]?.url
-            ? cleanImageLink(images[4].url)
-            : "",
-          EAN: p?.ean ?? "",
-          Brand: p?.brand?.name ?? "",
-          Availability: safeStock,
-          MarketplaceActivation: 1,
-          Minimum_Stock_Availability: 1,
-          Delivery_Type:
-            p.carrier === "amm" || p.carrier === "spedition"
-              ? "Spedition"
-              : "Paket",
-        };
-      });
+            Clean_URL: p?.url_key ?? "",
+            Color: p?.color ?? "",
+            Material: Array.isArray(p?.materials)
+              ? p.materials
+                  .map((material) => material?.name ?? "")
+                  .filter(Boolean)
+                  .join(", ")
+              : typeof p?.materials === "string"
+                ? p.materials
+                : "",
+            Length: Number(p?.length ?? 0) > 0 ? Number(p?.length) * 10 : "",
+            Width: Number(p?.width ?? 0) > 0 ? Number(p?.width) * 10 : "",
+            Height: Number(p?.height ?? 0) > 0 ? Number(p?.height) * 10 : "",
+            Weight: Number(p?.weight ?? 0) > 0 ? Number(p?.weight) * 1000 : "",
+            Product_Image_URL_1: images[0]?.url
+              ? cleanImageLink(images[0].url)
+              : "",
+            Product_Image_URL_2: images[1]?.url
+              ? cleanImageLink(images[1].url)
+              : "",
+            Product_Image_URL_3: images[2]?.url
+              ? cleanImageLink(images[2].url)
+              : "",
+            Product_Image_URL_4: images[3]?.url
+              ? cleanImageLink(images[3].url)
+              : "",
+            Product_Image_URL_5: images[4]?.url
+              ? cleanImageLink(images[4].url)
+              : "",
+            EAN: p?.ean ?? "",
+            Brand: p?.brand?.name ?? "",
+            Availability: safeStock,
+            MarketplaceActivation: 1,
+            Minimum_Stock_Availability: 1,
+            Delivery_Type:
+              p.carrier === "amm" || p.carrier === "spedition"
+                ? "Spedition"
+                : "Paket",
+          },
+        ];
+      } catch (error) {
+        skippedProducts += 1;
+        console.warn("Skip invalid Moebel24 product row:", {
+          id_provider: p?.id_provider,
+          error,
+        });
+        return [];
+      }
+    });
+
+    if (skippedProducts > 0) {
+      console.warn(
+        `Moebel24 feed skipped ${skippedProducts} invalid products.`,
+      );
+    }
 
     // Convert to CSV
     const header = headers.join(",");

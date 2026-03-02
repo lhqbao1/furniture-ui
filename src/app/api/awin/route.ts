@@ -20,33 +20,56 @@ export async function GET() {
   try {
     const products = await getProductsFeed();
 
+    const hasRequiredFields = (p: unknown) => {
+      if (!p || typeof p !== "object") return false;
+      const product = p as {
+        id_provider?: string;
+        name?: string;
+        url_key?: string;
+      };
+      return (
+        typeof product.id_provider === "string" &&
+        product.id_provider.trim().length > 0 &&
+        typeof product.name === "string" &&
+        product.name.trim().length > 0 &&
+        typeof product.url_key === "string" &&
+        product.url_key.trim().length > 0
+      );
+    };
+
+    let skippedProducts = 0;
+
     const itemsXml = products
-      .filter((p) => p.final_price > 0 && p.is_active)
-      .map((p) => {
-        const images = p.static_files || [];
-        const largeImage = images[0] ? cleanImageLink(images[0].url) : "";
-        const subImages = images.slice(1);
+      .flatMap((p) => {
+        if (!hasRequiredFields(p) || p.final_price <= 0 || !p.is_active) {
+          skippedProducts += 1;
+          return [];
+        }
 
-        // Nếu có nhiều ảnh thì lấy thêm 1 ảnh làm alternate/thumbnail
-        const alternateImage = subImages[0]
-          ? cleanImageLink(subImages[0].url)
-          : largeImage;
+        try {
+          const images = Array.isArray(p.static_files) ? p.static_files : [];
+          const largeImage = images[0] ? cleanImageLink(images[0].url) : "";
+          const subImages = images.slice(1);
+          const alternateImage = subImages[0]
+            ? cleanImageLink(subImages[0].url)
+            : largeImage;
 
-        const categories =
-          p.categories?.map((c) => c.name).join(" > ") || "General";
-        const colors =
-          p.options
-            ?.filter((opt) => opt.variant_name?.toLowerCase() === "color")
-            .map((opt) => opt.label)
-            .join(", ") || "";
+          const categories =
+            p.categories?.map((c) => c.name).join(" > ") || "General";
+          const colors =
+            p.options
+              ?.filter((opt) => opt.variant_name?.toLowerCase() === "color")
+              .map((opt) => opt.label)
+              .join(", ") || "";
+          const stock = calculateAvailableStock(p);
 
-        return `
+          return [`
   <product weboffer="no" preorder="no" instock="${
-    calculateAvailableStock(p) > 0 ? "yes" : "no"
+    stock > 0 ? "yes" : "no"
   }" forsale="${p.is_active ? "yes" : "no"}">
     <name><![CDATA[${escapeCDATA(p.name.trim())}]]></name>
     <pid>${escapeXml(p.id_provider || p.id)}</pid>
-    <desc><![CDATA[${escapeCDATA(cleanDescription(p.description))}]]></desc>
+    <desc><![CDATA[${escapeCDATA(cleanDescription(p.description ?? ""))}]]></desc>
     <category>${escapeXml(categories)}</category>
     <purl>${
       p.brand
@@ -79,7 +102,7 @@ export async function GET() {
         ? `Standard delivery in ${p.delivery_time} working days`
         : `Standard delivery in 3-5 working days`
     }</deltime>
-    <stockquant>${calculateAvailableStock(p) < 0 ? 0 : calculateAvailableStock(p)}</stockquant>
+    <stockquant>${stock < 0 ? 0 : stock}</stockquant>
     <alternate_image>${escapeXml(encodeURI(alternateImage))}</alternate_image>
     <large_image>${escapeXml(encodeURI(largeImage))}</large_image>
     <thumburl>${escapeXml(encodeURI(largeImage))}</thumburl>
@@ -87,9 +110,21 @@ export async function GET() {
       .toISOString()
       .replace("T", " ")
       .slice(0, 19)}</lastupdated>
-  </product>`;
+  </product>`];
+        } catch (error) {
+          skippedProducts += 1;
+          console.warn("Skip invalid AWIN product row:", {
+            id_provider: p?.id_provider,
+            error,
+          });
+          return [];
+        }
       })
       .join("\n");
+
+    if (skippedProducts > 0) {
+      console.warn(`AWIN feed skipped ${skippedProducts} invalid products.`);
+    }
 
     const xml = `<?xml version="1.0" encoding="utf-8"?>
 <merchant>

@@ -2,12 +2,7 @@
 export const runtime = "nodejs";
 
 import { pdf } from "@react-pdf/renderer";
-import { InvoicePDF } from "@/components/layout/pdf/file";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
-import {
-  getCheckOutByCheckOutId,
-  getMainCheckOutByMainCheckOutId,
-} from "@/features/checkout/api";
 import { RouteInvoicePDF } from "@/components/layout/pdf/route-invoice";
 
 export async function GET(
@@ -17,8 +12,7 @@ export async function GET(
   try {
     const { id } = await params; // ✅ BẮT BUỘC
     const invoice = await getInvoiceByCheckOut(id);
-    console.log(id);
-    console.log(invoice);
+
     if (!invoice) {
       return new Response("Invoice not found", { status: 404 });
     }
