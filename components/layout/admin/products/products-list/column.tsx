@@ -1966,11 +1966,10 @@ export const getProductColumns = (
         return <div className="text-center">—</div>;
       }
 
-      const shippingCostWithVat = shippingCost * 1.19;
-      const numerator =
-        salePrice - (purchaseCost * (1 + vatRate) + shippingCostWithVat);
       const denominator = salePrice + shippingCharge;
-      const margin = (numerator / denominator) * 100;
+      const margin =
+        (1 - (purchaseCost * (1 + vatRate) + shippingCost * 1.19) / denominator) *
+        100;
 
       return (
         <div className="text-right">

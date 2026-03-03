@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import CommentImageDialog from "./comment-image-dialog";
 import { useTranslations } from "next-intl";
 import { useGetReviewsByProduct } from "@/features/review/hook";
-import { formatDateTime } from "@/lib/date-formated";
+import { formatDateTimeGerman } from "@/lib/date-formated";
 import { useAtomValue } from "jotai";
 import { reviewRatingFilterAtom } from "@/store/review";
 
@@ -19,7 +19,7 @@ interface ListCommentsProps {
 const safeFormatDateTime = (value: unknown) => {
   if (!value) return "";
   try {
-    return formatDateTime(value as Date);
+    return formatDateTimeGerman(value);
   } catch {
     return "";
   }

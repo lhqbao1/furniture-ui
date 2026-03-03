@@ -10,7 +10,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 
 interface CustomPaginationProps {

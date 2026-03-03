@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/tooltip";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
+const SIDEBAR_STORAGE_KEY = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "240px";
 const SIDEBAR_WIDTH_MOBILE = "24rem";
@@ -78,6 +79,23 @@ function SidebarProvider({
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen);
+
+  React.useEffect(() => {
+    const storedOpen = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    if (storedOpen === "true" || storedOpen === "false") {
+      _setOpen(storedOpen === "true");
+      return;
+    }
+
+    const cookieValue = document.cookie
+      .split("; ")
+      .find((cookie) => cookie.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
+      ?.split("=")[1];
+    if (cookieValue === "true" || cookieValue === "false") {
+      _setOpen(cookieValue === "true");
+    }
+  }, []);
+
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -90,6 +108,7 @@ function SidebarProvider({
 
       // This sets the cookie to keep the sidebar state.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(openState));
     },
     [setOpenProp, open],
   );
