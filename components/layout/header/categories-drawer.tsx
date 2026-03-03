@@ -9,7 +9,7 @@ import {
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { currentCategoryIdAtom } from "@/store/category";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CategoryResponse } from "@/types/categories";
 import CategoryItem from "./categories-item";
 import { useTranslations } from "next-intl";
@@ -27,7 +27,7 @@ export default function CategoriesDrawer({ categories }: Props) {
   const t = useTranslations();
 
   const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>([]);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const [currentCategoryId, setCurrentCategoryId] = useAtom(
     currentCategoryIdAtom,
@@ -37,21 +37,20 @@ export default function CategoriesDrawer({ categories }: Props) {
     expandAllCategoriesAtom,
   );
 
-  const expandAll = () => {
-    const allIds = categories.map((c) => c.id);
-    setExpanded(allIds);
+  const expandAll = useCallback(() => {
+    setExpanded(new Set(categories.map((c) => c.id)));
 
     setCurrentCategoryId(null); // 🔥 FIX: Xóa ID → không override expand-all
     setOpen(true);
     setCategoryClicked(true);
-  };
+  }, [categories, setCategoryClicked, setCurrentCategoryId]);
 
   useEffect(() => {
     if (expandAllSignal) {
       expandAll();
       setExpandAllSignal(false); // reset trigger
     }
-  }, [expandAllSignal]);
+  }, [expandAllSignal, expandAll, setExpandAllSignal]);
 
   useEffect(() => {
     // Nếu không phải user click → KHÔNG mở drawer
@@ -59,15 +58,20 @@ export default function CategoriesDrawer({ categories }: Props) {
 
     if (currentCategoryId) {
       setOpen(true);
-      setExpanded([currentCategoryId]);
+      setExpanded(new Set([currentCategoryId]));
     }
   }, [currentCategoryId, categoryClicked]);
 
   const closeDrawer = () => {
     setOpen(false);
     setCategoryClicked(false); // reset state
-    setExpanded([]);
+    setExpanded(new Set());
   };
+
+  const isExpanded = useMemo(
+    () => (id: string) => expanded.has(id),
+    [expanded],
+  );
 
   return (
     <Drawer
@@ -87,13 +91,14 @@ export default function CategoriesDrawer({ categories }: Props) {
           {categories.map((cate) => (
             <Collapsible
               key={cate.id}
-              open={expanded.includes(cate.id)}
+              open={isExpanded(cate.id)}
               onOpenChange={(state) => {
-                if (state) {
-                  setExpanded((prev) => [...prev, cate.id]);
-                } else {
-                  setExpanded((prev) => prev.filter((id) => id !== cate.id));
-                }
+                setExpanded((prev) => {
+                  const next = new Set(prev);
+                  if (state) next.add(cate.id);
+                  else next.delete(cate.id);
+                  return next;
+                });
               }}
             >
               <CollapsibleTrigger
@@ -108,7 +113,7 @@ export default function CategoriesDrawer({ categories }: Props) {
                 {cate.name}
               </CollapsibleTrigger>
 
-              <AnimatedCollapsibleContent open={expanded.includes(cate.id)}>
+              <AnimatedCollapsibleContent open={isExpanded(cate.id)}>
                 <div className="pl-4 space-y-1 py-2">
                   {cate.children?.map((child) => (
                     <CategoryItem

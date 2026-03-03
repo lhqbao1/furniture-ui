@@ -45,6 +45,7 @@ import {
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import { getCarrierLogo } from "@/lib/getCarrierImage";
+import { getProductActivationMissingFields } from "@/lib/product-activation";
 import { CategoryResponse } from "@/types/categories";
 import { CARRIERS } from "@/data/data";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
@@ -1356,15 +1357,7 @@ function ToggleProductStatus({ product }: { product: ProductItem }) {
   const editProductMutation = useEditProduct();
 
   const handleToggleStatus = () => {
-    const missingFields: string[] = [];
-
-    if (product.static_files.length === 0) missingFields.push("Images");
-    if (!product.name) missingFields.push("Product name");
-    if (!product.final_price) missingFields.push("Final price");
-    if (!product.brand) missingFields.push("Brand");
-    if (!product.delivery_time) missingFields.push("Delivery time");
-    if (!product.carrier) missingFields.push("Carrier");
-    if (product.categories.length === 0) missingFields.push("Categories");
+    const missingFields = getProductActivationMissingFields(product);
 
     const isIncomplete = missingFields.length > 0;
 
@@ -1968,7 +1961,8 @@ export const getProductColumns = (
 
       const denominator = salePrice + shippingCharge;
       const margin =
-        (1 - (purchaseCost * (1 + vatRate) + shippingCost * 1.19) / denominator) *
+        (1 -
+          (purchaseCost * (1 + vatRate) + shippingCost * 1.19) / denominator) *
         100;
 
       return (

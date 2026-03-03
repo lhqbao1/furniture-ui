@@ -23,6 +23,7 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { ProductItem } from "@/types/products";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { getProductActivationMissingFields } from "@/lib/product-activation";
 import {
   Dialog,
   DialogContent,
@@ -161,20 +162,9 @@ const ProductDetailInputs = ({
                     checked={field.value}
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        // Lấy toàn bộ giá trị form hiện tại
                         const values = form.getValues();
-
-                        // Kiểm tra điều kiện
-                        const missingFields: string[] = [];
-                        if (!values.name) missingFields.push("name");
-                        if (!values.final_price)
-                          missingFields.push("final_price");
-                        if (!values.cost) missingFields.push("cost");
-                        // if (!values.stock) missingFields.push("stock");
-                        if (!values.static_files?.length)
-                          missingFields.push("images");
-                        if (!values.category_ids?.length)
-                          missingFields.push("categories");
+                        const missingFields =
+                          getProductActivationMissingFields(values);
 
                         if (missingFields.length > 0) {
                           toast.error(

@@ -7,16 +7,11 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { currentCategoryIdAtom } from "@/store/category";
-import { categoryClickedAtom } from "@/store/categories-drawer";
 import { CategoryResponse } from "@/types/categories";
-import { useAtom } from "jotai";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
-import { useMediaQuery } from "react-responsive";
 import CategoriesDrawer from "../header/categories-drawer";
 
 interface ListCategoriesHomeProps {
@@ -24,14 +19,9 @@ interface ListCategoriesHomeProps {
 }
 
 const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
-  const isMobile = useMediaQuery({ maxWidth: 767 });
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
-
-  if (isMobile) {
-    return <CategoriesDrawer categories={categories} />;
-  }
 
   return (
     <div className="w-full flex justify-center py-6 relative">
@@ -42,7 +32,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
           ))}
         </div>
       ) : (
-        <NavigationMenu viewport={isMobile}>
+        <NavigationMenu viewport={false}>
           <NavigationMenuList className="gap-x-2 gap-y-2 w-full flex-wrap mx-auto">
             {categories.slice(0, 8).map((category) => (
               <NavigationMenuItem key={category.id}>
@@ -57,7 +47,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                 </NavigationMenuTrigger>
 
                 {category.children?.length > 0 && (
-                  <NavigationMenuContent className="rounded-sm border-none ring-0 z-50">
+                  <NavigationMenuContent className="rounded-sm border-none ring-0 z-50 data-[motion=from-end]:slide-in-from-right-2 data-[motion=from-start]:slide-in-from-left-2 data-[motion=to-end]:slide-out-to-right-2 data-[motion=to-start]:slide-out-to-left-2">
                     <div className="min-w-50">
                       {category.children.map((child) => (
                         <NavigationMenuLink

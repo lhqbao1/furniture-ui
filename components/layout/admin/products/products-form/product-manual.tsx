@@ -8,9 +8,9 @@ import { Upload, Loader2 } from "lucide-react";
 import { useUploadStaticFile } from "@/features/file/hook";
 
 const MANUAL_SECTIONS = [
-  { key: "benutzerhandbuch", label: "User Manual" },
-  { key: "sicherheit_information", label: "Safety Information" },
-  { key: "aufbauanleitung", label: "Assembly Instructions" },
+  { key: "Benutzerhandbuch", label: "User Manual" },
+  { key: "Sicherheit_information", label: "Safety Information" },
+  { key: "Aufbauanleitung", label: "Assembly Instructions" },
 ];
 
 const ProductManual = () => {
@@ -84,16 +84,13 @@ const ProductManual = () => {
         <div className="grid lg:grid-cols-3 grid-cols-1 gap-6">
           {MANUAL_SECTIONS.map((section) => {
             const filesOfSection = pdfFiles.filter(
-              (item: any) => item.title === section.label,
+              (item: any) => item.title === section.key,
             );
 
             const currentFile = filesOfSection[0];
 
             return (
-              <div
-                key={section.key}
-                className="space-y-3"
-              >
+              <div key={section.key} className="space-y-3">
                 <div className="font-semibold">{section.label}</div>
 
                 {/* Hidden input */}
@@ -105,7 +102,7 @@ const ProductManual = () => {
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      await handleUpload([file], section.label);
+                      await handleUpload([file], section.key);
                     }
                   }}
                 />
@@ -113,15 +110,24 @@ const ProductManual = () => {
                 {/* If file exists → show label with delete button */}
                 {currentFile ? (
                   <div className="flex items-center justify-between px-4 py-2 border rounded-md bg-secondary/10 text-sm">
-                    <span className="truncate">
+                    <a
+                      href={currentFile.url}
+                      download={
+                        currentFile.url.split("/").pop() || "manual.pdf"
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="truncate text-secondary hover:underline"
+                      title="Download file"
+                    >
                       {currentFile.url.split("/").pop()}
-                    </span>
+                    </a>
 
                     <Button
                       type="button"
                       variant="ghost"
                       className="text-red-600 hover:text-red-700 hover:bg-transparent p-0"
-                      onClick={() => removeFile(section.label)}
+                      onClick={() => removeFile(section.key)}
                     >
                       ✕
                     </Button>

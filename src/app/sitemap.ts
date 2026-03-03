@@ -51,7 +51,7 @@ function collectCategoryUrls(
   const traverse = (cats: CategoryResponse[]) => {
     cats.forEach((cat) => {
       urls.push({
-        url: `https://www.prestige-home.de/category/${cat.slug}`,
+        url: `https://www.prestige-home.de/de/category/${cat.slug}`,
         lastModified: new Date(cat.updated_at || new Date()),
         changeFrequency: "weekly",
         priority: 0.7,
