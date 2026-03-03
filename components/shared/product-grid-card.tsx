@@ -8,6 +8,7 @@ import { useLocale } from "next-intl";
 import { useAddViewedProduct } from "@/features/viewed/hook";
 import ProductPricingField from "./product-pricing-field";
 import ProductBrand from "../layout/single-product/product-brand";
+import { useEffect, useState } from "react";
 
 interface ProductCardProps {
   product: ProductItem;
@@ -24,6 +25,20 @@ export default function ProductCard({
 }: ProductCardProps) {
   const locale = useLocale();
   const addProductToViewMutation = useAddViewedProduct();
+  const [canHover, setCanHover] = useState(false);
+  const [shouldLoadAltImage, setShouldLoadAltImage] = useState(false);
+  const altImageUrl = product.static_files?.[1]?.url;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    const updateCanHover = () => setCanHover(mediaQuery.matches);
+    updateCanHover();
+
+    mediaQuery.addEventListener("change", updateCanHover);
+    return () => mediaQuery.removeEventListener("change", updateCanHover);
+  }, []);
 
   const handleAddProductToViewed = (productId: string) => {
     addProductToViewMutation.mutate({ productId: productId });
@@ -44,7 +59,15 @@ export default function ProductCard({
             prefetch={false}
             className="cursor-pointer"
           >
-            <div className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group flex items-center">
+            <div
+              className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group flex items-center"
+              onMouseEnter={() => {
+                if (canHover && altImageUrl) setShouldLoadAltImage(true);
+              }}
+              onFocus={() => {
+                if (canHover && altImageUrl) setShouldLoadAltImage(true);
+              }}
+            >
               {/* Image 1 */}
               <Image
                 src={
@@ -66,9 +89,9 @@ export default function ProductCard({
               />
 
               {/* Image 2 */}
-              {product.static_files?.[1]?.url && (
+              {altImageUrl && shouldLoadAltImage && (
                 <Image
-                  src={product.static_files[1].url}
+                  src={altImageUrl}
                   alt={product.name}
                   width={800}
                   height={800}

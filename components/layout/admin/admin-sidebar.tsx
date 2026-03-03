@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { Button } from "../../ui/button";
-import Link from "next/link";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 
@@ -200,10 +199,6 @@ export function AdminSideBar() {
       setOpen(false);
     }
   };
-  const handleCloseMobile = () => {
-    if (isMobile) setOpenMobile(false);
-  };
-
   return (
     <Sidebar className="app-sidebar custom-scroll pointer-events-auto">
       <SidebarHeader className="items-end flex lg:hidden">
@@ -214,9 +209,10 @@ export function AdminSideBar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <Link
-            href={`/admin`}
-            onClick={handleCloseMobile}
+          <button
+            type="button"
+            onClick={() => handleNavigate("/admin")}
+            className="w-full text-left"
           >
             <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
               <Image
@@ -234,7 +230,7 @@ export function AdminSideBar() {
                 </span>
               </div>
             </div>
-          </Link>
+          </button>
           <SidebarGroupContent>
             <SidebarMenu className="gap-3">
               {items.map((item) => {

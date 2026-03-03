@@ -10,6 +10,16 @@ export function formatDateTime(dateString: Date) {
   });
 }
 
+export function formatDateTimeGerman(dateInput: Date | string | number) {
+  return new Date(dateInput).toLocaleString("de-DE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export function formatDateTimeString(dateString: any) {
   if (!dateString) return "";
 

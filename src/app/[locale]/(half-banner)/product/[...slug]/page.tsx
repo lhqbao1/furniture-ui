@@ -60,7 +60,6 @@ function isPublishableProduct(product?: Partial<ProductItem> | null) {
     product.final_price !== null &&
     product.final_price !== undefined &&
     Number.isFinite(Number(product.final_price));
-  const hasStock = product.stock !== null && product.stock !== undefined;
 
   return (
     product.is_active === true &&
@@ -71,8 +70,7 @@ function isPublishableProduct(product?: Partial<ProductItem> | null) {
     hasDescription &&
     hasCategory &&
     hasBrand &&
-    hasFinalPrice &&
-    hasStock
+    hasFinalPrice
   );
 }
 
@@ -126,7 +124,7 @@ export async function generateMetadata({
 
   // SAFE JSON
   product = JSON.parse(JSON.stringify(product));
-  if (!isPublishableProduct(product)) return notFound();
+  // if (isPublishableProduct(product) === false) return notFound();
 
   const reviews = await getReviewByProduct(product.id);
   const hasReviews = reviews && reviews.length > 0;
@@ -170,6 +168,26 @@ function toPlain<T>(data: T): T {
   return JSON.parse(JSON.stringify(data));
 }
 
+function isBlogsResponse(value: unknown): value is BlogsResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Array.isArray((value as BlogsResponse).items)
+  );
+}
+
+function getGtinField(ean?: string | null): Record<string, string> | null {
+  if (!ean) return null;
+  const digits = ean.replace(/\D/g, "");
+
+  if (digits.length === 8) return { gtin8: digits };
+  if (digits.length === 12) return { gtin12: digits };
+  if (digits.length === 13) return { gtin13: digits };
+  if (digits.length === 14) return { gtin14: digits };
+
+  return null;
+}
+
 export default async function Page({
   params,
 }: {
@@ -196,14 +214,14 @@ export default async function Page({
 
   // ⭐ Convert to JSON to avoid "function passed to client component"
   product = JSON.parse(JSON.stringify(product)) as ProductItem;
-  if (!isPublishableProduct(product)) return notFound();
+  // if (isPublishableProduct(product) === false) return notFound();
 
   /* ----------------------------------------------------
    * 2) PARALLEL REQUESTS (SAFE WRAPPED)
    * --------------------------------------------------*/
   let reviews: ReviewResponse[] = [];
   let parentProduct: ProductGroupDetailResponse | null = null;
-  let relatedBlogs: BlogsResponse | null = null;
+  let relatedBlogs: unknown = null;
   let inventoryPo: unknown[] = [];
 
   try {
@@ -252,7 +270,7 @@ export default async function Page({
       }
 
       if (taskKey === "relatedBlogs") {
-        relatedBlogs = result.value as BlogsResponse;
+        relatedBlogs = result.value;
       }
     });
   } catch (err) {
@@ -263,10 +281,9 @@ export default async function Page({
   const plainProduct = toPlain(product);
   const plainReviews = toPlain(reviews);
   const plainParent = toPlain(parentProduct);
-  const plainBlogs: BlogsResponse | null = relatedBlogs
-    ? toPlain(relatedBlogs)
-    : null;
-  const blogItems: BlogItem[] = plainBlogs?.items ?? [];
+  const blogItems: BlogItem[] = isBlogsResponse(relatedBlogs)
+    ? relatedBlogs.items
+    : [];
 
   const availableStock = calculateAvailableStock(plainProduct);
   const serverDeliveryEstimate = calculateDeliveryEstimate({
@@ -299,8 +316,9 @@ export default async function Page({
     },
   };
 
-  if (plainProduct.ean) {
-    productSchema.gtin13 = plainProduct.ean;
+  const gtinField = getGtinField(plainProduct.ean);
+  if (gtinField) {
+    Object.assign(productSchema, gtinField);
   }
 
   if (plainReviews && plainReviews.length > 0) {

@@ -6,17 +6,12 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
-import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
-import {
-  useGetCheckOutMain,
-  useGetCheckOutStatistic,
-} from "@/features/checkout/hook";
+import { useGetCheckOutMain } from "@/features/checkout/hook";
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import OrderStatistic from "@/components/layout/admin/orders/order-list/statistics";
 
 const OrderList = () => {
   const [page, setPage] = useState(1);

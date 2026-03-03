@@ -143,7 +143,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-        <Script id="gtm-head" strategy="afterInteractive">
+        <Script id="gtm-head" strategy="lazyOnload">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -181,7 +181,7 @@ export default function RootLayout({
             gtag('config', 'AW-17948582301');
                     `}
         </Script> */}
-        <Script id="gtag-init-safe" strategy="afterInteractive">
+        <Script id="gtag-init-safe" strategy="lazyOnload">
           {`
     (function () {
       try {
@@ -202,7 +202,7 @@ export default function RootLayout({
   `}
         </Script>
 
-        <Script id="google-ads-conversion-safe" strategy="afterInteractive">
+        <Script id="google-ads-conversion-safe" strategy="lazyOnload">
           {`
     (function () {
       try {
@@ -245,7 +245,7 @@ export default function RootLayout({
           `}
         </Script> */}
 
-        <Script id="fb-pixel-safe" strategy="afterInteractive">
+        <Script id="fb-pixel-safe" strategy="lazyOnload">
           {`
     (function () {
       try {

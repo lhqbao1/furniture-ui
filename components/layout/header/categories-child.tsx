@@ -1,47 +1,53 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { type ComponentPropsWithoutRef, type ReactNode, useRef, useEffect } from "react";
 import { CollapsibleContent } from "@/components/ui/collapsible";
-import gsap from "gsap";
+import { cn } from "@/lib/utils";
+
+interface AnimatedCollapsibleContentProps {
+  open: boolean;
+  children: ReactNode;
+}
 
 export default function AnimatedCollapsibleContent({
   open,
   children,
   ...props
-}: any) {
+}: AnimatedCollapsibleContentProps &
+  ComponentPropsWithoutRef<typeof CollapsibleContent>) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!ref.current) return;
+    const node = ref.current;
+    if (!node) return;
+
+    node.style.overflow = "hidden";
+    node.style.transition = "height 300ms ease, opacity 250ms ease";
 
     if (open) {
-      // Expand
-      gsap.fromTo(
-        ref.current,
-        { height: 0, opacity: 0 },
-        {
-          height: "auto",
-          opacity: 1,
-          duration: 0.35,
-          ease: "power2.out",
-        },
-      );
-    } else {
-      // Collapse
-      gsap.to(ref.current, {
-        height: 0,
-        opacity: 0,
-        duration: 0.3,
-        ease: "power2.in",
-      });
+      const targetHeight = node.scrollHeight;
+      node.style.height = `${targetHeight}px`;
+      node.style.opacity = "1";
+      const timeoutId = window.setTimeout(() => {
+        if (ref.current && open) ref.current.style.height = "auto";
+      }, 320);
+      return () => window.clearTimeout(timeoutId);
     }
+
+    const currentHeight = node.scrollHeight;
+    node.style.height = `${currentHeight}px`;
+    // Force reflow before collapsing.
+    void node.offsetHeight;
+    node.style.height = "0px";
+    node.style.opacity = "0";
   }, [open]);
 
   return (
     <CollapsibleContent
       ref={ref}
       {...props}
-      style={{ overflow: "hidden", height: 0 }}
+      className={cn(props.className)}
+      style={{ overflow: "hidden", height: 0, opacity: 0 }}
     >
       {children}
     </CollapsibleContent>
