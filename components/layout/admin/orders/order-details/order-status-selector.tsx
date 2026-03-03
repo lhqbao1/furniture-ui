@@ -12,6 +12,7 @@ import { STATUS_ACTIVE_RULES, STATUS_OPTIONS } from "@/data/data";
 import PaidConfirmDialog from "./dialog/paid-comfirm-dialog";
 import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
 import CancelWrongPriceDialog from "./dialog/canceled-wrong-price-dialog";
+import CancelNoStockConfirmDialog from "./dialog/canceled-no-stock-confirm-dialog";
 
 export const getStatusLabel = (status: string) => {
   const normalized = status.toLowerCase();
@@ -95,10 +96,7 @@ export default function OrderStatusSelector({
       </div>
 
       <div className="flex items-center gap-2">
-        <Select
-          value={value}
-          onValueChange={handleChange}
-        >
+        <Select value={value} onValueChange={handleChange}>
           <SelectTrigger
             className="w-fit px-0 py-0 border-none"
             iconColor="black"
@@ -147,7 +145,7 @@ export default function OrderStatusSelector({
       )}
 
       {openCancelNoStock && (
-        <CancelConfirmDialog
+        <CancelNoStockConfirmDialog
           id={order.id}
           status={status}
           open={openCancelNoStock}

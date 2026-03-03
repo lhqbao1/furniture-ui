@@ -207,7 +207,7 @@ export default async function Page({
     product = await getProductBySlug(lastSlug);
   } catch (err) {
     console.error("❌ getProductBySlug failed:", err);
-    return notFound(); // ✔ SAFE FALLBACK
+    return notFound();
   }
 
   if (!product) return notFound();
