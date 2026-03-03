@@ -19,11 +19,16 @@ import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 interface DeliveryRangeProps {
   productDetails: ProductItem;
   available_stock: number;
+  serverDeliveryRange?: {
+    from: string;
+    to: string;
+  } | null;
 }
 
 const DeliveryRange = ({
   productDetails,
   available_stock,
+  serverDeliveryRange,
 }: DeliveryRangeProps) => {
   const t = useTranslations();
   const { data, isLoading, isError } = useInventoryPoByProductId(
@@ -35,7 +40,13 @@ const DeliveryRange = ({
     [productDetails],
   );
 
-  console.log(data);
+  const parsedServerRange = React.useMemo(() => {
+    if (!serverDeliveryRange?.from || !serverDeliveryRange?.to) return null;
+    const from = new Date(serverDeliveryRange.from);
+    const to = new Date(serverDeliveryRange.to);
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return null;
+    return { from, to };
+  }, [serverDeliveryRange]);
 
   const nextIncomingDate = React.useMemo(() => {
     const today = new Date();
@@ -96,16 +107,23 @@ const DeliveryRange = ({
     productDetails.delivery_time,
   ]);
 
+  const displayRange = React.useMemo(() => {
+    if (parsedServerRange && (isLoading || isError || !data)) {
+      return parsedServerRange;
+    }
+    return estimatedDeliveryRange ?? parsedServerRange;
+  }, [parsedServerRange, isLoading, isError, data, estimatedDeliveryRange]);
+
   return (
     <div className="flex flex-row gap-4 items-start">
       <Clock size={25} className="mt-1.5" />
       <div>
         <span className="text-gray-800 font-medium text-sm">
-          {estimatedDeliveryRange ? (
+          {displayRange ? (
             <>
               {t.rich("deliveryDateRange", {
-                from: formatDateDE(estimatedDeliveryRange.from),
-                to: formatDateDE(estimatedDeliveryRange.to),
+                from: formatDateDE(displayRange.from),
+                to: formatDateDE(displayRange.to),
                 b: (chunks) => <strong>{chunks}</strong>,
               })}
             </>

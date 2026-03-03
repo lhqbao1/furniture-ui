@@ -105,10 +105,10 @@ const Footer = () => {
 
           <li className="hover:pl-2 transition-all duration-500">
             <Link
-              href="#"
+              href="/datenschutzerklaerung#cookie-einstellungen"
               onClick={(e) => {
-                e.preventDefault();
                 if (typeof window !== "undefined" && window.__ucCmp) {
+                  e.preventDefault();
                   window.__ucCmp.showSecondLayer();
                 }
               }}
@@ -126,7 +126,7 @@ const Footer = () => {
           <ul className="space-y-2 text-black-700 text-sm">
             <li>Prestige Home GmbH</li>
             <li>Greifswalder Straße 226, 10405 Berlin</li>
-            <li>{t("phone_number")}: +49 30 814 537 080</li>
+            <li>{t("phone_number")}: 02921 327 20 38</li>
             <li>{t("email")}: info@prestige-home.de</li>
             <li>Mo – Fr: 09:00 – 17:00 Uhr</li>
           </ul>

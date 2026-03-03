@@ -35,10 +35,7 @@ const ListComments = ({
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [expandedIndexes, setExpandedIndexes] = useState<number[]>([]);
   const [showButtonIndexes, setShowButtonIndexes] = useState<number[]>([]);
-  const {
-    data: listComments,
-    isLoading,
-  } = useGetReviewsByProduct(productId);
+  const { data: listComments, isLoading } = useGetReviewsByProduct(productId);
   const safeComments = React.useMemo(
     () => (Array.isArray(listComments) ? listComments : []),
     [listComments],
@@ -110,7 +107,7 @@ const ListComments = ({
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="text-gray-600 font-bold">
-                          {t("customer")}: {customerName}
+                          {customerName}
                         </p>
                       </div>
                       <div className="flex gap-2">

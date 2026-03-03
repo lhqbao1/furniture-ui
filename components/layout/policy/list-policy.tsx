@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useTransition } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -11,7 +11,7 @@ import { getPolicyItemsByVersion } from "@/features/policy/api";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { PolicyVersion } from "@/types/policy";
+import { PolicyResponse, PolicyVersion } from "@/types/policy";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "@/src/i18n/navigation";
@@ -22,6 +22,7 @@ import { useSmoothScrollToRef } from "@/hooks/scrollToRef";
 interface ListPolicyProps {
   versionId: string;
   versionData: PolicyVersion[];
+  initialPolicy?: PolicyResponse;
   policyId?: string;
   versionName?: string;
   isAdmin?: boolean;
@@ -30,6 +31,7 @@ interface ListPolicyProps {
 const ListPolicy = ({
   versionId,
   versionData,
+  initialPolicy,
   policyId,
   versionName,
   isAdmin = false,
@@ -37,6 +39,8 @@ const ListPolicy = ({
   const t = useTranslations();
   const [openAccordion, setOpenAccordion] = useState<string>("");
   const [currentPolicyItem, setCurrentPolicyItem] = useState(0);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const locale = useLocale();
   const [currentVersion, setCurrentVersion] = useState(versionId);
@@ -52,9 +56,31 @@ const ListPolicy = ({
     queryKey: ["policy-items", currentVersion],
     queryFn: () => getPolicyItemsByVersion(currentVersion),
     enabled: !!currentVersion,
+    initialData: currentVersion === versionId ? initialPolicy : undefined,
   });
 
   const filteredPolicies = policy?.legal_policies ?? [];
+  const isRouteLoading = isNavigating || isPending;
+
+  const getPolicyHref = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes("agb")) return "/agb";
+    if (lowerName.includes("impressum")) return "/impressum";
+    if (lowerName.includes("versandbedingungen")) return "/versandbedingungen";
+    if (lowerName.includes("zahlungsbedingungen")) return "/zahlungsbedingungen";
+    if (lowerName.includes("widerruf")) return "/widerrufsbelehrung";
+    if (lowerName.includes("datenschutzer")) return "/datenschutzerklaerung";
+    return "/agb";
+  };
+
+  const isSamePolicyRoute = (href: string) => {
+    const normalizedPath = pathname?.replace(/\/+$/, "") ?? "";
+    const normalizedHref = href.replace(/\/+$/, "");
+    return (
+      normalizedPath === normalizedHref ||
+      normalizedPath === `/${locale}${normalizedHref}`
+    );
+  };
 
   useEffect(() => {
     const path = pathname?.toLowerCase();
@@ -80,11 +106,15 @@ const ListPolicy = ({
     }
   }, [pathname, filteredPolicies]);
 
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
+
   // tìm current policy dựa trên accordion đang mở
   const currentPolicy =
     filteredPolicies.find((p) => p.id === openAccordion) || filteredPolicies[0];
 
-  if (isLoading)
+  if (isLoading && filteredPolicies.length === 0)
     return (
       <div className="">
         <Loader2 className="animate-spin" />
@@ -117,42 +147,16 @@ const ListPolicy = ({
                     if (isAdmin) {
                       setOpenAccordion(item.id);
                     } else {
-                      setTimeout(() => {
-                        switch (true) {
-                          case item.name.toLowerCase().includes("agb"):
-                            router.push("/agb", { locale });
-                            break;
-
-                          case item.name.toLowerCase().includes("impressum"):
-                            router.push("/impressum", { locale });
-                            break;
-
-                          case item.name
-                            .toLowerCase()
-                            .includes("versandbedingungen"):
-                            router.push("/versandbedingungen", { locale });
-                            break;
-
-                          case item.name
-                            .toLowerCase()
-                            .includes("zahlungsbedingungen"):
-                            router.push("/zahlungsbedingungen", { locale });
-                            break;
-
-                          case item.name.toLowerCase().includes("widerruf"):
-                            router.push("/widerrufsbelehrung", { locale });
-                            break;
-
-                          case item.name
-                            .toLowerCase()
-                            .includes("datenschutzer"):
-                            router.push("/datenschutzerklaerung", { locale });
-                            break;
-
-                          default:
-                            router.push("/agb", { locale });
-                        }
-                      }, 150);
+                      const href = getPolicyHref(item.name);
+                      if (isSamePolicyRoute(href)) {
+                        setOpenAccordion(item.id);
+                        setIsNavigating(false);
+                        return;
+                      }
+                      setIsNavigating(true);
+                      startTransition(() => {
+                        router.push(href, { locale });
+                      });
                     }
                   }}
                 >
@@ -205,8 +209,13 @@ const ListPolicy = ({
       {/* Nội dung bên phải */}
       <div
         // ref={setContainer}
-        className="w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll min-h-screen flex-1 max-h-full overflow-y-auto"
+        className="relative w-full lg:w-2/3 px-3 lg:px-12 space-y-6 lg:pb-8 pb-3 overflow-x-hidden content-scroll min-h-screen flex-1 max-h-full overflow-y-auto"
       >
+        {isRouteLoading && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/55 backdrop-blur-sm">
+            <Loader2 className="h-6 w-6 animate-spin text-secondary" />
+          </div>
+        )}
         <h1 className="text-center lg:text-3xl text-2xl text-secondary font-semibold uppercase text-wrap">
           {currentPolicy?.name}
         </h1>

@@ -92,6 +92,7 @@ export default async function PaymentTermsPage() {
             <ListPolicy
               versionId={firstVersion}
               versionData={versions}
+              initialPolicy={items}
               versionName={versions[0].name}
             />
           ) : (

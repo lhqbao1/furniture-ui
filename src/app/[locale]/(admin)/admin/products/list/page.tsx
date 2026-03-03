@@ -159,10 +159,17 @@ const ProductList = () => {
     if (!data?.items) return [];
     if (multiSearchValues.length === 0) return data.items;
 
-    const target = new Set(multiSearchValues);
+    const normalize = (value: unknown) =>
+      String(value ?? "")
+        .trim()
+        .toLowerCase();
+    const target = new Set(multiSearchValues.map(normalize).filter(Boolean));
+
     return data.items.filter((item) => {
-      const sku = item.sku ? String(item.sku).trim() : "";
-      return target.has(sku);
+      const candidates = [item.sku, item.ean, item.id_provider]
+        .map(normalize)
+        .filter(Boolean);
+      return candidates.some((candidate) => target.has(candidate));
     });
   }, [data?.items, multiSearchValues]);
 

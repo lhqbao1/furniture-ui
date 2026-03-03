@@ -52,8 +52,13 @@ const ListStarsReview = ({ size = 20, reviews }: ListStarsProps) => {
           );
         })}
       </div>
-      <span className="text-sm font-medium text-[#111]">
-        ({reviews.length})
+      <span className="text-sm font-medium text-[#111] leading-4">
+        (
+        {rating.toLocaleString("de-DE", {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        })}
+        )
       </span>
     </div>
   );

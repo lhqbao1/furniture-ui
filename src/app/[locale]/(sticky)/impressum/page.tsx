@@ -97,6 +97,7 @@ export default async function ImpressumPage() {
             <ListPolicy
               versionId={firstVersion}
               versionData={versions}
+              initialPolicy={items}
               versionName={versions[0].name}
             />
           ) : (
