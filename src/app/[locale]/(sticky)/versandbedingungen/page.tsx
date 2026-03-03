@@ -102,6 +102,7 @@ export default async function ShippingPolicyPage() {
             <ListPolicy
               versionId={firstVersion}
               versionData={versions}
+              initialPolicy={items}
               versionName={versions[0].name}
             />
           ) : (

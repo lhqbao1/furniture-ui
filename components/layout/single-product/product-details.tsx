@@ -20,12 +20,17 @@ interface ProductDetailsProps {
   reviews: ReviewResponse[];
   productDetails: ProductItem;
   parentProduct: ProductGroupDetailResponse | null;
+  serverDeliveryRange?: {
+    from: string;
+    to: string;
+  } | null;
 }
 
 const ProductDetails = ({
   reviews,
   productDetails,
   parentProduct,
+  serverDeliveryRange,
 }: ProductDetailsProps) => {
   const t = useTranslations();
 
@@ -88,7 +93,10 @@ const ProductDetails = ({
                   isProductDetails={true}
                 />
 
-                <ProductDetailsLogistic productDetails={productDetails} />
+                <ProductDetailsLogistic
+                  productDetails={productDetails}
+                  serverDeliveryRange={serverDeliveryRange}
+                />
                 {productDetails.meta_description && (
                   <div className="seo-content text-sm shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-2xl px-4 py-3 mt-2">
                     <h2 className="text-sm mb-0.5">

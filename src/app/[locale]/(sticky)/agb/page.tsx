@@ -3,7 +3,6 @@ import {
   getPolicyItemsByVersion,
   getPolicyVersion,
 } from "@/features/policy/api";
-import { PolicyResponse } from "@/types/policy";
 import {
   HydrationBoundary,
   QueryClient,
@@ -84,6 +83,7 @@ export default async function AGBPage() {
             <ListPolicy
               versionId={firstVersion}
               versionData={versions}
+              initialPolicy={items}
               versionName={versions[0].name}
             />
           ) : (

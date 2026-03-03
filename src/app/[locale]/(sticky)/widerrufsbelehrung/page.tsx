@@ -89,6 +89,7 @@ export default async function WiderrufPage() {
             <ListPolicy
               versionId={firstVersion}
               versionData={versions}
+              initialPolicy={items}
               versionName={versions[0].name}
             />
           ) : (

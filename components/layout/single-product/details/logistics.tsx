@@ -10,10 +10,15 @@ import { useInventoryPoByProductId } from "@/features/incoming-inventory/invento
 
 interface ProductDetailsLogisticProps {
   productDetails: ProductItem;
+  serverDeliveryRange?: {
+    from: string;
+    to: string;
+  } | null;
 }
 
 const ProductDetailsLogistic = ({
   productDetails,
+  serverDeliveryRange,
 }: ProductDetailsLogisticProps) => {
   const t = useTranslations();
 
@@ -107,6 +112,7 @@ const ProductDetailsLogistic = ({
       <DeliveryRange
         productDetails={productDetails}
         available_stock={totalStock}
+        serverDeliveryRange={serverDeliveryRange}
       />
 
       <div className="flex flex-row gap-4 items-center">

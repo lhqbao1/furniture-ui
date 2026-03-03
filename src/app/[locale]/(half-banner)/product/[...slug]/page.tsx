@@ -5,6 +5,9 @@ import {
 } from "@/features/product-group/api";
 import type { Metadata } from "next";
 import { ProductItem, StaticFile } from "@/types/products";
+import { ReviewResponse } from "@/types/review";
+import { ProductGroupDetailResponse } from "@/types/product-group";
+import { BlogItem, BlogsResponse } from "@/types/blog";
 
 import ProductDetails from "@/components/layout/single-product/product-details";
 import { ProductDetailsTab } from "@/components/layout/single-product/product-tab";
@@ -20,6 +23,8 @@ import BoughtTogetherSection from "@/components/layout/single-product/bought-tog
 import Script from "next/script";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import ProductReviewTab from "@/components/layout/single-product/tabs/review";
+import { getInventoryPoByProductId } from "@/features/incoming-inventory/inventory/api";
+import { calculateDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -178,7 +183,7 @@ export default async function Page({
   /* ----------------------------------------------------
    * 1) GET PRODUCT (wrapped in try/catch to prevent 502 crash)
    * --------------------------------------------------*/
-  let product: any = null;
+  let product: ProductItem | null = null;
 
   try {
     product = await getProductBySlug(lastSlug);
@@ -190,41 +195,66 @@ export default async function Page({
   if (!product) return notFound();
 
   // ⭐ Convert to JSON to avoid "function passed to client component"
-  product = JSON.parse(JSON.stringify(product));
+  product = JSON.parse(JSON.stringify(product)) as ProductItem;
   if (!isPublishableProduct(product)) return notFound();
 
   /* ----------------------------------------------------
    * 2) PARALLEL REQUESTS (SAFE WRAPPED)
    * --------------------------------------------------*/
-  let reviews = [];
-  let parentProduct = null;
-  let relatedBlogs = null;
+  let reviews: ReviewResponse[] = [];
+  let parentProduct: ProductGroupDetailResponse | null = null;
+  let relatedBlogs: BlogsResponse | null = null;
+  let inventoryPo: unknown[] = [];
 
   try {
-    const promises: Promise<any>[] = [getReviewByProduct(product.id)];
+    const tasks: { key: string; promise: Promise<unknown> }[] = [
+      { key: "reviews", promise: getReviewByProduct(product.id) },
+      { key: "inventoryPo", promise: getInventoryPoByProductId(product.id) },
+    ];
 
     if (product.parent_id) {
-      promises.push(getProductGroupDetail(product.parent_id));
+      tasks.push({
+        key: "parentProduct",
+        promise: getProductGroupDetail(product.parent_id),
+      });
     }
 
-    if (product.slug || product.url_key) {
-      promises.push(
-        getBlogsByProductSlug({
-          product_slug: product.slug ?? product.url_key,
+    if (product.url_key) {
+      tasks.push({
+        key: "relatedBlogs",
+        promise: getBlogsByProductSlug({
+          product_slug: product.url_key ?? "",
           page: 1,
           page_size: 4,
         }),
-      );
+      });
     }
 
-    const results = await Promise.allSettled(promises);
+    const results = await Promise.allSettled(tasks.map((task) => task.promise));
 
-    reviews = results[0].status === "fulfilled" ? results[0].value : [];
+    results.forEach((result, index) => {
+      if (result.status !== "fulfilled") return;
 
-    parentProduct =
-      results[1]?.status === "fulfilled" ? results[1].value : null;
+      const taskKey = tasks[index]?.key;
+      if (taskKey === "reviews" && Array.isArray(result.value)) {
+        reviews = result.value as ReviewResponse[];
+        return;
+      }
 
-    relatedBlogs = results[2]?.status === "fulfilled" ? results[2].value : null;
+      if (taskKey === "inventoryPo" && Array.isArray(result.value)) {
+        inventoryPo = result.value;
+        return;
+      }
+
+      if (taskKey === "parentProduct") {
+        parentProduct = result.value as ProductGroupDetailResponse;
+        return;
+      }
+
+      if (taskKey === "relatedBlogs") {
+        relatedBlogs = result.value as BlogsResponse;
+      }
+    });
   } catch (err) {
     console.error("❌ Error fetching child data:", err);
   }
@@ -233,11 +263,19 @@ export default async function Page({
   const plainProduct = toPlain(product);
   const plainReviews = toPlain(reviews);
   const plainParent = toPlain(parentProduct);
-  const plainBlogs = toPlain(relatedBlogs);
+  const plainBlogs: BlogsResponse | null = relatedBlogs
+    ? toPlain(relatedBlogs)
+    : null;
+  const blogItems: BlogItem[] = plainBlogs?.items ?? [];
 
   const availableStock = calculateAvailableStock(plainProduct);
+  const serverDeliveryEstimate = calculateDeliveryEstimate({
+    stock: availableStock,
+    inventory: Array.isArray(inventoryPo) ? inventoryPo : [],
+    deliveryTime: plainProduct.delivery_time,
+  });
 
-  const productSchema: any = {
+  const productSchema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: plainProduct.name,
@@ -323,6 +361,14 @@ export default async function Page({
             productDetails={plainProduct}
             reviews={plainReviews}
             parentProduct={plainParent}
+            serverDeliveryRange={
+              serverDeliveryEstimate
+                ? {
+                    from: serverDeliveryEstimate.from.toISOString(),
+                    to: serverDeliveryEstimate.to.toISOString(),
+                  }
+                : null
+            }
           />
 
           <BoughtTogetherSection productDetails={plainProduct} />
@@ -347,10 +393,10 @@ export default async function Page({
         </div>
       )}
 
-      {plainBlogs?.items?.length > 0 && (
+      {blogItems.length > 0 && (
         <div className="lg:mt-16 mt-10 pb-4 md:w-[95%] xl:w-3/4 w-[95%] mx-auto">
           <Suspense fallback={<ProductGridSkeleton length={4} />}>
-            <RelatedBlogs blogs={plainBlogs.items} slug={product.url_key} />
+            <RelatedBlogs blogs={blogItems} slug={product.url_key} />
           </Suspense>
         </div>
       )}
