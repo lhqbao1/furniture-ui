@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
-import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { cleanDescription } from "@/hooks/simplify-desciprtion";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // Escape CSV value
@@ -41,18 +41,62 @@ export async function GET() {
       "DisplayWeight",
     ];
 
-    const rows = products
-      .filter(
-        (p) =>
-          p.final_price > 0 &&
-          p.is_active &&
-          calculateAvailableStock(p) > 0 &&
-          p.brand &&
-          p.price &&
-          p.price > 0,
-      )
-      .map((p) => {
-        return [
+    const hasRequiredFields = (p: unknown) => {
+      if (!p || typeof p !== "object") return false;
+      const product = p as {
+        id_provider?: string;
+        ean?: string;
+        sku?: string;
+        name?: string;
+        url_key?: string;
+        brand?: { name?: string };
+        carrier?: string;
+        delivery_time?: string;
+        static_files?: unknown[];
+      };
+      return (
+        typeof product.id_provider === "string" &&
+        product.id_provider.trim().length > 0 &&
+        typeof product.ean === "string" &&
+        product.ean.trim().length > 0 &&
+        typeof product.sku === "string" &&
+        product.sku.trim().length > 0 &&
+        typeof product.name === "string" &&
+        product.name.trim().length > 0 &&
+        typeof product.url_key === "string" &&
+        product.url_key.trim().length > 0 &&
+        typeof product.brand?.name === "string" &&
+        product.brand.name.trim().length > 0 &&
+        typeof product.carrier === "string" &&
+        product.carrier.trim().length > 0 &&
+        typeof product.delivery_time === "string" &&
+        product.delivery_time.trim().length > 0 &&
+        Array.isArray(product.static_files)
+      );
+    };
+
+    let skippedProducts = 0;
+
+    const rows = products.flatMap((p) => {
+      if (
+        !hasRequiredFields(p) ||
+        p.final_price <= 0 ||
+        !p.is_active ||
+        !p.price ||
+        p.price <= 0
+      ) {
+        skippedProducts += 1;
+        return [];
+      }
+
+      try {
+        const availableStock = calculateAvailableStock(p);
+        if (availableStock <= 0) {
+          skippedProducts += 1;
+          return [];
+        }
+
+        return [[
           escapeCsv(p.id_provider),
           escapeCsv(p.ean),
           escapeCsv(p.sku),
@@ -74,15 +118,25 @@ export async function GET() {
           escapeCsv(formatEuro(p.price || 0)),
           escapeCsv(1),
           escapeCsv(1),
-          escapeCsv(
-            calculateAvailableStock(p) < 0 ? 0 : calculateAvailableStock(p),
-          ),
+          escapeCsv(availableStock < 0 ? 0 : availableStock),
 
           escapeCsv(p.carrier.toUpperCase()),
           escapeCsv(p.delivery_time.replace(/(\d+)-(\d+)/, "$1#$2")),
           escapeCsv(p.weight ?? 0),
-        ].join(",");
-      });
+        ].join(",")];
+      } catch (error) {
+        skippedProducts += 1;
+        console.warn("Skip invalid ManoMano product row:", {
+          id_provider: p?.id_provider,
+          error,
+        });
+        return [];
+      }
+    });
+
+    if (skippedProducts > 0) {
+      console.warn(`ManoMano feed skipped ${skippedProducts} invalid products.`);
+    }
 
     const csv = "\uFEFF" + [headers.join(","), ...rows].join("\n");
 

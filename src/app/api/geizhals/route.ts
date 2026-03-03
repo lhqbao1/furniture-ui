@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getProductsFeed } from "@/features/products/api";
-import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { cleanDescription } from "@/hooks/simplify-desciprtion";
 import { getAllProductsSelect } from "@/features/product-group/api";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
@@ -24,42 +23,57 @@ export async function GET() {
       all_products: true,
     });
 
+    const hasRequiredFields = (p: unknown) => {
+      if (!p || typeof p !== "object") return false;
+      const product = p as {
+        id_provider?: string;
+        name?: string;
+        url_key?: string;
+        ean?: string;
+        brand?: { name?: string };
+      };
+      return (
+        typeof product.id_provider === "string" &&
+        product.id_provider.trim().length > 0 &&
+        typeof product.name === "string" &&
+        product.name.trim().length > 0 &&
+        typeof product.url_key === "string" &&
+        product.url_key.trim().length > 0 &&
+        typeof product.ean === "string" &&
+        product.ean.trim().length > 0 &&
+        typeof product.brand?.name === "string" &&
+        product.brand.name.trim().length > 0
+      );
+    };
+
+    let skippedProducts = 0;
+
     const itemsXml = products
-      .filter(
-        (p) =>
-          p.final_price > 0 && calculateAvailableStock(p) > 0 && p.is_active,
-      )
-      .map((p) => {
-        const images = p.static_files || [];
-        const largeImage = images[0] ? cleanImageLink(images[0].url) : "";
-        const subImages = images.slice(1);
+      .flatMap((p) => {
+        if (!hasRequiredFields(p) || p.final_price <= 0 || !p.is_active) {
+          skippedProducts += 1;
+          return [];
+        }
 
-        // Nếu có nhiều ảnh thì lấy thêm 1 ảnh làm alternate/thumbnail
-        const alternateImage = subImages[0]
-          ? cleanImageLink(subImages[0].url)
-          : largeImage;
+        try {
+          const availableStock = calculateAvailableStock(p);
+          if (availableStock <= 0) {
+            skippedProducts += 1;
+            return [];
+          }
 
-        const categoryPath = p.categories
-          ?.map((c) => {
-            const child = c.children?.[0];
-            return child ? `${c.name} > ${child.name}` : c.name;
-          })
-          .join(", ");
+          const categories =
+            p.categories?.map((c) => c.name).join(" > ") || "General";
+          const largeImage =
+            Array.isArray(p.static_files) && p.static_files.length > 0
+              ? p.static_files[0]?.url ?? ""
+              : "";
+          const url =
+            p.brand.name.toLowerCase() === "econelo"
+              ? `https://econelo.de/produkt/${p.url_key}`
+              : `https://prestige-home.de/de/product/${p.url_key}`;
 
-        const categories =
-          p.categories?.map((c) => c.name).join(" > ") || "General";
-        const colors =
-          p.options
-            ?.filter((opt) => opt.variant_name?.toLowerCase() === "color")
-            .map((opt) => opt.label)
-            .join(", ") || "";
-        const url = p.brand
-          ? p.brand.name.toLowerCase() === "econelo"
-            ? `https://econelo.de/produkt/${p.url_key}`
-            : `https://prestige-home.de/de/product/${p.url_key}`
-          : `https://prestige-home.de/de/product/${p.url_key}`;
-
-        return `
+          return [`
  <product>
   <Artikelnummer>${escapeXml(p.id_provider)}</Artikelnummer>
 
@@ -87,15 +101,27 @@ export async function GET() {
 
   <Kategorie><![CDATA[${categories}]]></Kategorie>
 
-  <Bild><![CDATA[${encodeURI(largeImage)}]]></Bild>
+  <Bild><![CDATA[${escapeCDATA(largeImage)}]]></Bild>
 
   <Beschreibung><![CDATA[${escapeCDATA(
     cleanDescription(p.description),
   )}]]></Beschreibung>
 </product>
-`;
+`];
+        } catch (error) {
+          skippedProducts += 1;
+          console.warn("Skip invalid Geizhals product row:", {
+            id_provider: p?.id_provider,
+            error,
+          });
+          return [];
+        }
       })
       .join("\n");
+
+    if (skippedProducts > 0) {
+      console.warn(`Geizhals feed skipped ${skippedProducts} invalid products.`);
+    }
 
     const xml = `<?xml version="1.0" encoding="utf-8"?>
 <merchant>

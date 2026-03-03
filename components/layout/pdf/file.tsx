@@ -353,13 +353,16 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   {item.quantity}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
-                  {calculateProductVAT(
+                  {(calculateProductVAT(
                     item.final_price,
                     item.products.tax,
                     invoice?.main_checkout.checkouts[0].shipping_address
                       .country,
                     invoice?.main_checkout.checkouts[0].user.tax_id,
-                  ).vatRate * 100}
+                  ).vatRate * 100).toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                   %
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>

@@ -19,6 +19,7 @@ import RelatedBlogs from "@/components/layout/single-product/related-blogs";
 import BoughtTogetherSection from "@/components/layout/single-product/bought-together";
 import Script from "next/script";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import ProductReviewTab from "@/components/layout/single-product/tabs/review";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -326,8 +327,12 @@ export default async function Page({
 
           <BoughtTogetherSection productDetails={plainProduct} />
 
-          <div className="lg:mt-12 mt-0">
+          <div className="lg:mt-12 mt-0 shadow-[0_0_5px_rgba(0,0,0,0.1)] px-4 py-4 rounded-sm">
             <ProductDetailsTab reviews={plainReviews} product={plainProduct} />
+          </div>
+
+          <div className="lg:mt-6 mt-0 shadow-[0_0_5px_rgba(0,0,0,0.1)] px-4 py-4 rounded-sm">
+            <ProductReviewTab productId={plainProduct.id} />
           </div>
         </div>
       </div>

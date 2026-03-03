@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getAllProducts, getProductsFeed } from "@/features/products/api";
+import { getProductsFeed } from "@/features/products/api";
 import { cleanDescription, cleanImageLink } from "@/hooks/simplify-desciprtion";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 // Escape ký tự XML cho các field không dùng CDATA
 const escapeXml = (str?: string) =>
@@ -21,40 +22,58 @@ export async function GET() {
   try {
     const products = await getProductsFeed();
 
-    const formatName = (name: string) =>
-      name.trim().toLowerCase().replace(/\s+/g, "-");
-    const itemsXml = products
-      .filter(
-        (p) => p.final_price > 0 && p.is_active,
-        // && allowedSkus.includes(p.sku) // lọc theo sku
-      )
-      .map((p) => {
-        const categories = p.categories || [];
+    const hasRequiredFields = (p: unknown) => {
+      if (!p || typeof p !== "object") return false;
+      const product = p as {
+        id_provider?: string;
+        name?: string;
+        url_key?: string;
+        ean?: string;
+      };
+      return (
+        typeof product.id_provider === "string" &&
+        product.id_provider.trim().length > 0 &&
+        typeof product.name === "string" &&
+        product.name.trim().length > 0 &&
+        typeof product.url_key === "string" &&
+        product.url_key.trim().length > 0 &&
+        typeof product.ean === "string" &&
+        product.ean.trim().length > 0
+      );
+    };
 
-        const colors = p.options
-          .filter((opt) => opt.variant_name?.toLowerCase() === "color")
-          .map((opt) => opt.label)
-          .join(", ");
-        return `
+    let skippedProducts = 0;
+
+    const itemsXml = products
+      .flatMap((p) => {
+        if (!hasRequiredFields(p) || p.final_price <= 0 || !p.is_active) {
+          skippedProducts += 1;
+          return [];
+        }
+
+        try {
+          const stock = calculateAvailableStock(p);
+          const imageUrl = Array.isArray(p.static_files)
+            ? cleanImageLink(p.static_files[0]?.url)
+            : "";
+          const brandName = p.brand?.name?.toLowerCase();
+          const productUrl =
+            brandName === "econelo"
+              ? `https://econelo.de/produkt/${p.url_key}`
+              : `https://prestige-home.de/de/product/${p.url_key}`;
+
+          return [`
 <item>
   <g:id>${escapeXml(p.id_provider)}</g:id>
   <g:title><![CDATA[${escapeCDATA(p.name.trim())}]]></g:title>
   <g:description><![CDATA[${escapeCDATA(
-    cleanDescription(p.description),
+    cleanDescription(p.description ?? ""),
   )}]]></g:description>
 <g:link>${escapeXml(
-          encodeURI(
-            p.brand
-              ? p.brand.name.toLowerCase() === "econelo"
-                ? `https://econelo.de/produkt/${p.url_key}`
-                : `https://prestige-home.de/de/product/${p.url_key}`
-              : `https://prestige-home.de/de/product/${p.url_key}`,
-          ),
+          encodeURI(productUrl),
         )}</g:link>
-<g:image_link>${escapeXml(
-          encodeURI(cleanImageLink(p.static_files[0]?.url)),
-        )}</g:image_link>
-  <g:availability>${p.stock > 0 ? "in_stock" : "out_of_stock"}</g:availability>
+<g:image_link>${escapeXml(encodeURI(imageUrl))}</g:image_link>
+  <g:availability>${stock > 0 ? "in_stock" : "out_of_stock"}</g:availability>
   <g:price>${p.final_price.toFixed(2)} EUR</g:price>
   <g:gtin>${escapeXml(p.ean)}</g:gtin>
   <g:condition>new</g:condition>
@@ -67,9 +86,21 @@ export async function GET() {
     <g:price>${p.carrier === "dpd" ? "5.95 EUR" : "35.95 EUR"}</g:price>
   </g:shipping>
   <g:shipping_label>${p.carrier === "dpd" ? "DPD" : "AMM"}</g:shipping_label>
-</item>`;
+</item>`];
+        } catch (error) {
+          skippedProducts += 1;
+          console.warn("Skip invalid Google feed product row:", {
+            id_provider: p?.id_provider,
+            error,
+          });
+          return [];
+        }
       })
       .join("\n");
+
+    if (skippedProducts > 0) {
+      console.warn(`Google feed skipped ${skippedProducts} invalid products.`);
+    }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
