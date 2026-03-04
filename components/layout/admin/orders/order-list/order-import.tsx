@@ -59,6 +59,7 @@ type NormalizedOrder = {
   invoice_country: string;
   from_marketplace: string | null;
   marketplace_order_id: string | null;
+  netto_buyer_id: string | null;
   id_provider: string | null;
   quantity: number;
   title: string | null;
@@ -186,10 +187,11 @@ const normalize = (
 
     from_marketplace: channel.toLowerCase().trim(),
     marketplace_order_id: toTrimmedStringOrNull(row["marketplace_order_id"]),
+    netto_buyer_id: toTrimmedStringOrNull(row["netto_buyer"]),
 
     id_provider: toTrimmedStringOrNull(row["id_provider"]),
     quantity: Number(row["quantity"] ?? 1),
-    title: toStringOrNull(row["title"]),
+    title: toTrimmedStringOrNull(row["title"]),
     sku: toStringOrNull(row["sku"]),
     final_price: Number(row["final_price"] ?? 1),
     tax: computedTax ?? 0,
@@ -236,10 +238,39 @@ const OrderImport = () => {
       const preset = PRESET_BY_MARKETPLACE[channel] ?? null;
 
       const normalized = json.map((row) => normalize(row, preset, channel));
+      const isNettoChannel = channel.toLowerCase().trim() === "netto";
+      let validRows = normalized;
+
+      if (isNettoChannel) {
+        const missingNettoBuyerRows = normalized
+          .map((row, index) => ({
+            index,
+            marketplaceOrderId: row.marketplace_order_id,
+            nettoBuyerId: row.netto_buyer_id,
+          }))
+          .filter((row) => !row.nettoBuyerId);
+
+        if (missingNettoBuyerRows.length > 0) {
+          validRows = normalized.filter((row) => Boolean(row.netto_buyer_id));
+
+          const preview = missingNettoBuyerRows
+            .slice(0, 5)
+            .map((row) =>
+              row.marketplaceOrderId
+                ? `Order ${row.marketplaceOrderId}`
+                : `Row ${row.index + 2}`,
+            )
+            .join(", ");
+
+          toast.warning("Skipped rows missing Netto Customer ID", {
+            description: `${missingNettoBuyerRows.length} row(s) skipped. ${preview}${missingNettoBuyerRows.length > 5 ? ", ..." : ""}`,
+          });
+        }
+      }
 
       const grouped: Record<string, GroupedOrder> = {};
 
-      normalized.forEach((row) => {
+      validRows.forEach((row) => {
         const id = String(row.marketplace_order_id);
 
         if (!grouped[id]) {
@@ -261,7 +292,7 @@ const OrderImport = () => {
         grouped[id].items.push({
           quantity: row.quantity,
           id_provider: row.id_provider ?? "",
-          title: row.title ?? "",
+          title: row.title ?? null,
           sku: row.sku ?? "",
           final_price: row.final_price * (1 + row.vat),
           carrier: row.carrier ?? "",

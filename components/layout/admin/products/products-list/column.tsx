@@ -291,6 +291,7 @@ function EditableEanCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.ean ?? "");
   const [editing, setEditing] = useState(false);
   const EditProductMutation = useEditProduct();
+  const normalizedOriginalEan = (product.ean ?? "").replace(/\D/g, "");
 
   const handleEditProductEan = () => {
     const toastId = toast.loading("Updating product EAN...");
@@ -345,8 +346,13 @@ function EditableEanCell({ product }: { product: ProductItem }) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
-            setValue(product.ean ?? "");
-            setEditing(false);
+            const normalizedCurrentEan = value.trim().replace(/\D/g, "");
+            if (normalizedCurrentEan === normalizedOriginalEan) {
+              setValue(product.ean ?? "");
+              setEditing(false);
+              return;
+            }
+            handleEditProductEan();
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {

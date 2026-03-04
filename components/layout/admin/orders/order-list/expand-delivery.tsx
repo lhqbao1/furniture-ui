@@ -41,14 +41,16 @@ export function flattenCheckOutCart(checkoutMain: CheckOutMain): CartItem[] {
 
 const OrderExpandTable = ({ row }: { row: any }) => {
   const checkout = row.original as CheckOutMain;
-
+  const supplierName = checkout.checkouts[0].supplier
+    ? checkout.checkouts[0].supplier.business_name
+    : "Prestige Home";
   const items = flattenCheckOutCart(checkout);
 
   return (
     <div className="p-4 bg-white rounded-md border">
       <ProductTable<CartItem, unknown>
         data={items}
-        columns={orderListExpandColumns}
+        columns={orderListExpandColumns(supplierName)}
         page={1}
         pageSize={20}
         setPage={() => {}}

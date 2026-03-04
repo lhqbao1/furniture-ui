@@ -6,7 +6,7 @@ export const ManualOrderItemSchema = z.object({
     .number()
     .int({ message: "Quantity must be an integer" })
     .nonnegative({ message: "Quantity must be positive" }),
-  title: z.string().optional(),
+  title: z.string().optional().nullable(),
   sku: z.string().optional(),
   final_price: z
     .number()
@@ -57,6 +57,7 @@ export const ManualCreateOrderSchema = z
     payment_term: z.number().optional().nullable(),
 
     status: z.string().min(1, "Status is required"),
+    netto_buyer_id: z.string().optional().nullable(),
 
     items: z.array(ManualOrderItemSchema).min(1, {
       message: "You must select at least one product",

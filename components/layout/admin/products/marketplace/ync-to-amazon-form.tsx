@@ -103,6 +103,15 @@ const SyncToAmazonForm = ({
     resolver: zodResolver(amazonMarketplaceSchema),
     defaultValues,
   });
+  const selectedMarketplace =
+    form.watch("marketplace") ?? currentMarketplace ?? "";
+  const selectedMarketplaceRecord = useMemo(
+    () =>
+      product.marketplace_products?.find(
+        (item) => item.marketplace === selectedMarketplace,
+      ),
+    [product.marketplace_products, selectedMarketplace],
+  );
 
   useEffect(() => {
     form.reset(defaultValues);
@@ -488,7 +497,16 @@ const SyncToAmazonForm = ({
                     name="max_stock"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Max Stock</FormLabel>
+                        <FormLabel>
+                          Max Stock
+                          {selectedMarketplace && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              Stock previous time upload (
+                              {selectedMarketplace.toUpperCase()}):{" "}
+                              {selectedMarketplaceRecord?.max_stock ?? "—"}
+                            </span>
+                          )}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"

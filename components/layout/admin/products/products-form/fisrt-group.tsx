@@ -235,7 +235,10 @@ const ProductDetailInputs = ({
                   type="text"
                   {...field}
                   value={field.value ?? ""}
-                  onChange={(e) => field.onChange(e.target.value)}
+                  onChange={(e) => {
+                    const next = e.target.value.trim();
+                    field.onChange(next === "" ? null : next);
+                  }}
                 />
               </FormControl>
               <FormMessage></FormMessage>
