@@ -126,31 +126,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // },
   ];
 
-  // URL động cho category
-  let categories: CategoryResponse[] = [];
-  try {
-    const res = await apiPublic.get("/categories/");
-    categories = res.data;
-  } catch (e) {
-    categories = [];
-  }
+  const withTimeout = {
+    timeout: 20000,
+  };
+
+  // Fetch song song để tránh timeout sitemap khi build
+  const [categoriesRes, productsRes, blogsRes, keywordsRes] =
+    await Promise.allSettled([
+      apiPublic.get("/categories/", withTimeout),
+      apiPublic.get("/products/all", {
+        ...withTimeout,
+        params: {
+          all_products: false,
+          is_econelo: undefined,
+        },
+      }),
+      apiPublic.get("/blog/all", {
+        ...withTimeout,
+        params: {
+          page_size: 100,
+        },
+      }),
+      apiPublic.get("/products/get-all-key-work", withTimeout),
+    ]);
+
+  const categories: CategoryResponse[] =
+    categoriesRes.status === "fulfilled" &&
+    Array.isArray(categoriesRes.value.data)
+      ? categoriesRes.value.data
+      : [];
 
   const categoryUrls = collectCategoryUrls(categories);
 
-  // URL động cho product
-  let products: ProductItem[] = [];
-  try {
-    const res = await apiPublic.get("/products/all", {
-      params: {
-        all_products: false,
-        is_econelo: undefined,
-      },
-    });
-
-    products = res.data;
-  } catch (e) {
-    products = [];
-  }
+  const products: ProductItem[] =
+    productsRes.status === "fulfilled" && Array.isArray(productsRes.value.data)
+      ? productsRes.value.data
+      : [];
 
   const productUrls: MetadataRoute.Sitemap = products
     .filter(
@@ -167,18 +178,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-  // URL động cho blogs
-  let blogs: BlogItem[] = [];
-  try {
-    const res = await apiPublic.get("/blog/all", {
-      params: {
-        page_size: 100,
-      },
-    });
-    blogs = res.data.items;
-  } catch (e) {
-    blogs = [];
-  }
+  const blogs: BlogItem[] =
+    blogsRes.status === "fulfilled" &&
+    Array.isArray(blogsRes.value.data?.items)
+      ? blogsRes.value.data.items
+      : [];
 
   const blogUrls: MetadataRoute.Sitemap = blogs.map((p: BlogItem) => ({
     url: `https://www.prestige-home.de/de/blog/${p.slug}`,
@@ -187,14 +191,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  // URL động cho landing page
-  let keywords: string[] = [];
-  try {
-    const res = await apiPublic.get("/products/get-all-key-work");
-    keywords = res.data;
-  } catch (e) {
-    blogs = [];
-  }
+  const keywords: string[] =
+    keywordsRes.status === "fulfilled" &&
+    Array.isArray(keywordsRes.value.data)
+      ? keywordsRes.value.data
+      : [];
 
   const keywordUrls: MetadataRoute.Sitemap = keywords.map((p: string) => ({
     url: `https://www.prestige-home.de/de/shop/${p}`,
