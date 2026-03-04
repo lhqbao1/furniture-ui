@@ -16,9 +16,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CheckOut } from "@/types/checkout";
-import { formatDateTime } from "@/lib/date-formated";
-import { useTranslations } from "next-intl";
-import { useCallback } from "react";
+import {
+  getStatusStyle,
+  getStatusStyleDe,
+} from "../admin/orders/order-list/status-styles";
 
 interface MyOrderDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -43,48 +44,6 @@ export function MyOrderDataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-  const t = useTranslations();
-
-  const parseRange = useCallback(
-    (str: string | null | undefined): DeliveryRange => {
-      if (!str) {
-        throw new Error(`delivery_time is null or empty: "${str}"`);
-      }
-
-      const [startStr, endStr] = str.split("-");
-      const start = Number(startStr);
-      const end = Number(endStr);
-
-      if (isNaN(start) || isNaN(end)) {
-        throw new Error(`Invalid delivery_time format: "${str}"`);
-      }
-
-      return { start, end };
-    },
-    [],
-  );
-
-  const compareRanges = useCallback(
-    (a: DeliveryRange, b: DeliveryRange): number => {
-      if (a.start !== b.start) return a.start - b.start;
-      return a.end - b.end;
-    },
-    [],
-  );
-
-  const getMaxDeliveryTime = useCallback(
-    (data: CheckOut): string | null => {
-      const ranges = data.cart.items
-        .map((item) => parseRange(item.products.delivery_time))
-        .sort(compareRanges);
-
-      if (ranges.length === 0) return null;
-
-      const max = ranges[ranges.length - 1];
-      return `${max.start}-${max.end}`;
-    },
-    [parseRange, compareRanges],
-  );
 
   return (
     <div className="overflow-hidden rounded-md border">
@@ -97,7 +56,7 @@ export function MyOrderDataTable<TData, TValue>({
             >
               <div className="flex justify-between w-full">
                 <div className="text-md font-semibold">Lieferung: {pos}</div>
-                <p>{orderData.status}</p>
+                <p>{getStatusStyleDe(orderData.status).text ?? ""}</p>
               </div>
             </TableHead>
           </TableRow>
@@ -131,10 +90,7 @@ export function MyOrderDataTable<TData, TValue>({
             </>
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center"
-              >
+              <TableCell colSpan={columns.length} className="h-24 text-center">
                 No results.
               </TableCell>
             </TableRow>

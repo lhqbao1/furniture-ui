@@ -58,7 +58,7 @@ export function ProductDetailsTab({
     // },
     {
       value: "q&a",
-      label: "häufig gestellte Frage",
+      label: "Häufig gestellte Fragen",
       content: (
         <div className="space-y-6 w-full md:w-2/3 xl:w-1/2">
           <ProductFAQSection question={product.faqs} />

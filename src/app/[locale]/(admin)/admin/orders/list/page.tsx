@@ -113,6 +113,8 @@ const OrderList = () => {
     return <div>No data</div>;
   }
 
+  console.log(data?.items);
+
   return (
     <div className="flex flex-col gap-6 pb-4">
       <div className="space-y-6">

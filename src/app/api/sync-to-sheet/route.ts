@@ -9,6 +9,53 @@ const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!);
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 
+function isPublishableProduct(product?: Partial<ProductItem> | null) {
+  if (!product) return false;
+
+  const hasUrlKey =
+    typeof product.url_key === "string" && product.url_key.trim().length > 0;
+  const hasSku =
+    typeof product.sku === "string" && product.sku.trim().length > 0;
+  const hasEan =
+    typeof product.ean === "string" && product.ean.trim().length > 0;
+  const hasCarrier =
+    typeof product.carrier === "string" && product.carrier.trim().length > 0;
+  const hasImages =
+    Array.isArray(product.static_files) && product.static_files.length > 0;
+  const hasDescription =
+    typeof product.description === "string" &&
+    product.description.trim().length > 0;
+  const hasCategory =
+    Array.isArray(product.categories) && product.categories.length > 0;
+  const hasBrand =
+    typeof product.brand?.name === "string" &&
+    product.brand.name.trim().length > 0;
+  const hasFinalPrice =
+    product.final_price !== null &&
+    product.final_price !== undefined &&
+    Number.isFinite(Number(product.final_price));
+  const hasStock = calculateAvailableStock(product as ProductItem) > 0;
+
+  return (
+    product.is_active === true &&
+    hasUrlKey &&
+    hasSku &&
+    hasEan &&
+    hasImages &&
+    hasCarrier &&
+    hasDescription &&
+    hasCategory &&
+    hasBrand &&
+    hasFinalPrice &&
+    hasStock
+  );
+}
+
+function normalizeEan(value: unknown): string {
+  if (value == null) return "";
+  return String(value).replace(/\D/g, "");
+}
+
 export async function GET() {
   try {
     // 1️⃣ Xác thực với Google
@@ -36,18 +83,14 @@ export async function GET() {
       supplier_id: "prestige_home",
     }); // bạn sẽ viết hàm này
 
-    // 3️⃣ Lọc sản phẩm đang active và có tồn kho
-    const activeProducts = products.filter(
-      (p: ProductItem) =>
-        p.is_active === true && calculateAvailableStock(p) > 0,
+    // 3️⃣ Lọc theo điều kiện publish giống product page
+    const publishableProducts = products.filter((p: ProductItem) =>
+      isPublishableProduct(p),
     );
 
-    const values = activeProducts.map((p) => {
-      const productUrl = p.brand
-        ? p.brand.name.toLowerCase() === "econelo"
-          ? `https://econelo.de/produkt/${p.url_key}`
-          : `https://prestige-home.de/de/product/${p.url_key}`
-        : `https://prestige-home.de/de/product/${p.url_key}`;
+    const values = publishableProducts.map((p) => {
+      const productUrl = `https://www.prestige-home.de/de/product/${p.url_key}`;
+      const stock = calculateAvailableStock(p);
 
       const imageUrl =
         Array.isArray(p.static_files) && p.static_files.length > 0
@@ -60,15 +103,15 @@ export async function GET() {
         ?.replace(/\s+/g, " ")
         ?.trim();
 
-      const price = p.final_price
-        ? `${Number(p.final_price).toFixed(2)} EUR`
-        : "";
+      const price =
+        p.final_price !== null && p.final_price !== undefined
+          ? `${Number(p.final_price).toFixed(2)} EUR`
+          : "";
 
       // 4️⃣ Shipping cost
+      const carrier = p.carrier?.toLowerCase();
       const shippingPrice =
-        p.carrier?.toLowerCase() === "amm" || "spedition"
-          ? "35.95 EUR"
-          : "5.95 EUR";
+        carrier === "amm" || carrier === "spedition" ? "35.95 EUR" : "5.95 EUR";
       const shipping = `DE:::${shippingPrice}`;
 
       const additionalImages = Array.isArray(p.static_files)
@@ -87,11 +130,10 @@ export async function GET() {
         p.id_provider ?? "",
         p.name ?? "",
         cleanDescription ?? "",
-        calculateAvailableStock(p) > 0 ? "in_stock" : "out_of_stock",
+        stock > 0 ? "in_stock" : "out_of_stock",
         productUrl,
         price,
-        // p.ean ? "yes" : "no",
-        p.ean ?? "",
+        normalizeEan(p.ean),
         p.sku,
         imageUrl,
         "new",
@@ -101,7 +143,7 @@ export async function GET() {
       ];
     });
     // 4️⃣ Ghi vào Google Sheet (ví dụ từ A2)
-    https: await sheets.spreadsheets.values.update({
+    await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: "Sheet1!A2",
       valueInputOption: "RAW",

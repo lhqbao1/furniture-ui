@@ -170,7 +170,10 @@ export const GetCartColumns = ({
       cell: ({ row }) => (
         <div className="font-semibold text-right">
           €
-          {row.original.item_price.toLocaleString("de-DE", {
+          {(row.original.purchased_products
+            ? row.original.purchased_products.final_price
+            : row.original.products.final_price
+          ).toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
@@ -216,7 +219,11 @@ export const GetCartColumns = ({
         return (
           <div className="font-semibold text-right">
             €
-            {(item.item_price * quantity).toLocaleString("de-DE", {
+            {(
+              (row.original.purchased_products
+                ? row.original.purchased_products.final_price
+                : row.original.products.final_price) * quantity
+            ).toLocaleString("de-DE", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}

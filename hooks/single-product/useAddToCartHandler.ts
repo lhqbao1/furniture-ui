@@ -7,20 +7,20 @@ import { useAddToWishList } from "@/features/wishlist/hook";
 import { HandleApiError } from "@/lib/api-helper";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
-import { useCartLocal } from "@/hooks/cart";
-import { CartItemLocal } from "@/lib/utils/cart";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 import { ProductItem } from "@/types/products";
 import { useAddToCartLocalEnhanced } from "../cart/add-to-cart-enhanched";
 
-interface AddToCartProps {}
+interface HandleSubmitOptions {
+  onSuccess?: () => void;
+}
 
 export function useAddToCartHandler(productDetails: ProductItem) {
   const createCartMutation = useAddToCart();
   const addProductToWishlistMutation = useAddToWishList();
   const t = useTranslations();
-  const [userId, setUserId] = useAtom(userIdAtom);
+  const [userId] = useAtom(userIdAtom);
   const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
 
   const router = useRouter();
@@ -39,13 +39,15 @@ export function useAddToCartHandler(productDetails: ProductItem) {
     );
   };
 
-  const handleSubmitToCart = (values: any) => {
+  const handleSubmitToCart = (values: any, options?: HandleSubmitOptions) => {
     if (!productDetails) return;
 
     // LOCAL CART
     // LOCAL CART
     if (!userId) {
-      addToCartLocalOnly(productDetails, values.quantity);
+      addToCartLocalOnly(productDetails, values.quantity, {
+        onSuccess: options?.onSuccess,
+      });
       return;
     }
 
@@ -53,7 +55,10 @@ export function useAddToCartHandler(productDetails: ProductItem) {
     createCartMutation.mutate(
       { productId: productDetails.id, quantity: values.quantity },
       {
-        onSuccess: () => toast.success(t("addToCartSuccess")),
+        onSuccess: () => {
+          toast.success(t("addToCartSuccess"));
+          options?.onSuccess?.();
+        },
         onError: (error) => {
           const { status, message } = HandleApiError(error, t);
 
