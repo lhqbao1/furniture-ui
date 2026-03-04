@@ -473,6 +473,8 @@
   },
   "orderProcessingMessage": "Your order is being processed. This may take a moment. Please remain on this page.",
   "noProducts": "No product found",
+  "noProductsDescription": "Try adjusting your filters or search term to see matching products.",
+  "resetFilters": "Reset filters",
   "paymentFailedTitle": "Payment failed",
   "paymentFailedMessage": "Unfortunately, we could not complete your payment. No amount has been charged. Please try again or choose a different payment method.",
   "retryPayment": "Try payment again",
