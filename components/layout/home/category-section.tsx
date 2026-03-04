@@ -32,9 +32,10 @@ const CategorySection = async ({ slug }: CategorySectionProps) => {
       style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
     >
       <h2 className="section-header">
-        <Link href={"/shop-all?categories=Zäune+%26+Sichtschutz"}>
-          {products.name}
-        </Link>
+        {/* <Link href={"/shop-all?categories=Zäune+%26+Sichtschutz"}>
+         
+        </Link> */}
+        {products.name}
       </h2>
       <ProductsGridLayout
         data={products.products.filter((item) => item.is_active).slice(0, 4)}

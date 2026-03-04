@@ -4,13 +4,15 @@ import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { CustomPagination } from "@/components/shared/custom-pagination";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import React, { useEffect, useState } from "react";
 import ShopAllFilterSection from "@/components/layout/shop-all/shop-all-filter-section";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import MobileFilter from "@/components/layout/shop-all/mobile-filter";
 import { Loader2, X } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export default function ShopAllPage() {
   const t = useTranslations();
@@ -98,6 +100,11 @@ export default function ShopAllPage() {
     router.push(`/shop-all?${params.toString()}`, { scroll: false });
   };
 
+  const handleClearAllFilters = () => {
+    router.push("/shop-all");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="pt-3 xl:pb-16 pb-6 relative">
       <div className="grid grid-cols-12 gap-6">
@@ -114,7 +121,9 @@ export default function ShopAllPage() {
             <>
               <div className="space-y-4 flex justify-between items-center">
                 <div className="text-lg">
-                  {data.pagination.total_items} {t("items")}
+                  {data.pagination.total_items > 0
+                    ? `${data.pagination.total_items} ${t("items")}`
+                    : ""}
                 </div>
                 <div className="md:hidden block">
                   <MobileFilter />
@@ -134,7 +143,40 @@ export default function ShopAllPage() {
                 </div>
               )}
 
-              <ProductsGridLayout hasBadge data={data.items} />
+              {data.items.length === 0 ? (
+                <div className="mt-6 min-h-[52vh] flex items-center justify-center rounded-2xl border border-[#E6EAF0] bg-gradient-to-b from-white to-[#F8FAFC] px-6 py-12">
+                  <div className="max-w-lg text-center">
+                    <div className="mx-auto mb-6 flex size-28 items-center justify-center rounded-full bg-[#EEF5FF] shadow-sm">
+                      <Image
+                        src="/illustrations/no-products.svg"
+                        alt={t("noProducts")}
+                        width={84}
+                        height={84}
+                        unoptimized
+                        className="h-20 w-20 object-contain"
+                      />
+                    </div>
+
+                    <h2 className="text-2xl font-semibold text-[#111827]">
+                      {t("noProducts")}
+                    </h2>
+                    <p className="mt-2 text-sm md:text-base text-[#4B5563]">
+                      {t("noProductsDescription")}
+                    </p>
+
+                    <div className="mt-6 flex justify-center">
+                      <Button
+                        onClick={handleClearAllFilters}
+                        className="h-11 rounded-full px-6 text-base"
+                      >
+                        {t("resetFilters")}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <ProductsGridLayout hasBadge data={data.items} />
+              )}
               {data.pagination.total_pages > 1 && (
                 <CustomPagination
                   totalPages={data.pagination.total_pages}
