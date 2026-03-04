@@ -220,7 +220,7 @@ export function calculateProductVAT(
   const { net, vat } = splitGross(gross, vatRate);
 
   return {
-    gross: +gross.toFixed(2),
+    gross: gross.toFixed(2) ?? 0,
     net,
     vat,
     vatRate,

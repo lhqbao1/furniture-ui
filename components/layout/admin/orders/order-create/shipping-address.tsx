@@ -66,6 +66,7 @@ export default function ManualCheckOutShippingAddress({
       "invoice_recipient_name",
       "invoice_phone",
       "email_invoice",
+      "company_name",
     ],
   });
 
@@ -84,6 +85,7 @@ export default function ManualCheckOutShippingAddress({
       invoice_recipient_name,
       invoice_phone,
       email_invoice,
+      company_name,
     ] = JSON.parse(invoiceSnapshot);
 
     form.setValue("address", invoice_address || "");
@@ -91,7 +93,10 @@ export default function ManualCheckOutShippingAddress({
     form.setValue("city", invoice_city || "");
     form.setValue("additional_address", invoice_additional_address || "");
     form.setValue("country", invoice_country || "");
-    form.setValue("recipient_name", invoice_recipient_name || "");
+    form.setValue(
+      "recipient_name",
+      invoice_recipient_name || company_name || "",
+    );
     form.setValue("phone", invoice_phone || "");
     form.setValue("email_shipping", email_invoice || "");
   }, [isSameInvoice, invoiceSnapshot]);

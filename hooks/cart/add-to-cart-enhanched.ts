@@ -11,7 +11,11 @@ export function useAddToCartLocalEnhanced() {
   const { addToCartLocal, cart } = useCartLocal();
   const t = useTranslations();
 
-  const addToCartLocalOnly = (product: ProductItem, quantity: number = 1) => {
+  const addToCartLocalOnly = (
+    product: ProductItem,
+    quantity: number = 1,
+    options?: { onSuccess?: () => void; onError?: () => void },
+  ) => {
     if (!product) return;
 
     const existingItem = cart.find(
@@ -35,6 +39,7 @@ export function useAddToCartLocalEnhanced() {
     const baseStock = calculateAvailableStock(product);
     if (totalQuantity > baseStock + totalIncomingStock) {
       toast.error(t("notEnoughStock"));
+      options?.onError?.();
       return;
     }
 
@@ -63,8 +68,14 @@ export function useAddToCartLocalEnhanced() {
         },
       },
       {
-        onSuccess: () => toast.success(t("addToCartSuccess")),
-        onError: () => toast.error(t("addToCartFail")),
+        onSuccess: () => {
+          toast.success(t("addToCartSuccess"));
+          options?.onSuccess?.();
+        },
+        onError: () => {
+          toast.error(t("addToCartFail"));
+          options?.onError?.();
+        },
       },
     );
   };

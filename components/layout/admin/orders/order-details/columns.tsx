@@ -47,7 +47,9 @@ export function getOrderDetailColumns({
       header: () => <div className="text-center w-full">VAT</div>,
       cell: ({ row }) => {
         const { vat } = calculateProductVAT(
-          row.original.final_price,
+          row.original.purchased_products
+            ? row.original?.purchased_products?.final_price
+            : row.original.products.final_price,
           row.original.products.tax,
           country_code,
           tax_id,
@@ -71,7 +73,10 @@ export function getOrderDetailColumns({
       cell: ({ row }) => (
         <div className="text-right">
           €
-          {row.original.item_price.toLocaleString("de-DE", {
+          {(row.original.purchased_products
+            ? row.original.purchased_products.final_price
+            : row.original.products.final_price
+          ).toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
@@ -91,7 +96,12 @@ export function getOrderDetailColumns({
       cell: ({ row }) => (
         <div className="text-right">
           €
-          {row.original.final_price.toLocaleString("de-DE", {
+          {(
+            row.original.quantity *
+            (row.original.purchased_products
+              ? row.original.purchased_products.final_price
+              : row.original.products.final_price)
+          ).toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}

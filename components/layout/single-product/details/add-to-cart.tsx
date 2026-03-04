@@ -23,6 +23,7 @@ import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import PostAddToCartDrawer from "./post-add-to-cart-drawer";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -31,6 +32,8 @@ interface AddToCartFieldProps {
 
 const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   const t = useTranslations();
+  const [isPostAddDrawerOpen, setIsPostAddDrawerOpen] = React.useState(false);
+  const [lastAddedQuantity, setLastAddedQuantity] = React.useState(1);
 
   // Form setup
   const form = useForm<z.infer<typeof cartFormSchema>>({
@@ -83,13 +86,26 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   }, [productDetails, incomingStock]);
 
   const handleSubmitWithStockCheck = React.useCallback(
-    (values: z.infer<typeof cartFormSchema>) => {
+    (
+      values: z.infer<typeof cartFormSchema>,
+      options?: { openDrawer?: boolean },
+    ) => {
       if (maxStock <= 0 || values.quantity > maxStock) {
         console.error("Not enough stock to add to cart.");
         return;
       }
 
-      handleSubmitToCart(values);
+      handleSubmitToCart(values, {
+        onSuccess: () => {
+          const isDesktop =
+            typeof window !== "undefined" ? window.innerWidth >= 768 : true;
+
+          if (options?.openDrawer && isDesktop) {
+            setLastAddedQuantity(values.quantity ?? 1);
+            setIsPostAddDrawerOpen(true);
+          }
+        },
+      });
     },
     [handleSubmitToCart, maxStock],
   );
@@ -99,7 +115,8 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
       <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(
-            (values) => handleSubmitWithStockCheck(values),
+            (values) =>
+              handleSubmitWithStockCheck(values, { openDrawer: true }),
             (e) => console.error("Please check the form for errors", e),
           )}
         >
@@ -161,8 +178,8 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
               )}
 
               <div className="flex justify-end">
-                <div
-                  onClick={(e) => {
+              <div
+                  onClick={() => {
                     handleAddWishlist();
                   }}
                   className="bg-white rounded-md aspect-square text-gray-500 cursor-pointer font-bold flex items-center justify-center hover:text-white transition-all duration-300 hover:bg-secondary g:min-h-[40px] lg:h-fit !h-[40px]"
@@ -176,7 +193,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
           <MobileStickyCart
             onAddToCart={() =>
               form.handleSubmit((values) => {
-                handleSubmitWithStockCheck(values);
+                handleSubmitWithStockCheck(values, { openDrawer: false });
               })()
             }
             price={productDetails.final_price}
@@ -185,6 +202,12 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
           />
         </form>
       </FormProvider>
+      <PostAddToCartDrawer
+        open={isPostAddDrawerOpen}
+        onOpenChange={setIsPostAddDrawerOpen}
+        product={productDetails}
+        quantity={lastAddedQuantity}
+      />
     </>
   );
 };

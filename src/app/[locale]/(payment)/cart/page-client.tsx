@@ -1,9 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CartSummary from "@/components/layout/cart/cart-summary";
-import CartTable from "@/components/layout/cart/cart-table";
 import { LoginDrawer } from "@/components/shared/login-drawer";
-import CartLocalTable from "@/components/layout/cart/cart-local-table";
 
 import { CartActions, useCartData } from "@/hooks/cart/useCart";
 import { useAtom } from "jotai";
@@ -51,15 +49,19 @@ const CartPageClient = () => {
 
   const normalized = React.useMemo(() => {
     const items = userId
-      ? cart?.flatMap((g) => g.items) ?? []
-      : localCart ?? [];
+      ? (cart?.flatMap((g) => g.items) ?? [])
+      : (localCart ?? []);
 
     return normalizeCartItems(items, isAuthenticated);
   }, [cart, localCart, isAuthenticated]);
 
   const shippingCost = normalized?.length
-    ? calculateShipping(normalized) ?? 0
+    ? (calculateShipping(normalized) ?? 0)
     : 0;
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   return (
     <div className="mt-6 md:pb-0 pb-6 lg:px-0 px-4 container-padding overflow-auto">
@@ -83,7 +85,7 @@ const CartPageClient = () => {
                 <span className="mb-6 capitalize">
                   (
                   {userId
-                    ? cart?.reduce((acc, g) => acc + g.items.length, 0) ?? 0
+                    ? (cart?.reduce((acc, g) => acc + g.items.length, 0) ?? 0)
                     : localCart.length}{" "}
                   <span className="capitalize">{t("items")}</span>)
                 </span>
@@ -95,17 +97,11 @@ const CartPageClient = () => {
                 <CartItemSkeleton count={2} />
               ) : userId ? (
                 flatItems.map((item) => (
-                  <CartItemCard
-                    cartServer={item}
-                    key={item.id}
-                  />
+                  <CartItemCard cartServer={item} key={item.id} />
                 ))
               ) : (
                 localCart.map((item) => (
-                  <CartItemCard
-                    localProducts={item}
-                    key={item.product_id}
-                  />
+                  <CartItemCard localProducts={item} key={item.product_id} />
                 ))
               )}
             </div>

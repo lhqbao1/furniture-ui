@@ -1,10 +1,7 @@
 "use client";
-import {
-  getCheckOutByUserId,
-  getCheckOutMainByUserId,
-} from "@/features/checkout/api";
+import { getCheckOutMainByUserId } from "@/features/checkout/api";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { MyOrderDataTable } from "./table";
 import { useMyOrderTableColumns } from "./columns";
 import {
@@ -15,32 +12,13 @@ import {
 } from "@/components/ui/accordion";
 import { useLocale, useTranslations } from "next-intl";
 import { formatDate } from "@/lib/date-formated";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
-import { MoreHorizontalIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAtom } from "jotai";
-import { contactOrderIdAtom } from "@/store/checkout";
 import { useRouter } from "@/src/i18n/navigation";
 import { userIdAtom } from "@/store/auth";
 import { getStatusStyle } from "../admin/orders/order-list/status-styles";
-import { canShowCancelButton } from "@/lib/my-order/cancel-button-show";
 
 import { getInvoiceByUserId } from "@/features/invoice/api";
 import OrderDetailsDrawer from "./details-drawer";
@@ -63,6 +41,7 @@ const OrderList = () => {
     queryFn: () => getCheckOutMainByUserId(userId ?? ""),
     enabled: !!userId,
     retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const {
@@ -74,6 +53,7 @@ const OrderList = () => {
     queryFn: () => getInvoiceByUserId(userId ?? ""),
     retry: false,
     enabled: !!userId,
+    refetchOnWindowFocus: false,
   });
 
   const columns = useMyOrderTableColumns();

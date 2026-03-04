@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
 import { ChevronDown, ChevronRight, Eye, X } from "lucide-react";
-import ViewFileDialog from "./view-file";
 import { listChanel } from "@/data/data";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
@@ -20,8 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { ProductTable } from "../../products/products-list/product-table";
 import { cartSupplierColumn } from "@/components/layout/cart/columns";
-import ViewFileChildDialog from "@/components/layout/packaging-dialog/packaging-dialog-chil";
-import { getShippingStatusStyle, getStatusStyle } from "./status-styles";
+import { getStatusStyle } from "./status-styles";
 import CancelExchangeDialog from "../order-details/dialog/cancel-exchange-dialog";
 
 const ActionCell = ({
