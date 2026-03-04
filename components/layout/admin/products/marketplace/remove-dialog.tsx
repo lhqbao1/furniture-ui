@@ -64,7 +64,7 @@ const RemoveFromMarketplaceDialog = ({
         },
       );
     } else if (marketplace === "amazon" && marketplaceProduct) {
-      removeFromAmazonMutation.mutate(product.sku, {
+      removeFromAmazonMutation.mutate(product.id_provider, {
         onSuccess: () => {
           toast.success("Removed from Amazon successfully");
           setOpen(false);
@@ -77,10 +77,7 @@ const RemoveFromMarketplaceDialog = ({
     }
   };
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="outline"

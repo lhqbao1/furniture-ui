@@ -133,6 +133,15 @@ const SyncToEbayForm = ({
     resolver: zodResolver(marketPlaceSchema),
     defaultValues,
   });
+  const selectedMarketplace =
+    form.watch("marketplace") ?? currentMarketplace ?? "";
+  const selectedMarketplaceRecord = useMemo(
+    () =>
+      product.marketplace_products?.find(
+        (item) => item.marketplace === selectedMarketplace,
+      ),
+    [product.marketplace_products, selectedMarketplace],
+  );
 
   useEffect(() => {
     form.reset(defaultValues);
@@ -665,7 +674,16 @@ const SyncToEbayForm = ({
                     name="max_stock"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Stock</FormLabel>
+                        <FormLabel>
+                          Stock
+                          {selectedMarketplace && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              Stock previous time upload (
+                              {selectedMarketplace.toUpperCase()}):{" "}
+                              {selectedMarketplaceRecord?.max_stock ?? "—"}
+                            </span>
+                          )}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"

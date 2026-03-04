@@ -31,6 +31,8 @@ export default function ManualAdditionalInformation({
   const [marketplaceDisplay, setMarketplaceDisplay] = useState("");
   const marketplace = form.watch("from_marketplace");
   const isDirty = form.formState.isDirty;
+  const isNettoMarketplace =
+    String(marketplace ?? marketplaceDisplay ?? "").toLowerCase() === "netto";
 
   const carriers = [
     { id: "spedition", logo: "/amm.jpeg" },
@@ -52,6 +54,13 @@ export default function ManualAdditionalInformation({
       setMarketplaceDisplay(marketplace);
     }
   }, [marketplace, isDirty]);
+
+  useEffect(() => {
+    if (!isNettoMarketplace) {
+      form.setValue("netto_buyer_id", null);
+    }
+  }, [isNettoMarketplace, form]);
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between bg-secondary/10 p-2">
@@ -129,6 +138,32 @@ export default function ManualAdditionalInformation({
             </FormItem>
           )}
         />
+
+        {isNettoMarketplace && (
+          <FormField
+            control={form.control}
+            name="netto_buyer_id"
+            render={({ field }) => (
+              <FormItem className="col-span-1">
+                <FormLabel className="text-black font-semibold text-sm">
+                  Netto Customer ID
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder=""
+                    onChange={(e) => {
+                      const value = e.target.value.trim();
+                      field.onChange(value === "" ? null : value);
+                    }}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}

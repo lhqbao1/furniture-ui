@@ -1,7 +1,9 @@
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
 
-export const orderListExpandColumns: ColumnDef<CartItem>[] = [
+export const orderListExpandColumns = (
+  supplier_name: string | null,
+): ColumnDef<CartItem>[] => [
   {
     accessorKey: "pos",
     header: () => <div className="text-center w-full">POS.</div>,
@@ -34,14 +36,12 @@ export const orderListExpandColumns: ColumnDef<CartItem>[] = [
   },
 
   {
-    accessorKey: "ware_house",
+    accessorKey: "supplier",
     header: () => <div className="text-center w-full">SUPPLIER</div>,
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          {row.original.products.owner
-            ? row.original.products.owner.business_name
-            : "Prestige Home"}
+          {supplier_name ? supplier_name : "Prestige Home"}
         </div>
       );
     },
