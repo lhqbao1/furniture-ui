@@ -54,6 +54,8 @@ const SelectBundleComponent = ({
   });
 
   const handleSelectProduct = (product: ProductItem) => {
+    const firstPackage = product.packages?.[0];
+
     setListProducts((prev) => {
       if (prev.some((p) => p.product.id === product.id)) return prev;
       return [
@@ -61,10 +63,10 @@ const SelectBundleComponent = ({
         {
           product,
           amount: 1,
-          length: product.length,
-          width: product.width,
-          height: product.height,
-          weight: product.weight,
+          length: firstPackage?.length ?? 0,
+          width: firstPackage?.width ?? 0,
+          height: firstPackage?.height ?? 0,
+          weight: firstPackage?.weight ?? 0,
         },
       ];
     });
@@ -104,14 +106,18 @@ const SelectBundleComponent = ({
   useEffect(() => {
     if (currentProduct?.bundles?.length) {
       const initialBundles: SelectedProduct[] = currentProduct.bundles.map(
-        (b) => ({
-          product: b.bundle_item,
-          amount: b.quantity,
-          length: b.bundle_item.length ?? 0,
-          width: b.bundle_item.width ?? 0,
-          height: b.bundle_item.height ?? 0,
-          weight: b.bundle_item.weight ?? 0,
-        }),
+        (b) => {
+          const firstPackage = b.bundle_item.packages?.[0];
+
+          return {
+            product: b.bundle_item,
+            amount: b.quantity,
+            length: firstPackage?.length ?? 0,
+            width: firstPackage?.width ?? 0,
+            height: firstPackage?.height ?? 0,
+            weight: firstPackage?.weight ?? 0,
+          };
+        },
       );
 
       setListProducts(initialBundles);

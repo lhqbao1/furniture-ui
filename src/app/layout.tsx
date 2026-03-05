@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     template: "%s | Prestige Home",
   },
   description:
-    "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe. Qualität, Funktionalität und modernes Design aus einer Hand.",
+    "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe. Qualität und modernes Design aus einer Hand.",
   icons: {
     icon: "/favicon.ico",
     apple: "/favicon.ico",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Prestige Home – Qualität für Wohnen & Technik",
     description:
-      "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe. Qualität, Funktionalität und modernes Design aus einer Hand.",
+      "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe. Qualität und modernes Design aus einer Hand.",
     url: "https://www.prestige-home.de",
     siteName: "Prestige Home",
     locale: "de_DE",
@@ -86,7 +86,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Prestige Home – Qualität für Wohnen & Technik",
     description:
-      "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe. Qualität, Funktionalität und modernes Design aus einer Hand.",
+      "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe. Qualität und modernes Design aus einer Hand.",
     images: [
       "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/5c38c322-bafc-4e6f-8d14-0c1ba4b7b8de_invoice-logo.png",
     ],

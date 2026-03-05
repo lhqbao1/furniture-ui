@@ -141,12 +141,6 @@ function getFlattenedCartItems(invoice: InvoiceResponse) {
 
       // ✔ Flatten items
       .flatMap((checkout: CheckOut) => {
-        // Nếu checkout.cart là array (CartResponse)
-        if (Array.isArray(checkout.cart)) {
-          return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
-        }
-
-        // Nếu checkout.cart là object (CartResponseItem)
         return checkout.cart?.items ?? [];
       })
   );
@@ -157,10 +151,7 @@ export const RouteInvoicePDF = ({ invoice }: RouteInvoicePDFProps) => {
 
   return (
     <Document>
-      <Page
-        size="A4"
-        style={styles.page}
-      >
+      <Page size="A4" style={styles.page}>
         {/* Header Logo */}
         <View
           style={{
@@ -191,14 +182,16 @@ export const RouteInvoicePDF = ({ invoice }: RouteInvoicePDFProps) => {
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
                 : invoice.main_checkout.checkouts?.[0]?.invoice_address
-                    ?.recipient_name
-                ? invoice.main_checkout.checkouts[0].invoice_address
-                    .recipient_name
-                : `${
-                    invoice.main_checkout.checkouts?.[0]?.user?.first_name ?? ""
-                  } ${
-                    invoice.main_checkout.checkouts?.[0]?.user?.last_name ?? ""
-                  }`}
+                      ?.recipient_name
+                  ? invoice.main_checkout.checkouts[0].invoice_address
+                      .recipient_name
+                  : `${
+                      invoice.main_checkout.checkouts?.[0]?.user?.first_name ??
+                      ""
+                    } ${
+                      invoice.main_checkout.checkouts?.[0]?.user?.last_name ??
+                      ""
+                    }`}
             </Text>
             <Text>
               {" "}
@@ -230,8 +223,8 @@ export const RouteInvoicePDF = ({ invoice }: RouteInvoicePDFProps) => {
                 invoice.main_checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
                   ? invoice.main_checkout?.checkouts?.[0]?.invoice_address
                       ?.country
-                  : invoice.main_checkout?.checkouts?.[0]?.shipping_address
-                      ?.country ?? "",
+                  : (invoice.main_checkout?.checkouts?.[0]?.shipping_address
+                      ?.country ?? ""),
               )}
             </Text>
             <Text>{invoice.main_checkout.checkouts[0].user.tax_id}</Text>
@@ -379,7 +372,9 @@ export const RouteInvoicePDF = ({ invoice }: RouteInvoicePDFProps) => {
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
                   {calculateProductVAT(
-                    item.final_price,
+                    item.purchased_products
+                      ? item?.purchased_products?.final_price
+                      : item.products.final_price,
                     item.products.tax,
                     invoice?.main_checkout.checkouts[0].shipping_address
                       .country,
@@ -388,14 +383,19 @@ export const RouteInvoicePDF = ({ invoice }: RouteInvoicePDFProps) => {
                   %
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>
-                  {item.item_price.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
+                  {item.purchased_products
+                    ? item?.purchased_products?.final_price
+                    : item.products.final_price.toLocaleString("de-DE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                   €
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>
-                  {item.final_price.toLocaleString("de-DE", {
+                  {(item.purchased_products
+                    ? item?.purchased_products?.final_price
+                    : item.products.final_price * item.quantity
+                  ).toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}

@@ -120,7 +120,11 @@ export function calculateOrderTaxWithDiscount(
   // 1️⃣ Products (GROSS based)
   for (const item of items) {
     const vatRate = parseTaxRate(item.products?.tax, country_code, tax_id);
-    const gross = Number(item.final_price); // ✅ TRUST GROSS
+    const gross = Number(
+      item.purchased_products
+        ? item?.purchased_products?.final_price
+        : item.products.final_price,
+    ); // ✅ TRUST GROSS
 
     if (!buckets.has(vatRate)) {
       buckets.set(vatRate, {

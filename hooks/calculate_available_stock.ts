@@ -13,17 +13,19 @@ export const calculateAvailableStock = (
   if (bundles.length > 0) {
     const bundleStocks = bundles
       .map((bundle) => {
-      const qty = toNumber(bundle.quantity);
-      if (qty <= 0) return Number.NaN;
+        const qty = toNumber(bundle.quantity);
+        if (qty <= 0) return Number.NaN;
+
+        const bundleItem = bundle.bundle_item;
+        if (!bundleItem) return 0;
 
         const hasChildStockData =
-          bundle.bundle_item.stock != null ||
-          bundle.bundle_item.result_stock != null;
+          bundleItem.stock != null || bundleItem.result_stock != null;
         if (!hasChildStockData) return Number.NaN;
 
-      const childStock = calculateAvailableStock(bundle.bundle_item);
-      const ratio = childStock / qty;
-      return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
+        const childStock = calculateAvailableStock(bundleItem);
+        const ratio = childStock / qty;
+        return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
       })
       .filter((value) => !Number.isNaN(value));
 

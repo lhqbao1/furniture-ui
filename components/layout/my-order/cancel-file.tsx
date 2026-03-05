@@ -133,12 +133,6 @@ export const CancelInvoicePDF = ({
 
         // ✔ Flatten items
         .flatMap((checkout) => {
-          // Nếu checkout.cart là array (CartResponse)
-          if (Array.isArray(checkout.cart)) {
-            return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
-          }
-
-          // Nếu checkout.cart là object (CartResponseItem)
           return checkout.cart?.items ?? [];
         })
     );
@@ -146,10 +140,7 @@ export const CancelInvoicePDF = ({
 
   return (
     <Document>
-      <Page
-        size="A4"
-        style={styles.page}
-      >
+      <Page size="A4" style={styles.page}>
         {/* Header Logo */}
         <View
           style={{
@@ -180,10 +171,10 @@ export const CancelInvoicePDF = ({
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
                 : checkout.checkouts?.[0]?.invoice_address?.recipient_name
-                ? checkout.checkouts[0].invoice_address.recipient_name
-                : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
-                    checkout.checkouts?.[0]?.user?.last_name ?? ""
-                  }`}
+                  ? checkout.checkouts[0].invoice_address.recipient_name
+                  : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
+                      checkout.checkouts?.[0]?.user?.last_name ?? ""
+                    }`}
             </Text>
             <Text>
               {" "}
@@ -210,7 +201,7 @@ export const CancelInvoicePDF = ({
               {getCountryName(
                 checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
                   ? checkout?.checkouts?.[0]?.invoice_address?.country
-                  : checkout?.checkouts?.[0]?.shipping_address?.country ?? "",
+                  : (checkout?.checkouts?.[0]?.shipping_address?.country ?? ""),
               )}
             </Text>
             <Text>{checkout.checkouts[0].user.tax_id}</Text>
