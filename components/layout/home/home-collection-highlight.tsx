@@ -8,7 +8,7 @@ export default async function HomeCollectionHighlight() {
   return (
     <section className="section-padding">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-stretch [--tile-top:10rem] [--tile-bottom:9rem] [--tile-gap:1rem] md:[--tile-top:14rem] md:[--tile-bottom:11rem]">
-        <div className="relative overflow-hidden rounded-3xl border border-black/5 bg-[radial-gradient(circle_at_top,_rgba(255,237,213,0.9),_rgba(255,255,255,0.9))] p-6 md:p-10 lg:h-[calc(var(--tile-top)+var(--tile-bottom)+var(--tile-gap))]">
+        <div className="relative overflow-hidden rounded-3xl border border-black/5 bg-[radial-gradient(circle_at_top,_rgba(255,237,213,0.9),_rgba(255,255,255,0.9))] p-6 md:p-10">
           <div className="pointer-events-none absolute -left-14 top-1/2 h-40 w-40 -translate-y-1/2 rounded-full bg-orange-200/30 blur-3xl" />
           <div className="pointer-events-none absolute -right-12 top-8 h-28 w-28 rounded-full bg-amber-200/40 blur-2xl" />
           <div className="relative">
@@ -18,10 +18,16 @@ export default async function HomeCollectionHighlight() {
             <p className="mt-2 text-sm md:text-base text-gray-700 max-w-md">
               {t("story_body")}
             </p>
+            <p className="mt-4 text-sm md:text-base text-gray-700 leading-7">
+              {t("story_seo_1")}
+            </p>
+            <p className="mt-3 text-sm md:text-base text-gray-700 leading-7">
+              {t("story_seo_2")}
+            </p>
             <Link
               href="/shop-all"
               prefetch={false}
-              className="mt-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2"
             >
               {t("story_cta")}
               <span aria-hidden="true">→</span>
