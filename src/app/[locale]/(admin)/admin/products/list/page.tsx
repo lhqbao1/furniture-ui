@@ -5,7 +5,6 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
-import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetAllProducts } from "@/features/products/hook";
 import {
   productListColumnVisibilityByUserAtom,
@@ -23,6 +22,7 @@ import { getProductColumns } from "@/components/layout/admin/products/products-l
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { OnChangeFn, VisibilityState } from "@tanstack/react-table";
 import { adminIdAtom } from "@/store/auth";
+import { Loader2 } from "lucide-react";
 
 const PRODUCT_COLUMN_OPTIONS: {
   id: string;
@@ -135,7 +135,7 @@ const ProductList = () => {
     }
   }, [searchParams]);
 
-  const { data, isLoading, isError } = useGetAllProducts({
+  const { data, isLoading, isFetching, isError } = useGetAllProducts({
     page,
     page_size: pageSize,
     all_products: filters.all_products,
@@ -198,7 +198,7 @@ const ProductList = () => {
   if (isError) return <div>No data</div>;
 
   return (
-    <div className="h-screen flex flex-col gap-6 pb-6 overflow-hidden">
+    <div className="relative h-screen flex flex-col gap-6 pb-6 overflow-hidden">
       <div className="text-3xl text-secondary font-bold text-center">
         Product List
       </div>
@@ -221,9 +221,6 @@ const ProductList = () => {
         className="min-h-0"
         style={tableHeight ? { height: `${tableHeight}px` } : undefined}
       >
-        {isLoading ? (
-          <ProductTableSkeleton />
-        ) : (
         <ProductTable
           data={filteredItems}
           columns={getProductColumns(setSortByStock)}
@@ -249,8 +246,13 @@ const ProductList = () => {
             onColumnVisibilityChange={handleTableColumnVisibilityChange}
             enableClientSorting
           />
-        )}
       </div>
+
+      {(isLoading || isFetching) && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/45 backdrop-blur-[2px]">
+          <Loader2 className="size-10 animate-spin text-secondary" />
+        </div>
+      )}
     </div>
   );
 };

@@ -80,8 +80,9 @@ export function useGetAllProducts({
         supplier_id,
         brand_id,
       }),
-    // placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData,
     retry: false,
+    refetchOnWindowFocus: false,
   });
 }
 

@@ -160,6 +160,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
     queryFn: () => getCheckOutMain(params),
     placeholderData: (previousData) => previousData,
     retry: false,
+    refetchOnWindowFocus: false,
   });
 }
 
