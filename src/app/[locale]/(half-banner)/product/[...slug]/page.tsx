@@ -78,10 +78,16 @@ function isPublishableProduct(product?: Partial<ProductItem> | null) {
  * 1) STATIC PARAMS
  * ------------------------------------------------------*/
 export async function generateStaticParams() {
-  const products = await getAllProductsSelect({
-    is_econelo: undefined,
-    all_products: true,
-  });
+  let products: ProductItem[] = [];
+  try {
+    products = await getAllProductsSelect({
+      is_econelo: undefined,
+      all_products: true,
+    });
+  } catch (error) {
+    console.error("❌ generateStaticParams /product/[...slug] failed:", error);
+    return [];
+  }
   const locales = ["de"];
 
   return products
