@@ -6,16 +6,18 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import TableToolbar, {
   ToolbarType,
 } from "@/components/layout/admin/products/products-list/toolbar";
-import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { useGetCheckOutMain } from "@/features/checkout/hook";
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { CheckOutMain } from "@/types/checkout";
 
 const OrderList = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+  const [selectedOrders, setSelectedOrders] = useState<CheckOutMain[]>([]);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -36,7 +38,7 @@ const OrderList = () => {
     setPage(urlPage);
   }, [searchParams]);
 
-  const { data, isLoading, isError } = useGetCheckOutMain({
+  const { data, isLoading, isFetching, isError } = useGetCheckOutMain({
     page,
     page_size: pageSize,
     status: filters.status, // <-- thêm
@@ -105,18 +107,12 @@ const OrderList = () => {
     return () => window.removeEventListener("resize", updateHeight);
   }, [data, isLoading]);
 
-  if (!data && isLoading) {
-    return <ProductTableSkeleton columnsCount={6} rowsCount={6} />;
-  }
-
   if (!data && isError) {
     return <div>No data</div>;
   }
 
-  console.log(data?.items);
-
   return (
-    <div className="flex flex-col gap-6 pb-4">
+    <div className="relative flex flex-col gap-6 pb-4">
       <div className="space-y-6">
         {/* {isLoadingStatistic ? (
           <ProductStatisticSkeleton />
@@ -131,35 +127,32 @@ const OrderList = () => {
           setPage={setPage}
           setPageSize={setPageSize}
           type={ToolbarType.order}
+          selectedOrders={selectedOrders}
         />
-        {isLoading && !data ? (
-          <ProductTableSkeleton columnsCount={6} rowsCount={6} />
-        ) : (
-          // <div
-          //   ref={tableWrapRef}
-          //   className="min-h-0"
-          //   style={tableHeight ? { height: `${tableHeight}px` } : undefined}
-          // >
-
-          // </div>
-          <ProductTable
-            data={data ? data.items : []}
-            columns={orderColumns}
-            page={page}
-            setPage={handlePageChange}
-            pageSize={pageSize}
-            setPageSize={setPageSize}
-            totalItems={data?.pagination.total_items ?? 0}
-            totalPages={data?.pagination.total_pages ?? 0}
-            hasBackground
-            hasExpanded
-            renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
-            hasHeaderBackGround
-            isSticky
-            stickyContainerClassName="h-full"
-          />
-        )}
+        <ProductTable
+          data={data ? data.items : []}
+          columns={orderColumns}
+          page={page}
+          setPage={handlePageChange}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          totalItems={data?.pagination.total_items ?? 0}
+          totalPages={data?.pagination.total_pages ?? 0}
+          hasBackground
+          hasExpanded
+          renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
+          hasHeaderBackGround
+          isSticky
+          stickyContainerClassName="h-full"
+          onSelectedRowsChange={(rows) => setSelectedOrders(rows)}
+        />
       </div>
+
+      {(isLoading || isFetching) && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/45 backdrop-blur-[2px]">
+          <Loader2 className="size-10 animate-spin text-secondary" />
+        </div>
+      )}
     </div>
   );
 };

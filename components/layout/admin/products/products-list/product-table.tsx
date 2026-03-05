@@ -23,7 +23,6 @@ import React, { useEffect, useState } from "react";
 import { CheckOut } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
 import { getDeliveryOrderColumns } from "@/components/layout/cart/columns";
-import { ProductItem } from "@/types/products";
 import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
@@ -49,6 +48,7 @@ interface DataTableProps<TData, TValue> {
   isSticky?: boolean;
   stickyContainerClassName?: string;
   onSelectionChange?: (ids: string[]) => void; // 👈 thêm
+  onSelectedRowsChange?: (rows: TData[]) => void;
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   enableClientSorting?: boolean;
@@ -76,6 +76,7 @@ export function ProductTable<TData, TValue>({
   isSticky = false,
   stickyContainerClassName,
   onSelectionChange,
+  onSelectedRowsChange,
   columnVisibility,
   onColumnVisibilityChange,
   enableClientSorting = false,
@@ -114,13 +115,20 @@ export function ProductTable<TData, TValue>({
     () =>
       table
         .getSelectedRowModel()
-        .rows.map((row) => (row.original as ProductItem).id),
-    [rowSelection], // 👈 chỉ đổi khi selection đổi
+        .rows.map((row) => (row.original as { id?: string })?.id)
+        .filter((id): id is string => Boolean(id)),
+    [rowSelection, table], // 👈 chỉ đổi khi selection đổi
+  );
+
+  const selectedRows = React.useMemo(
+    () => table.getSelectedRowModel().rows.map((row) => row.original as TData),
+    [rowSelection, table],
   );
 
   useEffect(() => {
     onSelectionChange?.(selectedProductIds);
-  }, [selectedProductIds]);
+    onSelectedRowsChange?.(selectedRows);
+  }, [selectedProductIds, selectedRows, onSelectionChange, onSelectedRowsChange]);
 
   const transformCartItems = (cartItems: CartItem[]): CartItem[] => {
     return cartItems.flatMap((item) => {
