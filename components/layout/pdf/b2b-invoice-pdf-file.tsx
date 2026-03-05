@@ -75,7 +75,8 @@ const PDF_GRAY_BG = "#D2D2D2";
 const styles = StyleSheet.create({
   page: {
     paddingHorizontal: 24,
-    paddingVertical: 48,
+    paddingTop: 48,
+    paddingBottom: 145,
     fontSize: 11,
     fontFamily: "Figtree",
     color: "#666666",
@@ -111,6 +112,12 @@ const getCustomerName = (checkout: CheckOutMain) => {
   if (fullName) return fullName;
 
   return "";
+};
+
+const truncateText = (value: string, maxLength = 28) => {
+  if (!value) return "";
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength - 1)}…`;
 };
 
 export const B2BInvoicePDFFile = ({
@@ -266,11 +273,11 @@ export const B2BInvoicePDFFile = ({
             }}
           >
             <Text style={{ width: "8%", textAlign: "center" }}>Pos.</Text>
-            <Text style={{ width: "24%" }}>Art.-Nr.</Text>
-            <Text style={{ width: "40%" }}>Bezeichnung</Text>
+            <Text style={{ width: "24%" }}>Ref.-Nr .</Text>
+            <Text style={{ width: "30%" }}>Kundenname</Text>
             <Text style={{ width: "8%", textAlign: "center" }}>Menge</Text>
-            <Text style={{ width: "10%", textAlign: "right" }}>E.-Preis</Text>
-            <Text style={{ width: "10%", textAlign: "right" }}>G.-Preis</Text>
+            <Text style={{ width: "15%", textAlign: "right" }}>E.-Preis</Text>
+            <Text style={{ width: "15%", textAlign: "right" }}>G.-Preis</Text>
           </View>
 
           {orders.map((order, index) => {
@@ -294,16 +301,18 @@ export const B2BInvoicePDFFile = ({
                     order.checkout_code ||
                     order.id}
                 </Text>
-                <Text style={{ width: "40%" }}>{getCustomerName(order)}</Text>
+                <Text style={{ width: "30%" }}>
+                  {truncateText(getCustomerName(order))}
+                </Text>
                 <Text style={{ width: "8%", textAlign: "center" }}>1</Text>
-                <Text style={{ width: "10%", textAlign: "right" }}>
+                <Text style={{ width: "15%", textAlign: "right" }}>
                   €
                   {gross.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </Text>
-                <Text style={{ width: "10%", textAlign: "right" }}>
+                <Text style={{ width: "15%", textAlign: "right" }}>
                   €
                   {gross.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
@@ -400,6 +409,21 @@ export const B2BInvoicePDFFile = ({
         </View>
 
         <B2BInvoiceFooterSection />
+        <Text
+          fixed
+          style={{
+            position: "absolute",
+            bottom: 6,
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            fontSize: 8,
+            fontWeight: "bold",
+          }}
+          render={({ pageNumber, totalPages }) =>
+            `Seite ${pageNumber} von ${totalPages}`
+          }
+        />
       </Page>
     </Document>
   );
