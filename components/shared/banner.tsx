@@ -30,6 +30,16 @@ const Banner = ({ height, isHome = false }: BannerProps) => {
           100vw
         "
       />
+      {isHome && (
+        <>
+          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
+            <h1 className="text-white text-2xl md:text-4xl 2xl:text-5xl font-bold drop-shadow-md">
+              Möbel, Garten & Wohnen online kaufen
+            </h1>
+          </div>
+        </>
+      )}
     </div>
   );
 };

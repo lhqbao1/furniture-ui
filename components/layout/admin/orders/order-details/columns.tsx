@@ -1,7 +1,6 @@
 import { calculateProductVAT } from "@/lib/caculate-vat";
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
-import Image from "next/image";
 
 interface OrderDetailColumnsProps {
   country_code?: string | null;

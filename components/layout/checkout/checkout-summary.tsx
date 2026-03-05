@@ -9,21 +9,15 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   useGetVoucherById,
-  useGetVoucherForCheckout,
   useGetVoucherProducts,
 } from "@/features/vouchers/hook";
 import { CartItemLocal } from "@/lib/utils/cart";
-import { userIdAtom } from "@/store/auth";
 import { CartResponseItem } from "@/types/cart";
 import { useAtom } from "jotai";
 import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import ProductVoucher from "./checkout-voucher";
 import { currentVoucherAtom } from "@/store/voucher";
-import { BadgePercent } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import VoucherApply from "./voucher-apply";
 
 interface CheckoutSummaryProps {
@@ -215,10 +209,7 @@ const CheckoutSummary = ({
   return (
     <>
       <div className="space-y-4 flex justify-end xl:mb-8">
-        <VoucherApply
-          voucherId={voucherId}
-          setVoucherId={setVoucherId}
-        />
+        <VoucherApply voucherId={voucherId} setVoucherId={setVoucherId} />
       </div>
       {/* TOTAL + NOTE */}
       <div className="grid grid-cols-2 gap-6 items-start">

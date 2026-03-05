@@ -14,7 +14,6 @@ export default async function HomePage() {
   return (
     <div id="home" className="w-full min-h-[200vh] flex flex-col items-center">
       <div className="md:w-[95%] xl:w-3/4 w-[95%]">
-        <h1 className="sr-only">Prestige Home</h1> {/* CRITICAL FIRST PAINT */}
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <BestSellerSection />
         </Suspense>

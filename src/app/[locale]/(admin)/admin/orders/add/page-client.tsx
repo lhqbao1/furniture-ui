@@ -20,16 +20,8 @@ import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/orde
 import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
 import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
 import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreate";
-import { calculateShipping } from "@/hooks/caculate-shipping";
-import {
-  calculateShippingCost,
-  calculateShippingCostManual,
-} from "@/lib/caculate-vat";
-import {
-  getCountryCode,
-  getCountryLabelDE,
-} from "@/components/shared/getCountryNameDe";
-import { fromArrayBufferToHex } from "google-auth-library/build/src/crypto/shared";
+import { calculateShippingCostManual } from "@/lib/caculate-vat";
+import { getCountryCode } from "@/components/shared/getCountryNameDe";
 import { getCarrierFromItems } from "@/lib/get-carrier";
 
 export interface CartItem {
@@ -90,7 +82,11 @@ export default function CreateOrderPageClient() {
     }
 
     const currentItems = form.getValues("items") ?? [];
-    const result = calculateShippingCostManual(currentItems, countryCode, taxId);
+    const result = calculateShippingCostManual(
+      currentItems,
+      countryCode,
+      taxId,
+    );
 
     const autoShipping = result.gross;
     const autoCarrier = getCarrierFromItems(
