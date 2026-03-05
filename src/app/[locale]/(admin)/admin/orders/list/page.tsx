@@ -10,7 +10,13 @@ import { useGetCheckOutMain } from "@/features/checkout/hook";
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Loader2 } from "lucide-react";
 import { CheckOutMain } from "@/types/checkout";
 
@@ -47,6 +53,26 @@ const OrderList = () => {
     to_date: filters.toDate,
     search: filters.search,
   });
+
+  const multiSearchRaw = searchParams.get("multi_search") ?? "";
+  const multiSearchValues = useMemo(
+    () =>
+      multiSearchRaw
+        .split(",")
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean),
+    [multiSearchRaw],
+  );
+
+  const filteredItems = useMemo(() => {
+    if (!data?.items) return [];
+    if (multiSearchValues.length === 0) return data.items;
+
+    const target = new Set(multiSearchValues);
+    return data.items.filter((item) =>
+      target.has((item.marketplace_order_id ?? "").trim().toLowerCase()),
+    );
+  }, [data?.items, multiSearchValues]);
 
   // const {
   //   data: statistic,
@@ -130,14 +156,22 @@ const OrderList = () => {
           selectedOrders={selectedOrders}
         />
         <ProductTable
-          data={data ? data.items : []}
+          data={filteredItems}
           columns={orderColumns}
           page={page}
           setPage={handlePageChange}
           pageSize={pageSize}
           setPageSize={setPageSize}
-          totalItems={data?.pagination.total_items ?? 0}
-          totalPages={data?.pagination.total_pages ?? 0}
+          totalItems={
+            multiSearchValues.length > 0
+              ? filteredItems.length
+              : (data?.pagination.total_items ?? 0)
+          }
+          totalPages={
+            multiSearchValues.length > 0
+              ? 1
+              : (data?.pagination.total_pages ?? 0)
+          }
           hasBackground
           hasExpanded
           renderRowSubComponent={(row) => <OrderExpandTable row={row} />}

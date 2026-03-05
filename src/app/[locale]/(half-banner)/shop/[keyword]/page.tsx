@@ -111,7 +111,6 @@ export default async function ShopKeywordPage({
       <h1 className="text-center text-secondary capitalize">{searchText}</h1>
 
       <div className="mt-4 max-w-4xl mx-auto text-gray-700 leading-relaxed text-center">
-        {" "}
         {matchedKeyword?.body_description}
       </div>
 

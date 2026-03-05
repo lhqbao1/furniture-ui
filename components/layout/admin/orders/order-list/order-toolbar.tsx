@@ -45,6 +45,7 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import { B2BInvoicePDFFile } from "@/components/layout/pdf/b2b-invoice-pdf-file";
 import { getStatusStyle } from "./status-styles";
+import MultiSearch from "../../products/products-list/toolbar/multi-search";
 
 export enum ToolbarType {
   product = "product",
@@ -243,7 +244,8 @@ export default function OrderToolbar({
       </div>
 
       {/* Search (auto, no button) */}
-      <div className="flex items-center w-full flex-1 flex-wrap lg:flex-nowrap">
+      <div className="flex items-center w-full flex-1 flex-nowrap gap-2">
+        <MultiSearch />
         <Input
           placeholder="Search"
           value={searchValue}
@@ -267,6 +269,10 @@ export default function OrderToolbar({
               <SelectItem value="10">10 rows</SelectItem>
               <SelectItem value="20">20 rows</SelectItem>
               <SelectItem value="50">50 rows</SelectItem>
+              <SelectItem value="300">300 rows</SelectItem>
+              <SelectItem value="500">500 rows</SelectItem>
+              <SelectItem value="1000">1000 rows</SelectItem>
+              <SelectItem value="2000">2000 rows</SelectItem>
             </SelectContent>
           </Select>
         </div>
