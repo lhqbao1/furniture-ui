@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "@react-pdf/renderer";
 const styles = StyleSheet.create({
   footerWrapper: {
     position: "absolute",
-    bottom: 10,
+    bottom: 24,
     left: 24,
     right: 24,
     zIndex: 20,
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
 });
 
 export const B2BInvoiceFooterSection = () => (
-  <View style={styles.footerWrapper}>
+  <View fixed style={styles.footerWrapper}>
     <View style={{ width: "34%" }}>
       <Text style={styles.bold}>Prestige Home GmbH</Text>
       <Text style={styles.gap}>Greifswalder Straße 226</Text>

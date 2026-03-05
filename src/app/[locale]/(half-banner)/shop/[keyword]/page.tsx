@@ -1,14 +1,31 @@
 import { getAllKeywords, getAllProducts } from "@/features/products/api";
 import { slugify } from "@/lib/slugify";
 import type { Metadata } from "next";
+import { KeywordResponse } from "@/types/keyword";
+import { ProductResponse } from "@/types/products";
 import ShopKeywordClient from "./page-client";
 
-export async function generateStaticParams() {
-  const keywords = await getAllKeywords();
+const EMPTY_PRODUCTS: ProductResponse = {
+  pagination: {
+    page: 1,
+    page_size: 20,
+    total_items: 0,
+    total_pages: 1,
+  },
+  items: [],
+};
 
-  return keywords.map((keyword) => ({
-    keyword: slugify(keyword.keywork),
-  }));
+export async function generateStaticParams() {
+  try {
+    const keywords = await getAllKeywords();
+
+    return keywords.map((keyword) => ({
+      keyword: slugify(keyword.keywork),
+    }));
+  } catch (error) {
+    console.error("❌ generateStaticParams /shop/[keyword] failed:", error);
+    return [];
+  }
 }
 
 type PageParams = {
@@ -22,7 +39,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { keyword } = await params; // ✅ BẮT BUỘC
 
-  const keywords = await getAllKeywords();
+  let keywords: KeywordResponse[] = [];
+  try {
+    keywords = await getAllKeywords();
+  } catch (error) {
+    console.error("❌ generateMetadata /shop/[keyword] failed:", error);
+  }
 
   const rawKeyword = decodeURIComponent(keyword);
   const readable = rawKeyword.replaceAll("-", " ");
@@ -59,13 +81,20 @@ export default async function ShopKeywordPage({
   const searchText = keywordSlug.replaceAll("-", " ");
 
   // 🔹 fetch song song (tối ưu)
-  const [productsRaw, keywords] = await Promise.all([
+  const [productsResult, keywordsResult] = await Promise.allSettled([
     getAllProducts({
       search: searchText,
       page: 1,
     }),
     getAllKeywords(),
   ]);
+
+  const productsRaw =
+    productsResult.status === "fulfilled"
+      ? productsResult.value
+      : EMPTY_PRODUCTS;
+  const keywords: KeywordResponse[] =
+    keywordsResult.status === "fulfilled" ? keywordsResult.value : [];
 
   const products = {
     ...productsRaw,

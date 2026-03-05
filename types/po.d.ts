@@ -142,13 +142,15 @@ export type InventoryPOItem = {
     sku: string;
     id_provider: string;
     ean: string;
-    static_files_po: {
-      file_type: string;
-      url: string;
-      id: string;
-      created_at: string;
-      updated_at: string;
-    };
+    static_files: [
+      {
+        file_type: string;
+        url: string;
+        id: string;
+        created_at: string;
+        updated_at: string;
+      },
+    ];
     id: string;
   };
   created_at: string;
