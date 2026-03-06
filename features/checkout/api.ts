@@ -196,6 +196,21 @@ export async function changeOrderReturnStatus(
   return data;
 }
 
+export async function updateNoteForMainCheckout(
+  main_checkout_id: string,
+  note: string,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/note-for-main-checkout/${main_checkout_id}`,
+    null,
+    {
+      params: { note },
+    },
+  );
+
+  return data;
+}
+
 export async function makeOrderPaid(main_checkout_id: string) {
   const { data } = await apiAdmin.post(
     `/checkout/make-checkout-paid/${main_checkout_id}`,

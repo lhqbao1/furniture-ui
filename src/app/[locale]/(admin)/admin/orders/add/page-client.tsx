@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useCreateCheckOutManual } from "@/features/checkout/hook";
 import { useTranslations } from "next-intl";
@@ -23,6 +24,13 @@ import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreat
 import { calculateShippingCostManual } from "@/lib/caculate-vat";
 import { getCountryCode } from "@/components/shared/getCountryNameDe";
 import { getCarrierFromItems } from "@/lib/get-carrier";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export interface CartItem {
   id: number;
@@ -135,6 +143,7 @@ export default function CreateOrderPageClient() {
             ? null
             : values.invoice_additional_address,
         tax: 0,
+        note: values.note?.trim() ? values.note.trim() : null,
       },
       {
         onSuccess(data, variables, context) {
@@ -192,6 +201,28 @@ export default function CreateOrderPageClient() {
             <SelectOrderItems
               listProducts={listProducts}
               setListProducts={setListProducts}
+            />
+            <FormField
+              control={form.control}
+              name="note"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-black font-semibold text-sm">
+                    Note
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Add note..."
+                      value={field.value ?? ""}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        field.onChange(value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
             <div className="flex lg:justify-end justify-center gap-2">
               <Button type="submit" className="text-lg lg:w-1/3 w-1/2 py-6">

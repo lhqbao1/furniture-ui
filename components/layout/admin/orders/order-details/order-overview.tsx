@@ -18,6 +18,10 @@ const OrderDetailOverView = ({
   return (
     <div className="space-y-1 col-span-1">
       <div className="flex gap-1 text-sm font-bold">
+        <div>Chanel:</div>
+        <div className="uppercase">{order.from_marketplace}</div>
+      </div>
+      <div className="flex gap-1 text-sm font-bold">
         <div>Order ID:</div>
         <div>{order.checkout_code}</div>
       </div>
@@ -37,10 +41,7 @@ const OrderDetailOverView = ({
       </div>
       <div className="flex gap-1 text-sm">
         <div>Payment Method:</div>
-        <div
-          translate="no"
-          className="capitalize"
-        >
+        <div translate="no" className="capitalize">
           {order.from_marketplace &&
           order.from_marketplace.toLowerCase() !== "econelo"
             ? `${order.from_marketplace} Managed Payments`
@@ -49,10 +50,7 @@ const OrderDetailOverView = ({
       </div>
 
       <div className="space-y-2 mt-2">
-        <OrderStatusSelector
-          order={order}
-          status={status}
-        />
+        <OrderStatusSelector order={order} status={status} />
       </div>
     </div>
   );

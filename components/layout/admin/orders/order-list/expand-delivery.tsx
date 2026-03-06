@@ -4,6 +4,7 @@ import React from "react";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
+import { orderChildColumns } from "./column";
 import { orderListExpandColumns } from "./product-columns";
 
 function transformCartItems(items: CartItem[]): CartItem[] {
@@ -45,6 +46,9 @@ const OrderExpandTable = ({ row }: { row: any }) => {
     ? checkout.checkouts[0].supplier.business_name
     : "Prestige Home";
   const items = flattenCheckOutCart(checkout);
+  const deliveryOrders: CheckOut[] = Array.isArray(checkout.checkouts)
+    ? checkout.checkouts
+    : [];
 
   return (
     <div className="p-4 bg-white rounded-md border">
@@ -61,6 +65,22 @@ const OrderExpandTable = ({ row }: { row: any }) => {
         hasCount={false}
         hasHeaderBackGround
       />
+
+      <div className="mt-4">
+        <ProductTable<CheckOut, unknown>
+          data={deliveryOrders}
+          columns={orderChildColumns}
+          page={1}
+          pageSize={100}
+          setPage={() => {}}
+          setPageSize={() => {}}
+          hasPagination={false}
+          totalItems={deliveryOrders.length}
+          totalPages={1}
+          hasCount={false}
+          hasHeaderBackGround
+        />
+      </div>
     </div>
   );
 };

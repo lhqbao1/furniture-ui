@@ -62,6 +62,7 @@ export const ManualCreateOrderSchema = z
     items: z.array(ManualOrderItemSchema).min(1, {
       message: "You must select at least one product",
     }),
+    note: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
     if (

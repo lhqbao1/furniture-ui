@@ -5,8 +5,6 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ProductItem } from "@/types/products";
 import { useLocale } from "next-intl";
-import { useRouter } from "@/src/i18n/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   HoverCard,
   HoverCardTrigger,
@@ -225,6 +223,37 @@ function EditableEANCell({ product }: { product: ProductItem }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function ReservedStockCell({ product }: { product: ProductItem }) {
+  const locale = useLocale();
+
+  const reservedValue =
+    product.is_bundle || (product.bundles && product.bundles.length > 0)
+      ? calculateBundleReservedStock(product)
+      : product.result_stock;
+
+  return (
+    <div className="text-center">
+      <button
+        type="button"
+        className="text-center cursor-pointer"
+        onClick={() => {
+          const params = new URLSearchParams({
+            search: product.id_provider ?? "",
+            page: "1",
+          });
+          window.open(
+            `/${locale}/admin/orders/list?${params.toString()}`,
+            "_blank",
+            "noopener,noreferrer",
+          );
+        }}
+      >
+        {reservedValue}
+      </button>
     </div>
   );
 }
@@ -452,14 +481,7 @@ export const getInventoryColumns = (
     accessorKey: "reserved",
     header: ({}) => <div className="text-center uppercase">Reserved</div>,
     cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.is_bundle ||
-          (row.original.bundles && row.original.bundles.length > 0)
-            ? calculateBundleReservedStock(row.original)
-            : row.original.result_stock}
-        </div>
-      );
+      return <ReservedStockCell product={row.original} />;
     },
   },
 

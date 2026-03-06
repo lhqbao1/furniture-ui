@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
-import { ChevronDown, ChevronRight, Eye, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, NotebookPen, X } from "lucide-react";
 import { listChanel } from "@/data/data";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
@@ -13,6 +13,8 @@ import { CartItem } from "@/types/cart";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogFooter,
   DialogClose,
@@ -28,12 +30,16 @@ const ActionCell = ({
   setExpandedRowId,
   currentRowId,
   status,
+  note,
+  marketplaceOrderId,
 }: {
   id: string;
   expandedRowId?: string | null;
   setExpandedRowId?: (id: string | null) => void;
   currentRowId?: string;
   status: string;
+  note?: string | null;
+  marketplaceOrderId?: string | null;
 }) => {
   const router = useRouter();
   const locale = useLocale();
@@ -49,6 +55,24 @@ const ActionCell = ({
       >
         <Eye className="w-4 h-4" stroke="#F7941D" />
       </Button>
+
+      {note?.trim() && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <NotebookPen className="w-4 h-4 text-blue-600" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="w-[400px] max-w-[300px]">
+            <DialogHeader>
+              <DialogTitle>Note of {marketplaceOrderId || ""}</DialogTitle>
+            </DialogHeader>
+            <div className="text-sm whitespace-pre-wrap break-words">
+              {note}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Expand button */}
       <Button
@@ -327,6 +351,8 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
         currentRowId={row.id}
         status={row.original.status}
+        note={row.original.note}
+        marketplaceOrderId={row.original.marketplace_order_id}
       />
     ),
   },
@@ -498,28 +524,7 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
       );
     },
   },
-  {
-    accessorKey: "channel",
-    header: () => <div className="text-center w-full">CHANNEL</div>,
-    cell: ({ row }) => {
-      const currentChanel = row.original.from_marketplace;
-      const channelLogo =
-        listChanel.find((ch) => ch.name === currentChanel)?.icon ||
-        "new-logo.svg";
-      return (
-        <div className="h-12 relative">
-          <Image
-            src={`/${channelLogo}`}
-            alt="icon"
-            fill
-            className="object-contain p-2"
-            unoptimized
-          />
-        </div>
-        // <div className="text-center capitalize font-semibold">{row.original.from_marketplace ? row.original.from_marketplace : 'Prestige Home'}</div>
-      );
-    },
-  },
+
   {
     accessorKey: "created_at",
     header: () => <div className="text-center w-full">DATE CREATED</div>,
