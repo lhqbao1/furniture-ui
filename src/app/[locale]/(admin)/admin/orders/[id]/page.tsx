@@ -8,17 +8,22 @@ import OrderDetailOverView from "@/components/layout/admin/orders/order-details/
 import OrderDetailUser from "@/components/layout/admin/orders/order-details/order-customer";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import AdminBackButton from "@/components/layout/admin/admin-back-button";
-import { useGetMainCheckOutByMainCheckOutId } from "@/features/checkout/hook";
+import {
+  useGetMainCheckOutByMainCheckOutId,
+  useUpdateNoteForMainCheckout,
+} from "@/features/checkout/hook";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { formatDate, formatDateTimeString } from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
 import { CheckOutMain } from "@/types/checkout";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import OrderDetailsSkeleton from "./skeleton";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 import { getOrderDetailColumns } from "@/components/layout/admin/orders/order-details/columns";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   if (!checkOutMain?.checkouts) return [];
@@ -40,8 +45,10 @@ function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
 const OrderDetails = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [noteValue, setNoteValue] = useState("");
   const params = useParams<{ id: string }>(); // type-safe
   const checkoutId = params?.id;
+  const updateNoteMutation = useUpdateNoteForMainCheckout();
 
   const {
     data: order,
@@ -60,6 +67,10 @@ const OrderDetails = () => {
     if (!order) return [];
     return extractCartItemsFromMain(order);
   }, [order]);
+
+  useEffect(() => {
+    setNoteValue(order?.note ?? "");
+  }, [order?.note]);
 
   if (isLoading) return <OrderDetailsSkeleton />;
   if (isError) return <div>Error loading order</div>;
@@ -105,9 +116,38 @@ const OrderDetails = () => {
       />
       <div className="flex justify-between w-full">
         {order.status !== "Pending" ? (
-          <div className="flex gap-12">
+          <div className="flex flex-col gap-4">
             <DocumentTable order={order} invoiceCode={invoice?.invoice_code} />
-            {/* <DocumentTable /> */}
+            <div className="space-y-2 max-w-xl">
+              <div className="text-sm font-semibold">Order note</div>
+              <Textarea
+                placeholder="Type note and press Enter to save"
+                value={noteValue}
+                disabled={updateNoteMutation.isPending}
+                onChange={(event) => setNoteValue(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter" || event.shiftKey) return;
+                  event.preventDefault();
+
+                  if (!checkoutId) return;
+
+                  updateNoteMutation.mutate(
+                    {
+                      main_checkout_id: checkoutId,
+                      note: noteValue.trim(),
+                    },
+                    {
+                      onSuccess: () => {
+                        toast.success("Note updated");
+                      },
+                      onError: () => {
+                        toast.error("Failed to update note");
+                      },
+                    },
+                  );
+                }}
+              />
+            </div>
           </div>
         ) : (
           ""

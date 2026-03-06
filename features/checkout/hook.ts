@@ -32,6 +32,7 @@ import {
   makeOrderPaid,
   OrderStatisticsParams,
   returnOrder,
+  updateNoteForMainCheckout,
 } from "./api";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import React from "react";
@@ -278,6 +279,25 @@ export function useMakeOrderPaid() {
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables],
       });
+    },
+  });
+}
+
+export function useUpdateNoteForMainCheckout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      note,
+    }: {
+      main_checkout_id: string;
+      note: string;
+    }) => updateNoteForMainCheckout(main_checkout_id, note),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
     },
   });
 }
