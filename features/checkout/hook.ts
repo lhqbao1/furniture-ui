@@ -164,10 +164,17 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
   });
 }
 
-export function useGetAllCheckOutMain() {
+export function useGetAllCheckOutMain(params?: {
+  channel?: string;
+  status?: string[];
+}) {
   return useQuery({
-    queryKey: ["checkout-main-all"],
-    queryFn: () => getAllCheckOutMain(),
+    queryKey: [
+      "checkout-main-all",
+      params?.channel ?? null,
+      (params?.status ?? []).join(","),
+    ],
+    queryFn: () => getAllCheckOutMain(params?.channel, params?.status),
     retry: false,
   });
 }

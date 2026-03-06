@@ -89,6 +89,9 @@ const FilterExportForm = () => {
         return_cost: clean(p.return_cost),
         original_price: clean(p.price),
         sale_price: clean(p.final_price),
+        shipping_revenue: clean(
+          p.carrier === "amm" || p.carrier === "spedition" ? 35.95 : 5.95,
+        ),
         vat: vat,
         stock: clean(calculateAvailableStock(p)),
         img_url: clean(
