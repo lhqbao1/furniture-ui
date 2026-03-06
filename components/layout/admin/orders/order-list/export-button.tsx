@@ -30,6 +30,9 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
+import { STATUS_OPTIONS } from "@/data/data";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -52,12 +55,32 @@ function getPrimaryCheckout(p: CheckOutMain) {
 
 export default function ExportOrderExcelButton() {
   const [marketplace, setMarketplace] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const hasFilters = marketplace !== "" || selectedStatus.length > 0;
 
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["checkout-main-all", marketplace],
-    queryFn: () => getAllCheckOutMain(marketplace),
+    queryKey: ["checkout-main-all", marketplace, selectedStatus.join(",")],
+    queryFn: () => getAllCheckOutMain(marketplace, selectedStatus),
     enabled: false, // ❌ không auto call
   });
+
+  const toggleStatus = (item: (typeof STATUS_OPTIONS)[number]) => {
+    const backendStatuses = item.statuses ?? [item.key];
+    const isSelected = backendStatuses.every((status) =>
+      selectedStatus.includes(status),
+    );
+
+    if (isSelected) {
+      setSelectedStatus((prev) =>
+        prev.filter((status) => !backendStatuses.includes(status)),
+      );
+      return;
+    }
+
+    setSelectedStatus((prev) =>
+      Array.from(new Set([...prev, ...backendStatuses])),
+    );
+  };
 
   const getExportFileName = (marketplace: string) => {
     if (!marketplace) return "order_export.xlsx";
@@ -174,6 +197,11 @@ export default function ExportOrderExcelButton() {
     saveAs(blob, getExportFileName(marketplace));
   };
 
+  const handleResetFilters = () => {
+    setMarketplace("");
+    setSelectedStatus([]);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -182,10 +210,12 @@ export default function ExportOrderExcelButton() {
 
       <DropdownMenuContent className="w-64 p-3 space-y-4">
         {/* Marketplace Filter */}
-        <div className="space-y-1">
+        <div className="space-y-2">
+          <Label>Chanel</Label>
+
           <Select value={marketplace} onValueChange={setMarketplace}>
             <SelectTrigger placeholderColor className="border">
-              <SelectValue placeholder="All Marketplace" />
+              <SelectValue placeholder="All Chanel" />
             </SelectTrigger>
             <SelectContent>
               {CHANEL_OPTIONS.map((item) => (
@@ -195,12 +225,52 @@ export default function ExportOrderExcelButton() {
               ))}
             </SelectContent>
           </Select>
-        </div>
 
-        {/* Export Button */}
-        <Button onClick={handleExport} className="w-full" disabled={isFetching}>
-          {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
-        </Button>
+          <Label>Status</Label>
+          <Select>
+            <SelectTrigger className="border">
+              <SelectValue placeholder="Choose status" />
+            </SelectTrigger>
+            <SelectContent className="max-h-96">
+              {STATUS_OPTIONS.map((item) => (
+                <div
+                  key={item.key}
+                  className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-accent rounded-md"
+                  onClick={() => toggleStatus(item)}
+                >
+                  <Checkbox
+                    checked={
+                      item.statuses
+                        ? item.statuses.every((status) =>
+                            selectedStatus.includes(status),
+                          )
+                        : selectedStatus.includes(item.key)
+                    }
+                  />
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={handleResetFilters}
+              disabled={!hasFilters || isFetching}
+            >
+              Reset Filters
+            </Button>
+
+            <Button onClick={handleExport} disabled={isFetching}>
+              {isFetching ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Export Excel"
+              )}
+            </Button>
+          </div>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -111,9 +111,17 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
   return data as CheckOutMainResponse;
 }
 
-export async function getAllCheckOutMain(channel?: string) {
+export async function getAllCheckOutMain(
+  channel?: string,
+  status?: string[],
+) {
   const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all", {
-    params: { channel },
+    params: {
+      ...(channel ? { channel } : {}),
+      ...(status && status.length > 0 ? { status } : {}),
+    },
+    paramsSerializer: (params) =>
+      qs.stringify(params, { arrayFormat: "repeat" }),
   });
   return data as CheckOutMain[];
 }
