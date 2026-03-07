@@ -198,11 +198,7 @@ function CheckOutShippingAddress({
                   {t("phone_number")}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    placeholder=""
-                    {...field}
-                  />
+                  <Input type="number" placeholder="" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -283,11 +279,7 @@ function CheckOutShippingAddress({
                   {isAdmin ? "City" : t("city")}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
-                    autoComplete="address-level2"
-                    {...field}
-                  />
+                  <Input type="text" autoComplete="address-level2" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

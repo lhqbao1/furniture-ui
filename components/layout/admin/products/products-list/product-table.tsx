@@ -44,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   is_delivery_multiple?: boolean;
   hasCount?: boolean;
   hasHeaderBackGround?: boolean;
+  headerClassName?: string;
   renderRowSubComponent?: (row: any) => React.ReactNode;
   isSticky?: boolean;
   stickyContainerClassName?: string;
@@ -52,6 +53,7 @@ interface DataTableProps<TData, TValue> {
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   enableClientSorting?: boolean;
+  allowMultipleExpandedRows?: boolean;
 }
 
 export function ProductTable<TData, TValue>({
@@ -73,6 +75,7 @@ export function ProductTable<TData, TValue>({
   is_delivery_multiple = false,
   hasCount = true,
   hasHeaderBackGround = false,
+  headerClassName,
   isSticky = false,
   stickyContainerClassName,
   onSelectionChange,
@@ -80,13 +83,38 @@ export function ProductTable<TData, TValue>({
   columnVisibility,
   onColumnVisibilityChange,
   enableClientSorting = false,
+  allowMultipleExpandedRows = false,
   renderRowSubComponent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "id_provider", desc: false }, // default sort by id_provider asc
   ]);
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
+  const [expandedRowIds, setExpandedRowIds] = React.useState<string[]>([]);
   const [rowSelection, setRowSelection] = useState({});
+
+  const isRowExpanded = React.useCallback(
+    (rowId: string) =>
+      allowMultipleExpandedRows
+        ? expandedRowIds.includes(rowId)
+        : expandedRowId === rowId,
+    [allowMultipleExpandedRows, expandedRowIds, expandedRowId],
+  );
+
+  const toggleExpandedRow = React.useCallback(
+    (rowId: string) => {
+      if (allowMultipleExpandedRows) {
+        setExpandedRowIds((prev) =>
+          prev.includes(rowId)
+            ? prev.filter((current) => current !== rowId)
+            : [...prev, rowId],
+        );
+        return;
+      }
+      setExpandedRowId((prev) => (prev === rowId ? null : rowId));
+    },
+    [allowMultipleExpandedRows],
+  );
 
   const table = useReactTable({
     data,
@@ -108,6 +136,10 @@ export function ProductTable<TData, TValue>({
     meta: {
       expandedRowId,
       setExpandedRowId,
+      expandedRowIds,
+      setExpandedRowIds,
+      toggleExpandedRow,
+      isRowExpanded,
     },
   });
 
@@ -177,7 +209,9 @@ export function ProductTable<TData, TValue>({
                     }}
                     className={`${
                       hasHeaderBackGround ? "bg-secondary/10" : "bg-background"
-                    } ${isSticky ? "sticky top-0 z-30 shadow-sm bg-green-100" : ""}`}
+                    } ${headerClassName ?? ""} ${
+                      isSticky ? "sticky top-0 z-30 shadow-sm bg-green-100" : ""
+                    }`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -212,6 +246,10 @@ export function ProductTable<TData, TValue>({
                           ...cell.getContext(),
                           expandedRowId,
                           setExpandedRowId,
+                          expandedRowIds,
+                          setExpandedRowIds,
+                          toggleExpandedRow,
+                          isRowExpanded,
                           currentRowId: row.id,
                         })}
                       </TableCell>
@@ -227,6 +265,10 @@ export function ProductTable<TData, TValue>({
                             ...cell.getContext(),
                             expandedRowId,
                             setExpandedRowId,
+                            expandedRowIds,
+                            setExpandedRowIds,
+                            toggleExpandedRow,
+                            isRowExpanded,
                             currentRowId: row.id,
                           })}
                         </TableCell>
@@ -234,7 +276,7 @@ export function ProductTable<TData, TValue>({
                     </TableRow>
 
                     {/* Hàng expand */}
-                    {expandedRowId === row.id && (
+                    {isRowExpanded(row.id) && (
                       <TableRow>
                         <TableCell
                           colSpan={columns.length}
@@ -244,7 +286,7 @@ export function ProductTable<TData, TValue>({
                             className={`
                                                     overflow-hidden transition-all duration-1000 ease-in-out 
                                                     ${
-                                                      expandedRowId === row.id
+                                                      isRowExpanded(row.id)
                                                         ? "max-h-[400px] opacity-100"
                                                         : "max-h-0 opacity-0"
                                                     }

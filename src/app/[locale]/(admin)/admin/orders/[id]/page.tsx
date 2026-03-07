@@ -99,7 +99,9 @@ const OrderDetails = () => {
         data={cartItems}
         columns={getOrderDetailColumns({
           country_code:
-            invoice?.main_checkout.checkouts[0].shipping_address.country,
+            order?.checkouts[0]?.shipping_address?.country ??
+            order?.checkouts[0]?.invoice_address?.country ??
+            "DE",
           tax_id: invoice?.main_checkout.checkouts[0].user.tax_id,
         })}
         page={page}
@@ -163,7 +165,9 @@ const OrderDetails = () => {
                 .flatMap((c) => c.cart)
                 .flatMap((c) => c.items) ?? [],
               invoice?.voucher_amount,
-              invoice?.main_checkout.checkouts[0].shipping_address.country,
+              order?.checkouts[0]?.shipping_address?.country ??
+                order?.checkouts[0]?.invoice_address?.country ??
+                "DE",
               invoice?.main_checkout.checkouts[0].user.tax_id,
               order.total_shipping,
             ).totalVat

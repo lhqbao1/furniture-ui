@@ -79,6 +79,7 @@ const OrderExpandTable = ({ row }: { row: any }) => {
           totalPages={1}
           hasCount={false}
           hasHeaderBackGround
+          headerClassName="!bg-yellow-100"
         />
       </div>
     </div>

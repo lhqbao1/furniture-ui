@@ -28,6 +28,8 @@ const ActionCell = ({
   id,
   expandedRowId,
   setExpandedRowId,
+  toggleExpandedRow,
+  isRowExpanded,
   currentRowId,
   status,
   note,
@@ -36,6 +38,8 @@ const ActionCell = ({
   id: string;
   expandedRowId?: string | null;
   setExpandedRowId?: (id: string | null) => void;
+  toggleExpandedRow?: (id: string) => void;
+  isRowExpanded?: (id: string) => boolean;
   currentRowId?: string;
   status: string;
   note?: string | null;
@@ -44,7 +48,9 @@ const ActionCell = ({
   const router = useRouter();
   const locale = useLocale();
 
-  const isExpanded = expandedRowId === currentRowId;
+  const isExpanded = currentRowId
+    ? (isRowExpanded?.(currentRowId) ?? expandedRowId === currentRowId)
+    : false;
 
   return (
     <div className="flex justify-center">
@@ -79,7 +85,12 @@ const ActionCell = ({
         variant={"ghost"}
         type="button"
         onClick={() => {
-          setExpandedRowId?.(isExpanded ? null : (currentRowId ?? null));
+          if (!currentRowId) return;
+          if (toggleExpandedRow) {
+            toggleExpandedRow(currentRowId);
+            return;
+          }
+          setExpandedRowId?.(isExpanded ? null : currentRowId);
         }}
         className="p-1"
       >
@@ -99,6 +110,8 @@ const ActionCellChild = ({
   isSupplier = false,
   expandedRowId,
   setExpandedRowId,
+  toggleExpandedRow,
+  isRowExpanded,
   currentRowId,
   status,
 }: {
@@ -107,10 +120,14 @@ const ActionCellChild = ({
   isSupplier?: boolean;
   expandedRowId?: string | null;
   setExpandedRowId?: (id: string | null) => void;
+  toggleExpandedRow?: (id: string) => void;
+  isRowExpanded?: (id: string) => boolean;
   currentRowId?: string;
   status?: string;
 }) => {
-  const isExpanded = expandedRowId === currentRowId;
+  const isExpanded = currentRowId
+    ? (isRowExpanded?.(currentRowId) ?? expandedRowId === currentRowId)
+    : false;
 
   return (
     <div className="flex justify-center items-center gap-2">
@@ -156,9 +173,14 @@ const ActionCellChild = ({
       <Button
         variant={"ghost"}
         type="button"
-        onClick={() =>
-          setExpandedRowId?.(isExpanded ? null : (currentRowId ?? null))
-        }
+        onClick={() => {
+          if (!currentRowId) return;
+          if (toggleExpandedRow) {
+            toggleExpandedRow(currentRowId);
+            return;
+          }
+          setExpandedRowId?.(isExpanded ? null : currentRowId);
+        }}
         className="p-1"
       >
         {isExpanded ? (
@@ -349,6 +371,8 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
         id={row.original.id}
         expandedRowId={table.options.meta?.expandedRowId || null}
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
+        toggleExpandedRow={table.options.meta?.toggleExpandedRow}
+        isRowExpanded={table.options.meta?.isRowExpanded}
         currentRowId={row.id}
         status={row.original.status}
         note={row.original.note}
@@ -496,6 +520,8 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
         id={row.original.id}
         expandedRowId={table.options.meta?.expandedRowId || null}
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
+        toggleExpandedRow={table.options.meta?.toggleExpandedRow}
+        isRowExpanded={table.options.meta?.isRowExpanded}
         currentRowId={row.id}
         status={row.original.status}
       />
@@ -622,6 +648,8 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
         items={row.original.cart.items}
         expandedRowId={table.options.meta?.expandedRowId || null}
         setExpandedRowId={table.options.meta?.setExpandedRowId || (() => {})}
+        toggleExpandedRow={table.options.meta?.toggleExpandedRow}
+        isRowExpanded={table.options.meta?.isRowExpanded}
         currentRowId={row.id}
         status={row.original.status}
       />

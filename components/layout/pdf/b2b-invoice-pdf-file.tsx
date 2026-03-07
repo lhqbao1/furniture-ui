@@ -1,4 +1,5 @@
 import { formatDateToNum } from "@/lib/ios-to-num";
+import { parseTaxRate } from "@/lib/parse-tax";
 import { CheckOutMain } from "@/types/checkout";
 import {
   Document,
@@ -18,6 +19,9 @@ Font.register({
 
 interface B2BInvoicePDFFileProps {
   invoiceId: string;
+  deliveryAddress: string;
+  servicePeriod?: string;
+  orderNumber?: string;
   introText: string;
   paymentNote: string;
   orders: CheckOutMain[];
@@ -71,6 +75,35 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
   prestige: null,
 };
 const PDF_GRAY_BG = "#D2D2D2";
+const EU_COUNTRIES = new Set([
+  "AT",
+  "BE",
+  "BG",
+  "HR",
+  "CY",
+  "CZ",
+  "DK",
+  "EE",
+  "FI",
+  "FR",
+  "DE",
+  "GR",
+  "HU",
+  "IE",
+  "IT",
+  "LV",
+  "LT",
+  "LU",
+  "MT",
+  "NL",
+  "PL",
+  "PT",
+  "RO",
+  "SK",
+  "SI",
+  "ES",
+  "SE",
+]);
 
 const styles = StyleSheet.create({
   page: {
@@ -79,7 +112,7 @@ const styles = StyleSheet.create({
     paddingBottom: 145,
     fontSize: 11,
     fontFamily: "Figtree",
-    color: "#666666",
+    color: "#1f1f1f",
     position: "relative",
   },
   header: {
@@ -120,21 +153,136 @@ const truncateText = (value: string, maxLength = 28) => {
   return `${value.slice(0, maxLength - 1)}…`;
 };
 
+const formatEur = (value: number) =>
+  `${value.toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} EUR`;
+
 export const B2BInvoicePDFFile = ({
   invoiceId,
-  introText,
+  deliveryAddress,
+  servicePeriod,
+  orderNumber,
+  introText: _introText,
   paymentNote,
   orders,
 }: B2BInvoicePDFFileProps) => {
   const selectedMarketplace =
     orders?.[0]?.from_marketplace?.toLowerCase() ?? "";
   const marketplacePreset = PRESET_BY_MARKETPLACE[selectedMarketplace] ?? null;
-  const compactIntroText = introText.replace(/\n{2,}/g, "\n");
-  const compactPaymentNote = paymentNote.replace(/\n{2,}/g, "\n");
-  const subtotal = orders.reduce(
-    (sum, order) => sum + (Number(order.total_amount) || 0),
+  const invoiceCountry =
+    (
+      marketplacePreset?.invoice_country ??
+      orders?.[0]?.checkouts?.[0]?.invoice_address?.country ??
+      ""
+    )
+      .toString()
+      .toUpperCase()
+      .trim() || "DE";
+  const isGermanyInvoice = invoiceCountry === "DE";
+  const isEuInvoice = EU_COUNTRIES.has(invoiceCountry);
+  const cleanedOrderNumber = orderNumber?.trim() ?? "";
+  const cleanedDeliveryAddress = deliveryAddress.trim().replace(/\.+$/, "");
+  const deliveryAddressLine = `Anlieferadresse: ${cleanedDeliveryAddress}.`;
+  const titleLine = cleanedOrderNumber
+    ? `Rechnung Nr. ${invoiceId} - Ihre Bestellung ${cleanedOrderNumber}`
+    : `Rechnung Nr. ${invoiceId}`;
+  const introLine1 = "Sehr geehrte Damen und Herren,";
+  const introLine2 =
+    "vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!";
+  const introLine3 =
+    "Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:";
+
+  const paymentLines = paymentNote.split("\n");
+  const paymentLine1 =
+    paymentLines[0] ??
+    "Zahlungsbedingungen: Zahlung innerhalb von 14 Tagen ab Rechnungseingang ohne Abzüge.";
+  const paymentLine2 =
+    paymentLines.find((line) =>
+      line.startsWith(
+        "Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer",
+      ),
+    ) ??
+    "Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene";
+  const paymentLine3 =
+    paymentLines.find((line) => line === "Konto.") ?? "Konto.";
+  const paymentLine4 =
+    paymentLines.find((line) =>
+      line.startsWith("Der Rechnungsbetrag ist bis zum "),
+    ) ?? "";
+  const paymentLine5 =
+    paymentLines.find((line) => line === "Mit freundlichen Grüßen") ??
+    "Mit freundlichen Grüßen";
+  const paymentLine6 =
+    paymentLines.find((line) => line === "Duong Thuy Nguyen") ??
+    "Duong Thuy Nguyen";
+  const allCartItems = orders.flatMap((order) =>
+    (order.checkouts ?? []).flatMap((checkout) => checkout.cart?.items ?? []),
+  );
+
+  const shippingGrossTotal = orders.reduce(
+    (sum, order) => sum + (Number(order.total_shipping) || 0),
     0,
   );
+
+  const productGrossTotal = allCartItems.reduce((sum, item) => {
+    const unitGross = Number(
+      item.purchased_products?.final_price ??
+        item.products?.final_price ??
+        item.final_price ??
+        0,
+    );
+    const qty = Number(item.quantity) || 0;
+    return sum + unitGross * qty;
+  }, 0);
+
+  const taxBuckets = allCartItems.reduce(
+    (acc, item) => {
+      const rawTax = item.purchased_products?.tax ?? item.products?.tax ?? null;
+      const rate = parseTaxRate(rawTax);
+      const unitGross = Number(
+        item.purchased_products?.final_price ??
+          item.products?.final_price ??
+          item.final_price ??
+          0,
+      );
+      const qty = Number(item.quantity) || 0;
+      const gross = unitGross * qty;
+
+      if (rate <= 0) {
+        acc.net += gross;
+        return acc;
+      }
+
+      const net = gross / (1 + rate);
+      const vat = gross - net;
+      acc.net += net;
+
+      if (Math.abs(rate - 0.19) < 0.0001) {
+        acc.vat19 += vat;
+      } else if (Math.abs(rate - 0.07) < 0.0001) {
+        acc.vat7 += vat;
+      } else {
+        acc.otherVat += vat;
+      }
+
+      return acc;
+    },
+    { net: 0, vat19: 0, vat7: 0, otherVat: 0 },
+  );
+
+  const totalNet = isGermanyInvoice ? taxBuckets.net : productGrossTotal;
+  const totalVat19 = isGermanyInvoice ? taxBuckets.vat19 : 0;
+  const totalVat7 = isGermanyInvoice ? taxBuckets.vat7 : 0;
+  const totalVatOther = isGermanyInvoice ? taxBuckets.otherVat : 0;
+  const intraCommunityVat = !isGermanyInvoice && isEuInvoice ? 0 : null;
+  const totalGross =
+    totalNet +
+    totalVat19 +
+    totalVat7 +
+    totalVatOther +
+    shippingGrossTotal;
 
   return (
     <Document>
@@ -213,7 +361,7 @@ export const B2BInvoicePDFFile = ({
               }}
             >
               <Text style={{ width: 90, fontWeight: "bold" }}>
-                Belegnummer:
+                Rechnungs-Nr.:
               </Text>
               <Text>{invoiceId}</Text>
             </View>
@@ -226,10 +374,42 @@ export const B2BInvoicePDFFile = ({
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 90, fontWeight: "bold" }}>Datum:</Text>
+              <Text style={{ width: 90, fontWeight: "bold" }}>
+                Rechnungsdatum:
+              </Text>
               <Text>{formatDateToNum(new Date())}</Text>
             </View>
 
+            {servicePeriod?.trim() && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                }}
+              >
+                <Text style={{ width: 90, fontWeight: "bold" }}>
+                  Service Period:
+                </Text>
+                <Text>{servicePeriod.trim()}</Text>
+              </View>
+            )}
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ width: 90, fontWeight: "bold" }}>
+                Ihre Kundennummer
+              </Text>
+              <Text>1011</Text>
+            </View>
             <View
               style={{
                 flexDirection: "row",
@@ -238,21 +418,48 @@ export const B2BInvoicePDFFile = ({
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 90, fontWeight: "bold" }}>Bearbeiter:</Text>
+              <Text style={{ width: 90, fontWeight: "bold" }}>
+                Ihre USt-Id.
+              </Text>
+              <Text>ATU65296645</Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+              }}
+            >
+              <Text style={{ width: 90, fontWeight: "bold" }}>
+                Ihr Ansprechpartner
+              </Text>
               <Text>Duong Thuy Nguyen</Text>
             </View>
           </View>
         </View>
 
         <View style={{ marginTop: 10, marginBottom: 22 }}>
-          {compactIntroText.split("\n").map((line, index) => (
-            <Text
-              key={`${line}-${index}`}
-              style={{ marginBottom: 1, lineHeight: 1.05 }}
-            >
-              {line || " "}
-            </Text>
-          ))}
+          <Text
+            style={{
+              fontFamily: "Helvetica-Bold",
+              fontWeight: "bold",
+              fontSize: 14,
+              marginBottom: 15,
+            }}
+          >
+            {titleLine}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
+            {introLine1}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25 }}>{introLine2}</Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
+            {deliveryAddressLine}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
+            {introLine3}
+          </Text>
         </View>
 
         <View
@@ -324,88 +531,159 @@ export const B2BInvoicePDFFile = ({
           })}
         </View>
 
-        <View
-          style={{ marginTop: 18, display: "flex", alignItems: "flex-end" }}
-        >
-          <View style={{ width: "100%" }}>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                paddingVertical: 3,
-                paddingHorizontal: 6,
-              }}
-            >
-              <Text
-                style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                Rechnungsbetrag (brutto)
-              </Text>
-              <Text
-                style={{
-                  width: "30%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                {subtotal.toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                €
-              </Text>
-            </View>
+        <View style={{ marginTop: 18 }}>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              backgroundColor: PDF_GRAY_BG,
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+            }}
+          >
+            <Text style={{ width: "60%" }}>Gesamtbetrag netto</Text>
+            <Text style={{ width: "40%", textAlign: "right" }}>
+              {formatEur(totalNet)}
+            </Text>
+          </View>
 
-            <View
+          {isGermanyInvoice ? (
+            <>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                }}
+              >
+                <Text style={{ width: "60%" }}>Umsatzsteuer 19%</Text>
+                <Text style={{ width: "40%", textAlign: "right" }}>
+                  {formatEur(totalVat19)}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                }}
+              >
+                <Text style={{ width: "60%" }}>Umsatzsteuer 7%</Text>
+                <Text style={{ width: "40%", textAlign: "right" }}>
+                  {formatEur(totalVat7)}
+                </Text>
+              </View>
+
+              {totalVatOther > 0 && (
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                  }}
+                >
+                  <Text style={{ width: "60%" }}>Weitere Umsatzsteuer</Text>
+                  <Text style={{ width: "40%", textAlign: "right" }}>
+                    {formatEur(totalVatOther)}
+                  </Text>
+                </View>
+              )}
+            </>
+          ) : (
+            intraCommunityVat !== null && (
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                }}
+              >
+                <Text style={{ width: "60%" }}>
+                  Innergemeinschaftliche Lieferung 0%
+                </Text>
+                <Text style={{ width: "40%", textAlign: "right" }}>
+                  {formatEur(intraCommunityVat)}
+                </Text>
+              </View>
+            )
+          )}
+
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+            }}
+          >
+            <Text style={{ width: "60%" }}>Versandkosten</Text>
+            <Text style={{ width: "40%", textAlign: "right" }}>
+              {formatEur(shippingGrossTotal)}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              backgroundColor: PDF_GRAY_BG,
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+            }}
+          >
+            <Text
               style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                backgroundColor: PDF_GRAY_BG,
-                paddingVertical: 3,
-                paddingHorizontal: 6,
+                width: "60%",
+                fontFamily: "Helvetica-Bold",
+                fontWeight: "bold",
               }}
             >
-              <Text
-                style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                Zahlbetrag
-              </Text>
-              <Text
-                style={{
-                  width: "30%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                {subtotal.toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                €
-              </Text>
-            </View>
+              Gesamtbetrag brutto
+            </Text>
+            <Text
+              style={{
+                width: "40%",
+                textAlign: "right",
+                fontFamily: "Helvetica-Bold",
+                fontWeight: "bold",
+              }}
+            >
+              {formatEur(totalGross)}
+            </Text>
           </View>
         </View>
 
         <View style={{ marginTop: 18 }}>
-          {compactPaymentNote.split("\n").map((line, index) => (
-            <Text
-              key={`${line}-${index}`}
-              style={{ marginBottom: 1, lineHeight: 1.05 }}
-            >
-              {line || " "}
-            </Text>
-          ))}
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
+            {paymentLine1}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
+            {paymentLine2}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
+            {paymentLine3}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
+            {paymentLine4}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
+            {paymentLine5}
+          </Text>
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
+            {paymentLine6}
+          </Text>
         </View>
 
         <B2BInvoiceFooterSection />
