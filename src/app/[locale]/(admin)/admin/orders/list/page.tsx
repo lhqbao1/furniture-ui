@@ -174,6 +174,7 @@ const OrderList = () => {
           }
           hasBackground
           hasExpanded
+          allowMultipleExpandedRows
           renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
           hasHeaderBackGround
           isSticky

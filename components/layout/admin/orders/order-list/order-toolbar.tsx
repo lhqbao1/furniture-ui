@@ -68,14 +68,16 @@ interface OrderToolbarProps {
 const FILTER_KEYS = ["search", "status", "channel", "from_date", "to_date"];
 const DEFAULT_INVOICE_INTRO = `Sehr geehrte Damen und Herren,
 
-vielen Dank für Ihr Vertrauen!
-Hiermit stelle ich Ihnen folgende Leistungen zusammengefasst als Sammelrechnung:`;
+vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!
+Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:`;
 
-const DEFAULT_PAYMENT_NOTE = `Zahlungsbedingungen: Zahlung innerhalb von 14 Tagen ab Rechnungseingang ohne Abzüge.
-
-Bei Rückfragen stehen wir selbstverständlich jederzeit gerne zur Verfügung.
-
-Mit freundlichen Grüßen`;
+const PAYMENT_DUE_DATE_TOKEN = "__PAYMENT_DUE_DATE__";
+const DEFAULT_PAYMENT_NOTE = `Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene
+Konto.
+${PAYMENT_DUE_DATE_TOKEN}
+Mit freundlichen Grüßen
+Duong Thuy Nguyen
+`;
 
 export default function OrderToolbar({
   pageSize,
@@ -99,11 +101,32 @@ export default function OrderToolbar({
   const [b2bMarketplace, setB2BMarketplace] = useState<string>("");
   const [invoiceOrders, setInvoiceOrders] = useState<CheckOutMain[]>([]);
   const [invoiceId, setInvoiceId] = useState("");
+  const [invoiceIdError, setInvoiceIdError] = useState(false);
+  const [servicePeriod, setServicePeriod] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [deliveryAddressError, setDeliveryAddressError] = useState(false);
+  const [paymentTermDays, setPaymentTermDays] = useState("14");
+  const [paymentTermDaysError, setPaymentTermDaysError] = useState(false);
+  const [paymentDueDate, setPaymentDueDate] = useState("");
+  const [paymentDueDateError, setPaymentDueDateError] = useState(false);
   const [invoiceIntro, setInvoiceIntro] = useState(DEFAULT_INVOICE_INTRO);
   const [paymentNote, setPaymentNote] = useState(DEFAULT_PAYMENT_NOTE);
   const defaultSearch = searchParams.get("search") ?? "";
-  const invoiceTitleLine = `SAMMELRECHNUNG NR. ${invoiceId || "XXXXXXXX"}`;
+  const invoiceTitleLine = orderNumber.trim()
+    ? `Rechnung Nr. ${invoiceId || "XXXXXXXX"} - Ihre Bestellung ${orderNumber.trim()}`
+    : `Rechnung Nr. ${invoiceId || "XXXXXXXX"}`;
   const resolvedIntroText = `${invoiceTitleLine}\n\n${invoiceIntro}`;
+  const paymentTermLine = `Zahlungsbedingungen: Zahlung innerhalb von ${
+    paymentTermDays || "XX"
+  } Tagen ab Rechnungseingang ohne Abzüge.`;
+  const paymentDueDateLine = `Der Rechnungsbetrag ist bis zum ${
+    paymentDueDate || "TT.MM.JJJJ"
+  } fällig.`;
+  const paymentBodyWithDueDate = paymentNote.includes(PAYMENT_DUE_DATE_TOKEN)
+    ? paymentNote.replace(PAYMENT_DUE_DATE_TOKEN, paymentDueDateLine)
+    : `${paymentDueDateLine}\n${paymentNote}`;
+  const resolvedPaymentNote = `${paymentTermLine}\n\n${paymentBodyWithDueDate}`;
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
   const [prevParams, setPrevParams] = useState(
@@ -352,7 +375,7 @@ export default function OrderToolbar({
         onOpenChange={setOpenB2BDrawer}
         direction="right"
       >
-        <DrawerContent className="p-6 w-[520px] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[520px] mx-auto overflow-y-auto">
+        <DrawerContent className="p-6 w-[620px] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[620px] mx-auto overflow-y-auto">
           <DrawerHeader className="px-0 pb-4">
             <DrawerTitle>
               Create{" "}
@@ -365,25 +388,6 @@ export default function OrderToolbar({
               Selected orders: {invoiceOrders.length}
             </DrawerDescription>
           </DrawerHeader>
-
-          <div className="space-y-2">
-            {invoiceOrders.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No orders selected.
-              </p>
-            ) : (
-              <div className="rounded-md border p-3 text-sm font-medium break-words">
-                {invoiceOrders
-                  .map(
-                    (order) =>
-                      order.marketplace_order_id ||
-                      order.checkout_code ||
-                      order.id,
-                  )
-                  .join(", ")}
-              </div>
-            )}
-          </div>
 
           {invoiceOrders.some((order) => {
             const status = order.status?.toLowerCase();
@@ -433,8 +437,81 @@ export default function OrderToolbar({
               <p className="text-sm font-semibold">Invoice ID</p>
               <Input
                 value={invoiceId}
-                onChange={(e) => setInvoiceId(e.target.value)}
-                placeholder="Sammelrechnung Nr."
+                onChange={(e) => {
+                  setInvoiceId(e.target.value);
+                  if (invoiceIdError && e.target.value.trim()) {
+                    setInvoiceIdError(false);
+                  }
+                }}
+                placeholder="Rechnung Nr."
+                className={invoiceIdError ? "border-red-500" : undefined}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">Order Number (optional)</p>
+              <Input
+                value={orderNumber}
+                onChange={(e) => setOrderNumber(e.target.value)}
+                placeholder="e.g. 16PGJ"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">Delivery Address</p>
+              <Input
+                value={deliveryAddress}
+                onChange={(e) => {
+                  setDeliveryAddress(e.target.value);
+                  if (deliveryAddressError && e.target.value.trim()) {
+                    setDeliveryAddressError(false);
+                  }
+                }}
+                placeholder="Logis. Areal PP 1108/Hala BA5, 90055 Lozorno"
+                className={deliveryAddressError ? "border-red-500" : undefined}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">
+                Service Period (Leistungszeitraum)
+              </p>
+              <Input
+                value={servicePeriod}
+                onChange={(e) => setServicePeriod(e.target.value)}
+                placeholder="e.g. 01.02.2026 - 29.02.2026"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">Payment Term (days)</p>
+              <Input
+                type="number"
+                min={1}
+                value={paymentTermDays}
+                onChange={(e) => {
+                  setPaymentTermDays(e.target.value);
+                  if (paymentTermDaysError && e.target.value.trim()) {
+                    setPaymentTermDaysError(false);
+                  }
+                }}
+                placeholder="14"
+                className={paymentTermDaysError ? "border-red-500" : undefined}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">Payment Due Date</p>
+              <Input
+                value={paymentDueDate}
+                onChange={(e) => {
+                  setPaymentDueDate(e.target.value);
+                  if (paymentDueDateError && e.target.value.trim()) {
+                    setPaymentDueDateError(false);
+                  }
+                }}
+                placeholder="31.03.2026"
+                className={paymentDueDateError ? "border-red-500" : undefined}
               />
             </div>
 
@@ -446,7 +523,10 @@ export default function OrderToolbar({
                   const raw = e.target.value;
                   const withoutDynamicLine = raw.startsWith(invoiceTitleLine)
                     ? raw.slice(invoiceTitleLine.length)
-                    : raw.replace(/^SAMMELRECHNUNG NR\.\s.*\n?/, "");
+                    : raw.replace(
+                        /^(?:Rechnung Nr\.|SAMMELRECHNUNG NR\.)\s.*\n?/,
+                        "",
+                      );
                   setInvoiceIntro(withoutDynamicLine.replace(/^\n+/, ""));
                 }}
                 className="min-h-[150px]"
@@ -456,24 +536,77 @@ export default function OrderToolbar({
             <div className="space-y-2">
               <p className="text-sm font-semibold">Payment Terms & Closing</p>
               <Textarea
-                value={paymentNote}
-                onChange={(e) => setPaymentNote(e.target.value)}
+                value={resolvedPaymentNote}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  const withoutTermLine = raw.startsWith(paymentTermLine)
+                    ? raw.slice(paymentTermLine.length)
+                    : raw.replace(/^Zahlungsbedingungen:.*\n?/, "");
+                  const withoutDueDateLine = withoutTermLine.replace(
+                    /Der Rechnungsbetrag ist bis zum .* fällig\.\n?/,
+                    `${PAYMENT_DUE_DATE_TOKEN}\n`,
+                  );
+                  setPaymentNote(withoutDueDateLine.replace(/^\n+/, ""));
+                }}
                 className="min-h-[150px]"
               />
             </div>
 
             <Button
               className="w-full"
-              disabled={!invoiceId.trim() || invoiceOrders.length === 0}
+              disabled={invoiceOrders.length === 0}
               onClick={async () => {
+                if (!invoiceId.trim()) {
+                  setInvoiceIdError(true);
+                  toast.error("Missing required field", {
+                    description: "Invoice ID is required.",
+                  });
+                  return;
+                }
+
+                if (!deliveryAddress.trim()) {
+                  setDeliveryAddressError(true);
+                  toast.error("Missing required field", {
+                    description: "Delivery Address is required.",
+                  });
+                  return;
+                }
+                if (
+                  !paymentTermDays.trim() ||
+                  Number(paymentTermDays) <= 0 ||
+                  Number.isNaN(Number(paymentTermDays))
+                ) {
+                  setPaymentTermDaysError(true);
+                  toast.error("Missing required field", {
+                    description: "Payment Term (days) must be greater than 0.",
+                  });
+                  return;
+                }
+                if (!paymentDueDate.trim()) {
+                  setPaymentDueDateError(true);
+                  toast.error("Missing required field", {
+                    description: "Payment Due Date is required.",
+                  });
+                  return;
+                }
+
+                setInvoiceIdError(false);
+                setDeliveryAddressError(false);
+                setPaymentTermDaysError(false);
+                setPaymentDueDateError(false);
                 const marketplaceOrderIds = invoiceOrders
                   .map((order) => order.marketplace_order_id)
                   .filter((id): id is string => Boolean(id?.trim()));
 
                 console.log({
                   invoiceId,
+                  deliveryAddress,
+                  servicePeriod,
+                  orderNumber,
                   invoiceIntro: resolvedIntroText,
-                  paymentNote,
+                  paymentTermDays,
+                  paymentDueDate,
+                  paymentNote: resolvedPaymentNote,
                   marketplaceOrderIds,
                 });
 
@@ -481,8 +614,11 @@ export default function OrderToolbar({
                   const blob = await pdf(
                     <B2BInvoicePDFFile
                       invoiceId={invoiceId.trim()}
+                      deliveryAddress={deliveryAddress.trim()}
+                      servicePeriod={servicePeriod.trim()}
+                      orderNumber={orderNumber.trim()}
                       introText={resolvedIntroText}
-                      paymentNote={paymentNote}
+                      paymentNote={resolvedPaymentNote}
                       orders={invoiceOrders}
                     />,
                   ).toBlob();
