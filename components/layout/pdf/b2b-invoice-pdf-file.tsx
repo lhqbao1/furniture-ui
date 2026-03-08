@@ -278,11 +278,7 @@ export const B2BInvoicePDFFile = ({
   const totalVatOther = isGermanyInvoice ? taxBuckets.otherVat : 0;
   const intraCommunityVat = !isGermanyInvoice && isEuInvoice ? 0 : null;
   const totalGross =
-    totalNet +
-    totalVat19 +
-    totalVat7 +
-    totalVatOther +
-    shippingGrossTotal;
+    totalNet + totalVat19 + totalVat7 + totalVatOther + shippingGrossTotal;
 
   return (
     <Document>
@@ -390,7 +386,7 @@ export const B2BInvoicePDFFile = ({
                 }}
               >
                 <Text style={{ width: 90, fontWeight: "bold" }}>
-                  Service Period:
+                  Leistungszeitraum:
                 </Text>
                 <Text>{servicePeriod.trim()}</Text>
               </View>

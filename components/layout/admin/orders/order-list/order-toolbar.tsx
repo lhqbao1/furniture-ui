@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "use-debounce";
 import {
   DropdownMenu,
@@ -10,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Trash2 } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -33,19 +32,9 @@ import { useSearchParams } from "next/navigation";
 import ExportOrderExcelButton from "./export-button";
 import OrderImport from "./order-import";
 import { CheckOutMain } from "@/types/checkout";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from "@/components/ui/drawer";
 import { toast } from "sonner";
-import { pdf } from "@react-pdf/renderer";
-import { saveAs } from "file-saver";
-import { B2BInvoicePDFFile } from "@/components/layout/pdf/b2b-invoice-pdf-file";
-import { getStatusStyle } from "./status-styles";
 import MultiSearch from "../../products/products-list/toolbar/multi-search";
+import B2BInvoiceDrawer from "./b2b-invoice-drawer";
 
 export enum ToolbarType {
   product = "product",
@@ -66,18 +55,6 @@ interface OrderToolbarProps {
 }
 
 const FILTER_KEYS = ["search", "status", "channel", "from_date", "to_date"];
-const DEFAULT_INVOICE_INTRO = `Sehr geehrte Damen und Herren,
-
-vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!
-Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:`;
-
-const PAYMENT_DUE_DATE_TOKEN = "__PAYMENT_DUE_DATE__";
-const DEFAULT_PAYMENT_NOTE = `Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene
-Konto.
-${PAYMENT_DUE_DATE_TOKEN}
-Mit freundlichen Grüßen
-Duong Thuy Nguyen
-`;
 
 export default function OrderToolbar({
   pageSize,
@@ -99,34 +76,7 @@ export default function OrderToolbar({
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openB2BDrawer, setOpenB2BDrawer] = useState(false);
   const [b2bMarketplace, setB2BMarketplace] = useState<string>("");
-  const [invoiceOrders, setInvoiceOrders] = useState<CheckOutMain[]>([]);
-  const [invoiceId, setInvoiceId] = useState("");
-  const [invoiceIdError, setInvoiceIdError] = useState(false);
-  const [servicePeriod, setServicePeriod] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
-  const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [deliveryAddressError, setDeliveryAddressError] = useState(false);
-  const [paymentTermDays, setPaymentTermDays] = useState("14");
-  const [paymentTermDaysError, setPaymentTermDaysError] = useState(false);
-  const [paymentDueDate, setPaymentDueDate] = useState("");
-  const [paymentDueDateError, setPaymentDueDateError] = useState(false);
-  const [invoiceIntro, setInvoiceIntro] = useState(DEFAULT_INVOICE_INTRO);
-  const [paymentNote, setPaymentNote] = useState(DEFAULT_PAYMENT_NOTE);
   const defaultSearch = searchParams.get("search") ?? "";
-  const invoiceTitleLine = orderNumber.trim()
-    ? `Rechnung Nr. ${invoiceId || "XXXXXXXX"} - Ihre Bestellung ${orderNumber.trim()}`
-    : `Rechnung Nr. ${invoiceId || "XXXXXXXX"}`;
-  const resolvedIntroText = `${invoiceTitleLine}\n\n${invoiceIntro}`;
-  const paymentTermLine = `Zahlungsbedingungen: Zahlung innerhalb von ${
-    paymentTermDays || "XX"
-  } Tagen ab Rechnungseingang ohne Abzüge.`;
-  const paymentDueDateLine = `Der Rechnungsbetrag ist bis zum ${
-    paymentDueDate || "TT.MM.JJJJ"
-  } fällig.`;
-  const paymentBodyWithDueDate = paymentNote.includes(PAYMENT_DUE_DATE_TOKEN)
-    ? paymentNote.replace(PAYMENT_DUE_DATE_TOKEN, paymentDueDateLine)
-    : `${paymentDueDateLine}\n${paymentNote}`;
-  const resolvedPaymentNote = `${paymentTermLine}\n\n${paymentBodyWithDueDate}`;
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
   const [prevParams, setPrevParams] = useState(
@@ -170,12 +120,6 @@ export default function OrderToolbar({
       );
     }
   }, [debouncedSearch]);
-
-  useEffect(() => {
-    if (!openB2BDrawer) {
-      setInvoiceOrders(selectedOrders);
-    }
-  }, [selectedOrders, openB2BDrawer]);
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
@@ -251,7 +195,6 @@ export default function OrderToolbar({
 
                 const marketplace = marketplaces[0] ?? "";
                 setB2BMarketplace(marketplace);
-                setInvoiceOrders(selectedOrders);
                 setOpenB2BDrawer(true);
               }}
             >
@@ -370,271 +313,12 @@ export default function OrderToolbar({
         </Dialog>
       )}
 
-      <Drawer
+      <B2BInvoiceDrawer
         open={openB2BDrawer}
         onOpenChange={setOpenB2BDrawer}
-        direction="right"
-      >
-        <DrawerContent className="p-6 w-[620px] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[620px] mx-auto overflow-y-auto">
-          <DrawerHeader className="px-0 pb-4">
-            <DrawerTitle>
-              Create{" "}
-              {b2bMarketplace
-                ? `${b2bMarketplace.charAt(0).toUpperCase()}${b2bMarketplace.slice(1)} `
-                : ""}
-              B2B Invoice
-            </DrawerTitle>
-            <DrawerDescription>
-              Selected orders: {invoiceOrders.length}
-            </DrawerDescription>
-          </DrawerHeader>
-
-          {invoiceOrders.some((order) => {
-            const status = order.status?.toLowerCase();
-            return status !== "shipped" && status !== "completed";
-          }) && (
-            <div className="mt-4 rounded-md border border-red-400 bg-red-50 p-3">
-              <p className="text-sm font-medium text-red-700">
-                You selected orders with status different from dispatched.
-                Please review before creating invoice.
-              </p>
-              <div className="mt-2 space-y-1">
-                {invoiceOrders
-                  .filter((order) => {
-                    const status = order.status?.toLowerCase();
-                    return status !== "shipped" && status !== "completed";
-                  })
-                  .map((order) => (
-                    <div
-                      key={order.id}
-                      className="flex items-center justify-between rounded-sm border border-red-200 bg-white px-2 py-1 text-sm text-red-700"
-                    >
-                      <span>
-                        {order.marketplace_order_id ||
-                          order.checkout_code ||
-                          order.id}
-                        : {getStatusStyle(order.status ?? "").text}
-                      </span>
-                      <button
-                        type="button"
-                        className="text-red-600 hover:text-red-700"
-                        onClick={() =>
-                          setInvoiceOrders((prev) =>
-                            prev.filter((item) => item.id !== order.id),
-                          )
-                        }
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-5 space-y-4">
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Invoice ID</p>
-              <Input
-                value={invoiceId}
-                onChange={(e) => {
-                  setInvoiceId(e.target.value);
-                  if (invoiceIdError && e.target.value.trim()) {
-                    setInvoiceIdError(false);
-                  }
-                }}
-                placeholder="Rechnung Nr."
-                className={invoiceIdError ? "border-red-500" : undefined}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Order Number (optional)</p>
-              <Input
-                value={orderNumber}
-                onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="e.g. 16PGJ"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Delivery Address</p>
-              <Input
-                value={deliveryAddress}
-                onChange={(e) => {
-                  setDeliveryAddress(e.target.value);
-                  if (deliveryAddressError && e.target.value.trim()) {
-                    setDeliveryAddressError(false);
-                  }
-                }}
-                placeholder="Logis. Areal PP 1108/Hala BA5, 90055 Lozorno"
-                className={deliveryAddressError ? "border-red-500" : undefined}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">
-                Service Period (Leistungszeitraum)
-              </p>
-              <Input
-                value={servicePeriod}
-                onChange={(e) => setServicePeriod(e.target.value)}
-                placeholder="e.g. 01.02.2026 - 29.02.2026"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Payment Term (days)</p>
-              <Input
-                type="number"
-                min={1}
-                value={paymentTermDays}
-                onChange={(e) => {
-                  setPaymentTermDays(e.target.value);
-                  if (paymentTermDaysError && e.target.value.trim()) {
-                    setPaymentTermDaysError(false);
-                  }
-                }}
-                placeholder="14"
-                className={paymentTermDaysError ? "border-red-500" : undefined}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Payment Due Date</p>
-              <Input
-                value={paymentDueDate}
-                onChange={(e) => {
-                  setPaymentDueDate(e.target.value);
-                  if (paymentDueDateError && e.target.value.trim()) {
-                    setPaymentDueDateError(false);
-                  }
-                }}
-                placeholder="31.03.2026"
-                className={paymentDueDateError ? "border-red-500" : undefined}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Invoice Intro Text</p>
-              <Textarea
-                value={resolvedIntroText}
-                onChange={(e) => {
-                  const raw = e.target.value;
-                  const withoutDynamicLine = raw.startsWith(invoiceTitleLine)
-                    ? raw.slice(invoiceTitleLine.length)
-                    : raw.replace(
-                        /^(?:Rechnung Nr\.|SAMMELRECHNUNG NR\.)\s.*\n?/,
-                        "",
-                      );
-                  setInvoiceIntro(withoutDynamicLine.replace(/^\n+/, ""));
-                }}
-                className="min-h-[150px]"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm font-semibold">Payment Terms & Closing</p>
-              <Textarea
-                value={resolvedPaymentNote}
-                onChange={(e) => {
-                  const raw = e.target.value;
-                  const withoutTermLine = raw.startsWith(paymentTermLine)
-                    ? raw.slice(paymentTermLine.length)
-                    : raw.replace(/^Zahlungsbedingungen:.*\n?/, "");
-                  const withoutDueDateLine = withoutTermLine.replace(
-                    /Der Rechnungsbetrag ist bis zum .* fällig\.\n?/,
-                    `${PAYMENT_DUE_DATE_TOKEN}\n`,
-                  );
-                  setPaymentNote(withoutDueDateLine.replace(/^\n+/, ""));
-                }}
-                className="min-h-[150px]"
-              />
-            </div>
-
-            <Button
-              className="w-full"
-              disabled={invoiceOrders.length === 0}
-              onClick={async () => {
-                if (!invoiceId.trim()) {
-                  setInvoiceIdError(true);
-                  toast.error("Missing required field", {
-                    description: "Invoice ID is required.",
-                  });
-                  return;
-                }
-
-                if (!deliveryAddress.trim()) {
-                  setDeliveryAddressError(true);
-                  toast.error("Missing required field", {
-                    description: "Delivery Address is required.",
-                  });
-                  return;
-                }
-                if (
-                  !paymentTermDays.trim() ||
-                  Number(paymentTermDays) <= 0 ||
-                  Number.isNaN(Number(paymentTermDays))
-                ) {
-                  setPaymentTermDaysError(true);
-                  toast.error("Missing required field", {
-                    description: "Payment Term (days) must be greater than 0.",
-                  });
-                  return;
-                }
-                if (!paymentDueDate.trim()) {
-                  setPaymentDueDateError(true);
-                  toast.error("Missing required field", {
-                    description: "Payment Due Date is required.",
-                  });
-                  return;
-                }
-
-                setInvoiceIdError(false);
-                setDeliveryAddressError(false);
-                setPaymentTermDaysError(false);
-                setPaymentDueDateError(false);
-                const marketplaceOrderIds = invoiceOrders
-                  .map((order) => order.marketplace_order_id)
-                  .filter((id): id is string => Boolean(id?.trim()));
-
-                console.log({
-                  invoiceId,
-                  deliveryAddress,
-                  servicePeriod,
-                  orderNumber,
-                  invoiceIntro: resolvedIntroText,
-                  paymentTermDays,
-                  paymentDueDate,
-                  paymentNote: resolvedPaymentNote,
-                  marketplaceOrderIds,
-                });
-
-                try {
-                  const blob = await pdf(
-                    <B2BInvoicePDFFile
-                      invoiceId={invoiceId.trim()}
-                      deliveryAddress={deliveryAddress.trim()}
-                      servicePeriod={servicePeriod.trim()}
-                      orderNumber={orderNumber.trim()}
-                      introText={resolvedIntroText}
-                      paymentNote={resolvedPaymentNote}
-                      orders={invoiceOrders}
-                    />,
-                  ).toBlob();
-
-                  saveAs(blob, `b2b-invoice-${invoiceId.trim()}.pdf`);
-                } catch (error) {
-                  toast.error("Failed to create B2B invoice PDF");
-                  console.error(error);
-                }
-              }}
-            >
-              Create Invoice
-            </Button>
-          </div>
-        </DrawerContent>
-      </Drawer>
+        marketplace={b2bMarketplace}
+        selectedOrders={selectedOrders}
+      />
     </div>
   );
 }
