@@ -20,7 +20,7 @@ import { useUpdateStockProduct } from "@/features/products/inventory/hook";
 import { useAtom } from "jotai";
 import { adminIdAtom } from "@/store/auth";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
-import { getISOWeek, getISOWeekYear } from "date-fns";
+import { format, getISOWeek } from "date-fns";
 
 // function ActionsCell({ product }: { product: ProductItem }) {
 //   const locale = useLocale();
@@ -243,6 +243,7 @@ function ReservedStockCell({ product }: { product: ProductItem }) {
         onClick={() => {
           const params = new URLSearchParams({
             search: product.id_provider ?? "",
+            status: RESERVED_ORDER_STATUS_FILTER,
             page: "1",
           });
           window.open(
@@ -261,6 +262,12 @@ function ReservedStockCell({ product }: { product: ProductItem }) {
 const toNumber = (value: unknown): number =>
   typeof value === "number" ? value : Number(value) || 0;
 
+const RESERVED_ORDER_STATUS_FILTER = [
+  "tock_reserved", // Stock reserved
+  "paid", // Payment received
+  "preparation_shipping", // Preparing
+].join(",");
+
 const calculateBundlePhysicalStock = (product: ProductItem): number => {
   const bundles = product.bundles ?? [];
   if (bundles.length === 0) return toNumber(product.stock);
@@ -270,7 +277,8 @@ const calculateBundlePhysicalStock = (product: ProductItem): number => {
       const qty = toNumber(bundle.quantity);
       if (qty <= 0) return Number.NaN;
 
-      const childStock = toNumber(bundle.bundle_item.stock);
+      // Follow child available stock for bundle availability math.
+      const childStock = calculateAvailableStock(bundle.bundle_item);
       const ratio = childStock / qty;
       return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
     })
@@ -284,24 +292,6 @@ const calculateBundlePhysicalStock = (product: ProductItem): number => {
 };
 
 const calculateBundleReservedStock = (product: ProductItem): number => {
-  const bundles = product.bundles ?? [];
-  if (bundles.length === 0) return toNumber(product.result_stock);
-
-  const bundleStocks = bundles
-    .map((bundle) => {
-      const qty = toNumber(bundle.quantity);
-      if (qty <= 0) return Number.NaN;
-
-      const childReserved = toNumber(bundle.bundle_item.result_stock);
-      const ratio = childReserved / qty;
-      return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
-    })
-    .filter((value) => !Number.isNaN(value));
-
-  if (bundleStocks.length > 0) {
-    return Math.min(...bundleStocks);
-  }
-
   return toNumber(product.result_stock);
 };
 
@@ -471,7 +461,7 @@ export const getInventoryColumns = (
       const physical = isBundle
         ? calculateBundlePhysicalStock(row.original)
         : toNumber(row.original.stock);
-      const available = physical - Math.abs(reserved);
+      const available = Math.max(0, physical - Math.abs(reserved));
 
       return <div className="text-center">{available}</div>;
     },
@@ -529,9 +519,10 @@ export const getInventoryColumns = (
               : null;
             const formattedDate =
               date && !Number.isNaN(date.getTime())
-                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${String(
-                    getISOWeekYear(date),
-                  ).slice(-2)}`
+                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(
+                    date,
+                    "MMMM d",
+                  )}`
                 : "—";
 
             const sixWeeksFromNow = new Date(today);
@@ -571,7 +562,7 @@ export const getInventoryColumns = (
       const physical = isBundle
         ? calculateBundlePhysicalStock(row.original)
         : toNumber(row.original.stock);
-      const available = physical - Math.abs(reserved);
+      const available = Math.max(0, physical - Math.abs(reserved));
       return (
         <div className="text-center">
           {row.original.cost ? (
@@ -659,7 +650,7 @@ export const getInventoryColumns = (
       const physical = isBundle
         ? calculateBundlePhysicalStock(row.original)
         : toNumber(row.original.stock);
-      const available = physical - Math.abs(reserved);
+      const available = Math.max(0, physical - Math.abs(reserved));
 
       return (
         <div className="text-center">

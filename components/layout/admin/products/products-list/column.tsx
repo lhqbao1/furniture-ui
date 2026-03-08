@@ -50,7 +50,7 @@ import { CategoryResponse } from "@/types/categories";
 import { CARRIERS } from "@/data/data";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
-import { getISOWeek, getISOWeekYear } from "date-fns";
+import { format, getISOWeek } from "date-fns";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
 
@@ -1886,9 +1886,10 @@ export const getProductColumns = (
               : null;
             const formattedDate =
               date && !Number.isNaN(date.getTime())
-                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${String(
-                    getISOWeekYear(date),
-                  ).slice(-2)}`
+                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(
+                    date,
+                    "MMMM d",
+                  )}`
                 : "—";
 
             const sixWeeksFromNow = new Date(today);

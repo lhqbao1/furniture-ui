@@ -18,16 +18,14 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
-import { getISOWeek, getISOWeekYear } from "date-fns";
+import { format, getISOWeek } from "date-fns";
 
 const formatISOWeek = (value?: string | null) => {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   const week = getISOWeek(date);
-  const year = getISOWeekYear(date);
-  const shortYear = String(year).slice(-2);
-  return `CW ${String(week).padStart(2, "0")} - ${shortYear}`;
+  return `CW ${String(week).padStart(2, "0")} - ${format(date, "MMMM d")}`;
 };
 
 const IncomingInventoryList = () => {
