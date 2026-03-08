@@ -59,6 +59,8 @@ const ProductLogisticsGroup = ({
   ];
 
   const deliveryTimes = ["1-3", "3-5", "5-8", "8-14", "14-20", "20-30"];
+  const packageTypes = ["carton", "palletized", "crated", "bagged", "bulk"];
+  const EMPTY_PACKAGE_TYPE = "__none__";
 
   // Lấy giá trị number_of_packages từ form
   const numberOfPackages = useWatch({
@@ -294,6 +296,43 @@ const ProductLogisticsGroup = ({
                   }
                 />
               </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="package_type"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full">
+              <FormLabel className="text-black font-semibold text-sm">
+                Package Type
+              </FormLabel>
+              <FormControl>
+                <Select
+                  value={field.value ?? EMPTY_PACKAGE_TYPE}
+                  onValueChange={(val) =>
+                    field.onChange(val === EMPTY_PACKAGE_TYPE ? null : val)
+                  }
+                >
+                  <SelectTrigger className="border font-light">
+                    <SelectValue placeholder="Select package type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_PACKAGE_TYPE}>None</SelectItem>
+                    {packageTypes.map((type) => (
+                      <SelectItem
+                        key={type}
+                        value={type}
+                        className="capitalize"
+                      >
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />

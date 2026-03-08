@@ -179,6 +179,8 @@ export const addProductSchema = z.object({
   owner_id: z.string().optional().nullable(),
   is_fsc: z.boolean().optional().nullable(),
   note: z.string().optional().nullable(),
+
+  package_type: z.string().optional().nullable(),
 });
 
 export type ProductInput = z.infer<typeof addProductSchema>;
