@@ -19,7 +19,6 @@ Font.register({
 
 interface B2BInvoicePDFFileProps {
   invoiceId: string;
-  deliveryAddress: string;
   servicePeriod?: string;
   orderNumber?: string;
   introText: string;
@@ -161,7 +160,6 @@ const formatEur = (value: number) =>
 
 export const B2BInvoicePDFFile = ({
   invoiceId,
-  deliveryAddress,
   servicePeriod,
   orderNumber,
   introText: _introText,
@@ -183,8 +181,6 @@ export const B2BInvoicePDFFile = ({
   const isGermanyInvoice = invoiceCountry === "DE";
   const isEuInvoice = EU_COUNTRIES.has(invoiceCountry);
   const cleanedOrderNumber = orderNumber?.trim() ?? "";
-  const cleanedDeliveryAddress = deliveryAddress.trim().replace(/\.+$/, "");
-  const deliveryAddressLine = `Anlieferadresse: ${cleanedDeliveryAddress}.`;
   const titleLine = cleanedOrderNumber
     ? `Rechnung Nr. ${invoiceId} - Ihre Bestellung ${cleanedOrderNumber}`
     : `Rechnung Nr. ${invoiceId}`;
@@ -205,8 +201,6 @@ export const B2BInvoicePDFFile = ({
       ),
     ) ??
     "Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene";
-  const paymentLine3 =
-    paymentLines.find((line) => line === "Konto.") ?? "Konto.";
   const paymentLine4 =
     paymentLines.find((line) =>
       line.startsWith("Der Rechnungsbetrag ist bis zum "),
@@ -438,9 +432,6 @@ export const B2BInvoicePDFFile = ({
           </Text>
           <Text style={{ fontSize: 11, lineHeight: 1.25 }}>{introLine2}</Text>
           <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
-            {deliveryAddressLine}
-          </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
             {introLine3}
           </Text>
         </View>
@@ -544,7 +535,7 @@ export const B2BInvoicePDFFile = ({
               >
                 <Text style={{ width: "60%" }}>Umsatzsteuer 19%</Text>
                 <Text style={{ width: "40%", textAlign: "right" }}>
-                  {formatEur(totalVat19)}
+                  {formatEur(totalVat19 + shippingGrossTotal)}
                 </Text>
               </View>
 
@@ -601,7 +592,7 @@ export const B2BInvoicePDFFile = ({
             )
           )}
 
-          <View
+          {/* <View
             style={{
               display: "flex",
               flexDirection: "row",
@@ -614,7 +605,7 @@ export const B2BInvoicePDFFile = ({
             <Text style={{ width: "40%", textAlign: "right" }}>
               {formatEur(shippingGrossTotal)}
             </Text>
-          </View>
+          </View> */}
 
           <View
             style={{
@@ -652,21 +643,12 @@ export const B2BInvoicePDFFile = ({
           <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
             {paymentLine1}
           </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
-            {paymentLine2}
-          </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
-            {paymentLine3}
-          </Text>
           <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
             {paymentLine4}
           </Text>
-          {/* <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
-            {paymentLine5}
+          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
+            {paymentLine2}
           </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
-            {paymentLine6}
-          </Text> */}
         </View>
 
         <FooterSection />

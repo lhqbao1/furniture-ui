@@ -3,9 +3,9 @@ import { View, Text, StyleSheet } from "@react-pdf/renderer";
 const styles = StyleSheet.create({
   footerWrapper: {
     position: "absolute",
-    bottom: 16,
-    left: 48,
-    right: 48,
+    bottom: 24,
+    left: 24,
+    right: 24,
     zIndex: 20,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -21,6 +21,11 @@ const styles = StyleSheet.create({
   gap: {
     marginBottom: 3,
     fontSize: 8,
+  },
+  rightText: {
+    marginBottom: 3,
+    fontSize: 8,
+    textAlign: "right",
   },
 });
 
@@ -43,11 +48,11 @@ export const FooterSection = () => (
     </View>
 
     {/* COLUMN 3 */}
-    <View style={{ width: "20%" }}>
-      <Text style={styles.bold}>Geschäftsführung</Text>
-      <Text style={styles.gap}>Marco Oberste</Text>
-      <Text style={styles.gap}>Duong Thuy Nguyen</Text>
-      <Text style={styles.gap}>Ust-IdNr: DE454714336</Text>
+    <View style={{ width: "20%", alignItems: "flex-end" }}>
+      <Text style={styles.rightText}>Geschäftsführung</Text>
+      <Text style={styles.rightText}>Marco Oberste</Text>
+      <Text style={styles.rightText}>Duong Thuy Nguyen</Text>
+      <Text style={styles.rightText}>Ust-IdNr: DE454714336</Text>
     </View>
   </View>
 );
