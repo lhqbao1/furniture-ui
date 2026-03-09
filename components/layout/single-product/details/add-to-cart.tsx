@@ -24,6 +24,7 @@ import MobileStickyCart from "../sticky-cart-mobile";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import PostAddToCartDrawer from "./post-add-to-cart-drawer";
+import { toast } from "sonner";
 
 interface AddToCartFieldProps {
   productId: string;
@@ -85,11 +86,21 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
     return Math.max(0, baseStock + incomingStock);
   }, [productDetails, incomingStock]);
 
+  const hasValidFinalPrice = useMemo(() => {
+    const finalPrice = Number(productDetails.final_price);
+    return Number.isFinite(finalPrice) && finalPrice > 0;
+  }, [productDetails.final_price]);
+
   const handleSubmitWithStockCheck = React.useCallback(
     (
       values: z.infer<typeof cartFormSchema>,
       options?: { openDrawer?: boolean },
     ) => {
+      if (!hasValidFinalPrice) {
+        toast.error("This product has no price and cannot be purchased.");
+        return;
+      }
+
       if (maxStock <= 0 || values.quantity > maxStock) {
         console.error("Not enough stock to add to cart.");
         return;
@@ -107,7 +118,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
         },
       });
     },
-    [handleSubmitToCart, maxStock],
+    [handleSubmitToCart, hasValidFinalPrice, maxStock],
   );
 
   return (
@@ -155,7 +166,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             </div>
 
             <div className="space-y-2 lg:basis-2/5 basis-3/5 relative flex gap-2">
-              {maxStock > 0 ? (
+              {maxStock > 0 && hasValidFinalPrice ? (
                 <Button
                   className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
                   type="submit"
@@ -178,7 +189,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
               )}
 
               <div className="flex justify-end">
-              <div
+                <div
                   onClick={() => {
                     handleAddWishlist();
                   }}
@@ -198,7 +209,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             }
             price={productDetails.final_price}
             oldPrice={productDetails.price}
-            maxStock={maxStock}
+            maxStock={hasValidFinalPrice ? maxStock : 0}
           />
         </form>
       </FormProvider>
