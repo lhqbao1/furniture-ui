@@ -16,8 +16,13 @@ import {
 } from "@/components/ui/select";
 import { ProductItem, ProductPackage } from "@/types/products";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import {
+  aggregatePackages,
+  calcDeliveryCost,
+} from "@/lib/shipping/delivery-cost";
 
 interface ProductLogisticsGroupProps {
   isDSP?: boolean;
@@ -62,12 +67,6 @@ const ProductLogisticsGroup = ({
   const packageTypes = ["carton", "palletized", "crated", "bagged", "bulk"];
   const EMPTY_PACKAGE_TYPE = "__none__";
 
-  // Lấy giá trị number_of_packages từ form
-  const numberOfPackages = useWatch({
-    control,
-    name: "number_of_packages",
-  });
-
   // Tạo field array cho packages
   const { fields, append, remove } = useFieldArray({
     control,
@@ -75,6 +74,11 @@ const ProductLogisticsGroup = ({
   });
 
   const bundleItems = form.watch("bundles");
+  const watchedCarrier = useWatch({ control, name: "carrier" });
+  const watchedPackages = useWatch({ control, name: "packages" });
+  const watchedBundles = useWatch({ control, name: "bundles" });
+  const hasMountedWarningRef = useRef(false);
+  const lastWarningKeyRef = useRef("");
 
   // Thêm effect để đồng bộ bundleItems → number_of_packages + packages
   useEffect(() => {
@@ -115,6 +119,52 @@ const ProductLogisticsGroup = ({
       });
     }
   }, [fields.length, bundleItems, append]);
+
+  useEffect(() => {
+    const mergedPackage = aggregatePackages(
+      watchedPackages ?? [],
+      watchedBundles ?? [],
+    );
+    const normalizedCarrier = String(watchedCarrier ?? "")
+      .toLowerCase()
+      .trim();
+    const mergedWeight = Number(mergedPackage?.weight ?? 0);
+    const isAmmOrSpeditionCarrier =
+      normalizedCarrier.includes("amm") ||
+      normalizedCarrier.includes("spedition");
+
+    const { error } = calcDeliveryCost(
+      mergedPackage ? [mergedPackage] : [],
+      watchedCarrier,
+    );
+
+    let warningKey = "";
+    let warningMessage = "";
+
+    if (
+      Number.isFinite(mergedWeight) &&
+      mergedWeight > 31 &&
+      !isAmmOrSpeditionCarrier
+    ) {
+      warningKey = `over-31-${normalizedCarrier}`;
+      warningMessage = `This product is over 31kg and carrier "${watchedCarrier || "unknown"}" is selected. Please make sure this is the intended carrier.`;
+    } else if (error) {
+      warningKey = `delivery-error-${normalizedCarrier}`;
+      warningMessage = `Carrier "${watchedCarrier || "unknown"}" has a shipping warning: ${error}. Please make sure this is the intended carrier.`;
+    }
+
+    if (!hasMountedWarningRef.current) {
+      hasMountedWarningRef.current = true;
+      lastWarningKeyRef.current = warningKey;
+      return;
+    }
+
+    if (warningKey && warningKey !== lastWarningKeyRef.current) {
+      toast.info(warningMessage);
+    }
+
+    lastWarningKeyRef.current = warningKey;
+  }, [watchedCarrier, watchedPackages, watchedBundles]);
 
   return (
     <div className="space-y-6">
