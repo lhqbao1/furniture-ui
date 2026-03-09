@@ -145,7 +145,7 @@ const ProductAdditionalInputs = ({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
+                <PopoverContent className="p-0 z-[80] pointer-events-auto w-[var(--radix-popover-trigger-width)]">
                   <Command>
                     <CommandInput
                       placeholder="Search country..."
@@ -205,10 +205,7 @@ const ProductAdditionalInputs = ({
                   </SelectTrigger>
                   <SelectContent>
                     {unit.map((c) => (
-                      <SelectItem
-                        key={c.id}
-                        value={c.id}
-                      >
+                      <SelectItem key={c.id} value={c.id}>
                         <span className="">{c.id}</span>
                       </SelectItem>
                     ))}
@@ -293,10 +290,7 @@ const ProductAdditionalInputs = ({
                   </SelectTrigger>
                   <SelectContent>
                     {["A", "B", "C", "D", "E", "F"].map((option) => (
-                      <SelectItem
-                        key={option}
-                        value={option}
-                      >
+                      <SelectItem key={option} value={option}>
                         {option}
                       </SelectItem>
                     ))}

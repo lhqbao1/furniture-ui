@@ -35,7 +35,7 @@ type FlattenCategory = CategoryResponse & {
   isParent: boolean;
 };
 
-export function MultiSelectField({
+export function CategoriesSelect({
   fieldName,
   label,
   placeholder = "Select categories",
@@ -176,7 +176,7 @@ export function MultiSelectField({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[200px] max-h-[400px] overflow-y-scroll p-0 pointer-events-auto">
+              <PopoverContent className="z-[80] w-[200px] max-h-[400px] overflow-y-scroll p-0 pointer-events-auto">
                 {isLoading ? (
                   <div className="flex items-center justify-center p-4">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

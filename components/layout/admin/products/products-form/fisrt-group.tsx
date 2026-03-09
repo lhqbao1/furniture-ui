@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ProductPricingFields } from "./pricing-field";
-import { MultiSelectField } from "./category-select";
+import { CategoriesSelect } from "./category-select";
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -194,7 +194,7 @@ const ProductDetailInputs = ({
 
       <div className="grid lg:grid-cols-4 grid-cols-1 lg:gap-6 gap-4">
         {/*Product Category */}
-        <MultiSelectField fieldName="category_ids" label="Categories" />
+        <CategoriesSelect fieldName="category_ids" label="Categories" />
 
         {/* SKU input */}
         <FormField
