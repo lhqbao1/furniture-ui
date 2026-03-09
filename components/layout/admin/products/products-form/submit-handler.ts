@@ -109,13 +109,32 @@ export const submitProduct = async ({
     latestValues.packages ?? [],
     latestValues.bundles ?? [],
   );
+  const normalizedCarrier = String(latestValues.carrier ?? "")
+    .toLowerCase()
+    .trim();
+  const mergedWeight = Number(mergedPackage?.weight ?? 0);
+  const isAmmOrSpeditionCarrier =
+    normalizedCarrier.includes("amm") ||
+    normalizedCarrier.includes("spedition");
+
+  if (
+    Number.isFinite(mergedWeight) &&
+    mergedWeight > 31 &&
+    !isAmmOrSpeditionCarrier
+  ) {
+    toast.info(
+      `This product is over 31kg and carrier "${latestValues.carrier || "unknown"}" is selected. Please make sure this is the intended carrier.`,
+    );
+  }
+
   const { error } = calcDeliveryCost(
     mergedPackage ? [mergedPackage] : [],
     latestValues.carrier,
   );
   if (error) {
-    toast.error(`${error} Change to spedition carrier`);
-    return;
+    toast.info(
+      `Shipping check warning for carrier "${latestValues.carrier || "unknown"}": ${error}. Please make sure the selected carrier is correct.`,
+    );
   }
 
   const cleanedPackages = cleanPackages(latestValues.packages);

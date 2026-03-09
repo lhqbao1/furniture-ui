@@ -67,10 +67,7 @@ const GpsrInput = () => {
               {isLoadingBrand ? (
                 <Loader2 className="animate-spin" />
               ) : (
-                <Popover
-                  open={open}
-                  onOpenChange={setOpen}
-                >
+                <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -82,7 +79,7 @@ const GpsrInput = () => {
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                  <PopoverContent className="z-[80] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto">
                     <Command>
                       <CommandInput placeholder="Search brand name..." />
                       <CommandEmpty>No brand found.</CommandEmpty>

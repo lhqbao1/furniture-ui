@@ -158,7 +158,7 @@ const SelectBundleComponent = ({
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent className="w-[600px] p-0">
+          <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)] z-[80] pointer-events-auto">
             <Command shouldFilter={false}>
               <CommandInput
                 placeholder="Search product..."
