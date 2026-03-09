@@ -741,6 +741,26 @@ export const listChanel = [
     name: "bauhaus",
     icon: "bauhaus.svg",
   },
+  {
+    id: 16,
+    name: "channel21",
+    icon: "channel21.jpg",
+  },
+  {
+    id: 17,
+    name: "hornbach",
+    icon: "horn.png",
+  },
+  {
+    id: 18,
+    name: "forstinger",
+    icon: "forstinger.jpeg",
+  },
+  {
+    id: 19,
+    name: "neckermann",
+    icon: "necker.png",
+  },
 ];
 
 export const listDE = [
