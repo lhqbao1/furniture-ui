@@ -23,6 +23,11 @@ export const CHANEL_OPTIONS = [
   { key: "netto", label: "Netto", icon: "netto-logo.svg" },
   { key: "norma", label: "Norma24", icon: "norma.png" },
   { key: "check24", label: "Check24", icon: "check-24.png" },
+  { key: "channel21", label: "Channel21", icon: "channel21.jpg" },
+  { key: "hornbach", label: "Hornbach", icon: "horn.png" },
+  { key: "forstinger", label: "Forstinger", icon: "forstinger.jpeg" },
+  { key: "neckermann", label: "Neckermann", icon: "necker.png" },
+
   { key: "bauhaus", label: "Bauhaus", icon: "bauhaus.svg" },
   { key: "inprodius", label: "Inprodius", icon: "inprodius.png" },
   { key: "euro-tops", label: "Euro Tops", icon: "euro-top.png" },

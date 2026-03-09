@@ -80,18 +80,9 @@ export function ChartPieLabelList({
       >
         <PieChart>
           <ChartTooltip
-            content={
-              <ChartTooltipContent
-                nameKey="marketplace"
-                hideLabel
-              />
-            }
+            content={<ChartTooltipContent nameKey="marketplace" hideLabel />}
           />
-          <Pie
-            data={chartData}
-            dataKey="percentage"
-            nameKey="marketplace"
-          />
+          <Pie data={chartData} dataKey="percentage" nameKey="marketplace" />
           <ChartLegend
             content={<ChartLegendContent nameKey="marketplace" />}
             className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"

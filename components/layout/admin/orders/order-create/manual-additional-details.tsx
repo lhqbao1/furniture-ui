@@ -103,6 +103,10 @@ export default function ManualAdditionalInformation({
                     <SelectItem value="praktiker">Praktiker</SelectItem>
                     <SelectItem value="norma">Norma24</SelectItem>
                     <SelectItem value="check24">Check24</SelectItem>
+                    <SelectItem value="channel21">Channel21</SelectItem>
+                    <SelectItem value="hornbach">Hornbach</SelectItem>
+                    <SelectItem value="forstinger">Forstinger</SelectItem>
+                    <SelectItem value="neckermann">Neckermann</SelectItem>
                     <SelectItem value="bauhaus">Bauhaus</SelectItem>
                     <SelectItem value="euro-tops">Euro Tops</SelectItem>
                     <SelectItem value="XXXLUTZ">XXXLUTZ</SelectItem>
