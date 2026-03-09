@@ -1,5 +1,12 @@
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Link } from "@/src/i18n/navigation";
 
 export const orderListExpandColumns = (
   supplier_name: string | null,
@@ -9,6 +16,42 @@ export const orderListExpandColumns = (
     header: () => <div className="text-center w-full">POS.</div>,
     cell: ({ row }) => {
       return <div className="text-center">{row.index + 1}</div>;
+    },
+  },
+  {
+    id: "image",
+    header: () => <div className="text-center w-full">Image</div>,
+    cell: ({ row }) => {
+      const imageUrl = row.original.image_url ?? "/1.png";
+
+      return (
+        <div className="flex justify-center">
+          <HoverCard openDelay={100} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <Image
+                src={imageUrl}
+                width={32}
+                height={32}
+                alt={row.original.products?.name ?? "product image"}
+                className="w-8 h-8 object-cover rounded-xl cursor-pointer"
+              />
+            </HoverCardTrigger>
+
+            <HoverCardContent
+              side="bottom"
+              className="p-2 w-[200px] h-[200px] flex items-center justify-center"
+            >
+              <Image
+                src={imageUrl}
+                width={200}
+                height={200}
+                alt={row.original.products?.name ?? "preview image"}
+                className="w-full h-full object-contain rounded-md"
+              />
+            </HoverCardContent>
+          </HoverCard>
+        </div>
+      );
     },
   },
   {
@@ -31,7 +74,16 @@ export const orderListExpandColumns = (
     accessorKey: "product_name",
     header: "NAME",
     cell: ({ row }) => {
-      return <div>{row.original.products.name}</div>;
+      return (
+        <Link
+          href={`/product/${row.original.products.url_key}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          <div>{row.original.products.name}</div>
+        </Link>
+      );
     },
   },
 

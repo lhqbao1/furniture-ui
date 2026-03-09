@@ -1,6 +1,7 @@
 import { calculateProductVAT } from "@/lib/caculate-vat";
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
 
 interface OrderDetailColumnsProps {
   country_code?: string | null;
@@ -17,6 +18,7 @@ export function getOrderDetailColumns({
       header: () => <div className="text-center w-full">POS.</div>,
       cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
     },
+
     {
       id: "id",
       header: () => <div className="text-center w-full">ID</div>,

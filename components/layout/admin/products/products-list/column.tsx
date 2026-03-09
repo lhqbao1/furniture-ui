@@ -1553,7 +1553,7 @@ export const getProductColumns = (
     },
   },
   {
-    accessorKey: "id",
+    accessorKey: "id_provider",
     header: ({}) => <div className="text-center">ID</div>,
     cell: ({ row }) => {
       return <EditProductDrawer product={row.original} />;
