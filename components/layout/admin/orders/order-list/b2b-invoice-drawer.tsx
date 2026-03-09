@@ -18,7 +18,11 @@ import { saveAs } from "file-saver";
 import { B2BInvoicePDFFile } from "@/components/layout/pdf/b2b-invoice-pdf-file";
 import { CheckOutMain } from "@/types/checkout";
 import { getStatusStyle } from "./status-styles";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
@@ -36,9 +40,8 @@ vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!
 Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:`;
 
 const PAYMENT_DUE_DATE_TOKEN = "__PAYMENT_DUE_DATE__";
-const DEFAULT_PAYMENT_NOTE = `Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene
-Konto.
-${PAYMENT_DUE_DATE_TOKEN}
+const DEFAULT_PAYMENT_NOTE = `${PAYMENT_DUE_DATE_TOKEN}
+Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto.
 `;
 
 const formatDateDDMMYYYY = (date: Date) =>
@@ -64,8 +67,6 @@ export default function B2BInvoiceDrawer({
   >(undefined);
   const [servicePeriodOpen, setServicePeriodOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
-  const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [deliveryAddressError, setDeliveryAddressError] = useState(false);
   const [paymentTermDays, setPaymentTermDays] = useState("14");
   const [paymentTermDaysError, setPaymentTermDaysError] = useState(false);
   const [invoiceIntro, setInvoiceIntro] = useState(DEFAULT_INVOICE_INTRO);
@@ -111,9 +112,13 @@ export default function B2BInvoiceDrawer({
 
   const paymentTermLine = `Zahlungsbedingungen:`;
   const paymentDueDateLine = `Der Rechnungsbetrag ist bis zum ${computedPaymentDueDate} fällig.`;
-  const paymentBodyWithDueDate = paymentNote.includes(PAYMENT_DUE_DATE_TOKEN)
-    ? paymentNote.replace(PAYMENT_DUE_DATE_TOKEN, paymentDueDateLine)
-    : `${paymentDueDateLine}\n${paymentNote}`;
+  const paymentBodyWithoutDueDate = paymentNote
+    .replace(PAYMENT_DUE_DATE_TOKEN, "")
+    .replace(/Der Rechnungsbetrag ist bis zum .* fällig\.?\n?/g, "")
+    .trim();
+  const paymentBodyWithDueDate = paymentBodyWithoutDueDate
+    ? `${paymentDueDateLine}\n${paymentBodyWithoutDueDate}`
+    : paymentDueDateLine;
   const resolvedPaymentNote = `${paymentTermLine}\n\n${paymentBodyWithDueDate}`;
 
   return (
@@ -201,21 +206,6 @@ export default function B2BInvoiceDrawer({
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-semibold">Delivery Address</p>
-            <Input
-              value={deliveryAddress}
-              onChange={(e) => {
-                setDeliveryAddress(e.target.value);
-                if (deliveryAddressError && e.target.value.trim()) {
-                  setDeliveryAddressError(false);
-                }
-              }}
-              placeholder="Logis. Areal PP 1108/Hala BA5, 90055 Lozorno"
-              className={deliveryAddressError ? "border-red-500" : undefined}
-            />
-          </div>
-
-          <div className="space-y-2">
             <p className="text-sm font-semibold">
               Service Period (Leistungszeitraum)
             </p>
@@ -292,9 +282,13 @@ export default function B2BInvoiceDrawer({
               }}
               onKeyDown={(e) => {
                 if (
-                  ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(
-                    e.key,
-                  )
+                  [
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                  ].includes(e.key)
                 ) {
                   return;
                 }
@@ -362,14 +356,6 @@ export default function B2BInvoiceDrawer({
                 return;
               }
 
-              if (!deliveryAddress.trim()) {
-                setDeliveryAddressError(true);
-                toast.error("Missing required field", {
-                  description: "Delivery Address is required.",
-                });
-                return;
-              }
-
               if (
                 !paymentTermDays.trim() ||
                 Number(paymentTermDays) <= 0 ||
@@ -383,7 +369,6 @@ export default function B2BInvoiceDrawer({
               }
 
               setInvoiceIdError(false);
-              setDeliveryAddressError(false);
               setPaymentTermDaysError(false);
 
               const marketplaceOrderIds = invoiceOrders
@@ -392,7 +377,6 @@ export default function B2BInvoiceDrawer({
 
               console.log({
                 invoiceId,
-                deliveryAddress,
                 servicePeriod,
                 orderNumber,
                 invoiceIntro: resolvedIntroText,
@@ -405,7 +389,6 @@ export default function B2BInvoiceDrawer({
                 const blob = await pdf(
                   <B2BInvoicePDFFile
                     invoiceId={invoiceId.trim()}
-                    deliveryAddress={deliveryAddress.trim()}
                     servicePeriod={servicePeriod.trim()}
                     orderNumber={orderNumber.trim()}
                     introText={resolvedIntroText}
