@@ -38,7 +38,9 @@ const CategorySection = async ({ slug }: CategorySectionProps) => {
         {products.name}
       </h2>
       <ProductsGridLayout
-        data={products.products.filter((item) => item.is_active).slice(0, 4)}
+        data={products.products
+          .filter((item) => item.is_active && item.final_price)
+          .slice(0, 4)}
       />
     </div>
   );

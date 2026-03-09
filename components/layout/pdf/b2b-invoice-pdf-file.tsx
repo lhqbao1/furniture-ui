@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   page: {
     paddingHorizontal: 24,
     paddingTop: 48,
-    paddingBottom: 145,
+    paddingBottom: 132,
     fontSize: 11,
     fontFamily: "Figtree",
     color: "#1f1f1f",
@@ -453,19 +453,48 @@ export const B2BInvoicePDFFile = ({
               backgroundColor: PDF_GRAY_BG,
             }}
           >
-            <Text style={{ width: "8%", textAlign: "center" }}>Pos.</Text>
-            <Text style={{ width: "24%" }}>Ref.-Nr .</Text>
-            <Text style={{ width: "30%" }}>Kundenname</Text>
+            <Text style={{ width: "7%", textAlign: "center" }}>Pos.</Text>
+            <Text style={{ width: "16%" }}>Ref.-Nr .</Text>
+            <Text style={{ width: "14%" }}>Artikelnummer</Text>
+            <Text style={{ width: "25%" }}>Produktname</Text>
+            <Text style={{ width: "10%", textAlign: "right" }}>Versand</Text>
             <Text style={{ width: "8%", textAlign: "center" }}>Menge</Text>
-            <Text style={{ width: "15%", textAlign: "right" }}>E.-Preis</Text>
-            <Text style={{ width: "15%", textAlign: "right" }}>G.-Preis</Text>
+            <Text style={{ width: "10%", textAlign: "right" }}>E.-Preis</Text>
+            <Text style={{ width: "10%", textAlign: "right" }}>G.-Preis</Text>
           </View>
 
           {orders.map((order, index) => {
-            const gross = Number(order.total_amount) || 0;
+            const orderItems = (order.checkouts ?? []).flatMap(
+              (checkout) => checkout.cart?.items ?? [],
+            );
+            const firstItem = orderItems[0];
+            const quantity =
+              orderItems.reduce(
+                (sum, item) => sum + (Number(item.quantity) || 0),
+                0,
+              ) || 1;
+            const unitGross =
+              Number(
+                firstItem?.purchased_products?.final_price ??
+                  firstItem?.products?.final_price ??
+                  firstItem?.final_price ??
+                  0,
+              ) || 0;
+            const rowGross = unitGross * quantity;
+            const idProvider =
+              firstItem?.purchased_products?.id_provider ??
+              firstItem?.products?.id_provider ??
+              "-";
+            const productName =
+              firstItem?.purchased_products?.name ??
+              firstItem?.products?.name ??
+              "-";
+            const shipping = Number(order.total_shipping) || 0;
+
             return (
               <View
                 key={order.id}
+                wrap={false}
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -474,28 +503,38 @@ export const B2BInvoicePDFFile = ({
                   alignItems: "center",
                 }}
               >
-                <Text style={{ width: "8%", textAlign: "center" }}>
+                <Text style={{ width: "7%", textAlign: "center" }}>
                   {index + 1}
                 </Text>
-                <Text style={{ width: "24%" }}>
+                <Text style={{ width: "16%" }}>
                   {order.marketplace_order_id ||
                     order.checkout_code ||
                     order.id}
                 </Text>
-                <Text style={{ width: "30%" }}>
-                  {truncateText(getCustomerName(order))}
+                <Text style={{ width: "14%" }}>{truncateText(idProvider)}</Text>
+                <Text style={{ width: "25%" }}>
+                  {truncateText(String(productName), 34)}
                 </Text>
-                <Text style={{ width: "8%", textAlign: "center" }}>1</Text>
-                <Text style={{ width: "15%", textAlign: "right" }}>
+                <Text style={{ width: "10%", textAlign: "right" }}>
                   €
-                  {gross.toLocaleString("de-DE", {
+                  {shipping.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </Text>
-                <Text style={{ width: "15%", textAlign: "right" }}>
+                <Text style={{ width: "8%", textAlign: "center" }}>
+                  {quantity}
+                </Text>
+                <Text style={{ width: "10%", textAlign: "right" }}>
                   €
-                  {gross.toLocaleString("de-DE", {
+                  {unitGross.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </Text>
+                <Text style={{ width: "10%", textAlign: "right" }}>
+                  €
+                  {rowGross.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -535,7 +574,7 @@ export const B2BInvoicePDFFile = ({
               >
                 <Text style={{ width: "60%" }}>Umsatzsteuer 19%</Text>
                 <Text style={{ width: "40%", textAlign: "right" }}>
-                  {formatEur(totalVat19 + shippingGrossTotal)}
+                  {formatEur(totalVat19)}
                 </Text>
               </View>
 
@@ -592,20 +631,22 @@ export const B2BInvoicePDFFile = ({
             )
           )}
 
-          {/* <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingVertical: 4,
-              paddingHorizontal: 8,
-            }}
-          >
-            <Text style={{ width: "60%" }}>Versandkosten</Text>
-            <Text style={{ width: "40%", textAlign: "right" }}>
-              {formatEur(shippingGrossTotal)}
-            </Text>
-          </View> */}
+          {/* {shippingGrossTotal > 0 && (
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingVertical: 4,
+                paddingHorizontal: 8,
+              }}
+            >
+              <Text style={{ width: "60%" }}>Versandkosten</Text>
+              <Text style={{ width: "40%", textAlign: "right" }}>
+                {formatEur(shippingGrossTotal)}
+              </Text>
+            </View>
+          )} */}
 
           <View
             style={{

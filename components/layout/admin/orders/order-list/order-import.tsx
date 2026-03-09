@@ -269,6 +269,10 @@ const OrderImport = () => {
       }
 
       const grouped: Record<string, GroupedOrder> = {};
+      const nettoShippingMeta: Record<
+        string,
+        { baseShipping: number; totalQuantity: number }
+      > = {};
 
       validRows.forEach((row) => {
         const id = String(row.marketplace_order_id);
@@ -287,6 +291,22 @@ const OrderImport = () => {
             ...rest,
             items: [],
           };
+        }
+
+        if (isNettoChannel) {
+          if (!nettoShippingMeta[id]) {
+            nettoShippingMeta[id] = {
+              baseShipping: row.total_shipping,
+              totalQuantity: 0,
+            };
+          }
+
+          const qty = Number.isFinite(row.quantity) ? row.quantity : 0;
+          nettoShippingMeta[id].totalQuantity += qty;
+
+          grouped[id].total_shipping =
+            nettoShippingMeta[id].baseShipping *
+            nettoShippingMeta[id].totalQuantity;
         }
 
         grouped[id].items.push({
