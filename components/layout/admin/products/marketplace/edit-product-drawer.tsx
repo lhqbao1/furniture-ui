@@ -11,6 +11,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -49,23 +50,22 @@ const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
     );
   };
   return (
-    <Drawer
-      direction="right"
-      open={open}
-      onOpenChange={setOpen}
-      handleOnly
-    >
-      <div
-        className="text-wrap cursor-pointer hover:underline"
-        onClick={() => setOpen(true)}
-      >
-        {product.id_provider}
-      </div>
-      <DrawerContent className="p-6 w-[95vw] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[1600px] mx-auto overflow-auto">
+    <Drawer direction="right" open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <button
+          type="button"
+          className="text-wrap cursor-pointer hover:underline text-left"
+        >
+          {product.id_provider}
+        </button>
+      </DrawerTrigger>
+      <DrawerContent className="p-6 w-[95vw] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[1600px] overflow-y-auto">
         <DrawerHeader>
           <DrawerTitle>Edit Product</DrawerTitle>
         </DrawerHeader>
-        <ProductForm productValues={product} onSubmit={handleEdit} isDrawer />
+        <div className="relative">
+          <ProductForm productValues={product} onSubmit={handleEdit} isDrawer />
+        </div>
       </DrawerContent>
     </Drawer>
   );

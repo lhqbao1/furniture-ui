@@ -10,7 +10,7 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
-import { B2BInvoiceFooterSection } from "./b2b-invoice-footer";
+import { FooterSection } from "./file-footer";
 
 Font.register({
   family: "Figtree",
@@ -211,12 +211,12 @@ export const B2BInvoicePDFFile = ({
     paymentLines.find((line) =>
       line.startsWith("Der Rechnungsbetrag ist bis zum "),
     ) ?? "";
-  const paymentLine5 =
-    paymentLines.find((line) => line === "Mit freundlichen Grüßen") ??
-    "Mit freundlichen Grüßen";
-  const paymentLine6 =
-    paymentLines.find((line) => line === "Duong Thuy Nguyen") ??
-    "Duong Thuy Nguyen";
+  // const paymentLine5 =
+  //   paymentLines.find((line) => line === "Mit freundlichen Grüßen") ??
+  //   "Mit freundlichen Grüßen";
+  // const paymentLine6 =
+  //   paymentLines.find((line) => line === "Duong Thuy Nguyen") ??
+  //   "Duong Thuy Nguyen";
   const allCartItems = orders.flatMap((order) =>
     (order.checkouts ?? []).flatMap((checkout) => checkout.cart?.items ?? []),
   );
@@ -357,7 +357,7 @@ export const B2BInvoicePDFFile = ({
               }}
             >
               <Text style={{ width: 90, fontWeight: "bold" }}>
-                Rechnungs-Nr.:
+                Belegnummer:
               </Text>
               <Text>{invoiceId}</Text>
             </View>
@@ -405,19 +405,6 @@ export const B2BInvoicePDFFile = ({
                 Ihre Kundennummer
               </Text>
               <Text>1011</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 8,
-                paddingVertical: 2,
-              }}
-            >
-              <Text style={{ width: 90, fontWeight: "bold" }}>
-                Ihre USt-Id.
-              </Text>
-              <Text>ATU65296645</Text>
             </View>
             <View
               style={{
@@ -674,15 +661,15 @@ export const B2BInvoicePDFFile = ({
           <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
             {paymentLine4}
           </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
+          {/* <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
             {paymentLine5}
           </Text>
           <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
             {paymentLine6}
-          </Text>
+          </Text> */}
         </View>
 
-        <B2BInvoiceFooterSection />
+        <FooterSection />
         <Text
           fixed
           style={{
@@ -690,6 +677,7 @@ export const B2BInvoicePDFFile = ({
             bottom: 6,
             left: 0,
             right: 0,
+            marginTop: 6,
             textAlign: "center",
             fontSize: 8,
             fontWeight: "bold",

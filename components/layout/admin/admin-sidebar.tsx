@@ -36,7 +36,7 @@ export function AdminSideBar() {
           icon: CornerDownRight,
         },
         {
-          title: "Product List",
+          title: "Products",
           url: "/admin/products/list",
           icon: CornerDownRight,
         },
@@ -50,13 +50,9 @@ export function AdminSideBar() {
           url: "/admin/products/group",
           icon: CornerDownRight,
         },
+
         {
-          title: "Category List",
-          url: "/admin/products/categories",
-          icon: CornerDownRight,
-        },
-        {
-          title: "Brand List",
+          title: "Brands",
           url: "/admin/products/brand",
           icon: CornerDownRight,
         },
@@ -78,7 +74,7 @@ export function AdminSideBar() {
       icon: ChevronRight,
       children: [
         {
-          title: "Order List",
+          title: "Orders",
           url: "/admin/orders/list",
           icon: CornerDownRight,
         },
@@ -154,17 +150,17 @@ export function AdminSideBar() {
       icon: ChevronRight,
       children: [
         {
-          title: "Customer List",
+          title: "Customers",
           url: "/admin/crm/customers/list",
           icon: CornerDownRight,
         },
         {
-          title: "Supplier List",
+          title: "Suppliers",
           url: "/admin/crm/supplier/list",
           icon: CornerDownRight,
         },
         {
-          title: "Voucher List",
+          title: "Vouchers",
           url: "/admin/crm/vouchers/list",
           icon: CornerDownRight,
         },
@@ -183,6 +179,11 @@ export function AdminSideBar() {
         {
           title: "Policy",
           url: "/admin/settings/policy",
+          icon: CornerDownRight,
+        },
+        {
+          title: "Categories",
+          url: "/admin/products/categories",
           icon: CornerDownRight,
         },
       ],
@@ -237,10 +238,7 @@ export function AdminSideBar() {
                 const isActive = pathname === withLocale(item.url);
                 if (item.children) {
                   return (
-                    <SidebarMenuItem
-                      key={item.title}
-                      className="flex flex-col"
-                    >
+                    <SidebarMenuItem key={item.title} className="flex flex-col">
                       <SidebarMenuButton asChild>
                         <Button
                           className={`flex w-full flex-row items-center justify-start gap-4 rounded-none px-4 py-6 transition-colors ${
@@ -251,10 +249,7 @@ export function AdminSideBar() {
                           variant="ghost"
                         >
                           <div className="w-8">
-                            <item.icon
-                              height={40}
-                              width={40}
-                            />
+                            <item.icon height={40} width={40} />
                           </div>
                           <span className="text-xl">{item.title}</span>
                         </Button>
@@ -278,10 +273,7 @@ export function AdminSideBar() {
                                   : "hover:bg-secondary/20 text-[#4D4D4D] hover:text-black"
                               }`}
                             >
-                              <child.icon
-                                size={20}
-                                stroke="#00B159"
-                              />
+                              <child.icon size={20} stroke="#00B159" />
                               <span>{child.title}</span>
                             </Button>
                           );
@@ -293,8 +285,8 @@ export function AdminSideBar() {
 
                 return (
                   <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Button
+                    <SidebarMenuButton asChild>
+                      <Button
                         onClick={() => handleNavigate(item.url)}
                         className={`relative flex flex-row items-center justify-start gap-3 px-4 py-6 transition-colors ${
                           isActive
@@ -304,10 +296,7 @@ export function AdminSideBar() {
                         variant="ghost"
                       >
                         <div className="w-8">
-                          <item.icon
-                            height={40}
-                            width={40}
-                          />
+                          <item.icon height={40} width={40} />
                         </div>
                         <span className="text-xl">{item.title}</span>
                       </Button>

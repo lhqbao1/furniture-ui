@@ -111,7 +111,6 @@ const ProductForm = ({
                         <ProductDetailInputs
                           isEdit={!!productValues}
                           productId={productValues?.id_provider ?? null}
-                          productDetails={productValues}
                         />
                       </CardContent>
                     </Card>
@@ -243,7 +242,12 @@ const ProductForm = ({
             </div>
 
             <div className="lg:col-span-3 flex flex-col items-end gap-4">
-              <div className="grid grid-cols-2 gap-2 justify-end top-24 fixed">
+              <div
+                className={cn(
+                  "grid grid-cols-2 gap-2 justify-end z-20",
+                  isDrawer ? "sticky top-4 self-end" : "fixed top-24",
+                )}
+              >
                 <Button
                   type="submit"
                   disabled={isLoadingSEO}
