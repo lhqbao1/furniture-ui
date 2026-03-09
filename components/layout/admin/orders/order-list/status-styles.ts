@@ -103,6 +103,13 @@ export function getStatusStyle(raw: string) {
         color: "text-[#FF0000]",
       };
 
+    case "canceled_wrong_price":
+      return {
+        text: "Canceled wrong price",
+        bg: "bg-[#FFD2D3]",
+        color: "text-[#FF0000]",
+      };
+
     case "canceled":
       return { text: "canceled", bg: "bg-[#FFD2D3]", color: "text-[#FF0000]" };
 
