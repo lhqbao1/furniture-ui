@@ -22,11 +22,6 @@ const styles = StyleSheet.create({
     marginBottom: 3,
     fontSize: 8,
   },
-  rightText: {
-    marginBottom: 3,
-    fontSize: 8,
-    textAlign: "right",
-  },
 });
 
 export const FooterSection = () => (
@@ -48,11 +43,11 @@ export const FooterSection = () => (
     </View>
 
     {/* COLUMN 3 */}
-    <View style={{ width: "20%", alignItems: "flex-end" }}>
-      <Text style={styles.rightText}>Geschäftsführung</Text>
-      <Text style={styles.rightText}>Marco Oberste</Text>
-      <Text style={styles.rightText}>Duong Thuy Nguyen</Text>
-      <Text style={styles.rightText}>Ust-IdNr: DE454714336</Text>
+    <View style={{ width: "20%" }}>
+      <Text style={styles.bold}>Geschäftsführung</Text>
+      <Text style={styles.gap}>Marco Oberste</Text>
+      <Text style={styles.gap}>Duong Thuy Nguyen</Text>
+      <Text style={styles.gap}>Ust-IdNr: DE454714336</Text>
     </View>
   </View>
 );

@@ -10,41 +10,43 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  text: {
-    marginBottom: 4,
+  column: {
+    width: "30%",
+  },
+  bold: {
+    // fontFamily: "Helvetica-Bold",
+    marginBottom: 3,
     fontSize: 8,
-    color: "#de8400",
-    lineHeight: 1.15,
+  },
+  gap: {
+    marginBottom: 3,
+    fontSize: 8,
   },
 });
 
-export const B2BInvoiceFooterSection = () => (
+export const B2BInvoiceFooter = () => (
   <View fixed style={styles.footerWrapper}>
-    <View style={{ width: "25%" }}>
-      <Text style={styles.text}>Prestige Home GmbH</Text>
-      <Text style={styles.text}>Greifswalder Str. 226</Text>
-      <Text style={styles.text}>10405 Berlin</Text>
-      <Text style={styles.text}>Deutschland</Text>
+    {/* COLUMN 1 */}
+    <View style={{ width: "38%" }}>
+      <Text style={styles.bold}>Prestige Home GmbH</Text>
+      <Text style={styles.gap}>Greifswalder Straße 226</Text>
+      <Text style={styles.gap}>10405 Berlin</Text>
+      <Text style={styles.gap}>info@prestige-home.de</Text>
     </View>
 
-    <View style={{ width: "25%" }}>
-      <Text style={styles.text}>Tel. +49 15206576549</Text>
-      <Text style={styles.text}>E-Mail duong@prestige-home.de</Text>
-      <Text style={styles.text}>Web https://www.prestige-home.de/de</Text>
+    {/* COLUMN 2 */}
+    <View style={{ width: "42%" }}>
+      <Text style={styles.bold}>Bank Deutsche Bank</Text>
+      <Text style={styles.gap}>IBAN DE31 1007 0000 0839 7895 00</Text>
+      <Text style={styles.gap}>BIC DEUTDEFFXXX</Text>
     </View>
 
-    <View style={{ width: "27%" }}>
-      <Text style={styles.text}>Amtsgericht Charlottenburg</Text>
-      <Text style={styles.text}>HR-Nr. HRB 274256 B</Text>
-      <Text style={styles.text}>USt.-ID DE454714336</Text>
-      <Text style={styles.text}>Steuer-Nr. 37/478/50199</Text>
-      <Text style={styles.text}>Geschäftsführung Duong Thuy Nguyen</Text>
-    </View>
-
-    <View style={{ width: "23%" }}>
-      <Text style={styles.text}>Bank Deutsche Bank</Text>
-      <Text style={styles.text}>IBAN DE31 1007 0000 0839 7895 00</Text>
-      <Text style={styles.text}>BIC DEUTDEFFXXX</Text>
+    {/* COLUMN 3 */}
+    <View style={{ width: "20%" }}>
+      <Text style={styles.bold}>Geschäftsführung</Text>
+      <Text style={styles.gap}>Marco Oberste</Text>
+      <Text style={styles.gap}>Duong Thuy Nguyen</Text>
+      <Text style={styles.gap}>Ust-IdNr: DE454714336</Text>
     </View>
   </View>
 );

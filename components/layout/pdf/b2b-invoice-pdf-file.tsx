@@ -10,7 +10,7 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
-import { FooterSection } from "./file-footer";
+import { B2BInvoiceFooter } from "./b2b-invoice-footer";
 
 Font.register({
   family: "Figtree",
@@ -692,7 +692,7 @@ export const B2BInvoicePDFFile = ({
           </Text>
         </View>
 
-        <FooterSection />
+        <B2BInvoiceFooter />
         <Text
           fixed
           style={{
