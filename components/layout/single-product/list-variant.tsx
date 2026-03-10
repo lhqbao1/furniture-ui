@@ -88,8 +88,6 @@ const ListVariant = ({
     );
   }, [parentProduct]);
 
-  console.log(parentProduct);
-
   return (
     <Controller
       control={control}
