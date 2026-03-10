@@ -6,6 +6,9 @@ import ResetPasswordForm from "@/components/layout/auth/reset-password-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
+  title: "Passwort zurücksetzen",
+  description:
+    "Setzen Sie Ihr Prestige Home Konto-Passwort sicher zurück. Diese Seite ist nicht indexierbar.",
   robots: {
     index: false,
     follow: false,

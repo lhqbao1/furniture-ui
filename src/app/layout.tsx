@@ -91,9 +91,6 @@ export const metadata: Metadata = {
       "https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/5c38c322-bafc-4e6f-8d14-0c1ba4b7b8de_invoice-logo.png",
     ],
   },
-  alternates: {
-    canonical: "/",
-  },
 };
 
 export default function RootLayout({

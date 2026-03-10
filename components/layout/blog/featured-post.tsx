@@ -49,13 +49,15 @@ export default function FeaturedPost({ post }: { post: BlogItem }) {
           </div>
 
           {imageUrl && (
-            <Image
-              src={imageUrl}
-              width={500}
-              height={500}
-              alt={post.title}
-              className="rounded-xl object-contain w-full"
-            />
+            <div className="relative w-full max-w-[560px] h-[260px] sm:h-[320px] lg:h-[380px] mx-auto rounded-xl overflow-hidden bg-white">
+              <Image
+                src={imageUrl}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                alt={post.title}
+                className="object-contain"
+              />
+            </div>
           )}
         </CardContent>
       </Card>

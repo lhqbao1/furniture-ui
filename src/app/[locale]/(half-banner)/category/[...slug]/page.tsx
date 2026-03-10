@@ -116,14 +116,18 @@ export async function generateMetadata({
 
     return {
       title: `${category.meta_title ?? category.name} kaufen – WPC Sichtschutz & Zäune | Prestige Home`,
-      description: category.meta_description || "",
+      description:
+        category.meta_description?.trim() ||
+        `${category.name} online kaufen bei Prestige Home. Entdecken Sie passende Produkte, Preise und Verfügbarkeit.`,
       robots: { index: true, follow: true },
       alternates: {
         canonical: `https://www.prestige-home.de/de/category/${category.slug}`,
       },
       openGraph: {
         title: category.meta_title || category.name,
-        description: category.meta_description,
+        description:
+          category.meta_description?.trim() ||
+          `${category.name} online kaufen bei Prestige Home.`,
         url: `https://www.prestige-home.de/de/category/${category.slug}`,
         images: category.img_url ?? "",
       },

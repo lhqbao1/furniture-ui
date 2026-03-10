@@ -1,4 +1,4 @@
-import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import { routing } from "@/src/i18n/routing";
@@ -24,15 +24,10 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    alternates: {
-      canonical: `https://www.prestige-home.de/${locale}`,
-      languages: {
-        de: "https://www.prestige-home.de/de",
-        en: "https://www.prestige-home.de/en",
-      },
-    },
+    description:
+      "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe.",
     openGraph: {
-      locale,
+      locale: locale === "de" ? "de_DE" : locale,
     },
   };
 }

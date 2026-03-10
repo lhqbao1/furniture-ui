@@ -27,9 +27,9 @@ const ListFAQ = ({ topic_id, height }: ListFAQProps) => {
 
   return (
     <div className="grid grid-cols-12 lg:gap-x-12 gap-x-2 gap-y-8 lg:pt-12 pt-4 items-start xl:w-8/12 w-11/12 mx-auto overflow-x-hidden">
-      <h2 className="text-4xl font-semibold text-secondary text-center col-span-12">
+      <h1 className="text-4xl font-semibold text-secondary text-center col-span-12">
         FAQ
-      </h2>
+      </h1>
       <div className="lg:col-span-5 col-span-12 grid grid-cols-3 md:gap-10 gap-2">
         {isLoadingTopic ? (
           <FAQTopicSkeleton count={6} />

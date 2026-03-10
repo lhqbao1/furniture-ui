@@ -4,6 +4,9 @@ import Image from "next/image";
 import React from "react";
 
 export const metadata: Metadata = {
+  title: "Admin Anmeldung",
+  description:
+    "Sicherer Zugang für Administratoren von Prestige Home. Diese Seite ist nicht indexierbar.",
   robots: {
     index: false,
     follow: false,

@@ -142,13 +142,17 @@ export async function generateMetadata({
       ? `${baseTitle} kaufen – WPC Sichtschutzzaun | Prestige Home`
       : baseTitle;
 
+  const description =
+    product.meta_description?.trim() ||
+    product.description?.replace(/<[^>]*>/g, "").trim().slice(0, 160) ||
+    `${product.name} online kaufen bei Prestige Home.`;
+
   return {
     title: title,
-    description: product.meta_description || product.description?.slice(0, 150),
+    description,
     openGraph: {
       title: title,
-      description:
-        product.meta_description || product.description?.slice(0, 150),
+      description,
       url: `https://www.prestige-home.de/de/product/${product.url_key}`,
       images:
         product.static_files?.map((f: StaticFile) => ({ url: f.url })) ?? [],
@@ -156,8 +160,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: title,
-      description:
-        product.meta_description || product.description?.slice(0, 150),
+      description,
       images: product.static_files?.map((f: StaticFile) => f.url) ?? [],
     },
     alternates: {

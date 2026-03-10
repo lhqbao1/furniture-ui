@@ -130,6 +130,10 @@ export default function ShopAllPage() {
                 </div>
               </div>
 
+              <h1 className="text-4xl text-secondary font-bold mb-8 text-center">
+                {t("shopAll")}
+              </h1>
+
               {query && (
                 <div className="py-1 px-3 border rounded-full w-fit  gap-1.5 items-center md:hidden flex">
                   <span>{query}</span>
