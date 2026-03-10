@@ -16,11 +16,14 @@ const ProductDescription = ({
   question,
 }: ProductDescriptionProps) => {
   return (
-    <div className="w-full lg:w-2/3">
+    <div className="w-full grid grid-cols-12 gap-8">
       <div
-        className="product-descriptions font-sans"
+        className="product-descriptions font-sans col-span-12 xl:col-span-7"
         dangerouslySetInnerHTML={{ __html: description ?? "" }}
       />
+      <div className="xl:col-span-5 col-span-12">
+        <ProductFAQSection question={question} />
+      </div>
     </div>
   );
 };

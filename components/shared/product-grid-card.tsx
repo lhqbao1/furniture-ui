@@ -80,7 +80,7 @@ export default function ProductCard({
                 loading={isLCP ? "eager" : "lazy"}
                 sizes="(max-width: 768px) 50vw, 25vw"
                 className="
-                  object-contain
+                  object-cover
                   w-full h-full
                   transition-all duration-500 ease-in-out
                   group-hover:-translate-x-6

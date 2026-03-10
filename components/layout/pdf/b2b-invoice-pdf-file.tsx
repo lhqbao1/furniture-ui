@@ -250,10 +250,6 @@ export const B2BInvoicePDFFile = ({
     };
   });
 
-  const shippingGrossTotal = displayRows.reduce(
-    (sum, row) => sum + row.shippingGross,
-    0,
-  );
   const displayGrossTotal = displayRows.reduce(
     (sum, row) => sum + row.rowTotalGross,
     0,
@@ -289,6 +285,8 @@ export const B2BInvoicePDFFile = ({
   const totalVat19 = isGermanyInvoice ? taxBuckets.vat19 : 0;
   const totalVat7 = isGermanyInvoice ? taxBuckets.vat7 : 0;
   const totalVatOther = isGermanyInvoice ? taxBuckets.otherVat : 0;
+  // Keep summary fully aligned with table rows:
+  // each row contributes G.-Preis + Versand.
   const totalGross = displayGrossTotal;
   const totalNet = isGermanyInvoice
     ? totalGross - totalVat19 - totalVat7 - totalVatOther

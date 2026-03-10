@@ -22,7 +22,7 @@ export function useGetProductsSelect(params?: {
   all_products?: boolean;
   is_econelo?: boolean;
   supplier_id?: string;
-}) {
+}, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: [
       "all-products",
@@ -33,6 +33,10 @@ export function useGetProductsSelect(params?: {
       params?.supplier_id,
     ],
     queryFn: () => getAllProductsSelect(params ?? {}),
+    enabled: options?.enabled ?? true,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 }
 
