@@ -7,9 +7,12 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Link } from "@/src/i18n/navigation";
+import { calculateProductVAT } from "@/lib/caculate-vat";
 
 export const orderListExpandColumns = (
   supplier_name: string | null,
+  country?: string,
+  tax_id?: string,
 ): ColumnDef<CartItem>[] => [
   {
     accessorKey: "pos",
@@ -103,12 +106,18 @@ export const orderListExpandColumns = (
     accessorKey: "tax",
     header: () => <div className="text-center w-full">TAX</div>,
     cell: ({ row }) => {
+      console.log(row.original);
       return (
         <div className="text-right">
           €
-          {(row.original.final_price - row.original.price_whithout_tax).toFixed(
-            2,
-          )}
+          {calculateProductVAT(
+            row.original.purchased_products
+              ? row.original.purchased_products.final_price
+              : row.original.products.final_price,
+            row.original.products.tax,
+            country,
+            tax_id,
+          ).vat.toFixed(2)}
         </div>
       );
     },

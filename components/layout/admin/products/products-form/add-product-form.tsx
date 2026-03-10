@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   FormControl,
@@ -31,6 +31,9 @@ import { useLocale } from "next-intl";
 import { toast } from "sonner";
 import LogStockTab from "./log-stock-tab";
 import { cn } from "@/lib/utils";
+import SyncToEbayForm from "../marketplace/sync-to-ebay-form";
+import SyncToAmazonForm from "../marketplace/ync-to-amazon-form";
+import RemoveFromMarketplaceDialog from "../marketplace/remove-dialog";
 
 function getFirstErrorMessage(errors: any): string | undefined {
   for (const key in errors) {
@@ -42,6 +45,128 @@ function getFirstErrorMessage(errors: any): string | undefined {
     }
   }
   return undefined;
+}
+
+const MARKETPLACES = ["kaufland", "ebay", "amazon"] as const;
+type Marketplace = (typeof MARKETPLACES)[number];
+const MARKETPLACE_REFETCH_COOLDOWN_MS = 1800;
+
+function MarketplaceAction({
+  product,
+  marketplace,
+  isSyncing,
+}: {
+  product: ProductItem;
+  marketplace: Marketplace;
+  isSyncing: boolean;
+}) {
+  const [updating, setUpdating] = useState(false);
+  const marketplaceProduct = product.marketplace_products?.find(
+    (item) => item.marketplace === marketplace,
+  );
+  const hasMarketplace = Boolean(marketplaceProduct);
+  const isActive = marketplaceProduct?.is_active ?? false;
+
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-md border p-2">
+      <span className="text-xs font-semibold uppercase">{marketplace}</span>
+      <div className="flex items-center gap-2">
+        {isSyncing ? (
+          <Button type="button" variant="outline" size="icon" disabled>
+            <Loader2 className="size-4 animate-spin" />
+          </Button>
+        ) : (
+          <>
+            {hasMarketplace ? (
+              isActive ? (
+                marketplace === "amazon" ? (
+                  <SyncToAmazonForm
+                    updating={updating}
+                    setUpdating={setUpdating}
+                    product={product}
+                    isUpdating
+                    currentMarketplace={marketplace}
+                    isActive={isActive}
+                  />
+                ) : (
+                  <SyncToEbayForm
+                    updating={updating}
+                    setUpdating={setUpdating}
+                    product={product}
+                    isUpdating
+                    currentMarketplace={marketplace}
+                  />
+                )
+              ) : marketplace === "amazon" ? (
+                <SyncToAmazonForm
+                  updating={updating}
+                  setUpdating={setUpdating}
+                  product={product}
+                  currentMarketplace={marketplace}
+                  isActive={isActive}
+                  isAdd
+                />
+              ) : (
+                <SyncToEbayForm
+                  updating={updating}
+                  setUpdating={setUpdating}
+                  product={product}
+                  isAdd
+                  currentMarketplace={marketplace}
+                />
+              )
+            ) : marketplace === "amazon" ? (
+              <SyncToAmazonForm
+                updating={updating}
+                setUpdating={setUpdating}
+                product={product}
+                currentMarketplace={marketplace}
+                isActive={false}
+                isAdd
+              />
+            ) : (
+              <SyncToEbayForm
+                isAdd
+                setUpdating={setUpdating}
+                product={product}
+                updating={updating}
+                currentMarketplace={marketplace}
+              />
+            )}
+          </>
+        )}
+
+        {!isSyncing && isActive && marketplaceProduct && (
+          <RemoveFromMarketplaceDialog
+            marketplace={marketplace}
+            marketplaceProduct={marketplaceProduct}
+            product={product}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MarketplaceActions({
+  product,
+  isSyncing,
+}: {
+  product: ProductItem;
+  isSyncing: boolean;
+}) {
+  return (
+    <div className="space-y-2">
+      {MARKETPLACES.map((marketplace) => (
+        <MarketplaceAction
+          key={marketplace}
+          product={product}
+          marketplace={marketplace}
+          isSyncing={isSyncing}
+        />
+      ))}
+    </div>
+  );
 }
 
 const ProductForm = ({
@@ -60,6 +185,10 @@ const ProductForm = ({
   const router = useRouter();
   const locale = useLocale();
   const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
+  const productForMarketplace =
+    productValues && Array.isArray(productValues.marketplace_products)
+      ? (productValues as ProductItem)
+      : null;
 
   const {
     form,
@@ -69,6 +198,34 @@ const ProductForm = ({
     addProductMutation,
     editProductMutation,
   } = useProductForm({ productValues, productValuesClone });
+  const [isMarketplaceSyncing, setIsMarketplaceSyncing] = useState(false);
+
+  useEffect(() => {
+    if (!productForMarketplace) {
+      setIsMarketplaceSyncing(false);
+      return;
+    }
+
+    if (editProductMutation.isPending) {
+      setIsMarketplaceSyncing(true);
+      return;
+    }
+
+    if (editProductMutation.isSuccess) {
+      setIsMarketplaceSyncing(true);
+      const timer = window.setTimeout(() => {
+        setIsMarketplaceSyncing(false);
+      }, MARKETPLACE_REFETCH_COOLDOWN_MS);
+
+      return () => window.clearTimeout(timer);
+    }
+
+    setIsMarketplaceSyncing(false);
+  }, [
+    productForMarketplace,
+    editProductMutation.isPending,
+    editProductMutation.isSuccess,
+  ]);
 
   return (
     <div className={cn("lg:pb-20 lg:px-30 pb-12", isDrawer && "!px-4")}>
@@ -300,6 +457,17 @@ const ProductForm = ({
                 >
                   Clone
                 </Button>
+                {productForMarketplace && (
+                  <div className="col-span-2 space-y-2 lg:mt-2">
+                    <p className="text-sm font-semibold text-black">
+                      Marketplace
+                    </p>
+                    <MarketplaceActions
+                      product={productForMarketplace}
+                      isSyncing={isMarketplaceSyncing}
+                    />
+                  </div>
+                )}
                 <div className="col-span-2 lg:mt-4">
                   <FormField
                     control={form.control}

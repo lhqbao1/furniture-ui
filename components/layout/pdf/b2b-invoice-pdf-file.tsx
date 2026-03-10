@@ -211,38 +211,58 @@ export const B2BInvoicePDFFile = ({
   // const paymentLine6 =
   //   paymentLines.find((line) => line === "Duong Thuy Nguyen") ??
   //   "Duong Thuy Nguyen";
-  const allCartItems = orders.flatMap((order) =>
-    (order.checkouts ?? []).flatMap((checkout) => checkout.cart?.items ?? []),
-  );
+  const displayRows = orders.map((order, index) => {
+    const orderItems = (order.checkouts ?? []).flatMap(
+      (checkout) => checkout.cart?.items ?? [],
+    );
+    const firstItem = orderItems[0];
+    const quantity =
+      orderItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) ||
+      1;
+    const unitGross =
+      Number(
+        firstItem?.purchased_products?.final_price ??
+          firstItem?.products?.final_price ??
+          firstItem?.final_price ??
+          0,
+      ) || 0;
+    const rowGross = unitGross * quantity;
+    const shippingGross = Number(order.total_shipping) || 0;
+    const taxRate = parseTaxRate(
+      firstItem?.purchased_products?.tax ?? firstItem?.products?.tax ?? null,
+    );
 
-  const shippingGrossTotal = orders.reduce(
-    (sum, order) => sum + (Number(order.total_shipping) || 0),
+    return {
+      order,
+      index,
+      quantity,
+      unitGross,
+      rowGross,
+      shippingGross,
+      rowTotalGross: rowGross + shippingGross,
+      taxRate,
+      idProvider:
+        firstItem?.purchased_products?.id_provider ??
+        firstItem?.products?.id_provider ??
+        "-",
+      productName:
+        firstItem?.purchased_products?.name ?? firstItem?.products?.name ?? "-",
+    };
+  });
+
+  const shippingGrossTotal = displayRows.reduce(
+    (sum, row) => sum + row.shippingGross,
+    0,
+  );
+  const displayGrossTotal = displayRows.reduce(
+    (sum, row) => sum + row.rowTotalGross,
     0,
   );
 
-  const productGrossTotal = allCartItems.reduce((sum, item) => {
-    const unitGross = Number(
-      item.purchased_products?.final_price ??
-        item.products?.final_price ??
-        item.final_price ??
-        0,
-    );
-    const qty = Number(item.quantity) || 0;
-    return sum + unitGross * qty;
-  }, 0);
-
-  const taxBuckets = allCartItems.reduce(
+  const taxBuckets = displayRows.reduce(
     (acc, item) => {
-      const rawTax = item.purchased_products?.tax ?? item.products?.tax ?? null;
-      const rate = parseTaxRate(rawTax);
-      const unitGross = Number(
-        item.purchased_products?.final_price ??
-          item.products?.final_price ??
-          item.final_price ??
-          0,
-      );
-      const qty = Number(item.quantity) || 0;
-      const gross = unitGross * qty;
+      const rate = item.taxRate;
+      const gross = item.rowTotalGross;
 
       if (rate <= 0) {
         acc.net += gross;
@@ -266,13 +286,14 @@ export const B2BInvoicePDFFile = ({
     { net: 0, vat19: 0, vat7: 0, otherVat: 0 },
   );
 
-  const totalNet = isGermanyInvoice ? taxBuckets.net : productGrossTotal;
   const totalVat19 = isGermanyInvoice ? taxBuckets.vat19 : 0;
   const totalVat7 = isGermanyInvoice ? taxBuckets.vat7 : 0;
   const totalVatOther = isGermanyInvoice ? taxBuckets.otherVat : 0;
+  const totalGross = displayGrossTotal;
+  const totalNet = isGermanyInvoice
+    ? totalGross - totalVat19 - totalVat7 - totalVatOther
+    : totalGross;
   const intraCommunityVat = !isGermanyInvoice && isEuInvoice ? 0 : null;
-  const totalGross =
-    totalNet + totalVat19 + totalVat7 + totalVatOther + shippingGrossTotal;
 
   return (
     <Document>
@@ -463,37 +484,10 @@ export const B2BInvoicePDFFile = ({
             <Text style={{ width: "10%", textAlign: "right" }}>G.-Preis</Text>
           </View>
 
-          {orders.map((order, index) => {
-            const orderItems = (order.checkouts ?? []).flatMap(
-              (checkout) => checkout.cart?.items ?? [],
-            );
-            const firstItem = orderItems[0];
-            const quantity =
-              orderItems.reduce(
-                (sum, item) => sum + (Number(item.quantity) || 0),
-                0,
-              ) || 1;
-            const unitGross =
-              Number(
-                firstItem?.purchased_products?.final_price ??
-                  firstItem?.products?.final_price ??
-                  firstItem?.final_price ??
-                  0,
-              ) || 0;
-            const rowGross = unitGross * quantity;
-            const idProvider =
-              firstItem?.purchased_products?.id_provider ??
-              firstItem?.products?.id_provider ??
-              "-";
-            const productName =
-              firstItem?.purchased_products?.name ??
-              firstItem?.products?.name ??
-              "-";
-            const shipping = Number(order.total_shipping) || 0;
-
+          {displayRows.map((row) => {
             return (
               <View
-                key={order.id}
+                key={row.order.id}
                 wrap={false}
                 style={{
                   display: "flex",
@@ -504,37 +498,39 @@ export const B2BInvoicePDFFile = ({
                 }}
               >
                 <Text style={{ width: "7%", textAlign: "center" }}>
-                  {index + 1}
+                  {row.index + 1}
                 </Text>
                 <Text style={{ width: "16%" }}>
-                  {order.marketplace_order_id ||
-                    order.checkout_code ||
-                    order.id}
+                  {row.order.marketplace_order_id ||
+                    row.order.checkout_code ||
+                    row.order.id}
                 </Text>
-                <Text style={{ width: "14%" }}>{truncateText(idProvider)}</Text>
+                <Text style={{ width: "14%" }}>
+                  {truncateText(row.idProvider)}
+                </Text>
                 <Text style={{ width: "25%" }}>
-                  {truncateText(String(productName), 34)}
+                  {truncateText(String(row.productName), 34)}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
                   €
-                  {shipping.toLocaleString("de-DE", {
+                  {row.shippingGross.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </Text>
                 <Text style={{ width: "8%", textAlign: "center" }}>
-                  {quantity}
+                  {row.quantity}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
                   €
-                  {unitGross.toLocaleString("de-DE", {
+                  {row.unitGross.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
                   €
-                  {rowGross.toLocaleString("de-DE", {
+                  {row.rowGross.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
