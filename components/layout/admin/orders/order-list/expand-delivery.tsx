@@ -6,6 +6,7 @@ import { CheckOut, CheckOutMain } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
 import { orderChildColumns } from "./column";
 import { orderListExpandColumns } from "./product-columns";
+import { check } from "zod";
 
 function transformCartItems(items: CartItem[]): CartItem[] {
   return items.flatMap((item) => {
@@ -54,7 +55,11 @@ const OrderExpandTable = ({ row }: { row: any }) => {
     <div className="p-4 bg-white rounded-md border">
       <ProductTable<CartItem, unknown>
         data={items}
-        columns={orderListExpandColumns(supplierName)}
+        columns={orderListExpandColumns(
+          supplierName,
+          checkout.checkouts[0].shipping_address.country ?? "DE",
+          checkout.checkouts[0]?.user?.tax_id ?? "",
+        )}
         page={1}
         pageSize={20}
         setPage={() => {}}
