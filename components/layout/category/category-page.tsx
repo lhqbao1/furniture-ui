@@ -113,7 +113,10 @@ const ProductCategory = ({
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
 
-    router.push(`/shop-all?${params.toString()}`, { scroll: false });
+    router.push(
+      `/category/${categorySlugs[categorySlugs.length - 1]}?${params.toString()}`,
+      { scroll: false },
+    );
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -133,7 +136,7 @@ const ProductCategory = ({
         </div>
         <div className="pt-0 pb-12 lg:w-[90%] md:w-[95%] xl:w-[90%] w-full mx-auto col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
           <CustomBreadCrumb currentPage={category?.name ?? ""} />
-          <h2 className="section-header">{category?.name}</h2>
+          <h1 className="section-header">{category?.name}</h1>
           {algoliaData && algoliaData.items?.length === 0 && (
             <p className="text-center text-xl font-bold mt-2">
               {t("emptyCategory")}

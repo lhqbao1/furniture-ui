@@ -35,7 +35,7 @@ export default function SaleProductsPage() {
     <div className="pt-3 xl:pb-16 pb-6">
       <CustomBreadCrumb currentPage={t("sale")} />
       <div className="">
-        <h2 className="section-header">{t("sale")}</h2>
+        <h1 className="section-header">{t("sale")}</h1>
         {isLoading || isError || !products ? (
           <ProductGridSkeleton length={12} />
         ) : (
@@ -56,10 +56,7 @@ export default function SaleProductsPage() {
                         </Collapsible> */}
             {/*Products section */}
             <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
-              <ProductsGridLayout
-                hasBadge
-                data={newProducts}
-              />
+              <ProductsGridLayout hasBadge data={newProducts} />
             </div>
           </div>
         )}

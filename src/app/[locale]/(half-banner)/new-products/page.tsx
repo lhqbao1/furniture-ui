@@ -28,7 +28,7 @@ export default function NewProductsPage() {
     <div className="pt-3 xl:pb-16 pb-6">
       <CustomBreadCrumb currentPage={t("newProducts")} />
       <div className="">
-        <h2 className="section-header">{t("newProducts")}</h2>
+        <h1 className="section-header">{t("newProducts")}</h1>
         {isLoading || isError || !products ? (
           <ProductGridSkeleton length={12} />
         ) : (
@@ -49,10 +49,7 @@ export default function NewProductsPage() {
                         </Collapsible> */}
             {/*Products section */}
             <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
-              <ProductsGridLayout
-                hasBadge
-                data={newProducts}
-              />
+              <ProductsGridLayout hasBadge data={newProducts} />
             </div>
           </div>
         )}

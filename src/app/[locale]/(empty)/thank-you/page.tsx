@@ -3,6 +3,9 @@ import OrderPlacedWrapper from "./page-client";
 import Script from "next/script";
 
 export const metadata = {
+  title: "Vielen Dank für Ihre Bestellung",
+  description:
+    "Vielen Dank für Ihren Einkauf bei Prestige Home. Diese Bestätigungsseite ist nicht indexierbar.",
   robots: {
     index: false,
     follow: false,

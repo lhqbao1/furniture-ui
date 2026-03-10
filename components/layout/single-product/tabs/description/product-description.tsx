@@ -3,6 +3,7 @@ import QAInput from "../q&a/q&a-input";
 import { ListFAQQuestion } from "@/components/layout/faq/list-question";
 import { ProductFAQSection } from "./faq-accordion";
 import { ProductFAQ } from "@/types/products";
+import { sanitizeBodyHtml } from "@/lib/sanitize-body-html";
 
 interface ProductDescriptionProps {
   description: string;
@@ -19,7 +20,7 @@ const ProductDescription = ({
     <div className="w-full grid grid-cols-12 gap-8">
       <div
         className="product-descriptions font-sans col-span-12 xl:col-span-7"
-        dangerouslySetInnerHTML={{ __html: description ?? "" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeBodyHtml(description ?? "") }}
       />
       <div className="xl:col-span-5 col-span-12">
         <ProductFAQSection question={question} />

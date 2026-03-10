@@ -18,6 +18,7 @@ import { useRouter } from "@/src/i18n/navigation";
 import { formatDate } from "@/lib/date-formated";
 import { usePathname } from "next/navigation";
 import { useSmoothScrollToRef } from "@/hooks/scrollToRef";
+import { sanitizeBodyHtml } from "@/lib/sanitize-body-html";
 
 interface ListPolicyProps {
   versionId: string;
@@ -232,7 +233,9 @@ const ListPolicy = ({
               </div>
               {typeof cl?.content === "string" && cl.content.trim() !== "" ? (
                 <div
-                  dangerouslySetInnerHTML={{ __html: cl.content }}
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeBodyHtml(cl.content),
+                  }}
                   className="[&_a]:text-secondary [&_a]:underline"
                 />
               ) : (

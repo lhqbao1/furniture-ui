@@ -15,6 +15,7 @@ import { ProductItem } from "@/types/products";
 import { ProductGroupDetailResponse } from "@/types/product-group";
 import ProductImageWrapper from "./image/product-image-wrapper";
 import ProductBrand from "./product-brand";
+import { sanitizeBodyHtml } from "@/lib/sanitize-body-html";
 
 interface ProductDetailsProps {
   reviews: ReviewResponse[];
@@ -104,7 +105,7 @@ const ProductDetails = ({
                     </h2>
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: productDetails.meta_description,
+                        __html: sanitizeBodyHtml(productDetails.meta_description),
                       }}
                     />
                   </div>

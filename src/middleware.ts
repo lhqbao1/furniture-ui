@@ -9,8 +9,21 @@ const intlMiddleware = createMiddleware({
 });
 
 export default function middleware(req: NextRequest) {
-  const res = intlMiddleware(req) as NextResponse;
   const { pathname, searchParams } = req.nextUrl;
+
+  if (pathname === "/en" || pathname.startsWith("/en/")) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = pathname.replace(/^\/en(?=\/|$)/, "/de");
+    return NextResponse.redirect(redirectUrl, 301);
+  }
+
+  if (pathname === "/de/en" || pathname.startsWith("/de/en/")) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = pathname.replace(/^\/de\/en(?=\/|$)/, "/de");
+    return NextResponse.redirect(redirectUrl, 301);
+  }
+
+  const res = intlMiddleware(req) as NextResponse;
 
   res.headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
 
@@ -35,8 +48,10 @@ export default function middleware(req: NextRequest) {
     "order",
   ].some((param) => searchParams.has(param));
 
-  const isOtherOldWpPaths = pathname.startsWith("/shop/");
-  pathname.startsWith("/product-category/");
+  const isOtherOldWpPaths =
+    pathname.startsWith("/shop/") ||
+    pathname.startsWith("/product-category/") ||
+    pathname.startsWith("/de/product-category/");
   // pathname.startsWith("/cart") ||
   // pathname.startsWith("/checkout") ||
   // pathname.startsWith("/my-account");
@@ -50,6 +65,34 @@ export default function middleware(req: NextRequest) {
         "Cache-Control": "public, max-age=3600",
       },
     });
+  }
+
+  const noIndexPrefixes = [
+    "/admin",
+    "/dsp",
+    "/de/admin",
+    "/de/dsp",
+    "/de/cart",
+    "/de/check-out",
+    "/de/thank-you",
+    "/de/account",
+    "/de/my-order",
+    "/de/wishlist",
+    "/de/recent-viewed",
+    "/de/login",
+    "/de/sign-up",
+    "/de/forgot-password",
+    "/de/reset-password",
+    "/de/admin-login",
+    "/de/auth/callback",
+  ];
+
+  const shouldNoIndex = noIndexPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+
+  if (shouldNoIndex) {
+    res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   }
 
   // ✅ Cho phép các route hợp lệ tiếp tục

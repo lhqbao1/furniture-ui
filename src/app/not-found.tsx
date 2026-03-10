@@ -7,13 +7,9 @@ export const metadata: Metadata = {
     title: '404 | Page Not Found',
     description: 'Sorry, the page you are looking for does not exist.',
     robots: { index: false, follow: false }, // 👈 Quan trọng: không index
-    alternates: {
-        canonical: '/404',
-    },
     openGraph: {
         title: 'Page Not Found | Prestige Home',
         description: 'Sorry, the page you are looking for does not exist.',
-        url: 'https://www.prestige-home.de/404',
         type: 'website',
     },
 }

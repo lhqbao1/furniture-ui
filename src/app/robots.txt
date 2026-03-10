@@ -11,6 +11,19 @@ Disallow: /product-category/
 Disallow: /cart
 Disallow: /check-out
 Disallow: /thank-you
+Disallow: /de/cart
+Disallow: /de/check-out
+Disallow: /de/thank-you
+Disallow: /de/account
+Disallow: /de/my-order
+Disallow: /de/wishlist
+Disallow: /de/recent-viewed
+Disallow: /de/login
+Disallow: /de/sign-up
+Disallow: /de/forgot-password
+Disallow: /de/reset-password
+Disallow: /de/admin-login
+Disallow: /de/auth/callback
 Disallow: /*add_to_cart
 Disallow: /*remove_item
 Disallow: /*_wpnonce
@@ -18,10 +31,12 @@ Disallow: /*?add-to-cart
 Disallow: /*?add_to_wishlist
 Disallow: /admin/
 Disallow: /dsp/
+Disallow: /de/admin/
+Disallow: /de/dsp/
 
 Allow: /
 Allow: /product/
 Allow: /category/
 
 
-Sitemap: https://prestige-home.de/sitemap.xml
+Sitemap: https://www.prestige-home.de/sitemap.xml

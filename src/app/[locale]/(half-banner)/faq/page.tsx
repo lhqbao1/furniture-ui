@@ -1,5 +1,6 @@
 import ListFAQ from "@/components/layout/faq/list-faq";
 import { getFAQItem, getFAQTopic } from "@/features/faq/api";
+import type { Metadata } from "next";
 import {
   HydrationBoundary,
   QueryClient,
@@ -9,6 +10,15 @@ import React from "react";
 
 // ISR: regenerate page mỗi 3600 giây
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "FAQ",
+  description:
+    "Häufig gestellte Fragen zu Bestellung, Lieferung, Zahlung und Produkten bei Prestige Home.",
+  alternates: {
+    canonical: "https://www.prestige-home.de/de/faq",
+  },
+};
 
 export default async function FAQ() {
   const queryClient = new QueryClient();

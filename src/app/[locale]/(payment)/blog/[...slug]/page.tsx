@@ -28,6 +28,14 @@ const getSidebarBlogsCached = unstable_cache(
   { revalidate: 600 },
 );
 
+function toMetaDescription(value?: string | null): string {
+  if (!value) return "Entdecken Sie den Blogbeitrag von Prestige Home.";
+  const plainText = value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return (
+    plainText.slice(0, 160) || "Entdecken Sie den Blogbeitrag von Prestige Home."
+  );
+}
+
 /* --------------------------------------------------------
  * 2) GENERATE METADATA
  * ------------------------------------------------------*/
@@ -76,13 +84,13 @@ export async function generateMetadata({
 
   return {
     title: post.title,
-    description: post.content?.slice(0, 150),
+    description: toMetaDescription(post.content),
     alternates: {
       canonical: `https://www.prestige-home.de/de/blog/${post.slug}`,
     },
     openGraph: {
       title: post.title,
-      description: post.content,
+      description: toMetaDescription(post.content),
       url: `https://www.prestige-home.de/de/blog/${post.slug}`,
     },
     other: {

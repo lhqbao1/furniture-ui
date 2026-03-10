@@ -80,20 +80,13 @@ export default function ImageGallery() {
 
   return (
     <section className="w-full py-12">
-      <h2 className="text-2xl font-bold mb-6">{t("imageGallery")}</h2>
+      <h1 className="text-3xl font-bold mb-6">{t("imageGallery")}</h1>
 
       <div className="flex gap-4 w-full">
         {colArr.map((col, colIndex) => (
-          <div
-            key={colIndex}
-            className="flex flex-col gap-4 w-full"
-          >
+          <div key={colIndex} className="flex flex-col gap-4 w-full">
             {col.map((src, i) => (
-              <ImageItem
-                key={colIndex + "-" + i}
-                src={src}
-                index={i}
-              />
+              <ImageItem key={colIndex + "-" + i} src={src} index={i} />
             ))}
           </div>
         ))}

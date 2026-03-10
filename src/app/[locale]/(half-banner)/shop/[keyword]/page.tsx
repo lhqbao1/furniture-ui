@@ -32,6 +32,14 @@ type PageParams = {
   keyword: string;
 };
 
+function safeDecodeKeyword(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -46,7 +54,7 @@ export async function generateMetadata({
     console.error("❌ generateMetadata /shop/[keyword] failed:", error);
   }
 
-  const rawKeyword = decodeURIComponent(keyword);
+  const rawKeyword = safeDecodeKeyword(keyword);
   const readable = rawKeyword.replaceAll("-", " ");
 
   // 🔍 tìm keyword tương ứng
@@ -55,7 +63,7 @@ export async function generateMetadata({
   );
 
   const description =
-    matchedKeyword?.description ??
+    matchedKeyword?.description?.trim() ||
     `Buy ${readable} online at Prestige Home. Discover high-quality furniture and home accessories with fast delivery.`;
 
   return {
@@ -80,7 +88,7 @@ export default async function ShopKeywordPage({
 }) {
   const { keyword } = await params; // ✅ BẮT BUỘC
 
-  const keywordSlug = decodeURIComponent(keyword);
+  const keywordSlug = safeDecodeKeyword(keyword);
   const searchText = keywordSlug.replaceAll("-", " ");
 
   // 🔹 fetch song song (tối ưu)

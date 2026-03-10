@@ -1,4 +1,5 @@
 import { apiPublic } from "@/lib/axios";
+import { slugify } from "@/lib/slugify";
 import { BlogItem } from "@/types/blog";
 import { CategoryResponse } from "@/types/categories";
 import { ProductItem } from "@/types/products";
@@ -197,12 +198,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ? keywordsRes.value.data
       : [];
 
-  const keywordUrls: MetadataRoute.Sitemap = keywords.map((p: string) => ({
-    url: `https://www.prestige-home.de/de/shop/${p}`,
-    lastModified: new Date(new Date()),
-    changeFrequency: "daily",
-    priority: 0.6,
-  }));
+  const keywordUrls: MetadataRoute.Sitemap = keywords
+    .map((keyword: string) => slugify(keyword))
+    .filter((slug) => slug.length > 0)
+    .map((slug) => ({
+      url: `https://www.prestige-home.de/de/shop/${slug}`,
+      lastModified: new Date(new Date()),
+      changeFrequency: "daily",
+      priority: 0.6,
+    }));
 
   return [
     ...staticUrls,

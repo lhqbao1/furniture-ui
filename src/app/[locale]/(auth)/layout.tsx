@@ -1,5 +1,16 @@
 import type { Metadata } from "next";
-import "../../globals.css"
+import "../../globals.css";
+
+export const metadata: Metadata = {
+  title: "Kontozugang",
+  description:
+    "Anmelde- und Kontoseiten von Prestige Home. Diese Seiten sind nicht für Suchmaschinen indexiert.",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
 
 export default function MainLayout({
     children,

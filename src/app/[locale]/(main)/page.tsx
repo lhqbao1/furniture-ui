@@ -3,12 +3,22 @@ import BestSellerSection from "@/components/layout/home/best-seller-section";
 import NewsletterVoucherSection from "@/components/layout/home/contact-voucher-section";
 import HomeCollectionHighlight from "@/components/layout/home/home-collection-highlight";
 import HomeValueProps from "@/components/layout/home/home-value-props";
+import type { Metadata } from "next";
 
 import { Suspense } from "react";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 
 export const revalidate = 60;
 export const experimental_ppr = true;
+
+export const metadata: Metadata = {
+  title: "Prestige Home – Qualität für Wohnen & Technik",
+  description:
+    "Prestige Home bietet hochwertige Möbel, Haushalts- und Technikprodukte für Zuhause und Gewerbe.",
+  alternates: {
+    canonical: "https://www.prestige-home.de/de",
+  },
+};
 
 export default async function HomePage() {
   return (
