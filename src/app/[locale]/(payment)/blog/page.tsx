@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "Blog",
   description:
     "Entdecken Sie Artikel über Wohndesign, Einrichtungsideen und Lifestyle-Tipps.",
+  alternates: {
+    canonical: "https://www.prestige-home.de/de/blog",
+  },
   openGraph: {
     title: "Blog",
     description:
@@ -41,15 +44,24 @@ export default async function BlogPage() {
     { revalidate: 600 },
   );
 
-  // const getSidebarBlogsCached = unstable_cache(
-  //   async () => safeRequest(getBlogsByProduct(), []),
-  //   ["blog-sidebar-products"],
-  //   { revalidate: 600 },
-  // );
+  const getSidebarBlogsCached = unstable_cache(
+    async () =>
+      safeRequest(getBlogsByProduct(), {
+        products: [],
+        pagination_product: {
+          page: 1,
+          page_size: 5,
+          total_items: 0,
+          total_pages: 0,
+        },
+      }),
+    ["blog-sidebar-products"],
+    { revalidate: 600 },
+  );
 
-  const [mainData] = await Promise.all([
+  const [mainData, sideBarData] = await Promise.all([
     getMainBlogsCached(),
-    // getSidebarBlogsCached(),
+    getSidebarBlogsCached(),
   ]);
 
   const featured = mainData.items.length > 0 ? mainData.items[0] : null;
@@ -107,9 +119,9 @@ export default async function BlogPage() {
           </div>
 
           {/* SIDEBAR */}
-          {/* <aside className="lg:col-span-4">
+          <aside className="lg:col-span-4">
             <SidebarBlog items={sideBarData} />
-          </aside> */}
+          </aside>
         </div>
       </div>
     </>

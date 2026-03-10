@@ -4,6 +4,7 @@ import SidebarBlog from "@/components/layout/blog/blog-sidebar";
 import BlogDetails from "@/components/layout/blog/blog-details";
 import { getBlogDetailsBySlug, getBlogsByProduct } from "@/features/blog/api";
 import { unstable_cache } from "next/cache";
+import { BlogByProductResponse } from "@/types/blog";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -76,6 +77,9 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.content?.slice(0, 150),
+    alternates: {
+      canonical: `https://www.prestige-home.de/de/blog/${post.slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.content,
@@ -108,8 +112,19 @@ export default async function BlogDetailPage({
   }
   if (!post) return notFound();
 
-  if (!sidebarData || sidebarData.length === 0) {
-    sidebarData = await getBlogsByProduct().catch(() => []);
+  if (!sidebarData || (sidebarData.products?.length ?? 0) === 0) {
+    sidebarData = await getBlogsByProduct().catch(
+      () =>
+        ({
+          products: [],
+          pagination_product: {
+            page: 1,
+            page_size: 5,
+            total_items: 0,
+            total_pages: 0,
+          },
+        }) as BlogByProductResponse,
+    );
   }
 
   return (

@@ -1,5 +1,4 @@
 import { Pagination } from "./pagination";
-import { ProductItem } from "./products";
 
 export interface BlogItem {
   id: string;
@@ -10,10 +9,26 @@ export interface BlogItem {
   blog_id: string;
 }
 
+export interface BlogByProductBlogItem {
+  id: string;
+  title: string;
+  slug: string;
+  created_at?: string;
+}
+
+export interface BlogByProductProductItem {
+  id: string;
+  url_key: string;
+  id_provider: string;
+  name: string;
+  image: string;
+  blogs: BlogByProductBlogItem[];
+  pagination_blog: Pagination;
+}
+
 export interface BlogByProductResponse {
-  product: ProductItem;
-  blogs: BlogItem[];
-  created_at: string;
+  products: BlogByProductProductItem[];
+  pagination_product: Pagination;
 }
 
 export interface BlogsResponse {

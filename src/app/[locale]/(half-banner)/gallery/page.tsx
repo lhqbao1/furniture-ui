@@ -6,13 +6,13 @@ export const metadata = {
   description:
     "Entdecken Sie die Prestige Home Galerie mit hochwertigen Bildern und Videos moderner Wohnräume, Einrichtungsideen und exklusiver Interior-Inspirationen.",
   alternates: {
-    canonical: "https://www.prestige-home.de/gallery",
+    canonical: "https://www.prestige-home.de/de/gallery",
   },
   openGraph: {
     title: "Prestige Home Galerie – Bilder & Videos exklusiver Wohnideen",
     description:
       "Durchstöbern Sie unsere Galerie mit hochwertigen Fotos und Videos. Inspirationen für modernes Wohnen, stilvolle Einrichtung und exklusive Interior-Konzepte.",
-    url: "https://www.prestige-home.de/gallery",
+    url: "https://www.prestige-home.de/de/gallery",
     siteName: "Prestige Home",
     type: "website",
     locale: "de_DE",
@@ -28,7 +28,7 @@ export default function GalleryPage() {
     name: "Prestige Home Galerie",
     description:
       "Galerie mit hochwertigen Bildern und Videos moderner Wohnräume, Einrichtungsideen und exklusiven Interior-Inspirationen.",
-    url: "https://www.prestige-home.de/gallery",
+    url: "https://www.prestige-home.de/de/gallery",
 
     mainEntity: {
       "@type": "ItemList",
@@ -39,14 +39,14 @@ export default function GalleryPage() {
           name: "Prestige Home Video Galerie",
           description:
             "Videos von Wohninspirationen, Interior-Designs und modernen Einrichtungskonzepten.",
-          url: "https://www.prestige-home.de/gallery",
+          url: "https://www.prestige-home.de/de/gallery",
         },
         {
           "@type": "MediaObject",
           name: "Prestige Home Bildergalerie",
           description:
             "Hochwertige Fotos verschiedener Wohnstile, Möbel und Interior-Ideen.",
-          url: "https://www.prestige-home.de/gallery",
+          url: "https://www.prestige-home.de/de/gallery",
         },
       ],
     },

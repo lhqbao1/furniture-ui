@@ -25,6 +25,9 @@ export async function generateMetadata({
   return {
     title: `Blog Kategorie`,
     description: "Entdecken Sie themenbezogene Artikel und Ratgeber.",
+    alternates: {
+      canonical: `https://www.prestige-home.de/de/blog/category/${productId}`,
+    },
     openGraph: {
       title: "Blog Kategorie",
       description: "Alle Blogbeiträge zu diesem Produkt.",
