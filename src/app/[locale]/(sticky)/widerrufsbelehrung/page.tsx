@@ -17,13 +17,13 @@ export const metadata = {
   description:
     "Hier finden Sie die Widerrufsbelehrung (Rücktrittsrecht) von Prestige Home. Erfahren Sie, wie Sie Ihre Bestellung widerrufen können.",
   alternates: {
-    canonical: "http://prestige-home.de/de/widerrufsbelehrung",
+    canonical: "https://www.prestige-home.de/de/widerrufsbelehrung",
   },
   openGraph: {
     title: "Widerrufsbelehrung - Prestige Home",
     description:
       "Alles über Ihr Rücktrittsrecht bei Prestige Home. Informationen zum Widerruf von Bestellungen.",
-    url: "https://www.prestige-home.de/widerrufsbelehrung",
+    url: "https://www.prestige-home.de/de/widerrufsbelehrung",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "article",

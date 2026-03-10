@@ -20,13 +20,13 @@ export const metadata: Metadata = {
   description:
     "Lesen Sie die Datenschutzerklärung von Prestige Home – Informationen zum Datenschutz, zur Verarbeitung personenbezogener Daten und zu Ihren Rechten.",
   alternates: {
-    canonical: "http://prestige-home.de/de/datenschutzerklaerung",
+    canonical: "https://www.prestige-home.de/de/datenschutzerklaerung",
   },
   openGraph: {
     title: "Datenschutzerklärung",
     description:
       "Transparenz über Datenschutz und Ihre Rechte bei Prestige Home.",
-    url: "https://www.prestige-home.de/datenschutzerklaerung",
+    url: "https://www.prestige-home.de/de/datenschutzerklaerung",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "article",

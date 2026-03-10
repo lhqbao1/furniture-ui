@@ -8,13 +8,13 @@ export const metadata: Metadata = {
   description:
     "Erfahren Sie mehr über Prestige Home – unsere Geschichte, unsere Mission und wie wir hochwertige, erschwingliche Produkte für Ihr Zuhause anbieten.",
   alternates: {
-    canonical: "https://www.prestige-home.de/about-us",
+    canonical: "https://www.prestige-home.de/de/about-us",
   },
   openGraph: {
     title: "Über uns",
     description:
       "Entdecken Sie, wie Prestige Home praktische, stilvolle Produkte für jeden Bereich Ihres Zuhauses anbietet.",
-    url: "https://www.prestige-home.de/about-us",
+    url: "https://www.prestige-home.de/de/about-us",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "website",

@@ -21,12 +21,12 @@ export const metadata: Metadata = {
   description:
     "Hier finden Sie die allgemeinen Geschäftsbedingungen (AGB) von Prestige Home. Transparente Regeln und faire Konditionen.",
   alternates: {
-    canonical: "http://prestige-home.de/de/agb",
+    canonical: "https://www.prestige-home.de/de/agb",
   },
   openGraph: {
     title: "AGB - Prestige Home",
     description: "Unsere Allgemeinen Geschäftsbedingungen (AGB) im Überblick.",
-    url: "https://www.prestige-home.de/agb",
+    url: "https://www.prestige-home.de/de/agb",
     siteName: "Prestige Home",
     locale: "de_DE",
     type: "article",

@@ -61,6 +61,9 @@ export async function generateMetadata({
   return {
     title: `${readable} kaufen online`,
     description,
+    alternates: {
+      canonical: `https://www.prestige-home.de/de/shop/${keyword}`,
+    },
     robots: {
       index: true,
       follow: true,

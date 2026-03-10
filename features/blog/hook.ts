@@ -1,15 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   getBlogsByProduct,
   getBlogs,
   GetAllBlogsParams,
+  GetBlogsByProductParams,
   getBlogsByProductSlug,
 } from "@/features/blog/api";
 
-export function useGetBlogsByProduct() {
+export function useGetBlogsByProduct(params?: GetBlogsByProductParams) {
   return useQuery({
-    queryKey: ["blogs-by-product"],
-    queryFn: getBlogsByProduct,
+    queryKey: ["blogs-by-product", params?.page_size_product, params?.page_size_blog],
+    queryFn: () => getBlogsByProduct(params),
     retry: false,
   });
 }
