@@ -3,11 +3,37 @@ import { NextResponse } from "next/server";
 import { getProductsFeed } from "@/features/products/api";
 import { ProductItem } from "@/types/products";
 
-const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!);
+function parseGoogleServiceAccount() {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!raw) return null;
 
-const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID!;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
 
 export async function GET() {
+  const serviceAccount = parseGoogleServiceAccount();
+  if (!serviceAccount) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Missing or invalid GOOGLE_SERVICE_ACCOUNT_JSON",
+      },
+      { status: 500 },
+    );
+  }
+
+  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+  if (!folderId) {
+    return NextResponse.json(
+      { success: false, error: "Missing GOOGLE_DRIVE_FOLDER_ID" },
+      { status: 500 },
+    );
+  }
+
   try {
     const auth = new google.auth.GoogleAuth({
       credentials: serviceAccount,
@@ -49,7 +75,7 @@ export async function GET() {
 
     await drive.files.update({
       fileId: spreadsheetId,
-      addParents: FOLDER_ID,
+      addParents: folderId,
       removeParents: file.data.parents?.join(","),
       supportsAllDrives: true,
     });
@@ -134,13 +160,14 @@ export async function GET() {
       fileName,
       count: rows.length,
     });
-  } catch (err: any) {
-    console.error("🔥 EXPORT ERROR:", err?.message || err);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("🔥 EXPORT ERROR:", message);
 
     return NextResponse.json(
       {
         success: false,
-        error: err?.message || "Unknown error",
+        error: message,
       },
       { status: 500 },
     );

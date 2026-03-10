@@ -4,11 +4,6 @@ import { ProductItem } from "@/types/products";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
 
-// Bạn nên lưu nội dung JSON credentials trong biến môi trường
-const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!);
-
-const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-
 function isPublishableProduct(product?: Partial<ProductItem> | null) {
   if (!product) return false;
 
@@ -56,34 +51,59 @@ function normalizeEan(value: unknown): string {
   return String(value).replace(/\D/g, "");
 }
 
-export async function GET() {
+function parseGoogleServiceAccount() {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!raw) return null;
+
   try {
-    // 1️⃣ Xác thực với Google
-    // 1️⃣ Tạo GoogleAuth
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export async function GET() {
+  const serviceAccount = parseGoogleServiceAccount();
+  if (!serviceAccount) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Missing or invalid GOOGLE_SERVICE_ACCOUNT_JSON",
+      },
+      { status: 500 },
+    );
+  }
+
+  const sheetId = process.env.GOOGLE_SHEET_ID;
+  if (!sheetId) {
+    return NextResponse.json(
+      { success: false, error: "Missing GOOGLE_SHEET_ID" },
+      { status: 500 },
+    );
+  }
+
+  try {
     const auth = new google.auth.GoogleAuth({
       credentials: serviceAccount,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
-    // 2️⃣ Truyền GoogleAuth vào Google Sheets API
     const sheets = google.sheets({
       version: "v4",
-      auth, // ⭐ FIX CHÍNH Ở ĐÂY
+      auth,
     });
 
-    // 2️⃣ Xoá toàn bộ dữ liệu trừ hàng 1
     await sheets.spreadsheets.values.clear({
-      spreadsheetId: SHEET_ID,
-      range: "Sheet1!A2:Z9999", // xoá từ dòng 2 trở xuống
+      spreadsheetId: sheetId,
+      range: "Sheet1!A2:Z9999",
     });
 
     const products = await getAllProductsSelect({
       is_econelo: false,
       all_products: true,
       supplier_id: "prestige_home",
-    }); // bạn sẽ viết hàm này
+    });
 
-    // 3️⃣ Lọc theo điều kiện publish giống product page
     const publishableProducts = products.filter((p: ProductItem) =>
       isPublishableProduct(p),
     );
@@ -142,9 +162,8 @@ export async function GET() {
         additionalImages,
       ];
     });
-    // 4️⃣ Ghi vào Google Sheet (ví dụ từ A2)
     await sheets.spreadsheets.values.update({
-      spreadsheetId: SHEET_ID,
+      spreadsheetId: sheetId,
       range: "Sheet1!A2",
       valueInputOption: "RAW",
       requestBody: { values },

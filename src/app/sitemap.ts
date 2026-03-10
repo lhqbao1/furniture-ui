@@ -5,6 +5,32 @@ import { CategoryResponse } from "@/types/categories";
 import { ProductItem } from "@/types/products";
 import { MetadataRoute } from "next";
 
+function toKeywordSlug(value: unknown): string {
+  if (typeof value === "string") {
+    return slugify(value);
+  }
+
+  if (typeof value === "number") {
+    return slugify(String(value));
+  }
+
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const candidate =
+      record.keywork ?? record.keyword ?? record.name ?? record.value;
+
+    if (typeof candidate === "string") {
+      return slugify(candidate);
+    }
+
+    if (typeof candidate === "number") {
+      return slugify(String(candidate));
+    }
+  }
+
+  return "";
+}
+
 function isPublishableProduct(product?: Partial<ProductItem> | null) {
   if (!product) return false;
 
@@ -192,14 +218,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  const keywords: string[] =
+  const keywords: unknown[] =
     keywordsRes.status === "fulfilled" &&
     Array.isArray(keywordsRes.value.data)
       ? keywordsRes.value.data
       : [];
 
   const keywordUrls: MetadataRoute.Sitemap = keywords
-    .map((keyword: string) => slugify(keyword))
+    .map((keyword) => toKeywordSlug(keyword))
     .filter((slug) => slug.length > 0)
     .map((slug) => ({
       url: `https://www.prestige-home.de/de/shop/${slug}`,
