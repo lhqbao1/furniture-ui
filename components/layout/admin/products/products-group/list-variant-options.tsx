@@ -1,220 +1,248 @@
-import { Loader2, Plus, Trash2, X } from "lucide-react"
-import React, { useEffect, useState } from "react"
-import AddOptionDialog from "./add-option-modal"
-import { useAddOptionToProduct, useCreateVariantOption, useDeleteVariant, useDeleteVariantOption, useGetVariantOptionByVariant } from "@/features/variant/hook"
-import { useFormContext } from "react-hook-form"
-import { filterProductsByCombinations, VariantCombinations } from "./list-combination-options"
-import { VariantOptionInput, VariantOptionResponse, VariantOptionsResponse } from "@/types/variant"
-import { toast } from "sonner"
-import { ProductGroupDetailResponse } from "@/types/product-group"
-import Image from "next/image"
-import { useQuery } from "@tanstack/react-query"
-import { getProductGroupDetail } from "@/features/product-group/api"
-
+import { Loader2, Plus, Trash2, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import AddOptionDialog from "./add-option-modal";
+import {
+  useDeleteVariant,
+  useDeleteVariantOption,
+} from "@/features/variant/hook";
+import { useFormContext } from "react-hook-form";
+import {
+  filterProductsByCombinations,
+  VariantCombinations,
+} from "./list-combination-options";
+import { VariantOptionResponse, VariantOptionsResponse } from "@/types/variant";
+import { toast } from "sonner";
+import { ProductGroupDetailResponse } from "@/types/product-group";
+import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { getProductGroupDetail } from "@/features/product-group/api";
 
 const ListVariantOption = () => {
-    const { watch } = useFormContext()
-    const parent_id = watch('parent_id')
-    const [selected, setSelected] = useState<Record<string, VariantOptionResponse[]>>({})
-    const [openModalAddOption, setOpenModalAddOption] = useState<boolean>(false)
-    const [combination, setCombination] = useState<VariantOptionResponse[][]>()
+  const { watch } = useFormContext();
+  const parent_id = watch("parent_id");
+  const [selected, setSelected] = useState<
+    Record<string, VariantOptionResponse[]>
+  >({});
+  const [openModalAddOption, setOpenModalAddOption] = useState<boolean>(false);
+  const [combination, setCombination] = useState<VariantOptionResponse[][]>();
 
-    const { data: groupDetail, isLoading, isError } = useQuery({
-        queryKey: ["product-group-detail", parent_id],
-        queryFn: () => getProductGroupDetail(parent_id),
-        enabled: !!parent_id,
-    })
+  const {
+    data: groupDetail,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["product-group-detail", parent_id],
+    queryFn: () => getProductGroupDetail(parent_id),
+    enabled: !!parent_id,
+  });
 
-    const deleteVariantMutation = useDeleteVariant()
-    const deleteVariantOptionMutation = useDeleteVariantOption()
+  const deleteVariantMutation = useDeleteVariant();
+  const deleteVariantOptionMutation = useDeleteVariantOption();
 
-    const transformGroupDetailToSelected = (groupDetail: ProductGroupDetailResponse) => {
-        const result: Record<string, VariantOptionResponse[]> = {};
+  const transformGroupDetailToSelected = (
+    groupDetail: ProductGroupDetailResponse,
+  ) => {
+    const result: Record<string, VariantOptionResponse[]> = {};
 
-        groupDetail.variants.forEach((variant: VariantOptionsResponse) => {
-            result[variant.variant.id] = variant.options.map((o: VariantOptionResponse) => ({
-                id: o.id,
-                label: o.label,
-                image_url: o.image_url,
-                img_description: o.img_description,
-                is_global: o.is_global,
+    groupDetail.variants.forEach((variant: VariantOptionsResponse) => {
+      result[variant.variant.id] = variant.options.map(
+        (o: VariantOptionResponse) => ({
+          id: o.id,
+          label: o.label,
+          image_url: o.image_url,
+          img_description: o.img_description,
+          is_global: o.is_global,
+        }),
+      );
+    });
 
-            }));
-        });
+    return result;
+  };
 
-        return result;
-    };
+  const handleSaveVariantOption = () => {
+    const combinations = generateVariantCombinations(selected);
+    setCombination(combinations);
+  };
 
-    const handleSaveVariantOption = () => {
-        const combinations = generateVariantCombinations(selected);
-        setCombination(combinations)
-    };
+  useEffect(() => {
+    if (!parent_id) return;
 
-    useEffect(() => {
-        if (!parent_id) return;
+    // reset khi đổi parent
+    setCombination([]);
+    setSelected({});
 
-        // reset khi đổi parent
-        setCombination([]);
-        setSelected({});
-
-        if (groupDetail?.variants) {
-            setSelected(transformGroupDetailToSelected(groupDetail));
-        }
-    }, [parent_id, groupDetail]);
-
-    useEffect(() => {
-        if (parent_id) {
-            handleSaveVariantOption();
-        }
-    }, [parent_id, selected]);
-
-
-
-    // const generateVariantCombinations = (selected: Record<string, VariantOptionResponse[]>) => {
-    //     const variantIds = Object.keys(selected);
-
-    //     if (variantIds.length === 0) return [];
-
-    //     // Lấy danh sách options theo thứ tự variantIds
-    //     const optionsList = variantIds.map(id => selected[id]);
-
-    //     // Hàm Cartesian product
-    //     const cartesian = (arrays: VariantOptionResponse[][]): VariantOptionResponse[][] => {
-    //         return arrays.reduce<VariantOptionResponse[][]>(
-    //             (acc, curr) =>
-    //                 acc.flatMap(a => curr.map(c => [...a, c])),
-    //             [[]]
-    //         );
-    //     };
-    //     return cartesian(optionsList);
-    // };
-
-    const generateVariantCombinations = (
-        selected: Record<string, VariantOptionResponse[]>
-    ) => {
-        const variantIds = Object.keys(selected);
-
-        if (variantIds.length === 0) return [];
-
-        // Lấy danh sách options, bỏ qua variant không có option
-        const optionsList = variantIds
-            .map((id) => selected[id])
-            .filter((options) => options.length > 0);
-
-        if (optionsList.length === 0) return [];
-
-        // Cartesian product
-        const cartesian = (arrays: VariantOptionResponse[][]): VariantOptionResponse[][] => {
-            return arrays.reduce<VariantOptionResponse[][]>(
-                (acc, curr) => acc.flatMap((a) => curr.map((c) => [...a, c])),
-                [[]]
-            );
-        };
-
-        return cartesian(optionsList);
-    };
-
-
-    const handleDeleteVariant = (variant_id: string) => {
-        deleteVariantMutation.mutate(variant_id, {
-            onSuccess(data, variables, context) {
-                toast.success("Delete variant successful")
-            },
-            onError(error, variables, context) {
-                toast.error("Delete variant fail")
-            },
-        })
+    if (groupDetail?.variants) {
+      setSelected(transformGroupDetailToSelected(groupDetail));
     }
+  }, [parent_id, groupDetail]);
 
-    const handleDeleteVariantOption = (option_id: string) => {
-        deleteVariantOptionMutation.mutate(option_id, {
-            onSuccess(data, variables, context) {
-                toast.success("Delete variant option successful")
-            },
-            onError(error, variables, context) {
-                toast.error("Delete variant option fail")
-            },
-        })
+  useEffect(() => {
+    if (parent_id) {
+      handleSaveVariantOption();
     }
+  }, [parent_id, selected]);
 
-    if (!groupDetail) return <div className="text-red-500">You need to choose product group first</div>
-    if (isLoading) return <Loader2 className="animate-spin" />
+  // const generateVariantCombinations = (selected: Record<string, VariantOptionResponse[]>) => {
+  //     const variantIds = Object.keys(selected);
 
+  //     if (variantIds.length === 0) return [];
+
+  //     // Lấy danh sách options theo thứ tự variantIds
+  //     const optionsList = variantIds.map(id => selected[id]);
+
+  //     // Hàm Cartesian product
+  //     const cartesian = (arrays: VariantOptionResponse[][]): VariantOptionResponse[][] => {
+  //         return arrays.reduce<VariantOptionResponse[][]>(
+  //             (acc, curr) =>
+  //                 acc.flatMap(a => curr.map(c => [...a, c])),
+  //             [[]]
+  //         );
+  //     };
+  //     return cartesian(optionsList);
+  // };
+
+  const generateVariantCombinations = (
+    selected: Record<string, VariantOptionResponse[]>,
+  ) => {
+    const variantIds = Object.keys(selected);
+
+    if (variantIds.length === 0) return [];
+
+    // Lấy danh sách options, bỏ qua variant không có option
+    const optionsList = variantIds
+      .map((id) => selected[id])
+      .filter((options) => options.length > 0);
+
+    if (optionsList.length === 0) return [];
+
+    // Cartesian product
+    const cartesian = (
+      arrays: VariantOptionResponse[][],
+    ): VariantOptionResponse[][] => {
+      return arrays.reduce<VariantOptionResponse[][]>(
+        (acc, curr) => acc.flatMap((a) => curr.map((c) => [...a, c])),
+        [[]],
+      );
+    };
+
+    return cartesian(optionsList);
+  };
+
+  const handleDeleteVariant = (variant_id: string) => {
+    deleteVariantMutation.mutate(variant_id, {
+      onSuccess(data, variables, context) {
+        toast.success("Delete variant successful");
+      },
+      onError(error, variables, context) {
+        toast.error("Delete variant fail");
+      },
+    });
+  };
+
+  const handleDeleteVariantOption = (option_id: string) => {
+    deleteVariantOptionMutation.mutate(option_id, {
+      onSuccess(data, variables, context) {
+        toast.success("Delete variant option successful");
+      },
+      onError(error, variables, context) {
+        toast.error("Delete variant option fail");
+      },
+    });
+  };
+
+  if (!groupDetail)
     return (
-        <div className="space-y-6">
-            {isLoading || isError || !groupDetail ? (
-                <div className="flex justify-center items-center py-6">
-                    <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
-                </div>
-            ) : (groupDetail.variants.map((variant, index) => (
-                <div key={variant.variant.id} className="flex gap-2 justify-start">
-                    <div className="grid grid-cols-6 w-full gap-8">
-                        <p className="col-span-1 flex items-center justify-end">
-                            {variant.variant.name}:
-                        </p>
-                        <div className="font-semibold col-span-5 flex gap-4 items-center justify-between">
-                            {/* Hiển thị đã chọn */}
-                            <div className="flex gap-6 items-center">
-                                <div className="flex gap-6 items-center justify-start">
-                                    {variant.options.map((o) => (
-                                        <div key={o.id} className="relative inline-block group">
-                                            {o.image_url ? (
-                                                <Image
-                                                    src={o.image_url}
-                                                    width={40}
-                                                    height={40}
-                                                    alt=""
-                                                    className="w-10 h-10 object-cover rounded"
-                                                    unoptimized
-                                                />
-                                            ) : (
-                                                <span className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground block">
-                                                    {o.label}
-                                                </span>
-                                            )}
+      <div className="text-red-500">You need to choose product group first</div>
+    );
+  if (isLoading) return <Loader2 className="animate-spin" />;
 
-                                            {/* Delete button: chỉ hiện khi hover */}
-                                            <div
-                                                className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
-                                                onClick={() => handleDeleteVariantOption(o.id)}
-                                            >
-                                                <X size={12} className="text-red-500" />
-                                            </div>
-                                        </div>
+  console.log(groupDetail);
 
-                                    ))}
-                                </div>
-                                <AddOptionDialog isImage={variant.variant.is_img} variantId={variant.variant.id} open={openModalAddOption} setOpen={setOpenModalAddOption} />
-                                {/* Nếu chưa có option thì show cảnh báo */}
-                                {variant.options.length === 0 && (
-                                    <span className="text-red-500 text-sm">
-                                        You need to add options for this attribute
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex items-center" onClick={() => handleDeleteVariant(variant.variant.id)}><Trash2 size={18} className="text-gray-600 cursor-pointer" /></div>
-                        </div>
-                    </div>
-                </div>
-            )))
-            }
-
-            {!groupDetail ?
-                (<div><Loader2 className="animate-spin" /></div>)
-                :
-                (
-                    <VariantCombinations
-                        combinations={combination ? combination : []}
-                        productDetails={groupDetail}
-                        filteredProduct={filterProductsByCombinations(
-                            groupDetail.products,
-                            combination ?? []
-                        )}
-                    />
-                )}
-
+  return (
+    <div className="space-y-6">
+      {isLoading || isError || !groupDetail ? (
+        <div className="flex justify-center items-center py-6">
+          <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
         </div>
-    )
-}
+      ) : (
+        groupDetail.variants.map((variant, index) => (
+          <div key={variant.variant.id} className="flex gap-2 justify-start">
+            <div className="grid grid-cols-6 w-full gap-8">
+              <p className="col-span-1 flex items-center justify-end">
+                {variant.variant.name}:
+              </p>
+              <div className="font-semibold col-span-5 flex gap-4 items-center justify-between">
+                {/* Hiển thị đã chọn */}
+                <div className="flex gap-6 items-center">
+                  <div className="flex gap-6 items-center justify-start">
+                    {variant.options.map((o) => (
+                      <div key={o.id} className="relative inline-block group">
+                        {o.image_url ? (
+                          <Image
+                            src={o.image_url}
+                            width={40}
+                            height={40}
+                            alt=""
+                            className="w-10 h-10 object-cover rounded"
+                            unoptimized
+                          />
+                        ) : (
+                          <span className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground block">
+                            {o.label}
+                          </span>
+                        )}
 
-export default ListVariantOption
+                        {/* Delete button: chỉ hiện khi hover */}
+                        <div
+                          className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleDeleteVariantOption(o.id)}
+                        >
+                          <X size={12} className="text-red-500" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <AddOptionDialog
+                    isImage={variant.variant.is_img}
+                    variantId={variant.variant.id}
+                    open={openModalAddOption}
+                    setOpen={setOpenModalAddOption}
+                  />
+                  {/* Nếu chưa có option thì show cảnh báo */}
+                  {variant.options.length === 0 && (
+                    <span className="text-red-500 text-sm">
+                      You need to add options for this attribute
+                    </span>
+                  )}
+                </div>
+                <div
+                  className="flex items-center"
+                  onClick={() => handleDeleteVariant(variant.variant.id)}
+                >
+                  <Trash2 size={18} className="text-gray-600 cursor-pointer" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+
+      {!groupDetail ? (
+        <div>
+          <Loader2 className="animate-spin" />
+        </div>
+      ) : (
+        <VariantCombinations
+          combinations={combination ? combination : []}
+          productDetails={groupDetail}
+          filteredProduct={filterProductsByCombinations(
+            groupDetail.products,
+            combination ?? [],
+          )}
+        />
+      )}
+    </div>
+  );
+};
+
+export default ListVariantOption;

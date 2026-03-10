@@ -1,6 +1,6 @@
 import { ChevronRight, Eye, Plus, X } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import {
@@ -8,7 +8,6 @@ import {
   ProductOptionData,
   VariantOptionResponse,
 } from "@/types/variant";
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import { toast } from "sonner";
 import { useAddOptionToProduct } from "@/features/variant/hook";
 import { ProductGroupDetailResponse } from "@/types/product-group";
@@ -27,6 +26,7 @@ import {
 } from "@/components/ui/command";
 import Link from "next/link";
 import { useLocale } from "next-intl";
+import { useGetProductsSelect } from "@/features/product-group/hook";
 
 interface VariantCombinationsProps {
   combinations: VariantOptionResponse[][];
@@ -61,27 +61,32 @@ export function filterProductsByCombinations(
 
 export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
   combinations,
+  productDetails,
   filteredProduct,
 }) => {
   const { watch } = useFormContext();
   const parent_id = watch("parent_id") || "";
   const [queryParams, setQueryParams] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [localCombinations, setLocalCombinations] = useState(combinations);
   const locale = useLocale();
 
   const [selectedAction, setSelectedAction] =
     useState<Record<number, string>>(filteredProduct);
-  const [listSelect, setListSelect] = useState<ProductItem[]>([]);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
-  const { data: listProducts, isLoading, isError } = useGetProductsSelect();
   const {
     data: listProductsSelect,
     isLoading: isLoadingSelect,
     isError: isErrorSelect,
-  } = useGetProductsSelect({
-    search: queryParams,
-  });
+  } = useGetProductsSelect(
+    {
+      search: debouncedQuery.trim(),
+    },
+    {
+      enabled: openIdx !== null && debouncedQuery.trim().length >= 2,
+    },
+  );
 
   const addOptionToProductMutation = useAddOptionToProduct();
 
@@ -91,8 +96,22 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
   }, [combinations, filteredProduct]);
 
   useEffect(() => {
-    setListSelect(listProductsSelect ?? []);
-  }, [listProductsSelect]);
+    const timer = setTimeout(() => {
+      setDebouncedQuery(queryParams);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [queryParams]);
+
+  const selectedProductsMap = useMemo(() => {
+    const map = new Map<string, ProductItem>();
+    (productDetails?.products ?? []).forEach((product) => {
+      map.set(String(product.id ?? ""), product);
+    });
+    (listProductsSelect ?? []).forEach((product) => {
+      map.set(String(product.id ?? ""), product);
+    });
+    return map;
+  }, [listProductsSelect, productDetails?.products]);
 
   const handleDeleteCombination = (idx: number) => {
     setLocalCombinations((prev) => prev.filter((_, i) => i !== idx));
@@ -104,15 +123,15 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
     );
 
   const handleSaveGroup = () => {
-    const data = combinations.map((combination, idx) => {
+    const data = localCombinations.map((combination, idx) => {
       return {
         options: combination.map((opt) => opt.id!) as string[],
         product_id: selectedAction[idx],
       };
     });
 
-    const filteredData: ProductOptionData[] = data.filter(
-      (data, idx) => data.product_id !== undefined,
+    const filteredData: ProductOptionData[] = data.filter((item) =>
+      Boolean(item.product_id),
     );
 
     const result: AddOptionToProductInput = {
@@ -133,11 +152,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
   return (
     <div className="mt-6 border-t pt-4">
       <div className="text-right">
-        <Button
-          type="button"
-          onClick={handleSaveGroup}
-          className="mt-4"
-        >
+        <Button type="button" onClick={handleSaveGroup} className="mt-4">
           Save group
         </Button>
       </div>
@@ -146,18 +161,12 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
         {localCombinations
           .filter((comb) => comb.length > 0)
           .map((combination, idx) => (
-            <div
-              key={idx}
-              className="flex group items-center"
-            >
+            <div key={idx} className="flex group items-center">
               <div
                 className="flex items-center justify-center shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => handleDeleteCombination(idx)}
               >
-                <X
-                  size={20}
-                  className="text-red-500"
-                />
+                <X size={20} className="text-red-500" />
               </div>
 
               <div className="grid grid-cols-3 gap-6 flex-1">
@@ -182,10 +191,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                         )}
                       </div>
                       {index < combination.length - 1 && (
-                        <Plus
-                          size={20}
-                          className="text-black"
-                        />
+                        <Plus size={20} className="text-black" />
                       )}
                     </React.Fragment>
                   ))}
@@ -195,7 +201,11 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                 <div className="col-span-2 flex gap-2 items-center">
                   <Popover
                     open={openIdx === idx}
-                    onOpenChange={(isOpen) => setOpenIdx(isOpen ? idx : null)}
+                    onOpenChange={(isOpen) => {
+                      setOpenIdx(isOpen ? idx : null);
+                      setQueryParams("");
+                      setDebouncedQuery("");
+                    }}
                   >
                     <PopoverTrigger asChild>
                       <Button
@@ -203,49 +213,50 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                         role="combobox"
                         className="flex-1 justify-between py-2 h-auto"
                       >
-                        <div className="flex gap-4">
-                          {selectedAction[idx] ? (
-                            <div className="flex gap-2 items-center">
-                              <Image
-                                src={
-                                  listProducts?.find(
-                                    (p) => p.id === selectedAction[idx],
-                                  )?.static_files[0].url ??
-                                  "/placeholder-product.webp"
-                                }
-                                width={40}
-                                height={40}
-                                alt=""
-                                className="h-10 rounded-sm"
-                                unoptimized
-                              />
-                              <div className="text-base text-wrap text-start">
-                                {
-                                  listProducts?.find(
-                                    (p) => p.id === selectedAction[idx],
-                                  )?.name
-                                }
-                              </div>
-                              <Link
-                                href={`/de/product/${
-                                  listProducts?.find(
-                                    (p) => p.id === selectedAction[idx],
-                                  )?.url_key
-                                }`}
-                                locale={locale}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Eye
-                                  className="text-secondary cursor-pointer"
-                                  size={20}
-                                />
-                              </Link>
+                        {(() => {
+                          const selectedProduct = selectedProductsMap.get(
+                            String(selectedAction[idx] ?? ""),
+                          );
+
+                          return (
+                            <div className="flex gap-4">
+                              {selectedAction[idx] ? (
+                                <div className="flex gap-2 items-center">
+                                  <Image
+                                    src={
+                                      selectedProduct?.static_files?.[0]?.url ??
+                                      "/placeholder-product.webp"
+                                    }
+                                    width={40}
+                                    height={40}
+                                    alt=""
+                                    className="h-10 rounded-sm"
+                                    unoptimized
+                                  />
+                                  <div className="text-base text-wrap text-start">
+                                    {selectedProduct?.name ??
+                                      "Product selected"}
+                                  </div>
+                                  {selectedProduct?.url_key && (
+                                    <Link
+                                      href={`/de/product/${selectedProduct.url_key}`}
+                                      locale={locale}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      <Eye
+                                        className="text-secondary cursor-pointer"
+                                        size={20}
+                                      />
+                                    </Link>
+                                  )}
+                                </div>
+                              ) : (
+                                "Select product"
+                              )}
                             </div>
-                          ) : (
-                            "Select product"
-                          )}
-                        </div>
+                          );
+                        })()}
                         <ChevronRight />
                       </Button>
                     </PopoverTrigger>
@@ -259,52 +270,66 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                         />
                         <CommandEmpty>No product found.</CommandEmpty>
                         <CommandGroup className="h-[400px] overflow-y-scroll">
-                          {isLoading && (
-                            <CommandItem disabled>Loading...</CommandItem>
-                          )}
-                          {isError && (
+                          {debouncedQuery.trim().length < 2 && (
                             <CommandItem disabled>
-                              Error loading products
+                              Type at least 2 characters to search
                             </CommandItem>
                           )}
-                          {listSelect
-                            .filter(
-                              (product) =>
-                                !Object.values(selectedAction).includes(
-                                  product.id ?? "",
-                                ),
-                            )
-                            .map((product) => (
-                              <CommandItem
-                                key={product.id}
-                                value={product.id ?? ""}
-                                onSelect={(value) => {
-                                  setSelectedAction((prev) => ({
-                                    ...prev,
-                                    [idx]: value,
-                                  }));
-                                  setOpenIdx(null); // 👉 đóng popover sau khi chọn
-                                }}
-                                className="flex w-full justify-between"
-                              >
-                                <div className="flex items-center space-x-3">
-                                  <Image
-                                    src={
-                                      product.static_files.length > 0
-                                        ? product.static_files[0].url
-                                        : "/placeholder-product.webp"
-                                    }
-                                    height={25}
-                                    width={25}
-                                    alt=""
-                                    className="rounded-"
-                                    unoptimized
-                                  />
-                                  <span>{product.name}</span>
-                                </div>
-                                <span>#{product.id_provider}</span>
+                          {debouncedQuery.trim().length >= 2 &&
+                            isLoadingSelect && (
+                              <CommandItem disabled>Loading...</CommandItem>
+                            )}
+                          {debouncedQuery.trim().length >= 2 &&
+                            isErrorSelect && (
+                              <CommandItem disabled>
+                                Error loading products
                               </CommandItem>
-                            ))}
+                            )}
+                          {debouncedQuery.trim().length >= 2 &&
+                            (listProductsSelect ?? [])
+                              .filter(
+                                (product) =>
+                                  !Object.entries(selectedAction)
+                                    .filter(([key]) => Number(key) !== idx)
+                                    .some(
+                                      ([, value]) =>
+                                        String(value ?? "") ===
+                                        String(product.id ?? ""),
+                                    ),
+                              )
+                              .map((product) => (
+                                <CommandItem
+                                  key={product.id}
+                                  value={product.id ?? ""}
+                                  onSelect={(value) => {
+                                    setSelectedAction((prev) => ({
+                                      ...prev,
+                                      [idx]: value,
+                                    }));
+                                    setQueryParams("");
+                                    setDebouncedQuery("");
+                                    setOpenIdx(null); // 👉 đóng popover sau khi chọn
+                                  }}
+                                  className="flex w-full justify-between"
+                                >
+                                  <div className="flex items-center space-x-3">
+                                    <Image
+                                      src={
+                                        (product.static_files?.length ?? 0) > 0
+                                          ? product.static_files[0].url
+                                          : "/placeholder-product.webp"
+                                      }
+                                      height={25}
+                                      width={25}
+                                      alt=""
+                                      className="rounded-"
+                                      unoptimized
+                                    />
+                                    <span>{product.name}</span>
+                                  </div>
+                                  <span>#{product.id_provider}</span>
+                                </CommandItem>
+                              ))}
                         </CommandGroup>
                       </Command>
                     </PopoverContent>

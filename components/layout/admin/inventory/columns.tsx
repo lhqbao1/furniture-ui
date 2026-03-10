@@ -461,8 +461,7 @@ export const getInventoryColumns = (
       const physical = isBundle
         ? calculateBundlePhysicalStock(row.original)
         : toNumber(row.original.stock);
-      const available = Math.max(0, physical - Math.abs(reserved));
-
+      const available = physical - Math.abs(reserved);
       return <div className="text-center">{available}</div>;
     },
   },

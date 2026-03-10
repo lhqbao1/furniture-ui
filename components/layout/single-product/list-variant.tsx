@@ -24,11 +24,12 @@ const ListVariant = ({
   const { control, setValue } = useFormContext<CartFormValues>();
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const router = useRouter();
+  const normalizeId = (value: unknown) => String(value ?? "");
 
   useEffect(() => {
     if (!currentProduct?.options?.length) return;
 
-    const ids = currentProduct.options.map((o) => o.id);
+    const ids = currentProduct.options.map((o) => normalizeId(o.id));
 
     setSelectedOptions(ids);
 
@@ -41,22 +42,30 @@ const ListVariant = ({
 
   const handleSelect = (variantId: string, optionId: string) => {
     if (!parentProduct) return;
+    const normalizedVariantId = normalizeId(variantId);
+    const normalizedOptionId = normalizeId(optionId);
 
     const nextSelectedOptions = (() => {
       const otherOptions = selectedOptions.filter((id) => {
-        const isSameVariant = variant.some((g) =>
-          g.options.some((o) => o.id === id && g.variant.id === variantId),
+        const isSameVariant = variant.some(
+          (g) =>
+            normalizeId(g.variant.id) === normalizedVariantId &&
+            g.options.some((o) => normalizeId(o.id) === normalizeId(id)),
         );
         return !isSameVariant;
       });
-      return [...otherOptions, optionId];
+      return [...otherOptions, normalizedOptionId];
     })();
 
     setSelectedOptions(nextSelectedOptions);
 
     const matchedProduct = parentProduct.products.find((product) => {
-      const optionIds = product.options?.map((opt) => opt.id) ?? [];
-      return nextSelectedOptions.every((id) => optionIds.includes(id));
+      const optionIds =
+        product.options?.map((opt) => normalizeId(opt.id)) ?? [];
+      return (
+        optionIds.length === nextSelectedOptions.length &&
+        nextSelectedOptions.every((id) => optionIds.includes(normalizeId(id)))
+      );
     });
 
     if (matchedProduct?.url_key) {
@@ -73,9 +82,13 @@ const ListVariant = ({
 
   const validOptionIds = useMemo(() => {
     return new Set(
-      parentProduct.products?.flatMap((p) => p.options?.map((o) => o.id) ?? []),
+      parentProduct.products?.flatMap(
+        (p) => p.options?.map((o) => normalizeId(o.id)) ?? [],
+      ),
     );
   }, [parentProduct]);
+
+  console.log(parentProduct);
 
   return (
     <Controller
@@ -91,8 +104,9 @@ const ListVariant = ({
 
               <div className="flex gap-2 flex-wrap">
                 {group.options.map((option) => {
-                  const isSelected = selectedOptions.includes(option.id);
-                  const isValid = validOptionIds.has(option.id);
+                  const optionId = normalizeId(option.id);
+                  const isSelected = selectedOptions.includes(optionId);
+                  const isValid = validOptionIds.has(optionId);
 
                   return (
                     <div
@@ -112,7 +126,10 @@ const ListVariant = ({
                     `}
                       onClick={() => {
                         if (!isValid) return; // ❌ không cho click option invalid
-                        handleSelect(group.variant.id, option.id);
+                        handleSelect(
+                          normalizeId(group.variant.id),
+                          normalizeId(option.id),
+                        );
                       }}
                     >
                       {option.image_url ? (
