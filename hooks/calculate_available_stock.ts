@@ -9,7 +9,7 @@ const calculateOwnAvailableStock = (
   if (!product) return 0;
   const stock = toNumber(product.stock);
   const resultStock = toNumber(product.result_stock);
-  return Math.max(0, stock - Math.abs(resultStock));
+  return stock - Math.abs(resultStock);
 };
 
 const calculateBundleAvailableStock = (
@@ -38,7 +38,7 @@ const calculateBundleAvailableStock = (
     .filter((value) => !Number.isNaN(value));
 
   if (bundleStocks.length > 0) {
-    return Math.max(0, Math.min(...bundleStocks));
+    return Math.min(...bundleStocks);
   }
 
   return calculateOwnAvailableStock(product);
@@ -49,8 +49,5 @@ export const calculateAvailableStock = (
 ): number => {
   if (!product) return 0;
 
-  const stock = calculateBundleAvailableStock(product);
-  const resultStock = toNumber(product.result_stock);
-
-  return Math.max(0, stock - Math.abs(resultStock));
+  return calculateBundleAvailableStock(product);
 };
