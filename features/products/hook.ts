@@ -13,6 +13,7 @@ import {
   getAllMaterials,
   getAllProducts,
   GetAllProductsParams,
+  getProductLogs,
   getProductById,
   getProductByIdProvider,
   getProductByTag,
@@ -22,7 +23,11 @@ import {
   updateBulkActiveProducts,
 } from "./api";
 import { ProductInput } from "@/lib/schema/product";
-import { ProductItem, ProductResponse } from "@/types/products";
+import {
+  ProductDetailLog,
+  ProductItem,
+  ProductResponse,
+} from "@/types/products";
 import { toast } from "sonner";
 interface SEOInput {
   title: string;
@@ -160,6 +165,16 @@ export function useGetProductByIdProvider(id_provider: string) {
     queryFn: () => getProductByIdProvider(id_provider),
     enabled: !!id_provider,
     retry: false,
+  });
+}
+
+export function useGetProductLogs(productId: string) {
+  return useQuery<ProductDetailLog[]>({
+    queryKey: ["product-logs", productId],
+    queryFn: () => getProductLogs(productId),
+    enabled: !!productId,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 }
 

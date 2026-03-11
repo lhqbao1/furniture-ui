@@ -173,6 +173,25 @@ export interface ProductStockLog {
   updated_at: string; // ISO datetime
 }
 
+export interface ProductDetailLogUser {
+  id: string;
+  email: string;
+  first_name?: string | null;
+  last_name?: string | null;
+}
+
+export interface ProductDetailLog {
+  id: string;
+  field: string;
+  old_value: string | null;
+  new_value: string | null;
+  product_id: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  user: ProductDetailLogUser | null;
+}
+
 export type ProductItem = {
   name: string;
   description: string;

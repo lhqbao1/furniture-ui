@@ -11,7 +11,7 @@ export async function uploadStaticFile(file: FormData) {
 }
 
 export async function importProduct(file: FormData) {
-  const { data } = await apiPublic.post("/import-products", file, {
+  const { data } = await apiAdmin.post("/import-products", file, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -32,7 +32,7 @@ export async function importProductSupplier(
   file: FormData,
   supplier_id: string,
 ) {
-  const { data } = await apiPublic.post(
+  const { data } = await apiAdmin.post(
     `/import-products-for-supplier/${supplier_id}`,
     file,
     {
@@ -44,10 +44,7 @@ export async function importProductSupplier(
   return data;
 }
 
-export async function updateStockSupplier(
-  file: FormData,
-  supplier_id: string,
-) {
+export async function updateStockSupplier(file: FormData, supplier_id: string) {
   const { data } = await apiAdmin.post(
     `/update-stock-supplier/${supplier_id}`,
     file,

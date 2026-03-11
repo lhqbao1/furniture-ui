@@ -58,8 +58,7 @@ const ProductDetailInputs = ({
 }: ProductDetailInputsProps) => {
   const form = useFormContext();
   const listImages = form.watch("static_files") ?? [];
-  const stock = form.watch("stock");
-  const result_stock = form.watch("result_stock");
+
   const [isRemoveImagesOpen, setIsRemoveImagesOpen] = useState(false);
 
   function sanitizeFolderName(name: string) {
@@ -247,44 +246,48 @@ const ProductDetailInputs = ({
         />
 
         {/* Stock input */}
-        <FormField
-          control={form.control}
-          name="stock"
-          render={({ field }) => {
-            const computedStock = calculateAvailableStock(
-              productDetails ?? (form.getValues() as ProductItem),
-            );
-
-            return (
+        {isDSP ? (
+          <FormField
+            control={form.control}
+            name="stock"
+            render={({ field }) => (
               <FormItem className="flex flex-col w-full">
                 <FormLabel className="text-black font-semibold text-sm">
                   Stock
                 </FormLabel>
-
                 <FormControl>
                   <Input
                     type="number"
                     inputMode="decimal"
-                    disabled={!isDSP}
-                    value={isDSP ? (field.value ?? "") : computedStock}
-                    onChange={
-                      isDSP
-                        ? (e) =>
-                            field.onChange(
-                              e.target.value === ""
-                                ? null
-                                : e.target.valueAsNumber,
-                            )
-                        : undefined
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === "" ? null : e.target.valueAsNumber,
+                      )
                     }
                   />
                 </FormControl>
-
                 <FormMessage />
               </FormItem>
-            );
-          }}
-        />
+            )}
+          />
+        ) : (
+          <FormItem className="flex flex-col w-full">
+            <FormLabel className="text-black font-semibold text-sm">
+              Computed stock
+            </FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                inputMode="decimal"
+                disabled
+                value={calculateAvailableStock(
+                  productDetails ?? (form.getValues() as ProductItem),
+                )}
+              />
+            </FormControl>
+          </FormItem>
+        )}
       </div>
 
       {/*Product price fields */}

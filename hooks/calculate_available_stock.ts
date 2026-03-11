@@ -38,7 +38,7 @@ const calculateBundleAvailableStock = (
     .filter((value) => !Number.isNaN(value));
 
   if (bundleStocks.length > 0) {
-    return Math.min(...bundleStocks);
+    return Math.max(0, Math.min(...bundleStocks));
   }
 
   return calculateOwnAvailableStock(product);

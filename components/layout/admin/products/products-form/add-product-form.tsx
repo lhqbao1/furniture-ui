@@ -30,6 +30,7 @@ import { Link, useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
 import { toast } from "sonner";
 import LogStockTab from "./log-stock-tab";
+import DetailsLogTab from "./details-log-tab";
 import { cn } from "@/lib/utils";
 import SyncToEbayForm from "../marketplace/sync-to-ebay-form";
 import SyncToAmazonForm from "../marketplace/ync-to-amazon-form";
@@ -391,6 +392,29 @@ const ProductForm = ({
                       <Card>
                         <CardContent className="">
                           <LogStockTab productDetail={productValues} />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </AccordionItem>
+                )}
+
+                {/* Log All */}
+                {productValues && (
+                  <AccordionItem value="details-log" className="border-none">
+                    <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
+                      Details Log
+                    </AccordionTrigger>
+
+                    <div
+                      className={
+                        openAccordion.includes("details-log")
+                          ? "block mt-4"
+                          : "hidden"
+                      }
+                    >
+                      <Card>
+                        <CardContent className="">
+                          <DetailsLogTab productId={productValues.id} />
                         </CardContent>
                       </Card>
                     </div>
