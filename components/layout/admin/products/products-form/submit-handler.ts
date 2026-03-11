@@ -139,7 +139,9 @@ export const submitProduct = async ({
 
   const cleanedPackages = cleanPackages(latestValues.packages);
   const stockValue =
-    productValues && productValues.stock !== undefined && productValues.stock !== null
+    productValues &&
+    productValues.stock !== undefined &&
+    productValues.stock !== null
       ? productValues.stock
       : latestValues.stock;
 
