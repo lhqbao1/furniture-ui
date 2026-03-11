@@ -44,7 +44,7 @@ export const marketPlaceSchema = z.object({
   final_price: z.number().nonnegative().optional().nullable(),
   min_stock: z.number().nonnegative().optional().nullable(),
   max_stock: z.number().nonnegative().optional().nullable(),
-  current_stock: z.number().nonnegative().optional().nullable(),
+  current_stock: z.number().optional().nullable(),
   line_item_id: z.string().optional().nullable(),
   marketplace_offer_id: z.string().optional().nullable(),
   brand: z.string().optional().nullable(),
@@ -66,7 +66,7 @@ export const amazonMarketplaceSchema = z
     sku: z.string(),
     brand: z.string().optional().nullable(),
     line_item_id: z.string().optional().nullable(),
-    current_stock: z.number().nonnegative().optional().nullable(),
+    current_stock: z.number().optional().nullable(),
     country_of_origin: z.string(),
     handling_time: z.number().min(1, "Handling time is required"),
   })
@@ -125,7 +125,7 @@ export const addProductSchema = z.object({
   final_price: z.number().optional().nullable(),
   tax: z.string().min(1, { message: "Tax is required" }),
   collection: z.string().optional().nullable(),
-  stock: z.number().nonnegative().optional().nullable(),
+  stock: z.number().optional().nullable(),
   delivery_multiple: z.boolean().optional().nullable(),
 
   materials: z.string().optional().nullable(),
