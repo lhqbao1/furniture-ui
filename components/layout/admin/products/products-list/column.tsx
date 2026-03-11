@@ -1694,6 +1694,7 @@ export const getProductColumns = (
     },
     cell: ({ row }) => {
       const computedStock = calculateAvailableStock(row.original);
+      console.log(computedStock);
 
       return (
         <div

@@ -52,7 +52,7 @@ export default function BlogDetails({ post }: { post: BlogItem }) {
 
       {/* Content */}
       <div className="text-muted-foreground prose overflow-hidden blog-content">
-        <ReactMarkdown rehypePlugins={[rehypeRaw, rehypeSanitize]}>
+        <ReactMarkdown rehypePlugins={[rehypeRaw]}>
           {stripImagesAndHeadings(post.content)}
         </ReactMarkdown>
       </div>

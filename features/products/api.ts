@@ -1,7 +1,11 @@
 import { api, apiAdmin, apiPublic } from "@/lib/axios";
 import { ProductInput } from "@/lib/schema/product";
 import { KeywordResponse } from "@/types/keyword";
-import { ProductItem, ProductResponse } from "@/types/products";
+import {
+  ProductDetailLog,
+  ProductItem,
+  ProductResponse,
+} from "@/types/products";
 import qs from "qs";
 
 export interface GetAllProductsParams {
@@ -166,6 +170,16 @@ export async function getProductByIdProvider(id_provider: string) {
     `/products/by-id-provider/${id_provider}`,
   );
   return data as ProductItem;
+}
+
+export async function getProductLogs(product_id: string) {
+  const { data } = await apiAdmin.get(`/products/product/logs/${product_id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+  return data as ProductDetailLog[];
 }
 
 export async function getProductBySlug(product_slug: string) {

@@ -7,15 +7,11 @@ import { CustomPagination } from "@/components/shared/custom-pagination";
 import { useTranslations } from "next-intl";
 import { CategoryBySlugResponse } from "@/types/categories";
 import { useQuery } from "@tanstack/react-query";
-import {
-  getCategoryBySlug,
-  getChildrenCategoryByParent,
-} from "@/features/category/api";
+import { getChildrenCategoryByParent } from "@/features/category/api";
 import ShopAllFilterSection from "../shop-all/shop-all-filter-section";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/src/i18n/navigation";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
-import { useGetChildrenCategoriesByParent } from "@/features/category/hook";
 
 interface ProductCategoryProps {
   categorySlugs: string[];
@@ -35,7 +31,7 @@ const ProductCategory = ({
   // 🔹 1. LẤY PARAMS TỪ URL
   const query = searchParams.get("search") ?? undefined;
   const pageFromUrl = Number(searchParams.get("page")) || 1;
-  const pageSizeFromUrl = Number(searchParams.get("page_size")) || 40;
+  const pageSizeFromUrl = Number(searchParams.get("page_size")) || 20;
 
   const brands = searchParams.getAll("brand");
   const brandsKey =

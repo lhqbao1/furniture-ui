@@ -138,6 +138,10 @@ export const submitProduct = async ({
   }
 
   const cleanedPackages = cleanPackages(latestValues.packages);
+  const stockValue =
+    productValues && productValues.stock !== undefined && productValues.stock !== null
+      ? productValues.stock
+      : latestValues.stock;
 
   const payload = {
     ...latestValues, // 👈 Thay values bằng latestValues
@@ -171,7 +175,7 @@ export const submitProduct = async ({
         : undefined,
     final_price: latestValues.final_price ?? latestValues.price ?? undefined,
     ...(latestValues.price && { price: latestValues.price }),
-    stock: latestValues.stock ?? 0,
+    stock: stockValue ?? 0,
     is_bundle:
       latestValues.bundles && latestValues.bundles?.length > 0 ? true : false,
     tag: latestValues.tag === "" ? undefined : latestValues.tag,

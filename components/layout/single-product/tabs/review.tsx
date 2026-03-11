@@ -1,6 +1,4 @@
 "use client";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Star } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -121,7 +119,9 @@ const ProductReviewTab = ({ productId }: ProductReviewTabProps) => {
                     stroke="#f15a24"
                     className="cursor-pointer"
                     onClick={() =>
-                      setSelectedRate(selectedRate === item.title ? undefined : item.title)
+                      setSelectedRate(
+                        selectedRate === item.title ? undefined : item.title,
+                      )
                     }
                     fill={selectedRate === item.title ? "#f15a24" : "white"}
                   />

@@ -32,10 +32,7 @@ const CategorySection = async ({ slug }: CategorySectionProps) => {
       style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
     >
       <h2 className="section-header">
-        {/* <Link href={"/shop-all?categories=Zäune+%26+Sichtschutz"}>
-         
-        </Link> */}
-        {products.name}
+        <Link href={`/category/${slug}`}>{products.name}</Link>
       </h2>
       <ProductsGridLayout
         data={products.products
