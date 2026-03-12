@@ -130,21 +130,38 @@ export default function ProductSearch({
 
   function handleSubmit() {
     const value = query.trim();
-    if (!value) return;
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!value) {
+      setOpen(false);
+      params.delete("search");
+      params.set("page", "1");
+
+      const nextUrl = params.toString()
+        ? `/shop-all?${params.toString()}`
+        : "/shop-all";
+
+      if (isShopAllPage) {
+        router.replace(nextUrl, { locale });
+      } else {
+        router.push(nextUrl, { locale });
+      }
+      return;
+    }
 
     addSearchKeyword(value);
     setOpen(false);
-
-    // clone params hiện tại
-    const params = new URLSearchParams(searchParams.toString());
     params.set("search", value);
+    params.set("page", "1");
+
+    const nextUrl = `/shop-all?${params.toString()}`;
 
     if (isShopAllPage) {
       // ✅ đang ở /shop-all → chỉ update query
-      router.replace(`/shop-all?${params.toString()}`, { locale });
+      router.replace(nextUrl, { locale });
     } else {
       // ✅ chưa ở /shop-all → điều hướng sang
-      router.push(`/shop-all?${params.toString()}`, { locale });
+      router.push(nextUrl, { locale });
     }
   }
 

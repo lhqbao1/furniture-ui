@@ -72,7 +72,7 @@ export default function ProductCard({
             className="cursor-pointer"
           >
             <div
-              className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group flex items-center"
+              className="relative mb-2 w-full h-96 overflow-hidden rounded-md bg-white group flex items-center justify-center"
               onMouseEnter={() => {
                 if (enableAltHover && altImageUrl) setShouldLoadAltImage(true);
               }}
@@ -86,13 +86,12 @@ export default function ProductCard({
                   product.static_files?.[0]?.url || "/placeholder-product.webp"
                 }
                 alt={product.name}
-                width={800}
-                height={800}
+                fill
                 priority={isLCP} // 🔥 QUAN TRỌNG
                 loading={isLCP ? "eager" : "lazy"}
                 sizes="(max-width: 768px) 50vw, 25vw"
                 className={cn(
-                  "object-cover w-full h-full transition-all duration-500 ease-in-out rounded-xl",
+                  "object-contain transition-all duration-500 ease-in-out",
                   enableAltHover && "group-hover:-translate-x-6 group-hover:opacity-0",
                 )}
               />
@@ -102,12 +101,11 @@ export default function ProductCard({
                 <Image
                   src={altImageUrl}
                   alt={product.name}
-                  width={800}
-                  height={800}
+                  fill
                   loading="lazy"
                   sizes="(max-width: 768px) 50vw, 25vw"
                   className={cn(
-                    "object-contain absolute rounded-xl translate-x-6 opacity-0 transition-all duration-500 ease-in-out",
+                    "object-contain translate-x-6 opacity-0 transition-all duration-500 ease-in-out",
                     enableAltHover &&
                       "group-hover:translate-x-0 group-hover:opacity-100",
                   )}
