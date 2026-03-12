@@ -206,6 +206,8 @@ const CartSummary = ({
         <Button
           onClick={onCheckout}
           className="
+          hidden
+          md:flex
           w-full
           h-14
           mt-6
@@ -293,6 +295,35 @@ const CartSummary = ({
             className="w-auto h-10 object-contain hover:scale-110 duration-300 transition-all"
             unoptimized
           />
+        </div>
+      </div>
+
+      <div className="h-24 md:hidden" />
+
+      <div className="fixed bottom-0 left-0 z-50 w-full bg-white border-t shadow-lg md:hidden">
+        <div className="px-4 py-3">
+          <Button
+            onClick={onCheckout}
+            className="
+            w-full
+            h-14
+            rounded-sm
+            bg-secondary
+            text-white
+            text-base
+            tracking-wide
+            transition-all
+            duration-200
+            hover:bg-secondary/90
+            active:scale-[0.98]
+            focus-visible:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-secondary
+            focus-visible:ring-offset-2
+          "
+          >
+            {t("proceedToCheckout")}
+          </Button>
         </div>
       </div>
     </div>

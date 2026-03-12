@@ -1488,6 +1488,8 @@ function ActionsCell({ product }: { product: ProductItem }) {
 
 export const getProductColumns = (
   setSortByStock: (val?: "asc" | "desc") => void,
+  setSortByIncomingStock: (val: "asc" | "desc" | "") => void,
+  sortByIncomingStock: "asc" | "desc" | "",
 ): ColumnDef<ProductItem>[] => [
   {
     id: "select",
@@ -1694,7 +1696,6 @@ export const getProductColumns = (
     },
     cell: ({ row }) => {
       const computedStock = calculateAvailableStock(row.original);
-      console.log(computedStock);
 
       return (
         <div
@@ -1861,7 +1862,26 @@ export const getProductColumns = (
   },
   {
     id: "incoming_stock",
-    header: () => <div className="text-center uppercase">incoming stock</div>,
+    header: () => {
+      const direction = sortByIncomingStock;
+
+      return (
+        <Button
+          variant="ghost"
+          className="font-semibold flex items-center px-0 justify-center gap-1 w-fit mx-auto uppercase"
+          onClick={() => {
+            const nextDirection =
+              direction === "asc" ? "desc" : direction === "desc" ? "" : "asc";
+            setSortByIncomingStock(nextDirection);
+          }}
+        >
+          <div>incoming stock</div>
+          <div className="mb-0.5">
+            {direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕"}
+          </div>
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const inventoryPos = row.original.inventory_pos ?? [];
       const today = new Date();

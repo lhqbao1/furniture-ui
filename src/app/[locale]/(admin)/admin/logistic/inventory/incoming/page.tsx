@@ -134,6 +134,15 @@ const IncomingInventoryList = () => {
       ),
     },
     {
+      accessorKey: "product.po_number",
+      header: () => <div className="text-center">PO Number</div>,
+      cell: ({ row }) => (
+        <div className="text-center">
+          {row.original.container.purchase_order.po_number ?? "—"}
+        </div>
+      ),
+    },
+    {
       accessorKey: "container.date_to_warehouse",
       header: () => <div className="text-center">Estimated arrived date</div>,
       cell: ({ row }) => (

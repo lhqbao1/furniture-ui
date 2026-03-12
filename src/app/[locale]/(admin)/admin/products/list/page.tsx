@@ -106,8 +106,7 @@ const ProductList = () => {
         ...defaultVisibility,
         ...(prev[visibilityKey] ?? {}),
       };
-      const next =
-        typeof updater === "function" ? updater(current) : updater;
+      const next = typeof updater === "function" ? updater(current) : updater;
       return { ...prev, [visibilityKey]: next };
     });
   };
@@ -118,12 +117,27 @@ const ProductList = () => {
   const [tableHeight, setTableHeight] = useState<number | null>(null);
 
   const filters = useProductListFilters();
+  const normalizedIncomingStockSort =
+    filters.sort_by_incoming_stock === "asc" ||
+    filters.sort_by_incoming_stock === "desc"
+      ? filters.sort_by_incoming_stock
+      : "";
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const setSortByIncomingStock = (value: "asc" | "desc" | "") => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set("sort_by_incoming_stock", value);
+
+    params.set("page", "1");
+    setPage(1);
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -143,6 +157,7 @@ const ProductList = () => {
     sort_by_stock: sortByStock,
     supplier_id: filters.supplier_id,
     brand_id: filters.brand,
+    sort_by_incoming_stock: filters.sort_by_incoming_stock,
   });
 
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
@@ -223,29 +238,33 @@ const ProductList = () => {
       >
         <ProductTable
           data={filteredItems}
-          columns={getProductColumns(setSortByStock)}
+          columns={getProductColumns(
+            setSortByStock,
+            setSortByIncomingStock,
+            normalizedIncomingStockSort,
+          )}
           page={page}
           pageSize={pageSize}
-            setPage={handlePageChange}
-            setPageSize={setPageSize}
-            totalItems={
-              multiSearchValues.length > 0
-                ? filteredItems.length
-                : (data?.pagination.total_items ?? 0)
-            }
-            totalPages={
-              multiSearchValues.length > 0
-                ? 1
-                : (data?.pagination.total_pages ?? 0)
-            }
-            hasHeaderBackGround
-            isSticky
-            stickyContainerClassName="h-full"
-            onSelectionChange={setSelectedProductIds} // 👈 đây
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={handleTableColumnVisibilityChange}
-            enableClientSorting
-          />
+          setPage={handlePageChange}
+          setPageSize={setPageSize}
+          totalItems={
+            multiSearchValues.length > 0
+              ? filteredItems.length
+              : (data?.pagination.total_items ?? 0)
+          }
+          totalPages={
+            multiSearchValues.length > 0
+              ? 1
+              : (data?.pagination.total_pages ?? 0)
+          }
+          hasHeaderBackGround
+          isSticky
+          stickyContainerClassName="h-full"
+          onSelectionChange={setSelectedProductIds} // 👈 đây
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={handleTableColumnVisibilityChange}
+          enableClientSorting
+        />
       </div>
 
       {(isLoading || isFetching) && (

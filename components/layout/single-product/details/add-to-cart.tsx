@@ -144,7 +144,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
               />
             ) : null // hoặc render message "Không có phiên bản"
           }
-          <div className="flex flex-row items-start gap-4 mt-6">
+          <div className="md:flex flex-row items-start gap-4 mt-6 hidden">
             <div className="lg:basis-1/4 basis-2/5 space-y-2">
               <FormField
                 control={form.control}

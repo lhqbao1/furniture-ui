@@ -144,7 +144,10 @@ export async function generateMetadata({
 
   const description =
     product.meta_description?.trim() ||
-    product.description?.replace(/<[^>]*>/g, "").trim().slice(0, 160) ||
+    product.description
+      ?.replace(/<[^>]*>/g, "")
+      .trim()
+      .slice(0, 160) ||
     `${product.name} online kaufen bei Prestige Home.`;
 
   return {
@@ -404,7 +407,10 @@ export default async function Page({
             <ProductDetailsTab reviews={plainReviews} product={plainProduct} />
           </div>
 
-          <div className="lg:mt-6 mt-0 shadow-[0_0_5px_rgba(0,0,0,0.1)] px-4 py-4 rounded-sm">
+          <div
+            id="product-review-tab"
+            className="lg:mt-6 mt-0 shadow-[0_0_5px_rgba(0,0,0,0.1)] px-4 py-4 rounded-sm scroll-mt-24"
+          >
             <ProductReviewTab productId={plainProduct.id} />
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
-import { FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTranslations, useLocale } from "next-intl";
@@ -130,11 +130,34 @@ export default function CheckOutFormSection() {
     return Math.round(totalEuro * 100);
   }, [totalEuro]);
 
+  const scrollToFirstInvalidField = React.useCallback(() => {
+    if (typeof window === "undefined") return;
+
+    window.setTimeout(() => {
+      const firstInvalid = document.querySelector(
+        '[aria-invalid="true"]',
+      ) as HTMLElement | null;
+      const firstMessage = document.querySelector(
+        '[data-slot="form-message"]',
+      ) as HTMLElement | null;
+
+      const target = firstInvalid ?? firstMessage;
+      if (!target) return;
+
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (typeof target.focus === "function") {
+        target.focus({ preventScroll: true });
+      }
+    }, 0);
+  }, []);
+
   return (
     <form
       onSubmit={form.handleSubmit(
         (values) => handleOTP(values),
         (error) => {
+          scrollToFirstInvalidField();
+
           const firstKey = Object.keys(error)[0] as keyof typeof error;
           const firstMessage = error[firstKey]?.message;
 
@@ -207,10 +230,12 @@ export default function CheckOutFormSection() {
             render={({ field }) => (
               <FormItem>
                 <div className="flex flex-row gap-2 mt-4 items-center">
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
                   <FormLabel className="text-sm block">
                     {t("agreeTo")} <AGBDialogTrigger t={t} /> {t("and")}{" "}
                     <WiderrufDialogTrigger t={t} /> {t("agree_widderuf")}
@@ -221,10 +246,10 @@ export default function CheckOutFormSection() {
           />
 
           {/* CONTINUE BUTTON */}
-          <div className="flex lg:justify-start justify-center mt-2">
+          <div className="hidden md:flex lg:justify-start justify-center mt-2">
             <Button
               type="submit"
-              className="lg:text-lg text-base w-fu lg:w-1/3 md:w-1/2 py-6"
+              className="lg:text-lg text-base w-full lg:w-1/3 md:w-1/2 py-6"
               disabled={submitting}
             >
               {submitting ? (
@@ -233,6 +258,24 @@ export default function CheckOutFormSection() {
                 t("placeOrder")
               )}
             </Button>
+          </div>
+
+          <div className="h-24 md:hidden" />
+
+          <div className="fixed bottom-0 left-0 z-50 w-full border-t bg-white shadow-lg md:hidden">
+            <div className="px-4 py-3">
+              <Button
+                type="submit"
+                className="text-base w-full py-6"
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  t("placeOrder")
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

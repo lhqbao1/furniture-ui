@@ -26,18 +26,30 @@ export default function ProductCard({
   const locale = useLocale();
   const addProductToViewMutation = useAddViewedProduct();
   const [canHover, setCanHover] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [shouldLoadAltImage, setShouldLoadAltImage] = useState(false);
   const altImageUrl = product.static_files?.[1]?.url;
+  const enableAltHover = canHover && !isMobileViewport;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const hoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
 
-    const updateCanHover = () => setCanHover(mediaQuery.matches);
-    updateCanHover();
+    const updateMediaState = () => {
+      setCanHover(hoverQuery.matches);
+      setIsMobileViewport(mobileQuery.matches);
+    };
 
-    mediaQuery.addEventListener("change", updateCanHover);
-    return () => mediaQuery.removeEventListener("change", updateCanHover);
+    updateMediaState();
+
+    hoverQuery.addEventListener("change", updateMediaState);
+    mobileQuery.addEventListener("change", updateMediaState);
+
+    return () => {
+      hoverQuery.removeEventListener("change", updateMediaState);
+      mobileQuery.removeEventListener("change", updateMediaState);
+    };
   }, []);
 
   const handleAddProductToViewed = (productId: string) => {
@@ -62,10 +74,10 @@ export default function ProductCard({
             <div
               className="relative w-full h-48 md:h-56 lg:h-80 mb-2 overflow-hidden rounded group flex items-center"
               onMouseEnter={() => {
-                if (canHover && altImageUrl) setShouldLoadAltImage(true);
+                if (enableAltHover && altImageUrl) setShouldLoadAltImage(true);
               }}
               onFocus={() => {
-                if (canHover && altImageUrl) setShouldLoadAltImage(true);
+                if (enableAltHover && altImageUrl) setShouldLoadAltImage(true);
               }}
             >
               {/* Image 1 */}
@@ -79,17 +91,14 @@ export default function ProductCard({
                 priority={isLCP} // 🔥 QUAN TRỌNG
                 loading={isLCP ? "eager" : "lazy"}
                 sizes="(max-width: 768px) 50vw, 25vw"
-                className="
-                  object-cover
-                  w-full h-full
-                  transition-all duration-500 ease-in-out
-                  group-hover:-translate-x-6
-                  group-hover:opacity-0 rounded-xl
-                "
+                className={cn(
+                  "object-cover w-full h-full transition-all duration-500 ease-in-out rounded-xl",
+                  enableAltHover && "group-hover:-translate-x-6 group-hover:opacity-0",
+                )}
               />
 
               {/* Image 2 */}
-              {altImageUrl && shouldLoadAltImage && (
+              {altImageUrl && shouldLoadAltImage && enableAltHover && (
                 <Image
                   src={altImageUrl}
                   alt={product.name}
@@ -97,14 +106,11 @@ export default function ProductCard({
                   height={800}
                   loading="lazy"
                   sizes="(max-width: 768px) 50vw, 25vw"
-                  className="
-                    object-contain
-                    absolute rounded-xl
-                    translate-x-6 opacity-0
-                    transition-all duration-500 ease-in-out
-                    group-hover:translate-x-0
-                    group-hover:opacity-100
-                  "
+                  className={cn(
+                    "object-contain absolute rounded-xl translate-x-6 opacity-0 transition-all duration-500 ease-in-out",
+                    enableAltHover &&
+                      "group-hover:translate-x-0 group-hover:opacity-100",
+                  )}
                 />
               )}
             </div>
