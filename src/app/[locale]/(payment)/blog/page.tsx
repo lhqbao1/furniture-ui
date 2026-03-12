@@ -31,7 +31,12 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
   const getMainBlogsCached = unstable_cache(
     async () =>
-      safeRequest(getBlogs({ pageSize: 16 }), {
+      safeRequest(
+        getBlogs({
+          pageSize: 16,
+          is_econelo: false,
+        }),
+        {
         items: [],
         pagination: {
           page: 1,
@@ -39,14 +44,15 @@ export default async function BlogPage() {
           total_items: 0,
           total_pages: 0,
         },
-      }),
+        },
+      ),
     ["blog-main", "page-size-16"],
     { revalidate: 600 },
   );
 
   const getSidebarBlogsCached = unstable_cache(
     async () =>
-      safeRequest(getBlogsByProduct(), {
+      safeRequest(getBlogsByProduct({ is_econelo: false }), {
         products: [],
         pagination_product: {
           page: 1,

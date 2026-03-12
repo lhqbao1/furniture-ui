@@ -115,7 +115,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
           })
         : Promise.resolve(EMPTY_BLOGS_RESPONSE),
       productSlug ? getProductBySlug(productSlug) : Promise.resolve(null),
-      getBlogsByProduct(),
+      getBlogsByProduct({ is_econelo: false }),
     ]);
 
   const categoryBlogs =

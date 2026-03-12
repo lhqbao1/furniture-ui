@@ -9,16 +9,29 @@ import {
 
 export function useGetBlogsByProduct(params?: GetBlogsByProductParams) {
   return useQuery({
-    queryKey: ["blogs-by-product", params?.page_size_product, params?.page_size_blog],
-    queryFn: () => getBlogsByProduct(params),
+    queryKey: [
+      "blogs-by-product",
+      params?.page_size_product,
+      params?.page_size_blog,
+      false,
+    ],
+    queryFn: () =>
+      getBlogsByProduct({
+        ...params,
+        is_econelo: false,
+      }),
     retry: false,
   });
 }
 
 export function useGetBlogs(params?: GetAllBlogsParams) {
   return useQuery({
-    queryKey: ["blogs", params?.page, params?.pageSize],
-    queryFn: () => getBlogs(params),
+    queryKey: ["blogs", params?.page, params?.pageSize, false],
+    queryFn: () =>
+      getBlogs({
+        ...params,
+        is_econelo: false,
+      }),
     retry: false,
     placeholderData: (prev) => prev, // giữ lại data trước khi trang thay đổi (optional)
   });
