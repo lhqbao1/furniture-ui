@@ -28,20 +28,69 @@ export default function MainImage({
 }: MainImageProps) {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const animationTimeoutRef = React.useRef<number | null>(null);
+  const preloadedUrlsRef = React.useRef<Set<string>>(new Set());
 
   const [dragOffset, setDragOffset] = React.useState(0);
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const [swipeDirection, setSwipeDirection] = React.useState<
-    "next" | "prev" | null
-  >(null);
   const [containerWidth, setContainerWidth] = React.useState(1);
+  const [isMobileViewport, setIsMobileViewport] = React.useState(false);
 
   const imageCount = productDetails.static_files?.length ?? 0;
   const canSwipe = imageCount > 1;
+  const SLIDE_DURATION = 210;
+  const REBOUND_DURATION = 180;
+  const SNAP_RATIO = 0.3;
+  const FLICK_VELOCITY_THRESHOLD = 0.45;
+  const SLIDE_EASING = "cubic-bezier(0.22, 0.88, 0.26, 1)";
+
+  const nextIndex = React.useCallback(
+    (index: number) => (index + 1) % imageCount,
+    [imageCount],
+  );
+
+  const prevIndex = React.useCallback(
+    (index: number) => (index - 1 + imageCount) % imageCount,
+    [imageCount],
+  );
+
+  const getImageUrl = React.useCallback(
+    (index: number) => {
+      if (imageCount <= 0) return "/placeholder-product.webp";
+      return (
+        productDetails.static_files[index]?.url ?? "/placeholder-product.webp"
+      );
+    },
+    [imageCount, productDetails.static_files],
+  );
+
+  const preloadImageUrl = React.useCallback((url: string | null | undefined) => {
+    if (typeof window === "undefined") return;
+    if (!url || url === "/placeholder-product.webp") return;
+    if (preloadedUrlsRef.current.has(url)) return;
+
+    preloadedUrlsRef.current.add(url);
+    const img = new window.Image();
+    img.src = url;
+  }, []);
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const updateIsMobile = (event?: MediaQueryListEvent) => {
+      setIsMobileViewport(event?.matches ?? mediaQuery.matches);
+    };
+
+    updateIsMobile();
+    mediaQuery.addEventListener("change", updateIsMobile);
+
+    return () => mediaQuery.removeEventListener("change", updateIsMobile);
+  }, []);
 
   React.useEffect(() => {
     const updateWidth = () => {
-      const nextWidth = containerRef.current?.clientWidth ?? 1;
+      const elementWidth = containerRef.current?.clientWidth ?? 0;
+      const viewportWidth =
+        typeof window !== "undefined" ? window.innerWidth : 0;
+      const nextWidth = elementWidth || viewportWidth || 1;
       setContainerWidth(nextWidth > 0 ? nextWidth : 1);
     };
 
@@ -66,11 +115,10 @@ export default function MainImage({
   const clearAnimationState = React.useCallback(() => {
     setIsAnimating(false);
     setDragOffset(0);
-    setSwipeDirection(null);
   }, []);
 
   const scheduleAfterAnimation = React.useCallback(
-    (callback: () => void, delay = 280) => {
+    (callback: () => void, delay = SLIDE_DURATION) => {
       if (animationTimeoutRef.current) {
         window.clearTimeout(animationTimeoutRef.current);
       }
@@ -79,7 +127,32 @@ export default function MainImage({
         clearAnimationState();
       }, delay);
     },
-    [clearAnimationState],
+    [SLIDE_DURATION, clearAnimationState],
+  );
+
+  const animateSlide = React.useCallback(
+    (direction: "next" | "prev") => {
+      if (!canSwipe || isAnimating) return;
+
+      setIsAnimating(true);
+      setDragOffset(direction === "next" ? -containerWidth : containerWidth);
+
+      scheduleAfterAnimation(() => {
+        setMainImageIndex((prev) =>
+          direction === "next" ? nextIndex(prev) : prevIndex(prev),
+        );
+      }, SLIDE_DURATION);
+    },
+    [
+      canSwipe,
+      containerWidth,
+      isAnimating,
+      nextIndex,
+      prevIndex,
+      scheduleAfterAnimation,
+      setMainImageIndex,
+      SLIDE_DURATION,
+    ],
   );
 
   const swipeHandlers = useSwipeable({
@@ -87,86 +160,65 @@ export default function MainImage({
     preventScrollOnSwipe: true,
     delta: 8,
     onSwiping: ({ deltaX }) => {
-      if (!canSwipe || isAnimating) return;
+      if (!isMobileViewport || !canSwipe || isAnimating) return;
 
       const nextOffset = Math.max(
         -containerWidth,
         Math.min(containerWidth, deltaX),
       );
       setDragOffset(nextOffset);
-      setSwipeDirection(
-        nextOffset < 0 ? "next" : nextOffset > 0 ? "prev" : null,
-      );
       if (isHover) setIsHover(false);
     },
-    onSwiped: ({ deltaX }) => {
-      if (!canSwipe || isAnimating) return;
+    onSwiped: ({ deltaX, absX = 0, velocity = 0 }) => {
+      if (!isMobileViewport || !canSwipe || isAnimating) return;
 
       const finalOffset = Math.max(
         -containerWidth,
         Math.min(containerWidth, deltaX),
       );
-      const absOffset = Math.abs(finalOffset);
-      const threshold = Math.min(120, containerWidth * 0.2);
+      const absOffset = Math.max(Math.abs(finalOffset), absX);
+      const threshold = containerWidth * SNAP_RATIO;
       const direction =
         finalOffset < 0 ? "next" : finalOffset > 0 ? "prev" : null;
+      const isFlick = Math.abs(velocity) >= FLICK_VELOCITY_THRESHOLD;
+      const shouldNavigate = Boolean(direction) && (absOffset >= threshold || isFlick);
 
-      if (!direction || absOffset < threshold) {
+      if (!shouldNavigate) {
         setIsAnimating(true);
-        setSwipeDirection(direction);
         setDragOffset(0);
-        scheduleAfterAnimation(() => undefined, 220);
+        scheduleAfterAnimation(() => undefined, REBOUND_DURATION);
         return;
       }
-
-      setIsAnimating(true);
-      setSwipeDirection(direction);
-      setDragOffset(direction === "next" ? -containerWidth : containerWidth);
-
-      scheduleAfterAnimation(() => {
-        setMainImageIndex((prev) => {
-          if (direction === "next") return (prev + 1) % imageCount;
-          return prev === 0 ? imageCount - 1 : prev - 1;
-        });
-      });
+      animateSlide(direction);
     },
   });
 
-  const currentIndex = imageCount > 0 ? mainImageIndex % imageCount : 0;
-  const nextIndex = imageCount > 0 ? (currentIndex + 1) % imageCount : 0;
-  const prevIndex =
-    imageCount > 0 ? (currentIndex - 1 + imageCount) % imageCount : 0;
-
-  const currentFile =
-    imageCount > 0
-      ? (productDetails.static_files[currentIndex]?.url ??
-        "/placeholder-product.webp")
-      : "/placeholder-product.webp";
-
-  const previewIndex =
-    swipeDirection === "next"
-      ? nextIndex
-      : swipeDirection === "prev"
-        ? prevIndex
-        : null;
-
-  const previewFile =
-    previewIndex !== null && imageCount > 0
-      ? (productDetails.static_files[previewIndex]?.url ?? null)
-      : null;
-
-  const currentTranslateX = swipeDirection ? dragOffset : 0;
-  const previewTranslateX =
-    swipeDirection === "next"
-      ? dragOffset + containerWidth
-      : swipeDirection === "prev"
-        ? dragOffset - containerWidth
-        : 0;
+  const prevImage = getImageUrl(prevIndex(mainImageIndex));
+  const currentImage = getImageUrl(mainImageIndex);
+  const nextImage = getImageUrl(nextIndex(mainImageIndex));
+  const trackTranslateX = -containerWidth + dragOffset;
 
   const slideTransition = isAnimating
-    ? "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)"
+    ? `transform ${SLIDE_DURATION}ms ${SLIDE_EASING}`
     : "none";
-  const showSwipePreview = Boolean(swipeDirection && previewFile);
+
+  React.useEffect(() => {
+    if (!isMobileViewport || imageCount <= 0) return;
+
+    const next = nextIndex(mainImageIndex);
+    const prev = prevIndex(mainImageIndex);
+    preloadImageUrl(getImageUrl(mainImageIndex));
+    preloadImageUrl(getImageUrl(next));
+    preloadImageUrl(getImageUrl(prev));
+  }, [
+    isMobileViewport,
+    imageCount,
+    mainImageIndex,
+    nextIndex,
+    prevIndex,
+    getImageUrl,
+    preloadImageUrl,
+  ]);
 
   return (
     <ProductImageDialog
@@ -176,54 +228,74 @@ export default function MainImage({
     >
       <div
         ref={containerRef}
-        className="flex justify-center overflow-hidden main-image relative lg:h-[400px] h-[300px]"
+        className="flex justify-center overflow-hidden main-image relative lg:h-[430px] h-[340px] bg-white"
         onMouseMove={handleZoomImage}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
-        style={{ touchAction: "pan-y" }}
-        {...swipeHandlers}
+        style={isMobileViewport ? { touchAction: "pan-y" } : undefined}
+        {...(isMobileViewport ? swipeHandlers : {})}
       >
-        {showSwipePreview && (
+        {isMobileViewport ? (
           <div
-            className="absolute inset-0 flex justify-center"
+            className="absolute inset-0 flex"
             style={{
-              transform: `translate3d(${previewTranslateX}px, 0, 0)`,
+              width: `${containerWidth * 3}px`,
+              transform: `translate3d(${trackTranslateX}px, 0, 0)`,
               transition: slideTransition,
             }}
           >
-            {previewFile ? (
+            <div
+              className="relative h-full flex-shrink-0 bg-white"
+              style={{ width: `${containerWidth}px` }}
+            >
               <Image
-                src={previewFile}
-                width={500}
-                height={300}
+                src={prevImage}
+                fill
                 alt={productDetails.name}
-                className="lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer rounded-xs"
+                className="object-contain cursor-pointer rounded-xs"
+                sizes="100vw"
               />
-            ) : null}
+            </div>
+            <div
+              className="relative h-full flex-shrink-0 bg-white"
+              style={{ width: `${containerWidth}px` }}
+            >
+              <Image
+                src={currentImage}
+                fill
+                alt={productDetails.name}
+                priority
+                className="object-contain cursor-pointer rounded-xs"
+                sizes="100vw"
+              />
+            </div>
+            <div
+              className="relative h-full flex-shrink-0 bg-white"
+              style={{ width: `${containerWidth}px` }}
+            >
+              <Image
+                src={nextImage}
+                fill
+                alt={productDetails.name}
+                className="object-contain cursor-pointer rounded-xs"
+                sizes="100vw"
+              />
+            </div>
           </div>
-        )}
-
-        <div
-          className="absolute inset-0 flex justify-center"
-          style={{
-            transform: `translate3d(${currentTranslateX}px, 0, 0)`,
-            transition: slideTransition,
-          }}
-        >
+        ) : (
           <Image
-            src={currentFile}
+            src={currentImage}
             width={500}
             height={300}
             alt={productDetails.name}
             priority
-            className="transition-transform duration-300 lg:h-[400px] h-[300px] w-auto object-cover cursor-pointer rounded-xs"
+            className="transition-transform duration-300 lg:h-[430px] h-[340px] w-auto object-contain cursor-pointer rounded-xs"
             style={{
               transformOrigin: `${position.x}% ${position.y}%`,
-              transform:
-                isHover && !swipeDirection ? "scale(1.55)" : "scale(1)",
+              transform: isHover ? "scale(1.55)" : "scale(1)",
             }}
           />
-        </div>
+        )}
 
         {productDetails.is_fsc && (
           <div className="absolute top-4 right-4 cursor-pointer">
