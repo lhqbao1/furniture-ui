@@ -13,13 +13,13 @@ export function ProductGridSkeleton({
   hasLoading = false,
 }: ProductGridSkeletonProps) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-4 sm:mt-6 mt-4">
+    <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 sm:mt-6 mt-4 gap-8">
       {Array.from({ length }).map((_, idx) => (
         <Card
           key={idx}
-          className="relative overflow-hidden border-0 rounded-none shadow-none"
+          className="relative overflow-hidden border-0 rounded-none shadow-none bg-transparent"
         >
-          <CardContent className="bg-white p-0 py-4 flex flex-col items-center justify-center min-h-[260px]">
+          <CardContent className="bg-white p-0">
             {/* 🔹 Loader overlay */}
             {hasLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
@@ -27,17 +27,16 @@ export function ProductGridSkeleton({
               </div>
             )}
 
-            {/* Skeleton content */}
-            <Skeleton className="w-full h-48 mb-2 rounded" />
+            <Skeleton className="mb-2 h-96 w-full rounded-md" />
 
-            <div className="product-details py-2 mt-0 md:mt-5 xl:mt-8 flex flex-col gap-2 w-full">
-              {/* Product name */}
-              <Skeleton className="h-6 w-3/4 mx-auto" />
+            <div className="product-details py-2 mt-0 md:mt-4 xl:mt-4 flex flex-col gap-2 w-full">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-4/5" />
 
-              {/* Price */}
-              <div className="flex justify-center gap-2">
-                <Skeleton className="h-5 w-12" />
-                <Skeleton className="h-7 w-16" />
+              <div className="flex gap-2">
+                <Skeleton className="h-5 w-14" />
+                <Skeleton className="h-6 w-24" />
               </div>
             </div>
           </CardContent>
