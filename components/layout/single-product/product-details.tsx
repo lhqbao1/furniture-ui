@@ -105,7 +105,9 @@ const ProductDetails = ({
                     </h2>
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: sanitizeBodyHtml(productDetails.meta_description),
+                        __html: sanitizeBodyHtml(
+                          productDetails.meta_description,
+                        ),
                       }}
                     />
                   </div>

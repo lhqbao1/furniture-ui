@@ -402,7 +402,7 @@ const ProductForm = ({
                 {productValues && (
                   <AccordionItem value="details-log" className="border-none">
                     <AccordionTrigger className="bg-gray-100 px-2 rounded-sm text-lg font-bold cursor-pointer">
-                      Details Log
+                      Activities Log
                     </AccordionTrigger>
 
                     <div

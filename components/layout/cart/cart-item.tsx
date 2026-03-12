@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Heart, Loader2, Trash, Trash2 } from "lucide-react";
+import { Heart, Trash } from "lucide-react";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { CartItem } from "@/types/cart";
 import { useCartLocal } from "@/hooks/cart";
@@ -9,7 +9,7 @@ import {
   useUpdateCartItemQuantity,
 } from "@/features/cart/hook";
 import { toast } from "sonner";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { debounce } from "lodash";
 import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
@@ -97,7 +97,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
           height: localProducts.height,
           color: localProducts.color,
           stock: localProducts.stock,
-        inventory: localProducts.inventory,
+          inventory: localProducts.inventory,
           url_key: localProducts.url_key,
           id_provider: localProducts.id_provider,
           result_stock: localProducts.result_stock ?? 0,
@@ -236,7 +236,9 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
 
   const productIdForInventoryPo =
     cartServer?.products?.id ?? localProducts?.product_id;
-  const { data: inventoryPo } = useInventoryPoByProductId(productIdForInventoryPo);
+  const { data: inventoryPo } = useInventoryPoByProductId(
+    productIdForInventoryPo,
+  );
 
   const deliveryDayRange = React.useMemo(
     () => getDeliveryDayRange(item?.deliveryText),
@@ -331,12 +333,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
       from: addBusinessDays(nextIncomingDate, deliveryDayRange.min),
       to: addBusinessDays(nextIncomingDate, deliveryDayRange.max),
     };
-  }, [
-    deliveryDayRange,
-    totalStock,
-    nextIncomingDate,
-    addCalendarDays,
-  ]);
+  }, [deliveryDayRange, totalStock, nextIncomingDate, addCalendarDays]);
 
   const handleAddToWishlist = (id: string) => {
     if (!id) return;
@@ -361,7 +358,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   if (!item) return null;
 
   return (
-    <div className="flex gap-6 border-b py-6 items-center">
+    <div className="flex gap-6 border-b py-6 items-start">
       {/* IMAGE */}
       <div className="relative w-[120px] h-[120px] shrink-0">
         <Image
@@ -455,27 +452,22 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
             </div>
           </div>
           {/* RIGHT */}
-          <div className="flex flex-col items-end justify-between">
+          <div className="flex gap-4 items-center justify-between">
             {/* PRICE */}
-            {/* <div className="text-lg font-semibold">
-              {updateCartItemQuantityMutation.isPending ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <>
-                  {(item.price * item.quantity).toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  €
-                </>
-              )}
-            </div> */}
             <div className="text-lg font-semibold">
               {(item.price * uiQuantity).toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })}{" "}
+              })}
               €
+            </div>
+            <div className="text-sm text-gray-500">
+              (
+              {item.price.toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              € / Stück )
             </div>
           </div>
         </div>

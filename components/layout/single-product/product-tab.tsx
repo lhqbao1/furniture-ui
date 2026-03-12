@@ -1,5 +1,5 @@
 "use client";
-import { useMediaQuery } from "react-responsive";
+import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import ProductReviewTab from "./tabs/review";
 import { ProductItem } from "@/types/products";
 import { useTranslations } from "next-intl";
 import ProductDetailsProperties from "./tabs/properties/page";
@@ -15,7 +14,6 @@ import { ReviewResponse } from "@/types/review";
 import UserManualTab from "./tabs/user-manual/user-manual-tab";
 import ProductDescription from "./tabs/description/product-description";
 import QAInput from "./tabs/q&a/q&a-input";
-import { ProductFAQSection } from "./tabs/description/faq-accordion";
 
 interface ProductDetailsTabProps {
   product: ProductItem;
@@ -26,8 +24,22 @@ export function ProductDetailsTab({
   product,
   reviews,
 }: ProductDetailsTabProps) {
-  const isMobile = useMediaQuery({ maxWidth: 640 }); // mobile breakpoint
+  const [isMobile, setIsMobile] = React.useState(false);
   const t = useTranslations();
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 640px)");
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches);
+    };
+
+    setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   const sections = [
     {
@@ -73,11 +85,13 @@ export function ProductDetailsTab({
       <Accordion
         type="multiple"
         className="space-y-2"
-        defaultValue={["description"]}
+        defaultValue={["description", "details"]}
       >
         {sections.map((section) => (
           <AccordionItem value={section.value} key={section.value}>
-            <AccordionTrigger>{section.label}</AccordionTrigger>
+            <AccordionTrigger className="text-secondary text-base">
+              {section.label}
+            </AccordionTrigger>
             <AccordionContent>{section.content}</AccordionContent>
           </AccordionItem>
         ))}
@@ -100,15 +114,7 @@ export function ProductDetailsTab({
         ))}
       </TabsList>
       {sections.map((section) => (
-        <TabsContent
-          key={section.value}
-          value={section.value}
-          // className={`${
-          //   section.value === "description"
-          //     ? "w-full grid grid-cols-5 gap-12"
-          //     : ""
-          // }`}
-        >
+        <TabsContent key={section.value} value={section.value}>
           <div className="col-span-3">{section.content}</div>
         </TabsContent>
       ))}

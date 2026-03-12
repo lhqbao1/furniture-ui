@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Link } from "@/src/i18n/navigation";
 import { calculateProductVAT } from "@/lib/caculate-vat";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 export const orderListExpandColumns = (
   supplier_name: string | null,
@@ -21,9 +22,27 @@ export const orderListExpandColumns = (
       return <div className="text-center">{row.index + 1}</div>;
     },
   },
+
+  {
+    accessorKey: "id",
+    header: () => <div className="text-center w-full">ID</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">#{row.original.products.id_provider}</div>
+      );
+    },
+  },
+  {
+    accessorKey: "ean",
+    header: () => <div className="text-center w-full">EAN</div>,
+    cell: ({ row }) => {
+      return <div className="text-center">{row.original.products.ean}</div>;
+    },
+  },
+
   {
     id: "image",
-    header: () => <div className="text-center w-full">Image</div>,
+    header: () => <div className="text-center w-full uppercase">Image</div>,
     cell: ({ row }) => {
       const imageUrl = row.original.image_url ?? "/1.png";
 
@@ -33,10 +52,10 @@ export const orderListExpandColumns = (
             <HoverCardTrigger asChild>
               <Image
                 src={imageUrl}
-                width={32}
-                height={32}
+                width={40}
+                height={40}
                 alt={row.original.products?.name ?? "product image"}
-                className="w-8 h-8 object-cover rounded-xl cursor-pointer"
+                className="w-10 h-10 object-cover rounded-sm cursor-pointer"
               />
             </HoverCardTrigger>
 
@@ -55,22 +74,6 @@ export const orderListExpandColumns = (
           </HoverCard>
         </div>
       );
-    },
-  },
-  {
-    accessorKey: "id",
-    header: () => <div className="text-center w-full">ID</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">#{row.original.products.id_provider}</div>
-      );
-    },
-  },
-  {
-    accessorKey: "ean",
-    header: () => <div className="text-center w-full">EAN</div>,
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.products.ean}</div>;
     },
   },
   {
@@ -166,6 +169,18 @@ export const orderListExpandColumns = (
           })}
         </div>
       );
+    },
+  },
+
+  {
+    accessorKey: "stock",
+    header: ({ column }) => {
+      return <div className="text-center">STOCK LEFT</div>;
+    },
+    cell: ({ row }) => {
+      const computedStock = calculateAvailableStock(row.original.products);
+
+      return <div className="text-center">{computedStock} pcs.</div>;
     },
   },
 

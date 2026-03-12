@@ -20,6 +20,7 @@ export interface GetAllProductsParams {
   sort_by_marketplace?: string;
   supplier_id?: string;
   brand_id?: string;
+  sort_by_incoming_stock?: string;
 }
 
 export type GetProductsSearchParams = {
@@ -113,6 +114,9 @@ export async function getAllProducts(params?: GetAllProductsParams) {
       ...(params?.sort_by_stock && { sort_by_stock: params.sort_by_stock }),
       ...(params?.sort_by_marketplace && {
         sort_by_marketplace: params.sort_by_marketplace,
+      }),
+      ...(params?.sort_by_incoming_stock && {
+        sort_by_incoming_stock: params.sort_by_incoming_stock,
       }),
 
       ...(params?.is_econelo !== undefined && {

@@ -94,11 +94,8 @@ export function ProductFAQSection({ question }: ProductFAQProps) {
                 itemRefs.current[item.question] = el;
               }}
             >
-              <AccordionItem
-                value={item.question}
-                className="border-none"
-              >
-                <div className="w-2/3 ml-auto">
+              <AccordionItem value={item.question} className="border-none">
+                <div className="md:w-2/3 ml-auto w-full">
                   <AccordionTrigger
                     hasIcon={false}
                     onClick={(e) => {

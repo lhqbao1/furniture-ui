@@ -6,14 +6,34 @@ import React, { useMemo } from "react";
 interface ListStarsProps {
   size?: number;
   reviews: ReviewResponse[];
+  scrollTargetId?: string;
 }
 
-const ListStarsReview = ({ size = 20, reviews }: ListStarsProps) => {
+const ListStarsReview = ({
+  size = 20,
+  reviews,
+  scrollTargetId = "product-review-tab",
+}: ListStarsProps) => {
   const rating = useMemo(() => {
     if (!reviews || reviews.length === 0) return 0;
     const sum = reviews.reduce((total, r) => total + (r.rating || 0), 0);
     return Number((sum / reviews.length).toFixed(1));
   }, [reviews]);
+
+  const scrollToReviewTab = React.useCallback(() => {
+    const reviewTab = document.getElementById(scrollTargetId);
+    if (!reviewTab) return;
+
+    const isMobile = window.innerWidth < 768;
+    const offset = isMobile ? 100 : 200;
+    const targetTop =
+      reviewTab.getBoundingClientRect().top + window.scrollY - offset;
+
+    window.scrollTo({
+      top: Math.max(targetTop, 0),
+      behavior: "smooth",
+    });
+  }, [scrollTargetId]);
 
   const getFillPercent = (currentRating: number, index: number) => {
     const fullStars = Math.floor(currentRating);
@@ -30,7 +50,19 @@ const ListStarsReview = ({ size = 20, reviews }: ListStarsProps) => {
   if (rating === 0) return null;
 
   return (
-    <div className="flex items-end gap-2">
+    <div
+      className="flex items-end gap-2 cursor-pointer select-none w-fit"
+      onClick={scrollToReviewTab}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          scrollToReviewTab();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Scroll to product reviews"
+    >
       <div className="flex gap-1">
         {[0, 1, 2, 3, 4].map((index) => {
           const fillPercent = getFillPercent(rating, index);
