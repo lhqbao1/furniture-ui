@@ -1,6 +1,13 @@
 "use client";
 
-import { ChevronRight, CornerDownRight, Lock, LockOpen } from "lucide-react";
+import {
+  ChevronRight,
+  CornerDownRight,
+  Lock,
+  LockOpen,
+  Pin,
+  PinOff,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -239,33 +246,6 @@ export function AdminSideBar() {
             </div>
           </button>
 
-          <div className="px-5 pb-4 group-data-[collapsible=icon]:hidden">
-            <div className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2">
-              <div className="flex items-center gap-2 text-sm text-[#4D4D4D]">
-                {isSidebarLocked ? (
-                  <Lock size={16} strokeWidth={2} />
-                ) : (
-                  <LockOpen size={16} strokeWidth={2} />
-                )}
-                <span>Lock Sidebar</span>
-              </div>
-              <Switch
-                className="data-[state=unchecked]:bg-gray-400"
-                checked={isSidebarLocked}
-                onCheckedChange={(checked) => {
-                  setIsSidebarLocked(checked);
-
-                  if (checked) {
-                    if (isMobile) {
-                      setOpenMobile(true);
-                    } else {
-                      setOpen(true);
-                    }
-                  }
-                }}
-              />
-            </div>
-          </div>
           <SidebarGroupContent>
             <SidebarMenu className="gap-3">
               {items.map((item) => {
@@ -341,6 +321,32 @@ export function AdminSideBar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <div className="px-5 pb-4 group-data-[collapsible=icon]:hidden">
+          <div className="flex items-center justify-between rounded-md border border-secondary px-3 py-2">
+            <div className="flex items-center gap-2 text-sm text-[#4D4D4D]">
+              {isSidebarLocked ? (
+                <Pin size={16} strokeWidth={2} />
+              ) : (
+                <PinOff size={16} strokeWidth={2} />
+              )}
+            </div>
+            <Switch
+              className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary"
+              checked={isSidebarLocked}
+              onCheckedChange={(checked) => {
+                setIsSidebarLocked(checked);
+
+                if (checked) {
+                  if (isMobile) {
+                    setOpenMobile(true);
+                  } else {
+                    setOpen(true);
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
