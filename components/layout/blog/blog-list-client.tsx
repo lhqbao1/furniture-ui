@@ -25,7 +25,10 @@ export default function BlogListClient({
               page: pageParam,
               page_size: 16,
             })
-          : getBlogs({ page: pageParam }),
+          : getBlogs({
+              page: pageParam,
+              is_econelo: false,
+            }),
 
       getNextPageParam: (lastPage) => {
         const { page, total_pages } = lastPage.pagination;

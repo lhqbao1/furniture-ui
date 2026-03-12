@@ -23,7 +23,7 @@ const getBlogDetailCached = (slug: string) =>
   })();
 
 const getSidebarBlogsCached = unstable_cache(
-  () => getBlogsByProduct(),
+  () => getBlogsByProduct({ is_econelo: false }),
   ["blog-sidebar-products"],
   { revalidate: 600 },
 );
@@ -121,7 +121,7 @@ export default async function BlogDetailPage({
   if (!post) return notFound();
 
   if (!sidebarData || (sidebarData.products?.length ?? 0) === 0) {
-    sidebarData = await getBlogsByProduct().catch(
+    sidebarData = await getBlogsByProduct({ is_econelo: false }).catch(
       () =>
         ({
           products: [],
