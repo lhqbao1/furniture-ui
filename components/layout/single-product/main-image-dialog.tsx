@@ -37,6 +37,20 @@ export default function ProductImageDialog({
   const [mobileDragOffset, setMobileDragOffset] = React.useState(0);
   const [mobileIsAnimating, setMobileIsAnimating] = React.useState(false);
   const [mobileContainerWidth, setMobileContainerWidth] = React.useState(1);
+  const [mobileDisplayIndex, setMobileDisplayIndex] =
+    React.useState(mainImageIndex);
+  const [mobileZoomScale, setMobileZoomScale] = React.useState(1);
+  const [mobileZoomOrigin, setMobileZoomOrigin] = React.useState({
+    x: 50,
+    y: 50,
+  });
+  const [mobilePanOffset, setMobilePanOffset] = React.useState({ x: 0, y: 0 });
+  const pinchStartDistanceRef = React.useRef<number | null>(null);
+  const pinchStartScaleRef = React.useRef(1);
+  const isPinchingRef = React.useRef(false);
+  const isPanningRef = React.useRef(false);
+  const panStartPointRef = React.useRef({ x: 0, y: 0 });
+  const panStartOffsetRef = React.useRef({ x: 0, y: 0 });
 
   const imageCount = productDetails.static_files?.length ?? 0;
   const canNavigate = imageCount > 1;
@@ -73,6 +87,19 @@ export default function ProductImageDialog({
     const img = new window.Image();
     img.src = url;
   }, []);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    setMobileDisplayIndex(mainImageIndex);
+    setMobileZoomScale(1);
+    setMobilePanOffset({ x: 0, y: 0 });
+    setMobileZoomOrigin({ x: 50, y: 50 });
+  }, [isOpen, mainImageIndex]);
+
+  React.useEffect(() => {
+    if (mobileIsAnimating) return;
+    setMobileDisplayIndex(mainImageIndex);
+  }, [mainImageIndex, mobileIsAnimating]);
 
   React.useEffect(() => {
     if (!isOpen) return;
@@ -133,7 +160,7 @@ export default function ProductImageDialog({
 
   const animateMobileSlide = React.useCallback(
     (direction: "next" | "prev") => {
-      if (!canNavigate || mobileIsAnimating) return;
+      if (!canNavigate || mobileIsAnimating || mobileZoomScale > 1.01) return;
 
       setMobileIsAnimating(true);
       setMobileDragOffset(
@@ -141,9 +168,14 @@ export default function ProductImageDialog({
       );
 
       scheduleMobileAnimation(() => {
-        setMainImageIndex((prev) =>
-          direction === "next" ? nextIndex(prev) : prevIndex(prev),
-        );
+        setMobileDisplayIndex((prev) => {
+          const next = direction === "next" ? nextIndex(prev) : prevIndex(prev);
+          setMainImageIndex(next);
+          setMobileZoomScale(1);
+          setMobilePanOffset({ x: 0, y: 0 });
+          setMobileZoomOrigin({ x: 50, y: 50 });
+          return next;
+        });
       }, MOBILE_SLIDE_DURATION);
     },
     [
@@ -151,6 +183,7 @@ export default function ProductImageDialog({
       MOBILE_SLIDE_DURATION,
       mobileContainerWidth,
       mobileIsAnimating,
+      mobileZoomScale,
       nextIndex,
       prevIndex,
       scheduleMobileAnimation,
@@ -160,10 +193,17 @@ export default function ProductImageDialog({
 
   const mobileSwipeHandlers = useSwipeable({
     trackTouch: true,
-    preventScrollOnSwipe: true,
+    preventScrollOnSwipe: false,
     delta: 8,
     onSwiping: ({ deltaX }) => {
-      if (!canNavigate || mobileIsAnimating) return;
+      if (
+        !canNavigate ||
+        mobileIsAnimating ||
+        isPinchingRef.current ||
+        mobileZoomScale > 1.01
+      ) {
+        return;
+      }
 
       const nextOffset = Math.max(
         -mobileContainerWidth,
@@ -172,7 +212,14 @@ export default function ProductImageDialog({
       setMobileDragOffset(nextOffset);
     },
     onSwiped: ({ deltaX, absX = 0, velocity = 0 }) => {
-      if (!canNavigate || mobileIsAnimating) return;
+      if (
+        !canNavigate ||
+        mobileIsAnimating ||
+        isPinchingRef.current ||
+        mobileZoomScale > 1.01
+      ) {
+        return;
+      }
 
       const finalOffset = Math.max(
         -mobileContainerWidth,
@@ -195,6 +242,126 @@ export default function ProductImageDialog({
     },
   });
 
+  const getTouchDistance = React.useCallback(
+    (touches: React.TouchList) => {
+      if (touches.length < 2) return 0;
+      const touchA = touches[0];
+      const touchB = touches[1];
+      return Math.hypot(
+        touchB.clientX - touchA.clientX,
+        touchB.clientY - touchA.clientY,
+      );
+    },
+    [],
+  );
+
+  const clampPanOffset = React.useCallback(
+    (offset: { x: number; y: number }, scale: number) => {
+      if (scale <= 1.01) return { x: 0, y: 0 };
+      const maxX = (mobileContainerWidth * (scale - 1)) / 2;
+      const maxY = ((mobileContainerRef.current?.clientHeight ?? 0) * (scale - 1)) / 2;
+      return {
+        x: Math.max(-maxX, Math.min(maxX, offset.x)),
+        y: Math.max(-maxY, Math.min(maxY, offset.y)),
+      };
+    },
+    [mobileContainerWidth],
+  );
+
+  const handleMobileTouchStart = React.useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (event.touches.length === 2) {
+        isPinchingRef.current = true;
+        isPanningRef.current = false;
+        pinchStartDistanceRef.current = getTouchDistance(event.touches);
+        pinchStartScaleRef.current = mobileZoomScale;
+        setMobileDragOffset(0);
+
+        const rect = mobileContainerRef.current?.getBoundingClientRect();
+        if (rect) {
+          const centerX =
+            (event.touches[0].clientX + event.touches[1].clientX) / 2;
+          const centerY =
+            (event.touches[0].clientY + event.touches[1].clientY) / 2;
+          setMobileZoomOrigin({
+            x: ((centerX - rect.left) / rect.width) * 100,
+            y: ((centerY - rect.top) / rect.height) * 100,
+          });
+        }
+        return;
+      }
+
+      if (event.touches.length === 1 && mobileZoomScale > 1.01) {
+        isPanningRef.current = true;
+        const touch = event.touches[0];
+        panStartPointRef.current = { x: touch.clientX, y: touch.clientY };
+        panStartOffsetRef.current = { ...mobilePanOffset };
+      }
+    },
+    [getTouchDistance, mobilePanOffset, mobileZoomScale],
+  );
+
+  const handleMobileTouchMove = React.useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (isPinchingRef.current && event.touches.length === 2) {
+        const startDistance = pinchStartDistanceRef.current;
+        if (!startDistance || startDistance <= 0) return;
+
+        event.preventDefault();
+
+        const nextDistance = getTouchDistance(event.touches);
+        const scale = pinchStartScaleRef.current * (nextDistance / startDistance);
+        const clampedScale = Math.min(4, Math.max(1, scale));
+        setMobileZoomScale(clampedScale);
+        setMobilePanOffset((prev) => clampPanOffset(prev, clampedScale));
+        return;
+      }
+
+      if (
+        isPanningRef.current &&
+        event.touches.length === 1 &&
+        mobileZoomScale > 1.01
+      ) {
+        event.preventDefault();
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - panStartPointRef.current.x;
+        const deltaY = touch.clientY - panStartPointRef.current.y;
+        const nextOffset = {
+          x: panStartOffsetRef.current.x + deltaX,
+          y: panStartOffsetRef.current.y + deltaY,
+        };
+        setMobilePanOffset(clampPanOffset(nextOffset, mobileZoomScale));
+      }
+    },
+    [clampPanOffset, getTouchDistance, mobileZoomScale],
+  );
+
+  const handleMobileTouchEnd = React.useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (event.touches.length === 2) return;
+
+      if (isPinchingRef.current && event.touches.length === 1) {
+        isPinchingRef.current = false;
+        pinchStartDistanceRef.current = null;
+        isPanningRef.current = mobileZoomScale > 1.01;
+        const touch = event.touches[0];
+        panStartPointRef.current = { x: touch.clientX, y: touch.clientY };
+        panStartOffsetRef.current = { ...mobilePanOffset };
+        return;
+      }
+
+      isPinchingRef.current = false;
+      pinchStartDistanceRef.current = null;
+      isPanningRef.current = false;
+
+      if (mobileZoomScale < 1.02) {
+        setMobileZoomScale(1);
+        setMobilePanOffset({ x: 0, y: 0 });
+      }
+    },
+    [mobilePanOffset, mobileZoomScale],
+  );
+
   const handleZoomImage = (e: React.MouseEvent) => {
     if (!zoom) {
       const rect = imageContainerRef.current?.getBoundingClientRect();
@@ -207,10 +374,10 @@ export default function ProductImageDialog({
     setZoom(!zoom);
   };
 
-  const mobilePrevIndex = prevIndex(mainImageIndex);
-  const mobileNextIndex = nextIndex(mainImageIndex);
+  const mobilePrevIndex = prevIndex(mobileDisplayIndex);
+  const mobileNextIndex = nextIndex(mobileDisplayIndex);
   const mobilePrevImage = getImageUrl(mobilePrevIndex);
-  const mobileCurrentImage = getImageUrl(mainImageIndex);
+  const mobileCurrentImage = getImageUrl(mobileDisplayIndex);
   const mobileNextImage = getImageUrl(mobileNextIndex);
 
   const mobileTrackTranslateX = -mobileContainerWidth + mobileDragOffset;
@@ -222,12 +389,12 @@ export default function ProductImageDialog({
   React.useEffect(() => {
     if (!isOpen || imageCount <= 0) return;
 
-    const next = nextIndex(mainImageIndex);
-    const prev = prevIndex(mainImageIndex);
+    const next = nextIndex(mobileDisplayIndex);
+    const prev = prevIndex(mobileDisplayIndex);
     const next2 = nextIndex(next);
     const prev2 = prevIndex(prev);
 
-    preloadImageUrl(getImageUrl(mainImageIndex));
+    preloadImageUrl(getImageUrl(mobileDisplayIndex));
     preloadImageUrl(getImageUrl(next));
     preloadImageUrl(getImageUrl(prev));
     preloadImageUrl(getImageUrl(next2));
@@ -235,7 +402,7 @@ export default function ProductImageDialog({
   }, [
     isOpen,
     imageCount,
-    mainImageIndex,
+    mobileDisplayIndex,
     nextIndex,
     prevIndex,
     getImageUrl,
@@ -249,8 +416,9 @@ export default function ProductImageDialog({
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
+        overlayClassName="!z-[2147483646]"
         showCloseButton={false}
-        className="!left-0 !top-0 !translate-x-0 !translate-y-0 h-screen w-screen max-w-none rounded-none border-none bg-black p-0 lg:!left-[50%] lg:!top-[50%] lg:!translate-x-[-50%] lg:!translate-y-[-50%] lg:h-[90vh] lg:w-[calc(100%-8rem)] lg:rounded-lg lg:border lg:bg-background lg:p-6"
+        className="!z-[2147483647] !left-0 !top-0 !translate-x-0 !translate-y-0 h-screen w-screen max-w-none rounded-none border-none bg-black p-0 lg:!left-[50%] lg:!top-[50%] lg:!translate-x-[-50%] lg:!translate-y-[-50%] lg:h-[90vh] lg:w-[calc(100%-8rem)] lg:rounded-lg lg:border lg:bg-background lg:p-6"
         aria-describedby=""
       >
         <DialogTitle className="hidden">Product Image Viewer</DialogTitle>
@@ -270,8 +438,12 @@ export default function ProductImageDialog({
           <div
             ref={mobileContainerRef}
             className="relative h-[50vh] w-full overflow-hidden bg-white"
-            style={{ touchAction: "pan-y" }}
+            style={{ touchAction: "none" }}
             {...mobileSwipeHandlers}
+            onTouchStart={handleMobileTouchStart}
+            onTouchMove={handleMobileTouchMove}
+            onTouchEnd={handleMobileTouchEnd}
+            onTouchCancel={handleMobileTouchEnd}
           >
             <div
               className="absolute inset-0 flex"
@@ -310,6 +482,10 @@ export default function ProductImageDialog({
                   priority={isOpen}
                   loading="eager"
                   unoptimized
+                  style={{
+                    transform: `translate3d(${mobilePanOffset.x}px, ${mobilePanOffset.y}px, 0) scale(${mobileZoomScale})`,
+                    transformOrigin: `${mobileZoomOrigin.x}% ${mobileZoomOrigin.y}%`,
+                  }}
                 />
               </div>
               <div
