@@ -108,6 +108,22 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_postal_code: "90766",
     invoice_country: "DE",
   },
+  forstinger: {
+    company_name: "Forstinger eCom GmbH",
+    tax_id: "ATU81672717",
+    invoice_address: "Königstetter Straße 128-134",
+    invoice_city: "Tulln",
+    invoice_postal_code: "3430",
+    invoice_country: "AT",
+  },
+  "euro-tops": {
+    company_name: "Eurotops Versand GmbH",
+    tax_id: "ATU81672717",
+    invoice_address: "Elisabeth-Selbert-Str. 3",
+    invoice_city: "Langenfeld",
+    invoice_postal_code: "40764",
+    invoice_country: "DE",
+  },
   // thêm sau nếu cần:
   praktiker: null,
   check24: null,
@@ -115,7 +131,6 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
   prestige: null,
   channel21: null,
   hornbach: null,
-  forstinger: null,
   neckermann: null,
 };
 
