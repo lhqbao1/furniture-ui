@@ -81,8 +81,6 @@ const AmmWeAvisPage = () => {
 
   const importAmmProductMutation = useImportAmmProducts();
   function onSubmit(values: z.infer<typeof ammWeAvisSchema>) {
-    if (!products) return;
-
     const payload = {
       kopfdaten: values.kopfdaten,
       items: values.items.map((item: WeAvisItem, index: number) => {
@@ -90,9 +88,9 @@ const AmmWeAvisPage = () => {
 
         return {
           position_number: index + 1,
-          reference: product?.sku ?? "",
-          title: product?.name ?? "",
-          unit: "St",
+          reference: item.reference ?? product?.sku ?? "",
+          title: item.title ?? product?.name ?? "",
+          unit: item.unit ?? "St",
           quantity: item.quantity,
         };
       }),
@@ -121,11 +119,7 @@ const AmmWeAvisPage = () => {
     });
   }
 
-  const {
-    data: products,
-    isLoading,
-    isError,
-  } = useGetAllProducts({
+  const { data: products } = useGetAllProducts({
     search: debouncedSearch,
     page: 1,
     page_size: 50,
@@ -360,13 +354,15 @@ const AmmWeAvisPage = () => {
                 const product = products?.items?.find(
                   (p) => p.id === item.product_id,
                 );
+                const productName = item.title ?? product?.name ?? "";
+                const productSku = item.reference ?? product?.sku ?? "";
                 return (
                   <div
                     key={item.product_id}
                     className="grid grid-cols-12 items-center gap-2"
                   >
-                    <div className="col-span-5">{product?.name}</div>
-                    <div className="col-span-3">{product?.sku.toString()}</div>
+                    <div className="col-span-5">{productName}</div>
+                    <div className="col-span-3">{String(productSku)}</div>
                     <div className="col-span-2">St</div>
                     <div className="col-span-1">
                       <Input
