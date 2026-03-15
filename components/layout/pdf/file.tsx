@@ -482,8 +482,11 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     .flatMap((c) => c.cart)
                     .flatMap((c) => c.items) ?? [],
                   invoice?.voucher_amount,
-                  invoice?.main_checkout.checkouts[0].shipping_address.country,
-                  invoice?.main_checkout.checkouts[0].user.tax_id,
+                  checkout?.checkouts[0]?.shipping_address?.country ??
+                checkout?.checkouts[0]?.invoice_address?.country ??
+                "DE",
+              invoice?.main_checkout.checkouts[0].user.tax_id,
+              checkout.total_shipping,
                 ).totalVat.toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
