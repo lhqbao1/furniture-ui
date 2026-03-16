@@ -155,6 +155,8 @@ const toNumberOrNull = (value: unknown): number | null => {
 const toRequiredString = (value: unknown, fallback = ""): string =>
   toTrimmedStringOrNull(value) ?? fallback;
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const normalize = (
   row: RawOrderRow,
   preset: MarketplacePreset | null,
@@ -386,6 +388,10 @@ const OrderImport = () => {
           id: failedId,
           message: typeof detail === "string" ? detail : "Unknown error",
         });
+      }
+
+      if (index < orders.length - 1) {
+        await sleep(2000);
       }
     }
 
