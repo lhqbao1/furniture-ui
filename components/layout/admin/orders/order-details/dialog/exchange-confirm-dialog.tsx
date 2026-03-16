@@ -19,11 +19,6 @@ import {
 } from "@/features/checkout/hook";
 import { DeliveryOrderItem } from "@/features/checkout/api";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -72,7 +67,7 @@ const ExchangeConfirmDialog = ({
     isError,
   } = useGetAllProducts({
     search: queryParams,
-    page_size: 100,
+    page_size: 20,
   });
 
   const handleSelectProduct = (product: ProductItem) => {
@@ -134,82 +129,72 @@ const ExchangeConfirmDialog = ({
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onClose}
-    >
-      <DialogContent className="max-w-5xl">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-5xl overflow-visible">
         <DialogHeader>
           <DialogTitle>Exchange</DialogTitle>
         </DialogHeader>
 
-        <Popover
-          open={openPopover}
-          onOpenChange={setOpenPopover}
-        >
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex-1 justify-between py-1 h-12"
-            >
-              Select Products
-            </Button>
-          </PopoverTrigger>
-
-          <PopoverContent className="w-[600px] p-0 pointer-events-auto">
-            <Command shouldFilter={false}>
-              <CommandInput
-                placeholder="Search product..."
-                value={queryParams}
-                onValueChange={(value) => setQueryParams(value)}
-              />
-              <CommandEmpty>No product found.</CommandEmpty>
-              <CommandGroup className="h-[400px] overflow-y-scroll">
-                {isLoading && <CommandItem disabled>Loading...</CommandItem>}
-                {isError && (
-                  <CommandItem disabled>Error loading products</CommandItem>
-                )}
-                {filteredProducts.map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    value={product.id ?? ""}
-                    onSelect={() => handleSelectProduct(product)}
-                    className="flex justify-between cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={
-                          product.static_files?.[0]?.url ??
-                          "/product-placeholder.png"
-                        }
-                        height={25}
-                        width={25}
-                        alt=""
-                        className="rounded-sm"
-                        unoptimized
-                      />
-                      <span>{product.name}</span>
-                    </div>
-                    <span>€{product.final_price}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
-
-        <Select
-          onValueChange={(value) => setCarrier(value)}
-          value={carrier}
-        >
-          <SelectTrigger
-            className="border"
-            placeholderColor
+        <div className="space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1 justify-between py-1 h-12 w-full"
+            onClick={() => setOpenPopover((prev) => !prev)}
           >
+            Select Products
+          </Button>
+
+          {openPopover && (
+            <div className="w-full p-0 pointer-events-auto z-[120] border rounded-md bg-white">
+              <Command shouldFilter={false}>
+                <CommandInput
+                  placeholder="Search product..."
+                  value={queryParams}
+                  onValueChange={(value) => setQueryParams(value)}
+                />
+                <CommandEmpty>No product found.</CommandEmpty>
+                <CommandGroup className="h-[400px] overflow-y-scroll">
+                  {isLoading && <CommandItem disabled>Loading...</CommandItem>}
+                  {isError && (
+                    <CommandItem disabled>Error loading products</CommandItem>
+                  )}
+                  {filteredProducts.map((product) => (
+                    <CommandItem
+                      key={product.id}
+                      value={product.id ?? ""}
+                      onSelect={() => handleSelectProduct(product)}
+                      className="flex justify-between cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={
+                            product.static_files?.[0]?.url ??
+                            "/product-placeholder.png"
+                          }
+                          height={25}
+                          width={25}
+                          alt=""
+                          className="rounded-sm"
+                          unoptimized
+                        />
+                        <span>{product.name}</span>
+                      </div>
+                      <span>€{product.final_price}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </div>
+          )}
+        </div>
+
+        <Select onValueChange={(value) => setCarrier(value)} value={carrier}>
+          <SelectTrigger className="border" placeholderColor>
             <SelectValue placeholder="Select carrier" />
           </SelectTrigger>
 
-          <SelectContent>
+          <SelectContent className="z-[90]">
             <SelectItem value="dpd">DPD</SelectItem>
             <SelectItem value="amm">Spedition</SelectItem>
           </SelectContent>
