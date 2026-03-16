@@ -9,6 +9,7 @@ import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
 import { ProductItem } from "@/types/products";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { toast } from "sonner";
 
 const FilterExportForm = () => {
   const [isExportingSearch, setIsExportingSearch] = useState(false);
@@ -17,7 +18,7 @@ const FilterExportForm = () => {
   const statusParam = searchParams.get("all_products");
 
   const buildParams = () => {
-    const params: any = {};
+    const params: Record<string, string | boolean> = {};
 
     if (statusParam === "true") {
       params.all_products = true;
@@ -32,14 +33,18 @@ const FilterExportForm = () => {
     return params;
   };
 
-  const { data, isFetching, refetch } = useQuery({
+  const { isFetching, refetch } = useQuery({
     queryKey: ["all-products", supplierId, statusParam ?? "all"],
     queryFn: () => getAllProductsSelect(buildParams()),
     enabled: false,
   });
 
-  const buildExportData = (data: ProductItem[]) => {
-    const clean = (val: any) => (val === null || val === undefined ? "" : val);
+  const buildExportData = (
+    data: ProductItem[],
+    imageDelimiter = "|",
+  ) => {
+    const clean = (val: unknown) =>
+      val === null || val === undefined ? "" : val;
 
     return data.map((p) => {
       const rawTariff = clean(p.tariff_number);
@@ -55,7 +60,7 @@ const FilterExportForm = () => {
           : null;
 
       const getMarketplaceStatus = (
-        marketplaces: any[] | undefined,
+        marketplaces: ProductItem["marketplace_products"] | undefined,
         name: string,
       ) => {
         if (!Array.isArray(marketplaces)) return "not synced";
@@ -95,7 +100,9 @@ const FilterExportForm = () => {
         vat: vat,
         stock: clean(calculateAvailableStock(p)),
         img_url: clean(
-          p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
+          p.static_files
+            ?.map((f) => f.url.replaceAll(" ", "%20"))
+            .join(imageDelimiter),
         ),
         length: clean(p.length),
         width: clean(p.width),
@@ -140,10 +147,27 @@ const FilterExportForm = () => {
     });
   };
 
+  const normalizeProductsResponse = (payload: unknown): ProductItem[] => {
+    if (Array.isArray(payload)) return payload as ProductItem[];
+
+    if (
+      payload &&
+      typeof payload === "object" &&
+      Array.isArray((payload as { items?: unknown[] }).items)
+    ) {
+      return (payload as { items: ProductItem[] }).items;
+    }
+
+    return [];
+  };
+
   const handleExportExcel = async () => {
     const res = await refetch();
-    const data = res.data;
-    if (!data?.length) return;
+    const data = normalizeProductsResponse(res.data);
+    if (!data.length) {
+      toast.info("No products to export");
+      return;
+    }
 
     const exportData = buildExportData(data);
 
@@ -163,12 +187,24 @@ const FilterExportForm = () => {
   };
 
   const handleExportExcelWithSearch = async () => {
-    const search = searchParams.get("search") ?? undefined;
+    const search = searchParams.get("search")?.trim() || undefined;
     setIsExportingSearch(true);
     try {
-      const data = await getAllProductsSelect({ search });
+      const payload = await getAllProductsSelect({
+        ...buildParams(),
+        search,
+        all_products: undefined,
+      });
+      const data = normalizeProductsResponse(payload);
 
-      if (!data?.length) return;
+      if (!data.length) {
+        toast.info(
+          search
+            ? "No products matched your search"
+            : "No products to export with current filters",
+        );
+        return;
+      }
 
       const exportData = buildExportData(data);
       const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -184,6 +220,20 @@ const FilterExportForm = () => {
         new Blob([excelBuffer], { type: "application/octet-stream" }),
         `export-search-${Date.now()}.xlsx`,
       );
+      toast.success("Export with search completed");
+    } catch (error: unknown) {
+      const err = error as {
+        response?: { data?: { detail?: unknown; message?: unknown } };
+        message?: unknown;
+      };
+      const message =
+        err.response?.data?.detail ??
+        err.response?.data?.message ??
+        err.message ??
+        "Failed to export with search";
+      toast.error("Export with search failed", {
+        description: String(message),
+      });
     } finally {
       setIsExportingSearch(false);
     }
@@ -191,8 +241,11 @@ const FilterExportForm = () => {
 
   const handleExportCSV = async () => {
     const res = await refetch();
-    const data = res.data;
-    if (!data?.length) return;
+    const data = normalizeProductsResponse(res.data);
+    if (!data.length) {
+      toast.info("No products to export");
+      return;
+    }
 
     const exportData = buildExportData(data);
 
@@ -212,6 +265,32 @@ const FilterExportForm = () => {
     saveAs(blob, `export-${Date.now()}.csv`);
   };
 
+  const handleExportCSVForPraktiker = async () => {
+    const res = await refetch();
+    const data = normalizeProductsResponse(res.data);
+    if (!data.length) {
+      toast.info("No products to export");
+      return;
+    }
+
+    const exportData = buildExportData(data, "///");
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+    const csv = XLSX.utils.sheet_to_csv(worksheet, {
+      FS: ",",
+      RS: "\n",
+      forceQuotes: true,
+      blankrows: false,
+    });
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    saveAs(blob, `export-praktiker-${Date.now()}.csv`);
+  };
+
   return (
     <div>
       {/* Export Button */}
@@ -227,6 +306,15 @@ const FilterExportForm = () => {
           type="button"
         >
           Export CSV
+        </Button>
+
+        <Button
+          variant="secondary"
+          onClick={handleExportCSVForPraktiker}
+          disabled={isFetching}
+          type="button"
+        >
+          Export for Praktiker
         </Button>
 
         <Button

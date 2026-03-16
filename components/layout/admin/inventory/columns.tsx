@@ -230,10 +230,7 @@ function EditableEANCell({ product }: { product: ProductItem }) {
 function ReservedStockCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
 
-  const reservedValue =
-    product.is_bundle || (product.bundles && product.bundles.length > 0)
-      ? calculateBundleReservedStock(product)
-      : product.result_stock;
+  const reservedValue = product.result_stock ?? 0;
 
   return (
     <div className="text-center">
@@ -270,7 +267,7 @@ const RESERVED_ORDER_STATUS_FILTER = [
 
 const calculateBundlePhysicalStock = (product: ProductItem): number => {
   const bundles = product.bundles ?? [];
-  if (bundles.length === 0) return toNumber(product.stock);
+  if (bundles.length === 0) return Math.max(0, toNumber(product.stock));
 
   const bundleStocks = bundles
     .map((bundle) => {
@@ -285,10 +282,10 @@ const calculateBundlePhysicalStock = (product: ProductItem): number => {
     .filter((value) => !Number.isNaN(value));
 
   if (bundleStocks.length > 0) {
-    return Math.min(...bundleStocks);
+    return Math.max(0, Math.min(...bundleStocks));
   }
 
-  return toNumber(product.stock);
+  return Math.max(0, toNumber(product.stock));
 };
 
 const calculateBundleReservedStock = (product: ProductItem): number => {
