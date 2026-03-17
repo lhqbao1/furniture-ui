@@ -565,9 +565,11 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
 
   {
     accessorKey: "created_at",
-    header: () => <div className="text-center w-full">DATE CREATED</div>,
+    header: () => <div className="text-center w-full">SHIPPED DATE</div>,
     cell: ({ row }) => {
-      let iso = row.original.shipment.shipper_date.toString();
+      let iso = row.original?.shipment?.shipper_date.toString();
+
+      if (!iso) return <div className="text-center">-</div>;
 
       // 👉 Nếu backend không gửi Z, mình thêm vào để JS parse đúng UTC
       if (!iso.endsWith("Z")) {
