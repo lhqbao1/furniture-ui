@@ -68,6 +68,14 @@ export function useManualCheckoutLogic(
       invoice_postal_code: "40764",
       invoice_country: "DE",
     },
+    bauhaus: {
+      company_name: "BAHAG Baus Handelsgesellschaft AG",
+      tax_id: "DE143872368",
+      invoice_address: "Gutenbergstr. 21",
+      invoice_city: "Mannheim",
+      invoice_postal_code: "68167",
+      invoice_country: "DE",
+    },
   };
 
   // -------------------------------------------------------------
