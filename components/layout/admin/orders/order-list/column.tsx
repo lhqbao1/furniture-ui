@@ -23,6 +23,7 @@ import { ProductTable } from "../../products/products-list/product-table";
 import { cartSupplierColumn } from "@/components/layout/cart/columns";
 import { getStatusStyle } from "./status-styles";
 import CancelExchangeDialog from "../order-details/dialog/cancel-exchange-dialog";
+import Link from "next/link";
 
 const ActionCell = ({
   id,
@@ -616,9 +617,20 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
       const trackingNumber = row.original?.shipment?.tracking_number;
       return (
         <div className="text-center">
-          {trackingNumber === null || trackingNumber === undefined
-            ? "-"
-            : String(trackingNumber)}
+          {row.original.carrier.toLowerCase() === "dpd" ? (
+            <Link
+              className="text-center"
+              href={`https://tracking.dpd.de/status/de_DE/parcel/${String(trackingNumber)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {trackingNumber === null || trackingNumber === undefined
+                ? "-"
+                : String(trackingNumber)}
+            </Link>
+          ) : (
+            <div className="text-center">{String(trackingNumber)}</div>
+          )}
         </div>
       );
     },

@@ -49,6 +49,7 @@ import { getProductActivationMissingFields } from "@/lib/product-activation";
 import { CategoryResponse } from "@/types/categories";
 import { CARRIERS } from "@/data/data";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
 import { format, getISOWeek } from "date-fns";
 
@@ -128,6 +129,53 @@ const getErrorDescription = (error: any) => {
   }
 
   return "Please try again.";
+};
+
+type IncomingDisplayItem = {
+  id: string;
+  quantity: number;
+  date: Date;
+};
+
+const getIncomingDisplayItems = (product: ProductItem): IncomingDisplayItem[] => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isBundleProduct = (product.bundles?.length ?? 0) > 0;
+  if (isBundleProduct) {
+    const summary = calculateIncomingStockSummary(product);
+    if (summary.incomingStock <= 0 || !summary.latestIncomingDate) return [];
+
+    return [
+      {
+        id: `bundle-${product.id}`,
+        quantity: summary.incomingStock,
+        date: summary.latestIncomingDate,
+      },
+    ];
+  }
+
+  const inventoryPos = product.inventory_pos ?? [];
+
+  return inventoryPos
+    .map((item) => {
+      if ((item.quantity ?? 0) <= 0) return null;
+      if (!item.list_delivery_date) return null;
+
+      const date = new Date(item.list_delivery_date);
+      if (Number.isNaN(date.getTime())) return null;
+      date.setHours(0, 0, 0, 0);
+
+      if (date <= today) return null;
+
+      return {
+        id: item.id,
+        quantity: item.quantity ?? 0,
+        date,
+      };
+    })
+    .filter((item): item is IncomingDisplayItem => item !== null)
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 };
 
 function EditableNameCell({ product }: { product: ProductItem }) {
@@ -1883,34 +1931,22 @@ export const getProductColumns = (
       );
     },
     cell: ({ row }) => {
-      const inventoryPos = row.original.inventory_pos ?? [];
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const upcoming = inventoryPos.filter((item) => {
-        if (!item.list_delivery_date) return false;
-        const date = new Date(item.list_delivery_date);
-        if (Number.isNaN(date.getTime())) return false;
-        date.setHours(0, 0, 0, 0);
-        return date > today;
-      });
+      const incomingItems = getIncomingDisplayItems(row.original);
 
-      if (!upcoming.length) {
+      if (!incomingItems.length) {
         return <div className="text-center">—</div>;
       }
 
       return (
         <div className="space-y-1.5 text-sm text-center">
-          {upcoming.map((item) => {
-            const date = item.list_delivery_date
-              ? new Date(item.list_delivery_date)
-              : null;
+          {incomingItems.map((item) => {
+            const date = item.date;
             const formattedDate =
               date && !Number.isNaN(date.getTime())
-                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(
-                    date,
-                    "MMMM d",
-                  )}`
+                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(date, "MMMM d")}`
                 : "—";
 
             const sixWeeksFromNow = new Date(today);
