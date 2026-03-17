@@ -47,7 +47,7 @@ const ImportDialog = ({
   const [openSupplier, setOpenSupplier] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
 
-  const { data: listSuppliers, isLoading, isError } = useGetSuppliers();
+  const { data: listSuppliers } = useGetSuppliers();
 
   const importProductMutation = useImportProducts();
   const importProductForSupplierMutation = useImportProductsSupplier();
@@ -63,11 +63,13 @@ const ImportDialog = ({
     multiple: false,
   });
 
-  const getErrorDescription = (error: any) => {
+  const getErrorDescription = (error: unknown) => {
+    const err = error as {
+      response?: { data?: { detail?: unknown; message?: unknown } };
+      message?: unknown;
+    };
     const detail =
-      error?.response?.data?.detail ??
-      error?.response?.data?.message ??
-      error?.message;
+      err.response?.data?.detail ?? err.response?.data?.message ?? err.message;
 
     if (!detail) return "Unknown error";
     if (typeof detail === "string") {
@@ -177,7 +179,7 @@ const ImportDialog = ({
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[600px]">
+      <DialogContent className="w-[600px] overflow-visible">
         <DialogHeader>
           <DialogTitle>Upload file</DialogTitle>
         </DialogHeader>
@@ -202,13 +204,16 @@ const ImportDialog = ({
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-full p-0 pointer-events-auto">
+              <PopoverContent
+                usePortal={false}
+                className="w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto z-[120]"
+              >
                 <Command>
                   <CommandInput placeholder="Search supplier..." />
 
                   <CommandEmpty>No supplier found.</CommandEmpty>
 
-                  <CommandGroup>
+                  <CommandGroup className="max-h-[260px] overflow-y-auto">
                     {/* Suppliers from API */}
                     {listSuppliers
                       ?.slice() // tránh mutate array gốc
