@@ -179,6 +179,20 @@ export async function returnOrder(main_checkout_id: string) {
   return data;
 }
 
+export async function returnIssueOrder(
+  main_checkout_id: string,
+  amount_refund: number,
+) {
+  const { data } = await apiAdmin.post(
+    `/checkout/return-issue/${main_checkout_id}`,
+    null,
+    {
+      params: { amount_refund },
+    },
+  );
+  return data;
+}
+
 export async function changeOrderReturnStatus(
   main_checkout_id: string,
   status: string,
@@ -205,6 +219,21 @@ export async function updateNoteForMainCheckout(
     null,
     {
       params: { note },
+    },
+  );
+
+  return data;
+}
+
+export async function updateReasonForMainCheckout(
+  main_checkout_id: string,
+  reason: string,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/reason-for-main-checkout/${main_checkout_id}`,
+    null,
+    {
+      params: { reason },
     },
   );
 

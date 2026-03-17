@@ -13,6 +13,7 @@ import PaidConfirmDialog from "./dialog/paid-comfirm-dialog";
 import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
 import CancelWrongPriceDialog from "./dialog/canceled-wrong-price-dialog";
 import CancelNoStockConfirmDialog from "./dialog/canceled-no-stock-confirm-dialog";
+import IssueRefundDialog from "./dialog/issue-refund-dialog";
 
 export const getStatusLabel = (status: string) => {
   const normalized = status.toLowerCase();
@@ -39,6 +40,8 @@ export default function OrderStatusSelector({
 }) {
   const [value, setValue] = React.useState<string>(status?.toLowerCase() ?? "");
   const [openReturn, setOpenReturn] = React.useState(false);
+  const [openIssueRefund, setOpenIssueRefund] = React.useState(false);
+
   const [openCancel, setOpenCancel] = React.useState(false);
   const [openPaid, setOpenPaid] = React.useState(false);
   const [openExchange, setOpenExchange] = React.useState(false);
@@ -78,6 +81,8 @@ export default function OrderStatusSelector({
       setOpenCancelNoStock(true);
     } else if (val === "canceled_wrong_price") {
       setOpenCancelWrongPrice(true);
+    } else if (val === "return_issue") {
+      setOpenIssueRefund(true);
     }
   };
 
@@ -139,6 +144,18 @@ export default function OrderStatusSelector({
           open={openCancel}
           onClose={() => {
             setOpenCancel(false);
+            setValue(status.toLocaleLowerCase());
+          }}
+        />
+      )}
+
+      {openIssueRefund && (
+        <IssueRefundDialog
+          id={order.id}
+          status={status}
+          open={openIssueRefund}
+          onClose={() => {
+            setOpenIssueRefund(false);
             setValue(status.toLocaleLowerCase());
           }}
         />

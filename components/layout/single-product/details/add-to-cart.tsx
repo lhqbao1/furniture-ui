@@ -23,6 +23,7 @@ import { FormQuantityInput } from "./quantity-input";
 import MobileStickyCart from "../sticky-cart-mobile";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 import PostAddToCartDrawer from "./post-add-to-cart-drawer";
 import { toast } from "sonner";
 
@@ -59,27 +60,12 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
 
   const { data: inventoryPo } = useInventoryPoByProductId(productDetails.id);
 
-  const incomingStock = useMemo(() => {
-    const items = Array.isArray(inventoryPo)
-      ? inventoryPo
-      : inventoryPo
-        ? [inventoryPo]
-        : [];
+  const incomingSummary = useMemo(
+    () => calculateIncomingStockSummary(productDetails, { inventoryPo }),
+    [productDetails, inventoryPo],
+  );
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return items.reduce((sum, item) => {
-      if ((item.quantity ?? 0) <= 0) return sum;
-      if (!item.list_delivery_date) return sum;
-      const deliveryDate = new Date(item.list_delivery_date);
-      if (Number.isNaN(deliveryDate.getTime())) return sum;
-      deliveryDate.setHours(0, 0, 0, 0);
-      if (deliveryDate < today) return sum;
-
-      return sum + (item.quantity ?? 0);
-    }, 0);
-  }, [inventoryPo]);
+  const incomingStock = incomingSummary.incomingStock;
 
   const maxStock = useMemo(() => {
     const baseStock = calculateAvailableStock(productDetails);

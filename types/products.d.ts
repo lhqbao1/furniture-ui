@@ -2,6 +2,7 @@ import { BrandResponse } from "./brand";
 import { CategoryResponse } from "./categories";
 import { CheckOutMain } from "./checkout";
 import { Pagination } from "./pagination";
+import { POContainerInventoryDetail } from "./po";
 import { Customer } from "./user";
 import { VariantOptionResponse } from "./variant";
 import { VoucherItem } from "./voucher";

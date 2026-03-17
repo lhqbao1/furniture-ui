@@ -156,6 +156,7 @@
   "401": "Unauthorized. Please login to buy product",
   "addToCartSuccess": "Add product to cart successful",
   "addToCartFail": "Add product to cart fail",
+  "updateCartFail": "Failed to update item quantity in your cart.",
   "addToWishlistSuccess": "Product is added to wishlist",
   "addToCheckoutSuccess": "Product is added to checkout",
   "inStock": "In stock",

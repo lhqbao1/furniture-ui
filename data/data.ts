@@ -1104,16 +1104,22 @@ export const STATUS_OPTIONS = [
     active: true,
     pos: 18,
   },
+  {
+    key: "return_issue",
+    label: "Issue Refund",
+    active: true,
+    pos: 18,
+  },
 ];
 
 export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
-  completed: ["return", "exchange"],
+  completed: ["return", "exchange", "return_issue"],
   preparation_shipping: [
     "canceled",
     "canceled_no_stock",
     "canceled_wrong_price",
   ],
-  shipped: ["exchange", "return"],
+  shipped: ["exchange", "return", "return_issue"],
   pending: ["paid", "canceled", "canceled_no_stock", "canceled_wrong_price"],
   paid: ["canceled", "canceled_no_stock", "canceled_wrong_price"],
   return: ["items_are_checked"],

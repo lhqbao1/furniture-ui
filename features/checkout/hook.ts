@@ -32,6 +32,8 @@ import {
   makeOrderPaid,
   OrderStatisticsParams,
   returnOrder,
+  returnIssueOrder,
+  updateReasonForMainCheckout,
   updateNoteForMainCheckout,
 } from "./api";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
@@ -196,6 +198,28 @@ export function useReturnOrder() {
   });
 }
 
+export function useReturnIssueOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      amount_refund,
+    }: {
+      main_checkout_id: string;
+      amount_refund: number;
+    }) => returnIssueOrder(main_checkout_id, amount_refund),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({ queryKey: ["checkout-user-id"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+    },
+  });
+}
+
 export function useChangeOrderReturnStatus() {
   const qc = useQueryClient();
   return useMutation({
@@ -302,12 +326,30 @@ export function useUpdateNoteForMainCheckout() {
   });
 }
 
+export function useUpdateReasonForMainCheckout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      reason,
+    }: {
+      main_checkout_id: string;
+      reason: string;
+    }) => updateReasonForMainCheckout(main_checkout_id, reason),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+    },
+  });
+}
+
 export function useCancelExchangeOrder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({
       checkout_id,
-      main_checkout_id,
     }: {
       checkout_id: string;
       main_checkout_id: string;
