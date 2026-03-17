@@ -42,7 +42,7 @@ export function getStatusStyle(raw: string) {
 
     case "shipped":
       return {
-        text: "shipped",
+        text: "dispatched",
         bg: "bg-[#dcfce7]",
         color: "text-[#22c55e]",
       };

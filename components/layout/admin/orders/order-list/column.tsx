@@ -567,9 +567,15 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     accessorKey: "created_at",
     header: () => <div className="text-center w-full">SHIPPED DATE</div>,
     cell: ({ row }) => {
-      let iso = row.original?.shipment?.shipper_date.toString();
+      const rawShipperDate = row.original?.shipment?.shipper_date;
+      const isoRaw =
+        rawShipperDate === null || rawShipperDate === undefined
+          ? ""
+          : String(rawShipperDate).trim();
 
-      if (!iso) return <div className="text-center">-</div>;
+      if (!isoRaw) return <div className="text-center">-</div>;
+
+      let iso = isoRaw;
 
       // 👉 Nếu backend không gửi Z, mình thêm vào để JS parse đúng UTC
       if (!iso.endsWith("Z")) {
@@ -577,6 +583,9 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
       }
 
       const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) {
+        return <div className="text-center">-</div>;
+      }
 
       const time = date.toLocaleString("en-US", {
         hour: "2-digit",
@@ -604,11 +613,12 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     accessorKey: "tracking_number",
     header: ({}) => <div className="text-center">TRACKING NUMBER</div>,
     cell: ({ row }) => {
+      const trackingNumber = row.original?.shipment?.tracking_number;
       return (
         <div className="text-center">
-          {row.original?.shipment
-            ? row.original?.shipment?.tracking_number
-            : ""}
+          {trackingNumber === null || trackingNumber === undefined
+            ? "-"
+            : String(trackingNumber)}
         </div>
       );
     },
