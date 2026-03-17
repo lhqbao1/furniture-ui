@@ -14,7 +14,9 @@ const OrderDetailUser = ({
   shippingAddress,
   invoiceAddress,
 }: OrderDetailUserProps) => {
-  const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(" ");
+  const fullName = [user?.first_name, user?.last_name]
+    .filter(Boolean)
+    .join(" ");
   const customerName = fullName || user?.company_name || "-";
   const shippingName =
     (user?.company_name && !shippingAddress?.recipient_name
@@ -73,15 +75,19 @@ const OrderDetailUser = ({
         <div className="space-y-2.5">
           <div className="text-sm">
             <div>{shippingName}</div>
-            <div>{shippingAddress?.phone_number || "-"}</div>
-            <div>{shippingAddress?.address_line || "-"}</div>
+            <div>{shippingAddress?.phone_number || ""}</div>
+            <div>{shippingAddress?.address_line || ""}</div>
             <div>{shippingAddress?.additional_address_line || ""}</div>
             <div className="flex gap-1">
-              <div>{shippingAddress?.postal_code || "-"}</div>
-              <div>{shippingAddress?.city || "-"}</div>
+              <div>{shippingAddress?.postal_code || ""}</div>
+              <div>{shippingAddress?.city || ""}</div>
             </div>
             <div>{shippingCountry}</div>
-            <div>{shippingAddress?.email || user?.email || "-"}</div>
+            <div>
+              {shippingAddress?.email ||
+                user?.email.toLowerCase() !== "guest" ||
+                ""}
+            </div>
           </div>
         </div>
       </div>

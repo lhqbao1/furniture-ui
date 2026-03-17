@@ -11,8 +11,10 @@ import { ProductItem } from "@/types/products";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { toast } from "sonner";
 
+type ExportAction = "excel" | "csv" | "praktiker" | "search" | null;
+
 const FilterExportForm = () => {
-  const [isExportingSearch, setIsExportingSearch] = useState(false);
+  const [exportingAction, setExportingAction] = useState<ExportAction>(null);
   const searchParams = useSearchParams();
   const supplierId = searchParams.get("supplier_id") ?? "";
   const statusParam = searchParams.get("all_products");
@@ -33,16 +35,14 @@ const FilterExportForm = () => {
     return params;
   };
 
-  const { isFetching, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["all-products", supplierId, statusParam ?? "all"],
     queryFn: () => getAllProductsSelect(buildParams()),
     enabled: false,
   });
+  const isAnyExporting = exportingAction !== null;
 
-  const buildExportData = (
-    data: ProductItem[],
-    imageDelimiter = "|",
-  ) => {
+  const buildExportData = (data: ProductItem[], imageDelimiter = "|") => {
     const clean = (val: unknown) =>
       val === null || val === undefined ? "" : val;
 
@@ -73,7 +73,7 @@ const FilterExportForm = () => {
 
       return {
         id: Number(clean(p.id_provider)),
-        ean: clean(p.ean),
+        ean: String(clean(p.ean)),
         status: p.is_active === true ? "ACTIVE" : "INACTIVE",
         brand_name: clean(p.brand?.name),
         supplier_name: clean(p.owner?.business_name ?? "Prestige Home"),
@@ -162,33 +162,38 @@ const FilterExportForm = () => {
   };
 
   const handleExportExcel = async () => {
-    const res = await refetch();
-    const data = normalizeProductsResponse(res.data);
-    if (!data.length) {
-      toast.info("No products to export");
-      return;
+    setExportingAction("excel");
+    try {
+      const res = await refetch();
+      const data = normalizeProductsResponse(res.data);
+      if (!data.length) {
+        toast.info("No products to export");
+        return;
+      }
+
+      const exportData = buildExportData(data);
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      saveAs(
+        new Blob([excelBuffer], { type: "application/octet-stream" }),
+        `export-${Date.now()}.xlsx`,
+      );
+    } finally {
+      setExportingAction(null);
     }
-
-    const exportData = buildExportData(data);
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    saveAs(
-      new Blob([excelBuffer], { type: "application/octet-stream" }),
-      `export-${Date.now()}.xlsx`,
-    );
   };
 
   const handleExportExcelWithSearch = async () => {
     const search = searchParams.get("search")?.trim() || undefined;
-    setIsExportingSearch(true);
+    setExportingAction("search");
     try {
       const payload = await getAllProductsSelect({
         ...buildParams(),
@@ -235,95 +240,134 @@ const FilterExportForm = () => {
         description: String(message),
       });
     } finally {
-      setIsExportingSearch(false);
+      setExportingAction(null);
     }
   };
 
   const handleExportCSV = async () => {
-    const res = await refetch();
-    const data = normalizeProductsResponse(res.data);
-    if (!data.length) {
-      toast.info("No products to export");
-      return;
+    setExportingAction("csv");
+    try {
+      const res = await refetch();
+      const data = normalizeProductsResponse(res.data);
+      if (!data.length) {
+        toast.info("No products to export");
+        return;
+      }
+
+      const exportData = buildExportData(data);
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+      const csv = XLSX.utils.sheet_to_csv(worksheet, {
+        FS: ",", // ✅ COMMA
+        RS: "\n",
+        forceQuotes: true, // ✅ vì description có dấu phẩy
+        blankrows: false,
+      });
+
+      const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;",
+      });
+
+      saveAs(blob, `export-${Date.now()}.csv`);
+    } finally {
+      setExportingAction(null);
     }
-
-    const exportData = buildExportData(data);
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    const csv = XLSX.utils.sheet_to_csv(worksheet, {
-      FS: ",", // ✅ COMMA
-      RS: "\n",
-      forceQuotes: true, // ✅ vì description có dấu phẩy
-      blankrows: false,
-    });
-
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    saveAs(blob, `export-${Date.now()}.csv`);
   };
 
   const handleExportCSVForPraktiker = async () => {
-    const res = await refetch();
-    const data = normalizeProductsResponse(res.data);
-    if (!data.length) {
-      toast.info("No products to export");
-      return;
+    setExportingAction("praktiker");
+    try {
+      const res = await refetch();
+      const data = normalizeProductsResponse(res.data);
+      if (!data.length) {
+        toast.info("No products to export");
+        return;
+      }
+
+      const inStockProducts = data.filter(
+        (product) =>
+          calculateAvailableStock(product) > 0 &&
+          Array.isArray(product.static_files) &&
+          product.static_files.length > 0 &&
+          product.final_price,
+      );
+
+      if (!inStockProducts.length) {
+        toast.info("No products with stock > 0 and images to export");
+        return;
+      }
+
+      const exportData = buildExportData(inStockProducts, "///");
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+      const csv = XLSX.utils.sheet_to_csv(worksheet, {
+        FS: ",",
+        RS: "\n",
+        forceQuotes: true,
+        blankrows: false,
+      });
+
+      const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;",
+      });
+
+      saveAs(blob, `export-praktiker-${Date.now()}.csv`);
+    } finally {
+      setExportingAction(null);
     }
-
-    const exportData = buildExportData(data, "///");
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    const csv = XLSX.utils.sheet_to_csv(worksheet, {
-      FS: ",",
-      RS: "\n",
-      forceQuotes: true,
-      blankrows: false,
-    });
-
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    saveAs(blob, `export-praktiker-${Date.now()}.csv`);
   };
 
   return (
     <div>
       {/* Export Button */}
       <div className="flex justify-start gap-2">
-        <Button onClick={handleExportExcel} disabled={isFetching} type="button">
-          {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
+        <Button
+          onClick={handleExportExcel}
+          disabled={isAnyExporting}
+          type="button"
+        >
+          {exportingAction === "excel" ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            "Export Excel"
+          )}
         </Button>
 
         <Button
           variant="secondary"
           onClick={handleExportCSV}
-          disabled={isFetching}
+          disabled={isAnyExporting}
           type="button"
         >
-          Export CSV
+          {exportingAction === "csv" ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            "Export CSV"
+          )}
         </Button>
 
         <Button
           variant="secondary"
           onClick={handleExportCSVForPraktiker}
-          disabled={isFetching}
+          disabled={isAnyExporting}
           type="button"
         >
-          Export for Praktiker
+          {exportingAction === "praktiker" ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            "Export for Praktiker"
+          )}
         </Button>
 
         <Button
           variant="outline"
           onClick={handleExportExcelWithSearch}
-          disabled={isFetching || isExportingSearch}
+          disabled={isAnyExporting}
           type="button"
         >
-          {isExportingSearch ? (
+          {exportingAction === "search" ? (
             <Loader2 className="animate-spin" />
           ) : (
             "Export with search"

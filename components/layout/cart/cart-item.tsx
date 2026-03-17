@@ -138,35 +138,6 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     [item?.quantity],
   );
 
-  const handleUpdateCartItemQuantity = (
-    item: CartItem,
-    newQuantity: number,
-  ) => {
-    if (newQuantity <= 0) {
-      handleRemoveCartItemServer(item.id);
-      return;
-    }
-
-    const totalIncomingStock =
-      item.products.inventory_pos?.reduce((sum, inv) => {
-        if (!inv.list_delivery_date) return sum;
-        const date = new Date(inv.list_delivery_date);
-        if (Number.isNaN(date.getTime())) return sum;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        date.setHours(0, 0, 0, 0);
-        if (date < today) return sum;
-        return sum + (inv.quantity ?? 0);
-      }, 0) ?? 0;
-
-    if (newQuantity > item.products.stock + totalIncomingStock) {
-      toast.error(t("notEnoughStock"));
-      return;
-    }
-
-    debouncedUpdate(item.id, newQuantity);
-  };
-
   const handleRemoveCartItemServer = (id: string) => {
     deleteCartItemMutation.mutate(id, {
       onSuccess(data, variables, context) {

@@ -4,7 +4,7 @@ import {
   getDeliveryDayRange,
 } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
-import { InventoryItem, ProductItem } from "@/types/products";
+import { ProductItem } from "@/types/products";
 import { Clock, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -15,10 +15,10 @@ import {
 } from "@/components/ui/tooltip";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 
 interface DeliveryRangeProps {
   productDetails: ProductItem;
-  available_stock: number;
   serverDeliveryRange?: {
     from: string;
     to: string;
@@ -27,7 +27,6 @@ interface DeliveryRangeProps {
 
 const DeliveryRange = ({
   productDetails,
-  available_stock,
   serverDeliveryRange,
 }: DeliveryRangeProps) => {
   const t = useTranslations();
@@ -48,27 +47,20 @@ const DeliveryRange = ({
     return { from, to };
   }, [serverDeliveryRange]);
 
+  const incomingSummary = React.useMemo(
+    () => calculateIncomingStockSummary(productDetails, { inventoryPo: data }),
+    [productDetails, data],
+  );
+
   const nextIncomingDate = React.useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const isBundleProduct = (productDetails.bundles?.length ?? 0) > 0;
 
-    const poItems = Array.isArray(data) ? data : data ? [data] : [];
-    const futureDates = poItems
-      .filter((item) => (item?.quantity ?? 0) > 0)
-      .map((item) =>
-        item?.list_delivery_date ? new Date(item.list_delivery_date) : null,
-      )
-      .filter((date): date is Date => {
-        if (!date || Number.isNaN(date.getTime())) return false;
-        const normalized = new Date(date);
-        normalized.setHours(0, 0, 0, 0);
-        return normalized >= today;
-      })
-      .sort((a, b) => a.getTime() - b.getTime());
+    if (isBundleProduct) {
+      return incomingSummary.latestIncomingDate;
+    }
 
-    if (futureDates.length === 0) return null;
-    return futureDates[0];
-  }, [data]);
+    return incomingSummary.nearestIncomingDate;
+  }, [productDetails.bundles, incomingSummary]);
 
   const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
     const result = new Date(startDate);

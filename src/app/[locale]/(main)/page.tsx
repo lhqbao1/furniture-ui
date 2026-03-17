@@ -34,6 +34,12 @@ export default async function HomePage() {
           <NewsletterVoucherSection />
         </Suspense>
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          <CategorySection slug="gartenmoebel" />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+          <CategorySection slug="zaeune-sichtschutz" />
+        </Suspense>
+        <Suspense fallback={<ProductGridSkeleton length={4} />}>
           {" "}
           <CategorySection slug="gartenhaeuser" />
         </Suspense>
@@ -43,12 +49,6 @@ export default async function HomePage() {
         </Suspense>
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <CategorySection slug="pflanzenpflege" />
-        </Suspense>
-        <Suspense fallback={<ProductGridSkeleton length={4} />}>
-          <CategorySection slug="gartenmoebel" />
-        </Suspense>
-        <Suspense fallback={<ProductGridSkeleton length={4} />}>
-          <CategorySection slug="zaeune-sichtschutz" />
         </Suspense>
       </div>
     </div>

@@ -120,6 +120,13 @@ export function getStatusStyle(raw: string) {
         color: "text-[#F7931E]",
       };
 
+    case "return_issue":
+      return {
+        text: "Issue Refund",
+        bg: "bg-[#FDE9D2]",
+        color: "text-[#F7931E]",
+      };
+
     default:
       return { text: key, bg: "bg-gray-200", color: "text-gray-700" };
   }
@@ -231,6 +238,12 @@ export function getStatusStyleDe(raw: string) {
     case "return":
       return {
         text: "Zurückgesendet",
+        bg: "bg-[#FDE9D2]",
+        color: "text-[#F7931E]",
+      };
+    case "return_issue":
+      return {
+        text: "Rückerstattung veranlassen",
         bg: "bg-[#FDE9D2]",
         color: "text-[#F7931E]",
       };
