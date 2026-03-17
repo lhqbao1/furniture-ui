@@ -62,7 +62,7 @@ export function useManualCheckoutLogic(
     },
     "euro-tops": {
       company_name: "Eurotops Versand GmbH",
-      tax_id: "ATU81672717",
+      tax_id: "DE121393328",
       invoice_address: "Elisabeth-Selbert-Str. 3",
       invoice_city: "Langenfeld",
       invoice_postal_code: "40764",
