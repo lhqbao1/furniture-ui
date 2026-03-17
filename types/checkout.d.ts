@@ -55,6 +55,10 @@ interface CheckOut {
   updated_at: Date;
 }
 
+export interface CheckOutPaymentRl {
+  capture_id?: string;
+}
+
 export interface CheckOutMain {
   id: string;
   checkout_code: string;
@@ -71,6 +75,7 @@ export interface CheckOutMain {
   payment_method: string;
   checkouts: CheckOut[];
   tax: number;
+  payment_rl: CheckOutPaymentRl;
   created_at: Date;
   updated_at: Date;
 }

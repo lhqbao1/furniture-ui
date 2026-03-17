@@ -320,7 +320,17 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       );
     },
   },
-
+  {
+    accessorKey: "payment_rl",
+    header: ({}) => <div className="text-center">PAYMENT</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          {row.original.payment_rl ? row.original.payment_rl.capture_id : "-"}
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "status",
     header: () => <div className="text-center w-full">STATUS</div>,
@@ -412,6 +422,7 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
       );
     },
   },
+
   {
     accessorKey: "channel",
     header: () => <div className="text-center w-full">CHANNEL</div>,
@@ -486,6 +497,7 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
       );
     },
   },
+
   {
     accessorKey: "value",
     header: () => <div className="text-center w-full">INVOICE</div>,
@@ -555,7 +567,7 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     accessorKey: "created_at",
     header: () => <div className="text-center w-full">DATE CREATED</div>,
     cell: ({ row }) => {
-      let iso = row.original.created_at.toString();
+      let iso = row.original.shipment.shipper_date.toString();
 
       // 👉 Nếu backend không gửi Z, mình thêm vào để JS parse đúng UTC
       if (!iso.endsWith("Z")) {
