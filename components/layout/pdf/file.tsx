@@ -178,9 +178,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   ? checkout.checkouts[0].invoice_address.recipient_name
                   : checkout.checkouts?.[0]?.shipping_address?.recipient_name
                     ? checkout.checkouts[0].shipping_address.recipient_name
-                  : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
-                      checkout.checkouts?.[0]?.user?.last_name ?? ""
-                    }`}
+                    : `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
+                        checkout.checkouts?.[0]?.user?.last_name ?? ""
+                      }`}
             </Text>
             <Text>
               {checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
@@ -353,13 +353,15 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   {item.quantity}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
-                  {(calculateProductVAT(
-                    item.final_price,
-                    item.products.tax,
-                    invoice?.main_checkout.checkouts[0].shipping_address
-                      .country,
-                    invoice?.main_checkout.checkouts[0].user.tax_id,
-                  ).vatRate * 100).toLocaleString("de-DE", {
+                  {(
+                    calculateProductVAT(
+                      item.final_price,
+                      item.products.tax,
+                      invoice?.main_checkout.checkouts[0].shipping_address
+                        .country,
+                      invoice?.main_checkout.checkouts[0].user.tax_id,
+                    ).vatRate * 100
+                  ).toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -483,10 +485,10 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     .flatMap((c) => c.items) ?? [],
                   invoice?.voucher_amount,
                   checkout?.checkouts[0]?.shipping_address?.country ??
-                checkout?.checkouts[0]?.invoice_address?.country ??
-                "DE",
-              invoice?.main_checkout.checkouts[0].user.tax_id,
-              checkout.total_shipping,
+                    checkout?.checkouts[0]?.invoice_address?.country ??
+                    "DE",
+                  invoice?.main_checkout.checkouts[0].user.tax_id,
+                  checkout.total_shipping,
                 ).totalVat.toLocaleString("de-DE", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,

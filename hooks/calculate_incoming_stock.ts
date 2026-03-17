@@ -93,7 +93,7 @@ export const calculateIncomingStockSummary = (
       if (quantityPerBundle <= 0) continue;
 
       const bundleIncomingItems = normalizeFutureIncomingItems(
-        bundle?.incoming,
+        bundle?.bundle_item?.inventory_pos,
         referenceDate,
       );
 

@@ -213,6 +213,7 @@
   "turnOnNotificationsSuccess": "Benachrichtigungen erfolgreich aktiviert",
   "turnOnNotificationsError": "Aktivieren der Benachrichtigungen fehlgeschlagen",
   "addToCartFail": "Produkt konnte nicht in den Warenkorb gelegt werden",
+  "updateCartFail": "Die Menge des Artikels im Warenkorb konnte nicht aktualisiert werden.",
   "city": "Stadt",
   "selectCity": "Stadt auswählen...",
   "noCity": "Keine Stadt gefunden.",

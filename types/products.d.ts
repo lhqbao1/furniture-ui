@@ -102,7 +102,6 @@ export type Owner = {
 export type ProductBundles = {
   bundle_item: ProductItem;
   quantity: number;
-  incoming: POContainerInventoryDetail;
 };
 
 export type MarketplaceProduct = {
