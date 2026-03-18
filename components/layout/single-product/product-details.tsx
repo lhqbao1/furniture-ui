@@ -112,6 +112,14 @@ const ProductDetails = ({
                     />
                   </div>
                 )}
+
+                {productDetails.brand.name.toLowerCase() === "econelo" && (
+                  <div className="seo-content text-sm shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-2xl px-4 py-3 mt-2">
+                    2 Jahre Garantie auf das Fahrzeug. Die Batterie hat eine
+                    Garantie von 6 Monaten ab dem Lieferdatum.
+                  </div>
+                )}
+
                 <AddToCartField
                   productDetails={productDetails}
                   productId={productDetails.id}
