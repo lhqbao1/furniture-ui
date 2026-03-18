@@ -721,7 +721,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
           <Text>
             {checkout?.checkouts?.[0]?.shipping_address?.postal_code?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.postal_code
-              : ""}{" "}
+              : ""}
             {checkout?.checkouts?.[0]?.shipping_address?.city?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.city
               : ""}

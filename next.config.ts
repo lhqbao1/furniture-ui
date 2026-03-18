@@ -38,6 +38,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "gzhls.at",
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
     ],
     minimumCacheTTL: 2678400, // 31 ngày
     formats: ["image/webp"],

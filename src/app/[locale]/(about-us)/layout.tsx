@@ -1,0 +1,24 @@
+import Footer from "@/components/shared/footer";
+import HalfBannerGuard from "@/components/shared/half-banner-guard";
+import "../../globals.css";
+import PageHeader from "@/components/layout/header/header";
+
+export default function MainLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <>
+      <PageHeader />
+      <main className="relative w-full">
+        {/* <StickyIcon /> */}
+        <div className="overflow-x-hidden">
+          <HalfBannerGuard height={200} />
+          <div className="flex-1 min-h-screen">{children}</div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
