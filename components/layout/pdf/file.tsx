@@ -90,6 +90,13 @@ const styles = StyleSheet.create({
   bold: { fontWeight: "bold" },
   text: { fontFamily: "Roboto", fontSize: 12 },
   flexColBlock: { display: "flex", flexDirection: "column" },
+  flexColBlockWithTop: {
+    display: "flex",
+    flexDirection: "column",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+
   flexRowBlock: { display: "flex", flexDirection: "row", gap: "4px" },
   boldWithGap: { fontFamily: "FigtreeBold" },
   flexEndTotal: {
@@ -691,6 +698,41 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               </Text>
             </View>
           </View>
+        </View>
+
+        <View style={styles.flexColBlockWithTop}>
+          <Text style={{ marginBottom: 2 }}>Lieferadresse:</Text>
+          <Text>
+            {invoice.main_checkout.checkouts?.[0]?.shipping_address
+              ?.recipient_name ?? ""}
+          </Text>
+
+          <Text>
+            {checkout?.checkouts?.[0]?.shipping_address?.address_line?.trim()
+              ? checkout?.checkouts?.[0]?.shipping_address?.address_line
+              : ""}
+          </Text>
+          <Text>
+            {checkout?.checkouts?.[0]?.shipping_address?.additional_address_line?.trim()
+              ? checkout?.checkouts?.[0]?.shipping_address
+                  ?.additional_address_line
+              : ""}
+          </Text>
+          <Text>
+            {checkout?.checkouts?.[0]?.shipping_address?.postal_code?.trim()
+              ? checkout?.checkouts?.[0]?.shipping_address?.postal_code
+              : ""}{" "}
+            {checkout?.checkouts?.[0]?.shipping_address?.city?.trim()
+              ? checkout?.checkouts?.[0]?.shipping_address?.city
+              : ""}
+          </Text>
+          <Text>
+            {getCountryName(
+              checkout?.checkouts?.[0]?.shipping_address?.country?.trim()
+                ? checkout?.checkouts?.[0]?.shipping_address?.country
+                : "",
+            )}
+          </Text>
         </View>
 
         {checkout.status.toLowerCase() === "pending" ? (

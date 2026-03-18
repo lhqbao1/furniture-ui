@@ -78,7 +78,9 @@ const ImportDialog = ({
       );
       if (duplicateMatch?.[0]) return duplicateMatch[0];
 
-      const detailLineMatch = detail.match(/DETAIL:\s*Key\s*\([^)]+\)=\([^)]+\)\s*already exists\./i);
+      const detailLineMatch = detail.match(
+        /DETAIL:\s*Key\s*\([^)]+\)=\([^)]+\)\s*already exists\./i,
+      );
       if (detailLineMatch?.[0]) return detailLineMatch[0];
 
       return detail;
@@ -185,10 +187,7 @@ const ImportDialog = ({
         </DialogHeader>
         {isSupplier && listSuppliers && (
           <div>
-            <Popover
-              open={openSupplier}
-              onOpenChange={setOpenSupplier}
-            >
+            <Popover open={openSupplier} onOpenChange={setOpenSupplier}>
               <PopoverTrigger asChild>
                 <Button
                   type="button"
@@ -293,10 +292,7 @@ const ImportDialog = ({
 
         {/* Action buttons */}
         <div className="mt-6 flex justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-          >
+          <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button
