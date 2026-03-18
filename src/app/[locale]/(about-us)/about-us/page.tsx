@@ -44,14 +44,20 @@ const brandLogos = [
   },
 ];
 
-const aboutImageIds = [
-  1571463, 1571460, 3932930, 1571458, 6489127, 276724, 7061676, 271743,
-  6489125, 7061396,
-];
-
-const aboutGallery = aboutImageIds.map((id, index) => ({
-  src: `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1400`,
-  alt: `Prestige Home Einblick ${index + 1}`,
+const aboutGallery = [
+  { id: 31702079, alt: "Frühlingsgarten mit Holzmöbeln" },
+  { id: 8411959, alt: "Holzbank vor Holzzaun im Garten" },
+  { id: 6314329, alt: "Outdoor-Holzsofa mit Bambuszaun" },
+  { id: 31231173, alt: "Rustikale Garten-Terrasse mit Holzsitzmöbeln" },
+  { id: 25430952, alt: "Gartenweg mit Holzzaun und Blumen" },
+  { id: 34006835, alt: "Gemeinschaftsgarten mit Sitzbank und Zaun" },
+  { id: 6903867, alt: "Holzzaun in üppiger Gartenlandschaft" },
+  { id: 271624, alt: "Moderner Wohnbereich als Indoor-Kontrast" },
+  { id: 1571458, alt: "Heller Innenraum mit natürlicher Holzoptik" },
+  { id: 1571460, alt: "Wohnliches Interieur mit warmen Akzenten" },
+].map((item, index) => ({
+  src: `https://images.pexels.com/photos/${item.id}/pexels-photo-${item.id}.jpeg?auto=compress&cs=tinysrgb&w=1400`,
+  alt: `${item.alt} ${index + 1}`,
 }));
 
 const AboutUsPage = () => {
