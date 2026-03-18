@@ -4,6 +4,8 @@ export function getCountryName(code: string): string {
   switch (normalized) {
     case "DE":
       return "Deutschland"; // Nước Đức
+    case "FR":
+      return "Frankreich"; // Nước Đức
     case "AT":
       return "Österreich"; // Nước Áo
     case "SCHWEIZ":
