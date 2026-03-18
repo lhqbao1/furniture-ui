@@ -119,7 +119,7 @@ export default function RootLayout({
         <meta name="google" content="notranslate" />
         <meta
           name="google-site-verification"
-          content="-2RJrCLuu7-ix7PEWO4htQVD0mT7LJNowlLZBZwzRCQ"
+          content="lgEEkRermTV6Bt9K6imSXiAP0gE4KbR2gG34gr9V9cc"
         />
         <Script
           id="structured-data"

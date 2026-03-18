@@ -4,13 +4,12 @@ import { ReviewResponse } from "@/types/review";
 // Components
 import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import ProductDetailsSkeleton from "@/components/layout/single-product/product-detail-skeleton";
-
 import ProductDetailsLogistic from "./details/logistics";
 import ProductDetailsPrice from "./details/price";
 import AddToCartField from "./details/add-to-cart";
 import AdminView from "./details/admin-view";
 import ListStarsReview from "./details/list-stars-review";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { ProductItem } from "@/types/products";
 import { ProductGroupDetailResponse } from "@/types/product-group";
 import ProductImageWrapper from "./image/product-image-wrapper";
@@ -115,8 +114,8 @@ const ProductDetails = ({
 
                 {productDetails.brand.name.toLowerCase() === "econelo" && (
                   <div className="seo-content text-sm shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-2xl px-4 py-3 mt-2">
-                    2 Jahre Garantie auf das Fahrzeug. Die Batterie hat eine
-                    Garantie von 6 Monaten ab dem Lieferdatum.
+                    2 Jahre Gewährleistung auf das Fahrzeug. Die Batterie hat
+                    eine Garantie von 6 Monaten ab dem Lieferdatum.
                   </div>
                 )}
 
