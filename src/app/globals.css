@@ -507,3 +507,85 @@ input[type="number"] {
 .tawk-icon-right img {
   display: none;
 }
+
+.about-fade-up {
+  opacity: 0;
+  transform: translateY(26px);
+  animation: aboutFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.about-delay-1 {
+  animation-delay: 0.15s;
+}
+
+.about-delay-2 {
+  animation-delay: 0.28s;
+}
+
+.about-delay-3 {
+  animation-delay: 0.4s;
+}
+
+.about-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(14px);
+  opacity: 0.35;
+  animation: floatOrb 12s ease-in-out infinite;
+}
+
+.about-orb-first {
+  width: 300px;
+  height: 300px;
+  top: 60px;
+  left: -120px;
+  background: radial-gradient(circle, #34d399 0%, transparent 68%);
+}
+
+.about-orb-second {
+  width: 280px;
+  height: 280px;
+  top: 45%;
+  right: -120px;
+  background: radial-gradient(circle, #f59e0b 0%, transparent 68%);
+  animation-delay: 2.5s;
+}
+
+.about-orb-third {
+  width: 240px;
+  height: 240px;
+  bottom: -60px;
+  left: 35%;
+  background: radial-gradient(circle, #86efac 0%, transparent 72%);
+  animation-delay: 5s;
+}
+
+@keyframes aboutFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatOrb {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-fade-up,
+  .about-orb {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -154,13 +154,13 @@ export function getStatusStyleDe(raw: string) {
 
     case "tock_reserved":
       return {
-        text: "Bestand reserviert",
+        text: "Wird vorbereitet",
         bg: "bg-[#ffe4e9]",
         color: "text-[#ff4f7b]",
       };
     case "reserved":
       return {
-        text: "Reserviert",
+        text: "Wird vorbereitet",
         bg: "bg-[#ffe4e9]",
         color: "text-[#ff4f7b]",
       };
@@ -188,14 +188,14 @@ export function getStatusStyleDe(raw: string) {
 
     case "shipped":
       return {
-        text: "Versandt",
+        text: "Zugestellt",
         bg: "bg-[#dcfce7]",
         color: "text-[#22c55e]",
       };
 
     case "completed":
       return {
-        text: "Versandt",
+        text: "Versendet",
         bg: "bg-[#dcfce7]",
         color: "text-[#39B54A]",
       };
