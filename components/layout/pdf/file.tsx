@@ -123,6 +123,9 @@ interface InvoicePDFProps {
   invoice: InvoiceResponse;
 }
 
+const normalizeRecipientName = (value?: string | null) =>
+  (value ?? "").replace(/\s{2,}/g, " ").trim();
+
 export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
   const flattenedCartItems = useMemo(() => {
     const checkouts = invoice?.main_checkout?.checkouts;
@@ -181,13 +184,17 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             <Text>
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
-                : checkout.checkouts?.[0]?.invoice_address?.recipient_name
-                  ? checkout.checkouts[0].invoice_address.recipient_name
+                : checkout.checkouts?.[0]?.invoice_address?.recipient_name?.trim()
+                  ? normalizeRecipientName(
+                      checkout.checkouts[0].invoice_address.recipient_name,
+                    )
                   : // : checkout.checkouts?.[0]?.shipping_address?.recipient_name
                     //   ? checkout.checkouts[0].shipping_address.recipient_name
-                    `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
-                      checkout.checkouts?.[0]?.user?.last_name ?? ""
-                    }`}
+                    normalizeRecipientName(
+                      `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
+                        checkout.checkouts?.[0]?.user?.last_name ?? ""
+                      }`,
+                    )}
             </Text>
             <Text>
               {checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
@@ -703,8 +710,10 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
         <View style={styles.flexColBlockWithTop}>
           <Text style={{ marginBottom: 2 }}>Lieferadresse:</Text>
           <Text>
-            {invoice.main_checkout.checkouts?.[0]?.shipping_address
-              ?.recipient_name ?? ""}
+            {normalizeRecipientName(
+              invoice.main_checkout.checkouts?.[0]?.shipping_address
+                ?.recipient_name,
+            )}
           </Text>
 
           <Text>
@@ -721,7 +730,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
           <Text>
             {checkout?.checkouts?.[0]?.shipping_address?.postal_code?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.postal_code
-              : ""}
+              : ""}{" "}
             {checkout?.checkouts?.[0]?.shipping_address?.city?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.city
               : ""}
