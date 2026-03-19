@@ -6,61 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
-import { useState } from "react";
-import { useEditProduct } from "@/features/products/hook";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 import { useLocale } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { getProductByIdDSP } from "@/features/dsp/products/api";
-import DeleteDialogDSP from "./delete-dialog";
-
-function EdittbalePriceCell({ product }: { product: ProductItem }) {
-  const [value, setValue] = useState(product.final_price);
-  const [editing, setEditing] = useState(false);
-  const EditProductMutation = useEditProduct();
-
-  const handleEditProductPrice = () => {
-    EditProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          final_price: value,
-          ...(product.categories?.length
-            ? { category_ids: product.categories.map((c) => c.id) }
-            : {}),
-          ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
-          // 🔹 Thêm bundles
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-          brand_id: product.brand ? product.brand.id : null,
-        },
-        id: product.id,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Update product price successful");
-          setEditing(false);
-        },
-        onError(error, variables, context) {
-          toast.error("Update product price fail");
-        },
-      },
-    );
-  };
-
-  return <div className="text-right">€{product.final_price?.toFixed(2)}</div>;
-}
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { getCarrierLogo } from "@/lib/getCarrierImage";
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -151,24 +104,27 @@ export const productColumnsDSP: ColumnDef<ProductItem>[] = [
     ),
   },
   {
-    accessorKey: "category",
-    header: "CATEGORY",
-    cell: ({ row }) => {
-      return (
-        <div className="flex flex-col gap-1 items-center">
-          {row.original.categories.map((item, indx) => {
-            return <div key={item.id}>{item.name}</div>;
-          })}
-        </div>
-      );
-    },
+    accessorKey: "sku",
+    header: ({}) => <div className="text-center">SKU</div>,
+    // cell: ({ row }) => <EditableNameCell product={row.original} />,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.sku ?? "-"}</div>
+    ),
+  },
+  {
+    accessorKey: "ean",
+    header: ({}) => <div className="text-center">EAN</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.ean ?? "-"}</div>
+    ),
   },
   {
     accessorKey: "stock",
     header: "STOCK",
-    // cell: ({ row }) => <EditableStockCell product={row.original} />,
     cell: ({ row }) => (
-      <div className="text-center">{row.original.stock} pcs.</div>
+      <div className="text-center">
+        {calculateAvailableStock(row.original)} pcs.
+      </div>
     ),
   },
   {
@@ -208,57 +164,47 @@ export const productColumnsDSP: ColumnDef<ProductItem>[] = [
         {row.original.delivery_cost ? (
           <>€{row.original.delivery_cost?.toFixed(2)}</>
         ) : (
-          "updating"
+          "-"
         )}
       </div>
     ),
   },
   {
-    accessorKey: "final_price",
-    header: () => <div className="text-right">FINAL PRICE</div>,
-    cell: ({ row }) => <EdittbalePriceCell product={row.original} />,
+    accessorKey: "delivery_time",
+    header: () => <div className="text-center">DELIVERY TIME</div>,
+    cell: ({ row }) => (
+      <div className="text-center">
+        {row.original.delivery_time ? (
+          <>{row.original.delivery_time} Werktage</>
+        ) : (
+          "-"
+        )}
+      </div>
+    ),
   },
-  {
-    id: "margin",
-    header: () => <div className="text-right">MARGIN</div>,
-    cell: ({ row }) => {
-      const { final_price, cost, tax } = row.original;
-      const taxRate = parseFloat(tax) / 100;
-      if (!final_price || !cost || final_price <= 0)
-        return <div className="text-right">updating</div>;
 
-      const margin = (1 / (1 + taxRate) - cost / final_price) * 100;
-      return <div className="text-right">{margin.toFixed(1)}%</div>;
-    },
-  },
   {
     id: "carrier",
     header: () => <div className="text-center">CARRIER</div>,
     cell: ({ row }) => {
       const carrier = row.original.carrier?.toLowerCase();
+      const normalizedCarrier =
+        carrier === "spedition" ? "amm" : (carrier ?? "");
+      const logo = normalizedCarrier ? getCarrierLogo(normalizedCarrier) : null;
 
-      let image: string | null = null;
-      if (carrier === "amm" || carrier === "spedition") {
-        image = "/amm.jpeg";
-      } else if (carrier === "dpd") {
-        image = "/dpd.jpeg";
+      if (!logo) {
+        return <span className="text-muted-foreground">—</span>;
       }
 
       return (
-        <div className="flex items-center justify-center">
-          {image ? (
-            <Image
-              src={image}
-              alt={carrier}
-              width={60}
-              height={60}
-              unoptimized
-              className="object-fill"
-            />
-          ) : (
-            <div>updating</div>
-          )}
-        </div>
+        <Image
+          src={logo}
+          alt={normalizedCarrier}
+          width={60}
+          height={40}
+          unoptimized
+          className="object-contain"
+        />
       );
     },
   },
@@ -267,13 +213,4 @@ export const productColumnsDSP: ColumnDef<ProductItem>[] = [
     header: () => <div className="text-start">ACTION</div>,
     cell: ({ row }) => <ActionsCell product={row.original} />,
   },
-  // {
-  //     id: 'sync',
-  //     header: "EBAY",
-  //     cell: ({ row }) => {
-  //         return (
-  //             <SyncToEbay product={row.original} />
-  //         )
-  //     }
-  // }
 ];
