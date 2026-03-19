@@ -87,7 +87,14 @@ export async function getCheckOutSupplier(params?: GetAllCheckoutParams) {
     params: {
       ...(params?.page !== undefined && { page: params.page }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
+      ...(params?.status !== undefined && { status: params.status }),
+      ...(params?.channel !== undefined && { channel: params.channel }),
+      ...(params?.from_date !== undefined && { from_date: params.from_date }),
+      ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(params?.search !== undefined && { search: params.search }),
     },
+    paramsSerializer: (params) =>
+      qs.stringify(params, { arrayFormat: "repeat" }),
   });
   return data as CheckOutResponse;
 }

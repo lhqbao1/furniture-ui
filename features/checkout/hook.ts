@@ -51,11 +51,36 @@ export function useGetCheckOut({ page, page_size }: GetAllCheckoutParams = {}) {
 export function useGetCheckOutSupplier({
   page,
   page_size,
+  status,
+  channel,
+  from_date,
+  to_date,
+  search,
 }: GetAllCheckoutParams = {}) {
   return useQuery({
-    queryKey: ["supplier-checkout", page, page_size],
-    queryFn: () => getCheckOutSupplier({ page, page_size }),
+    queryKey: [
+      "supplier-checkout",
+      page ?? 1,
+      page_size ?? 50,
+      (status ?? []).join(","),
+      (channel ?? []).join(","),
+      from_date ?? null,
+      to_date ?? null,
+      search ?? null,
+    ],
+    queryFn: () =>
+      getCheckOutSupplier({
+        page,
+        page_size,
+        status,
+        channel,
+        from_date,
+        to_date,
+        search,
+      }),
+    placeholderData: (previousData) => previousData,
     retry: false,
+    refetchOnWindowFocus: false,
   });
 }
 
