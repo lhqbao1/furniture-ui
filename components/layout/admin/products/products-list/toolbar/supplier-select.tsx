@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Popover,
   PopoverTrigger,
@@ -35,6 +35,29 @@ export default function SupplierSelect({
     (s) => !s.business_name.includes("tes"),
   );
 
+  const sortedSuppliers = useMemo(() => {
+    if (!filteredSuppliers) return [];
+
+    const getPriority = (businessName: string) => {
+      const normalized = businessName.trim().toLowerCase();
+      if (normalized === "all") return 0;
+      if (normalized === "prestige home") return 1;
+      return 2;
+    };
+
+    return filteredSuppliers.slice().sort((a, b) => {
+      const priorityA = getPriority(a.business_name);
+      const priorityB = getPriority(b.business_name);
+
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      if (priorityA < 2) return 0;
+
+      return a.business_name.localeCompare(b.business_name, "de", {
+        sensitivity: "base",
+      });
+    });
+  }, [filteredSuppliers]);
+
   const selectedLabel =
     filteredSuppliers?.find((s) => s.id === supplier)?.business_name ||
     "Select supplier";
@@ -53,31 +76,24 @@ export default function SupplierSelect({
             <CommandList>
               <CommandEmpty>No supplier found.</CommandEmpty>
 
-              {filteredSuppliers
-                ?.slice() // tránh mutate array gốc
-                .sort((a, b) =>
-                  a.business_name.localeCompare(b.business_name, "de", {
-                    sensitivity: "base",
-                  }),
-                )
-                .map((item) => (
-                  <CommandItem
-                    key={item.id}
-                    value={item.business_name.toLowerCase()}
-                    onSelect={() => {
-                      setSupplier(item.id);
-                      setOpen(false);
-                    }}
-                  >
-                    {item.business_name}
-                    <Check
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        item.id === supplier ? "opacity-100" : "opacity-0",
-                      )}
-                    />
-                  </CommandItem>
-                ))}
+              {sortedSuppliers.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  value={item.business_name.toLowerCase()}
+                  onSelect={() => {
+                    setSupplier(item.id);
+                    setOpen(false);
+                  }}
+                >
+                  {item.business_name}
+                  <Check
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      item.id === supplier ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                </CommandItem>
+              ))}
             </CommandList>
           </Command>
         </PopoverContent>

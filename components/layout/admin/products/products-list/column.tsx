@@ -3,11 +3,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CopyCheck, Eye, Loader2, Pencil } from "lucide-react";
+import { CopyCheck, Eye, Loader2, Pencil, Upload } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useEffect, useMemo, useState } from "react";
 import { useEditProduct } from "@/features/products/hook";
+import { useImportProductToAmm } from "@/features/amm/hook";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,14 @@ import { useLocale } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getProductById } from "@/features/products/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useGetSuppliers } from "@/features/supplier/hook";
 import { useGetBrands } from "@/features/brand/hook";
 import { useGetCategories } from "@/features/category/hook";
@@ -137,7 +146,9 @@ type IncomingDisplayItem = {
   date: Date;
 };
 
-const getIncomingDisplayItems = (product: ProductItem): IncomingDisplayItem[] => {
+const getIncomingDisplayItems = (
+  product: ProductItem,
+): IncomingDisplayItem[] => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -1469,6 +1480,59 @@ function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const importAmmProductMutation = useImportProductToAmm();
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+
+  const getMissingAmmFields = () => {
+    const missingFields: string[] = [];
+
+    if (!product.name?.trim()) missingFields.push("name");
+    if (!product.sku?.trim()) missingFields.push("sku");
+    if (!product.ean?.trim()) missingFields.push("ean");
+    if (!product.packages || product.packages.length === 0)
+      missingFields.push("package");
+
+    return missingFields;
+  };
+
+  const handleOpenImportDialog = () => {
+    const missingFields = getMissingAmmFields();
+    if (missingFields.length > 0) {
+      toast.error("Product is missing required fields", {
+        description: `Missing: ${missingFields.join(", ")}`,
+      });
+      return;
+    }
+
+    if (!product.id_provider?.trim()) {
+      toast.error("Product is missing id_provider");
+      return;
+    }
+
+    setIsImportDialogOpen(true);
+  };
+
+  const handleImportToAmm = () => {
+    if (!product.id_provider?.trim()) {
+      toast.error("Product is missing id_provider");
+      return;
+    }
+
+    const toastId = toast.loading("Importing product...");
+    importAmmProductMutation.mutate([product.id_provider], {
+      onSuccess: () => {
+        toast.success("Product imported successfully", { id: toastId });
+        setIsImportDialogOpen(false);
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      },
+      onError: (error) => {
+        toast.error("Failed to import product", {
+          id: toastId,
+          description: getErrorDescription(error),
+        });
+      },
+    });
+  };
 
   const handleClick = async (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -1505,32 +1569,95 @@ function ActionsCell({ product }: { product: ProductItem }) {
   };
 
   return (
-    <div className="flex gap-2">
-      {/* <Link href={`/admin/products/${product.id}/edit`}> */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={(e) => handleClick(e, product.id)}
-        title="Edit Product"
-      >
-        <Pencil className="w-4 h-4 text-primary" />
-      </Button>
+    <>
+      <div className="flex gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={(e) => handleClick(e, product.id)}
+          title="Edit Product"
+        >
+          <Pencil className="w-4 h-4 text-primary" />
+        </Button>
 
-      <Link
-        href={`/product/${product.url_key}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button variant="ghost" size="icon">
-          <Eye className="w-4 h-4 text-secondary" />
-        </Button>
-      </Link>
-      <Link href={`/admin/products/${product.id}/clone`} prefetch={true}>
-        <Button variant="ghost" size="icon">
-          <CopyCheck className="w-4 h-4 text-secondary" />
-        </Button>
-      </Link>
-    </div>
+        {product.is_import_to_amm === false && (
+          <Button
+            variant="ghost"
+            size="icon"
+            title="Import to AMM"
+            onClick={handleOpenImportDialog}
+            disabled={importAmmProductMutation.isPending}
+          >
+            {importAmmProductMutation.isPending ? (
+              <Loader2 className="w-4 h-4 text-amber-600 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4 text-amber-600" />
+            )}
+          </Button>
+        )}
+
+        <Link
+          href={`/product/${product.url_key}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button variant="ghost" size="icon">
+            <Eye className="w-4 h-4 text-secondary" />
+          </Button>
+        </Link>
+        <Link href={`/admin/products/${product.id}/clone`} prefetch={true}>
+          <Button variant="ghost" size="icon">
+            <CopyCheck className="w-4 h-4 text-secondary" />
+          </Button>
+        </Link>
+      </div>
+
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Import product to AMM</DialogTitle>
+            <DialogDescription>
+              This action will import the selected product to AMM.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-1 text-sm">
+            <div>
+              <span className="font-medium">Name:</span> {product.name || "—"}
+            </div>
+            <div>
+              <span className="font-medium">SKU:</span> {product.sku || "—"}
+            </div>
+            <div>
+              <span className="font-medium">EAN:</span> {product.ean || "—"}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsImportDialogOpen(false)}
+              disabled={importAmmProductMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleImportToAmm}
+              disabled={importAmmProductMutation.isPending}
+            >
+              {importAmmProductMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Importing...
+                </>
+              ) : (
+                "Confirm Import"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
