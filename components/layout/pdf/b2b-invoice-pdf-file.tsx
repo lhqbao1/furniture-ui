@@ -146,30 +146,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const getCustomerName = (checkout: CheckOutMain) => {
-  const first = checkout.checkouts?.[0];
-  if (!first) return "";
-
-  const shippingRecipient = first?.shipping_address?.recipient_name?.trim();
-  if (shippingRecipient) {
-    return shippingRecipient;
-  }
-
-  const invoiceRecipient = first?.invoice_address?.recipient_name?.trim();
-  if (invoiceRecipient) {
-    return invoiceRecipient;
-  }
-
-  const companyName = first?.user?.company_name?.trim();
-  if (companyName) return companyName;
-
-  const fullName =
-    `${first?.user?.first_name ?? ""} ${first?.user?.last_name ?? ""}`.trim();
-  if (fullName) return fullName;
-
-  return "";
-};
-
 const truncateText = (value: string, maxLength = 28) => {
   if (!value) return "";
   if (value.length <= maxLength) return value;
@@ -186,7 +162,7 @@ export const B2BInvoicePDFFile = ({
   invoiceId,
   servicePeriod,
   orderNumber,
-  introText: _introText,
+  introText,
   paymentNote,
   orders,
 }: B2BInvoicePDFFileProps) => {
@@ -208,33 +184,21 @@ export const B2BInvoicePDFFile = ({
   const titleLine = cleanedOrderNumber
     ? `Rechnung Nr. ${invoiceId} - Ihre Bestellung ${cleanedOrderNumber}`
     : `Rechnung Nr. ${invoiceId}`;
-  const introLine1 = "Sehr geehrte Damen und Herren,";
-  const introLine2 =
-    "vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!";
-  const introLine3 =
-    "Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:";
+  const defaultIntroText = `${titleLine}
 
-  const paymentLines = paymentNote.split("\n");
-  const paymentLine1 =
-    paymentLines[0] ??
-    "Zahlungsbedingungen: Zahlung innerhalb von 14 Tagen ab Rechnungseingang ohne Abzüge.";
-  const paymentLine2 =
-    paymentLines.find((line) =>
-      line.startsWith(
-        "Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer",
-      ),
-    ) ??
-    "Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene";
-  const paymentLine4 =
-    paymentLines.find((line) =>
-      line.startsWith("Der Rechnungsbetrag ist bis zum "),
-    ) ?? "";
-  // const paymentLine5 =
-  //   paymentLines.find((line) => line === "Mit freundlichen Grüßen") ??
-  //   "Mit freundlichen Grüßen";
-  // const paymentLine6 =
-  //   paymentLines.find((line) => line === "Duong Thuy Nguyen") ??
-  //   "Duong Thuy Nguyen";
+Sehr geehrte Damen und Herren,
+vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!
+Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:`;
+  const resolvedIntroText = introText?.trim() ? introText : defaultIntroText;
+  const introLines = resolvedIntroText.replace(/\r\n/g, "\n").split("\n");
+
+  const defaultPaymentText = `Zahlungsbedingungen:
+
+Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto.`;
+  const resolvedPaymentNote = paymentNote?.trim()
+    ? paymentNote
+    : defaultPaymentText;
+  const paymentLines = resolvedPaymentNote.replace(/\r\n/g, "\n").split("\n");
   const displayRows = orders.map((order, index) => {
     const orderItems = (order.checkouts ?? []).flatMap(
       (checkout) => checkout.cart?.items ?? [],
@@ -330,6 +294,7 @@ export const B2BInvoicePDFFile = ({
             marginBottom: 20,
           }}
         >
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <Image
             src="https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/681cde2c-27cd-45ea-94c2-7d82a35453bc_invoice-logo.png?"
             style={{ width: 80, height: 70 }}
@@ -460,23 +425,28 @@ export const B2BInvoicePDFFile = ({
         </View>
 
         <View style={{ marginTop: 10, marginBottom: 22 }}>
-          <Text
-            style={{
-              fontFamily: "Helvetica-Bold",
-              fontWeight: "bold",
-              fontSize: 14,
-              marginBottom: 15,
-            }}
-          >
-            {titleLine}
-          </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
-            {introLine1}
-          </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25 }}>{introLine2}</Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
-            {introLine3}
-          </Text>
+          {introLines.map((line, index) => (
+            <Text
+              key={`intro-line-${index}`}
+              style={
+                index === 0
+                  ? {
+                      fontFamily: "Helvetica-Bold",
+                      fontWeight: "bold",
+                      fontSize: 14,
+                      lineHeight: 1.25,
+                      marginBottom: line.trim() ? 10 : 4,
+                    }
+                  : {
+                      fontSize: 11,
+                      lineHeight: 1.25,
+                      marginBottom: line.trim() ? 4 : 8,
+                    }
+              }
+            >
+              {line || " "}
+            </Text>
+          ))}
         </View>
 
         <View
@@ -699,15 +669,18 @@ export const B2BInvoicePDFFile = ({
         </View>
 
         <View style={{ marginTop: 18 }}>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
-            {paymentLine1}
-          </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 10 }}>
-            {paymentLine4}
-          </Text>
-          <Text style={{ fontSize: 11, lineHeight: 1.25, marginBottom: 2 }}>
-            {paymentLine2}
-          </Text>
+          {paymentLines.map((line, index) => (
+            <Text
+              key={`payment-line-${index}`}
+              style={{
+                fontSize: 11,
+                lineHeight: 1.25,
+                marginBottom: line.trim() ? 4 : 8,
+              }}
+            >
+              {line || " "}
+            </Text>
+          ))}
         </View>
 
         <B2BInvoiceFooter />
