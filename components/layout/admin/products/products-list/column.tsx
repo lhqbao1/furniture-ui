@@ -1580,7 +1580,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
           <Pencil className="w-4 h-4 text-primary" />
         </Button>
 
-        {product.is_import_to_amm === false && (
+        {/* {product.is_import_to_amm === false && (
           <Button
             variant="ghost"
             size="icon"
@@ -1594,7 +1594,20 @@ function ActionsCell({ product }: { product: ProductItem }) {
               <Upload className="w-4 h-4 text-amber-600" />
             )}
           </Button>
-        )}
+        )} */}
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Import to AMM"
+          onClick={handleOpenImportDialog}
+          disabled={importAmmProductMutation.isPending}
+        >
+          {importAmmProductMutation.isPending ? (
+            <Loader2 className="w-4 h-4 text-amber-600 animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4 text-amber-600" />
+          )}
+        </Button>
 
         <Link
           href={`/product/${product.url_key}`}
