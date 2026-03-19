@@ -44,11 +44,7 @@ const ActionCellChild = ({
       {!isSupplier && (
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-amber-50"
-            >
+            <Button variant="ghost" size="icon" className="hover:bg-amber-50">
               <Eye className="w-4 h-4 text-amber-500" />
             </Button>
           </DialogTrigger>
@@ -84,33 +80,9 @@ const ActionCellChild = ({
         <Eye className="w-4 h-4 text-amber-500" />
       </Button>
 
-      {/* <ViewFileChildDialog
-        checkoutId={checkoutId}
-        data={items}
-      /> */}
-
       {status?.toLowerCase() === "exchange" && (
-        <CancelExchangeDialog
-          id={checkoutId}
-          main_checkout_id={checkoutId}
-        />
+        <CancelExchangeDialog id={checkoutId} main_checkout_id={checkoutId} />
       )}
-
-      {/* Expand button */}
-      {/* <Button
-        variant={"ghost"}
-        type="button"
-        onClick={() =>
-          setExpandedRowId?.(isExpanded ? null : currentRowId ?? null)
-        }
-        className="p-1"
-      >
-        {isExpanded ? (
-          <ChevronDown className="size-4 text-gray-600" />
-        ) : (
-          <ChevronRight className="size-4 text-gray-600" />
-        )}
-      </Button> */}
     </div>
   );
 };

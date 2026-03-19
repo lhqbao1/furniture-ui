@@ -189,7 +189,7 @@ export function DSPAdminSidebar() {
         <SidebarGroup>
           <button
             type="button"
-            onClick={() => handleNavigate("/admin")}
+            onClick={() => handleNavigate("/dsp/admin")}
             className="w-full text-left"
           >
             <div className="side-bar__logo px-5 py-6 flex flex-col items-center gap-3 group-data-[collapsible=icon]:[&>div]:hidden cursor-pointer">
@@ -204,7 +204,7 @@ export function DSPAdminSidebar() {
               />
               <div className="text-[29px] flex gap-1">
                 <span className="text-secondary font-semibold">
-                  Administrator
+                  Dropshipping <span className="text-primary">Portal</span>
                 </span>
               </div>
             </div>
