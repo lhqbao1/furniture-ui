@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CopyCheck, Eye, Loader2, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useState } from "react";
@@ -11,169 +11,13 @@ import { useEditProduct } from "@/features/products/hook";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useRemoveFormEbay, useSyncToEbay } from "@/features/ebay/hook";
-import { stripHtmlRegex } from "@/hooks/simplifyHtml";
-import { Switch } from "@/components/ui/switch";
+
 import { useLocale } from "next-intl";
-import { Link, useRouter } from "@/src/i18n/navigation";
+import { useRouter } from "@/src/i18n/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getProductById } from "@/features/products/api";
-import DeleteDialog from "./delete-dialog";
+
 import { getProductByIdDSP } from "@/features/dsp/products/api";
 import DeleteDialogDSP from "./delete-dialog";
-
-function EditableNameCell({ product }: { product: ProductItem }) {
-  const [value, setValue] = useState(product.name);
-  const [editing, setEditing] = useState(false);
-  const EditProductMutation = useEditProduct();
-
-  const handleEditProductName = () => {
-    EditProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          name: value,
-          category_ids: product.categories.map((c) => c.id),
-          brand_id: product.brand ? product.brand.id : null,
-          // 🔹 Thêm bundles
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-        },
-        id: product.id,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Update product name successful");
-          setEditing(false);
-        },
-        onError(error, variables, context) {
-          toast.error("Update product name fail");
-        },
-      },
-    );
-  };
-
-  return (
-    <div className="w-60 text-wrap">
-      {editing ? (
-        <Input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={() => {
-            if (value !== product.name) {
-            } else {
-              setEditing(false);
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleEditProductName();
-            }
-            if (e.key === "Escape") {
-              setValue(product.name);
-              setEditing(false);
-            }
-          }}
-          autoFocus
-          disabled={EditProductMutation.isPending}
-          className={cn(
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
-          )}
-        />
-      ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
-          {product.name}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EditableStockCell({ product }: { product: ProductItem }) {
-  const [value, setValue] = useState(product.stock);
-  const [editing, setEditing] = useState(false);
-  const EditProductMutation = useEditProduct();
-
-  const handleEditProductStock = () => {
-    EditProductMutation.mutate(
-      {
-        input: {
-          ...product,
-          stock: value,
-          category_ids: product.categories.map((c) => c.id), // map ra id array
-          brand_id: product.brand ? product.brand.id : null,
-          // 🔹 Thêm bundles
-          ...(product.bundles?.length
-            ? {
-                bundles: product.bundles.map((item) => ({
-                  product_id: item.bundle_item.id,
-                  quantity: item.quantity,
-                })),
-              }
-            : { bundles: [] }),
-        },
-        id: product.id,
-      },
-      {
-        onSuccess(data, variables, context) {
-          toast.success("Update product stock successful");
-          setEditing(false);
-        },
-        onError(error, variables, context) {
-          toast.error("Update product stock fail");
-        },
-      },
-    );
-  };
-
-  return (
-    <div className="">
-      {editing ? (
-        <Input
-          type="number"
-          value={value}
-          onChange={(e) => setValue(e.target.valueAsNumber)}
-          onBlur={() => {
-            if (value !== product.stock) {
-            } else {
-              setEditing(false);
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleEditProductStock();
-            }
-            if (e.key === "Escape") {
-              setValue(product.stock);
-              setEditing(false);
-            }
-          }}
-          autoFocus
-          disabled={EditProductMutation.isPending}
-          className={cn(
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
-          )}
-        />
-      ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
-          {product.stock} pcs.
-        </div>
-      )}
-    </div>
-  );
-}
 
 function EdittbalePriceCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.final_price);
@@ -215,179 +59,8 @@ function EdittbalePriceCell({ product }: { product: ProductItem }) {
     );
   };
 
-  return (
-    <div className="">
-      {editing ? (
-        <Input
-          type="number"
-          value={value}
-          onChange={(e) => setValue(e.target.valueAsNumber)}
-          onBlur={() => {
-            if (value !== product.final_price) {
-            } else {
-              setEditing(false);
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleEditProductPrice();
-            }
-            if (e.key === "Escape") {
-              setValue(product.final_price);
-              setEditing(false);
-            }
-          }}
-          autoFocus
-          disabled={EditProductMutation.isPending}
-          className={cn(
-            EditProductMutation.isPending ? "cursor-wait" : "cursor-text",
-          )}
-        />
-      ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
-          {product.final_price ? (
-            <div className="text-right">€{product.final_price?.toFixed(2)}</div>
-          ) : (
-            <div className="text-right">updating</div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+  return <div className="text-right">€{product.final_price?.toFixed(2)}</div>;
 }
-
-// function SyncToEbay({ product }: { product: ProductItem }) {
-//   const syncToEbayMutation = useSyncToEbay();
-//   const removeFromEbayMutation = useRemoveFormEbay();
-
-//   const handleRemoveFromEbay = () => {
-//     removeFromEbayMutation.mutate(product.sku, {
-//       onSuccess(data, variables, context) {
-//         toast.success("Remove from Ebay successful");
-//       },
-//       onError(error, variables, context) {
-//         toast.error("Remove from Ebay fail");
-//       },
-//     });
-//   };
-
-//   const handleSyncToEbay = () => {
-//     syncToEbayMutation.mutate(
-//       {
-//         price: product.final_price,
-//         sku: product.sku,
-//         stock: product.stock,
-//         tax: product.tax ? product.tax : null,
-//         brand: product.brand ? product.brand.name : "",
-//         product: {
-//           description: stripHtmlRegex(product.description),
-//           title: JSON.stringify(product.name),
-//           imageUrls:
-//             product.static_files?.map((file) =>
-//               file.url.replace(/\s+/g, "%20")
-//             ) ?? // Đổi khoảng trắng thành %20
-//             [],
-//           ean: product.ean ? [product.ean] : [],
-//         },
-//         carrier: product.carrier,
-//       },
-//       {
-//         onSuccess(data, variables, context) {
-//           toast.success("Sync to Ebay successful");
-//         },
-
-//         onError(error) {
-//           const message =
-//             error.response?.data?.detail?.errors?.[0]?.message ??
-//             "Fail to sync to Ebay";
-//           toast.error(message);
-//         },
-//       }
-//     );
-//   };
-
-//   return (
-//     <div className="flex justify-start gap-2">
-//       <Button
-//         onClick={() => handleSyncToEbay()}
-//         variant={"outline"}
-//         disabled={
-//           syncToEbayMutation.isPending || removeFromEbayMutation.isPending
-//         }
-//       >
-//         {syncToEbayMutation.isPending ? (
-//           <Loader2 className="animate-spin" />
-//         ) : (
-//           "Sync"
-//         )}
-//       </Button>
-//       {product.ebay ? (
-//         <Button
-//           onClick={() => handleRemoveFromEbay()}
-//           variant={"outline"}
-//           className="text-red-600 border-red-600"
-//           disabled={
-//             removeFromEbayMutation.isPending || syncToEbayMutation.isPending
-//           }
-//         >
-//           {syncToEbayMutation.isPending ? (
-//             <Loader2 className="animate-spin" />
-//           ) : (
-//             "Remove"
-//           )}
-//         </Button>
-//       ) : (
-//         ""
-//       )}
-//     </div>
-//   );
-// }
-
-// function ToogleProductStatus({ product }: { product: ProductItem }) {
-//   const editProductMutation = useEditProduct();
-//   const handleToogleStatus = () => {
-//     editProductMutation.mutate(
-//       {
-//         input: {
-//           ...product,
-//           is_active: !product.is_active,
-//           category_ids: product.categories.map((c) => c.id), // map ra id array
-//           // 🔹 Thêm bundles
-//           ...(product.bundles?.length
-//             ? {
-//                 bundles: product.bundles.map((item) => ({
-//                   product_id: item.bundle_item.id,
-//                   quantity: item.quantity,
-//                 })),
-//               }
-//             : { bundles: [] }),
-//           // brand_id: product.brand.id
-//         },
-//         id: product.id,
-//       },
-//       {
-//         onSuccess(data, variables, context) {
-//           toast.success("Update product status successful");
-//         },
-//         onError(error, variables, context) {
-//           toast.error("Update product status fail");
-//         },
-//       },
-//     );
-//   };
-
-//   return (
-//     <Switch
-//       checked={product.is_active}
-//       onCheckedChange={handleToogleStatus}
-//       disabled={editProductMutation.isPending}
-//       className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary cursor-pointer"
-//     />
-//   );
-// }
 
 function ActionsCell({ product }: { product: ProductItem }) {
   const locale = useLocale();
@@ -418,7 +91,7 @@ function ActionsCell({ product }: { product: ProductItem }) {
         <Pencil className="w-4 h-4 text-primary" />
       </Button>
       {/* </Link> */}
-      <DeleteDialogDSP product={product} />
+      {/* <DeleteDialogDSP product={product} /> */}
     </div>
   );
 }

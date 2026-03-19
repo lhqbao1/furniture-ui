@@ -61,11 +61,13 @@ const SupplierOrderDetails = () => {
         hasHeaderBackGround
       />
 
-      {!order.shipment && order.status !== "PENDING" && (
-        <div className="w-full md:w-1/2">
-          <ShipmentInput checkoutId={order.id} />
-        </div>
-      )}
+      {(!order.shipment &&
+        order.status.toLowerCase() === "preparation_shipping") ||
+        (order.status.toLowerCase() === "paid" && (
+          <div className="w-full md:w-1/2">
+            <ShipmentInput checkoutId={order.id} />
+          </div>
+        ))}
       {/* <div className="flex justify-between w-full">
         {order.status !== "Pending" ? (
           <div className="flex gap-12">
