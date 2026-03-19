@@ -39,10 +39,8 @@ const DEFAULT_INVOICE_INTRO = `Sehr geehrte Damen und Herren,
 vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!
 Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:`;
 
-const PAYMENT_DUE_DATE_TOKEN = "__PAYMENT_DUE_DATE__";
-const DEFAULT_PAYMENT_NOTE = `${PAYMENT_DUE_DATE_TOKEN}
-Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto.
-`;
+const DEFAULT_PAYMENT_NOTE =
+  "Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto.";
 
 const formatDateDDMMYYYY = (date: Date) =>
   date.toLocaleDateString("de-DE", {
@@ -69,8 +67,10 @@ export default function B2BInvoiceDrawer({
   const [orderNumber, setOrderNumber] = useState("");
   const [paymentTermDays, setPaymentTermDays] = useState("14");
   const [paymentTermDaysError, setPaymentTermDaysError] = useState(false);
-  const [invoiceIntro, setInvoiceIntro] = useState(DEFAULT_INVOICE_INTRO);
-  const [paymentNote, setPaymentNote] = useState(DEFAULT_PAYMENT_NOTE);
+  const [invoiceIntro, setInvoiceIntro] = useState("");
+  const [paymentNote, setPaymentNote] = useState("");
+  const [isInvoiceIntroEdited, setIsInvoiceIntroEdited] = useState(false);
+  const [isPaymentNoteEdited, setIsPaymentNoteEdited] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -96,7 +96,7 @@ export default function B2BInvoiceDrawer({
   const invoiceTitleLine = orderNumber.trim()
     ? `Rechnung Nr. ${invoiceId || "XXXXXXXX"} - Ihre Bestellung ${orderNumber.trim()}`
     : `Rechnung Nr. ${invoiceId || "XXXXXXXX"}`;
-  const resolvedIntroText = `${invoiceTitleLine}\n\n${invoiceIntro}`;
+  const defaultIntroText = `${invoiceTitleLine}\n\n${DEFAULT_INVOICE_INTRO}`;
 
   const parsedPaymentTermDays = Number(paymentTermDays);
   const safePaymentTermDays =
@@ -112,14 +112,25 @@ export default function B2BInvoiceDrawer({
 
   const paymentTermLine = `Zahlungsbedingungen:`;
   const paymentDueDateLine = `Der Rechnungsbetrag ist bis zum ${computedPaymentDueDate} fällig.`;
-  const paymentBodyWithoutDueDate = paymentNote
-    .replace(PAYMENT_DUE_DATE_TOKEN, "")
-    .replace(/Der Rechnungsbetrag ist bis zum .* fällig\.?\n?/g, "")
-    .trim();
-  const paymentBodyWithDueDate = paymentBodyWithoutDueDate
-    ? `${paymentDueDateLine}\n${paymentBodyWithoutDueDate}`
-    : paymentDueDateLine;
-  const resolvedPaymentNote = `${paymentTermLine}\n\n${paymentBodyWithDueDate}`;
+  const defaultPaymentNote = `${paymentTermLine}\n\n${paymentDueDateLine}\n${DEFAULT_PAYMENT_NOTE}`;
+
+  useEffect(() => {
+    if (!open) return;
+    setInvoiceIntro(defaultIntroText);
+    setPaymentNote(defaultPaymentNote);
+    setIsInvoiceIntroEdited(false);
+    setIsPaymentNoteEdited(false);
+  }, [open, defaultIntroText, defaultPaymentNote]);
+
+  useEffect(() => {
+    if (!open || isInvoiceIntroEdited) return;
+    setInvoiceIntro(defaultIntroText);
+  }, [defaultIntroText, isInvoiceIntroEdited, open]);
+
+  useEffect(() => {
+    if (!open || isPaymentNoteEdited) return;
+    setPaymentNote(defaultPaymentNote);
+  }, [defaultPaymentNote, isPaymentNoteEdited, open]);
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
@@ -310,16 +321,10 @@ export default function B2BInvoiceDrawer({
           <div className="space-y-2">
             <p className="text-sm font-semibold">Invoice Intro Text</p>
             <Textarea
-              value={resolvedIntroText}
+              value={invoiceIntro}
               onChange={(e) => {
-                const raw = e.target.value;
-                const withoutDynamicLine = raw.startsWith(invoiceTitleLine)
-                  ? raw.slice(invoiceTitleLine.length)
-                  : raw.replace(
-                      /^(?:Rechnung Nr\.|SAMMELRECHNUNG NR\.)\s.*\n?/,
-                      "",
-                    );
-                setInvoiceIntro(withoutDynamicLine.replace(/^\n+/, ""));
+                setIsInvoiceIntroEdited(true);
+                setInvoiceIntro(e.target.value);
               }}
               className="min-h-[150px]"
             />
@@ -328,17 +333,10 @@ export default function B2BInvoiceDrawer({
           <div className="space-y-2">
             <p className="text-sm font-semibold">Payment Terms & Closing</p>
             <Textarea
-              value={resolvedPaymentNote}
+              value={paymentNote}
               onChange={(e) => {
-                const raw = e.target.value;
-                const withoutTermLine = raw.startsWith(paymentTermLine)
-                  ? raw.slice(paymentTermLine.length)
-                  : raw.replace(/^Zahlungsbedingungen:.*\n?/, "");
-                const withoutDueDateLine = withoutTermLine.replace(
-                  /Der Rechnungsbetrag ist bis zum .* fällig\.\n?/,
-                  `${PAYMENT_DUE_DATE_TOKEN}\n`,
-                );
-                setPaymentNote(withoutDueDateLine.replace(/^\n+/, ""));
+                setIsPaymentNoteEdited(true);
+                setPaymentNote(e.target.value);
               }}
               className="min-h-[150px]"
             />
@@ -379,9 +377,9 @@ export default function B2BInvoiceDrawer({
                 invoiceId,
                 servicePeriod,
                 orderNumber,
-                invoiceIntro: resolvedIntroText,
+                invoiceIntro,
                 paymentTermDays,
-                paymentNote: resolvedPaymentNote,
+                paymentNote,
                 marketplaceOrderIds,
               });
 
@@ -391,8 +389,8 @@ export default function B2BInvoiceDrawer({
                     invoiceId={invoiceId.trim()}
                     servicePeriod={servicePeriod.trim()}
                     orderNumber={orderNumber.trim()}
-                    introText={resolvedIntroText}
-                    paymentNote={resolvedPaymentNote}
+                    introText={invoiceIntro}
+                    paymentNote={paymentNote}
                     orders={invoiceOrders}
                   />,
                 ).toBlob();

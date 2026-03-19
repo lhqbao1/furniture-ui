@@ -86,13 +86,6 @@ export default function OrderStatusSelector({
     }
   };
 
-  const labelForStatus = (status: string) => {
-    const found = STATUS_OPTIONS.find((s) =>
-      s.statuses?.includes(status.toLowerCase()),
-    );
-    return found ? found.label : status;
-  };
-
   return (
     <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold">
       <div className="flex gap-1 items-center flex-1">
@@ -152,7 +145,7 @@ export default function OrderStatusSelector({
       {openIssueRefund && (
         <IssueRefundDialog
           id={order.id}
-          status={status}
+          order={order}
           open={openIssueRefund}
           onClose={() => {
             setOpenIssueRefund(false);
