@@ -350,6 +350,8 @@ const SyncToEbayForm = ({
             { value: product.final_price, label: "Final price" },
             { value: product.carrier, label: "Carrier" },
             { value: product.brand, label: "Brand" },
+            { value: product.materials, label: "Materials" },
+            { value: product.color, label: "Color" },
           ].find((field) => !field.value);
 
           if (missingField) {
@@ -383,6 +385,8 @@ const SyncToEbayForm = ({
               phone: product.brand.company_phone ?? "",
             },
             handling_time: values.handling_time ?? 0,
+            material: product.materials,
+            color: product.color,
           };
 
           syncToKauflandMutation.mutate(
@@ -423,7 +427,8 @@ const SyncToEbayForm = ({
             ...productBase,
             category_ids: categories.map((c) => c.id),
             marketplace_products: updatedMarketplaceProducts,
-            static_files: static_files?.map((file) => ({ url: file.url })) ?? [],
+            static_files:
+              static_files?.map((file) => ({ url: file.url })) ?? [],
             ...(bundles?.length
               ? {
                   bundles: bundles.map((item) => ({

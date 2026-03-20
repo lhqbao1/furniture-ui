@@ -75,10 +75,14 @@ export default function ManualAdditionalInformation({
         { value: "forstinger", label: "Forstinger" },
         { value: "neckermann", label: "Neckermann" },
         { value: "bauhaus", label: "Bauhaus" },
+        { value: "bader", label: "Bader" },
+
         { value: "euro-tops", label: "Euro Tops" },
         { value: "XXXLUTZ", label: "XXXLUTZ" },
         { value: "prestige", label: "Prestige Home" },
-      ].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" })),
+      ].sort((a, b) =>
+        a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
+      ),
     [],
   );
 
@@ -86,7 +90,8 @@ export default function ManualAdditionalInformation({
     () =>
       marketplaceOptions.find(
         (option) =>
-          option.value.toLowerCase() === String(marketplaceDisplay).toLowerCase(),
+          option.value.toLowerCase() ===
+          String(marketplaceDisplay).toLowerCase(),
       ),
     [marketplaceOptions, marketplaceDisplay],
   );

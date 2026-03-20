@@ -22,6 +22,8 @@ export interface syncToKauflandInput {
   max_stock?: number;
   brand: KauflandBrandInput;
   handling_time?: number;
+  color: string;
+  material: string;
 }
 export async function syncToKaufland(input: syncToKauflandInput) {
   const response = await apiAdmin.post("/kaufland/products/publish", input, {
