@@ -152,6 +152,13 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
     );
   }, [invoice]);
 
+  const primaryCheckout = checkout?.checkouts?.[0];
+  const useShippingAddressForInvoice =
+    (checkout?.from_marketplace ?? "").toLowerCase() === "ebay";
+  const addressForInvoice = useShippingAddressForInvoice
+    ? primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address
+    : primaryCheckout?.invoice_address;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -178,51 +185,48 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             <Text style={{ fontSize: 8 }}>
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
+
+            {/* Invoice Address */}
             <Text>
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name ?? ""}
             </Text>
             <Text>
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
-                : checkout.checkouts?.[0]?.invoice_address?.recipient_name?.trim()
+                : addressForInvoice?.recipient_name?.trim()
                   ? normalizeRecipientName(
-                      checkout.checkouts[0].invoice_address.recipient_name,
+                      addressForInvoice.recipient_name,
                     )
-                  : // : checkout.checkouts?.[0]?.shipping_address?.recipient_name
-                    //   ? checkout.checkouts[0].shipping_address.recipient_name
-                    normalizeRecipientName(
+                  : normalizeRecipientName(
                       `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
                         checkout.checkouts?.[0]?.user?.last_name ?? ""
                       }`,
                     )}
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.invoice_address?.address_line?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address?.address_line
+              {addressForInvoice?.address_line?.trim()
+                ? addressForInvoice?.address_line
                 : ""}
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.invoice_address?.additional_address_line?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address
-                    ?.additional_address_line
+              {addressForInvoice?.additional_address_line?.trim()
+                ? addressForInvoice?.additional_address_line
                 : ""}
             </Text>
             <Text>
-              {checkout?.checkouts?.[0]?.invoice_address?.postal_code?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address?.postal_code
+              {addressForInvoice?.postal_code?.trim()
+                ? addressForInvoice?.postal_code
                 : ""}{" "}
-              {checkout?.checkouts?.[0]?.invoice_address?.city?.trim()
-                ? checkout?.checkouts?.[0]?.invoice_address?.city
+              {addressForInvoice?.city?.trim()
+                ? addressForInvoice?.city
                 : ""}
             </Text>
             <Text>
               {getCountryName(
-                checkout?.checkouts?.[0]?.invoice_address?.country?.trim()
-                  ? checkout?.checkouts?.[0]?.invoice_address?.country
-                  : "",
+                addressForInvoice?.country?.trim() ? addressForInvoice.country : "",
               )}
             </Text>
-            <Text>{checkout.checkouts[0].user.tax_id}</Text>
+            <Text>{checkout?.checkouts?.[0]?.user?.tax_id ?? ""}</Text>
           </View>
           <View
             style={{

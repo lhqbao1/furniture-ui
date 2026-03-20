@@ -190,12 +190,7 @@ const OrderPlaced = () => {
 
     const process = async () => {
       try {
-        const doc = (
-          <InvoicePDF
-            checkout={checkout}
-            invoice={invoice}
-          />
-        );
+        const doc = <InvoicePDF checkout={checkout} invoice={invoice} />;
         const asPdf = pdf(doc);
         const blob = await asPdf.toBlob();
 

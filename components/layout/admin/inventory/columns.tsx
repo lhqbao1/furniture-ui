@@ -19,7 +19,6 @@ import { useEditProduct } from "@/features/products/hook";
 import { useUpdateStockProduct } from "@/features/products/inventory/hook";
 import { useAtom } from "jotai";
 import { adminIdAtom } from "@/store/auth";
-import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { format, getISOWeek } from "date-fns";
 
 // function ActionsCell({ product }: { product: ProductItem }) {
@@ -274,9 +273,8 @@ const calculateBundlePhysicalStock = (product: ProductItem): number => {
       const qty = toNumber(bundle.quantity);
       if (qty <= 0) return Number.NaN;
 
-      // Follow child available stock for bundle availability math.
-      const childStock = calculateAvailableStock(bundle.bundle_item);
-      const ratio = childStock / qty;
+      const childPhysicalStock = Math.max(0, toNumber(bundle.bundle_item?.stock));
+      const ratio = childPhysicalStock / qty;
       return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
     })
     .filter((value) => !Number.isNaN(value));
@@ -458,6 +456,9 @@ export const getInventoryColumns = (
       const physical = isBundle
         ? calculateBundlePhysicalStock(row.original)
         : toNumber(row.original.stock);
+
+      console.log(reserved);
+      console.log(physical);
       const available = physical - Math.abs(reserved);
       return <div className="text-center">{available}</div>;
     },
