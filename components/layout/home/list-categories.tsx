@@ -34,7 +34,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
       ) : (
         <NavigationMenu viewport={false}>
           <NavigationMenuList className="gap-x-2 gap-y-2 w-full flex-wrap mx-auto">
-            {categories.slice(0, 8).map((category) => (
+            {categories.map((category) => (
               <NavigationMenuItem key={category.id}>
                 <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2">
                   <Link
