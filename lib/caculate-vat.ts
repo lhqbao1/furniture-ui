@@ -118,30 +118,31 @@ export function calculateOrderTaxWithDiscount(
   const buckets = new Map<number, TaxBucket>();
 
   // 1️⃣ Products (GROSS based)
- for (const item of items) {
-  const vatRate = parseTaxRate(item.products?.tax, country_code, tax_id);
+  for (const item of items) {
+    const vatRate = parseTaxRate(item.products?.tax, country_code, tax_id);
 
-  const unitGross = Number(
-    item.purchased_products
-      ? item.purchased_products?.final_price
-      : item.products?.final_price,
-  ) || 0;
+    const unitGross =
+      Number(
+        item.purchased_products
+          ? item.purchased_products?.final_price
+          : item.products?.final_price,
+      ) || 0;
 
-  const quantity = Number(item.quantity) || 1;
+    const quantity = Number(item.quantity) || 1;
 
-  const gross = +(unitGross * quantity).toFixed(2);
+    const gross = +(unitGross * quantity).toFixed(2);
 
-  if (!buckets.has(vatRate)) {
-    buckets.set(vatRate, {
-      vatRate,
-      gross: 0,
-      net: 0,
-      vat: 0,
-    });
+    if (!buckets.has(vatRate)) {
+      buckets.set(vatRate, {
+        vatRate,
+        gross: 0,
+        net: 0,
+        vat: 0,
+      });
+    }
+
+    buckets.get(vatRate)!.gross += gross;
   }
-
-  buckets.get(vatRate)!.gross += gross;
-}
 
   const shipping = calculateShippingCost(
     items,
