@@ -204,8 +204,9 @@ export function calculateOrderTaxWithDiscount(
 
   const totalGross = +(totalNet + totalVat).toFixed(2);
 
-  const totalNetWithoutShipping =
-    totalNet - shipping.net - (discountGross ?? 0);
+  // Discount has already been allocated into each bucket above,
+  // so it must not be subtracted again here.
+  const totalNetWithoutShipping = totalNet - shipping.net;
 
   return {
     buckets: Array.from(buckets.values()),
