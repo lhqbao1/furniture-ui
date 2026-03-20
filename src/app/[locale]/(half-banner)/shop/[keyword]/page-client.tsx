@@ -2,8 +2,7 @@
 
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import { CustomPagination } from "@/components/shared/custom-pagination";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "@/src/i18n/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { ProductResponse } from "@/types/products";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
@@ -33,7 +32,22 @@ export default function ShopKeywordClient({
     is_active: true,
   });
 
-  const data = useMemo(() => queryData ?? initialData, [initialData, queryData]);
+  const data = useMemo(() => {
+    const source = queryData ?? initialData;
+    const items = Array.isArray(source?.items) ? source.items : [];
+    const totalPages = Math.max(
+      1,
+      Number(source?.pagination?.total_pages) || 1,
+    );
+
+    return {
+      items,
+      pagination: {
+        ...source?.pagination,
+        total_pages: totalPages,
+      },
+    };
+  }, [initialData, queryData]);
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());

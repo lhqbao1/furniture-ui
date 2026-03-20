@@ -88,6 +88,9 @@ function ContainersDrawerCell({ po }: { po: PurchaseOrderDetail }) {
                 <div className="font-semibold">
                   Container {idx + 1}: {container.container_number || "-"}
                 </div>
+                <div className="text-secondary">
+                  {container.avis_code ?? "-"}
+                </div>
                 <div>Size: {container.size || "-"}</div>{" "}
                 <div>
                   Delivery:{" "}
