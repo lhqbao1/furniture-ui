@@ -5,7 +5,14 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckOut, CheckOutMain } from "@/types/checkout";
-import { ChevronDown, ChevronRight, Eye, NotebookPen, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  Eye,
+  NotebookPen,
+  X,
+} from "lucide-react";
 import { listChanel } from "@/data/data";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
@@ -615,22 +622,28 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     header: ({}) => <div className="text-center">TRACKING NUMBER</div>,
     cell: ({ row }) => {
       const trackingNumber = row.original?.shipment?.tracking_number;
+      const isDpdCarrier = (row.original?.carrier ?? "").toLowerCase() === "dpd";
+      const hasTrackingNumber =
+        trackingNumber !== null &&
+        trackingNumber !== undefined &&
+        String(trackingNumber).trim() !== "";
+
       return (
-        <div className="text-center">
-          {row.original.carrier.toLowerCase() === "dpd" ? (
+        <div className="flex items-center justify-center gap-1">
+          <span className="select-text">
+            {hasTrackingNumber ? String(trackingNumber) : "-"}
+          </span>
+          {isDpdCarrier && hasTrackingNumber ? (
             <Link
-              className="text-center"
-              href={`https://tracking.dpd.de/status/de_DE/parcel/${String(trackingNumber)}`}
+              className="inline-flex items-center text-[#4D4D4D] hover:text-[#1a73e8]"
+              href={`https://tracking.dpd.de/status/de_DE/parcel/${encodeURIComponent(String(trackingNumber))}`}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`Open DPD tracking ${String(trackingNumber)}`}
             >
-              {trackingNumber === null || trackingNumber === undefined
-                ? "-"
-                : String(trackingNumber)}
+              <ExternalLink className="w-3.5 h-3.5" />
             </Link>
-          ) : (
-            <div className="text-center">{String(trackingNumber)}</div>
-          )}
+          ) : null}
         </div>
       );
     },
