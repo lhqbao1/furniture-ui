@@ -279,7 +279,7 @@
   "removeItemCartFail": "Artikel konnte nicht aus dem Warenkorb entfernt werden",
   "removeItemWishlistSuccess": "Artikel wurde erfolgreich von der Wunschliste entfernt",
   "removeItemWishlistFail": "Artikel konnte nicht von der Wunschliste entfernt werden",
-  "getOtp": "OTP anfordern",
+  "getOtp": "Einmalpasswort",
   "signUpSuccess": "Registrierung erfolgreich!",
   "signUpFail": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "city_required": "Stadt ist ein Pflichtfeld",
