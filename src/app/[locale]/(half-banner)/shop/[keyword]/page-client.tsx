@@ -50,9 +50,15 @@ export default function ShopKeywordClient({
   }, [initialData, queryData]);
 
   const handlePageChange = (newPage: number) => {
+    if (newPage === page) return;
+
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
     router.push(`?${params.toString()}`, { scroll: false });
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   };
 
   return (

@@ -76,6 +76,14 @@ export function useManualCheckoutLogic(
       invoice_postal_code: "68167",
       invoice_country: "DE",
     },
+    bader: {
+      company_name: "BRUNO BADER GmbH + Co. KG",
+      tax_id: "DE 144173081",
+      invoice_address: "Maximilianstr. 48",
+      invoice_city: "Pforzheim",
+      invoice_postal_code: "75172",
+      invoice_country: "DE",
+    },
   };
 
   // -------------------------------------------------------------

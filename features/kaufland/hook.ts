@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { removeFromKaufland, syncToKaufland, syncToKauflandInput } from "./api";
 import { toast } from "sonner";

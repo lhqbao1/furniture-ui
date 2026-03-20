@@ -17,6 +17,7 @@ export const CHANEL_OPTIONS = [
   { key: "prestige_home", label: "Prestige Home", icon: "new-logo.svg" },
   { key: "amazon", label: "Amazon", icon: "amazon.png" },
   { key: "bauhaus", label: "Bauhaus", icon: "bauhaus.svg" },
+  { key: "bader", label: "Bader", icon: "bader.jpg" },
   { key: "channel21", label: "Channel21", icon: "channel21.jpg" },
   { key: "check24", label: "Check24", icon: "check-24.png" },
   { key: "econelo", label: "Econelo", icon: "econelo-favicon.png" },
