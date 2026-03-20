@@ -18,7 +18,6 @@ export default function ShopKeywordClient({
 }: ShopKeywordClientProps) {
   const [data, setData] = useState(initialData);
   const [page, setPage] = useState(1);
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const searchParams = useSearchParams();

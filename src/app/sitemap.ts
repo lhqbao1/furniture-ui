@@ -1,17 +1,16 @@
 import { apiPublic } from "@/lib/axios";
-import { slugify } from "@/lib/slugify";
 import { BlogItem } from "@/types/blog";
 import { CategoryResponse } from "@/types/categories";
 import { ProductItem } from "@/types/products";
 import { MetadataRoute } from "next";
 
-function toKeywordSlug(value: unknown): string {
+function toKeywordValue(value: unknown): string {
   if (typeof value === "string") {
-    return slugify(value);
+    return value.trim();
   }
 
   if (typeof value === "number") {
-    return slugify(String(value));
+    return String(value).trim();
   }
 
   if (value && typeof value === "object") {
@@ -20,11 +19,11 @@ function toKeywordSlug(value: unknown): string {
       record.keywork ?? record.keyword ?? record.name ?? record.value;
 
     if (typeof candidate === "string") {
-      return slugify(candidate);
+      return candidate.trim();
     }
 
     if (typeof candidate === "number") {
-      return slugify(String(candidate));
+      return String(candidate).trim();
     }
   }
 
@@ -225,10 +224,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       : [];
 
   const keywordUrls: MetadataRoute.Sitemap = keywords
-    .map((keyword) => toKeywordSlug(keyword))
-    .filter((slug) => slug.length > 0)
-    .map((slug) => ({
-      url: `https://www.prestige-home.de/de/shop/${slug}`,
+    .map((keyword) => toKeywordValue(keyword))
+    .filter((keyword) => keyword.length > 0)
+    .map((keyword) => ({
+      url: `https://www.prestige-home.de/de/shop/${encodeURIComponent(keyword)}`,
       lastModified: new Date(new Date()),
       changeFrequency: "daily",
       priority: 0.6,

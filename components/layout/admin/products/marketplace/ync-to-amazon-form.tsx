@@ -70,8 +70,6 @@ const SyncToAmazonForm = ({
   const updateProductMutation = useEditProduct();
   const syncToAmazonMutation = useSyncToAmazon();
 
-  console.log(product);
-
   const [open, setOpen] = useState<boolean>(false);
   const marketplaceLabel =
     (currentMarketplace ?? "")
@@ -205,13 +203,8 @@ const SyncToAmazonForm = ({
       }
     }
 
-    const {
-      static_files,
-      categories,
-      bundles,
-      brand,
-      ...productBase
-    } = product;
+    const { static_files, categories, bundles, brand, ...productBase } =
+      product;
 
     updateProductMutation.mutate(
       {

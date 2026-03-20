@@ -1,5 +1,7 @@
-import { getAllKeywords, getAllProducts } from "@/features/products/api";
-import { slugify } from "@/lib/slugify";
+import {
+  getAllKeywords,
+  getProductsAlgoliaSearch,
+} from "@/features/products/api";
 import type { Metadata } from "next";
 import { KeywordResponse } from "@/types/keyword";
 import { ProductResponse } from "@/types/products";
@@ -20,7 +22,7 @@ export async function generateStaticParams() {
     const keywords = await getAllKeywords();
 
     return keywords.map((keyword) => ({
-      keyword: slugify(keyword.keywork),
+      keyword: keyword.keywork,
     }));
   } catch (error) {
     console.error("❌ generateStaticParams /shop/[keyword] failed:", error);
@@ -55,7 +57,7 @@ export async function generateMetadata({
   }
 
   const rawKeyword = safeDecodeKeyword(keyword);
-  const readable = rawKeyword.replaceAll("-", " ");
+  const readable = rawKeyword;
 
   // 🔍 tìm keyword tương ứng
   const matchedKeyword = keywords.find(
@@ -70,7 +72,7 @@ export async function generateMetadata({
     title: `${readable} kaufen online`,
     description,
     alternates: {
-      canonical: `https://www.prestige-home.de/de/shop/${keyword}`,
+      canonical: `https://www.prestige-home.de/de/shop/${encodeURIComponent(rawKeyword)}`,
     },
     robots: {
       index: true,
@@ -88,14 +90,15 @@ export default async function ShopKeywordPage({
 }) {
   const { keyword } = await params; // ✅ BẮT BUỘC
 
-  const keywordSlug = safeDecodeKeyword(keyword);
-  const searchText = keywordSlug.replaceAll("-", " ");
+  const decodedKeyword = safeDecodeKeyword(keyword);
+  const searchText = decodedKeyword;
 
   // 🔹 fetch song song (tối ưu)
   const [productsResult, keywordsResult] = await Promise.allSettled([
-    getAllProducts({
-      search: searchText,
+    getProductsAlgoliaSearch({
+      query: searchText,
       page: 1,
+      page_size: 12,
     }),
     getAllKeywords(),
   ]);
@@ -114,7 +117,7 @@ export default async function ShopKeywordPage({
 
   // 🔍 tìm keyword tương ứng
   const matchedKeyword = keywords.find(
-    (k) => k.keywork.toLowerCase() === keywordSlug.toLowerCase(),
+    (k) => k.keywork.toLowerCase() === decodedKeyword.toLowerCase(),
   );
 
   return (
