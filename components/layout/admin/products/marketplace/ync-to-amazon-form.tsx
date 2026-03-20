@@ -52,17 +52,25 @@ interface SyncToAmazonFormProps {
 
 type MarketPlaceFormValues = z.infer<typeof amazonMarketplaceSchema>;
 
+const NORMA_OWNER_BUSINESS_NAME = "NORMA24 Online-Shop GmbH & Co. KG";
+const NORMA_PACKAGE_FALLBACK = {
+  length: 120,
+  width: 80,
+  height: 60,
+  weight: 8,
+};
+
 const SyncToAmazonForm = ({
   product,
   isUpdating = false,
   currentMarketplace,
-  updating,
-  isActive,
   setUpdating,
   isAdd,
 }: SyncToAmazonFormProps) => {
   const updateProductMutation = useEditProduct();
   const syncToAmazonMutation = useSyncToAmazon();
+
+  console.log(product);
 
   const [open, setOpen] = useState<boolean>(false);
   const marketplaceLabel =
@@ -200,7 +208,6 @@ const SyncToAmazonForm = ({
     const {
       static_files,
       categories,
-      marketplace_products,
       bundles,
       brand,
       ...productBase
@@ -229,6 +236,25 @@ const SyncToAmazonForm = ({
       {
         onSuccess(data) {
           if (isUpdating || isAdd) {
+            const hasPackageInformation =
+              !!product.packages && product.packages.length > 0;
+            const isNormaOwner =
+              product.owner?.business_name === NORMA_OWNER_BUSINESS_NAME;
+            const useNormaFallback = isNormaOwner && !hasPackageInformation;
+
+            const resolvedLength = useNormaFallback
+              ? NORMA_PACKAGE_FALLBACK.length
+              : product.length;
+            const resolvedWidth = useNormaFallback
+              ? NORMA_PACKAGE_FALLBACK.width
+              : product.width;
+            const resolvedHeight = useNormaFallback
+              ? NORMA_PACKAGE_FALLBACK.height
+              : product.height;
+            const resolvedWeight = useNormaFallback
+              ? NORMA_PACKAGE_FALLBACK.weight
+              : product.weight;
+
             const missingField = [
               { value: product.ean, label: "EAN" },
               { value: product.name, label: "Name" },
@@ -239,16 +265,16 @@ const SyncToAmazonForm = ({
                 label: "Images",
               },
               {
-                value: product.packages && product.packages.length > 0,
+                value: hasPackageInformation || useNormaFallback,
                 label: "Packages information",
               },
               { value: product.final_price, label: "Final price" },
               { value: product.carrier, label: "Carrier" },
               { value: product.brand, label: "Brand" },
-              { value: product.length, label: "Length" },
-              { value: product.width, label: "Width" },
-              { value: product.height, label: "Height" },
-              { value: product.weight, label: "Net Weight" },
+              { value: resolvedLength, label: "Length" },
+              { value: resolvedWidth, label: "Width" },
+              { value: resolvedHeight, label: "Height" },
+              { value: resolvedWeight, label: "Net Weight" },
             ].find((field) => !field.value);
 
             if (missingField) {
@@ -269,19 +295,19 @@ const SyncToAmazonForm = ({
               is_fragile: false,
               number_of_items: Number(product.amount_unit) || 0,
               included_components: product.name,
-              weight: product.weight,
-              height: product.height,
-              width: product.width,
-              length: product.length,
-              package_length: Math.max(
-                ...product.packages.map((p) => p.length ?? 0),
-              ),
-              package_height: Math.max(
-                ...product.packages.map((p) => p.height ?? 0),
-              ),
-              package_width: Math.max(
-                ...product.packages.map((p) => p.width ?? 0),
-              ),
+              weight: resolvedWeight,
+              height: resolvedHeight,
+              width: resolvedWidth,
+              length: resolvedLength,
+              package_length: hasPackageInformation
+                ? Math.max(...product.packages.map((p) => p.length ?? 0))
+                : resolvedLength,
+              package_height: hasPackageInformation
+                ? Math.max(...product.packages.map((p) => p.height ?? 0))
+                : resolvedHeight,
+              package_width: hasPackageInformation
+                ? Math.max(...product.packages.map((p) => p.width ?? 0))
+                : resolvedWidth,
               color: product.color ?? "",
               unit_count: Number(product.amount_unit ?? 0),
               unit_count_type: product.unit,
@@ -292,7 +318,7 @@ const SyncToAmazonForm = ({
               brand: product.brand ? product.brand.name : "",
               images: product.static_files?.map((f) => f.url) ?? [],
               model_number: product.sku,
-              size: `${product.length}x${product.width}x${product.height}`,
+              size: `${resolvedLength}x${resolvedWidth}x${resolvedHeight}`,
               country_of_origin: values.country_of_origin,
               min_stock: values.min_stock ?? 0,
               max_stock: values.max_stock ?? 10,
