@@ -83,22 +83,33 @@ export async function generateMetadata({
 
 export const revalidate = 300; // ISR
 
+function parsePositivePage(value?: string) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 1;
+  return Math.max(1, Math.floor(parsed));
+}
+
 export default async function ShopKeywordPage({
   params,
+  searchParams,
 }: {
   params: Promise<PageParams>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { keyword } = await params; // ✅ BẮT BUỘC
+  const { page } = await searchParams;
 
   const decodedKeyword = safeDecodeKeyword(keyword);
   const searchText = decodedKeyword;
+  const currentPage = parsePositivePage(page);
 
   // 🔹 fetch song song (tối ưu)
   const [productsResult, keywordsResult] = await Promise.allSettled([
     getProductsAlgoliaSearch({
       query: searchText,
-      page: 1,
+      page: currentPage,
       page_size: 12,
+      is_active: true,
     }),
     getAllKeywords(),
   ]);
@@ -110,10 +121,7 @@ export default async function ShopKeywordPage({
   const keywords: KeywordResponse[] =
     keywordsResult.status === "fulfilled" ? keywordsResult.value : [];
 
-  const products = {
-    ...productsRaw,
-    items: productsRaw.items.filter((p) => p.is_active),
-  };
+  const products = productsRaw;
 
   // 🔍 tìm keyword tương ứng
   const matchedKeyword = keywords.find(
@@ -129,7 +137,11 @@ export default async function ShopKeywordPage({
       </div>
 
       {/* Client handles pagination */}
-      <ShopKeywordClient initialData={products} searchText={searchText} />
+      <ShopKeywordClient
+        initialData={products}
+        searchText={searchText}
+        initialPage={currentPage}
+      />
     </div>
   );
 }
