@@ -11,6 +11,12 @@ const escapeCsv = (value?: string | number) => {
   return `"${str}"`; // ALWAYS quote → safest
 };
 
+const hasCsvFieldValue = (value: unknown): boolean => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "number") return Number.isFinite(value);
+  return String(value).trim().length > 0;
+};
+
 export async function GET() {
   try {
     const products = await getAllProductsSelect({
@@ -99,8 +105,14 @@ export async function GET() {
       }
 
       try {
-        const availableStock = calculateAvailableStock(p);
-        if (availableStock <= 0) {
+        const availableStock = Number(calculateAvailableStock(p));
+        const stockAmount =
+          Number.isFinite(availableStock) && availableStock > 0
+            ? Math.floor(availableStock)
+            : 0;
+
+        // Keep old behavior, but enforce explicit stock > 0 gate.
+        if (stockAmount <= 0) {
           skippedProducts += 1;
           return [];
         }
@@ -109,64 +121,65 @@ export async function GET() {
         const lyingSurface = `${p.width} x ${p.length} cm`;
         const color = p.color.replace(/\s+(and|und)\s+/gi, "/");
 
-        return [
-          [
-            escapeCsv(p.ean),
-            escapeCsv(p.id_provider),
-            escapeCsv(p.name),
-            escapeCsv(
-              html(
-                `<div>${cleanDescription(p.description || "")}<div>Artikel-ID: ${
-                  p.id_provider
-                }</div></div>`,
-              ),
-            ),
-            escapeCsv(
-              p.brand.name.toLowerCase() === "econelo"
-                ? `https://econelo.de/produkt/${p.url_key}`
-                : `https://prestige-home.de/de/product/${p.url_key}`,
-            ),
-            escapeCsv(p.brand.name ?? ""),
-            escapeCsv(p.color ? color.toUpperCase() : ""),
-            escapeCsv(size),
-            escapeCsv(p.height),
-            escapeCsv(p.width),
-            escapeCsv(p.length),
-            escapeCsv(lyingSurface),
-            escapeCsv(p.materials ?? ""),
-            escapeCsv(p.static_files.length > 0 ? p.static_files[0].url : ""),
-            escapeCsv(p.static_files.length > 1 ? p.static_files[1].url : ""),
-            escapeCsv(p.static_files.length > 2 ? p.static_files[2].url : ""),
-            escapeCsv(p.static_files.length > 3 ? p.static_files[3].url : ""),
-            escapeCsv(p.static_files.length > 4 ? p.static_files[4].url : ""),
-            escapeCsv(p.static_files.length > 5 ? p.static_files[5].url : ""),
-            escapeCsv(p.static_files.length > 6 ? p.static_files[6].url : ""),
-            escapeCsv(p.static_files.length > 7 ? p.static_files[7].url : ""),
-            escapeCsv(p.static_files.length > 8 ? p.static_files[8].url : ""),
-            escapeCsv(p.static_files.length > 9 ? p.static_files[9].url : ""),
-            escapeCsv(p.component),
-            escapeCsv(availableStock < 0 ? 0 : availableStock),
-            escapeCsv(`${formatEuro(p.final_price)} €`),
-            escapeCsv(`${p.delivery_time} Werktage`),
-            escapeCsv(
-              p.carrier === "amm" || p.carrier === "spedition"
-                ? "Spedition"
-                : "Paket",
-            ),
-            escapeCsv(
-              p.carrier === "amm" || p.carrier === "spedition"
-                ? `${formatEuro(35.95)} €`
-                : `${formatEuro(5.95)} €`,
-            ),
-            escapeCsv(p.brand.name ?? ""),
-            escapeCsv(p.brand.company_address ?? ""),
-            escapeCsv(p.brand.company_postal_code ?? ""),
-            escapeCsv(p.brand.company_city ?? ""),
-            escapeCsv(p.brand.company_country ?? ""),
-            escapeCsv(p.brand.company_email ?? ""),
-            escapeCsv(p.brand.company_phone ?? ""),
-          ].join(","),
+        const rowValues: Array<string | number> = [
+          p.ean ?? "",
+          p.id_provider ?? "",
+          p.name ?? "",
+          html(
+            `<div>${cleanDescription(p.description || "")}<div>Artikel-ID: ${
+              p.id_provider
+            }</div></div>`,
+          ),
+          p.brand.name.toLowerCase() === "econelo"
+            ? `https://econelo.de/produkt/${p.url_key}`
+            : `https://prestige-home.de/de/product/${p.url_key}`,
+          p.brand.name ?? "",
+          p.color ? color.toUpperCase() : "",
+          size,
+          p.height ?? "",
+          p.width ?? "",
+          p.length ?? "",
+          lyingSurface,
+          p.materials ?? "",
+          p.static_files?.[0]?.url ?? "",
+          p.static_files?.[1]?.url ?? "",
+          p.static_files?.[2]?.url ?? "",
+          p.static_files?.[3]?.url ?? "",
+          p.static_files?.[4]?.url ?? "",
+          p.static_files?.[5]?.url ?? "",
+          p.static_files?.[6]?.url ?? "",
+          p.static_files?.[7]?.url ?? "",
+          p.static_files?.[8]?.url ?? "",
+          p.static_files?.[9]?.url ?? "",
+          p.component ?? "",
+          stockAmount,
+          `${formatEuro(p.final_price)} €`,
+          `${p.delivery_time} Werktage`,
+          p.carrier === "amm" || p.carrier === "spedition"
+            ? "Spedition"
+            : "Paket",
+          p.carrier === "amm" || p.carrier === "spedition"
+            ? `${formatEuro(35.95)} €`
+            : `${formatEuro(5.95)} €`,
+          p.brand.name ?? "",
+          p.brand.company_address ?? "",
+          p.brand.company_postal_code ?? "",
+          p.brand.company_city ?? "",
+          p.brand.company_country ?? "",
+          p.brand.company_email ?? "",
+          p.brand.company_phone ?? "",
         ];
+
+        const hasAllCsvFields =
+          rowValues.length === headers.length &&
+          rowValues.every((value) => hasCsvFieldValue(value));
+
+        if (!hasAllCsvFields) {
+          skippedProducts += 1;
+          return [];
+        }
+
+        return [rowValues.map((value) => escapeCsv(value)).join(",")];
       } catch (error) {
         skippedProducts += 1;
         console.warn("Skip invalid Check24 product row:", {
