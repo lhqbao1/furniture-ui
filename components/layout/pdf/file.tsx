@@ -156,7 +156,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
   const useShippingAddressForInvoice =
     (checkout?.from_marketplace ?? "").toLowerCase() === "ebay";
   const addressForInvoice = useShippingAddressForInvoice
-    ? primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address
+    ? (primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address)
     : primaryCheckout?.invoice_address;
 
   return (
@@ -194,9 +194,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {invoice.main_checkout.checkouts?.[0]?.user?.company_name
                 ? "" // Nếu company_name có → không hiện dòng này
                 : addressForInvoice?.recipient_name?.trim()
-                  ? normalizeRecipientName(
-                      addressForInvoice.recipient_name,
-                    )
+                  ? normalizeRecipientName(addressForInvoice.recipient_name)
                   : normalizeRecipientName(
                       `${checkout.checkouts?.[0]?.user?.first_name ?? ""} ${
                         checkout.checkouts?.[0]?.user?.last_name ?? ""
@@ -217,13 +215,13 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               {addressForInvoice?.postal_code?.trim()
                 ? addressForInvoice?.postal_code
                 : ""}{" "}
-              {addressForInvoice?.city?.trim()
-                ? addressForInvoice?.city
-                : ""}
+              {addressForInvoice?.city?.trim() ? addressForInvoice?.city : ""}
             </Text>
             <Text>
               {getCountryName(
-                addressForInvoice?.country?.trim() ? addressForInvoice.country : "",
+                addressForInvoice?.country?.trim()
+                  ? addressForInvoice.country
+                  : "",
               )}
             </Text>
             <Text>{checkout?.checkouts?.[0]?.user?.tax_id ?? ""}</Text>
@@ -644,11 +642,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     fontWeight: "bold",
                   }}
                 >
-                  Zahlung{" "}
-                  <Text style={{ textTransform: "capitalize" }}>
-                    ({checkout.from_marketplace ?? checkout.payment_method}
-                  </Text>{" "}
-                  Managed Payments) vom {formatDateToNum(invoice.created_at)}
+                  Zahlung vom {formatDateToNum(invoice.created_at)}
                 </Text>
                 <Text
                   style={{
