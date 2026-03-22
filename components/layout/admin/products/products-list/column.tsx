@@ -2080,6 +2080,8 @@ export const getProductColumns = (
         return <div className="text-center">—</div>;
       }
 
+      console.log(row.original);
+
       return (
         <div className="space-y-1.5 text-sm text-center">
           {incomingItems.map((item) => {
