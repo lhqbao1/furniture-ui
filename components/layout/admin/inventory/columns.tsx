@@ -265,25 +265,26 @@ const RESERVED_ORDER_STATUS_FILTER = [
 ].join(",");
 
 const calculateBundlePhysicalStock = (product: ProductItem): number => {
-  const bundles = product.bundles ?? [];
-  if (bundles.length === 0) return Math.max(0, toNumber(product.stock));
+  // const bundles = product.bundles ?? [];
+  // if (bundles.length === 0) return Math.max(0, toNumber(product.stock));
 
-  const bundleStocks = bundles
-    .map((bundle) => {
-      const qty = toNumber(bundle.quantity);
-      if (qty <= 0) return Number.NaN;
+  // const bundleStocks = bundles
+  //   .map((bundle) => {
+  //     const qty = toNumber(bundle.quantity);
+  //     if (qty <= 0) return Number.NaN;
 
-      const childPhysicalStock = Math.max(0, toNumber(bundle.bundle_item?.stock));
-      const ratio = childPhysicalStock / qty;
-      return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
-    })
-    .filter((value) => !Number.isNaN(value));
+  //     const childPhysicalStock = Math.max(0, toNumber(bundle.bundle_item?.stock));
+  //     const ratio = childPhysicalStock / qty;
+  //     return ratio >= 0 ? Math.floor(ratio) : Math.ceil(ratio);
+  //   })
+  //   .filter((value) => !Number.isNaN(value));
 
-  if (bundleStocks.length > 0) {
-    return Math.max(0, Math.min(...bundleStocks));
-  }
+  // if (bundleStocks.length > 0) {
+  //   return Math.max(0, Math.min(...bundleStocks));
+  // }
 
-  return Math.max(0, toNumber(product.stock));
+  // return Math.max(0, toNumber(product.stock));
+  return toNumber(product.stock);
 };
 
 const calculateBundleReservedStock = (product: ProductItem): number => {
@@ -457,8 +458,6 @@ export const getInventoryColumns = (
         ? calculateBundlePhysicalStock(row.original)
         : toNumber(row.original.stock);
 
-      console.log(reserved);
-      console.log(physical);
       const available = physical - Math.abs(reserved);
       return <div className="text-center">{available}</div>;
     },

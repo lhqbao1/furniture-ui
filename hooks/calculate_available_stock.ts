@@ -49,5 +49,5 @@ export const calculateAvailableStock = (
 ): number => {
   if (!product) return 0;
 
-  return calculateBundleAvailableStock(product);
+  return calculateOwnAvailableStock(product);
 };
