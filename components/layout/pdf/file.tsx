@@ -36,11 +36,12 @@ Font.register({
 const styles = StyleSheet.create({
   page: {
     paddingHorizontal: 24,
-    paddingVertical: 48,
+    paddingTop: 24,
+    paddingBottom: 132,
     fontSize: 11,
     fontFamily: "Figtree",
     fontWeight: "bold",
-    color: "#666666",
+    color: "#1f1f1f",
     position: "relative",
   },
   header: {
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 20,
     textAlign: "center",
-    color: "#00B159",
+    color: "#1f1f1f",
   },
   footer: {
     marginTop: 50,
@@ -95,6 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginTop: 20,
     marginBottom: 10,
+    fontSize: 10,
   },
 
   flexRowBlock: { display: "flex", flexDirection: "row", gap: "4px" },
@@ -158,6 +160,124 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
   const addressForInvoice = useShippingAddressForInvoice
     ? (primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address)
     : primaryCheckout?.invoice_address;
+  const checkoutCountryCode =
+    checkout?.checkouts?.[0]?.shipping_address?.country ??
+    checkout?.checkouts?.[0]?.invoice_address?.country ??
+    "DE";
+  const checkoutTaxId = invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id;
+  const paymentTermDays = Number(invoice?.payment_term);
+  const resolvedPaymentTermDays =
+    Number.isFinite(paymentTermDays) && paymentTermDays > 0
+      ? String(paymentTermDays)
+      : "XX";
+  const shipperDateRaw =
+    checkout?.checkouts?.[0]?.shipment?.shipper_date?.trim();
+  const hasServicePeriod = Boolean(shipperDateRaw);
+  const servicePeriodValue = hasServicePeriod
+    ? formatDateToNum(shipperDateRaw ?? "") || shipperDateRaw || ""
+    : "";
+  const marketplaceReference = checkout?.marketplace_order_id?.trim() ?? "";
+  const hasMarketplaceReference = marketplaceReference.length > 0;
+
+  const productNetTotal = useMemo(
+    () =>
+      flattenedCartItems.reduce((sum, item) => {
+        const vatRateRaw = Number(
+          calculateProductVAT(
+            item?.final_price,
+            item?.products?.tax,
+            checkoutCountryCode,
+            checkoutTaxId,
+          ).vatRate,
+        );
+        const normalizedVatRate =
+          Number.isFinite(vatRateRaw) && vatRateRaw > 1
+            ? vatRateRaw / 100
+            : Number.isFinite(vatRateRaw)
+              ? vatRateRaw
+              : 0;
+        const vatFactor = normalizedVatRate + 1;
+        const netUnitPriceRaw = Number(item?.item_price) / vatFactor;
+        const netUnitPrice = Number.isFinite(netUnitPriceRaw)
+          ? netUnitPriceRaw
+          : 0;
+        const quantityNumber = Number(item?.quantity);
+        const safeQuantity = Number.isFinite(quantityNumber)
+          ? quantityNumber
+          : 0;
+
+        return sum + netUnitPrice * safeQuantity;
+      }, 0),
+    [checkoutCountryCode, checkoutTaxId, flattenedCartItems],
+  );
+
+  const orderTaxSummary = useMemo(
+    () =>
+      calculateOrderTaxWithDiscount(
+        flattenedCartItems,
+        invoice?.voucher_amount,
+        checkoutCountryCode,
+        checkoutTaxId,
+        checkout?.total_shipping,
+      ),
+    [
+      checkout?.total_shipping,
+      checkoutCountryCode,
+      checkoutTaxId,
+      flattenedCartItems,
+      invoice?.voucher_amount,
+    ],
+  );
+
+  const vatRows = useMemo(() => {
+    const rows = (orderTaxSummary?.buckets ?? [])
+      .map((bucket) => {
+        const rawRate = Number(bucket?.vatRate) || 0;
+        const normalizedRate = rawRate > 1 ? rawRate / 100 : rawRate;
+        const percent = normalizedRate * 100;
+        const gross = Number(bucket?.gross) || 0;
+
+        // Recalculate VAT from gross -> net -> VAT to reduce rounding drift.
+        const netFromGross =
+          normalizedRate > 0 ? gross / (1 + normalizedRate) : gross;
+        const vatFromGross =
+          normalizedRate > 0 ? netFromGross * normalizedRate : 0;
+
+        return {
+          percent,
+          vat: Number.isFinite(vatFromGross) ? vatFromGross : 0,
+        };
+      })
+      .filter((row) => Number.isFinite(row.percent))
+      .sort((a, b) => b.percent - a.percent);
+
+    if (rows.length > 0) return rows;
+
+    return [
+      {
+        percent: 0,
+        vat: Number(orderTaxSummary?.totalVat) || 0,
+      },
+    ];
+  }, [orderTaxSummary]);
+
+  const introLines = [
+    "Rechnung",
+    "Sehr geehrte Damen und Herren,",
+    "vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!",
+    "Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:",
+  ];
+
+  const paymentLines = [
+    "Zahlungsbedingungen:",
+    `Zahlung innerhalb von ${resolvedPaymentTermDays} Tagen ab Rechnungseingang ohne Abzüge. Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto.`,
+  ];
+  const isWaitingForPayment =
+    (checkout?.status ?? "").toLowerCase() === "pending";
+
+  const giftCouponGross =
+    (invoice?.coupon_amount ?? 0) + Math.abs(invoice?.voucher_amount ?? 0);
+  const showGiftCouponRow = giftCouponGross > 0;
 
   return (
     <Document>
@@ -175,14 +295,15 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
         >
           <Image
             src="https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/681cde2c-27cd-45ea-94c2-7d82a35453bc_invoice-logo.png?"
-            style={{ width: 80, height: 70 }}
+            alt="Prestige Home logo"
+            style={{ width: 60, height: 50 }}
           />
         </View>
 
         {/* Customer & Invoice Info */}
         <View style={styles.header}>
           <View style={styles.flexColBlock}>
-            <Text style={{ fontSize: 8 }}>
+            <Text style={{ fontSize: 8, paddingBottom: 20 }}>
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
 
@@ -229,7 +350,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
           <View
             style={{
               border: "1pt solid #e6e6e6",
-              width: 200,
+              width: 270,
               fontSize: 10,
               display: "flex",
               flexDirection: "column",
@@ -255,8 +376,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 80, fontWeight: "bold" }}>
-                Belegnummer:
+              <Text style={{ width: 115, fontWeight: "bold" }}>
+                Rechnungs-Nr:
               </Text>
               <Text>{invoice.invoice_code}</Text>
             </View>
@@ -269,56 +390,103 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 80, fontWeight: "bold" }}>Datum:</Text>
-              <Text>{formatDateToNum(checkout.created_at)}</Text>
+              <Text style={{ width: 115, fontWeight: "bold" }}>
+                Rechnungsdatum:
+              </Text>
+              <Text>{formatDateToNum(invoice.created_at)}</Text>
             </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 8,
-                paddingVertical: 2,
-              }}
-            >
-              <Text style={{ width: 80, fontWeight: "bold" }}>Kunden-Nr:</Text>
-              <Text>{checkout.checkouts[0].user.user_code}</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 8,
-                paddingVertical: 2,
-              }}
-            >
-              <Text style={{ width: 80, fontWeight: "bold" }}>Bearbeiter:</Text>
-              <Text>–</Text>
-            </View>
-
-            {/* Footer note */}
-            <View
-              style={{
-                paddingVertical: 4,
-              }}
-            >
-              <Text
+            {hasServicePeriod && (
+              <View
                 style={{
-                  textAlign: "center",
-                  fontSize: 9,
-                  fontWeight: "bold",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
                 }}
               >
-                Bitte bei allen Rückfragen angeben!
+                <Text style={{ width: 115, fontWeight: "bold" }}>
+                  Leistungszeitraum:
+                </Text>
+                <Text>{servicePeriodValue}</Text>
+              </View>
+            )}
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ width: 115, fontWeight: "bold" }}>
+                Ihre Kundennummer:
               </Text>
+              <Text>1011</Text>
+            </View>
+
+            {hasMarketplaceReference && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                }}
+              >
+                <Text style={{ width: 115, fontWeight: "bold" }}>
+                  Referenz:
+                </Text>
+                <Text>{marketplaceReference}</Text>
+              </View>
+            )}
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+              }}
+            >
+              <Text style={{ width: 115, fontWeight: "bold" }}>
+                Ihr Ansprechpartner:
+              </Text>
+              <Text>Duong Thuy Nguyen</Text>
             </View>
           </View>
         </View>
 
+        <View style={{ marginTop: 10, marginBottom: 22 }}>
+          {introLines.map((line, index) => (
+            <Text
+              key={`intro-line-${index}`}
+              style={
+                index === 0
+                  ? {
+                      fontFamily: "Helvetica-Bold",
+                      fontWeight: "bold",
+                      fontSize: 12,
+                      lineHeight: 1.25,
+                      marginBottom: line.trim() ? 10 : 4,
+                    }
+                  : {
+                      fontSize: 9,
+                      lineHeight: 1.25,
+                      marginBottom: line.trim() ? 4 : 8,
+                    }
+              }
+            >
+              {line || " "}
+            </Text>
+          ))}
+        </View>
+
         <View
           style={{
-            fontSize: 10,
+            fontSize: 9,
             width: "100%",
             borderBottom: "none",
           }}
@@ -335,8 +503,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             }}
           >
             <Text style={{ width: "6%", textAlign: "center" }}>Pos.</Text>
-            <Text style={{ width: "16%" }}>Art.-Nr.</Text>
-            <Text style={{ width: "36%" }}>Bezeichnung</Text>
+            <Text style={{ width: "14%" }}>Art.-Nr.</Text>
+            <Text style={{ width: "38%" }}>Bezeichnung</Text>
             <Text style={{ width: "10%", textAlign: "center" }}>Menge</Text>
             <Text style={{ width: "10%", textAlign: "right" }}>MwSt.</Text>
             <Text style={{ width: "11%", textAlign: "right" }}>E.-Preis</Text>
@@ -345,6 +513,32 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
 
           {/* Item 1 */}
           {flattenedCartItems.map((item, index) => {
+            const vatRateRaw = Number(
+              calculateProductVAT(
+                item.final_price,
+                item.products.tax,
+                checkoutCountryCode,
+                checkoutTaxId,
+              ).vatRate,
+            );
+            const normalizedVatRate =
+              Number.isFinite(vatRateRaw) && vatRateRaw > 1
+                ? vatRateRaw / 100
+                : Number.isFinite(vatRateRaw)
+                  ? vatRateRaw
+                  : 0;
+            const vatPercent = normalizedVatRate * 100;
+            const vatFactor = normalizedVatRate + 1;
+            const netUnitPriceRaw = Number(item.item_price) / vatFactor;
+            const netUnitPrice = Number.isFinite(netUnitPriceRaw)
+              ? netUnitPriceRaw
+              : 0;
+            const quantityNumber = Number(item.quantity);
+            const safeQuantity = Number.isFinite(quantityNumber)
+              ? quantityNumber
+              : 0;
+            const netLineTotal = netUnitPrice * safeQuantity;
+
             return (
               <View
                 key={index}
@@ -358,41 +552,35 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 <Text style={{ width: "6%", textAlign: "center" }}>
                   {index + 1}
                 </Text>
-                <Text style={{ width: "16%" }}>
+                <Text style={{ width: "14%" }}>
                   {item.products.id_provider}
                 </Text>
-                <View style={{ width: "36%" }}>
+                <View style={{ width: "38%" }}>
                   <Text>{item.products.name}</Text>
                 </View>
                 <Text style={{ width: "10%", textAlign: "center" }}>
                   {item.quantity}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right" }}>
-                  {(
-                    calculateProductVAT(
-                      item.final_price,
-                      item.products.tax,
-                      invoice?.main_checkout.checkouts[0].shipping_address
-                        .country,
-                      invoice?.main_checkout.checkouts[0].user.tax_id,
-                    ).vatRate * 100
-                  ).toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
+                  {vatPercent.toLocaleString("de-DE", {
+                    minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
                   })}
                   %
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>
-                  {item.item_price.toLocaleString("de-DE", {
+                  {netUnitPrice.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
+                  €
                 </Text>
                 <Text style={{ width: "11%", textAlign: "right" }}>
-                  {item.final_price.toLocaleString("de-DE", {
+                  {netLineTotal.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
+                  €
                 </Text>
               </View>
             );
@@ -402,7 +590,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
         {/* Summary */}
         <View
           style={{
-            fontSize: 10,
+            fontSize: 9,
             width: "100%",
             marginTop: 10,
             borderBottom: "1pt solid #e6e6e6",
@@ -419,14 +607,14 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             }}
           >
             <Text style={{ width: "60%", textAlign: "right" }}>
-              Warenwert (brutto)
+              Warenwert (netto)
             </Text>
             <Text style={{ width: "20%", textAlign: "right" }}>
-              {invoice.total_amount_item.toLocaleString("de-DE", {
+              {productNetTotal.toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
-              €
+              {" €"}
             </Text>
           </View>
 
@@ -440,14 +628,17 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             }}
           >
             <Text style={{ width: "60%", textAlign: "right" }}>
-              Versandkosten (brutto)
+              Versandkosten (netto)
             </Text>
             <Text style={{ width: "20%", textAlign: "right" }}>
-              {(invoice?.total_shipping ?? 0)?.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              €
+              {(Number(orderTaxSummary?.shipping?.net) || 0).toLocaleString(
+                "de-DE",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                },
+              )}
+              {" €"}
             </Text>
           </View>
 
@@ -469,55 +660,89 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     </View> */}
 
           <View>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                paddingVertical: 2,
-                paddingHorizontal: 6,
-              }}
-            >
-              <Text
+            {vatRows.map((row, index) => (
+              <View
+                key={`vat-row-${index}-${row.percent}`}
                 style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  paddingVertical: 2,
+                  paddingHorizontal: 6,
                 }}
               >
-                MwSt.
-              </Text>
-              <Text
+                <Text
+                  style={{
+                    width: "60%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Mehrwertsteuer{" "}
+                  {row.percent.toLocaleString("de-DE", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2,
+                  })}
+                  %
+                </Text>
+                <Text
+                  style={{
+                    width: "20%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {row.vat.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  {" €"}
+                </Text>
+              </View>
+            ))}
+
+            {showGiftCouponRow && (
+              <View
                 style={{
-                  width: "20%",
-                  textAlign: "right",
-                  fontWeight: "bold",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  paddingVertical: 3,
+                  paddingHorizontal: 6,
                 }}
               >
-                {calculateOrderTaxWithDiscount(
-                  invoice?.main_checkout.checkouts
-                    .flatMap((c) => c.cart)
-                    .flatMap((c) => c.items) ?? [],
-                  invoice?.voucher_amount,
-                  checkout?.checkouts[0]?.shipping_address?.country ??
-                    checkout?.checkouts[0]?.invoice_address?.country ??
-                    "DE",
-                  invoice?.main_checkout.checkouts[0].user.tax_id,
-                  checkout.total_shipping,
-                ).totalVat.toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                €
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    width: "60%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Wertgutschein (brutto)
+                </Text>
+                <Text
+                  style={{
+                    width: "20%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {giftCouponGross.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  {" €"}
+                </Text>
+              </View>
+            )}
 
             <View
               style={{
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "flex-end",
-                paddingVertical: 2,
+                backgroundColor: "#ededed",
+                paddingVertical: 3,
                 paddingHorizontal: 6,
               }}
             >
@@ -545,85 +770,11 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
-                €
+                {" €"}
               </Text>
             </View>
 
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                paddingVertical: 3,
-                paddingHorizontal: 6,
-              }}
-            >
-              <Text
-                style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                Wertgutschein (brutto)
-              </Text>
-              <Text
-                style={{
-                  width: "20%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                {(
-                  (invoice?.coupon_amount ?? 0) +
-                  Math.abs(invoice?.voucher_amount ?? 0)
-                ).toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                €
-              </Text>
-            </View>
-
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                backgroundColor: "#ededed",
-                paddingVertical: 3,
-                paddingHorizontal: 6,
-              }}
-            >
-              <Text
-                style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                Zahlbetrag
-              </Text>
-              <Text
-                style={{
-                  width: "20%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                {(
-                  (invoice?.total_amount_item ?? 0) +
-                  (invoice?.total_shipping ?? 0) -
-                  Math.abs(invoice?.voucher_amount ?? 0)
-                ).toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                €
-              </Text>
-            </View>
-
-            {checkout.status.toLowerCase() === "pending" ? (
+            {/* {checkout.status.toLowerCase() === "pending" ? (
               ""
             ) : (
               <View
@@ -659,12 +810,12 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                  €
+                  {" €"}
                 </Text>
               </View>
-            )}
+            )} */}
 
-            <View
+            {/* <View
               style={{
                 display: "flex",
                 flexDirection: "row",
@@ -699,33 +850,33 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                       maximumFractionDigits: 2,
                     })
                   : "00,00"}
-                €
+                {" €"}
               </Text>
-            </View>
+            </View> */}
           </View>
         </View>
 
         <View style={styles.flexColBlockWithTop}>
-          <Text style={{ marginBottom: 2 }}>Lieferadresse:</Text>
-          <Text>
+          <Text style={{ marginBottom: 2, fontSize: 9 }}>Lieferadresse:</Text>
+          <Text style={{ fontSize: 9 }}>
             {normalizeRecipientName(
               invoice.main_checkout.checkouts?.[0]?.shipping_address
                 ?.recipient_name,
             )}
           </Text>
 
-          <Text>
+          <Text style={{ fontSize: 9 }}>
             {checkout?.checkouts?.[0]?.shipping_address?.address_line?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.address_line
               : ""}
           </Text>
-          <Text>
+          <Text style={{ fontSize: 9 }}>
             {checkout?.checkouts?.[0]?.shipping_address?.additional_address_line?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address
                   ?.additional_address_line
               : ""}
           </Text>
-          <Text>
+          <Text style={{ fontSize: 9 }}>
             {checkout?.checkouts?.[0]?.shipping_address?.postal_code?.trim()
               ? checkout?.checkouts?.[0]?.shipping_address?.postal_code
               : ""}{" "}
@@ -733,7 +884,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               ? checkout?.checkouts?.[0]?.shipping_address?.city
               : ""}
           </Text>
-          <Text>
+          <Text style={{ fontSize: 9 }}>
             {getCountryName(
               checkout?.checkouts?.[0]?.shipping_address?.country?.trim()
                 ? checkout?.checkouts?.[0]?.shipping_address?.country
@@ -742,15 +893,21 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
           </Text>
         </View>
 
-        {checkout.status.toLowerCase() === "pending" ? (
-          <View style={{ marginTop: 10, textAlign: "left", fontSize: 10 }}>
-            <Text>
-              Zahlungsbedingungen: Zahlung innerhalb von {invoice.payment_term}{" "}
-              Tagen ab Rechnungseingang ohne Abzüge.
-            </Text>
+        {isWaitingForPayment && (
+          <View style={{ marginTop: 12 }}>
+            {paymentLines.map((line, index) => (
+              <Text
+                key={`payment-line-${index}`}
+                style={{
+                  fontSize: 9,
+                  lineHeight: 1.25,
+                  marginBottom: line.trim() ? 4 : 8,
+                }}
+              >
+                {line || " "}
+              </Text>
+            ))}
           </View>
-        ) : (
-          ""
         )}
 
         {/* Footer */}

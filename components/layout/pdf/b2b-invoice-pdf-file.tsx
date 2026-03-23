@@ -302,16 +302,16 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
             marginBottom: 20,
           }}
         >
-          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <Image
             src="https://pxjiuyvomonmptmmkglv.supabase.co/storage/v1/object/public/erp/uploads/681cde2c-27cd-45ea-94c2-7d82a35453bc_invoice-logo.png?"
-            style={{ width: 80, height: 70 }}
+            alt="Prestige Home logo"
+            style={{ width: 60, height: 50 }}
           />
         </View>
 
         <View style={styles.header}>
           <View style={{ display: "flex", flexDirection: "column" }}>
-            <Text style={{ fontSize: 8 }}>
+            <Text style={{ fontSize: 8, paddingBottom: 20 }}>
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
             <Text>
@@ -342,7 +342,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
           <View
             style={{
               border: "1pt solid #e6e6e6",
-              width: 220,
+              width: 270,
               fontSize: 10,
               display: "flex",
               flexDirection: "column",
@@ -366,7 +366,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 90, fontWeight: "bold" }}>
+              <Text style={{ width: 115, fontWeight: "bold" }}>
                 Belegnummer:
               </Text>
               <Text>{invoiceId}</Text>
@@ -380,7 +380,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 90, fontWeight: "bold" }}>
+              <Text style={{ width: 115, fontWeight: "bold" }}>
                 Rechnungsdatum:
               </Text>
               <Text>{formatDateToNum(new Date())}</Text>
@@ -395,7 +395,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                   paddingVertical: 2,
                 }}
               >
-                <Text style={{ width: 90, fontWeight: "bold" }}>
+                <Text style={{ width: 115, fontWeight: "bold" }}>
                   Leistungszeitraum:
                 </Text>
                 <Text>{servicePeriod.trim()}</Text>
@@ -411,7 +411,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 marginTop: 10,
               }}
             >
-              <Text style={{ width: 90, fontWeight: "bold" }}>
+              <Text style={{ width: 115, fontWeight: "bold" }}>
                 Ihre Kundennummer
               </Text>
               <Text>1011</Text>
@@ -424,7 +424,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 90, fontWeight: "bold" }}>
+              <Text style={{ width: 115, fontWeight: "bold" }}>
                 Ihr Ansprechpartner
               </Text>
               <Text>Duong Thuy Nguyen</Text>
