@@ -43,6 +43,13 @@ export interface CreateRefundMainCheckoutResponse {
   [key: string]: unknown;
 }
 
+export type UploadCheckoutFilesPayload = string[];
+
+export interface UploadCheckoutFilesResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
 export async function createCheckOut(item: CreateOrderFormValues) {
   const { data } = await api.post(`/checkout`, item, {
     headers: {
@@ -268,6 +275,23 @@ export async function updateReasonForMainCheckout(
   );
 
   return data;
+}
+
+export async function uploadCheckoutFiles(
+  main_checkout_id: string,
+  payload: UploadCheckoutFilesPayload,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/files/${main_checkout_id}`,
+    payload,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return data as UploadCheckoutFilesResponse;
 }
 
 export async function makeOrderPaid(main_checkout_id: string) {

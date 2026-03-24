@@ -1,6 +1,7 @@
 import { Address } from "./address";
 import { CartItem, CartResponse, CartResponseItem } from "./cart";
 import { Pagination } from "./pagination";
+import { StaticFile, StaticFileResponse } from "./products";
 import { SupplierResponse } from "./supplier";
 import { Customer, User } from "./user";
 
@@ -76,6 +77,7 @@ export interface CheckOutMain {
   checkouts: CheckOut[];
   tax: number;
   payment_rl: CheckOutPaymentRl;
+  files: StaticFile[];
   created_at: Date;
   updated_at: Date;
 }

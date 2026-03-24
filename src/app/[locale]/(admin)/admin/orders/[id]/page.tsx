@@ -10,20 +10,34 @@ import { ProductTable } from "@/components/layout/admin/products/products-list/p
 import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import {
   useGetMainCheckOutByMainCheckOutId,
+  useUploadCheckoutFiles,
   useUpdateNoteForMainCheckout,
 } from "@/features/checkout/hook";
+import { useUploadStaticFile } from "@/features/file/hook";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { formatDate, formatDateTimeString } from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
 import { CheckOutMain } from "@/types/checkout";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import OrderDetailsSkeleton from "./skeleton";
 import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 import { getOrderDetailColumns } from "@/components/layout/admin/orders/order-details/columns";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FileText, Trash2, Upload } from "lucide-react";
+import { StaticFile } from "@/types/products";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   if (!checkOutMain?.checkouts) return [];
@@ -42,13 +56,35 @@ function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
   );
 }
 
+function isImageUrl(url: string) {
+  return /\.(png|jpe?g|gif|webp|bmp|svg|avif)(\?.*)?$/i.test(url);
+}
+
+function getFileNameFromUrl(url: string) {
+  const path = url.split("?")[0] ?? "";
+  const fileName = path.split("/").pop() ?? "file";
+  try {
+    return decodeURIComponent(fileName);
+  } catch {
+    return fileName;
+  }
+}
+
 const OrderDetails = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [noteValue, setNoteValue] = useState("");
+  const [isDragOverFiles, setIsDragOverFiles] = useState(false);
+  const [isFilesDialogOpen, setIsFilesDialogOpen] = useState(false);
+  const [orderFilesState, setOrderFilesState] = useState<StaticFile[]>([]);
+  const [dialogOrderFiles, setDialogOrderFiles] = useState<StaticFile[]>([]);
+  const [hasPendingFileDeletes, setHasPendingFileDeletes] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const params = useParams<{ id: string }>(); // type-safe
   const checkoutId = params?.id;
   const updateNoteMutation = useUpdateNoteForMainCheckout();
+  const uploadStaticFileMutation = useUploadStaticFile();
+  const uploadCheckoutFilesMutation = useUploadCheckoutFiles();
 
   const {
     data: order,
@@ -67,10 +103,149 @@ const OrderDetails = () => {
     if (!order) return [];
     return extractCartItemsFromMain(order);
   }, [order]);
+  const orderFiles = useMemo(() => orderFilesState ?? [], [orderFilesState]);
+  const dialogOrderFileEntries = useMemo(
+    () =>
+      dialogOrderFiles
+        .map((file, index) => ({
+          file,
+          index,
+          url: (file?.url ?? "").trim(),
+        }))
+        .filter((entry) => Boolean(entry.url)),
+    [dialogOrderFiles],
+  );
+  const imageOrderFiles = useMemo(
+    () => dialogOrderFileEntries.filter((entry) => isImageUrl(entry.url)),
+    [dialogOrderFileEntries],
+  );
+  const documentOrderFiles = useMemo(
+    () => dialogOrderFileEntries.filter((entry) => !isImageUrl(entry.url)),
+    [dialogOrderFileEntries],
+  );
+  const isUploadingFiles =
+    uploadStaticFileMutation.isPending || uploadCheckoutFilesMutation.isPending;
+  const isSavingFileList = uploadCheckoutFilesMutation.isPending;
+
+  const handleUploadFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    if (!checkoutId) return;
+
+    const formData = new FormData();
+    Array.from(files).forEach((file) => {
+      formData.append("files", file);
+    });
+
+    try {
+      const uploadResult = await uploadStaticFileMutation.mutateAsync(formData);
+      const uploadedUrls =
+        uploadResult.results
+          ?.map((item) => item.url)
+          .filter((url): url is string => Boolean(url)) ?? [];
+
+      if (uploadedUrls.length === 0) {
+        toast.error("No uploaded file URL returned");
+        return;
+      }
+
+      const existingUrls = orderFiles
+        .map((file) => (file?.url ?? "").trim())
+        .filter((url): url is string => Boolean(url));
+      const nextUrls = [...existingUrls, ...uploadedUrls];
+
+      await uploadCheckoutFilesMutation.mutateAsync({
+        main_checkout_id: checkoutId,
+        payload: nextUrls,
+      });
+      setOrderFilesState((prev) => [
+        ...prev,
+        ...uploadedUrls.map((url) => ({ url })),
+      ]);
+      toast.success("Files uploaded successfully");
+    } catch (error) {
+      const err = error as {
+        response?: { data?: { detail?: unknown; message?: unknown } };
+        message?: unknown;
+      };
+
+      const message =
+        err.response?.data?.detail ??
+        err.response?.data?.message ??
+        err.message ??
+        "Failed to upload files";
+
+      toast.error("Failed to upload files", {
+        description: String(message),
+      });
+    }
+  };
+
+  const handleStageDeleteOrderFile = (targetIndex: number) => {
+    setDialogOrderFiles((prev) => prev.filter((_, index) => index !== targetIndex));
+    setHasPendingFileDeletes(true);
+  };
+
+  const handleConfirmFileChanges = async () => {
+    if (!checkoutId) return;
+    if (!hasPendingFileDeletes) {
+      setIsFilesDialogOpen(false);
+      return;
+    }
+
+    const nextUrls = dialogOrderFiles
+      .map((file) => (file?.url ?? "").trim())
+      .filter((url): url is string => Boolean(url));
+
+    try {
+      await uploadCheckoutFilesMutation.mutateAsync({
+        main_checkout_id: checkoutId,
+        payload: nextUrls,
+      });
+      setOrderFilesState(dialogOrderFiles);
+      setHasPendingFileDeletes(false);
+      setIsFilesDialogOpen(false);
+      toast.success("File list updated");
+    } catch (error) {
+      const err = error as {
+        response?: { data?: { detail?: unknown; message?: unknown } };
+        message?: unknown;
+      };
+
+      const message =
+        err.response?.data?.detail ??
+        err.response?.data?.message ??
+        err.message ??
+        "Failed to update file list";
+
+      toast.error("Failed to update file list", {
+        description: String(message),
+      });
+    }
+  };
+
+  const handleDropFiles = async (
+    event: React.DragEvent<HTMLDivElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragOverFiles(false);
+    if (isUploadingFiles) return;
+    await handleUploadFiles(event.dataTransfer.files);
+  };
 
   useEffect(() => {
     setNoteValue(order?.note ?? "");
   }, [order?.note]);
+
+  useEffect(() => {
+    setOrderFilesState(Array.isArray(order?.files) ? order.files : []);
+  }, [order?.files]);
+
+  useEffect(() => {
+    if (!isFilesDialogOpen) return;
+    setDialogOrderFiles(orderFiles);
+    setHasPendingFileDeletes(false);
+  }, [isFilesDialogOpen, orderFiles]);
 
   if (isLoading) return <OrderDetailsSkeleton />;
   if (isError) return <div>Error loading order</div>;
@@ -149,6 +324,202 @@ const OrderDetails = () => {
                   );
                 }}
               />
+              <div className="space-y-2 pt-2">
+                <Dialog open={isFilesDialogOpen} onOpenChange={setIsFilesDialogOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-sm font-semibold underline underline-offset-4 decoration-dotted hover:text-primary"
+                    >
+                      Order files ({orderFiles.length})
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                      <DialogTitle>Order files</DialogTitle>
+                      <DialogDescription>
+                        Uploaded images and documents for this order.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="max-h-[70vh] overflow-y-auto">
+                      {dialogOrderFiles.length === 0 ? (
+                        <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                          No files uploaded yet.
+                        </div>
+                      ) : (
+                        <div className="space-y-5">
+                          <div className="space-y-2">
+                            <div className="text-sm font-semibold">Images</div>
+                            {imageOrderFiles.length === 0 ? (
+                              <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+                                No images uploaded.
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                {imageOrderFiles.map((entry) => {
+                                  const url = entry.url;
+                                  const fileName = getFileNameFromUrl(url);
+
+                                  return (
+                                    <div
+                                      key={`image-${url}-${entry.index}`}
+                                      className="group relative overflow-hidden rounded-md border"
+                                    >
+                                      <button
+                                        type="button"
+                                        className="absolute right-2 top-2 z-10 rounded-md bg-black/60 p-1.5 text-white opacity-0 transition hover:bg-black/80 group-hover:opacity-100"
+                                        onClick={(event) => {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+                                          handleStageDeleteOrderFile(entry.index);
+                                        }}
+                                        disabled={isSavingFileList}
+                                        aria-label="Delete file"
+                                      >
+                                        <Trash2 className="size-4" />
+                                      </button>
+                                      <a
+                                        href={url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="block hover:bg-muted/20"
+                                      >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                          src={url}
+                                          alt={fileName}
+                                          className="h-44 w-full object-cover"
+                                        />
+                                        <div className="border-t px-3 py-2 text-sm">
+                                          {fileName}
+                                        </div>
+                                      </a>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="text-sm font-semibold">Files</div>
+                            {documentOrderFiles.length === 0 ? (
+                              <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+                                No documents uploaded.
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                {documentOrderFiles.map((entry) => {
+                                  const url = entry.url;
+                                  const fileName = getFileNameFromUrl(url);
+
+                                  return (
+                                    <div
+                                      key={`file-${url}-${entry.index}`}
+                                      className="group relative rounded-md border"
+                                    >
+                                      <button
+                                        type="button"
+                                        className="absolute right-2 top-2 z-10 rounded-md bg-black/60 p-1.5 text-white opacity-0 transition hover:bg-black/80 group-hover:opacity-100"
+                                        onClick={(event) => {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+                                          handleStageDeleteOrderFile(entry.index);
+                                        }}
+                                        disabled={isSavingFileList}
+                                        aria-label="Delete file"
+                                      >
+                                        <Trash2 className="size-4" />
+                                      </button>
+                                      <a
+                                        href={url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex items-center gap-2 rounded-md px-3 py-4 hover:bg-muted/20"
+                                      >
+                                        <FileText className="size-4 text-muted-foreground" />
+                                        <span className="line-clamp-2 text-sm">
+                                          {fileName}
+                                        </span>
+                                      </a>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsFilesDialogOpen(false)}
+                        disabled={isSavingFileList}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleConfirmFileChanges}
+                        disabled={!hasPendingFileDeletes || isSavingFileList}
+                      >
+                        {isSavingFileList ? "Saving..." : "Confirm"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                <div
+                  className={`rounded-md border border-dashed p-4 transition-colors ${
+                    isDragOverFiles ? "border-primary bg-primary/5" : "border-input"
+                  }`}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (isUploadingFiles) return;
+                    setIsDragOverFiles(true);
+                  }}
+                  onDragEnter={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (isUploadingFiles) return;
+                    setIsDragOverFiles(true);
+                  }}
+                  onDragLeave={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setIsDragOverFiles(false);
+                  }}
+                  onDrop={handleDropFiles}
+                >
+                  <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
+                    <Upload className="size-4" />
+                    <span>Drag and drop files here</span>
+                    <span>or</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isUploadingFiles}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {isUploadingFiles ? "Uploading..." : "Choose files"}
+                    </Button>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={async (event) => {
+                      await handleUploadFiles(event.target.files);
+                      event.currentTarget.value = "";
+                    }}
+                    disabled={isUploadingFiles}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         ) : (

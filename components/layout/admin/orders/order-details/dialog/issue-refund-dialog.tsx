@@ -10,7 +10,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, X } from "lucide-react";
+import { FileText, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   useCreateRefundMainCheckout,
@@ -53,7 +53,7 @@ const REFUND_REASONS = [
 ] as const;
 
 type RefundMode = "full" | "partial";
-type ItemQuality = "A-Goods" | "B-Goods" | "C-Goods" | "No return";
+type ItemQuality = "A-Goods" | "C-Goods" | "No return";
 
 type RefundLine = {
   key: string;
@@ -72,7 +72,8 @@ type RefundLine = {
 type RefundLineImage = {
   id: string;
   file: File;
-  previewUrl: string;
+  previewUrl: string | null;
+  isImage: boolean;
 };
 
 type RefundLineFormState = {
@@ -85,7 +86,6 @@ type RefundLineFormState = {
 
 const ITEM_QUALITY_OPTIONS: ItemQuality[] = [
   "A-Goods",
-  "B-Goods",
   "C-Goods",
   "No return",
 ];
@@ -107,6 +107,8 @@ const parseAmountInput = (value: string) => {
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
+
+const isImageFile = (file: File) => file.type.startsWith("image/");
 
 const getUnitPrice = (item: CartItem) => {
   if (item.purchased_products?.final_price)
@@ -181,6 +183,9 @@ const IssueRefundDialog = ({
   const [lineFormByKey, setLineFormByKey] = React.useState<
     Record<string, RefundLineFormState>
   >({});
+  const [draggingLineKey, setDraggingLineKey] = React.useState<string | null>(
+    null,
+  );
 
   const [shippingUnits, setShippingUnits] = React.useState(0);
   const [shippingAmountInput, setShippingAmountInput] = React.useState("");
@@ -210,7 +215,7 @@ const IssueRefundDialog = ({
     setLineFormByKey((prev) => {
       for (const lineKey of Object.keys(prev)) {
         for (const image of prev[lineKey]?.images ?? []) {
-          URL.revokeObjectURL(image.previewUrl);
+          if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
         }
       }
       return initialLineForms;
@@ -289,11 +294,18 @@ const IssueRefundDialog = ({
   const handleLineImageUpload = (lineKey: string, files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    const incomingImages: RefundLineImage[] = Array.from(files).map((file, idx) => ({
-      id: `${lineKey}-${Date.now()}-${idx}`,
-      file,
-      previewUrl: URL.createObjectURL(file),
-    }));
+    const incomingImages: RefundLineImage[] = Array.from(files).map(
+      (file, idx) => {
+        const canPreviewAsImage = isImageFile(file);
+
+        return {
+          id: `${lineKey}-${Date.now()}-${idx}`,
+          file,
+          previewUrl: canPreviewAsImage ? URL.createObjectURL(file) : null,
+          isImage: canPreviewAsImage,
+        };
+      },
+    );
 
     updateLineForm(lineKey, (prev) => ({
       ...prev,
@@ -304,7 +316,7 @@ const IssueRefundDialog = ({
   const handleRemoveLineImage = (lineKey: string, imageId: string) => {
     updateLineForm(lineKey, (prev) => {
       const target = prev.images.find((img) => img.id === imageId);
-      if (target) URL.revokeObjectURL(target.previewUrl);
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
 
       return {
         ...prev,
@@ -316,10 +328,41 @@ const IssueRefundDialog = ({
   const handleClose = () => {
     for (const lineKey of Object.keys(lineFormByKey)) {
       for (const image of lineFormByKey[lineKey]?.images ?? []) {
-        URL.revokeObjectURL(image.previewUrl);
+        if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
       }
     }
+    setDraggingLineKey(null);
     onClose();
+  };
+
+  const handleLineDragOver = (
+    lineKey: string,
+    event: React.DragEvent<HTMLDivElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isSubmitting) return;
+    setDraggingLineKey(lineKey);
+  };
+
+  const handleLineDragLeave = (
+    event: React.DragEvent<HTMLDivElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDraggingLineKey(null);
+  };
+
+  const handleLineDrop = (
+    lineKey: string,
+    event: React.DragEvent<HTMLDivElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDraggingLineKey(null);
+    if (isSubmitting) return;
+
+    handleLineImageUpload(lineKey, event.dataTransfer.files);
   };
 
   const handleConfirm = async () => {
@@ -602,37 +645,58 @@ const IssueRefundDialog = ({
 
                 <div className="mt-4">
                   <Label className="mb-2 block text-xs text-muted-foreground">
-                    Upload images
+                    Upload files
                   </Label>
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground hover:bg-muted/40">
-                    <Upload className="size-4" />
-                    Upload image
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={(event) => {
-                        handleLineImageUpload(line.key, event.target.files);
-                        event.currentTarget.value = "";
-                      }}
-                      disabled={isSubmitting}
-                    />
-                  </label>
+                  <div
+                    onDragOver={(event) => handleLineDragOver(line.key, event)}
+                    onDragEnter={(event) => handleLineDragOver(line.key, event)}
+                    onDragLeave={handleLineDragLeave}
+                    onDrop={(event) => handleLineDrop(line.key, event)}
+                    className={`rounded-md border border-dashed p-4 transition-colors ${
+                      draggingLineKey === line.key
+                        ? "border-primary bg-primary/5"
+                        : "border-input"
+                    }`}
+                  >
+                    <label className="flex cursor-pointer flex-col items-center gap-2 text-sm text-muted-foreground">
+                      <Upload className="size-4" />
+                      <span>Drag and drop files here</span>
+                      <span>or click to browse</span>
+                      <input
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={(event) => {
+                          handleLineImageUpload(line.key, event.target.files);
+                          event.currentTarget.value = "";
+                        }}
+                        disabled={isSubmitting}
+                      />
+                    </label>
+                  </div>
 
                   {line.images.length > 0 ? (
                     <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
                       {line.images.map((image) => (
                         <div
                           key={image.id}
-                          className="relative overflow-hidden rounded-md border"
+                          className="relative overflow-hidden rounded-md border bg-muted/20"
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={image.previewUrl}
-                            alt={image.file.name}
-                            className="h-24 w-full object-cover"
-                          />
+                          {image.isImage && image.previewUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={image.previewUrl}
+                              alt={image.file.name}
+                              className="h-24 w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-24 w-full items-center gap-2 px-3">
+                              <FileText className="size-4 text-muted-foreground" />
+                              <span className="line-clamp-2 text-xs">
+                                {image.file.name}
+                              </span>
+                            </div>
+                          )}
                           <button
                             type="button"
                             className="absolute right-1 top-1 rounded bg-black/60 p-1 text-white hover:bg-black/80"
