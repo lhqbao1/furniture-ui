@@ -35,6 +35,8 @@ import {
   OrderStatisticsParams,
   returnOrder,
   returnIssueOrder,
+  uploadCheckoutFiles,
+  UploadCheckoutFilesPayload,
   updateReasonForMainCheckout,
   updateNoteForMainCheckout,
 } from "./api";
@@ -390,6 +392,26 @@ export function useUpdateReasonForMainCheckout() {
         queryKey: ["checkout-main-id", variables.main_checkout_id],
       });
       qc.refetchQueries({ queryKey: ["checkout-main"] });
+    },
+  });
+}
+
+export function useUploadCheckoutFiles() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      payload,
+    }: {
+      main_checkout_id: string;
+      payload: UploadCheckoutFilesPayload;
+    }) => uploadCheckoutFiles(main_checkout_id, payload),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
     },
   });
 }

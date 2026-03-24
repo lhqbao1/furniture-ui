@@ -99,7 +99,9 @@ export const orderListExpandColumns = (
     cell: ({ row }) => {
       return (
         <div className="text-center">
-          {supplier_name ? supplier_name : "Prestige Home"}
+          {row.original.products.owner
+            ? row.original.products.owner.business_name
+            : "Prestige Home"}
         </div>
       );
     },
