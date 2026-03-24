@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ProductItem } from "@/types/products";
 import Link from "next/link";
-import { Eye, X } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useGetAllProducts } from "@/features/products/hook";
 import RemoveBundleDialog from "./remove-dialog";
@@ -29,6 +29,51 @@ type SelectedProduct = {
   width: number;
   height: number;
   weight: number;
+};
+
+type PackageSize = {
+  length: number;
+  width: number;
+  height: number;
+  weight: number;
+};
+
+const toFiniteNumber = (value: unknown) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const hasPositivePackageValue = (pkg: PackageSize) =>
+  pkg.length > 0 && pkg.width > 0 && pkg.height > 0 && pkg.weight > 0;
+
+const getPreferredPackageSize = (product: ProductItem): PackageSize => {
+  const packageCandidates = Array.isArray(product.packages)
+    ? product.packages.map((pkg) => ({
+        length: toFiniteNumber(pkg?.length),
+        width: toFiniteNumber(pkg?.width),
+        height: toFiniteNumber(pkg?.height),
+        weight: toFiniteNumber(pkg?.weight),
+      }))
+    : [];
+
+  const firstValidPackage = packageCandidates.find(hasPositivePackageValue);
+  if (firstValidPackage) return firstValidPackage;
+
+  const directPackage = {
+    length: toFiniteNumber(product.length),
+    width: toFiniteNumber(product.width),
+    height: toFiniteNumber(product.height),
+    weight: toFiniteNumber(product.weight),
+  };
+
+  if (hasPositivePackageValue(directPackage)) return directPackage;
+
+  return {
+    length: 0,
+    width: 0,
+    height: 0,
+    weight: 0,
+  };
 };
 
 interface SelectBundleComponentProps {
@@ -54,7 +99,7 @@ const SelectBundleComponent = ({
   });
 
   const handleSelectProduct = (product: ProductItem) => {
-    const firstPackage = product.packages?.[0];
+    const preferredPackage = getPreferredPackageSize(product);
 
     setListProducts((prev) => {
       if (prev.some((p) => p.product.id === product.id)) return prev;
@@ -63,10 +108,10 @@ const SelectBundleComponent = ({
         {
           product,
           amount: 1,
-          length: firstPackage?.length ?? 0,
-          width: firstPackage?.width ?? 0,
-          height: firstPackage?.height ?? 0,
-          weight: firstPackage?.weight ?? 0,
+          length: preferredPackage.length,
+          width: preferredPackage.width,
+          height: preferredPackage.height,
+          weight: preferredPackage.weight,
         },
       ];
     });
@@ -87,7 +132,7 @@ const SelectBundleComponent = ({
       .filter(
         (p: ProductItem) => !listProducts.some((lp) => lp.product.id === p.id),
       );
-  }, [products?.items, listProducts]);
+  }, [currentProduct?.id, products?.items, listProducts]);
 
   const maxParentStock = useMemo(() => {
     if (listProducts.length === 0) return 0;
@@ -107,15 +152,15 @@ const SelectBundleComponent = ({
     if (currentProduct?.bundles?.length) {
       const initialBundles: SelectedProduct[] = currentProduct.bundles.map(
         (b) => {
-          const firstPackage = b.bundle_item.packages?.[0];
+          const preferredPackage = getPreferredPackageSize(b.bundle_item);
 
           return {
             product: b.bundle_item,
             amount: b.quantity,
-            length: firstPackage?.length ?? 0,
-            width: firstPackage?.width ?? 0,
-            height: firstPackage?.height ?? 0,
-            weight: firstPackage?.weight ?? 0,
+            length: preferredPackage.length,
+            width: preferredPackage.width,
+            height: preferredPackage.height,
+            weight: preferredPackage.weight,
           };
         },
       );

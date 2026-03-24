@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProductItem, ProductPackage } from "@/types/products";
 import Image from "next/image";
 import React, { useEffect, useRef } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
@@ -28,7 +27,14 @@ interface ProductLogisticsGroupProps {
   isDSP?: boolean;
 }
 
-function isValidPackage(pkg: ProductPackage) {
+type PackageValue = {
+  length: number | null;
+  width: number | null;
+  height: number | null;
+  weight: number | null;
+};
+
+function isValidPackage(pkg: PackageValue | null | undefined) {
   return (
     pkg?.length != null &&
     pkg?.width != null &&
@@ -36,6 +42,59 @@ function isValidPackage(pkg: ProductPackage) {
     pkg?.weight != null
   );
 }
+
+const toFiniteNumberOrNull = (value: unknown) => {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const normalizePackage = (value: unknown): PackageValue => {
+  const source = (value ?? {}) as Record<string, unknown>;
+
+  return {
+    length: toFiniteNumberOrNull(source.length),
+    width: toFiniteNumberOrNull(source.width),
+    height: toFiniteNumberOrNull(source.height),
+    weight: toFiniteNumberOrNull(source.weight),
+  };
+};
+
+const hasPositivePackageValue = (pkg: PackageValue) =>
+  (pkg.length ?? 0) > 0 &&
+  (pkg.width ?? 0) > 0 &&
+  (pkg.height ?? 0) > 0 &&
+  (pkg.weight ?? 0) > 0;
+
+const pickPreferredPackage = (packages: unknown): PackageValue | null => {
+  if (!Array.isArray(packages) || packages.length === 0) return null;
+
+  const normalizedPackages = packages.map((item) => normalizePackage(item));
+  const firstValidWithPositiveValue = normalizedPackages.find((pkg) =>
+    isValidPackage(pkg) && hasPositivePackageValue(pkg),
+  );
+  if (firstValidWithPositiveValue) return firstValidWithPositiveValue;
+
+  return normalizedPackages.find((pkg) => isValidPackage(pkg)) ?? null;
+};
+
+const getBundleMappedPackage = (bundle: unknown): PackageValue => {
+  const bundleSource = (bundle ?? {}) as Record<string, unknown>;
+  const bundleItem = (bundleSource.bundle_item ?? {}) as Record<string, unknown>;
+
+  const packageFromBundleItem = pickPreferredPackage(bundleItem.packages);
+  if (packageFromBundleItem) return packageFromBundleItem;
+
+  const packageFromBundle = pickPreferredPackage(bundleSource.packages);
+  if (packageFromBundle) return packageFromBundle;
+
+  return normalizePackage({
+    length: bundleSource.length ?? bundleItem.length,
+    width: bundleSource.width ?? bundleItem.width,
+    height: bundleSource.height ?? bundleItem.height,
+    weight: bundleSource.weight ?? bundleItem.weight,
+  });
+};
 
 const ProductLogisticsGroup = ({
   isDSP = false,
@@ -73,10 +132,10 @@ const ProductLogisticsGroup = ({
     name: "packages",
   });
 
-  const bundleItems = form.watch("bundles");
+  const bundleItems = useWatch({ control, name: "bundles" });
   const watchedCarrier = useWatch({ control, name: "carrier" });
   const watchedPackages = useWatch({ control, name: "packages" });
-  const watchedBundles = useWatch({ control, name: "bundles" });
+  const watchedBundles = bundleItems;
   const hasMountedWarningRef = useRef(false);
   const lastWarningKeyRef = useRef("");
 
@@ -84,16 +143,12 @@ const ProductLogisticsGroup = ({
   useEffect(() => {
     if (!bundleItems || bundleItems.length === 0) return;
 
-    // ✅ Set số lượng packages bằng số lượng bundleItems
-    form.setValue("number_of_packages", bundleItems.length);
+    // ✅ Fill từng gói từ bundle_items (ưu tiên bundle_item.packages)
+    const filledPackages = bundleItems.map((bundle) =>
+      getBundleMappedPackage(bundle),
+    );
 
-    // ✅ Fill từng gói từ bundle_items
-    const filledPackages = bundleItems.map((b: ProductItem) => ({
-      length: b?.length ?? null,
-      height: b?.height ?? null,
-      width: b?.width ?? null,
-      weight: b?.weight ?? null,
-    }));
+    form.setValue("number_of_packages", filledPackages.length);
 
     form.setValue("packages", filledPackages);
   }, [bundleItems, form]);
@@ -493,18 +548,3 @@ const ProductLogisticsGroup = ({
 };
 
 export default ProductLogisticsGroup;
-
-const PackageSkeleton = () => (
-  <div className="flex flex-col w-full border p-3 rounded-2xl shadow-sm animate-pulse">
-    <div className="h-4 w-1/3 bg-gray-300 rounded mb-3"></div>
-
-    <div className="grid grid-cols-4 gap-3 w-full">
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="flex flex-col-reverse items-center flex-1">
-          <div className="h-10 w-full bg-gray-300 rounded"></div>
-          <div className="h-3 w-10 bg-gray-300 rounded mb-1"></div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
