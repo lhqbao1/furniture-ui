@@ -2,6 +2,7 @@ import qs from "qs";
 import { api, apiAdmin, apiDSP, apiFlexible, apiPublic } from "@/lib/axios";
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
+import { CreateRefundMainCheckoutPayload } from "@/lib/schema/refund";
 import {
   CheckOut,
   CheckoutDashboardResponse,
@@ -35,6 +36,11 @@ export interface DeliveryOrderItem {
 export interface DeliveryOrderPayload {
   items: DeliveryOrderItem[];
   carrier: string;
+}
+
+export interface CreateRefundMainCheckoutResponse {
+  message?: string;
+  [key: string]: unknown;
 }
 
 export async function createCheckOut(item: CreateOrderFormValues) {
@@ -198,6 +204,23 @@ export async function returnIssueOrder(
     },
   );
   return data;
+}
+
+export async function createRefundMainCheckout(
+  main_checkout_id: string,
+  payload: CreateRefundMainCheckoutPayload,
+) {
+  const { data } = await apiAdmin.post(
+    `/refund/main-checkout/${main_checkout_id}`,
+    payload,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return data as CreateRefundMainCheckoutResponse;
 }
 
 export async function changeOrderReturnStatus(

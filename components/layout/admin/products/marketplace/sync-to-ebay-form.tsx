@@ -387,6 +387,10 @@ const SyncToEbayForm = ({
             handling_time: values.handling_time ?? 0,
             material: product.materials,
             color: product.color,
+            length: product.length || null,
+            width: product.length || null,
+            height: product.length || null,
+            weight: product.length || null,
           };
 
           syncToKauflandMutation.mutate(

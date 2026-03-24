@@ -10,12 +10,12 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import {
-  useReturnIssueOrder,
-  useUpdateReasonForMainCheckout,
+  useCreateRefundMainCheckout,
 } from "@/features/checkout/hook";
+import { useUploadStaticFile } from "@/features/file/hook";
 import { Input } from "@/components/ui/input";
 import { CheckOutMain } from "@/types/checkout";
 import { CartItem } from "@/types/cart";
@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface ReturnConfirmDialogProps {
   id: string;
@@ -52,9 +53,14 @@ const REFUND_REASONS = [
 ] as const;
 
 type RefundMode = "full" | "partial";
+type ItemQuality = "A-Goods" | "B-Goods" | "C-Goods" | "No return";
 
 type RefundLine = {
   key: string;
+  sourceItemId: string;
+  idProvider: string;
+  unitIndex: number;
+  totalUnits: number;
   name: string;
   sku: string;
   image: string | null;
@@ -62,6 +68,27 @@ type RefundLine = {
   unitPrice: number;
   maxAmount: number;
 };
+
+type RefundLineImage = {
+  id: string;
+  file: File;
+  previewUrl: string;
+};
+
+type RefundLineFormState = {
+  units: number;
+  amountInput: string;
+  reason: string;
+  quality: ItemQuality;
+  images: RefundLineImage[];
+};
+
+const ITEM_QUALITY_OPTIONS: ItemQuality[] = [
+  "A-Goods",
+  "B-Goods",
+  "C-Goods",
+  "No return",
+];
 
 const normalizeCurrency = (amount: number) =>
   amount.toLocaleString("de-DE", {
@@ -106,26 +133,40 @@ const getOrderCartItems = (order: CheckOutMain): CartItem[] => {
 };
 
 const buildRefundLines = (order: CheckOutMain): RefundLine[] =>
-  getOrderCartItems(order).map((item, index) => {
-    const quantity = Math.max(0, Number(item.quantity) || 0);
+  getOrderCartItems(order).flatMap((item, index) => {
+    const totalUnits = Math.max(0, Number(item.quantity) || 0);
     const unitPrice = getUnitPrice(item);
-    return {
-      key: `${item.id}-${index}`,
-      name: item.purchased_products?.name || item.products?.name || "Unnamed product",
-      sku:
-        item.purchased_products?.sku ||
-        item.products?.sku ||
-        item.products?.id_provider ||
-        "-",
-      image:
-        item.image_url ||
-        item.purchased_products?.image ||
-        item.products?.static_files?.[0]?.url ||
-        null,
-      quantity,
+    const name =
+      item.purchased_products?.name || item.products?.name || "Unnamed product";
+    const sku =
+      item.purchased_products?.sku ||
+      item.products?.sku ||
+      item.products?.id_provider ||
+      "-";
+    const image =
+      item.image_url ||
+      item.purchased_products?.image ||
+      item.products?.static_files?.[0]?.url ||
+      null;
+    const sourceItemId = String(item.id ?? `item-${index}`);
+    const idProvider =
+      item.purchased_products?.id_provider ||
+      item.products?.id_provider ||
+      "";
+
+    return Array.from({ length: totalUnits }, (_, unitIndex) => ({
+      key: `${sourceItemId}-${index}-unit-${unitIndex + 1}`,
+      sourceItemId,
+      idProvider,
+      unitIndex: unitIndex + 1,
+      totalUnits,
+      name,
+      sku,
+      image,
+      quantity: 1,
       unitPrice,
-      maxAmount: quantity * unitPrice,
-    };
+      maxAmount: unitPrice,
+    }));
   });
 
 const IssueRefundDialog = ({
@@ -134,25 +175,18 @@ const IssueRefundDialog = ({
   open,
   onClose,
 }: ReturnConfirmDialogProps) => {
-  const returnIssueMutation = useReturnIssueOrder();
-  const updateReasonMutation = useUpdateReasonForMainCheckout();
+  const createRefundMutation = useCreateRefundMainCheckout();
+  const uploadStaticFileMutation = useUploadStaticFile();
   const [refundMode, setRefundMode] = React.useState<RefundMode>("full");
-
-  const [unitsByLine, setUnitsByLine] = React.useState<Record<string, number>>(
-    {},
-  );
-  const [amountByLine, setAmountByLine] = React.useState<Record<string, string>>(
-    {},
-  );
-  const [reasonByLine, setReasonByLine] = React.useState<Record<string, string>>(
-    {},
-  );
+  const [lineFormByKey, setLineFormByKey] = React.useState<
+    Record<string, RefundLineFormState>
+  >({});
 
   const [shippingUnits, setShippingUnits] = React.useState(0);
   const [shippingAmountInput, setShippingAmountInput] = React.useState("");
 
   const isSubmitting =
-    returnIssueMutation.isPending || updateReasonMutation.isPending;
+    createRefundMutation.isPending || uploadStaticFileMutation.isPending;
 
   const refundLines = React.useMemo(() => buildRefundLines(order), [order]);
   const shippingMaxAmount = Math.max(0, Number(order.total_shipping ?? 0));
@@ -161,32 +195,62 @@ const IssueRefundDialog = ({
   React.useEffect(() => {
     if (!open) return;
 
-    const initialUnits: Record<string, number> = {};
-    const initialAmounts: Record<string, string> = {};
+    const initialLineForms: Record<string, RefundLineFormState> = {};
     for (const line of refundLines) {
-      initialUnits[line.key] = line.quantity;
-      initialAmounts[line.key] = "";
+      initialLineForms[line.key] = {
+        units: line.quantity,
+        amountInput: "",
+        reason: "",
+        quality: "No return",
+        images: [],
+      };
     }
 
     setRefundMode("full");
-    setUnitsByLine(initialUnits);
-    setAmountByLine(initialAmounts);
-    setReasonByLine({});
+    setLineFormByKey((prev) => {
+      for (const lineKey of Object.keys(prev)) {
+        for (const image of prev[lineKey]?.images ?? []) {
+          URL.revokeObjectURL(image.previewUrl);
+        }
+      }
+      return initialLineForms;
+    });
     setShippingUnits(0);
     setShippingAmountInput("");
   }, [open, refundLines]);
 
+  const updateLineForm = React.useCallback(
+    (lineKey: string, updater: (prev: RefundLineFormState) => RefundLineFormState) => {
+      setLineFormByKey((prev) => {
+        const previousLine = prev[lineKey] ?? {
+          units: 1,
+          amountInput: "",
+          reason: "",
+          quality: "No return" as ItemQuality,
+          images: [],
+        };
+
+        return {
+          ...prev,
+          [lineKey]: updater(previousLine),
+        };
+      });
+    },
+    [],
+  );
+
   const lineRefunds = React.useMemo(
     () =>
       refundLines.map((line) => {
+        const lineForm = lineFormByKey[line.key];
         const units = clamp(
-          Math.floor(Number(unitsByLine[line.key] ?? 0)),
+          Math.floor(Number(lineForm?.units ?? 0)),
           0,
           line.quantity,
         );
 
         const partialAmount = clamp(
-          parseAmountInput(amountByLine[line.key] ?? ""),
+          parseAmountInput(lineForm?.amountInput ?? ""),
           0,
           line.maxAmount,
         );
@@ -197,10 +261,12 @@ const IssueRefundDialog = ({
           ...line,
           units,
           amount,
-          reason: reasonByLine[line.key]?.trim() ?? "",
+          reason: lineForm?.reason?.trim() ?? "",
+          quality: lineForm?.quality ?? ("No return" as ItemQuality),
+          images: lineForm?.images ?? [],
         };
       }),
-    [amountByLine, reasonByLine, refundLines, refundMode, unitsByLine],
+    [lineFormByKey, refundLines, refundMode],
   );
 
   const shippingRefundAmount = React.useMemo(() => {
@@ -220,7 +286,39 @@ const IssueRefundDialog = ({
 
   const amountAfterRefund = Math.max(orderTotal - totalRefundAmount, 0);
 
+  const handleLineImageUpload = (lineKey: string, files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const incomingImages: RefundLineImage[] = Array.from(files).map((file, idx) => ({
+      id: `${lineKey}-${Date.now()}-${idx}`,
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+
+    updateLineForm(lineKey, (prev) => ({
+      ...prev,
+      images: [...prev.images, ...incomingImages],
+    }));
+  };
+
+  const handleRemoveLineImage = (lineKey: string, imageId: string) => {
+    updateLineForm(lineKey, (prev) => {
+      const target = prev.images.find((img) => img.id === imageId);
+      if (target) URL.revokeObjectURL(target.previewUrl);
+
+      return {
+        ...prev,
+        images: prev.images.filter((img) => img.id !== imageId),
+      };
+    });
+  };
+
   const handleClose = () => {
+    for (const lineKey of Object.keys(lineFormByKey)) {
+      for (const image of lineFormByKey[lineKey]?.images ?? []) {
+        URL.revokeObjectURL(image.previewUrl);
+      }
+    }
     onClose();
   };
 
@@ -244,27 +342,41 @@ const IssueRefundDialog = ({
       return;
     }
 
-    const reasonParts = productRefundLines.map((line) =>
-      refundMode === "full"
-        ? `${line.sku} x${line.units}: ${line.reason}`
-        : `${line.sku} €${normalizeCurrency(line.amount)}: ${line.reason}`,
-    );
-
-    if (hasShippingRefund) {
-      reasonParts.push(`SHIPPING €${normalizeCurrency(shippingRefundAmount)}`);
-    }
-
-    const refundReason = reasonParts.join(" | ");
-
     try {
-      await updateReasonMutation.mutateAsync({
-        main_checkout_id: id,
-        reason: refundReason,
-      });
+      const uploadedUrlsByLineKey: Record<string, string[]> = {};
+      const linesWithImages = lineRefunds.filter((line) => line.images.length > 0);
 
-      await returnIssueMutation.mutateAsync({
+      await Promise.all(
+        linesWithImages.map(async (line) => {
+          const formData = new FormData();
+          line.images.forEach((image) => {
+            formData.append("files", image.file);
+          });
+
+          const uploadResult = await uploadStaticFileMutation.mutateAsync(formData);
+          uploadedUrlsByLineKey[line.key] =
+            uploadResult.results?.map((result) => result.url).filter(Boolean) ?? [];
+        }),
+      );
+
+      await createRefundMutation.mutateAsync({
         main_checkout_id: id,
-        amount_refund: Number(totalRefundAmount.toFixed(2)),
+        payload: {
+          amount: Number(totalRefundAmount.toFixed(2)),
+          products: productRefundLines.map((line) => ({
+            name: line.name,
+            sku: line.sku,
+            quantity: refundMode === "full" ? line.units : line.amount > 0 ? 1 : 0,
+            id_provider: line.idProvider,
+            unit_price: Number(line.unitPrice.toFixed(2)),
+            refund_amount: Number(line.amount.toFixed(2)),
+            reason: line.reason,
+            type: line.quality,
+            file: (uploadedUrlsByLineKey[line.key] ?? []).map((url) => ({
+              url,
+            })),
+          })),
+        },
       });
 
       toast.success("Issue refund successfully");
@@ -345,7 +457,7 @@ const IssueRefundDialog = ({
                         SKU: {line.sku}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Quantity: {line.quantity}
+                        Unit: {line.unitIndex}/{line.totalUnits}
                       </div>
                     </div>
                   </div>
@@ -366,9 +478,9 @@ const IssueRefundDialog = ({
                         <Select
                           value={String(line.units)}
                           onValueChange={(value) =>
-                            setUnitsByLine((prev) => ({
+                            updateLineForm(line.key, (prev) => ({
                               ...prev,
-                              [line.key]: Number(value),
+                              units: Number(value),
                             }))
                           }
                           disabled={isSubmitting}
@@ -398,14 +510,14 @@ const IssueRefundDialog = ({
                           min={0}
                           max={line.maxAmount}
                           step="0.01"
-                          value={amountByLine[line.key] ?? ""}
+                          value={lineFormByKey[line.key]?.amountInput ?? ""}
                           onChange={(event) => {
                             const rawValue = event.target.value;
 
                             if (!rawValue.trim()) {
-                              setAmountByLine((prev) => ({
+                              updateLineForm(line.key, (prev) => ({
                                 ...prev,
-                                [line.key]: "",
+                                amountInput: "",
                               }));
                               return;
                             }
@@ -414,9 +526,9 @@ const IssueRefundDialog = ({
                             if (Number.isNaN(parsedValue)) return;
 
                             const clampedValue = clamp(parsedValue, 0, line.maxAmount);
-                            setAmountByLine((prev) => ({
+                            updateLineForm(line.key, (prev) => ({
                               ...prev,
-                              [line.key]:
+                              amountInput:
                                 parsedValue === clampedValue
                                   ? rawValue
                                   : formatAmountInput(clampedValue),
@@ -443,9 +555,9 @@ const IssueRefundDialog = ({
                   <Select
                     value={line.reason || undefined}
                     onValueChange={(value) =>
-                      setReasonByLine((prev) => ({
+                      updateLineForm(line.key, (prev) => ({
                         ...prev,
-                        [line.key]: value,
+                        reason: value,
                       }))
                     }
                     disabled={isSubmitting}
@@ -461,6 +573,79 @@ const IssueRefundDialog = ({
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="mt-4">
+                  <Label className="mb-2 block text-xs text-muted-foreground">
+                    Item quality
+                  </Label>
+                  <RadioGroup
+                    value={line.quality}
+                    onValueChange={(value) =>
+                      updateLineForm(line.key, (prev) => ({
+                        ...prev,
+                        quality: value as ItemQuality,
+                      }))
+                    }
+                    className="grid grid-cols-2 gap-2 md:grid-cols-4"
+                  >
+                    {ITEM_QUALITY_OPTIONS.map((option) => (
+                      <div key={option} className="flex items-center gap-2 rounded border px-3 py-2">
+                        <RadioGroupItem value={option} id={`${line.key}-${option}`} />
+                        <Label htmlFor={`${line.key}-${option}`} className="cursor-pointer">
+                          {option}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                <div className="mt-4">
+                  <Label className="mb-2 block text-xs text-muted-foreground">
+                    Upload images
+                  </Label>
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground hover:bg-muted/40">
+                    <Upload className="size-4" />
+                    Upload image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(event) => {
+                        handleLineImageUpload(line.key, event.target.files);
+                        event.currentTarget.value = "";
+                      }}
+                      disabled={isSubmitting}
+                    />
+                  </label>
+
+                  {line.images.length > 0 ? (
+                    <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+                      {line.images.map((image) => (
+                        <div
+                          key={image.id}
+                          className="relative overflow-hidden rounded-md border"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={image.previewUrl}
+                            alt={image.file.name}
+                            className="h-24 w-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-1 top-1 rounded bg-black/60 p-1 text-white hover:bg-black/80"
+                            onClick={() => handleRemoveLineImage(line.key, image.id)}
+                            disabled={isSubmitting}
+                            aria-label="Remove image"
+                          >
+                            <X className="size-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ))}
