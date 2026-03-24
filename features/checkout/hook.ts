@@ -1,4 +1,5 @@
 import { CreateOrderFormValues } from "@/lib/schema/checkout";
+import { CreateRefundMainCheckoutPayload } from "@/lib/schema/refund";
 import {
   useMutation,
   useQueries,
@@ -14,6 +15,7 @@ import {
   changeOrderReturnStatus,
   createCheckOut,
   createDeliveryOrder,
+  createRefundMainCheckout,
   createManualCheckOut,
   DeliveryOrderPayload,
   getAllCheckOutMain,
@@ -233,6 +235,28 @@ export function useReturnIssueOrder() {
       main_checkout_id: string;
       amount_refund: number;
     }) => returnIssueOrder(main_checkout_id, amount_refund),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+      qc.refetchQueries({ queryKey: ["checkout-statistic"] });
+      qc.refetchQueries({ queryKey: ["checkout-user-id"] });
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+    },
+  });
+}
+
+export function useCreateRefundMainCheckout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      payload,
+    }: {
+      main_checkout_id: string;
+      payload: CreateRefundMainCheckoutPayload;
+    }) => createRefundMainCheckout(main_checkout_id, payload),
     onSuccess: (data, variables) => {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });

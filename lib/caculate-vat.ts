@@ -144,26 +144,90 @@ export function calculateOrderTaxWithDiscount(
     buckets.get(vatRate)!.gross += gross;
   }
 
-  const shipping = calculateShippingCost(
+  const shippingBase = calculateShippingCost(
     items,
     country_code,
     tax_id,
     total_shipping,
   );
+  const shippingGross = Math.max(0, Number(shippingBase.gross) || 0);
 
-  const shippingGross = Number(shipping.gross) || 0;
-  const shippingRate = Number(shipping.vatRate) || 0;
+  // ✅ Shipping VAT follows main goods VAT composition:
+  // split shipping gross proportionally by product gross per VAT bucket.
+  const productBuckets = Array.from(buckets.entries())
+    .map(([vatRate, bucket]) => ({
+      vatRate,
+      gross: +(Number(bucket.gross) || 0).toFixed(2),
+    }))
+    .filter((bucket) => bucket.gross > 0);
 
-  if (!buckets.has(shippingRate)) {
-    buckets.set(shippingRate, {
-      vatRate: shippingRate,
-      gross: 0,
-      net: 0,
-      vat: 0,
-    });
+  let shippingNet = 0;
+  let shippingVat = 0;
+  const shippingRates = new Set<number>();
+
+  const applyShippingToBucket = (vatRate: number, gross: number) => {
+    const grossRounded = +gross.toFixed(2);
+    if (grossRounded <= 0) return;
+
+    if (!buckets.has(vatRate)) {
+      buckets.set(vatRate, {
+        vatRate,
+        gross: 0,
+        net: 0,
+        vat: 0,
+      });
+    }
+
+    const bucket = buckets.get(vatRate)!;
+    bucket.gross = +(bucket.gross + grossRounded).toFixed(2);
+
+    const split = splitGross(grossRounded, vatRate);
+    shippingNet = +(shippingNet + split.net).toFixed(2);
+    shippingVat = +(shippingVat + split.vat).toFixed(2);
+    shippingRates.add(vatRate);
+  };
+
+  if (shippingGross > 0) {
+    const totalProductGross = +productBuckets
+      .reduce((sum, bucket) => sum + bucket.gross, 0)
+      .toFixed(2);
+
+    if (productBuckets.length === 0 || totalProductGross <= 0) {
+      applyShippingToBucket(Number(shippingBase.vatRate) || 0, shippingGross);
+    } else {
+      let remainingGross = +shippingGross.toFixed(2);
+
+      productBuckets.forEach((bucket, index) => {
+        const isLast = index === productBuckets.length - 1;
+        let allocatedGross = isLast
+          ? remainingGross
+          : +((shippingGross * bucket.gross) / totalProductGross).toFixed(2);
+
+        allocatedGross = Math.max(
+          0,
+          Math.min(+remainingGross.toFixed(2), allocatedGross),
+        );
+        remainingGross = +(remainingGross - allocatedGross).toFixed(2);
+
+        applyShippingToBucket(bucket.vatRate, allocatedGross);
+      });
+
+      if (remainingGross > 0) {
+        const fallbackRate = productBuckets[productBuckets.length - 1].vatRate;
+        applyShippingToBucket(fallbackRate, remainingGross);
+      }
+    }
   }
 
-  buckets.get(shippingRate)!.gross += shippingGross;
+  const shipping = {
+    gross: +shippingGross.toFixed(2),
+    net: +shippingNet.toFixed(2),
+    vat: +shippingVat.toFixed(2),
+    vatRate:
+      shippingRates.size === 1
+        ? Number(Array.from(shippingRates)[0]) || 0
+        : 0,
+  };
 
   // 3️⃣ Total gross before discount
   let totalGrossBeforeDiscount = 0;
@@ -181,7 +245,8 @@ export function calculateOrderTaxWithDiscount(
   let totalVat = 0;
 
   for (const bucket of buckets.values()) {
-    const ratio = bucket.gross / totalGrossBeforeDiscount;
+    const ratio =
+      totalGrossBeforeDiscount > 0 ? bucket.gross / totalGrossBeforeDiscount : 0;
     const discountGross = +(appliedDiscountGross * ratio).toFixed(2);
 
     bucket.discountGross = discountGross;

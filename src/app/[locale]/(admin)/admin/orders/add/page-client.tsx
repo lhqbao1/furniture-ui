@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useCreateCheckOutManual } from "@/features/checkout/hook";
+import { useCreateInformationManualOrder } from "@/features/user-order/hook";
 import { useTranslations } from "next-intl";
 import z from "zod";
 import {
@@ -14,6 +15,7 @@ import {
   ManualCreateOrderFormValues,
   ManualCreateOrderSchema,
 } from "@/lib/schema/manual-checkout";
+import { UserOrderFormValues } from "@/lib/schema/user-order";
 import { ProductItem } from "@/types/products";
 
 import { AdminCheckOutUserInformation } from "@/components/layout/admin/orders/order-create/admin-user-information";
@@ -52,8 +54,11 @@ interface SelectedProduct {
 export default function CreateOrderPageClient() {
   const t = useTranslations();
   const createOrderManualMutation = useCreateCheckOutManual();
+  const createInformationManualOrderMutation = useCreateInformationManualOrder();
   const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);
   const [disabledFields, setDisabledFields] = useState<string[]>([]);
+  const [saveUserInformation, setSaveUserInformation] = useState(false);
+  const [hasSelectedSavedUser, setHasSelectedSavedUser] = useState(false);
   const prevProductIdsRef = React.useRef<string[]>([]);
 
   const form = useForm<ManualCreateOrderFormValues>({
@@ -121,7 +126,66 @@ export default function CreateOrderPageClient() {
     }
   }, [listProducts, countryCode, taxId, form]);
 
-  useManualCheckoutLogic(form, setDisabledFields);
+  useManualCheckoutLogic(form, setDisabledFields, {
+    skipMarketplacePreset: hasSelectedSavedUser,
+  });
+
+  function mapToUserOrderPayload(
+    values: z.infer<typeof ManualCreateOrderSchema>,
+  ): UserOrderFormValues {
+    const getString = (value: string | null | undefined) => value ?? "";
+    const genderValue =
+      (form.getValues("gender" as never) as string | null | undefined) ?? "";
+    const sameAsInvoiceFromToggle =
+      (form.getValues("same_as_invoice" as never) as boolean | undefined) ??
+      undefined;
+    const invoiceFullName = [values.first_name, values.last_name]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    const sameAsInvoice =
+      getString(values.address) === getString(values.invoice_address) &&
+      getString(values.additional_address) ===
+        getString(values.invoice_additional_address) &&
+      getString(values.city) === getString(values.invoice_city) &&
+      getString(values.postal_code) === getString(values.invoice_postal_code) &&
+      getString(values.country) === getString(values.invoice_country);
+
+    return {
+      first_name: getString(values.first_name),
+      last_name: getString(values.last_name),
+      email: getString(values.email),
+      gender: getString(genderValue),
+      company: getString(values.company_name),
+      tax_id: getString(values.tax_id),
+      phone_number: getString(values.phone_number),
+      address: getString(values.invoice_address),
+      additional_address: getString(values.invoice_additional_address),
+      city: getString(values.invoice_city),
+      postal_code: getString(values.invoice_postal_code),
+      country: getString(values.invoice_country),
+      recipient_name:
+        getString(values.recipient_name).trim() || invoiceFullName,
+      recipient_email:
+        getString(values.email_shipping).trim() || getString(values.email),
+      recipient_phone_number:
+        getString(values.phone).trim() || getString(values.phone_number),
+      recipient_address:
+        getString(values.address).trim() || getString(values.invoice_address),
+      recipient_additional_address:
+        getString(values.additional_address).trim() ||
+        getString(values.invoice_additional_address),
+      recipient_city:
+        getString(values.city).trim() || getString(values.invoice_city),
+      recipient_postal_code:
+        getString(values.postal_code).trim() ||
+        getString(values.invoice_postal_code),
+      recipient_country:
+        getString(values.country).trim() || getString(values.invoice_country),
+      same_as_invoice: sameAsInvoiceFromToggle ?? sameAsInvoice,
+    };
+  }
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
     createOrderManualMutation.mutate(
@@ -146,12 +210,25 @@ export default function CreateOrderPageClient() {
         note: values.note?.trim() ? values.note.trim() : null,
       },
       {
-        onSuccess(data, variables, context) {
+        onSuccess() {
+          if (saveUserInformation) {
+            createInformationManualOrderMutation.mutate(
+              mapToUserOrderPayload(values),
+              {
+                onError: () => {
+                  toast.error("Save user information fail");
+                },
+              },
+            );
+          }
+
           toast.success("Create order successfully");
           form.reset();
           setListProducts([]);
+          setHasSelectedSavedUser(false);
+          setSaveUserInformation(false);
         },
-        onError(error, variables, context) {
+        onError() {
           toast.error("Create order fail");
         },
       },
@@ -190,6 +267,9 @@ export default function CreateOrderPageClient() {
             <AdminCheckOutUserInformation
               isAdmin
               disabledFields={disabledFields}
+              saveUserInformation={saveUserInformation}
+              onSaveUserInformationChange={setSaveUserInformation}
+              onSavedUserSelectionChange={setHasSelectedSavedUser}
             />
             <ManualCheckOutShippingAddress isAdmin />
             {/* <ManualCheckOutInvoiceAddress isAdmin /> */}

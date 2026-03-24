@@ -1,0 +1,51 @@
+import { z } from "zod";
+
+export const userOrderSchema = z.object({
+  first_name: z.string(),
+  last_name: z.string(),
+  email: z.string(),
+  gender: z.string(),
+  company: z.string(),
+  tax_id: z.string(),
+  phone_number: z.string(),
+  address: z.string(),
+  additional_address: z.string(),
+  city: z.string(),
+  postal_code: z.string(),
+  country: z.string(),
+  recipient_name: z.string(),
+  recipient_email: z.string(),
+  recipient_phone_number: z.string(),
+  recipient_address: z.string(),
+  recipient_additional_address: z.string(),
+  recipient_city: z.string(),
+  recipient_postal_code: z.string(),
+  recipient_country: z.string(),
+  same_as_invoice: z.boolean(),
+});
+
+export type UserOrderFormValues = z.infer<typeof userOrderSchema>;
+
+export const userOrderDefaultValues: UserOrderFormValues = {
+  first_name: "",
+  last_name: "",
+  email: "",
+  gender: "",
+  company: "",
+  tax_id: "",
+  phone_number: "",
+  address: "",
+  additional_address: "",
+  city: "",
+  postal_code: "",
+  country: "DE",
+  recipient_name: "",
+  recipient_email: "",
+  recipient_phone_number: "",
+  recipient_address: "",
+  recipient_additional_address: "",
+  recipient_city: "",
+  recipient_postal_code: "",
+  recipient_country: "DE",
+  same_as_invoice: true,
+};

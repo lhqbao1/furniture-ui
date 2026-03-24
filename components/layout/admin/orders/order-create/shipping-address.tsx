@@ -24,10 +24,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { BRAND_COUNTRY_OPTIONS, COUNTRY_OPTIONS } from "@/data/data";
+import { BRAND_COUNTRY_OPTIONS } from "@/data/data";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useTranslations } from "next-intl";
 
 interface CheckOutShippingAddressProps {
   isAdmin?: boolean;
@@ -45,12 +44,18 @@ interface ShippingAddressValues {
 }
 
 export default function ManualCheckOutShippingAddress({
-  isAdmin = false,
+  isAdmin: _isAdmin = false,
 }: CheckOutShippingAddressProps) {
-  const t = useTranslations();
+  void _isAdmin;
   const form = useFormContext();
   const [open, setOpen] = useState(false);
-  const [isSameInvoice, setIsSameInvoice] = useState(true);
+  const sameAsInvoiceFromForm = useWatch({
+    control: form.control,
+    name: "same_as_invoice",
+  }) as boolean | undefined;
+  const [isSameInvoice, setIsSameInvoice] = useState(
+    sameAsInvoiceFromForm ?? true,
+  );
 
   const shippingSnapshot = useRef<ShippingAddressValues | null>(null);
   const prevIsSameInvoice = useRef(isSameInvoice);
@@ -71,6 +76,12 @@ export default function ManualCheckOutShippingAddress({
   });
 
   const invoiceSnapshot = JSON.stringify(invoiceValues);
+
+  useEffect(() => {
+    if (typeof sameAsInvoiceFromForm === "boolean") {
+      setIsSameInvoice(sameAsInvoiceFromForm);
+    }
+  }, [sameAsInvoiceFromForm]);
 
   // // 1) Sync invoice <- shipping KHI VÀ CHỈ KHI isSameInvoice = true
   useEffect(() => {
@@ -142,7 +153,7 @@ export default function ManualCheckOutShippingAddress({
     }
 
     prevIsSameInvoice.current = isSameInvoice;
-  }, [isSameInvoice, form]);
+  }, [isSameInvoice]);
 
   return (
     <div className="space-y-4">
@@ -153,7 +164,10 @@ export default function ManualCheckOutShippingAddress({
           <Switch
             id="same-invoice"
             checked={isSameInvoice}
-            onCheckedChange={setIsSameInvoice}
+            onCheckedChange={(checked) => {
+              setIsSameInvoice(checked);
+              form.setValue("same_as_invoice", checked, { shouldDirty: true });
+            }}
             className="data-[state=unchecked]:bg-gray-400 data-[state=checked]:bg-secondary"
           />
         </div>

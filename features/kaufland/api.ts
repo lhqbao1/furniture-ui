@@ -24,6 +24,10 @@ export interface syncToKauflandInput {
   handling_time?: number;
   color: string;
   material: string;
+  length: number | null;
+  width: number | null;
+  height: number | null;
+  weight: number | null;
 }
 export async function syncToKaufland(input: syncToKauflandInput) {
   const response = await apiAdmin.post("/kaufland/products/publish", input, {
