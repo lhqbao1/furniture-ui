@@ -19,7 +19,9 @@ import {
   createManualCheckOut,
   DeliveryOrderPayload,
   getAllCheckOutMain,
+  getCheckOutRefundOrders,
   GetAllCheckoutParams,
+  GetRefundOrdersParams,
   getCheckOut,
   getCheckOutByCheckOutId,
   getCheckOutByUserId,
@@ -200,6 +202,24 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       search ?? null,
     ],
     queryFn: () => getCheckOutMain(params),
+    placeholderData: (previousData) => previousData,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useGetCheckOutRefundOrders(params: GetRefundOrdersParams = {}) {
+  const { page, page_size, channel, search } = params;
+
+  return useQuery({
+    queryKey: [
+      "checkout-refund-orders",
+      page ?? 1,
+      page_size ?? 50,
+      (channel ?? []).join(","),
+      search ?? null,
+    ],
+    queryFn: () => getCheckOutRefundOrders(params),
     placeholderData: (previousData) => previousData,
     retry: false,
     refetchOnWindowFocus: false,

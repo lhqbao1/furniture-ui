@@ -78,7 +78,7 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
   });
 
   return (
-    <div className="overflow-hidden rounded-md border">
+    <div className="overflow-hidden rounded-md border w-1/2">
       <Table>
         <TableHeader className="bg-secondary/10">
           {table.getHeaderGroups().map((headerGroup) => (

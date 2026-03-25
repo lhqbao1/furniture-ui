@@ -11,6 +11,7 @@ import {
   CheckOutResponse,
   CheckOutStatistics,
   ProviderOverviewResponse,
+  RefundOrdersResponse,
 } from "@/types/checkout";
 
 export interface GetAllCheckoutParams {
@@ -26,6 +27,13 @@ export interface GetAllCheckoutParams {
 export interface OrderStatisticsParams {
   from_date?: string;
   to_date?: string;
+}
+
+export interface GetRefundOrdersParams {
+  page?: number;
+  page_size?: number;
+  channel?: string[] | null;
+  search?: string;
 }
 
 export interface DeliveryOrderItem {
@@ -150,6 +158,21 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
   });
 
   return data as CheckOutMainResponse;
+}
+
+export async function getCheckOutRefundOrders(params?: GetRefundOrdersParams) {
+  const { data } = await apiAdmin.get("/refund/check-out-refund/", {
+    params: {
+      ...(params?.page !== undefined && { page: params.page }),
+      ...(params?.page_size !== undefined && { page_size: params.page_size }),
+      ...(params?.channel !== undefined && { channel: params.channel }),
+      ...(params?.search !== undefined && { search: params.search }),
+    },
+    paramsSerializer: (params) =>
+      qs.stringify(params, { arrayFormat: "repeat" }),
+  });
+
+  return data as RefundOrdersResponse;
 }
 
 export async function getAllCheckOutMain(channel?: string, status?: string[]) {

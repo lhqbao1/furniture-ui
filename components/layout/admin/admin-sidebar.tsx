@@ -94,6 +94,11 @@ export function AdminSideBar() {
           url: "/admin/orders/add",
           icon: CornerDownRight,
         },
+        {
+          title: "Return Orders",
+          url: "/admin/orders/return-orders",
+          icon: CornerDownRight,
+        },
       ],
     },
     {
