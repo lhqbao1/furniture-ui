@@ -207,7 +207,7 @@ const IssueRefundDialog = ({
     const initialLineForms: Record<string, RefundLineFormState> = {};
     for (const line of refundLines) {
       initialLineForms[line.key] = {
-        units: line.quantity,
+        units: 0,
         amountInput: "",
         reason: "",
         quality: "No return",
@@ -232,7 +232,7 @@ const IssueRefundDialog = ({
     (lineKey: string, updater: (prev: RefundLineFormState) => RefundLineFormState) => {
       setLineFormByKey((prev) => {
         const previousLine = prev[lineKey] ?? {
-          units: 1,
+          units: 0,
           amountInput: "",
           reason: "",
           quality: "No return" as ItemQuality,
@@ -378,9 +378,27 @@ const IssueRefundDialog = ({
       return;
     }
 
-    const missingProductReason = productRefundLines.find((line) => !line.reason);
-    if (missingProductReason) {
-      toast.error(`Reason is required for ${missingProductReason.name}`);
+    const invalidRefundLines = productRefundLines
+      .map((line) => {
+        const missingFields: string[] = [];
+        if (!line.reason) missingFields.push("reason");
+        if (line.images.length === 0) missingFields.push("images");
+        if (missingFields.length === 0) return null;
+
+        return `${line.name} (unit ${line.unitIndex}/${line.totalUnits}): missing ${missingFields.join(", ")}`;
+      })
+      .filter((line): line is string => Boolean(line));
+
+    if (invalidRefundLines.length > 0) {
+      const previewMessages = invalidRefundLines.slice(0, 3).join(" | ");
+      const restCount = invalidRefundLines.length - 3;
+
+      toast.error("Missing required fields", {
+        description:
+          restCount > 0
+            ? `${previewMessages} | +${restCount} more item(s)`
+            : previewMessages,
+      });
       return;
     }
 

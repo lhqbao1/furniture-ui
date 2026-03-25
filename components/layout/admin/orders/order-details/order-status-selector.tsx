@@ -15,6 +15,8 @@ import CancelWrongPriceDialog from "./dialog/canceled-wrong-price-dialog";
 import CancelNoStockConfirmDialog from "./dialog/canceled-no-stock-confirm-dialog";
 import IssueRefundDialog from "./dialog/issue-refund-dialog";
 
+const EMPTY_STATUS_VALUE = "__status_empty__";
+
 export const getStatusLabel = (status: string) => {
   const normalized = status.toLowerCase();
 
@@ -38,7 +40,7 @@ export default function OrderStatusSelector({
   status: string;
   order: CheckOutMain; // or CheckOutMain
 }) {
-  const [value, setValue] = React.useState<string>(status?.toLowerCase() ?? "");
+  const [value, setValue] = React.useState<string>(EMPTY_STATUS_VALUE);
   const [openReturn, setOpenReturn] = React.useState(false);
   const [openIssueRefund, setOpenIssueRefund] = React.useState(false);
 
@@ -56,7 +58,7 @@ export default function OrderStatusSelector({
   }, [status]);
 
   const selectValue = React.useMemo(
-    () => (options.some((opt) => opt.key === value) ? value : undefined),
+    () => (options.some((opt) => opt.key === value) ? value : EMPTY_STATUS_VALUE),
     [options, value],
   );
 
@@ -97,6 +99,9 @@ export default function OrderStatusSelector({
             {/* <SelectValue placeholder={labelFor(value) || "Select"} /> */}
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value={EMPTY_STATUS_VALUE} className="hidden" disabled>
+              Select
+            </SelectItem>
             {options.map((opt) => (
               <SelectItem
                 key={opt.key}
@@ -119,7 +124,7 @@ export default function OrderStatusSelector({
           open={openReturn}
           onClose={() => {
             setOpenReturn(false);
-            setValue(status.toLocaleLowerCase());
+            setValue(EMPTY_STATUS_VALUE);
           }}
         />
       )}
@@ -131,7 +136,7 @@ export default function OrderStatusSelector({
           open={openCancel}
           onClose={() => {
             setOpenCancel(false);
-            setValue(status.toLocaleLowerCase());
+            setValue(EMPTY_STATUS_VALUE);
           }}
         />
       )}
@@ -143,7 +148,7 @@ export default function OrderStatusSelector({
           open={openIssueRefund}
           onClose={() => {
             setOpenIssueRefund(false);
-            setValue(status.toLocaleLowerCase());
+            setValue(EMPTY_STATUS_VALUE);
           }}
         />
       )}
@@ -155,7 +160,7 @@ export default function OrderStatusSelector({
           open={openCancelNoStock}
           onClose={() => {
             setOpenCancelNoStock(false);
-            setValue(status.toLocaleLowerCase());
+            setValue(EMPTY_STATUS_VALUE);
           }}
         />
       )}
@@ -167,7 +172,7 @@ export default function OrderStatusSelector({
           open={openCancelWrongPrice}
           onClose={() => {
             setOpenCancelWrongPrice(false);
-            setValue(status.toLocaleLowerCase());
+            setValue(EMPTY_STATUS_VALUE);
           }}
         />
       )}
@@ -179,7 +184,7 @@ export default function OrderStatusSelector({
           open={openPaid}
           onClose={() => {
             setOpenPaid(false);
-            setValue(status.toLocaleLowerCase());
+            setValue(EMPTY_STATUS_VALUE);
           }}
         />
       )}
@@ -191,7 +196,7 @@ export default function OrderStatusSelector({
           open={openExchange}
           onClose={() => {
             setOpenExchange(false);
-            setValue(status.toLocaleLowerCase());
+            setValue(EMPTY_STATUS_VALUE);
           }}
         />
       )}
