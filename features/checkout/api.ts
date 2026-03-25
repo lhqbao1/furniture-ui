@@ -50,6 +50,27 @@ export interface UploadCheckoutFilesResponse {
   [key: string]: unknown;
 }
 
+export interface ProductRefundFile {
+  url: string;
+  id?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProductRefundItem {
+  name: string;
+  sku: string;
+  quantity: number;
+  id_provider?: string;
+  unit_price: number;
+  refund_amount: number;
+  reason: string;
+  type: string;
+  files: ProductRefundFile[];
+}
+
+export type ProductRefundResponse = ProductRefundItem[];
+
 export async function createCheckOut(item: CreateOrderFormValues) {
   const { data } = await api.post(`/checkout`, item, {
     headers: {
@@ -131,10 +152,7 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
   return data as CheckOutMainResponse;
 }
 
-export async function getAllCheckOutMain(
-  channel?: string,
-  status?: string[],
-) {
+export async function getAllCheckOutMain(channel?: string, status?: string[]) {
   const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all", {
     params: {
       ...(channel ? { channel } : {}),
@@ -292,6 +310,15 @@ export async function uploadCheckoutFiles(
   );
 
   return data as UploadCheckoutFilesResponse;
+}
+
+export async function getProductRefundByMainCheckoutId(
+  main_checkout_id: string,
+) {
+  const { data } = await apiAdmin.get(
+    `/refund/product-refund/${main_checkout_id}`,
+  );
+  return data as ProductRefundResponse;
 }
 
 export async function makeOrderPaid(main_checkout_id: string) {

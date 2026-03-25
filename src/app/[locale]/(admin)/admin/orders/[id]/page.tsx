@@ -9,6 +9,7 @@ import OrderDetailUser from "@/components/layout/admin/orders/order-details/orde
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import AdminBackButton from "@/components/layout/admin/admin-back-button";
 import {
+  useGetProductRefundByMainCheckoutId,
   useGetMainCheckOutByMainCheckOutId,
   useUploadCheckoutFiles,
   useUpdateNoteForMainCheckout,
@@ -27,6 +28,12 @@ import { getOrderDetailColumns } from "@/components/layout/admin/orders/order-de
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   Dialog,
   DialogContent,
@@ -70,6 +77,34 @@ function getFileNameFromUrl(url: string) {
   }
 }
 
+function toSafeNumber(value: unknown) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatCurrency(value: unknown) {
+  return `€${toSafeNumber(value).toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function formatVietnamDateTime(value?: string) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+
+  return date.toLocaleString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
 const OrderDetails = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -91,6 +126,8 @@ const OrderDetails = () => {
     isLoading,
     isError,
   } = useGetMainCheckOutByMainCheckOutId(checkoutId);
+  const { data: productRefundData, isLoading: isLoadingProductRefund } =
+    useGetProductRefundByMainCheckoutId(checkoutId);
 
   const { data: invoice } = useQuery({
     queryKey: ["invoice-checkout", checkoutId],
@@ -103,6 +140,21 @@ const OrderDetails = () => {
     if (!order) return [];
     return extractCartItemsFromMain(order);
   }, [order]);
+  const productRefunds = useMemo(
+    () =>
+      Array.isArray(productRefundData)
+        ? productRefundData.filter((item) => item && typeof item === "object")
+        : [],
+    [productRefundData],
+  );
+  const totalProductRefundAmount = useMemo(
+    () =>
+      productRefunds.reduce(
+        (sum, item) => sum + toSafeNumber(item?.refund_amount),
+        0,
+      ),
+    [productRefunds],
+  );
   const orderFiles = useMemo(() => orderFilesState ?? [], [orderFilesState]);
   const dialogOrderFileEntries = useMemo(
     () =>
@@ -181,7 +233,9 @@ const OrderDetails = () => {
   };
 
   const handleStageDeleteOrderFile = (targetIndex: number) => {
-    setDialogOrderFiles((prev) => prev.filter((_, index) => index !== targetIndex));
+    setDialogOrderFiles((prev) =>
+      prev.filter((_, index) => index !== targetIndex),
+    );
     setHasPendingFileDeletes(true);
   };
 
@@ -223,9 +277,7 @@ const OrderDetails = () => {
     }
   };
 
-  const handleDropFiles = async (
-    event: React.DragEvent<HTMLDivElement>,
-  ) => {
+  const handleDropFiles = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
     setIsDragOverFiles(false);
@@ -291,6 +343,203 @@ const OrderDetails = () => {
         hasCount={false}
         hasHeaderBackGround
       />
+      {(isLoadingProductRefund || productRefunds.length > 0) && (
+        <Accordion
+          type="single"
+          collapsible
+          className="rounded-lg border bg-white px-4"
+        >
+          <AccordionItem value="refund-details" className="border-none">
+            <AccordionTrigger hasIcon className="py-4">
+              <div className="flex w-full items-center justify-between pr-2 text-left">
+                <div>
+                  <h3 className="text-base font-semibold">Refund details</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Product refund information from marketplace response.
+                  </p>
+                </div>
+                <div className="text-right text-sm">
+                  <div className="font-medium">
+                    Items:{" "}
+                    {isLoadingProductRefund ? "..." : productRefunds.length}
+                  </div>
+                  <div className="text-muted-foreground">
+                    Total refund:{" "}
+                    {isLoadingProductRefund
+                      ? "..."
+                      : formatCurrency(totalProductRefundAmount)}
+                  </div>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              {isLoadingProductRefund ? (
+                <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                  Loading refund details...
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {productRefunds.map((item, index) => {
+                    const files = Array.isArray(item?.files) ? item.files : [];
+                    const fileEntries = files
+                      .map((file, fileIndex) => {
+                        const fileUrl = (file?.url ?? "").trim();
+                        if (!fileUrl) return null;
+
+                        return {
+                          file,
+                          fileIndex,
+                          fileUrl,
+                          fileName: getFileNameFromUrl(fileUrl),
+                          isImage: isImageUrl(fileUrl),
+                        };
+                      })
+                      .filter(
+                        (entry): entry is NonNullable<typeof entry> =>
+                          entry !== null,
+                      );
+                    const photoFiles = fileEntries.filter((entry) => entry.isImage);
+                    const documentFiles = fileEntries.filter(
+                      (entry) => !entry.isImage,
+                    );
+                    const providerId = item?.id_provider ?? "-";
+
+                    return (
+                      <div
+                        key={`${item?.sku ?? "refund"}-${index}`}
+                        className="rounded-md border p-3"
+                      >
+                        <div className="grid gap-3 lg:grid-cols-2">
+                          <div className="space-y-2 text-sm">
+                            <div>
+                              <span className="font-medium">Name:</span>{" "}
+                              {item?.name ?? "-"}
+                            </div>
+                            <div>
+                              <span className="font-medium">SKU:</span>{" "}
+                              {item?.sku ?? "-"}
+                            </div>
+                            <div>
+                              <span className="font-medium">Quantity:</span>{" "}
+                              {toSafeNumber(item?.quantity)}
+                            </div>
+                            <div>
+                              <span className="font-medium">ID provider:</span>{" "}
+                              {providerId}
+                            </div>
+                            <div>
+                              <span className="font-medium">Unit price:</span>{" "}
+                              {formatCurrency(item?.unit_price)}
+                            </div>
+                            <div>
+                              <span className="font-medium">
+                                Refund amount:
+                              </span>{" "}
+                              {formatCurrency(item?.refund_amount)}
+                            </div>
+                            <div>
+                              <span className="font-medium">Reason:</span>{" "}
+                              {item?.reason ?? "-"}
+                            </div>
+                            <div>
+                              <span className="font-medium">Type:</span>{" "}
+                              {item?.type ?? "-"}
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div className="space-y-2">
+                              <div className="text-sm font-medium">
+                                Photos ({photoFiles.length})
+                              </div>
+                              {photoFiles.length === 0 ? (
+                                <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+                                  No photos
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+                                  {photoFiles.map((entry) => (
+                                    <div
+                                      key={`photo-${entry.fileUrl}-${entry.file?.id ?? entry.fileIndex}`}
+                                      className="rounded-md border"
+                                    >
+                                      <a
+                                        href={entry.fileUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="block"
+                                      >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                          src={entry.fileUrl}
+                                          alt={entry.fileName}
+                                          className="h-28 w-full rounded-t-md object-cover"
+                                        />
+                                      </a>
+                                      <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                                        <div>
+                                          Created:{" "}
+                                          {formatVietnamDateTime(
+                                            entry.file?.created_at,
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="space-y-2">
+                              <div className="text-sm font-medium">
+                                Files ({documentFiles.length})
+                              </div>
+                              {documentFiles.length === 0 ? (
+                                <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+                                  No files
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
+                                  {documentFiles.map((entry) => (
+                                    <div
+                                      key={`doc-${entry.fileUrl}-${entry.file?.id ?? entry.fileIndex}`}
+                                      className="rounded-md border"
+                                    >
+                                      <a
+                                        href={entry.fileUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex items-center gap-2 px-3 py-3 text-sm hover:bg-muted/20"
+                                      >
+                                        <FileText className="size-4 text-muted-foreground" />
+                                        <span className="line-clamp-2">
+                                          {entry.fileName}
+                                        </span>
+                                      </a>
+                                      <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+                                        <div>
+                                          Created:{" "}
+                                          {formatVietnamDateTime(
+                                            entry.file?.created_at,
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
       <div className="flex justify-between w-full">
         {order.status !== "Pending" ? (
           <div className="flex flex-col gap-4">
@@ -325,7 +574,10 @@ const OrderDetails = () => {
                 }}
               />
               <div className="space-y-2 pt-2">
-                <Dialog open={isFilesDialogOpen} onOpenChange={setIsFilesDialogOpen}>
+                <Dialog
+                  open={isFilesDialogOpen}
+                  onOpenChange={setIsFilesDialogOpen}
+                >
                   <DialogTrigger asChild>
                     <button
                       type="button"
@@ -371,7 +623,9 @@ const OrderDetails = () => {
                                         onClick={(event) => {
                                           event.preventDefault();
                                           event.stopPropagation();
-                                          handleStageDeleteOrderFile(entry.index);
+                                          handleStageDeleteOrderFile(
+                                            entry.index,
+                                          );
                                         }}
                                         disabled={isSavingFileList}
                                         aria-label="Delete file"
@@ -424,7 +678,9 @@ const OrderDetails = () => {
                                         onClick={(event) => {
                                           event.preventDefault();
                                           event.stopPropagation();
-                                          handleStageDeleteOrderFile(entry.index);
+                                          handleStageDeleteOrderFile(
+                                            entry.index,
+                                          );
                                         }}
                                         disabled={isSavingFileList}
                                         aria-label="Delete file"
@@ -473,7 +729,9 @@ const OrderDetails = () => {
 
                 <div
                   className={`rounded-md border border-dashed p-4 transition-colors ${
-                    isDragOverFiles ? "border-primary bg-primary/5" : "border-input"
+                    isDragOverFiles
+                      ? "border-primary bg-primary/5"
+                      : "border-input"
                   }`}
                   onDragOver={(event) => {
                     event.preventDefault();
@@ -547,6 +805,7 @@ const OrderDetails = () => {
           payment_method={order.payment_method}
           entry_date={order.created_at}
           is_Ebay={order.from_marketplace === "ebay" ? true : false}
+          refund_amount={order.refund_amount}
         />
       </div>
       <OrderDeliveryOrder data={order.checkouts} />

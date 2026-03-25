@@ -26,6 +26,7 @@ import {
   getCheckOutDashboard,
   getCheckOutMain,
   getCheckOutMainByUserIdAdmin,
+  getProductRefundByMainCheckoutId,
   getCheckOutStatistics,
   getCheckOutSupplier,
   getCheckOutSupplierByCheckOutId,
@@ -134,6 +135,15 @@ export function useGetMainCheckOutByMainCheckOutId(main_checkout_id: string) {
   return useQuery({
     queryKey: ["checkout-main-id", main_checkout_id],
     queryFn: () => getMainCheckOutByMainCheckOutId(main_checkout_id),
+    enabled: !!main_checkout_id,
+    retry: false,
+  });
+}
+
+export function useGetProductRefundByMainCheckoutId(main_checkout_id: string) {
+  return useQuery({
+    queryKey: ["product-refund", main_checkout_id],
+    queryFn: () => getProductRefundByMainCheckoutId(main_checkout_id),
     enabled: !!main_checkout_id,
     retry: false,
   });

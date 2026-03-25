@@ -78,6 +78,7 @@ export interface CheckOutMain {
   tax: number;
   payment_rl: CheckOutPaymentRl;
   files: StaticFile[];
+  refund_amount: number;
   created_at: Date;
   updated_at: Date;
 }

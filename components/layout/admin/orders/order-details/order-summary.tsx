@@ -19,6 +19,7 @@ interface OrderInformationProps {
   tax?: number;
   total_amount?: number;
   is_Ebay?: boolean;
+  refund_amount: number | null;
 }
 
 const OrderSummary = ({
@@ -38,6 +39,7 @@ const OrderSummary = ({
   discount_amount,
   tax,
   total_amount,
+  refund_amount,
   is_Ebay = false,
 }: OrderInformationProps) => {
   return (
@@ -62,16 +64,34 @@ const OrderSummary = ({
           })}
         </div>
       </div>
-      <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
-        <div className="text-end col-span-2">Discount</div>
-        <div className="text-end">
-          €
-          {discount_amount?.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
+      {discount_amount && discount_amount > 0 ? (
+        <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
+          <div className="text-end col-span-2">Discount</div>
+          <div className="text-end">
+            €
+            {discount_amount?.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </div>
         </div>
-      </div>
+      ) : (
+        ""
+      )}
+      {refund_amount && refund_amount > 0 ? (
+        <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
+          <div className="text-end col-span-2">Refund Amount</div>
+          <div className="text-end">
+            €
+            {(refund_amount ?? 0)?.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
       <div className="grid grid-cols-3 lg:w-1/4 w-1/2">
         <div className="text-end col-span-2">VAT</div>
         <div className="text-end">

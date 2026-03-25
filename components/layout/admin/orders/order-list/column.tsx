@@ -622,24 +622,37 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     header: ({}) => <div className="text-center">TRACKING NUMBER</div>,
     cell: ({ row }) => {
       const trackingNumber = row.original?.shipment?.tracking_number;
-      const isDpdCarrier = (row.original?.carrier ?? "").toLowerCase() === "dpd";
+      const shippingCarrier = (
+        row.original?.shipment?.shipping_carrier ?? ""
+      ).toLowerCase();
       const hasTrackingNumber =
         trackingNumber !== null &&
         trackingNumber !== undefined &&
         String(trackingNumber).trim() !== "";
+      const encodedTrackingNumber = encodeURIComponent(String(trackingNumber));
+
+      let trackingLink = `https://trackandtrace.cepra.de/Track/${encodedTrackingNumber}?language=de&culture=DE`;
+
+      if (shippingCarrier === "dpd") {
+        trackingLink = `https://tracking.dpd.de/status/de_DE/parcel/${encodedTrackingNumber}`;
+      } else if (shippingCarrier === "dhl") {
+        trackingLink = `https://www.dhl.de/de/privatkunden/dhl-sendungsverfolgung.html?piececode=${encodedTrackingNumber}`;
+      } else if (shippingCarrier === "gls") {
+        trackingLink = `https://www.gls-pakete.de/reach-sendungsverfolgung?trackingNumber=${encodedTrackingNumber}`;
+      }
 
       return (
         <div className="flex items-center justify-center gap-1">
           <span className="select-text">
             {hasTrackingNumber ? String(trackingNumber) : "-"}
           </span>
-          {isDpdCarrier && hasTrackingNumber ? (
+          {hasTrackingNumber ? (
             <Link
               className="inline-flex items-center text-[#4D4D4D] hover:text-[#1a73e8]"
-              href={`https://tracking.dpd.de/status/de_DE/parcel/${encodeURIComponent(String(trackingNumber))}`}
+              href={trackingLink}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Open DPD tracking ${String(trackingNumber)}`}
+              aria-label={`Open tracking ${String(trackingNumber)}`}
             >
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
