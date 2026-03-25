@@ -19,13 +19,16 @@ import {
   createManualCheckOut,
   DeliveryOrderPayload,
   getAllCheckOutMain,
+  getCheckOutRefundOrders,
   GetAllCheckoutParams,
+  GetRefundOrdersParams,
   getCheckOut,
   getCheckOutByCheckOutId,
   getCheckOutByUserId,
   getCheckOutDashboard,
   getCheckOutMain,
   getCheckOutMainByUserIdAdmin,
+  getProductRefundByMainCheckoutId,
   getCheckOutStatistics,
   getCheckOutSupplier,
   getCheckOutSupplierByCheckOutId,
@@ -139,6 +142,15 @@ export function useGetMainCheckOutByMainCheckOutId(main_checkout_id: string) {
   });
 }
 
+export function useGetProductRefundByMainCheckoutId(main_checkout_id: string) {
+  return useQuery({
+    queryKey: ["product-refund", main_checkout_id],
+    queryFn: () => getProductRefundByMainCheckoutId(main_checkout_id),
+    enabled: !!main_checkout_id,
+    retry: false,
+  });
+}
+
 export function useGetCheckOutByUserId(user_id: string) {
   return useQuery({
     queryKey: ["checkout-user-id", user_id],
@@ -190,6 +202,24 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       search ?? null,
     ],
     queryFn: () => getCheckOutMain(params),
+    placeholderData: (previousData) => previousData,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useGetCheckOutRefundOrders(params: GetRefundOrdersParams = {}) {
+  const { page, page_size, channel, search } = params;
+
+  return useQuery({
+    queryKey: [
+      "checkout-refund-orders",
+      page ?? 1,
+      page_size ?? 50,
+      (channel ?? []).join(","),
+      search ?? null,
+    ],
+    queryFn: () => getCheckOutRefundOrders(params),
     placeholderData: (previousData) => previousData,
     retry: false,
     refetchOnWindowFocus: false,

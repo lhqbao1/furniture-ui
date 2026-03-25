@@ -14,6 +14,7 @@ import { FileText, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   useCreateRefundMainCheckout,
+  useUploadCheckoutFiles,
 } from "@/features/checkout/hook";
 import { useUploadStaticFile } from "@/features/file/hook";
 import { Input } from "@/components/ui/input";
@@ -178,6 +179,7 @@ const IssueRefundDialog = ({
   onClose,
 }: ReturnConfirmDialogProps) => {
   const createRefundMutation = useCreateRefundMainCheckout();
+  const uploadCheckoutFilesMutation = useUploadCheckoutFiles();
   const uploadStaticFileMutation = useUploadStaticFile();
   const [refundMode, setRefundMode] = React.useState<RefundMode>("full");
   const [lineFormByKey, setLineFormByKey] = React.useState<
@@ -191,7 +193,9 @@ const IssueRefundDialog = ({
   const [shippingAmountInput, setShippingAmountInput] = React.useState("");
 
   const isSubmitting =
-    createRefundMutation.isPending || uploadStaticFileMutation.isPending;
+    createRefundMutation.isPending ||
+    uploadStaticFileMutation.isPending ||
+    uploadCheckoutFilesMutation.isPending;
 
   const refundLines = React.useMemo(() => buildRefundLines(order), [order]);
   const shippingMaxAmount = Math.max(0, Number(order.total_shipping ?? 0));
@@ -386,7 +390,7 @@ const IssueRefundDialog = ({
     }
 
     try {
-      const uploadedUrlsByLineKey: Record<string, string[]> = {};
+      const uploadedCheckoutUrls: string[] = [];
       const linesWithImages = lineRefunds.filter((line) => line.images.length > 0);
 
       await Promise.all(
@@ -397,8 +401,9 @@ const IssueRefundDialog = ({
           });
 
           const uploadResult = await uploadStaticFileMutation.mutateAsync(formData);
-          uploadedUrlsByLineKey[line.key] =
+          const urls =
             uploadResult.results?.map((result) => result.url).filter(Boolean) ?? [];
+          uploadedCheckoutUrls.push(...urls);
         }),
       );
 
@@ -415,12 +420,24 @@ const IssueRefundDialog = ({
             refund_amount: Number(line.amount.toFixed(2)),
             reason: line.reason,
             type: line.quality,
-            file: (uploadedUrlsByLineKey[line.key] ?? []).map((url) => ({
-              url,
-            })),
+            file: [],
           })),
         },
       });
+
+      if (uploadedCheckoutUrls.length > 0) {
+        const existingCheckoutUrls = (order.files ?? [])
+          .map((file) => file?.url)
+          .filter((url): url is string => Boolean(url));
+        const mergedCheckoutUrls = Array.from(
+          new Set([...existingCheckoutUrls, ...uploadedCheckoutUrls]),
+        );
+
+        await uploadCheckoutFilesMutation.mutateAsync({
+          main_checkout_id: id,
+          payload: mergedCheckoutUrls,
+        });
+      }
 
       toast.success("Issue refund successfully");
       handleClose();

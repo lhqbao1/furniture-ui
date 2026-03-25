@@ -50,20 +50,15 @@ export default function OrderStatusSelector({
 
   const options = React.useMemo(() => {
     const current = String(status).toLowerCase();
-    const allowedKeys = STATUS_ACTIVE_RULES[current] ?? [];
+    const allowedKeys = new Set(STATUS_ACTIVE_RULES[current] ?? []);
 
-    return STATUS_OPTIONS.map((item) => {
-      // nếu item đại diện cho nhiều status (dispatched)
-      const isCurrent =
-        item.statuses?.includes(current) || item.key === current;
-
-      return {
-        ...item,
-        active: allowedKeys.includes(item.key),
-        current: isCurrent, // optional: để highlight step hiện tại
-      };
-    });
+    return STATUS_OPTIONS.filter((item) => allowedKeys.has(item.key));
   }, [status]);
+
+  const selectValue = React.useMemo(
+    () => (options.some((opt) => opt.key === value) ? value : undefined),
+    [options, value],
+  );
 
   const handleChange = (val: string) => {
     setValue(val);
@@ -94,7 +89,7 @@ export default function OrderStatusSelector({
       </div>
 
       <div className="flex items-center gap-2">
-        <Select value={value} onValueChange={handleChange}>
+        <Select value={selectValue} onValueChange={handleChange}>
           <SelectTrigger
             className="w-fit px-0 py-0 border-none"
             iconColor="black"
@@ -106,7 +101,6 @@ export default function OrderStatusSelector({
               <SelectItem
                 key={opt.key}
                 value={opt.key}
-                disabled={!opt.active} // ⬅️ disable option không hợp lệ
                 className="cursor-pointer"
               >
                 {opt.key === "completed" ? "" : `${opt.pos - 1}.`} {opt.label}

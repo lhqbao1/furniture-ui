@@ -78,11 +78,42 @@ export interface CheckOutMain {
   tax: number;
   payment_rl: CheckOutPaymentRl;
   files: StaticFile[];
+  refund_amount: number;
   created_at: Date;
   updated_at: Date;
 }
 interface CheckOutMainResponse {
   items: CheckOutMain[];
+  pagination: Pagination;
+}
+
+export interface RefundOrderFile {
+  url: string;
+  id?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface RefundOrderProduct {
+  name: string;
+  sku: string;
+  quantity: number;
+  id_provider?: string;
+  unit_price: number;
+  refund_amount: number;
+  reason: string;
+  type: string;
+  files?: RefundOrderFile[];
+}
+
+export interface RefundOrderItem extends CheckOutMain {
+  reason?: string;
+  invoice_pdf_file?: string;
+  product_refund?: RefundOrderProduct[];
+}
+
+export interface RefundOrdersResponse {
+  items: RefundOrderItem[];
   pagination: Pagination;
 }
 

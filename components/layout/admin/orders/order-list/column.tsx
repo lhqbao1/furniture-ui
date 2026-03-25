@@ -11,7 +11,6 @@ import {
   ExternalLink,
   Eye,
   NotebookPen,
-  X,
 } from "lucide-react";
 import { listChanel } from "@/data/data";
 import { useRouter } from "@/src/i18n/navigation";
@@ -39,7 +38,6 @@ const ActionCell = ({
   toggleExpandedRow,
   isRowExpanded,
   currentRowId,
-  status,
   note,
   marketplaceOrderId,
 }: {
@@ -49,7 +47,6 @@ const ActionCell = ({
   toggleExpandedRow?: (id: string) => void;
   isRowExpanded?: (id: string) => boolean;
   currentRowId?: string;
-  status: string;
   note?: string | null;
   marketplaceOrderId?: string | null;
 }) => {
@@ -242,32 +239,23 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     accessorKey: "customer",
     header: "CUSTOMER",
     cell: ({ row }) => {
+      const primaryCheckout = row.original.checkouts?.[0];
+      const user = primaryCheckout?.user;
+      const shippingAddress = primaryCheckout?.shipping_address;
+      const invoiceAddress = primaryCheckout?.invoice_address;
+      const displayName =
+        shippingAddress?.recipient_name?.trim() ||
+        user?.company_name?.trim() ||
+        invoiceAddress?.recipient_name?.trim() ||
+        "";
+      const displayEmail = user?.is_real
+        ? (user?.email ?? "")
+        : (invoiceAddress?.email ?? "");
+
       return (
         <div>
-          <div>
-            {row.original.checkouts[0]?.user && (
-              <div>
-                {row.original.checkouts[0]?.shipping_address?.recipient_name
-                  ? row.original.checkouts[0]?.shipping_address?.recipient_name
-                  : row.original.checkouts[0]?.user?.company_name
-                    ? row.original.checkouts[0]?.user?.company_name
-                    : row.original.checkouts[0]?.invoice_address?.recipient_name
-                      ? row.original.checkouts[0].invoice_address.recipient_name
-                      : ""}
-              </div>
-            )}
-          </div>
-          <div>
-            {row.original.checkouts[0]?.user.is_real ? (
-              <div>{row.original.checkouts[0]?.user?.email ?? ""}</div>
-            ) : (
-              <>
-                <div>
-                  {row.original.checkouts[0]?.invoice_address?.email ?? ""}
-                </div>
-              </>
-            )}
-          </div>
+          <div>{displayName}</div>
+          <div>{displayEmail}</div>
         </div>
       );
     },
@@ -392,7 +380,6 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
         toggleExpandedRow={table.options.meta?.toggleExpandedRow}
         isRowExpanded={table.options.meta?.isRowExpanded}
         currentRowId={row.id}
-        status={row.original.status}
         note={row.original.note}
         marketplaceOrderId={row.original.marketplace_order_id}
       />
@@ -419,13 +406,17 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
     accessorKey: "customer",
     header: "CUSTOMER",
     cell: ({ row }) => {
+      const primaryCheckout = row.original.checkouts?.[0];
+      const firstName = primaryCheckout?.user?.first_name ?? "";
+      const lastName = primaryCheckout?.user?.last_name ?? "";
+      const email = primaryCheckout?.user?.email ?? "";
+
       return (
         <div>
           <div className="capitalize">
-            {row.original.checkouts[0].user.first_name}{" "}
-            {row.original.checkouts[0].user.last_name}
+            {`${firstName} ${lastName}`.trim()}
           </div>
-          <div>{row.original.checkouts[0].user.email}</div>
+          <div>{email}</div>
         </div>
       );
     },
@@ -622,24 +613,37 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     header: ({}) => <div className="text-center">TRACKING NUMBER</div>,
     cell: ({ row }) => {
       const trackingNumber = row.original?.shipment?.tracking_number;
-      const isDpdCarrier = (row.original?.carrier ?? "").toLowerCase() === "dpd";
+      const shippingCarrier = (
+        row.original?.shipment?.shipping_carrier ?? ""
+      ).toLowerCase();
       const hasTrackingNumber =
         trackingNumber !== null &&
         trackingNumber !== undefined &&
         String(trackingNumber).trim() !== "";
+      const encodedTrackingNumber = encodeURIComponent(String(trackingNumber));
+
+      let trackingLink = `https://trackandtrace.cepra.de/Track/${encodedTrackingNumber}?language=de&culture=DE`;
+
+      if (shippingCarrier === "dpd") {
+        trackingLink = `https://tracking.dpd.de/status/de_DE/parcel/${encodedTrackingNumber}`;
+      } else if (shippingCarrier === "dhl") {
+        trackingLink = `https://www.dhl.de/de/privatkunden/dhl-sendungsverfolgung.html?piececode=${encodedTrackingNumber}`;
+      } else if (shippingCarrier === "gls") {
+        trackingLink = `https://www.gls-pakete.de/reach-sendungsverfolgung?trackingNumber=${encodedTrackingNumber}`;
+      }
 
       return (
         <div className="flex items-center justify-center gap-1">
           <span className="select-text">
             {hasTrackingNumber ? String(trackingNumber) : "-"}
           </span>
-          {isDpdCarrier && hasTrackingNumber ? (
+          {hasTrackingNumber ? (
             <Link
               className="inline-flex items-center text-[#4D4D4D] hover:text-[#1a73e8]"
-              href={`https://tracking.dpd.de/status/de_DE/parcel/${encodeURIComponent(String(trackingNumber))}`}
+              href={trackingLink}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Open DPD tracking ${String(trackingNumber)}`}
+              aria-label={`Open tracking ${String(trackingNumber)}`}
             >
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>

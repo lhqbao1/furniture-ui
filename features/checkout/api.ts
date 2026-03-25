@@ -11,6 +11,7 @@ import {
   CheckOutResponse,
   CheckOutStatistics,
   ProviderOverviewResponse,
+  RefundOrdersResponse,
 } from "@/types/checkout";
 
 export interface GetAllCheckoutParams {
@@ -26,6 +27,13 @@ export interface GetAllCheckoutParams {
 export interface OrderStatisticsParams {
   from_date?: string;
   to_date?: string;
+}
+
+export interface GetRefundOrdersParams {
+  page?: number;
+  page_size?: number;
+  channel?: string[] | null;
+  search?: string;
 }
 
 export interface DeliveryOrderItem {
@@ -49,6 +57,27 @@ export interface UploadCheckoutFilesResponse {
   message?: string;
   [key: string]: unknown;
 }
+
+export interface ProductRefundFile {
+  url: string;
+  id?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProductRefundItem {
+  name: string;
+  sku: string;
+  quantity: number;
+  id_provider?: string;
+  unit_price: number;
+  refund_amount: number;
+  reason: string;
+  type: string;
+  files: ProductRefundFile[];
+}
+
+export type ProductRefundResponse = ProductRefundItem[];
 
 export async function createCheckOut(item: CreateOrderFormValues) {
   const { data } = await api.post(`/checkout`, item, {
@@ -131,10 +160,22 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
   return data as CheckOutMainResponse;
 }
 
-export async function getAllCheckOutMain(
-  channel?: string,
-  status?: string[],
-) {
+export async function getCheckOutRefundOrders(params?: GetRefundOrdersParams) {
+  const { data } = await apiAdmin.get("/refund/check-out-refund/", {
+    params: {
+      ...(params?.page !== undefined && { page: params.page }),
+      ...(params?.page_size !== undefined && { page_size: params.page_size }),
+      ...(params?.channel !== undefined && { channel: params.channel }),
+      ...(params?.search !== undefined && { search: params.search }),
+    },
+    paramsSerializer: (params) =>
+      qs.stringify(params, { arrayFormat: "repeat" }),
+  });
+
+  return data as RefundOrdersResponse;
+}
+
+export async function getAllCheckOutMain(channel?: string, status?: string[]) {
   const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all", {
     params: {
       ...(channel ? { channel } : {}),
@@ -292,6 +333,15 @@ export async function uploadCheckoutFiles(
   );
 
   return data as UploadCheckoutFilesResponse;
+}
+
+export async function getProductRefundByMainCheckoutId(
+  main_checkout_id: string,
+) {
+  const { data } = await apiAdmin.get(
+    `/refund/product-refund/${main_checkout_id}`,
+  );
+  return data as ProductRefundResponse;
 }
 
 export async function makeOrderPaid(main_checkout_id: string) {

@@ -68,35 +68,6 @@ const SupplierOrderDetails = () => {
             <ShipmentInput checkoutId={order.id} />
           </div>
         ))}
-      {/* <div className="flex justify-between w-full">
-        {order.status !== "Pending" ? (
-          <div className="flex gap-12">
-            <DocumentTable
-              order={order}
-              invoiceCode={invoice?.invoice_code}
-            />
-          </div>
-        ) : (
-          ""
-        )}
-        <OrderSummary
-          language={order.checkouts[0].user.language ?? ""}
-          sub_total={order.total_amount_item}
-          shipping_amount={order.total_shipping}
-          discount_amount={Math.abs(order.voucher_amount)}
-          tax={calculateVAT({
-            items: invoice?.total_amount_item,
-            shipping: invoice?.total_shipping,
-            discount: invoice?.voucher_amount,
-            taxPercent: order.tax ?? 19,
-          })}
-          total_amount={order.total_amount}
-          payment_method={order.payment_method}
-          entry_date={order.created_at}
-          is_Ebay={order.from_marketplace === "ebay" ? true : false}
-        />
-      </div>
-      <OrderDeliveryOrder data={order.checkouts} /> */}
     </div>
   );
 };

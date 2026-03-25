@@ -64,36 +64,36 @@ export function getStatusStyle(raw: string) {
     case "items_are_checked":
       return {
         text: "Items are checked",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#dbeafe]",
+        color: "text-[#2563eb]",
       };
 
     case "waiting_for_return":
       return {
         text: "Waiting for return",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#fff7ed]",
+        color: "text-[#ea580c]",
       };
 
     case "warranty_initiated":
       return {
         text: "Warranty Initiated",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#eef2ff]",
+        color: "text-[#4f46e5]",
       };
 
     case "exchange_initiated":
       return {
         text: "Exchange Initiated",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#ecfeff]",
+        color: "text-[#0891b2]",
       };
 
     case "credit_note_created":
       return {
         text: "Credit note created",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#dcfce7]",
+        color: "text-[#16a34a]",
       };
 
     case "canceled_no_stock":
@@ -203,36 +203,36 @@ export function getStatusStyleDe(raw: string) {
     case "items_are_checked":
       return {
         text: "Artikel geprüft",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#dbeafe]",
+        color: "text-[#2563eb]",
       };
 
     case "waiting_for_return":
       return {
         text: "Warten auf Rücksendung",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#fff7ed]",
+        color: "text-[#ea580c]",
       };
 
     case "warranty_initiated":
       return {
         text: "Garantie gestartet",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#eef2ff]",
+        color: "text-[#4f46e5]",
       };
 
     case "exchange_initiated":
       return {
         text: "Umtausch gestartet",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#ecfeff]",
+        color: "text-[#0891b2]",
       };
 
     case "credit_note_created":
       return {
         text: "Gutschrift erstellt",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#dcfce7]",
+        color: "text-[#16a34a]",
       };
 
     case "return":
@@ -318,36 +318,36 @@ export function getShippingStatusStyle(raw: string) {
     case "items_are_checked":
       return {
         text: "Items are checked",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#dbeafe]",
+        color: "text-[#2563eb]",
       };
 
     case "waiting_for_return":
       return {
         text: "Waiting for return",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#fff7ed]",
+        color: "text-[#ea580c]",
       };
 
     case "warranty_initiated":
       return {
         text: "Warranty Initiated",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#eef2ff]",
+        color: "text-[#4f46e5]",
       };
 
     case "exchange_initiated":
       return {
         text: "Exchange Initiated",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#ecfeff]",
+        color: "text-[#0891b2]",
       };
 
     case "credit_note_created":
       return {
         text: "Credit note created",
-        bg: "bg-[#fee2e2]",
-        color: "text-[#dc2626]",
+        bg: "bg-[#dcfce7]",
+        color: "text-[#16a34a]",
       };
 
     case "canceled_no_stock":
