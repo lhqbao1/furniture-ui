@@ -388,9 +388,9 @@ const SyncToEbayForm = ({
             material: product.materials,
             color: product.color,
             length: product.length || null,
-            width: product.length || null,
-            height: product.length || null,
-            weight: product.length || null,
+            width: product.width || null,
+            height: product.height || null,
+            weight: product.weight || null,
           };
 
           syncToKauflandMutation.mutate(
