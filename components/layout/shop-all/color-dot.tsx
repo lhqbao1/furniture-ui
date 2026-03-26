@@ -5,13 +5,13 @@ interface ColorDotProps {
   checked: boolean;
 }
 
-const ColorDot = ({ color, checked }: { color: string; checked: boolean }) => {
+const ColorDot = ({ color, checked }: ColorDotProps) => {
   const isGradient = color.startsWith("repeating");
 
   return (
     <div
       className={cn(
-        "h-5 w-5 rounded-full transition",
+        "size-5 min-w-5 min-h-5 shrink-0 rounded-full transition",
         checked ? "ring-2 ring-black ring-offset-2" : "border border-gray-300",
       )}
       style={{

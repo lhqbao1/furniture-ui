@@ -72,9 +72,16 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
           onOpenChange={toggleOpen}
         >
           <CollapsibleTrigger asChild>
-            <button
-              type="button"
+            <div
+              role="button"
+              tabIndex={0}
               className="group flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[#f1f7f1]"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.currentTarget.click();
+                }
+              }}
             >
               <div
                 className="flex min-w-0 items-center gap-1"
@@ -116,7 +123,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
                   categoryId={category.id}
                 />
               </div>
-            </button>
+            </div>
           </CollapsibleTrigger>
           <CollapsibleContent className="pl-1">
             <div className="mt-1 flex flex-col gap-0.5">
@@ -133,13 +140,20 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
           </CollapsibleContent>
         </Collapsible>
       ) : (
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           className={cn(
             "group flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[#f1f7f1]",
             activeClass ? "bg-[#eaf8ef] text-primary" : "text-[#1f2937]",
           )}
           onClick={handleClick}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleClick();
+            }
+          }}
         >
           <div
             className="flex min-w-0 items-center gap-1"
@@ -177,7 +191,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
               categoryId={category.id}
             />
           </div>
-        </button>
+        </div>
       )}
     </div>
   );

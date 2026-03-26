@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMemo, useState } from "react";
 import { categorySchema } from "@/lib/schema/category";
 import ImagePickerInput from "@/components/layout/single-product/tabs/review/image-picker-input";
@@ -137,24 +136,24 @@ export default function AddCategoryDrawer({
       updateCategoryMutation.mutate(
         { id: categoryId ?? "", input: payload },
         {
-          onSuccess(data, variables, context) {
+          onSuccess() {
             toast.success("Category is updated successful");
             form.reset(defaultValues);
             setOpen(false);
           },
-          onError(error, variables, context) {
+          onError() {
             toast.error("Category is updated fail");
           },
         },
       );
     } else {
       createCategoryMutation.mutate(payload, {
-        onSuccess(data, variables, context) {
+        onSuccess() {
           toast.success("Category is created successful");
           form.reset(defaultValues);
           setOpen(false);
         },
-        onError(error, variables, context) {
+        onError() {
           toast.error("Category is created fail");
         },
       });
@@ -182,7 +181,7 @@ export default function AddCategoryDrawer({
           <Button variant={"secondary"}>Add Category</Button>
         )}
       </DrawerTrigger>
-      <DrawerContent className="overflow-y-scroll pb-4">
+      <DrawerContent className="overflow-y-scroll pb-4 w-[92vw] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[980px]">
         <DrawerHeader>
           <DrawerTitle>Add Category</DrawerTitle>
         </DrawerHeader>
@@ -246,6 +245,7 @@ export default function AddCategoryDrawer({
                     >
                       <PopoverTrigger asChild>
                         <Button
+                          type="button"
                           variant="outline"
                           className="w-full justify-between"
                           disabled={isLoading || isError}
@@ -263,7 +263,7 @@ export default function AddCategoryDrawer({
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent
-                        className="w-[320px] p-0"
+                        className="w-[420px] max-w-[calc(92vw-2rem)] p-0 z-[80]"
                         align="start"
                       >
                         {isLoading ? (

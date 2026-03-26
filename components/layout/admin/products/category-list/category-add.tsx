@@ -23,9 +23,11 @@ import SkeletonTable from './table-skeleton'
 import { useAddProductToCategory, useRemoveProductFromCategory } from '@/features/category/hook'
 import { AddOrRemoveProductToCategoryInput } from '@/types/categories'
 import { toast } from 'sonner'
+import { useGetAllProducts } from '@/features/products/hook'
 
 const CategoryAdd = () => {
   const [searchTerm, setSearchTerm] = useState("")
+  const deferredSearchTerm = React.useDeferredValue(searchTerm)
 
   const [selectedCategory] = useAtom(selectedCategoryAtom)
   const [selectedCategoryName] = useAtom(selectedCategoryNameAtom)
@@ -43,20 +45,19 @@ const CategoryAdd = () => {
     retry: false,
   })
 
-  const productsData = React.useMemo(() => categoryProducts?.not_in_category ?? [], [categoryProducts])
+  const { data: allProductsResponse, isLoading: allProductsLoading } = useGetAllProducts({
+    page: 1,
+    page_size: 40,
+    search: deferredSearchTerm.trim() ? deferredSearchTerm.trim() : undefined,
+  })
+
+  const productsData = React.useMemo(() => allProductsResponse?.items ?? [], [allProductsResponse?.items])
+  const allProductsTotalItems = allProductsResponse?.pagination?.total_items ?? productsData.length
   const categoryData = React.useMemo(() => categoryProducts?.in_category ?? [], [categoryProducts])
   const columns = React.useMemo(() => productsColumn, [])
 
-  const filteredProductsData = React.useMemo(() => {
-    if (!searchTerm) return productsData
-    return productsData.filter((product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.id_provider.toString().includes(searchTerm),
-    )
-  }, [productsData, searchTerm])
-
   const productsTable = useReactTable({
-    data: filteredProductsData,
+    data: productsData,
     columns,
     state: {
       rowSelection: productsSelection,
@@ -187,12 +188,12 @@ const CategoryAdd = () => {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-semibold text-[#334155] sm:text-lg">All products</h2>
             <span className="rounded-full bg-[#e8f7ee] px-2 py-1 text-xs font-medium text-[#1f7a44]">
-              {filteredProductsData.length} items
+              {allProductsTotalItems} items
             </span>
           </div>
 
           <div className="overflow-hidden rounded-lg border border-gray-200">
-            {categoryProductsLoading ? (
+            {allProductsLoading ? (
               <SkeletonTable columns={productsColumn.length} rows={5} />
             ) : (
               <div className="max-h-[520px] overflow-auto">

@@ -14,6 +14,8 @@ import { Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
+const SHOP_ALL_PAGE_SIZE = 20;
+
 export default function ShopAllPage() {
   const t = useTranslations();
   const router = useRouter();
@@ -22,7 +24,6 @@ export default function ShopAllPage() {
   // 🔹 1. LẤY PARAMS TỪ URL
   const query = searchParams.get("search") ?? undefined;
   const pageFromUrl = Number(searchParams.get("page")) || 1;
-  const pageSizeFromUrl = Number(searchParams.get("page_size")) || 40;
 
   const brands = searchParams.getAll("brand");
   const brandsKey =
@@ -46,18 +47,16 @@ export default function ShopAllPage() {
 
   // 🔹 2. STATE (sync với URL)
   const [page, setPage] = useState(pageFromUrl);
-  const [pageSize, setPageSize] = useState(pageSizeFromUrl);
 
   // 🔹 3. SYNC khi back / reload
   useEffect(() => {
     setPage(pageFromUrl);
-    setPageSize(pageSizeFromUrl);
-  }, [pageFromUrl, pageSizeFromUrl]);
+  }, [pageFromUrl]);
 
   // 🔹 4. QUERY
   const { data, isLoading, isError } = useProductsAlgoliaSearch({
     page,
-    page_size: pageSize,
+    page_size: SHOP_ALL_PAGE_SIZE,
     query,
     is_active: true,
     is_econelo: undefined,
@@ -77,6 +76,7 @@ export default function ShopAllPage() {
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
+    params.delete("page_size");
 
     router.push(`/shop-all?${params.toString()}`, { scroll: false });
 
@@ -96,6 +96,7 @@ export default function ShopAllPage() {
 
     params.delete("search"); // ❌ xóa query
     params.delete("page"); // (optional) reset về page 1
+    params.delete("page_size");
 
     router.push(`/shop-all?${params.toString()}`, { scroll: false });
   };

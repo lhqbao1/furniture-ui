@@ -21,7 +21,7 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
   const t = useTranslations();
   const [showContent, setShowContent] = useState(false);
   const [openPriceComparision, setOpenPriceComparsion] = useState(
-    typeof open === "boolean" ? open : true,
+    typeof open === "boolean" ? open : false,
   );
 
   const hasMarketplace = product.marketplace_products.length > 0;
@@ -63,7 +63,7 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
     product.final_price <= minMarketplacePrice;
 
   return (
-    <section className="mt-12">
+    <section className="mt-12 rounded-2xl border border-[#e7eaef] bg-gradient-to-b from-white to-[#f9fbfa] p-4 shadow-[0_8px_24px_rgba(0,0,0,0.04)] md:p-6">
       <Accordion
         type="single"
         collapsible
@@ -73,18 +73,18 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
       >
         <AccordionItem value="compare" className="border-b-0">
           <AccordionTrigger
-            className="py-0 text-2xl font-semibold text-[#666666]"
+            className="rounded-xl border border-[#dfe4ea] bg-white px-4 py-3 text-lg font-semibold text-[#2b3543] transition-colors hover:bg-[#f8fafc] data-[state=open]:border-[#c8ead8] data-[state=open]:bg-[#f3fbf7] md:px-5 md:py-4 md:text-2xl"
             hasIcon
-            iconClassName="size-5 text-[#666666]"
+            iconClassName="size-5 text-[#5d6b7b]"
           >
             {t("priceComparison")}
           </AccordionTrigger>
-          <AccordionContent className="mt-12">
+          <AccordionContent className="mt-4 md:mt-5">
             {openPriceComparision &&
               (!showContent ? (
                 <ProductGridSkeleton length={4} hasLoading />
               ) : (
-                <div className="grid xl:grid-cols-4 grid-cols-2 gap-y-12 gap-x-4 md:gap-x-8 md:gap-y-8 w-full">
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-8">
                   {/* Marketplace prices */}
                   {hasMarketplace &&
                     product.marketplace_products.map((item) => (

@@ -92,7 +92,10 @@ const ComparePriceCard = ({
     >
       <div
         key={product.id}
-        className={cn("relative z-10 h-full border boder-[#e0e0e0]", className)}
+        className={cn(
+          "relative z-10 h-full overflow-hidden rounded-xl border border-[#e0e0e0]",
+          className,
+        )}
       >
         <div className="bg-white p-0 group z-0 pt-8 lg:px-4 px-2">
           <Image
