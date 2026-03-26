@@ -10,8 +10,6 @@ import { ProductItem } from "@/types/products";
 import ComparePriceCard from "./compare-price-card";
 import { useTranslations } from "next-intl";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
-import { useAtom } from "jotai";
-import { openPriceComparisionAtom } from "@/store/price-comparision";
 import { ApplyVoucherDialog } from "./apply-voucher-dialog";
 
 interface ComparePriceSectionProps {
@@ -22,11 +20,17 @@ interface ComparePriceSectionProps {
 const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
   const t = useTranslations();
   const [showContent, setShowContent] = useState(false);
-  const [openPriceComparision, setOpenPriceComparsion] = useAtom(
-    openPriceComparisionAtom,
+  const [openPriceComparision, setOpenPriceComparsion] = useState(
+    typeof open === "boolean" ? open : true,
   );
 
   const hasMarketplace = product.marketplace_products.length > 0;
+
+  useEffect(() => {
+    if (typeof open === "boolean") {
+      setOpenPriceComparsion(open);
+    }
+  }, [open]);
 
   // 🔹 Delay render 1.5s
   useEffect(() => {
@@ -62,21 +66,23 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
     <section className="mt-12">
       <Accordion
         type="single"
-        collapsible={false}
+        collapsible
         className="w-full"
-        value={openPriceComparision ? "compare" : undefined}
+        value={openPriceComparision ? "compare" : ""}
+        onValueChange={(value) => setOpenPriceComparsion(value === "compare")}
       >
-        <AccordionItem
-          value="compare"
-          className="border-b-0"
-        >
+        <AccordionItem value="compare" className="border-b-0">
+          <AccordionTrigger
+            className="py-0 text-2xl font-semibold text-[#666666]"
+            hasIcon
+            iconClassName="size-5 text-[#666666]"
+          >
+            {t("priceComparison")}
+          </AccordionTrigger>
           <AccordionContent className="mt-12">
             {openPriceComparision &&
               (!showContent ? (
-                <ProductGridSkeleton
-                  length={4}
-                  hasLoading
-                />
+                <ProductGridSkeleton length={4} hasLoading />
               ) : (
                 <div className="grid xl:grid-cols-4 grid-cols-2 gap-y-12 gap-x-4 md:gap-x-8 md:gap-y-8 w-full">
                   {/* Marketplace prices */}
