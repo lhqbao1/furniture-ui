@@ -72,7 +72,7 @@ export default function ProductCard({
             className="cursor-pointer"
           >
             <div
-              className="relative mb-2 w-full h-96 overflow-hidden rounded-md bg-white group flex items-center justify-center"
+              className="relative mb-2 w-full lg:h-96 h-60 overflow-hidden rounded-md bg-white group flex items-center justify-center"
               onMouseEnter={() => {
                 if (enableAltHover && altImageUrl) setShouldLoadAltImage(true);
               }}
@@ -92,7 +92,8 @@ export default function ProductCard({
                 sizes="(max-width: 768px) 50vw, 25vw"
                 className={cn(
                   "object-contain transition-all duration-500 ease-in-out",
-                  enableAltHover && "group-hover:-translate-x-6 group-hover:opacity-0",
+                  enableAltHover &&
+                    "group-hover:-translate-x-6 group-hover:opacity-0",
                 )}
               />
 

@@ -1,26 +1,28 @@
-import React, { useState } from 'react'
+import React, { useState } from "react"
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useCreateVariant } from '@/features/variant/hook'
-import { toast } from 'sonner'
-import { useFormContext } from 'react-hook-form'
-import { Loader2 } from 'lucide-react'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useCreateVariant } from "@/features/variant/hook"
+import { toast } from "sonner"
+import { useFormContext } from "react-hook-form"
+import { Loader2 } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface AttributesModalProps {
     dialogOpen: boolean
     setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) => {
+const AttributesModal = ({
+    dialogOpen,
+    setDialogOpen,
+}: AttributesModalProps) => {
     const { watch } = useFormContext()
     const parent_id = watch('parent_id')
     const [attr, setAttr] = useState("")
@@ -31,12 +33,12 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
 
     const handleCreateVariant = (name: string) => {
         createVariantMutation.mutate({ parent_id, name, is_img: isImage }, {
-            onSuccess(data, variables, context) {
+            onSuccess() {
                 toast.success("Product attributes created")
                 setDialogOpen(false)
                 setAttr('')
             },
-            onError(error, variables, context) {
+            onError() {
                 toast.error("Product attributes created fail")
             },
         })
@@ -47,7 +49,7 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
             <Button
                 type="button"
                 variant={'secondary'}
-                // className='text-secondary hover:bg-secondary hover:text-white'
+                className="w-full sm:w-auto whitespace-nowrap"
                 onClick={() => {
                     if (!parent_id) {
                         toast.error("You need to choose a parent before choose or create an attributes")
@@ -59,7 +61,7 @@ const AttributesModal = ({ dialogOpen, setDialogOpen }: AttributesModalProps) =>
             >
                 Add Attribute
             </Button>
-            <DialogContent className="w-1/3">
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Add Product Attribute</DialogTitle>
                 </DialogHeader>

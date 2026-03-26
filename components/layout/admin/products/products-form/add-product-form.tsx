@@ -35,13 +35,15 @@ import { cn } from "@/lib/utils";
 import SyncToEbayForm from "../marketplace/sync-to-ebay-form";
 import SyncToAmazonForm from "../marketplace/ync-to-amazon-form";
 import RemoveFromMarketplaceDialog from "../marketplace/remove-dialog";
+import { ProductInput } from "@/lib/schema/product";
+import SaveAndSyncMarketplacesButton from "./save-and-sync-marketplaces-button";
 
-function getFirstErrorMessage(errors: any): string | undefined {
+function getFirstErrorMessage(errors: Record<string, unknown>): string | undefined {
   for (const key in errors) {
-    const err = errors[key];
-    if (err?.message) return err.message;
+    const err = errors[key] as { message?: unknown } | undefined;
+    if (typeof err?.message === "string") return err.message;
     if (typeof err === "object") {
-      const nested = getFirstErrorMessage(err);
+      const nested = getFirstErrorMessage(err as Record<string, unknown>);
       if (nested) return nested;
     }
   }
@@ -172,17 +174,20 @@ function MarketplaceActions({
 
 const ProductForm = ({
   productValues,
-  onSubmit,
-  isPending,
+  onSubmit: _onSubmit,
+  isPending: _isPending,
   productValuesClone,
   isDrawer,
 }: {
   productValues?: Partial<ProductItem>;
-  onSubmit: any;
+  onSubmit: (values: ProductInput) => void;
   isPending?: boolean;
   productValuesClone?: Partial<ProductItem>;
   isDrawer?: boolean;
 }) => {
+  void _onSubmit;
+  void _isPending;
+
   const router = useRouter();
   const locale = useLocale();
   const [openAccordion, setOpenAccordion] = useState<string[]>(["details"]);
@@ -444,6 +449,14 @@ const ProductForm = ({
                     "Add"
                   )}
                 </Button>
+                {productValues?.id && (
+                  <SaveAndSyncMarketplacesButton
+                    form={form}
+                    productValues={productValues}
+                    disabled={isLoadingSEO}
+                    className="text-lg px-4"
+                  />
+                )}
                 {!isDrawer && <AdminBackButton />}
                 {productValues?.url_key ? (
                   <Button

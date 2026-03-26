@@ -484,6 +484,14 @@ const SyncToEbayForm = ({
     }
   };
 
+  const submitDialogForm = form.handleSubmit(
+    onSubmit,
+    (errors) => {
+      console.log("SyncToEbayForm submit errors", errors);
+      toast.error("Please check the form for errors");
+    },
+  );
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -513,22 +521,28 @@ const SyncToEbayForm = ({
           <div className="mx-auto space-y-6">
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit, (errors) => {
-                  console.log("SyncToEbayForm submit errors", errors);
-                  toast.error("Please check the form for errors");
-                })}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  void submitDialogForm();
+                }}
                 className="space-y-6"
               >
                 {/* Submit */}
                 <div className="flex justify-start">
                   <Button
-                    type="submit"
+                    type="button"
                     className="px-6 py-2 text-lg"
                     disabled={
                       updateProductMutation.isPending ||
                       syncToEbayMutation.isPending ||
                       syncToKauflandMutation.isPending
                     }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      void submitDialogForm();
+                    }}
                   >
                     {updateProductMutation.isPending ||
                     syncToEbayMutation.isPending ||

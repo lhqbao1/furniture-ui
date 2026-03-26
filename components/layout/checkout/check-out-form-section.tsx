@@ -2,7 +2,12 @@
 
 import React, { useEffect, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTranslations, useLocale } from "next-intl";
@@ -234,6 +239,7 @@ export default function CheckOutFormSection() {
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      className="border-black/50"
                     />
                   </FormControl>
                   <FormLabel className="text-sm block">
@@ -289,10 +295,7 @@ export default function CheckOutFormSection() {
         verifyOtp={verifyOtp}
       />
 
-      <BankDialog
-        open={openBankDialog}
-        onOpenChange={setOpenBankDialog}
-      />
+      <BankDialog open={openBankDialog} onOpenChange={setOpenBankDialog} />
     </form>
   );
 }

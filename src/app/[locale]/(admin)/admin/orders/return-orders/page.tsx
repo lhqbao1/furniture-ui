@@ -76,7 +76,7 @@ const ReturnOrdersPage = () => {
     <div className="relative flex flex-col gap-6 pb-4">
       <div className="space-y-6">
         <div className="text-3xl text-secondary font-bold text-center">
-          Return Orders
+          Refund Orders
         </div>
 
         <OrderToolbar

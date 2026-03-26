@@ -1,4 +1,4 @@
-import { Loader2, Plus, Trash2, X } from "lucide-react";
+import { Loader2, Trash2, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import AddOptionDialog from "./add-option-modal";
 import {
@@ -59,11 +59,6 @@ const ListVariantOption = () => {
     return result;
   };
 
-  const handleSaveVariantOption = () => {
-    const combinations = generateVariantCombinations(selected);
-    setCombination(combinations);
-  };
-
   useEffect(() => {
     if (!parent_id) return;
 
@@ -78,7 +73,8 @@ const ListVariantOption = () => {
 
   useEffect(() => {
     if (parent_id) {
-      handleSaveVariantOption();
+      const combinations = generateVariantCombinations(selected);
+      setCombination(combinations);
     }
   }, [parent_id, selected]);
 
@@ -130,10 +126,10 @@ const ListVariantOption = () => {
 
   const handleDeleteVariant = (variant_id: string) => {
     deleteVariantMutation.mutate(variant_id, {
-      onSuccess(data, variables, context) {
+      onSuccess() {
         toast.success("Delete variant successful");
       },
-      onError(error, variables, context) {
+      onError() {
         toast.error("Delete variant fail");
       },
     });
@@ -141,10 +137,10 @@ const ListVariantOption = () => {
 
   const handleDeleteVariantOption = (option_id: string) => {
     deleteVariantOptionMutation.mutate(option_id, {
-      onSuccess(data, variables, context) {
+      onSuccess() {
         toast.success("Delete variant option successful");
       },
-      onError(error, variables, context) {
+      onError() {
         toast.error("Delete variant option fail");
       },
     });
@@ -156,8 +152,6 @@ const ListVariantOption = () => {
     );
   if (isLoading) return <Loader2 className="animate-spin" />;
 
-  console.log(groupDetail);
-
   return (
     <div className="space-y-6">
       {isLoading || isError || !groupDetail ? (
@@ -165,64 +159,60 @@ const ListVariantOption = () => {
           <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
         </div>
       ) : (
-        groupDetail.variants.map((variant, index) => (
-          <div key={variant.variant.id} className="flex gap-2 justify-start">
-            <div className="grid grid-cols-6 w-full gap-8">
-              <p className="col-span-1 flex items-center justify-end">
-                {variant.variant.name}:
-              </p>
-              <div className="font-semibold col-span-5 flex gap-4 items-center justify-between">
-                {/* Hiển thị đã chọn */}
-                <div className="flex gap-6 items-center">
-                  <div className="flex gap-6 items-center justify-start">
-                    {variant.options.map((o) => (
-                      <div key={o.id} className="relative inline-block group">
-                        {o.image_url ? (
-                          <Image
-                            src={o.image_url}
-                            width={40}
-                            height={40}
-                            alt=""
-                            className="w-10 h-10 object-cover rounded"
-                            unoptimized
-                          />
-                        ) : (
-                          <span className="px-2 py-1 text-xs rounded bg-muted text-muted-foreground block">
-                            {o.label}
-                          </span>
-                        )}
+        groupDetail.variants.map((variant) => (
+          <div key={variant.variant.id} className="rounded-lg border p-3 sm:p-4">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-sm font-semibold">{variant.variant.name}:</p>
+              <button
+                type="button"
+                className="shrink-0 text-gray-600 transition-colors hover:text-red-500"
+                onClick={() => handleDeleteVariant(variant.variant.id)}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
 
-                        {/* Delete button: chỉ hiện khi hover */}
-                        <div
-                          className="absolute -top-1 -right-2 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleDeleteVariantOption(o.id)}
-                        >
-                          <X size={12} className="text-red-500" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <AddOptionDialog
-                    isImage={variant.variant.is_img}
-                    variantId={variant.variant.id}
-                    open={openModalAddOption}
-                    setOpen={setOpenModalAddOption}
-                  />
-                  {/* Nếu chưa có option thì show cảnh báo */}
-                  {variant.options.length === 0 && (
-                    <span className="text-red-500 text-sm">
-                      You need to add options for this attribute
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              {variant.options.map((o) => (
+                <div key={o.id} className="relative inline-block group">
+                  {o.image_url ? (
+                    <Image
+                      src={o.image_url}
+                      width={40}
+                      height={40}
+                      alt=""
+                      className="h-10 w-10 rounded object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <span className="block rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                      {o.label}
                     </span>
                   )}
+
+                  <button
+                    type="button"
+                    className="absolute -right-2 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white opacity-0 shadow transition-opacity group-hover:opacity-100"
+                    onClick={() => handleDeleteVariantOption(o.id)}
+                  >
+                    <X size={12} className="text-red-500" />
+                  </button>
                 </div>
-                <div
-                  className="flex items-center"
-                  onClick={() => handleDeleteVariant(variant.variant.id)}
-                >
-                  <Trash2 size={18} className="text-gray-600 cursor-pointer" />
-                </div>
-              </div>
+              ))}
+
+              <AddOptionDialog
+                isImage={variant.variant.is_img}
+                variantId={variant.variant.id}
+                open={openModalAddOption}
+                setOpen={setOpenModalAddOption}
+              />
             </div>
+
+            {variant.options.length === 0 && (
+              <p className="mt-3 text-sm text-red-500">
+                You need to add options for this attribute
+              </p>
+            )}
           </div>
         ))
       )}

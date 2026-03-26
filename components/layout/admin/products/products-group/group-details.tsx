@@ -5,22 +5,38 @@ import { currentProductGroup } from "@/store/product-group";
 import ListVariantOption from "./list-variant-options";
 
 const GroupDetails = () => {
-  const [currentGroup, setCurrentGroup] = useAtom(currentProductGroup);
+  const [currentGroup] = useAtom(currentProductGroup);
 
   return (
-    <div className="flex flex-col items-start gap-6 w-full">
-      <div className="grid grid-cols-6 w-full gap-8 items-center">
-        <p className="col-span-1 text-right">Group name:</p>
-        <div className="flex gap-4 items-center col-span-5">
-          <span className="font-semibold col-span-5 text-xl text-secondary">
-            {currentGroup ? currentGroup : "None"}
-          </span>
+    <div className="space-y-6">
+      <section className="rounded-xl border bg-muted/20 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Current Group
+        </p>
+        <p className="mt-2 text-2xl font-semibold text-secondary">
+          {currentGroup || "None Selected"}
+        </p>
+      </section>
+
+      <section className="rounded-xl border p-4 lg:p-5">
+        <h2 className="text-base font-semibold">Attributes</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Choose the attributes that define this product group.
+        </p>
+        <div className="mt-4">
+          <SelectProductAttributes />
         </div>
-      </div>
-      <div className="w-full space-y-6">
-        <SelectProductAttributes />
-        <ListVariantOption />
-      </div>
+      </section>
+
+      <section className="rounded-xl border p-4 lg:p-5">
+        <h2 className="text-base font-semibold">Variant Options</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Configure options and combinations for selected attributes.
+        </p>
+        <div className="mt-4">
+          <ListVariantOption />
+        </div>
+      </section>
     </div>
   );
 };

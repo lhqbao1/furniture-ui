@@ -45,7 +45,7 @@ export function ProductImageCarousel({
             (item: StaticFile, index: number) => (
               <CarouselItem
                 key={index}
-                className="lg:basis-1/4 basis-1/3"
+                className="lg:basis-1/4 basis-1/3 3xl:basis-1/5"
               >
                 <div
                   className="cursor-pointer"

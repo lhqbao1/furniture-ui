@@ -107,6 +107,11 @@ const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
     }
 
     const hasImageOrDesc = !!preview || !!imageDes
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        handleAdd()
+    }
 
     return (
         <Dialog open={open}
@@ -123,7 +128,14 @@ const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
             }}
         >
             <DialogTrigger asChild>
-                <Plus size={16} className="border cursor-pointer" />
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                >
+                    <Plus size={16} />
+                </Button>
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-md">
@@ -133,7 +145,7 @@ const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-4">
+                <form className="space-y-4" onSubmit={handleSubmit}>
                     {/* image group */}
                     {isImage ?
                         <>
@@ -190,14 +202,13 @@ const AddOptionDialog = ({ variantId, isImage }: AddImageOptionDialogProps) => {
                             Cancel
                         </Button>
                         <Button
-                            type="button"
-                            onClick={handleAdd}
+                            type="submit"
                             disabled={uploadStaticFile.isPending || createVariantOptionMutation.isPending}
                         >
                             {createVariantOptionMutation.isPending ? "Adding..." : "Add"}
                         </Button>
                     </div>
-                </div>
+                </form>
             </DialogContent>
         </Dialog>
     )

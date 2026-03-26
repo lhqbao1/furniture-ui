@@ -341,6 +341,16 @@ const SyncToAmazonForm = ({
     );
   };
 
+  const submitDialogForm = form.handleSubmit(
+    (values) => {
+      handleSubmit(values);
+    },
+    (errors) => {
+      console.log(errors);
+      toast.error("Please check the form for errors");
+    },
+  );
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -371,26 +381,27 @@ const SyncToAmazonForm = ({
           <div className="mx-auto space-y-6">
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(
-                  (values) => {
-                    handleSubmit(values);
-                  },
-                  (errors) => {
-                    console.log(errors);
-                    toast.error("Please check the form for errors");
-                  },
-                )}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  void submitDialogForm();
+                }}
                 className="space-y-6"
               >
                 <div className="flex justify-start">
                   <Button
-                    type="submit"
+                    type="button"
                     className="px-6 py-2 text-lg"
                     disabled={
                       isUpdating
                         ? syncToAmazonMutation.isPending
                         : updateProductMutation.isPending
                     }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      void submitDialogForm();
+                    }}
                   >
                     {isUpdating ? (
                       syncToAmazonMutation.isPending ? (

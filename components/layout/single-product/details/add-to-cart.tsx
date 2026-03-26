@@ -82,6 +82,11 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
       values: z.infer<typeof cartFormSchema>,
       options?: { openDrawer?: boolean },
     ) => {
+      if (!productDetails.is_active) {
+        console.error("This product is inactivate");
+        return;
+      }
+
       if (!hasValidFinalPrice) {
         toast.error("This product has no price and cannot be purchased.");
         return;
@@ -152,7 +157,9 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             </div>
 
             <div className="space-y-2 lg:basis-2/5 basis-3/5 relative flex gap-2">
-              {maxStock > 0 && hasValidFinalPrice ? (
+              {maxStock > 0 &&
+              hasValidFinalPrice &&
+              productDetails.is_active ? (
                 <Button
                   className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
                   type="submit"
