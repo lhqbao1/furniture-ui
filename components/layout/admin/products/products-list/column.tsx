@@ -1640,6 +1640,10 @@ function ActionsCell({ product }: { product: ProductItem }) {
     }
   };
 
+  const productPackages = Array.isArray(product.packages)
+    ? product.packages
+    : [];
+
   return (
     <>
       <div className="flex gap-2">
@@ -1715,6 +1719,25 @@ function ActionsCell({ product }: { product: ProductItem }) {
             </div>
             <div>
               <span className="font-medium">EAN:</span> {product.ean || "—"}
+            </div>
+            <div className="pt-2">
+              <span className="font-medium">Packages:</span>
+              {productPackages.length > 0 ? (
+                <div className="mt-1 space-y-1">
+                  {productPackages.map((pkg, index) => (
+                    <div
+                      key={`${index}-${pkg.weight}-${pkg.length}-${pkg.width}-${pkg.height}`}
+                      className="rounded-md border border-gray-200 bg-gray-50 px-2 py-1"
+                    >
+                      <span className="font-medium">#{index + 1}</span>{" "}
+                      Weight: {pkg.weight ?? 0} | Length: {pkg.length ?? 0} |
+                      Width: {pkg.width ?? 0} | Height: {pkg.height ?? 0}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="ml-1">—</span>
+              )}
             </div>
           </div>
 

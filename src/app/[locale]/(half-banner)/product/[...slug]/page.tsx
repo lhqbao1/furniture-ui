@@ -25,6 +25,7 @@ import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import ProductReviewTab from "@/components/layout/single-product/tabs/review";
 import { getInventoryPoByProductId } from "@/features/incoming-inventory/inventory/api";
 import { calculateDeliveryEstimate } from "@/hooks/get-estimated-shipping";
+import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -401,7 +402,9 @@ export default async function Page({
             }
           />
 
-          <BoughtTogetherSection productDetails={plainProduct} />
+          <ComparePriceSection product={plainProduct} />
+
+          {/* <BoughtTogetherSection productDetails={plainProduct} /> */}
 
           <div className="lg:mt-12 mt-0 shadow-[0_0_5px_rgba(0,0,0,0.1)] px-4 py-4 rounded-sm">
             <ProductDetailsTab reviews={plainReviews} product={plainProduct} />
