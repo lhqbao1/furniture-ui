@@ -1,4 +1,4 @@
-import { ChevronRight, Eye, Plus, X } from "lucide-react";
+import { ChevronRight, Eye, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/command";
 import Link from "next/link";
 import { useLocale } from "next-intl";
-import { useGetProductsSelect } from "@/features/product-group/hook";
+import { useGetAllProducts } from "@/features/products/hook";
 
 interface VariantCombinationsProps {
   combinations: VariantOptionResponse[][];
@@ -73,20 +73,24 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
 
   const [selectedAction, setSelectedAction] =
     useState<Record<number, string>>(filteredProduct);
+  const [selectedProductsById, setSelectedProductsById] = useState<
+    Record<string, ProductItem>
+  >({});
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   const {
     data: listProductsSelect,
     isLoading: isLoadingSelect,
     isError: isErrorSelect,
-  } = useGetProductsSelect(
-    {
-      search: debouncedQuery.trim(),
-    },
-    {
-      enabled: openIdx !== null && debouncedQuery.trim().length >= 2,
-    },
-  );
+  } = useGetAllProducts({
+    search: debouncedQuery.trim(),
+    page_size: 20,
+    page: 1,
+  });
+  const searchableProducts: ProductItem[] = useMemo(() => {
+    const payload = listProductsSelect as { items?: ProductItem[] } | undefined;
+    return Array.isArray(payload?.items) ? payload.items : [];
+  }, [listProductsSelect]);
 
   const addOptionToProductMutation = useAddOptionToProduct();
 
@@ -96,25 +100,50 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
   }, [combinations, filteredProduct]);
 
   useEffect(() => {
+    setSelectedProductsById((prev) => {
+      const next = { ...prev };
+      (productDetails?.products ?? []).forEach((product) => {
+        const productId = String(product.id ?? "");
+        if (!productId) return;
+        next[productId] = product;
+      });
+      return next;
+    });
+  }, [productDetails?.products]);
+
+  useEffect(() => {
+    setSelectedProductsById((prev) => {
+      const next = { ...prev };
+      searchableProducts.forEach((product) => {
+        const productId = String(product.id ?? "");
+        if (!productId) return;
+        next[productId] = product;
+      });
+      return next;
+    });
+  }, [searchableProducts]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(queryParams);
     }, 350);
     return () => clearTimeout(timer);
   }, [queryParams]);
 
-  const selectedProductsMap = useMemo(() => {
-    const map = new Map<string, ProductItem>();
-    (productDetails?.products ?? []).forEach((product) => {
-      map.set(String(product.id ?? ""), product);
-    });
-    (listProductsSelect ?? []).forEach((product) => {
-      map.set(String(product.id ?? ""), product);
-    });
-    return map;
-  }, [listProductsSelect, productDetails?.products]);
-
   const handleDeleteCombination = (idx: number) => {
     setLocalCombinations((prev) => prev.filter((_, i) => i !== idx));
+    setSelectedAction((prev) => {
+      const next: Record<number, string> = {};
+      Object.entries(prev).forEach(([key, value]) => {
+        const keyNumber = Number(key);
+        if (keyNumber < idx) {
+          next[keyNumber] = value;
+        } else if (keyNumber > idx) {
+          next[keyNumber - 1] = value;
+        }
+      });
+      return next;
+    });
   };
 
   if (combinations.length === 0)
@@ -151,7 +180,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
 
   return (
     <div className="mt-6 border-t pt-4">
-      <div className="text-right">
+      <div className="flex justify-start sm:justify-end">
         <Button type="button" onClick={handleSaveGroup} className="mt-4">
           Save group
         </Button>
@@ -161,17 +190,9 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
         {localCombinations
           .filter((comb) => comb.length > 0)
           .map((combination, idx) => (
-            <div key={idx} className="flex group items-center">
-              <div
-                className="flex items-center justify-center shadow cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => handleDeleteCombination(idx)}
-              >
-                <X size={20} className="text-red-500" />
-              </div>
-
-              <div className="grid grid-cols-3 gap-6 flex-1">
-                {/* hiển thị các option */}
-                <div className="flex items-center gap-2 col-span-1 justify-end relative ">
+            <div key={idx} className="group rounded-lg border p-3 sm:p-4">
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {combination.map((option, index) => (
                     <React.Fragment key={option.id ?? index}>
                       <div>
@@ -181,24 +202,31 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                             alt={option.label}
                             width={30}
                             height={30}
-                            className="w-12 h-12 object-contain rounded"
+                            className="h-10 w-10 rounded object-contain"
                             unoptimized
                           />
                         ) : (
-                          <span className="border-2 rounded-sm py-1 px-2">
+                          <span className="rounded-sm border-2 px-2 py-1">
                             {option.label}
                           </span>
                         )}
                       </div>
                       {index < combination.length - 1 && (
-                        <Plus size={20} className="text-black" />
+                        <Plus size={16} className="text-black" />
                       )}
                     </React.Fragment>
                   ))}
+
+                  <button
+                    type="button"
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-red-500 transition-colors hover:bg-red-50"
+                    onClick={() => handleDeleteCombination(idx)}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
 
-                {/* Combobox Popover */}
-                <div className="col-span-2 flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <Popover
                     open={openIdx === idx}
                     onOpenChange={(isOpen) => {
@@ -211,57 +239,52 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                       <Button
                         variant="outline"
                         role="combobox"
-                        className="flex-1 justify-between py-2 h-auto"
+                        className="h-auto w-full justify-between gap-2 py-2 text-left"
                       >
                         {(() => {
-                          const selectedProduct = selectedProductsMap.get(
-                            String(selectedAction[idx] ?? ""),
-                          );
+                          const selectedId = String(selectedAction[idx] ?? "");
+                          const selectedProduct = selectedProductsById[selectedId];
 
-                          return (
-                            <div className="flex gap-4">
-                              {selectedAction[idx] ? (
-                                <div className="flex gap-2 items-center">
-                                  <Image
-                                    src={
-                                      selectedProduct?.static_files?.[0]?.url ??
-                                      "/placeholder-product.webp"
-                                    }
-                                    width={40}
-                                    height={40}
-                                    alt=""
-                                    className="h-10 rounded-sm"
-                                    unoptimized
+                          return selectedAction[idx] ? (
+                            <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                              <Image
+                                src={
+                                  selectedProduct?.static_files?.[0]?.url ??
+                                  "/placeholder-product.webp"
+                                }
+                                width={40}
+                                height={40}
+                                alt=""
+                                className="h-9 w-9 shrink-0 rounded-sm"
+                                unoptimized
+                              />
+                              <div className="truncate text-sm sm:text-base">
+                                {selectedProduct?.name ?? "Product selected"}
+                              </div>
+                              {selectedProduct?.url_key && (
+                                <Link
+                                  href={`/de/product/${selectedProduct.url_key}`}
+                                  locale={locale}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="ml-auto shrink-0"
+                                >
+                                  <Eye
+                                    className="cursor-pointer text-secondary"
+                                    size={18}
                                   />
-                                  <div className="text-base text-wrap text-start">
-                                    {selectedProduct?.name ??
-                                      "Product selected"}
-                                  </div>
-                                  {selectedProduct?.url_key && (
-                                    <Link
-                                      href={`/de/product/${selectedProduct.url_key}`}
-                                      locale={locale}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      <Eye
-                                        className="text-secondary cursor-pointer"
-                                        size={20}
-                                      />
-                                    </Link>
-                                  )}
-                                </div>
-                              ) : (
-                                "Select product"
+                                </Link>
                               )}
                             </div>
+                          ) : (
+                            <span className="text-sm">Select product</span>
                           );
                         })()}
-                        <ChevronRight />
+                        <ChevronRight className="shrink-0" />
                       </Button>
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-[600px] p-0">
+                    <PopoverContent className="w-[calc(100vw-3rem)] max-w-[600px] p-0">
                       <Command shouldFilter={false}>
                         <CommandInput
                           placeholder="Search product..."
@@ -269,7 +292,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                           onValueChange={(value) => setQueryParams(value)}
                         />
                         <CommandEmpty>No product found.</CommandEmpty>
-                        <CommandGroup className="h-[400px] overflow-y-scroll">
+                        <CommandGroup className="max-h-[320px] overflow-y-auto">
                           {debouncedQuery.trim().length < 2 && (
                             <CommandItem disabled>
                               Type at least 2 characters to search
@@ -286,7 +309,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                               </CommandItem>
                             )}
                           {debouncedQuery.trim().length >= 2 &&
-                            (listProductsSelect ?? [])
+                            searchableProducts
                               .filter(
                                 (product) =>
                                   !Object.entries(selectedAction)
@@ -301,18 +324,24 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                 <CommandItem
                                   key={product.id}
                                   value={product.id ?? ""}
-                                  onSelect={(value) => {
+                                  onSelect={() => {
+                                    const selectedId = String(product.id ?? "");
+
                                     setSelectedAction((prev) => ({
                                       ...prev,
-                                      [idx]: value,
+                                      [idx]: selectedId,
+                                    }));
+                                    setSelectedProductsById((prev) => ({
+                                      ...prev,
+                                      [selectedId]: product,
                                     }));
                                     setQueryParams("");
                                     setDebouncedQuery("");
-                                    setOpenIdx(null); // 👉 đóng popover sau khi chọn
+                                    setOpenIdx(null);
                                   }}
-                                  className="flex w-full justify-between"
+                                  className="flex w-full justify-between gap-3"
                                 >
-                                  <div className="flex items-center space-x-3">
+                                  <div className="flex min-w-0 items-center space-x-3">
                                     <Image
                                       src={
                                         (product.static_files?.length ?? 0) > 0
@@ -322,12 +351,12 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                       height={25}
                                       width={25}
                                       alt=""
-                                      className="rounded-"
+                                      className="shrink-0 rounded"
                                       unoptimized
                                     />
-                                    <span>{product.name}</span>
+                                    <span className="truncate">{product.name}</span>
                                   </div>
-                                  <span>#{product.id_provider}</span>
+                                  <span className="shrink-0">#{product.id_provider}</span>
                                 </CommandItem>
                               ))}
                         </CommandGroup>

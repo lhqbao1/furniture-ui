@@ -59,25 +59,25 @@ const ProductDetailsProperties = ({
         </div>
         <div className="px-4">
           {product.materials ? (
-            <div className="grid grid-cols-2 lg:w-1/2 w-full">
-              <div>{t("materials")}:</div>
-              <div>{product.materials}</div>
+            <div className="grid grid-cols-8 w-full">
+              <div className="col-span-2">{t("materials")}:</div>
+              <div className="col-span-6">{product.materials}</div>
             </div>
           ) : (
             ""
           )}
           {product.color ? (
-            <div className="grid grid-cols-2 lg:w-1/2 w-full">
-              <div>{t("color")}:</div>
-              <div>{product.color}</div>
+            <div className="grid grid-cols-8 w-full">
+              <div className="col-span-2">{t("color")}:</div>
+              <div className="col-span-6 capitalize">{product.color}</div>
             </div>
           ) : (
             ""
           )}
           {product.ean && (
-            <div className="grid grid-cols-2 lg:w-1/2 w-full">
-              <div>GTIN:</div>
-              <div>{product.ean}</div>
+            <div className="grid grid-cols-8 w-full">
+              <div className="col-span-2">GTIN:</div>
+              <div className="col-span-6">{product.ean}</div>
             </div>
           )}
         </div>

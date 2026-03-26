@@ -49,7 +49,11 @@ export default function CheckoutPaymentUI({
                       className="flex items-center gap-2 flex-row"
                     >
                       <FormControl>
-                        <RadioGroupItem value={option.id} id={option.id} />
+                        <RadioGroupItem
+                          value={option.id}
+                          id={option.id}
+                          className="border-black/50"
+                        />
                       </FormControl>
 
                       <FormLabel

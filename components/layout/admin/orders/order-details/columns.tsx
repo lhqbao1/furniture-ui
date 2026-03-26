@@ -69,6 +69,23 @@ export function getOrderDetailColumns({
     },
 
     {
+      id: "cost",
+      header: () => <div className="text-right w-full">COST</div>,
+      cell: ({ row }) => (
+        <div className="text-right">
+          €
+          {(row.original.purchased_products
+            ? row.original.purchased_products.final_price
+            : row.original.products.cost
+          ).toLocaleString("de-DE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </div>
+      ),
+    },
+
+    {
       id: "unit_price",
       header: () => <div className="text-right w-full">UNIT PRICE</div>,
       cell: ({ row }) => (
@@ -84,6 +101,7 @@ export function getOrderDetailColumns({
         </div>
       ),
     },
+
     {
       id: "quantity",
       header: () => <div className="text-center w-full">QUANTITY</div>,

@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import {
-  Check,
   Loader2,
   Pencil,
   PencilOffIcon,
@@ -93,6 +92,18 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
   const [items, setItems] = React.useState<SelectedInventoryItem[]>([]);
   const [open, setOpen] = React.useState(false);
+  const productOptions = React.useMemo<ProductItem[]>(() => {
+    const rawProducts = products as
+      | { items?: ProductItem[]; results?: ProductItem[] }
+      | ProductItem[]
+      | undefined;
+
+    if (Array.isArray(rawProducts)) return rawProducts;
+    if (Array.isArray(rawProducts?.items)) return rawProducts.items;
+    if (Array.isArray(rawProducts?.results)) return rawProducts.results;
+
+    return [];
+  }, [products]);
 
   const handleSelectProduct = (product: ProductItem) => {
     setItems((prev) => {
@@ -298,6 +309,8 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
     fetchInventory();
   }, [containerId]);
 
+  console.log(isLoading);
+
   return (
     <div className="w-full">
       <Popover open={open} onOpenChange={setOpen}>
@@ -313,7 +326,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
           align="center"
           sideOffset={8}
         >
-          <Command>
+          <Command shouldFilter={false}>
             <CommandInput
               placeholder="Search product..."
               value={search}
@@ -327,16 +340,22 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                 </div>
               )}
 
-              {!isLoading && products?.items.length === 0 && (
+              {!isLoading && productOptions.length === 0 && (
                 <CommandEmpty>No product found.</CommandEmpty>
               )}
 
-              {!isLoading && products && products?.items.length > 0 && (
+              {!isLoading && productOptions.length > 0 && (
                 <CommandGroup>
-                  {products.items.map((product: ProductItem) => (
+                  {productOptions.map((product: ProductItem, index) => (
                     <CommandItem
-                      key={product.id}
-                      value={product.name}
+                      key={product.id ?? `${product.id_provider ?? "product"}-${index}`}
+                      value={
+                        product.id ??
+                        product.id_provider ??
+                        product.sku ??
+                        product.name ??
+                        `product-${index}`
+                      }
                       onSelect={() => handleSelectProduct(product)}
                       className="flex gap-3 items-center"
                     >
@@ -351,9 +370,11 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                       />
 
                       <div className="flex flex-col text-sm">
-                        <span className="font-medium">{product.name}</span>
+                        <span className="font-medium">
+                          {product.name || "Unnamed product"}
+                        </span>
                         <span className="text-xs text-muted-foreground">
-                          Provider: {product.id_provider}
+                          Provider: {product.id_provider || "-"}
                         </span>
                       </div>
                     </CommandItem>

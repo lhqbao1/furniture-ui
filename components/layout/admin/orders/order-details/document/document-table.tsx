@@ -40,7 +40,7 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
     ];
 
     // ✅ Chỉ thêm Package Slip khi có <= 1 checkout
-    if ((order.checkouts?.length ?? 0) <= 1) {
+    if (order.checkouts?.length ?? 0) {
       baseData.push({
         document: "Package Slip",
         code: order.checkout_code ?? "",

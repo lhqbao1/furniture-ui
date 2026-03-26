@@ -54,7 +54,9 @@ const normalizeFutureIncomingItems = (
     if (Number.isNaN(date.getTime())) return [];
 
     date.setHours(0, 0, 0, 0);
-    if (date < today) return [];
+    // Keep consistent with product-list "incoming stock" column:
+    // only future deliveries (strictly after today).
+    if (date <= today) return [];
 
     return [{ quantity, date }];
   });
