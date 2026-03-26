@@ -65,7 +65,7 @@ const ContainerCardSkeleton = () => {
 };
 
 const ListContainers = ({ po_id }: ListContainersProps) => {
-  const { data, isLoading, isError } = useGetContainersByPurchaseOrder(po_id);
+  const { data, isLoading } = useGetContainersByPurchaseOrder(po_id);
   const sendContainerToAmmMutation = useSendContainerToAmm();
   const [pendingContainerId, setPendingContainerId] = React.useState<
     string | null
@@ -161,6 +161,14 @@ function ContainerCard({
 }) {
   const { data: containerInventory } = useContainerInventory(item.id);
   const hasInventory = (containerInventory?.length ?? 0) > 0;
+  const totalItems = React.useMemo(
+    () =>
+      (containerInventory ?? []).reduce(
+        (sum, inventoryItem) => sum + (Number(inventoryItem?.quantity) || 0),
+        0,
+      ),
+    [containerInventory],
+  );
   const canSendAmm =
     item.is_sended_avis === false || item.is_sended_avis === null;
   const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -322,6 +330,17 @@ function ContainerCard({
             }
           >
             {item.size || "Missing"}
+          </span>
+        </div>
+
+        <div>
+          Total items:{" "}
+          <span
+            className={
+              totalItems > 0 ? "text-secondary font-semibold" : "text-gray-500"
+            }
+          >
+            {totalItems}
           </span>
         </div>
       </CardContent>
