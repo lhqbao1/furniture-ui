@@ -16,9 +16,11 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import { Check, Loader2 } from "lucide-react";
 import { useGetCategories } from "@/features/category/hook";
@@ -176,7 +178,7 @@ export function CategoriesSelect({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="z-[80] w-[200px] max-h-[400px] overflow-y-scroll p-0 pointer-events-auto">
+              <PopoverContent className="z-[80] w-[260px] p-0 pointer-events-auto">
                 {isLoading ? (
                   <div className="flex items-center justify-center p-4">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -186,28 +188,34 @@ export function CategoriesSelect({
                     No categories available
                   </div>
                 ) : (
-                  <Command>
+                  <Command className="w-full">
                     <CommandInput
                       placeholder="Search categories..."
                       className="h-10"
                     />
-                    <CommandGroup>
-                      {selectedLeaves.map((cat) => (
-                        <CommandItem
-                          key={cat.id}
-                          onSelect={() => toggleSelect(cat.id)}
-                          className="flex items-center gap-2 cursor-pointer"
-                        >
-                          <Checkbox
-                            checked
-                            onCheckedChange={() => toggleSelect(cat.id)}
-                            className="pointer-events-none"
-                          />
-                          <span>{cat.name}</span>
-                        </CommandItem>
-                      ))}
-                      {options ? renderUnselected(options) : null}
-                    </CommandGroup>
+                    <CommandList
+                      className="max-h-[320px] overflow-y-auto overscroll-contain"
+                      onWheelCapture={(event) => event.stopPropagation()}
+                    >
+                      <CommandEmpty>No categories available</CommandEmpty>
+                      <CommandGroup>
+                        {selectedLeaves.map((cat) => (
+                          <CommandItem
+                            key={cat.id}
+                            onSelect={() => toggleSelect(cat.id)}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
+                            <Checkbox
+                              checked
+                              onCheckedChange={() => toggleSelect(cat.id)}
+                              className="pointer-events-none"
+                            />
+                            <span>{cat.name}</span>
+                          </CommandItem>
+                        ))}
+                        {options ? renderUnselected(options) : null}
+                      </CommandGroup>
+                    </CommandList>
                   </Command>
                 )}
               </PopoverContent>
