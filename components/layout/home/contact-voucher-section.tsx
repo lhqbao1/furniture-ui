@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useSendVoucherViaEmail } from "@/features/vouchers/hook";
 import { toast } from "sonner";
 import { useUploadContactForm } from "@/features/contact/hook";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;

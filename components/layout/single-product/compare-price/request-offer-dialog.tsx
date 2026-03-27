@@ -24,11 +24,13 @@ import { hasRequestedVoucherAtom, voucherDialogAtom } from "@/store/voucher";
 interface RequestOfferDialogProps {
   productName?: string;
   productUrl?: string;
+  productId?: string;
 }
 
 export default function RequestOfferDialog({
   productName,
   productUrl,
+  productId,
 }: RequestOfferDialogProps) {
   const t = useTranslations();
 
@@ -96,11 +98,12 @@ export default function RequestOfferDialog({
         message,
         subject: "Request Voucher",
         type: "voucher",
+        product_id: productId,
       },
       {
         onSuccess() {
           toast.success(t("messageSent"));
-          setDialogStep("apply");
+          setDialogStep("none");
           setHasRequestedVoucher(true);
         },
         onError() {
