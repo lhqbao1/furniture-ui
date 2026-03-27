@@ -60,18 +60,22 @@ const ComparePriceCard = ({
   const [dialogStep, setDialogStep] = useAtom(voucherDialogAtom);
   const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
 
-  const handleAddToCart = (values: any) => {
+  const handleAddToCart = (values: { quantity?: number } | string) => {
     if (!product) return;
+    const quantity =
+      typeof values === "object" && values
+        ? Number(values.quantity ?? 1)
+        : 1;
 
     // LOCAL CART
     if (!userId) {
-      addToCartLocalOnly(product, values.quantity);
+      addToCartLocalOnly(product, quantity);
       return;
     }
 
     // SERVER CART
     createCartMutation.mutate(
-      { productId: product.id, quantity: values.quantity },
+      { productId: product.id, quantity },
       {
         onSuccess: () => toast.success(t("addToCartSuccess")),
         onError: (error) => {
@@ -86,10 +90,7 @@ const ComparePriceCard = ({
   };
 
   return (
-    <div
-      className="relative group"
-      key={product.id_provider}
-    >
+    <div className="relative group" key={product.id_provider}>
       <div
         key={product.id}
         className={cn(
@@ -135,12 +136,7 @@ const ComparePriceCard = ({
                 "
                 >
                   {t("best_price")}
-                  <Image
-                    src={"/award.png"}
-                    width={15}
-                    height={15}
-                    alt=""
-                  />
+                  <Image src={"/award.png"} width={15} height={15} alt="" />
                 </div>
               )}
 
@@ -190,6 +186,7 @@ const ComparePriceCard = ({
                     <RequestOfferDialog
                       productName={product.name}
                       productUrl={`/product/${product.url_key}`}
+                      productId={product.id}
                     />
                   )}
               </div>
@@ -201,6 +198,12 @@ const ComparePriceCard = ({
           <span className="absolute top-0 left-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
           <span className="absolute top-0 right-0 w-full h-[1px] bg-secondary scale-x-0 origin-center transition-transform duration-300  group-hover:scale-x-100"></span>
           <span className="absolute bottom-0 right-0 h-full w-[1px] bg-secondary scale-y-0 origin-center transition-transform duration-300  group-hover:scale-y-100"></span>
+
+          {/* Corner caps to avoid tiny gaps at rounded corners */}
+          <span className="absolute top-0 left-0 h-[2px] w-[2px] rounded-full bg-secondary opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100"></span>
+          <span className="absolute top-0 right-0 h-[2px] w-[2px] rounded-full bg-secondary opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100"></span>
+          <span className="absolute bottom-0 left-0 h-[2px] w-[2px] rounded-full bg-secondary opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100"></span>
+          <span className="absolute bottom-0 right-0 h-[2px] w-[2px] rounded-full bg-secondary opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100"></span>
         </div>
       </div>
 
@@ -216,12 +219,7 @@ const ComparePriceCard = ({
         </div>
       ) : (
         <div className="absolute -top-2 right-1/2 -translate-y-1/2 translate-x-1/2 z-20">
-          <Image
-            src={"/invoice-logo.png"}
-            height={20}
-            width={60}
-            alt=""
-          />
+          <Image src={"/invoice-logo.png"} height={20} width={60} alt="" />
         </div>
       )}
     </div>

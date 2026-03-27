@@ -6,15 +6,39 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ProductItem } from "@/types/products";
 import ComparePriceCard from "./compare-price-card";
 import { useTranslations } from "next-intl";
-import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { ApplyVoucherDialog } from "./apply-voucher-dialog";
+import { Scale } from "lucide-react";
 
 interface ComparePriceSectionProps {
   product: ProductItem;
   open?: boolean; // 👈 control từ ngoài
+}
+
+function ComparePriceCardsSkeleton({ length = 4 }: { length?: number }) {
+  return (
+    <div className="mt-10 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-8">
+      {Array.from({ length }).map((_, idx) => (
+        <div
+          key={idx}
+          className="relative overflow-hidden rounded-xl border border-[#e6eaf0] bg-white p-5 shadow-[0_10px_28px_rgba(15,23,42,0.06)]"
+        >
+          <Skeleton className="mx-auto mb-4 h-8 w-24 rounded-full" />
+
+          <Skeleton className="h-56 w-full rounded-lg" />
+
+          <div className="mt-6 space-y-3">
+            <Skeleton className="h-5 w-5/6 rounded-md" />
+            <Skeleton className="h-5 w-4/5 rounded-md" />
+            <Skeleton className="h-10 w-32 rounded-md" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
@@ -73,18 +97,19 @@ const ComparePriceSection = ({ product, open }: ComparePriceSectionProps) => {
       >
         <AccordionItem value="compare" className="border-b-0">
           <AccordionTrigger
-            className="rounded-xl border border-[#dfe4ea] bg-white px-4 py-3 text-lg font-semibold text-[#2b3543] transition-colors hover:bg-[#f8fafc] data-[state=open]:border-[#c8ead8] data-[state=open]:bg-[#f3fbf7] md:px-5 md:py-4 md:text-2xl"
+            className="w-fit flex-none rounded-xl border border-[#dfe4ea] bg-white px-4 py-2 text-sm font-semibold text-[#2b3543] transition-colors hover:bg-[#f8fafc] data-[state=open]:border-[#c8ead8] data-[state=open]:bg-[#f3fbf7] md:px-5 md:text-base"
             hasIcon
-            iconClassName="size-5 text-[#5d6b7b]"
+            iconClassName="size-4 text-[#5d6b7b]"
           >
-            {t("priceComparison")}
+            <span className="inline-flex items-center gap-2">
+              <Scale className="size-4 text-[#5d6b7b]" />
+              {t("priceComparison")}
+            </span>
           </AccordionTrigger>
           <AccordionContent className="mt-4 md:mt-5">
             {openPriceComparision &&
-              (!showContent ? (
-                <ProductGridSkeleton length={4} hasLoading />
-              ) : (
-                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-8">
+              (!showContent ? <ComparePriceCardsSkeleton length={4} /> : (
+                <div className="mt-10 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 xl:grid-cols-4 xl:gap-8">
                   {/* Marketplace prices */}
                   {hasMarketplace &&
                     product.marketplace_products.map((item) => (

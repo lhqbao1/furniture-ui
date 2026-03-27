@@ -17,6 +17,11 @@ export function stripImagesAndHeadings(content: string): string {
 }
 
 export default function BlogDetails({ post }: { post: BlogItem }) {
+  const createdAt = new Date(post.created_at);
+  const createdAtLabel = Number.isNaN(createdAt.getTime())
+    ? ""
+    : createdAt.toLocaleDateString("de-DE");
+
   return (
     <article className="space-y-6">
       <div>
@@ -33,27 +38,29 @@ export default function BlogDetails({ post }: { post: BlogItem }) {
           />
         </div>
         {/* Title */}
-        <h1 className="text-4xl font-bold">{post.title}</h1>
+        <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+          {post.title}
+        </h1>
         {/* Meta info */}
         <div className="text-muted-foreground text-sm flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <User className="size-6 text-secondary" />
             <span className="mt-0.5">{"Prestige Home"}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="size-6 text-secondary" />
-            <span className="mt-0.5">
-              {new Date(post.created_at).toLocaleDateString("de-DE")}
-            </span>
-          </div>
+          {createdAtLabel ? (
+            <div className="flex items-center gap-2">
+              <Calendar className="size-6 text-secondary" />
+              <span className="mt-0.5">{createdAtLabel}</span>
+            </div>
+          ) : null}
         </div>
         <hr className="my-5 h-0.5"></hr>
       </div>
 
       {/* Content */}
       <div className="text-muted-foreground prose overflow-hidden blog-content">
-        <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-          {stripImagesAndHeadings(post.content)}
+        <ReactMarkdown rehypePlugins={[rehypeRaw, rehypeSanitize]}>
+          {stripImagesAndHeadings(post.content ?? "")}
         </ReactMarkdown>
       </div>
 

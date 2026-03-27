@@ -1,5 +1,4 @@
 import { apiAdmin, apiPublic } from "@/lib/axios";
-import { StaticFileResponse } from "@/types/products";
 
 export interface ContactFormInput {
   email: string;
@@ -8,6 +7,7 @@ export interface ContactFormInput {
   order_id?: string;
   file_url?: string;
   type?: string;
+  product_id?: string;
 }
 
 export interface ContactFormResponse {
@@ -15,6 +15,7 @@ export interface ContactFormResponse {
   subject: string;
   message: string;
   order_id: string;
+  product_id: string;
   file_url: string;
   ticket: number;
   id: string;
