@@ -317,17 +317,6 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     },
   },
   {
-    accessorKey: "payment_rl",
-    header: ({}) => <div className="text-center">PAYMENT</div>,
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          {row.original.payment_rl ? row.original.payment_rl.capture_id : "-"}
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "status",
     header: () => <div className="text-center w-full">STATUS</div>,
     cell: ({ row }) => {
@@ -413,9 +402,7 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
 
       return (
         <div>
-          <div className="capitalize">
-            {`${firstName} ${lastName}`.trim()}
-          </div>
+          <div className="capitalize">{`${firstName} ${lastName}`.trim()}</div>
           <div>{email}</div>
         </div>
       );
