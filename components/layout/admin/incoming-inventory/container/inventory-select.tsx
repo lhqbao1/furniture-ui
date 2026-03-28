@@ -39,6 +39,7 @@ interface SelectedInventoryItem {
   name: string;
   image?: string;
   provider_id?: string;
+  sku?: string;
 
   quantity: number;
   unit_cost: number;
@@ -120,6 +121,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
               ? product.static_files[0].url
               : "/1.png",
           provider_id: product.id_provider,
+          sku: product.sku,
           quantity: 0,
           unit_cost: 0,
           total_cost: 0,
@@ -267,6 +269,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
         name: item.product.name,
         image: item.product.image ? item.product.image : "/1.png",
         provider_id: item.product.id_provider,
+        sku: item.product.sku,
 
         quantity: item.quantity,
         unit_cost: item.unit_cost,
@@ -413,7 +416,10 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                         <div>
                           <div className="font-medium">{item.name}</div>
                           <div className="text-xs text-muted-foreground">
-                            {item.provider_id}
+                            ID: {item.provider_id || "-"}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            SKU: {item.sku || "-"}
                           </div>
                           {/* <div className="text-xs text-muted-foreground">
                             {item. ??""}

@@ -49,6 +49,7 @@ const ComparePriceCard = ({
   isProductCheapest,
   isProduct,
 }: ComparePriceCardProps) => {
+  const TOAST_DURATION = 6000;
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
@@ -77,10 +78,10 @@ const ComparePriceCard = ({
     createCartMutation.mutate(
       { productId: product.id, quantity },
       {
-        onSuccess: () => toast.success(t("addToCartSuccess")),
+        onSuccess: () => toast.success(t("addToCartSuccess"), { duration: TOAST_DURATION }),
         onError: (error) => {
-          const { status, message } = HandleApiError(error, t);
-          toast.error(message);
+          const { status } = HandleApiError(error, t);
+          toast.error(t("addToCartFail"), { duration: TOAST_DURATION });
           if (status === 401) {
             router.push("/login", { locale });
           }
@@ -185,8 +186,8 @@ const ComparePriceCard = ({
                   hasRequestedVoucher === false && (
                     <RequestOfferDialog
                       productName={product.name}
-                      productUrl={`/product/${product.url_key}`}
                       productId={product.id}
+                      product={product}
                     />
                   )}
               </div>
