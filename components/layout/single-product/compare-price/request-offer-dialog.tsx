@@ -11,39 +11,48 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useTranslations } from "next-intl";
-import {
-  useSendTawkMessage,
-  useUploadContactForm,
-} from "@/features/contact/hook";
+import { useLocale, useTranslations } from "next-intl";
+import { useUploadContactForm } from "@/features/contact/hook";
 import { toast } from "sonner";
 import { useAtom } from "jotai";
 import { hasRequestedVoucherAtom, voucherDialogAtom } from "@/store/voucher";
+import { ProductItem } from "@/types/products";
+import { useAddToCart } from "@/features/cart/hook";
+import { userIdAtom } from "@/store/auth";
+import { useAddToCartLocalEnhanced } from "@/hooks/cart/add-to-cart-enhanched";
+import { HandleApiError } from "@/lib/api-helper";
+import { useRouter } from "@/src/i18n/navigation";
 
 interface RequestOfferDialogProps {
   productName?: string;
-  productUrl?: string;
   productId?: string;
+  product?: ProductItem;
 }
 
 export default function RequestOfferDialog({
   productName,
-  productUrl,
   productId,
+  product,
 }: RequestOfferDialogProps) {
+  const TOAST_DURATION = 6000;
   const t = useTranslations();
+  const locale = useLocale();
+  const router = useRouter();
 
-  const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState<string | null>(null);
   const [hasRequestedVoucher, setHasRequestedVoucher] = useAtom(
     hasRequestedVoucherAtom,
   );
   const [dialogStep, setDialogStep] = useAtom(voucherDialogAtom);
+  const [userId] = useAtom(userIdAtom);
 
   const emailInputRef = React.useRef<HTMLInputElement>(null);
+  const formContainerRef = React.useRef<HTMLDivElement>(null);
   const sendContactMutation = useUploadContactForm();
+  const addToCartMutation = useAddToCart();
+  const { addToCartLocalOnly } = useAddToCartLocalEnhanced();
+  const isDialogOpen = dialogStep === "request";
 
   const isValidEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -63,7 +72,7 @@ export default function RequestOfferDialog({
    * Auto-focus + Reset form
    * ----------------------------- */
   React.useEffect(() => {
-    if (open) {
+    if (isDialogOpen) {
       // Auto-focus email khi mở dialog
       setTimeout(() => {
         emailInputRef.current?.focus();
@@ -74,17 +83,66 @@ export default function RequestOfferDialog({
       setMessage(defaultMessage);
       setEmailError(null);
     }
-  }, [open, defaultMessage]);
+  }, [isDialogOpen, defaultMessage]);
 
-  const handleSubmit = () => {
+  const addProductAndGoCheckout = React.useCallback(() => {
+    if (!productId) {
+      router.push("/check-out", { locale });
+      return;
+    }
+
+    // Guest checkout flow -> local cart
+    if (!userId) {
+      if (!product) {
+        toast.error(t("addToCartFail"), { duration: TOAST_DURATION });
+        return;
+      }
+
+      addToCartLocalOnly(product, 1, {
+        onSuccess: () => {
+          router.push("/check-out", { locale });
+        },
+      });
+      return;
+    }
+
+    // Logged-in flow -> server cart
+    addToCartMutation.mutate(
+      { productId, quantity: 1 },
+      {
+        onSuccess: () => {
+          toast.success(t("addToCartSuccess"), { duration: TOAST_DURATION });
+          router.push("/check-out", { locale });
+        },
+        onError: (error) => {
+          const { status } = HandleApiError(error, t);
+          toast.error(t("addToCartFail"), { duration: TOAST_DURATION });
+          if (status === 401) {
+            router.push("/login", { locale });
+          }
+        },
+      },
+    );
+  }, [
+    addToCartLocalOnly,
+    addToCartMutation,
+    locale,
+    product,
+    productId,
+    router,
+    t,
+    userId,
+  ]);
+
+  const handleSubmit = async () => {
     // 🔴 validate
     if (!email) {
-      setEmailError(t("emailRequired", { default: "Email is required" }));
+      setEmailError(t("emailRequired"));
       return;
     }
 
     if (!isValidEmail(email)) {
-      setEmailError(t("invalidEmail", { default: "Invalid email address" }));
+      setEmailError(t("invalidEmail"));
       return;
     }
 
@@ -92,28 +150,40 @@ export default function RequestOfferDialog({
 
     if (!message) return;
 
-    sendContactMutation.mutate(
-      {
+    const loadingToastId = toast.loading(t("requestOfferSending"));
+
+    try {
+      await sendContactMutation.mutateAsync({
         email,
         message,
         subject: "Request Voucher",
         type: "voucher",
         product_id: productId,
-      },
-      {
-        onSuccess() {
-          toast.success(t("messageSent"));
-          setDialogStep("none");
-          setHasRequestedVoucher(true);
-        },
-        onError() {
-          toast.error(
-            t("messageSendFail", { default: "Failed to send request" }),
-          );
-        },
-      },
-    );
+      });
+
+      toast.dismiss(loadingToastId);
+      toast.success(t("messageSent"), { duration: TOAST_DURATION });
+      setDialogStep("none");
+      setHasRequestedVoucher(true);
+      addProductAndGoCheckout();
+    } catch {
+      toast.dismiss(loadingToastId);
+      toast.error(t("messageSendFail"), { duration: TOAST_DURATION });
+    }
   };
+
+  const handleEmailFocus = React.useCallback(() => {
+    setTimeout(() => {
+      emailInputRef.current?.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
+      formContainerRef.current?.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, 220);
+  }, []);
 
   return (
     <Dialog
@@ -123,19 +193,17 @@ export default function RequestOfferDialog({
       }}
     >
       <DialogTrigger asChild>
-        <DialogTrigger asChild>
-          <Button
-            onClick={() => setDialogStep("request")}
-            className={`rounded-md lg:px-4 mr-1 text-sm ${
-              hasRequestedVoucher ? "bg-gray-500 text-white" : ""
-            }`}
-          >
-            {t("requestOffer")}
-          </Button>
-        </DialogTrigger>
+        <Button
+          onClick={() => setDialogStep("request")}
+          className={`rounded-md lg:px-4 mr-1 text-sm ${
+            hasRequestedVoucher ? "bg-gray-500 text-white" : ""
+          }`}
+        >
+          {t("requestOffer")}
+        </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="top-[max(0.75rem,env(safe-area-inset-top))] max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-md translate-y-0 overflow-y-auto p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:top-[50%] sm:translate-y-[-50%] sm:p-6">
         <DialogHeader>
           <DialogTitle>{t("contactTitle")}</DialogTitle>
           <DialogDescription>
@@ -152,7 +220,7 @@ export default function RequestOfferDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 mt-4">
+        <div ref={formContainerRef} className="mt-4 space-y-4">
           {/* EMAIL */}
           <div className="space-y-1">
             <Input
@@ -160,6 +228,7 @@ export default function RequestOfferDialog({
               type="email"
               placeholder={t("email")}
               value={email}
+              onFocus={handleEmailFocus}
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (emailError) setEmailError(null);
@@ -181,7 +250,12 @@ export default function RequestOfferDialog({
             className="w-full"
             onClick={handleSubmit}
             // variant={"secondary"}
-            disabled={!!emailError || !email || sendContactMutation.isPending}
+            disabled={
+              !!emailError ||
+              !email ||
+              sendContactMutation.isPending ||
+              addToCartMutation.isPending
+            }
           >
             {t("send")}
           </Button>

@@ -161,14 +161,16 @@ function ContainerCard({
 }) {
   const { data: containerInventory } = useContainerInventory(item.id);
   const hasInventory = (containerInventory?.length ?? 0) > 0;
-  const totalItems = React.useMemo(
-    () =>
-      (containerInventory ?? []).reduce(
+  const inventorySummary = React.useMemo(() => {
+    const rows = containerInventory ?? [];
+    return {
+      itemCount: rows.length,
+      totalQuantity: rows.reduce(
         (sum, inventoryItem) => sum + (Number(inventoryItem?.quantity) || 0),
         0,
       ),
-    [containerInventory],
-  );
+    };
+  }, [containerInventory]);
   const canSendAmm =
     item.is_sended_avis === false || item.is_sended_avis === null;
   const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -337,10 +339,12 @@ function ContainerCard({
           Total items:{" "}
           <span
             className={
-              totalItems > 0 ? "text-secondary font-semibold" : "text-gray-500"
+              inventorySummary.totalQuantity > 0
+                ? "text-secondary font-semibold"
+                : "text-gray-500"
             }
           >
-            {totalItems}
+            {inventorySummary.itemCount}/{inventorySummary.totalQuantity}
           </span>
         </div>
       </CardContent>

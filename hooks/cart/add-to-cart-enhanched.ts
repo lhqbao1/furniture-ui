@@ -9,6 +9,7 @@ import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 
 export function useAddToCartLocalEnhanced() {
+  const TOAST_DURATION = 6000;
   const { addToCartLocal, cart } = useCartLocal();
   const t = useTranslations();
 
@@ -29,7 +30,7 @@ export function useAddToCartLocalEnhanced() {
 
     const baseStock = calculateAvailableStock(product);
     if (totalQuantity > baseStock + totalIncomingStock) {
-      toast.error(t("notEnoughStock"));
+      toast.error(t("notEnoughStock"), { duration: TOAST_DURATION });
       options?.onError?.();
       return;
     }
@@ -60,11 +61,11 @@ export function useAddToCartLocalEnhanced() {
       },
       {
         onSuccess: () => {
-          toast.success(t("addToCartSuccess"));
+          toast.success(t("addToCartSuccess"), { duration: TOAST_DURATION });
           options?.onSuccess?.();
         },
         onError: () => {
-          toast.error(t("addToCartFail"));
+          toast.error(t("addToCartFail"), { duration: TOAST_DURATION });
           options?.onError?.();
         },
       },

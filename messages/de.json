@@ -414,6 +414,7 @@
   "sendRequest": "Anfrage senden",
   "defaultOfferMessage": "Hallo, ich interessiere mich für {product}. Gibt es ein besseres Angebot oder einen Gutschein?",
   "contactTitle": "Besseres Angebot anfragen",
+  "requestOfferSending": "Anfrage wird gesendet...",
   "messageSent": "Anfrage erfolgreich gesendet",
   "messageSendFail": "Anfrage konnte nicht gesendet werden",
   "productPrice": "Preis",
