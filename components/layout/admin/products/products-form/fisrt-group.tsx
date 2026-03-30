@@ -58,6 +58,8 @@ const ProductDetailInputs = ({
 }: ProductDetailInputsProps) => {
   const form = useFormContext();
   const listImages = form.watch("static_files") ?? [];
+  const supplierName =
+    productDetails?.owner?.business_name?.trim() || "Prestige Home";
 
   const [isRemoveImagesOpen, setIsRemoveImagesOpen] = useState(false);
 
@@ -152,7 +154,7 @@ const ProductDetailInputs = ({
             control={form.control}
             name="is_active"
             render={({ field }) => (
-              <FormItem className="flex items-center space-x-2">
+              <FormItem className="flex flex-row items-center space-x-2">
                 <FormLabel className="mt-0! text-black font-semibold">
                   Active
                 </FormLabel>
@@ -190,6 +192,8 @@ const ProductDetailInputs = ({
           />
         )}
       </div>
+
+      <div>Supplier: {supplierName}</div>
 
       <div className="grid lg:grid-cols-4 grid-cols-1 lg:gap-6 gap-4">
         {/*Product Category */}

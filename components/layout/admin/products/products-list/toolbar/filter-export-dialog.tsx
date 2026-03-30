@@ -18,6 +18,14 @@ const FilterExportForm = () => {
   const searchParams = useSearchParams();
   const supplierId = searchParams.get("supplier_id") ?? "";
   const statusParam = searchParams.get("all_products");
+  const brandId = searchParams.get("brand_id") ?? "";
+  const search = searchParams.get("search")?.trim() ?? "";
+  const sortByStock = searchParams.get("sort_by_stock") ?? "";
+  const sortByIncomingStock = searchParams.get("sort_by_incoming_stock") ?? "";
+  const sortByMarketplace = searchParams.get("sort_by_marketplace") ?? "";
+  const isInventory = searchParams.get("is_inventory") ?? "";
+  const isEconeloParam = searchParams.get("is_econelo");
+  const multiSearchRaw = searchParams.get("multi_search") ?? "";
 
   const buildParams = () => {
     const params: Record<string, string | boolean> = {};
@@ -32,11 +40,52 @@ const FilterExportForm = () => {
       params.supplier_id = supplierId;
     }
 
+    if (brandId) {
+      params.brand_id = brandId;
+    }
+
+    if (search) {
+      params.search = search;
+    }
+
+    if (sortByStock) {
+      params.sort_by_stock = sortByStock;
+    }
+
+    if (sortByIncomingStock) {
+      params.sort_by_incoming_stock = sortByIncomingStock;
+    }
+
+    if (sortByMarketplace) {
+      params.sort_by_marketplace = sortByMarketplace;
+    }
+
+    if (isInventory) {
+      params.is_inventory = isInventory;
+    }
+
+    if (isEconeloParam === "true") {
+      params.is_econelo = true;
+    } else if (isEconeloParam === "false") {
+      params.is_econelo = false;
+    }
+
     return params;
   };
 
   const { refetch } = useQuery({
-    queryKey: ["all-products", supplierId, statusParam ?? "all"],
+    queryKey: [
+      "all-products",
+      supplierId,
+      statusParam ?? "all",
+      brandId,
+      search,
+      sortByStock,
+      sortByIncomingStock,
+      sortByMarketplace,
+      isInventory,
+      isEconeloParam ?? "all",
+    ],
     queryFn: () => getAllProductsSelect(buildParams()),
     enabled: false,
   });
@@ -161,11 +210,28 @@ const FilterExportForm = () => {
     return [];
   };
 
+  const applyMultiSearchFilter = (products: ProductItem[]): ProductItem[] => {
+    const terms = multiSearchRaw
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (terms.length === 0) return products;
+
+    const target = new Set(terms);
+    return products.filter((item) => {
+      const candidates = [item.sku, item.ean, item.id_provider]
+        .map((value) => String(value ?? "").trim().toLowerCase())
+        .filter(Boolean);
+      return candidates.some((candidate) => target.has(candidate));
+    });
+  };
+
   const handleExportExcel = async () => {
     setExportingAction("excel");
     try {
       const res = await refetch();
-      const data = normalizeProductsResponse(res.data);
+      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
       if (!data.length) {
         toast.info("No products to export");
         return;
@@ -192,19 +258,18 @@ const FilterExportForm = () => {
   };
 
   const handleExportExcelWithSearch = async () => {
-    const search = searchParams.get("search")?.trim() || undefined;
+    const searchValue = search || undefined;
     setExportingAction("search");
     try {
       const payload = await getAllProductsSelect({
         ...buildParams(),
-        search,
-        all_products: undefined,
+        search: searchValue,
       });
-      const data = normalizeProductsResponse(payload);
+      const data = applyMultiSearchFilter(normalizeProductsResponse(payload));
 
       if (!data.length) {
         toast.info(
-          search
+          searchValue
             ? "No products matched your search"
             : "No products to export with current filters",
         );
@@ -248,7 +313,7 @@ const FilterExportForm = () => {
     setExportingAction("csv");
     try {
       const res = await refetch();
-      const data = normalizeProductsResponse(res.data);
+      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
       if (!data.length) {
         toast.info("No products to export");
         return;
@@ -279,7 +344,7 @@ const FilterExportForm = () => {
     setExportingAction("praktiker");
     try {
       const res = await refetch();
-      const data = normalizeProductsResponse(res.data);
+      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
       if (!data.length) {
         toast.info("No products to export");
         return;

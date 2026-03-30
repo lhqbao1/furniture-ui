@@ -15,7 +15,7 @@ const Footer = () => {
     <footer
       id="footer"
       className={cn(
-        "bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-32 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-26 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl relative",
+        "bg-white shadow-secondary/100 shadow-2xl mt-10 lg:mt-2 text-black w-full grid lg:grid-cols-12 grid-cols-2 lg:gap-0 gap-4 lg:px-20 lg:pt-20 lg:pb-4 px-8 py-8 rounded-tl-2lg rounded-tr-2xl relative",
         isProductDetail ? "pb-30" : "",
       )}
     >

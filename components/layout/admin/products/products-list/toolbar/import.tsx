@@ -170,7 +170,7 @@ const ImportDialog = ({
     >
       <DialogTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           className=""
           disabled={importProductMutation.isPending ? true : false}
         >

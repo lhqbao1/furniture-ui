@@ -9,6 +9,7 @@ import { orderListExpandColumns } from "./product-columns";
 import { ProductItem } from "@/types/products";
 import { format, getISOWeek } from "date-fns";
 import { cn } from "@/lib/utils";
+import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 
 function transformCartItems(items: CartItem[]): CartItem[] {
   return items.flatMap((item) => {
@@ -86,14 +87,20 @@ const getIncomingDisplayItems = (
       .filter(
         (
           state,
-        ): state is { quantityPerBundle: number; incomingByDate: Map<number, number> } =>
-          state !== null,
+        ): state is {
+          quantityPerBundle: number;
+          incomingByDate: Map<number, number>;
+        } => state !== null,
       );
 
     if (bundleStates.length === 0) return [];
 
     const allDates = Array.from(
-      new Set(bundleStates.flatMap((state) => Array.from(state.incomingByDate.keys()))),
+      new Set(
+        bundleStates.flatMap((state) =>
+          Array.from(state.incomingByDate.keys()),
+        ),
+      ),
     ).sort((a, b) => a - b);
 
     if (allDates.length === 0) return [];
@@ -192,10 +199,73 @@ const OrderExpandTable = ({ row }: { row: { original: CheckOutMain } }) => {
     value.setDate(value.getDate() + 42);
     return value;
   }, [today]);
+  const normalizedStatus = (checkout.status ?? "").toLowerCase();
+  const isStockReserved =
+    normalizedStatus === "tock_reserved" ||
+    normalizedStatus === "stock_reserved" ||
+    normalizedStatus === "reserved";
+  const latestIncomingForReserved = React.useMemo(() => {
+    if (!isStockReserved) return null;
+
+    console.log(items);
+    const candidates = items
+      .map((item, index) => {
+        const product = item?.products;
+        if (!product) return null;
+
+        const summary = calculateIncomingStockSummary(product);
+        if (!summary.latestIncomingDate) return null;
+
+        return {
+          key: String(
+            item?.id ??
+              `${String(product?.id ?? product?.id_provider ?? "product")}-${index}`,
+          ),
+          name:
+            item?.purchased_products?.name?.trim() ||
+            product?.name?.trim() ||
+            `Product ${index + 1}`,
+          date: summary.latestIncomingDate,
+        };
+      })
+      .filter(
+        (candidate): candidate is { key: string; name: string; date: Date } =>
+          candidate !== null && !Number.isNaN(candidate.date.getTime()),
+      );
+
+    if (candidates.length === 0) return null;
+
+    return candidates.sort((a, b) => b.date.getTime() - a.date.getTime())[0];
+  }, [isStockReserved, items]);
 
   return (
     <div className="p-4 bg-white rounded-md border">
-      {incomingByProduct.length > 0 && (
+      {isStockReserved && (
+        <div className="mb-4 rounded-md border border-secondary/20 bg-secondary/5 p-3">
+          <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
+            Incoming stock estimate
+          </div>
+          {latestIncomingForReserved ? (
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="font-medium line-clamp-1">
+                {latestIncomingForReserved.name}
+              </span>
+              <span className="inline-flex items-center rounded-md border border-secondary/30 bg-secondary/10 px-2 py-1 text-xs text-secondary">
+                {`CW ${String(
+                  getISOWeek(latestIncomingForReserved.date),
+                ).padStart(
+                  2,
+                  "0",
+                )} - ${format(latestIncomingForReserved.date, "d/M")}`}
+              </span>
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">—</div>
+          )}
+        </div>
+      )}
+
+      {!isStockReserved && incomingByProduct.length > 0 && (
         <div className="mb-4 rounded-md border border-secondary/20 bg-secondary/5 p-3">
           <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
             Incoming stock schedule

@@ -37,12 +37,22 @@ export async function getAllProductsSelect({
   all_products,
   is_econelo,
   supplier_id,
+  brand_id,
+  sort_by_stock,
+  sort_by_incoming_stock,
+  sort_by_marketplace,
+  is_inventory,
 }: {
   search?: string;
   is_customer?: boolean;
   all_products?: boolean | null;
   is_econelo?: boolean;
   supplier_id?: string | null;
+  brand_id?: string | null;
+  sort_by_stock?: "asc" | "desc" | string;
+  sort_by_incoming_stock?: "asc" | "desc" | string;
+  sort_by_marketplace?: string;
+  is_inventory?: string;
 }) {
   const { data } = await apiPublic.get("/products/all", {
     params: {
@@ -53,6 +63,11 @@ export async function getAllProductsSelect({
       ...(supplier_id !== undefined && supplier_id !== null
         ? { supplier_id }
         : {}),
+      ...(brand_id !== undefined && brand_id !== null ? { brand_id } : {}),
+      ...(sort_by_stock ? { sort_by_stock } : {}),
+      ...(sort_by_incoming_stock ? { sort_by_incoming_stock } : {}),
+      ...(sort_by_marketplace ? { sort_by_marketplace } : {}),
+      ...(is_inventory ? { is_inventory } : {}),
     },
     headers: {
       "Content-Type": "application/json",

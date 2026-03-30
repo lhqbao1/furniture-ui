@@ -32,7 +32,6 @@ export default function MainImage({
 
   const [dragOffset, setDragOffset] = React.useState(0);
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const [containerWidth, setContainerWidth] = React.useState(1);
   const [isMobileViewport, setIsMobileViewport] = React.useState(false);
 
   const imageCount = productDetails.static_files?.length ?? 0;
@@ -85,23 +84,14 @@ export default function MainImage({
     return () => mediaQuery.removeEventListener("change", updateIsMobile);
   }, []);
 
-  React.useEffect(() => {
-    const updateWidth = () => {
-      const elementWidth = containerRef.current?.clientWidth ?? 0;
-      const viewportWidth =
-        typeof window !== "undefined" ? window.innerWidth : 0;
-      const nextWidth = elementWidth || viewportWidth || 1;
-      setContainerWidth(nextWidth > 0 ? nextWidth : 1);
-    };
-
-    updateWidth();
-
-    if (!containerRef.current || typeof ResizeObserver === "undefined") return;
-
-    const resizeObserver = new ResizeObserver(updateWidth);
-    resizeObserver.observe(containerRef.current);
-
-    return () => resizeObserver.disconnect();
+  const getCurrentContainerWidth = React.useCallback(() => {
+    const elementWidth = containerRef.current?.getBoundingClientRect().width ?? 0;
+    const viewportWidth =
+      typeof window !== "undefined"
+        ? (window.visualViewport?.width ?? window.innerWidth)
+        : 0;
+    const nextWidth = elementWidth || viewportWidth || 1;
+    return nextWidth > 0 ? nextWidth : 1;
   }, []);
 
   React.useEffect(() => {
@@ -134,8 +124,9 @@ export default function MainImage({
     (direction: "next" | "prev") => {
       if (!canSwipe || isAnimating) return;
 
+      const currentWidth = getCurrentContainerWidth();
       setIsAnimating(true);
-      setDragOffset(direction === "next" ? -containerWidth : containerWidth);
+      setDragOffset(direction === "next" ? -currentWidth : currentWidth);
 
       scheduleAfterAnimation(() => {
         setMainImageIndex((prev) =>
@@ -145,7 +136,7 @@ export default function MainImage({
     },
     [
       canSwipe,
-      containerWidth,
+      getCurrentContainerWidth,
       isAnimating,
       nextIndex,
       prevIndex,
@@ -161,23 +152,25 @@ export default function MainImage({
     delta: 8,
     onSwiping: ({ deltaX }) => {
       if (!isMobileViewport || !canSwipe || isAnimating) return;
+      const currentWidth = getCurrentContainerWidth();
 
       const nextOffset = Math.max(
-        -containerWidth,
-        Math.min(containerWidth, deltaX),
+        -currentWidth,
+        Math.min(currentWidth, deltaX),
       );
       setDragOffset(nextOffset);
       if (isHover) setIsHover(false);
     },
     onSwiped: ({ deltaX, absX = 0, velocity = 0 }) => {
       if (!isMobileViewport || !canSwipe || isAnimating) return;
+      const currentWidth = getCurrentContainerWidth();
 
       const finalOffset = Math.max(
-        -containerWidth,
-        Math.min(containerWidth, deltaX),
+        -currentWidth,
+        Math.min(currentWidth, deltaX),
       );
       const absOffset = Math.max(Math.abs(finalOffset), absX);
-      const threshold = containerWidth * SNAP_RATIO;
+      const threshold = currentWidth * SNAP_RATIO;
       const direction =
         finalOffset < 0 ? "next" : finalOffset > 0 ? "prev" : null;
       const isFlick = Math.abs(velocity) >= FLICK_VELOCITY_THRESHOLD;
@@ -196,7 +189,6 @@ export default function MainImage({
   const prevImage = getImageUrl(prevIndex(mainImageIndex));
   const currentImage = getImageUrl(mainImageIndex);
   const nextImage = getImageUrl(nextIndex(mainImageIndex));
-  const trackTranslateX = -containerWidth + dragOffset;
 
   const slideTransition = isAnimating
     ? `transform ${SLIDE_DURATION}ms ${SLIDE_EASING}`
@@ -228,7 +220,7 @@ export default function MainImage({
     >
       <div
         ref={containerRef}
-        className="flex justify-center overflow-hidden main-image relative lg:h-[430px] h-[340px] bg-white"
+        className="flex w-full justify-center overflow-hidden main-image relative lg:h-[430px] h-[340px] bg-white"
         onMouseMove={handleZoomImage}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
@@ -239,15 +231,12 @@ export default function MainImage({
           <div
             className="absolute inset-0 flex"
             style={{
-              width: `${containerWidth * 3}px`,
-              transform: `translate3d(${trackTranslateX}px, 0, 0)`,
+              width: "300%",
+              transform: `translate3d(calc(-33.3333% + ${dragOffset}px), 0, 0)`,
               transition: slideTransition,
             }}
           >
-            <div
-              className="relative h-full flex-shrink-0 bg-white"
-              style={{ width: `${containerWidth}px` }}
-            >
+            <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
               <Image
                 src={prevImage}
                 fill
@@ -256,10 +245,7 @@ export default function MainImage({
                 sizes="100vw"
               />
             </div>
-            <div
-              className="relative h-full flex-shrink-0 bg-white"
-              style={{ width: `${containerWidth}px` }}
-            >
+            <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
               <Image
                 src={currentImage}
                 fill
@@ -269,10 +255,7 @@ export default function MainImage({
                 sizes="100vw"
               />
             </div>
-            <div
-              className="relative h-full flex-shrink-0 bg-white"
-              style={{ width: `${containerWidth}px` }}
-            >
+            <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
               <Image
                 src={nextImage}
                 fill

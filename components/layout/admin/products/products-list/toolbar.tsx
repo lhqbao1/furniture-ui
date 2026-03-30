@@ -188,11 +188,11 @@ export default function TableToolbar({
 
         <div className="flex gap-2 text-sm font-medium">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            {/* <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 Export <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger>
+            </DropdownMenuTrigger> */}
 
             <DropdownMenuContent className="w-150 p-4 space-y-4">
               <FilterExportForm />
