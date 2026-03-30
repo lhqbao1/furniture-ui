@@ -201,7 +201,8 @@ function ContainerCard({
         )}
         <CardAction className="space-x-2">
           <AddContainerDialog purchaseOrderId={po_id} container={item} />
-          {hasInventory && canSendAmm && (
+          {/* {hasInventory && canSendAmm && ( */}
+          {hasInventory && (
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
               <DialogTrigger asChild>
                 <Button
