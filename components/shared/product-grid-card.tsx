@@ -28,8 +28,11 @@ export default function ProductCard({
   const [canHover, setCanHover] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [shouldLoadAltImage, setShouldLoadAltImage] = useState(false);
-  const altImageUrl = product.static_files?.[1]?.url;
-  const enableAltHover = canHover && !isMobileViewport;
+  const hasAltImage =
+    (product.static_files?.length ?? 0) >= 2 &&
+    Boolean(product.static_files?.[1]?.url);
+  const altImageUrl = hasAltImage ? product.static_files?.[1]?.url : undefined;
+  const enableAltHover = canHover && !isMobileViewport && hasAltImage;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -74,10 +77,10 @@ export default function ProductCard({
             <div
               className="relative mb-2 w-full lg:h-60 h-40 overflow-hidden rounded-md bg-white group flex items-center justify-center"
               onMouseEnter={() => {
-                if (enableAltHover && altImageUrl) setShouldLoadAltImage(true);
+                if (enableAltHover) setShouldLoadAltImage(true);
               }}
               onFocus={() => {
-                if (enableAltHover && altImageUrl) setShouldLoadAltImage(true);
+                if (enableAltHover) setShouldLoadAltImage(true);
               }}
             >
               {/* Image 1 */}
