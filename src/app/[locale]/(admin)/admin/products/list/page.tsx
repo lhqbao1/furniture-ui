@@ -8,7 +8,6 @@ import TableToolbar, {
 import { useGetAllProducts } from "@/features/products/hook";
 import {
   productListColumnVisibilityByUserAtom,
-  sortByStockAtom,
 } from "@/store/product";
 import { useAtom, useAtomValue } from "jotai";
 import React, {
@@ -59,7 +58,8 @@ const DEFAULT_VISIBLE_PRODUCT_COLUMNS = new Set(
 const ProductList = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const [sortByStock, setSortByStock] = useAtom(sortByStockAtom);
+  const [sortByStock, setSortByStock] = useState<"asc" | "desc" | undefined>();
+  const [hasStockSortInteracted, setHasStockSortInteracted] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const adminId = useAtomValue(adminIdAtom);
   const [columnVisibilityByUser, setColumnVisibilityByUser] = useAtom(
@@ -122,6 +122,7 @@ const ProductList = () => {
     filters.sort_by_incoming_stock === "desc"
       ? filters.sort_by_incoming_stock
       : "";
+  const effectiveSortByStock = hasStockSortInteracted ? sortByStock : undefined;
 
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
@@ -141,6 +142,11 @@ const ProductList = () => {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  const handleSortByStock = (value?: "asc" | "desc") => {
+    setHasStockSortInteracted(true);
+    setSortByStock(value);
+  };
+
   // 🧩 Khi user back lại (hoặc reload), đọc page từ URL
   useEffect(() => {
     const param = searchParams.get("page");
@@ -154,7 +160,7 @@ const ProductList = () => {
     page_size: pageSize,
     all_products: filters.all_products,
     search: filters.search,
-    sort_by_stock: sortByStock,
+    sort_by_stock: effectiveSortByStock,
     supplier_id: filters.supplier_id,
     brand_id: filters.brand,
     sort_by_incoming_stock: filters.sort_by_incoming_stock,
@@ -239,7 +245,7 @@ const ProductList = () => {
         <ProductTable
           data={filteredItems}
           columns={getProductColumns(
-            setSortByStock,
+            handleSortByStock,
             setSortByIncomingStock,
             normalizedIncomingStockSort,
           )}

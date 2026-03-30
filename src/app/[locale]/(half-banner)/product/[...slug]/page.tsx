@@ -304,13 +304,18 @@ export default async function Page({
     inventory: Array.isArray(inventoryPo) ? inventoryPo : [],
     deliveryTime: plainProduct.delivery_time,
   });
+  const schemaDescription =
+    plainProduct.description
+      ?.replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim() || plainProduct.name;
 
   const productSchema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: plainProduct.name,
     image: plainProduct.static_files?.map((f: StaticFile) => f.url),
-    description: plainProduct.description,
+    description: schemaDescription,
     sku: plainProduct.sku,
     brand: {
       "@type": "Brand",
@@ -342,7 +347,7 @@ export default async function Page({
 
     productSchema.aggregateRating = {
       "@type": "AggregateRating",
-      ratingValue: ratingValue.toFixed(1),
+      ratingValue: Number(ratingValue.toFixed(1)),
       reviewCount: plainReviews.length,
     };
   }
@@ -354,7 +359,7 @@ export default async function Page({
       {
         "@type": "ListItem",
         position: 1,
-        name: "Home",
+        name: "Startseite",
         item: "https://www.prestige-home.de/de",
       },
       ...(plainProduct.categories?.[0]?.slug

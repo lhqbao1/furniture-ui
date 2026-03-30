@@ -13,6 +13,7 @@ import { CategoryResponse } from "@/types/categories";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import CategoriesDrawer from "../header/categories-drawer";
+import { useMemo } from "react";
 
 interface ListCategoriesHomeProps {
   categories: CategoryResponse[];
@@ -22,6 +23,14 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
+  const econeloCategories = useMemo(
+    () => (categories ?? []).filter((category) => category.is_econelo),
+    [categories],
+  );
+  const regularCategories = useMemo(
+    () => (categories ?? []).filter((category) => !category.is_econelo),
+    [categories],
+  );
 
   return (
     <div className="w-full flex justify-center py-6 relative">
@@ -34,48 +43,86 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
       ) : (
         <NavigationMenu viewport={false}>
           <NavigationMenuList className="gap-x-2 gap-y-2 w-full flex-wrap mx-auto">
-            {categories.map((category) => (
-              <NavigationMenuItem key={category.id}>
-                <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2">
-                  <Link
-                    href={`/category/${category.slug}`}
-                    locale={locale}
-                    className="uppercase bg-transparent font-semibold text-sm px-2 py-2"
-                  >
-                    {category.name}
-                  </Link>
-                </NavigationMenuTrigger>
+            {regularCategories.map((category) => {
+              const visibleChildren =
+                category.children?.filter((child) => !child.is_econelo) ?? [];
 
-                {category.children?.length > 0 && (
-                  <NavigationMenuContent className="rounded-sm border-none ring-0 z-50 data-[motion=from-end]:slide-in-from-right-2 data-[motion=from-start]:slide-in-from-left-2 data-[motion=to-end]:slide-out-to-right-2 data-[motion=to-start]:slide-out-to-left-2">
-                    <div className="min-w-50">
-                      {category.children.map((child) => (
-                        <NavigationMenuLink
-                          key={child.id}
-                          onClick={() => {
-                            // setCurrentCategoryId(child.id);
-                            // setCategoryClicked(true);
-                            router.push(`/category/${child.slug}`, { locale });
-                          }}
-                          className="
-                          relative cursor-pointer px-2 py-2 text-sm
-                          after:content-['']
-                          after:absolute after:left-0 after:bottom-0
-                          after:h-[2px] after:w-full
-                          after:origin-left after:scale-x-0
-                          after:bg-secondary
-                          after:transition-transform after:duration-300 after:ease-out
-                          hover:after:scale-x-100 hover:bg-transparent w-fit
-                        "
-                        >
-                          {child.name}
-                        </NavigationMenuLink>
-                      ))}
-                    </div>
-                  </NavigationMenuContent>
-                )}
+              return (
+                <NavigationMenuItem key={category.id}>
+                  <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2">
+                    <Link
+                      href={`/category/${category.slug}`}
+                      locale={locale}
+                      className="uppercase bg-transparent font-semibold text-sm px-2 py-2"
+                    >
+                      {category.name}
+                    </Link>
+                  </NavigationMenuTrigger>
+
+                  {visibleChildren.length > 0 && (
+                    <NavigationMenuContent className="rounded-sm border-none ring-0 z-50 group-data-[viewport=false]/navigation-menu:mt-2 data-[motion=from-end]:slide-in-from-right-2 data-[motion=from-start]:slide-in-from-left-2 data-[motion=to-end]:slide-out-to-right-2 data-[motion=to-start]:slide-out-to-left-2">
+                      <div className="min-w-50">
+                        {visibleChildren.map((child) => (
+                          <NavigationMenuLink
+                            key={child.id}
+                            onClick={() => {
+                              router.push(`/category/${child.slug}`, { locale });
+                            }}
+                            className="
+                            relative cursor-pointer px-2 py-2 text-sm
+                            after:content-['']
+                            after:absolute after:left-0 after:bottom-0
+                            after:h-[2px] after:w-full
+                            after:origin-left after:scale-x-0
+                            after:bg-secondary
+                            after:transition-transform after:duration-300 after:ease-out
+                            hover:after:scale-x-100 hover:bg-transparent w-fit
+                          "
+                          >
+                            {child.name}
+                          </NavigationMenuLink>
+                        ))}
+                      </div>
+                    </NavigationMenuContent>
+                  )}
+                </NavigationMenuItem>
+              );
+            })}
+            {econeloCategories.length > 0 && (
+              <NavigationMenuItem className="md:static">
+                <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2">
+                  E-Mobilität
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="rounded-sm border-none ring-0 z-50 group-data-[viewport=false]/navigation-menu:mt-2 md:!w-[1080px] md:max-w-[calc(100vw-3rem)] md:left-1/2 md:-translate-x-1/2 xl:!w-[1140px] data-[motion=from-end]:slide-in-from-right-2 data-[motion=from-start]:slide-in-from-left-2 data-[motion=to-end]:slide-out-to-right-2 data-[motion=to-start]:slide-out-to-left-2">
+                  <div className="grid grid-cols-1 gap-5 p-4 md:grid-cols-3 md:gap-x-7 md:gap-y-6 md:p-6">
+                    {econeloCategories.map((parent) => (
+                      <div key={parent.id} className="mb-4">
+                        <div className="w-fit p-0 text-sm font-bold">
+                          {parent.name}
+                        </div>
+                        {(parent.children ?? []).length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            {parent.children.map((child) => (
+                              <NavigationMenuLink
+                                key={child.id}
+                                onClick={() => {
+                                  router.push(`/category/${child.slug}`, {
+                                    locale,
+                                  });
+                                }}
+                                className="relative w-fit cursor-pointer p-0 pl-3 text-sm font-normal hover:bg-transparent focus:bg-transparent after:content-[''] after:absolute after:left-3 after:bottom-[-2px] after:h-[2px] after:w-[calc(100%-0.75rem)] after:origin-left after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 after:ease-out hover:text-secondary hover:after:scale-x-100"
+                              >
+                                {child.name}
+                              </NavigationMenuLink>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </NavigationMenuContent>
               </NavigationMenuItem>
-            ))}
+            )}
             <NavigationMenuItem>
               <NavigationMenuLink
                 asChild

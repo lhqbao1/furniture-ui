@@ -54,7 +54,7 @@ export default function ShopAllPage() {
   }, [pageFromUrl]);
 
   // 🔹 4. QUERY
-  const { data, isLoading, isError } = useProductsAlgoliaSearch({
+  const { data, isLoading, isFetching, isError } = useProductsAlgoliaSearch({
     page,
     page_size: SHOP_ALL_PAGE_SIZE,
     query,
@@ -106,6 +106,9 @@ export default function ShopAllPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const showSkeleton =
+    isLoading || !data || (isFetching && (data?.items?.length ?? 0) === 0);
+
   return (
     <div className="pt-3 xl:pb-16 pb-6 relative">
       <div className="grid grid-cols-12 gap-6">
@@ -116,7 +119,7 @@ export default function ShopAllPage() {
         </div>
 
         <div className="pt-0 pb-12 lg:w-[90%] md:w-[95%] xl:w-[90%] w-full mx-auto col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
-          {isLoading || !data ? (
+          {showSkeleton ? (
             <ProductGridSkeleton length={12} />
           ) : (
             <>

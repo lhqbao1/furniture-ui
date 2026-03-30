@@ -1960,14 +1960,10 @@ export const getProductColumns = (
           variant="ghost"
           className="font-semibold flex items-center px-0 justify-center gap-1 w-fit"
           onClick={() => {
-            // toggleSorting sẽ tự xử lý asc/desc/undefined xoay vòng
             column.toggleSorting(direction === "asc");
-
-            // Đợi 1 tick để state cập nhật rồi sync với API param
-            setTimeout(() => {
-              const newDir = column.getIsSorted() as "asc" | "desc" | undefined;
-              setSortByStock(newDir);
-            }, 0);
+            const nextDirection: "asc" | "desc" =
+              direction === "asc" ? "desc" : "asc";
+            setSortByStock(nextDirection);
           }}
         >
           <div>STOCK</div>

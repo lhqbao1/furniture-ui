@@ -72,7 +72,7 @@ export default function ProductCard({
             className="cursor-pointer"
           >
             <div
-              className="relative mb-2 w-full lg:h-96 h-60 overflow-hidden rounded-md bg-white group flex items-center justify-center"
+              className="relative mb-2 w-full lg:h-60 h-40 overflow-hidden rounded-md bg-white group flex items-center justify-center"
               onMouseEnter={() => {
                 if (enableAltHover && altImageUrl) setShouldLoadAltImage(true);
               }}
