@@ -164,8 +164,7 @@ type IncomingDisplayItem = {
 const getIncomingDisplayItems = (
   product: ProductItem,
 ): IncomingDisplayItem[] => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
 
   const buildFutureIncomingRows = (
     inventoryPos: ProductItem["inventory_pos"] | undefined,
@@ -177,8 +176,9 @@ const getIncomingDisplayItems = (
 
         const date = new Date(item.list_delivery_date);
         if (Number.isNaN(date.getTime())) return null;
-        date.setHours(0, 0, 0, 0);
-        if (date <= today) return null;
+        // Treat delivery date as available until end of that day.
+        date.setHours(23, 59, 59, 999);
+        if (date < now) return null;
 
         return {
           id: item.id,

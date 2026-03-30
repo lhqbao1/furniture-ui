@@ -11,7 +11,12 @@ import { ProductItem } from "@/types/products";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { toast } from "sonner";
 
-type ExportAction = "excel" | "csv" | "praktiker" | "search" | null;
+type ExportAction =
+  | "excel"
+  | "csv"
+  | "praktiker"
+  | "search"
+  | null;
 
 const FilterExportForm = () => {
   const [exportingAction, setExportingAction] = useState<ExportAction>(null);
@@ -24,7 +29,7 @@ const FilterExportForm = () => {
   const sortByIncomingStock = searchParams.get("sort_by_incoming_stock") ?? "";
   const sortByMarketplace = searchParams.get("sort_by_marketplace") ?? "";
   const isInventory = searchParams.get("is_inventory") ?? "";
-  const isEconeloParam = searchParams.get("is_econelo");
+  const isEconeloParam = "true";
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
 
   const buildParams = () => {
@@ -78,7 +83,7 @@ const FilterExportForm = () => {
       "all-products",
       supplierId,
       statusParam ?? "all",
-      brandId,
+      // brandId,
       search,
       sortByStock,
       sortByIncomingStock,
@@ -221,7 +226,11 @@ const FilterExportForm = () => {
     const target = new Set(terms);
     return products.filter((item) => {
       const candidates = [item.sku, item.ean, item.id_provider]
-        .map((value) => String(value ?? "").trim().toLowerCase())
+        .map((value) =>
+          String(value ?? "")
+            .trim()
+            .toLowerCase(),
+        )
         .filter(Boolean);
       return candidates.some((candidate) => target.has(candidate));
     });
