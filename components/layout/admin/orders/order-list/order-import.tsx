@@ -165,6 +165,15 @@ const toRequiredString = (value: unknown, fallback = ""): string =>
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const getOrderGroupKey = (row: NormalizedOrder, rowIndex: number): string => {
+  const marketplaceOrderId = row.marketplace_order_id?.trim();
+  // If marketplace_order_id exists, rows with same id are treated as one order
+  // and merged into the same items array.
+  if (marketplaceOrderId) return marketplaceOrderId;
+  // Fallback for malformed rows: avoid accidentally merging unrelated orders.
+  return `__row_${rowIndex}`;
+};
+
 const normalize = (
   row: RawOrderRow,
   preset: MarketplacePreset | null,
@@ -267,7 +276,11 @@ const OrderImport = () => {
       const preset = PRESET_BY_MARKETPLACE[channel] ?? null;
 
       const normalized = json.map((row) => normalize(row, preset, channel));
-      const isNettoChannel = channel.toLowerCase().trim() === "netto";
+      const normalizedChannel = channel.toLowerCase().trim();
+      const isNettoChannel = normalizedChannel === "netto";
+      const isNorma24Channel =
+        normalizedChannel === "norma" || normalizedChannel === "norma24";
+      const shouldAggregateShippingByRow = isNettoChannel || isNorma24Channel;
       let validRows = normalized;
 
       if (isNettoChannel) {
@@ -298,15 +311,11 @@ const OrderImport = () => {
       }
 
       const grouped: Record<string, GroupedOrder> = {};
-      const nettoShippingMeta: Record<
-        string,
-        { baseShipping: number; totalQuantity: number }
-      > = {};
 
-      validRows.forEach((row) => {
-        const id = String(row.marketplace_order_id);
+      validRows.forEach((row, rowIndex) => {
+        const groupKey = getOrderGroupKey(row, rowIndex);
 
-        if (!grouped[id]) {
+        if (!grouped[groupKey]) {
           const {
             sku,
             quantity,
@@ -316,29 +325,22 @@ const OrderImport = () => {
             vat,
             ...rest
           } = row;
-          grouped[id] = {
+          grouped[groupKey] = {
             ...rest,
+            total_shipping: shouldAggregateShippingByRow ? 0 : rest.total_shipping,
             items: [],
           };
         }
 
-        if (isNettoChannel) {
-          if (!nettoShippingMeta[id]) {
-            nettoShippingMeta[id] = {
-              baseShipping: row.total_shipping,
-              totalQuantity: 0,
-            };
-          }
-
-          const qty = Number.isFinite(row.quantity) ? row.quantity : 0;
-          nettoShippingMeta[id].totalQuantity += qty;
-
-          grouped[id].total_shipping =
-            nettoShippingMeta[id].baseShipping *
-            nettoShippingMeta[id].totalQuantity;
+        if (shouldAggregateShippingByRow) {
+          const quantity = Number.isFinite(row.quantity) && row.quantity > 0 ? row.quantity : 1;
+          const shippingPerUnit = Number.isFinite(row.total_shipping)
+            ? row.total_shipping
+            : 0;
+          grouped[groupKey].total_shipping += shippingPerUnit * quantity;
         }
 
-        grouped[id].items.push({
+        grouped[groupKey].items.push({
           quantity: row.quantity,
           id_provider: row.id_provider ?? "",
           title: row.title ?? null,
@@ -381,14 +383,18 @@ const OrderImport = () => {
       try {
         await createManualCheckOut(orders[index]);
         successCount += 1;
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Failed to create order", { index, error });
         const failedId = (orders[index] as { marketplace_order_id?: string })
           ?.marketplace_order_id;
+        const err = error as {
+          response?: { data?: { detail?: unknown; message?: unknown } };
+          message?: unknown;
+        };
         const detail =
-          error?.response?.data?.detail ??
-          error?.response?.data?.message ??
-          error?.message ??
+          err?.response?.data?.detail ??
+          err?.response?.data?.message ??
+          err?.message ??
           "Unknown error";
         failures.push({
           index,

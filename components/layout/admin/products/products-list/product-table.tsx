@@ -284,11 +284,11 @@ export function ProductTable<TData, TValue>({
                         >
                           <div
                             className={`
-                                                    overflow-hidden transition-all duration-1000 ease-in-out 
+                                                    transition-all duration-1000 ease-in-out 
                                                     ${
                                                       isRowExpanded(row.id)
-                                                        ? "max-h-[400px] opacity-100"
-                                                        : "max-h-0 opacity-0"
+                                                        ? "max-h-[75vh] overflow-y-auto overscroll-contain opacity-100"
+                                                        : "max-h-0 overflow-hidden opacity-0"
                                                     }
                                                     `}
                           >
