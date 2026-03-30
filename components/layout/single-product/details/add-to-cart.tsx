@@ -109,7 +109,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
         },
       });
     },
-    [handleSubmitToCart, hasValidFinalPrice, maxStock],
+    [handleSubmitToCart, hasValidFinalPrice, maxStock, productDetails.is_active],
   );
 
   return (
@@ -203,6 +203,7 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
             price={productDetails.final_price}
             oldPrice={productDetails.price}
             maxStock={hasValidFinalPrice ? maxStock : 0}
+            isActive={Boolean(productDetails.is_active)}
           />
         </form>
       </FormProvider>
