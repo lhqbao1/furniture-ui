@@ -2,10 +2,7 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -55,14 +52,18 @@ const AddVoucherDialog = ({
             </Button>
           )}
         </DialogTrigger>
-        <DialogContent className="w-[600px]">
-          <DialogHeader>
-            <DialogTitle>{isEdit ? "Edit Voucher" : "Add Voucher"}</DialogTitle>
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-4xl max-h-[92vh] overflow-y-auto p-0">
+          <DialogHeader className="sticky top-0 z-10 border-b bg-background px-6 py-4">
+            <DialogTitle className="text-2xl font-semibold">
+              {isEdit ? "Edit Voucher" : "Add Voucher"}
+            </DialogTitle>
           </DialogHeader>
-          <AddOrEditVouchersForm
-            onClose={handleClose}
-            {...(voucherValues ? { voucherValues } : {})}
-          />
+          <div className="px-6 pb-6 pt-4">
+            <AddOrEditVouchersForm
+              onClose={handleClose}
+              {...(voucherValues ? { voucherValues } : {})}
+            />
+          </div>
         </DialogContent>
       </form>
     </Dialog>
