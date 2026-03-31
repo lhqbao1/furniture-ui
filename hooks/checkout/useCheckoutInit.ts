@@ -16,9 +16,10 @@ import {
   normalizeCartItems,
 } from "@/hooks/caculate-shipping";
 import { useAtom } from "jotai";
-import { userIdAtom, userIdGuestAtom } from "@/store/auth";
+import { authHydratedAtom, userIdAtom, userIdGuestAtom } from "@/store/auth";
 
 export function useCheckoutInit() {
+  const [authHydrated] = useAtom(authHydratedAtom);
   const [userLoginId, setUserLoginId] = useAtom(userIdAtom);
   const [userGuestId, setUserGuestId] = useAtom(userIdGuestAtom);
 
@@ -70,16 +71,16 @@ export function useCheckoutInit() {
       });
     },
 
-    // ⭐ ONLY CALL WHEN REAL LOGIN EXISTS
-    enabled: !!finalUserId,
+    // chỉ fetch cart server khi auth đã hydrate + đã có login user
+    enabled: authHydrated && !!userLoginId,
     retry: false,
   });
 
-  const hasServerCart =
-    !!userLoginId && Array.isArray(cartItems) && cartItems.length > 0;
+  const hasServerCart = authHydrated && !!userLoginId;
+  const checkoutLocalCart = authHydrated && !hasServerCart ? localCart : [];
 
   const normalized = normalizeCartItems(
-    hasServerCart ? cartItems.flatMap((g) => g.items) : localCart,
+    hasServerCart ? (cartItems?.flatMap((g) => g.items) ?? []) : checkoutLocalCart,
     hasServerCart,
   );
 
@@ -93,7 +94,7 @@ export function useCheckoutInit() {
     addresses,
     invoiceAddress,
     cartItems,
-    localCart,
+    localCart: checkoutLocalCart,
     isLoadingCart,
     hasServerCart,
     shippingCost,
@@ -103,6 +104,7 @@ export function useCheckoutInit() {
     userLoginId,
     setUserLoginId,
     finalUserId,
+    authHydrated,
     totalAmount,
   };
 }

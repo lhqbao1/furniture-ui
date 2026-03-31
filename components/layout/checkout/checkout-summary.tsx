@@ -40,8 +40,7 @@ const CheckoutSummary = ({
   const [currentVoucher, setCurrentVoucher] = useAtom(currentVoucherAtom);
   const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
 
-  const hasServerCart =
-    !!userLoginId && Array.isArray(cartItems) && cartItems.length > 0;
+  const hasServerCart = !!userLoginId;
 
   const { data: listValidProducts } = useGetVoucherProducts(voucherId ?? "");
 
@@ -245,7 +244,7 @@ const CheckoutSummary = ({
             </span>
             <span className="text-right col-span-2">
               €
-              {(userLoginId && cartItems && cartItems.length > 0
+              {(hasServerCart
                 ? cartItems
                     .flatMap((g) => g.items)
                     .filter((i) => i.is_active)

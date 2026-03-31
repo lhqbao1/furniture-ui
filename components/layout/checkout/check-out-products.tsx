@@ -6,8 +6,6 @@ import CartTable from "../cart/cart-table";
 import CartLocalTable from "../cart/cart-local-table";
 import { useCartLocal } from "@/hooks/cart";
 import { useMediaQuery } from "react-responsive";
-import { useAtom } from "jotai";
-import { userIdAtom } from "@/store/auth";
 import { flattenCartItems } from "@/hooks/cart/flattenCart";
 import CartItemCard from "../cart/cart-item";
 
@@ -15,17 +13,19 @@ interface CheckoutProductsProps {
   cartItems: CartResponseItem[];
   localCart: CartItemLocal[];
   isLoadingCart: boolean;
+  userLoginId: string | null;
 }
 
 const CheckoutProducts = ({
   cartItems,
   localCart,
   isLoadingCart,
+  userLoginId,
 }: CheckoutProductsProps) => {
   const [localQuantities, setLocalQuantities] = useState<
     Record<string, number>
   >({});
-  const [userId, setUserId] = useAtom(userIdAtom);
+  const isLoggedIn = Boolean(userLoginId);
 
   const isTabletSmall = useMediaQuery({ maxWidth: 1023 });
   const flatItems = flattenCartItems(cartItems ?? []);
@@ -35,13 +35,19 @@ const CheckoutProducts = ({
   return (
     <>
       {isTabletSmall ? (
-        userId ? (
-          flatItems.map((item) => (
-            <CartItemCard
-              cartServer={item}
-              key={item.id}
-            />
-          ))
+        isLoggedIn ? (
+          isLoadingCart ? (
+            <div className="py-6 text-sm text-muted-foreground">
+              Loading checkout items...
+            </div>
+          ) : (
+            flatItems.map((item) => (
+              <CartItemCard
+                cartServer={item}
+                key={item.id}
+              />
+            ))
+          )
         ) : (
           localCart.map((item) => (
             <CartItemCard
@@ -50,7 +56,7 @@ const CheckoutProducts = ({
             />
           ))
         )
-      ) : userId && cartItems && cartItems.length > 0 ? (
+      ) : isLoggedIn ? (
         <CartTable
           isLoadingCart={isLoadingCart}
           cart={
