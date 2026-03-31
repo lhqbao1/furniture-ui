@@ -276,8 +276,6 @@ const FilterExportForm = () => {
         toast.info("No products to export");
         return;
       }
-      console.log(res);
-      console.log(data);
 
       const basicData = data
         .filter(
@@ -457,7 +455,7 @@ const FilterExportForm = () => {
             "Export Excel"
           )}
         </Button>
-        <Button
+        {/* <Button
           onClick={handleExportExcelBasic}
           disabled={isAnyExporting}
           type="button"
@@ -467,7 +465,7 @@ const FilterExportForm = () => {
           ) : (
             "Export Excel Basic"
           )}
-        </Button>
+        </Button> */}
 
         <Button
           variant="secondary"
