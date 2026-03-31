@@ -80,36 +80,54 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
   const handleSubmitWithStockCheck = React.useCallback(
     (
       values: z.infer<typeof cartFormSchema>,
-      options?: { openDrawer?: boolean },
+      options?: { openDrawer?: boolean; onSuccess?: () => void },
     ) => {
-      if (!productDetails.is_active) {
-        console.error("This product is inactivate");
+      if (!productDetails?.is_active) {
+        toast.error(t("outStock"));
         return;
       }
 
       if (!hasValidFinalPrice) {
-        toast.error("This product has no price and cannot be purchased.");
+        toast.error(t("addToCartFail"));
         return;
       }
 
-      if (maxStock <= 0 || values.quantity > maxStock) {
-        console.error("Not enough stock to add to cart.");
+      const quantity = Number(values.quantity ?? 0);
+      if (!Number.isFinite(quantity) || quantity <= 0) {
+        toast.error(t("addToCartFail"));
         return;
       }
 
-      handleSubmitToCart(values, {
+      if (maxStock <= 0) {
+        toast.error(t("outStock"));
+        return;
+      }
+
+      if (quantity > maxStock) {
+        toast.error(t("notEnoughStock"));
+        return;
+      }
+
+      handleSubmitToCart({ ...values, quantity }, {
         onSuccess: () => {
           const isDesktop =
             typeof window !== "undefined" ? window.innerWidth >= 768 : true;
 
           if (options?.openDrawer && isDesktop) {
-            setLastAddedQuantity(values.quantity ?? 1);
+            setLastAddedQuantity(quantity);
             setIsPostAddDrawerOpen(true);
           }
+          options?.onSuccess?.();
         },
       });
     },
-    [handleSubmitToCart, hasValidFinalPrice, maxStock, productDetails.is_active],
+    [
+      handleSubmitToCart,
+      hasValidFinalPrice,
+      maxStock,
+      productDetails.is_active,
+      t,
+    ],
   );
 
   return (
@@ -195,9 +213,12 @@ const AddToCartField = ({ productId, productDetails }: AddToCartFieldProps) => {
           </div>
 
           <MobileStickyCart
-            onAddToCart={() =>
+            onAddToCart={(cb) =>
               form.handleSubmit((values) => {
-                handleSubmitWithStockCheck(values, { openDrawer: false });
+                handleSubmitWithStockCheck(values, {
+                  openDrawer: false,
+                  onSuccess: cb?.onSuccess,
+                });
               })()
             }
             price={productDetails.final_price}

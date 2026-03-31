@@ -40,8 +40,7 @@ const normalizeFutureIncomingItems = (
   source: IncomingSourceItem[] | IncomingSourceItem | null | undefined,
   referenceDate: Date,
 ): NormalizedIncomingItem[] => {
-  const today = new Date(referenceDate);
-  today.setHours(0, 0, 0, 0);
+  const now = new Date(referenceDate);
 
   return toArray(source).flatMap((item) => {
     const quantity = toNumber(item?.quantity);
@@ -53,10 +52,9 @@ const normalizeFutureIncomingItems = (
     const date = new Date(String(rawDate));
     if (Number.isNaN(date.getTime())) return [];
 
-    date.setHours(0, 0, 0, 0);
-    // Keep consistent with product-list "incoming stock" column:
-    // only future deliveries (strictly after today).
-    if (date <= today) return [];
+    // Delivery is considered available until end of delivery day.
+    date.setHours(23, 59, 59, 999);
+    if (date < now) return [];
 
     return [{ quantity, date }];
   });

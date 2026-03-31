@@ -764,7 +764,7 @@ export const listChanel = [
   {
     id: 19,
     name: "neckermann",
-    icon: "necker.png",
+    icon: "neckermann.png",
   },
 ];
 
