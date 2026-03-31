@@ -117,6 +117,7 @@ export default function AddOrEditVouchersForm({
         {
           voucher_id: voucherValues.id,
           input: {
+            type: payload.type,
             discount_value: payload.discount_value,
             end_at: payload.end_at ?? "",
             is_active: payload.is_active,

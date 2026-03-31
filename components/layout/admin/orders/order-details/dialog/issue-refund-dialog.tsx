@@ -382,7 +382,6 @@ const IssueRefundDialog = ({
       .map((line) => {
         const missingFields: string[] = [];
         if (!line.reason) missingFields.push("reason");
-        if (line.images.length === 0) missingFields.push("images");
         if (missingFields.length === 0) return null;
 
         return `${line.name} (unit ${line.unitIndex}/${line.totalUnits}): missing ${missingFields.join(", ")}`;
