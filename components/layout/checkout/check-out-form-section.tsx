@@ -67,6 +67,7 @@ export default function CheckOutFormSection() {
     setUserLoginId,
     totalAmount,
     finalUserId,
+    authHydrated,
   } = useCheckoutInit();
 
   // -------------------------------
@@ -109,8 +110,8 @@ export default function CheckOutFormSection() {
 
   const totalEuro = useMemo(() => {
     const productsTotal =
-      userLoginId && cartItems && cartItems.length > 0
-        ? cartItems
+      userLoginId
+        ? (cartItems ?? [])
             .flatMap((g) => g.items)
             .filter((i) => i.is_active)
             .reduce((sum, item) => sum + (item.final_price ?? 0), 0)
@@ -128,7 +129,7 @@ export default function CheckOutFormSection() {
       (couponAmount ?? 0) -
       (voucherAmount ?? 0)
     );
-  }, [cartItems, localCart, shippingCost, couponAmount, voucherAmount]);
+  }, [userLoginId, cartItems, localCart, shippingCost, couponAmount, voucherAmount]);
 
   // Chuyển sang cents cho Stripe
   const totalCents = useMemo(() => {
@@ -194,6 +195,7 @@ export default function CheckOutFormSection() {
             cartItems={cartItems ?? []}
             isLoadingCart={isLoadingCart}
             localCart={localCart}
+            userLoginId={userLoginId}
           />
 
           {/* TOTAL + NOTE */}
@@ -256,7 +258,9 @@ export default function CheckOutFormSection() {
             <Button
               type="submit"
               className="lg:text-lg text-base w-full lg:w-1/3 md:w-1/2 py-6"
-              disabled={submitting}
+              disabled={
+                submitting || !authHydrated || (Boolean(userLoginId) && isLoadingCart)
+              }
             >
               {submitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -273,7 +277,9 @@ export default function CheckOutFormSection() {
               <Button
                 type="submit"
                 className="text-base w-full py-6"
-                disabled={submitting}
+                disabled={
+                  submitting || !authHydrated || (Boolean(userLoginId) && isLoadingCart)
+                }
               >
                 {submitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

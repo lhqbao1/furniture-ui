@@ -82,39 +82,6 @@ export function useCheckoutSubmit({
     createShipping.isPending ||
     createUser.isPending;
 
-  // =====================================================================================
-  // STEP 1 — Submit lần đầu → chỉ check email + mở OTP dialog
-  // =====================================================================================
-  const handleOTP = useCallback(
-    async (data: CreateOrderFormValues) => {
-      try {
-        const isDifferentEmail = user?.email && user.email !== data.email;
-
-        if (!userLoginId || isDifferentEmail) {
-          await sendOtp(data.email);
-          setPendingData(data);
-          setOtpEmail(data.email);
-          setOpenOtpDialog(true);
-          return;
-        }
-
-        // Case 3: Logged-in user, same email
-        setPendingData(data);
-        handleSubmit(data);
-      } catch (err) {
-        console.error(err);
-        toast.error(t("orderFail"));
-      }
-    },
-    [user],
-  );
-
-  const verifyOtp = useCallback(() => {
-    if (!pendingData) return;
-    handleSubmit(pendingData); // chạy tiếp phần checkout thật
-    setPendingData(null);
-  }, [pendingData]);
-
   const handleSubmit = useCallback(
     async (data: CreateOrderFormValues) => {
       let cleanupNeeded = false;
@@ -315,8 +282,42 @@ export function useCheckoutSubmit({
       localCart,
       shippingCost,
       locale,
+      userLoginId,
     ],
   );
+
+  // =====================================================================================
+  // STEP 1 — Submit lần đầu → chỉ check email + mở OTP dialog
+  // =====================================================================================
+  const handleOTP = useCallback(
+    async (data: CreateOrderFormValues) => {
+      try {
+        const isDifferentEmail = user?.email && user.email !== data.email;
+
+        if (!userLoginId || isDifferentEmail) {
+          await sendOtp(data.email);
+          setPendingData(data);
+          setOtpEmail(data.email);
+          setOpenOtpDialog(true);
+          return;
+        }
+
+        // Case 3: Logged-in user, same email
+        setPendingData(data);
+        handleSubmit(data);
+      } catch (err) {
+        console.error(err);
+        toast.error(t("orderFail"));
+      }
+    },
+    [user, userLoginId, handleSubmit, t],
+  );
+
+  const verifyOtp = useCallback(() => {
+    if (!pendingData) return;
+    handleSubmit(pendingData); // chạy tiếp phần checkout thật
+    setPendingData(null);
+  }, [pendingData, handleSubmit]);
 
   return {
     submitting,
