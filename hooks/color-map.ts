@@ -6,6 +6,9 @@ export const COLOR_MAP: Record<string, string> = {
   white: "#ffffff",
 
   grau: "#9ca3af",
+  mattgrau: "#c4c4c4",
+  "matt grau": "#c4c4c4",
+  "matt-grau": "#c4c4c4",
   hellgrau: "#d1d5db",
   dunkelgrau: "#4b5563",
   taupe: "#8b7d6b",
@@ -14,6 +17,9 @@ export const COLOR_MAP: Record<string, string> = {
 
   anthrazit: "#2f2f2f",
   schwarz: "#000000",
+  mattschwarz: "#1a1a1a",
+  "matt schwarz": "#1a1a1a",
+  "matt-schwarz": "#1a1a1a",
   black: "#000000",
 
   blau: "#2563eb",

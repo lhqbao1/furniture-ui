@@ -13,6 +13,7 @@ import { toast } from "sonner";
 
 type ExportAction =
   | "excel"
+  | "excel_basic"
   | "csv"
   | "praktiker"
   | "search"
@@ -29,7 +30,7 @@ const FilterExportForm = () => {
   const sortByIncomingStock = searchParams.get("sort_by_incoming_stock") ?? "";
   const sortByMarketplace = searchParams.get("sort_by_marketplace") ?? "";
   const isInventory = searchParams.get("is_inventory") ?? "";
-  const isEconeloParam = "true";
+  // const isEconeloParam = "true";
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
 
   const buildParams = () => {
@@ -45,9 +46,9 @@ const FilterExportForm = () => {
       params.supplier_id = supplierId;
     }
 
-    if (brandId) {
-      params.brand_id = brandId;
-    }
+    // if (brandId) {
+    //   params.brand_id = brandId;
+    // }
 
     if (search) {
       params.search = search;
@@ -69,11 +70,11 @@ const FilterExportForm = () => {
       params.is_inventory = isInventory;
     }
 
-    if (isEconeloParam === "true") {
-      params.is_econelo = true;
-    } else if (isEconeloParam === "false") {
-      params.is_econelo = false;
-    }
+    // if (isEconeloParam === "true") {
+    //   params.is_econelo = true;
+    // } else if (isEconeloParam === "false") {
+    //   params.is_econelo = false;
+    // }
 
     return params;
   };
@@ -89,7 +90,7 @@ const FilterExportForm = () => {
       sortByIncomingStock,
       sortByMarketplace,
       isInventory,
-      isEconeloParam ?? "all",
+      // isEconeloParam ?? "all",
     ],
     queryFn: () => getAllProductsSelect(buildParams()),
     enabled: false,
@@ -266,6 +267,52 @@ const FilterExportForm = () => {
     }
   };
 
+  const handleExportExcelBasic = async () => {
+    setExportingAction("excel_basic");
+    try {
+      const res = await refetch();
+      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
+      if (!data.length) {
+        toast.info("No products to export");
+        return;
+      }
+
+      const basicData = data
+        .filter(
+          (product) =>
+            (product.brand?.name ?? "").trim().toLowerCase() ===
+            "prestige home living outdoor",
+        )
+        .map((product) => ({
+          id_provider: product.id_provider ?? "",
+          name: product.name ?? "",
+          sku: product.sku ?? "",
+          ean: product.ean ?? "",
+        }));
+
+      if (!basicData.length) {
+        toast.info("No matching products for Prestige Home Living Indoor");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(basicData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      saveAs(
+        new Blob([excelBuffer], { type: "application/octet-stream" }),
+        `export-basic-${Date.now()}.xlsx`,
+      );
+    } finally {
+      setExportingAction(null);
+    }
+  };
+
   const handleExportExcelWithSearch = async () => {
     const searchValue = search || undefined;
     setExportingAction("search");
@@ -408,6 +455,17 @@ const FilterExportForm = () => {
             "Export Excel"
           )}
         </Button>
+        {/* <Button
+          onClick={handleExportExcelBasic}
+          disabled={isAnyExporting}
+          type="button"
+        >
+          {exportingAction === "excel_basic" ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            "Export Excel Basic"
+          )}
+        </Button> */}
 
         <Button
           variant="secondary"

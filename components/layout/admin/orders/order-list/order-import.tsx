@@ -132,6 +132,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_postal_code: "68167",
     invoice_country: "DE",
   },
+  bader: {
+    company_name: "BRUNO BADER GmbH + Co. KG",
+    tax_id: "DE 144173081",
+    invoice_address: "Maximilianstr. 48",
+    invoice_city: "Pforzheim",
+    invoice_postal_code: "75172",
+    invoice_country: "DE",
+  },
   // thêm sau nếu cần:
   praktiker: null,
   check24: null,
@@ -299,13 +307,18 @@ const OrderImport = () => {
           } = row;
           grouped[groupKey] = {
             ...rest,
-            total_shipping: shouldAggregateShippingByRow ? 0 : rest.total_shipping,
+            total_shipping: shouldAggregateShippingByRow
+              ? 0
+              : rest.total_shipping,
             items: [],
           };
         }
 
         if (shouldAggregateShippingByRow) {
-          const quantity = Number.isFinite(row.quantity) && row.quantity > 0 ? row.quantity : 1;
+          const quantity =
+            Number.isFinite(row.quantity) && row.quantity > 0
+              ? row.quantity
+              : 1;
           const shippingPerUnit = Number.isFinite(row.total_shipping)
             ? row.total_shipping
             : 0;
