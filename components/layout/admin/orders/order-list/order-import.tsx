@@ -281,38 +281,10 @@ const OrderImport = () => {
       const isNorma24Channel =
         normalizedChannel === "norma" || normalizedChannel === "norma24";
       const shouldAggregateShippingByRow = isNettoChannel || isNorma24Channel;
-      let validRows = normalized;
-
-      if (isNettoChannel) {
-        const missingNettoBuyerRows = normalized
-          .map((row, index) => ({
-            index,
-            marketplaceOrderId: row.marketplace_order_id,
-            nettoBuyerId: row.netto_buyer_id,
-          }))
-          .filter((row) => !row.nettoBuyerId);
-
-        if (missingNettoBuyerRows.length > 0) {
-          validRows = normalized.filter((row) => Boolean(row.netto_buyer_id));
-
-          const preview = missingNettoBuyerRows
-            .slice(0, 5)
-            .map((row) =>
-              row.marketplaceOrderId
-                ? `Order ${row.marketplaceOrderId}`
-                : `Row ${row.index + 2}`,
-            )
-            .join(", ");
-
-          toast.warning("Skipped rows missing Netto Customer ID", {
-            description: `${missingNettoBuyerRows.length} row(s) skipped. ${preview}${missingNettoBuyerRows.length > 5 ? ", ..." : ""}`,
-          });
-        }
-      }
 
       const grouped: Record<string, GroupedOrder> = {};
 
-      validRows.forEach((row, rowIndex) => {
+      normalized.forEach((row, rowIndex) => {
         const groupKey = getOrderGroupKey(row, rowIndex);
 
         if (!grouped[groupKey]) {

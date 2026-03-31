@@ -3,7 +3,6 @@
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { useRouter } from "@/src/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useAtom } from "jotai";
 import { checkOutIdAtom, paymentIdAtom } from "@/store/payment";

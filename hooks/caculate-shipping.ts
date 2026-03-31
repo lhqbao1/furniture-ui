@@ -1,6 +1,5 @@
 import { CartItemLocal } from "@/lib/utils/cart";
 import { CartItem } from "@/types/cart";
-import { ProductItem } from "@/types/products";
 
 type NormalizedCartItem = {
   carrier: string;
