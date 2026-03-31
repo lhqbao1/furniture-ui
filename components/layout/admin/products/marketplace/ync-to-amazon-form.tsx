@@ -34,6 +34,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useSyncToAmazon } from "@/features/amazon/hook";
 import { SyncToAmazonInput } from "@/features/amazon/api";
@@ -51,6 +52,15 @@ interface SyncToAmazonFormProps {
 }
 
 type MarketPlaceFormValues = z.infer<typeof amazonMarketplaceSchema>;
+type AmazonSyncIssue = {
+  severity?: string;
+  message?: string;
+};
+
+type AmazonSyncResponse = {
+  status?: string;
+  issues?: AmazonSyncIssue[];
+};
 
 const NORMA_OWNER_BUSINESS_NAME = "NORMA24 Online-Shop GmbH & Co. KG";
 const NORMA_PACKAGE_FALLBACK = {
@@ -67,6 +77,7 @@ const SyncToAmazonForm = ({
   setUpdating,
   isAdd,
 }: SyncToAmazonFormProps) => {
+  const queryClient = useQueryClient();
   const updateProductMutation = useEditProduct();
   const syncToAmazonMutation = useSyncToAmazon();
 
@@ -124,20 +135,53 @@ const SyncToAmazonForm = ({
   }, [form, defaultValues]);
 
   const handleSubmit = (values: MarketPlaceFormValues) => {
+    const loadingToastId: string | number = toast.loading(
+      "Syncing marketplace data...",
+      {
+        description: (
+          <div className="space-y-0.5">
+            <div>Name: {product.name ?? "—"}</div>
+            <div>EAN: {product.ean ?? "—"}</div>
+            <div>SKU: {product.sku ?? "—"}</div>
+          </div>
+        ),
+      },
+    );
+    const invalidateProductQueries = () => {
+      queryClient.invalidateQueries({ queryKey: ["all-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", product.id] });
+    };
+    const finalizeSuccess = () => {
+      toast.success("Sync marketplace data success", {
+        id: loadingToastId,
+      });
+      setUpdating(false);
+      setOpen(false);
+      invalidateProductQueries();
+    };
+    const finalizeError = (message: string, description?: string) => {
+      toast.error(message, {
+        id: loadingToastId,
+        ...(description ? { description } : {}),
+      });
+      setUpdating(false);
+    };
+
     if (!product.brand) {
-      toast.error("Brand is missing from current product");
+      finalizeError("Brand is missing from current product");
       return;
     }
 
     const selectedMarketplace = values.marketplace ?? currentMarketplace ?? "";
 
     if (!selectedMarketplace) {
-      toast.error("Marketplace is missing");
+      finalizeError("Marketplace is missing");
       return;
     }
 
     if (!values.handling_time || values.handling_time === 0) {
-      toast.error("Handling times is missing from current product");
+      finalizeError("Handling times is missing from current product");
       return;
     }
 
@@ -225,6 +269,7 @@ const SyncToAmazonForm = ({
         },
 
         id: product.id,
+        skipInvalidateProducts: true,
       },
       {
         onSuccess(data) {
@@ -271,7 +316,8 @@ const SyncToAmazonForm = ({
             ].find((field) => !field.value);
 
             if (missingField) {
-              return toast.error(`Missing ${missingField.label}`);
+              finalizeError(`Missing ${missingField.label}`);
+              return;
             }
             const amazonData = data.marketplace_products?.find(
               (m) => m.marketplace === "amazon",
@@ -323,19 +369,50 @@ const SyncToAmazonForm = ({
               bullet_point5: product.bullet_point_5 ?? null,
             };
 
-            syncToAmazonMutation.mutate(payload, {
-              onError(error) {
-                toast.error("Failed to update marketplace data", {
-                  description: error.message,
-                });
+            syncToAmazonMutation.mutate(
+              { ...payload, __silent: true },
+              {
+                onSuccess(response) {
+                  const syncResponse = response as AmazonSyncResponse;
+                  const status = syncResponse?.status;
+                  const issues = Array.isArray(syncResponse?.issues)
+                    ? syncResponse.issues
+                    : [];
+                  const errorIssue = issues.find(
+                    (issue) =>
+                      issue?.severity?.toUpperCase() === "ERROR" &&
+                      issue?.message,
+                  );
+
+                  if (errorIssue?.message) {
+                    finalizeError(errorIssue.message);
+                    return;
+                  }
+
+                  if (status !== "ACCEPTED") {
+                    finalizeError(
+                      `Amazon returned status: ${status ?? "UNKNOWN"}`,
+                    );
+                    return;
+                  }
+
+                  finalizeSuccess();
+                },
+                onError(error) {
+                  finalizeError(
+                    "Failed to update marketplace data",
+                    error.message,
+                  );
+                },
               },
-            });
+            );
+            return;
           }
+
+          finalizeSuccess();
         },
         onError(e) {
-          toast.error("Failed to update marketplace data", {
-            description: e.message,
-          });
+          finalizeError("Failed to update marketplace data", e.message);
         },
       },
     );

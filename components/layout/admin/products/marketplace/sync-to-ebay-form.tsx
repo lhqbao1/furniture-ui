@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import { syncToKauflandInput } from "@/features/kaufland/api";
 import { useSyncToKaufland } from "@/features/kaufland/hook";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SyncToEbayFormProps {
   product: ProductItem;
@@ -59,7 +60,12 @@ export function parseError(error: unknown): string {
   if (error instanceof Error) return error.message;
 
   if (typeof error === "object") {
-    const e = error as any;
+    const e = error as {
+      response?: { data?: { detail?: unknown; message?: unknown } };
+      data?: { message?: unknown };
+      error?: { message?: unknown };
+      message?: unknown;
+    };
 
     return (
       e?.response?.data?.detail ||
@@ -81,6 +87,7 @@ const SyncToEbayForm = ({
   setUpdating,
   isAdd,
 }: SyncToEbayFormProps) => {
+  const queryClient = useQueryClient();
   const updateProductMutation = useEditProduct();
   const syncToEbayMutation = useSyncToEbay();
   const syncToKauflandMutation = useSyncToKaufland();
@@ -158,6 +165,23 @@ const SyncToEbayForm = ({
 
   const onSubmit = (values: MarketPlaceFormValues) => {
     let loadingToastId: string | number | undefined;
+    const invalidateProductQueries = () => {
+      queryClient.invalidateQueries({ queryKey: ["all-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", product.id] });
+    };
+    const finalizeSuccess = () => {
+      toast.success("Sync marketplace data success", {
+        id: loadingToastId,
+      });
+      setUpdating(false);
+      setOpen(false);
+      invalidateProductQueries();
+    };
+    const finalizeError = (message: string, description?: string) => {
+      toast.error(message, { id: loadingToastId, description });
+      setUpdating(false);
+    };
 
     if (!product.brand) {
       toast.error("Brand is missing from current product");
@@ -272,9 +296,8 @@ const SyncToEbayForm = ({
           ].find((field) => !field.value);
 
           if (missingField) {
-            return toast.error(`Missing ${missingField.label}`, {
-              id: loadingToastId,
-            });
+            finalizeError(`Missing ${missingField.label}`);
+            return;
           }
           const payload: syncToEbayInput = {
             price: marketplaceData?.final_price ?? product.final_price,
@@ -320,21 +343,17 @@ const SyncToEbayForm = ({
             { ...payload, __silent: true },
             {
               onSuccess() {
-                toast.success("Sync marketplace data success", {
-                  id: loadingToastId,
-                });
-                setUpdating(false);
-                setOpen(false);
+                finalizeSuccess();
               },
               onError(error) {
-                toast.error("Failed to update marketplace data", {
-                  id: loadingToastId,
-                  description: error.message,
-                });
-                setUpdating(false);
+                finalizeError(
+                  "Failed to update marketplace data",
+                  error.message,
+                );
               },
             },
           );
+          return;
         }
 
         if (marketplace === "kaufland") {
@@ -355,9 +374,8 @@ const SyncToEbayForm = ({
           ].find((field) => !field.value);
 
           if (missingField) {
-            return toast.error(`Missing ${missingField.label}`, {
-              id: loadingToastId,
-            });
+            finalizeError(`Missing ${missingField.label}`);
+            return;
           }
           const payload: syncToKauflandInput = {
             ean: product.ean,
@@ -397,23 +415,21 @@ const SyncToEbayForm = ({
             { ...payload, __silent: true },
             {
               onSuccess() {
-                toast.success("Sync marketplace data success", {
-                  id: loadingToastId,
-                });
-                setUpdating(false);
-                setOpen(false);
+                finalizeSuccess();
               },
               onError(error) {
                 console.log(error);
-                toast.error("Failed to update marketplace data", {
-                  id: loadingToastId,
-                  description: error.message,
-                });
-                setUpdating(false);
+                finalizeError(
+                  "Failed to update marketplace data",
+                  error.message,
+                );
               },
             },
           );
+          return;
         }
+
+        finalizeError("Unsupported marketplace for this form");
       };
 
       const {
@@ -445,6 +461,7 @@ const SyncToEbayForm = ({
           },
 
           id: product.id,
+          skipInvalidateProducts: true,
         },
         {
           onSuccess(data) {
@@ -459,28 +476,18 @@ const SyncToEbayForm = ({
               return;
             }
 
-            toast.success("Sync marketplace data success", {
-              id: loadingToastId,
-            });
-            setUpdating(false);
-            setOpen(false);
+            finalizeSuccess();
           },
           onError(e) {
-            toast.error("Failed to update marketplace data", {
-              id: loadingToastId,
-              description: parseError(e),
-            });
-            setUpdating(false);
+            finalizeError("Failed to update marketplace data", parseError(e));
           },
         },
       );
     } catch (error) {
-      toast.error("Submit failed", {
-        id: loadingToastId,
-        description:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      });
-      setUpdating(false);
+      finalizeError(
+        "Submit failed",
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
     }
   };
 

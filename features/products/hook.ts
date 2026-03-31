@@ -207,12 +207,21 @@ export function useAddProduct() {
 export function useEditProduct() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: EditProductInput }) =>
+    mutationFn: ({
+      id,
+      input,
+    }: {
+      id: string;
+      input: EditProductInput;
+      skipInvalidateProducts?: boolean;
+    }) =>
       editProduct(input, id),
     onSuccess: (res, variables) => {
-      qc.invalidateQueries({ queryKey: ["all-products"] });
-      qc.invalidateQueries({ queryKey: ["products"] });
-      qc.invalidateQueries({ queryKey: ["product", variables.id] });
+      if (!variables.skipInvalidateProducts) {
+        qc.invalidateQueries({ queryKey: ["all-products"] });
+        qc.invalidateQueries({ queryKey: ["products"] });
+        qc.invalidateQueries({ queryKey: ["product", variables.id] });
+      }
     },
   });
 }

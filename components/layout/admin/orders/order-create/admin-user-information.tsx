@@ -79,7 +79,8 @@ export function AdminCheckOutUserInformation({
     value: string;
     label: string;
   } | null>(null);
-  const deleteInformationManualOrderMutation = useDeleteInformationManualOrder();
+  const deleteInformationManualOrderMutation =
+    useDeleteInformationManualOrder();
   const { data: savedUsersResponse, isLoading: isLoadingSavedUsers } =
     useGetInformationManualOrders();
 
@@ -114,7 +115,8 @@ export function AdminCheckOutUserInformation({
           postalCodeLabel,
           cityLabel,
         ].filter(Boolean);
-        const secondaryLabel = details.length > 0 ? ` - ${details.join(" - ")}` : "";
+        const secondaryLabel =
+          details.length > 0 ? ` - ${details.join(" - ")}` : "";
 
         return {
           value: optionValue,
@@ -156,7 +158,9 @@ export function AdminCheckOutUserInformation({
     form.setValue("first_name", savedUser.first_name ?? "", {
       shouldDirty: true,
     });
-    form.setValue("last_name", savedUser.last_name ?? "", { shouldDirty: true });
+    form.setValue("last_name", savedUser.last_name ?? "", {
+      shouldDirty: true,
+    });
     form.setValue("company_name", savedUser.company ?? "", {
       shouldDirty: true,
     });
@@ -215,18 +219,16 @@ export function AdminCheckOutUserInformation({
     );
     form.setValue(
       "additional_address",
-      savedUser.recipient_additional_address ?? savedUser.additional_address ?? "",
+      savedUser.recipient_additional_address ??
+        savedUser.additional_address ??
+        "",
       {
         shouldDirty: true,
       },
     );
-    form.setValue(
-      "city",
-      savedUser.recipient_city ?? savedUser.city ?? "",
-      {
-        shouldDirty: true,
-      },
-    );
+    form.setValue("city", savedUser.recipient_city ?? savedUser.city ?? "", {
+      shouldDirty: true,
+    });
     form.setValue(
       "postal_code",
       savedUser.recipient_postal_code ?? savedUser.postal_code ?? "",
@@ -314,7 +316,10 @@ export function AdminCheckOutUserInformation({
               onSaveUserInformationChange(checked === true)
             }
           />
-          <Label htmlFor="save-user-information" className="text-sm font-medium">
+          <Label
+            htmlFor="save-user-information"
+            className="text-sm font-medium"
+          >
             Save user information
           </Label>
         </div>
@@ -349,7 +354,7 @@ export function AdminCheckOutUserInformation({
                       {option.id ? (
                         <button
                           type="button"
-                          className="rounded p-1 text-red-500 hover:bg-red-50"
+                          className="rounded p-1 text-red-500 hover:bg-red-50 pointer-events-auto cursor-pointer"
                           onPointerDown={(event) => {
                             event.preventDefault();
                             event.stopPropagation();

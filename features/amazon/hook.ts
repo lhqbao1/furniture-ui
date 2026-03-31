@@ -4,27 +4,44 @@ import { toast } from "sonner";
 import { removeFromAmazon, syncToAmazon, SyncToAmazonInput } from "./api";
 
 type SyncErrorResponse = AmazonError | AuthError | GenericError;
+type SyncToAmazonInputWithMeta = SyncToAmazonInput & { __silent?: boolean };
+type AmazonSyncIssue = {
+  severity?: string;
+  message?: string;
+};
+type AmazonSyncResponse = {
+  status?: string;
+  issues?: AmazonSyncIssue[];
+};
 
 export function useSyncToAmazon() {
   const qc = useQueryClient();
 
   return useMutation<
-    any, // response data kiểu nào cũng nhận
+    AmazonSyncResponse,
     AxiosError<SyncErrorResponse>,
-    SyncToAmazonInput,
+    SyncToAmazonInputWithMeta,
     string | number
   >({
-    mutationFn: (input) => syncToAmazon(input),
+    mutationFn: (input) => {
+      const payload = { ...input } as SyncToAmazonInputWithMeta;
+      delete payload.__silent;
+      return syncToAmazon(payload as SyncToAmazonInput);
+    },
 
-    onMutate: () => toast.loading("Syncing data to Amazon..."),
+    onMutate: (variables) => {
+      if (variables.__silent) return;
+      return toast.loading("Syncing data to Amazon...");
+    },
 
-    onSuccess: (data, _vars, toastId) => {
+    onSuccess: (data, vars, toastId) => {
+      if (vars.__silent) return;
       const status = data?.status;
       const issues = data?.issues ?? [];
 
       // 1) Tìm issues có severity = ERROR
       const errorIssue = issues.find(
-        (i: any) => i.severity?.toUpperCase() === "ERROR",
+        (issue) => issue.severity?.toUpperCase() === "ERROR",
       );
 
       if (errorIssue) {
@@ -43,13 +60,20 @@ export function useSyncToAmazon() {
       qc.invalidateQueries({ queryKey: ["products"] });
     },
 
-    onError: (error, _vars, toastId) => {
+    onError: (error, vars, toastId) => {
+      if (vars.__silent) return;
       let message = "Update to Amazon failed";
 
       try {
-        const data = error.response?.data as any;
+        const data = error.response?.data as
+          | {
+              detail?: { errors?: Array<{ message?: string }> } | string;
+              message?: string;
+              error?: string;
+            }
+          | undefined;
         message =
-          data?.detail?.errors?.[0]?.message ||
+          (typeof data?.detail === "object" && data?.detail?.errors?.[0]?.message) ||
           data?.message ||
           data?.error ||
           error.message;
@@ -66,7 +90,7 @@ export function useRemoveFromAmazon() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (sku: string) => removeFromAmazon(sku),
-    onSuccess(data, variables, context) {
+    onSuccess() {
       qc.invalidateQueries({ queryKey: ["products"] });
     },
   });
