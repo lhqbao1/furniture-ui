@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { FileDigit, Loader2 } from "lucide-react";
+import { CalendarIcon, FileDigit, Loader2 } from "lucide-react";
 import { VoucherItem } from "@/types/voucher";
 import {
   voucherDefaultValues,
@@ -21,8 +21,6 @@ import {
 } from "@/lib/schema/voucher";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-
 import {
   Popover,
   PopoverTrigger,
@@ -35,11 +33,30 @@ import {
   useUpdateVoucher,
 } from "@/features/vouchers/hook";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 type AddOrEditVouchersFormProps = {
   submitText?: string;
   onClose?: () => void;
   voucherValues?: VoucherItem;
+};
+
+const voucherTypeOptions = [
+  { value: "product", label: "Product" },
+  { value: "order", label: "Order" },
+  { value: "user_specific", label: "User" },
+  { value: "shipping", label: "Shipping" },
+] as const;
+
+const discountTypeOptions = [
+  { value: "percent", label: "Percent (%)" },
+  { value: "fixed", label: "Fixed Amount" },
+] as const;
+
+const parseIsoDate = (value?: string | null) => {
+  if (!value) return undefined;
+  const parsedDate = new Date(value);
+  return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate;
 };
 
 function removeZ(dateString?: string) {
@@ -100,6 +117,7 @@ export default function AddOrEditVouchersForm({
         {
           voucher_id: voucherValues.id,
           input: {
+            type: payload.type,
             discount_value: payload.discount_value,
             end_at: payload.end_at ?? "",
             is_active: payload.is_active,
@@ -150,22 +168,19 @@ export default function AddOrEditVouchersForm({
           (values) => {
             handleSubmit(values);
           },
-          (errors) => {
+          () => {
             toast.error("Please check the form for errors");
           },
         )}
-        className="space-y-6"
+        className="space-y-5"
       >
         {/* Voucher status */}
         <FormField
           control={form.control}
           name="is_active"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-start gap-2 w-fit">
-              <div className="space-y-1">
-                <FormLabel>Status</FormLabel>
-              </div>
-
+            <FormItem className="inline-flex w-fit items-center gap-3 rounded-lg border bg-muted/20 px-4 py-2">
+              <FormLabel className="mb-0">Status</FormLabel>
               <FormControl>
                 <Switch
                   checked={field.value}
@@ -178,41 +193,43 @@ export default function AddOrEditVouchersForm({
             </FormItem>
           )}
         />
-        {/* Voucher Code */}
-        <FormField
-          control={form.control}
-          name="code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Voucher Code</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Voucher Code"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* Voucher Code */}
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Voucher Code</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Voucher Code"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Voucher Name */}
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Voucher Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Voucher Name"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Voucher Name */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Voucher Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Voucher Name"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {/* Voucher Type */}
         <FormField
@@ -226,40 +243,26 @@ export default function AddOrEditVouchersForm({
                 <RadioGroup
                   onValueChange={field.onChange}
                   value={field.value}
-                  className="grid grid-cols-1 gap-2"
+                  className="grid grid-cols-2 gap-2 md:grid-cols-4"
                 >
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <RadioGroupItem value="product" />
-                    </FormControl>
-                    <FormLabel className="cursor-pointer">Product</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <RadioGroupItem value="user_specific" />
-                    </FormControl>
-                    <FormLabel className="cursor-pointer">User</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <RadioGroupItem
-                        value="shipping"
-                        // disabled={watchDiscountType === "freeship"}
-                      />
-                    </FormControl>
-                    <FormLabel
-                      // className={`cursor-pointer
-                      //   ${
-                      //     watchDiscountType === "freeship"
-                      //       ? "text-gray-300"
-                      //       : ""
-                      //   }
-                      // `}
-                      className="curosr-pointer"
+                  {voucherTypeOptions.map((option) => (
+                    <FormItem
+                      key={option.value}
+                      className={cn(
+                        "flex items-center gap-2 rounded-md border px-3 py-2 transition-colors",
+                        field.value === option.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border",
+                      )}
                     >
-                      Shipping
-                    </FormLabel>
-                  </FormItem>
+                      <FormControl>
+                        <RadioGroupItem value={option.value} />
+                      </FormControl>
+                      <FormLabel className="cursor-pointer mb-0">
+                        {option.label}
+                      </FormLabel>
+                    </FormItem>
+                  ))}
                 </RadioGroup>
               </FormControl>
 
@@ -280,27 +283,26 @@ export default function AddOrEditVouchersForm({
                 <RadioGroup
                   onValueChange={field.onChange}
                   value={field.value}
-                  className="grid grid-cols-1 gap-3"
+                  className="grid grid-cols-1 gap-2 md:grid-cols-2"
                 >
-                  {/* Percent */}
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <RadioGroupItem value="percent" />
-                    </FormControl>
-                    <FormLabel className="cursor-pointer">
-                      Percent (%)
-                    </FormLabel>
-                  </FormItem>
-
-                  {/* Fixed Amount */}
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <RadioGroupItem value="fixed" />
-                    </FormControl>
-                    <FormLabel className="cursor-pointer">
-                      Fixed Amount
-                    </FormLabel>
-                  </FormItem>
+                  {discountTypeOptions.map((option) => (
+                    <FormItem
+                      key={option.value}
+                      className={cn(
+                        "flex items-center gap-2 rounded-md border px-3 py-2 transition-colors",
+                        field.value === option.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border",
+                      )}
+                    >
+                      <FormControl>
+                        <RadioGroupItem value={option.value} />
+                      </FormControl>
+                      <FormLabel className="cursor-pointer mb-0">
+                        {option.label}
+                      </FormLabel>
+                    </FormItem>
+                  ))}
                 </RadioGroup>
               </FormControl>
               <FormMessage />
@@ -320,29 +322,29 @@ export default function AddOrEditVouchersForm({
                   <RadioGroup
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
-                    className="flex gap-6"
+                    className="grid grid-cols-1 gap-2 md:grid-cols-3"
                   >
-                    <FormItem className="flex items-center gap-2">
+                    <FormItem className="flex items-center gap-2 rounded-md border px-3 py-2">
                       <FormControl>
                         <RadioGroupItem value="dpd" />
                       </FormControl>
-                      <FormLabel className="cursor-pointer">DPD</FormLabel>
+                      <FormLabel className="cursor-pointer mb-0">DPD</FormLabel>
                     </FormItem>
 
-                    <FormItem className="flex items-center gap-2">
+                    <FormItem className="flex items-center gap-2 rounded-md border px-3 py-2">
                       <FormControl>
                         <RadioGroupItem value="amm" />
                       </FormControl>
-                      <FormLabel className="cursor-pointer">
+                      <FormLabel className="cursor-pointer mb-0">
                         Spedition
                       </FormLabel>
                     </FormItem>
 
-                    <FormItem className="flex items-center gap-2">
+                    <FormItem className="flex items-center gap-2 rounded-md border px-3 py-2">
                       <FormControl>
                         <RadioGroupItem value="all" />
                       </FormControl>
-                      <FormLabel className="cursor-pointer">All</FormLabel>
+                      <FormLabel className="cursor-pointer mb-0">All</FormLabel>
                     </FormItem>
                   </RadioGroup>
                 </FormControl>
@@ -353,7 +355,7 @@ export default function AddOrEditVouchersForm({
           />
         )}
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           {/* Voucher Discount Value */}
           <FormField
             control={form.control}
@@ -453,93 +455,107 @@ export default function AddOrEditVouchersForm({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Voucher Start Date */}
           <FormField
             control={form.control}
             name="start_at"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
+            render={({ field }) => {
+              const parsedStartDate = parseIsoDate(field.value);
 
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        {field.value ? (
-                          format(new Date(field.value), "PPP") // Hiển thị đẹp nhưng value vẫn là ISO
-                        ) : (
-                          <span>Select a start date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
+              return (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Start Date</FormLabel>
 
-                  <PopoverContent className="p-0 pointer-events-auto">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => {
-                        field.onChange(date?.toISOString() ?? null); // ✔️ trả về ISO date
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                  <Popover modal>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal"
+                        >
+                          {parsedStartDate ? (
+                            format(parsedStartDate, "PPP")
+                          ) : (
+                            <span>Select a start date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
 
-                <FormMessage />
-              </FormItem>
-            )}
+                    <PopoverContent
+                      align="start"
+                      className="z-[80] w-auto p-0 pointer-events-auto"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={parsedStartDate}
+                        onSelect={(date) => {
+                          field.onChange(date?.toISOString() ?? null);
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
 
           {/* Voucher Expired Date */}
           <FormField
             control={form.control}
             name="end_at"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Expired Date</FormLabel>
+            render={({ field }) => {
+              const parsedEndDate = parseIsoDate(field.value);
 
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        {field.value ? (
-                          format(new Date(field.value), "PPP") // Hiển thị đẹp nhưng value vẫn là ISO
-                        ) : (
-                          <span>Select a expired date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
+              return (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Expired Date</FormLabel>
 
-                  <PopoverContent className="p-0 pointer-events-auto">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => {
-                        field.onChange(date?.toISOString() ?? null); // ✔️ trả về ISO date
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                  <Popover modal>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal"
+                        >
+                          {parsedEndDate ? (
+                            format(parsedEndDate, "PPP")
+                          ) : (
+                            <span>Select a expired date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
 
-                <FormMessage />
-              </FormItem>
-            )}
+                    <PopoverContent
+                      align="start"
+                      className="z-[80] w-auto p-0 pointer-events-auto"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={parsedEndDate}
+                        onSelect={(date) => {
+                          field.onChange(date?.toISOString() ?? null);
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Amount */}
           <FormField
             control={form.control}
