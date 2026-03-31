@@ -13,19 +13,6 @@ import { SupplierResponse } from "@/types/supplier";
 import SupplierSelect from "../../products/products-list/toolbar/supplier-select";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
-function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
-  const range = XLSX.utils.decode_range(worksheet["!ref"]!);
-  for (let r = range.s.r + 1; r <= range.e.r; r++) {
-    columns.forEach((c) => {
-      const addr = `${c}${r + 1}`;
-      if (worksheet[addr]) {
-        worksheet[addr].t = "s"; // string
-        worksheet[addr].z = "@"; // TEXT format (QUAN TRỌNG)
-      }
-    });
-  }
-}
-
 const ExportInventoryDialog = () => {
   const [supplier, setSupplier] = useState<string>("");
   const [status, setStatus] = useState<"active" | "inactive" | "all">("all");
@@ -68,45 +55,46 @@ const ExportInventoryDialog = () => {
       const available = calculateAvailableStock(p);
 
       return {
-      id: p.id_provider ?? undefined, // text
-      name: p.name ?? undefined, // text
-      ean: p.ean ?? undefined, // text
-      sku: p.sku ?? undefined, // text
-      supplier: p.owner?.business_name ?? undefined, // text
+        id: p.id_provider ?? undefined, // text
+        name: p.name ?? undefined, // text
+        ean: p.ean ?? undefined, // text
+        sku: p.sku ?? undefined, // text
+        supplier: p.owner?.business_name ?? undefined, // text
 
-      // === cost & price ===
-      net_purchase_cost: typeof p.cost === "number" ? p.cost : undefined,
+        // === cost & price ===
+        net_purchase_cost: typeof p.cost === "number" ? p.cost : undefined,
 
-      sale_price: typeof p.final_price === "number" ? p.final_price : undefined,
+        sale_price:
+          typeof p.final_price === "number" ? p.final_price : undefined,
 
-      // === stock === (value)
-      available_stock: available,
+        // === stock === (value)
+        available_stock: available,
 
-      reserved_stock:
-        typeof p.result_stock === "number" ? p.result_stock : undefined,
+        reserved_stock:
+          typeof p.result_stock === "number" ? p.result_stock : undefined,
 
-      physical_stock: typeof p.stock === "number" ? p.stock : undefined,
+        physical_stock: typeof p.stock === "number" ? p.stock : undefined,
 
-      // === purchase value ===
-      available_purchase_value:
-        typeof p.cost === "number" ? available * p.cost : undefined,
+        // === purchase value ===
+        available_purchase_value:
+          typeof p.cost === "number" ? available * p.cost : undefined,
 
-      reserved_purchase_value:
-        typeof p.cost === "number" && typeof p.result_stock === "number"
-          ? p.result_stock * p.cost
-          : undefined,
+        reserved_purchase_value:
+          typeof p.cost === "number" && typeof p.result_stock === "number"
+            ? p.result_stock * p.cost
+            : undefined,
 
-      physical_purchase_value:
-        typeof p.cost === "number" && typeof p.stock === "number"
-          ? p.stock * p.cost
-          : undefined,
+        physical_purchase_value:
+          typeof p.cost === "number" && typeof p.stock === "number"
+            ? p.stock * p.cost
+            : undefined,
 
-      // === sale value ===
-      available_sale_value:
-        typeof p.final_price === "number"
-          ? available * p.final_price
-          : undefined,
-    };
+        // === sale value ===
+        available_sale_value:
+          typeof p.final_price === "number"
+            ? available * p.final_price
+            : undefined,
+      };
     });
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -167,29 +155,17 @@ const ExportInventoryDialog = () => {
         {/* Status Filter */}
         <div className="space-y-2">
           <Label>Status</Label>
-          <RadioGroup
-            value={status}
-            onValueChange={(v) => setStatus(v as any)}
-          >
+          <RadioGroup value={status} onValueChange={(v) => setStatus(v as any)}>
             <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="active"
-                id="status-active"
-              />
+              <RadioGroupItem value="active" id="status-active" />
               <Label htmlFor="status-active">Active</Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="inactive"
-                id="status-inactive"
-              />
+              <RadioGroupItem value="inactive" id="status-inactive" />
               <Label htmlFor="status-inactive">Inactive</Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="all"
-                id="status-all"
-              />
+              <RadioGroupItem value="all" id="status-all" />
               <Label htmlFor="status-all">All</Label>
             </div>
           </RadioGroup>
@@ -198,10 +174,7 @@ const ExportInventoryDialog = () => {
 
       {/* Export Button */}
       <div className="flex justify-end">
-        <Button
-          onClick={handleExport}
-          disabled={isFetching}
-        >
+        <Button onClick={handleExport} disabled={isFetching}>
           {isFetching ? <Loader2 className="animate-spin" /> : "Export Excel"}
         </Button>
       </div>

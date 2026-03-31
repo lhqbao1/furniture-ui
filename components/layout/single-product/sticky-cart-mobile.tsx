@@ -18,7 +18,7 @@ import { FormQuantityInputMobile } from "./details/quantity-input-mobile";
 interface MobileStickyCartProps {
   price: number;
   oldPrice?: number;
-  onAddToCart?: () => void;
+  onAddToCart?: (options?: { onSuccess?: () => void }) => void;
   maxStock: number;
   isActive: boolean;
 }
@@ -96,8 +96,11 @@ export default function MobileStickyCart({
                 className="rounded-md font-bold flex-1 lg:px-12 mr-1 text-center justify-center lg:text-lg text-base lg:min-h-[40px] lg:h-fit !h-[40px] w-full"
                 type="button"
                 onClick={() => {
-                  onAddToCart?.(); // ✅ gọi hàm
-                  router.push("/cart", { locale });
+                  onAddToCart?.({
+                    onSuccess: () => {
+                      router.push("/cart", { locale });
+                    },
+                  });
                 }}
               >
                 {/* {productDetails.stock > 0 ? t("addToCart") : t("outStock")} */}
