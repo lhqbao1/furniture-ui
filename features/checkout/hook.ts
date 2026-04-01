@@ -17,6 +17,7 @@ import {
   createDeliveryOrder,
   createRefundMainCheckout,
   createManualCheckOut,
+  deleteCheckoutPdfFile,
   DeliveryOrderPayload,
   getAllCheckOutMain,
   getCheckOutRefundOrders,
@@ -38,6 +39,7 @@ import {
   OrderStatisticsParams,
   returnOrder,
   returnIssueOrder,
+  uploadCheckoutPdfFile,
   uploadCheckoutFiles,
   UploadCheckoutFilesPayload,
   updateReasonForMainCheckout,
@@ -436,6 +438,41 @@ export function useUploadCheckoutFiles() {
       main_checkout_id: string;
       payload: UploadCheckoutFilesPayload;
     }) => uploadCheckoutFiles(main_checkout_id, payload),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+    },
+  });
+}
+
+export function useUploadCheckoutPdfFile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      url,
+    }: {
+      main_checkout_id: string;
+      url: string;
+    }) => uploadCheckoutPdfFile(main_checkout_id, url),
+    onSuccess: (data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+    },
+  });
+}
+
+export function useDeleteCheckoutPdfFile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ main_checkout_id }: { main_checkout_id: string }) =>
+      deleteCheckoutPdfFile(main_checkout_id),
     onSuccess: (data, variables) => {
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables.main_checkout_id],

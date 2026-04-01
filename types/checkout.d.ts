@@ -10,6 +10,16 @@ interface CheckOutResponse {
   pagination: Pagination;
 }
 
+export interface CheckOutShipmentProductReturn {
+  sku: string;
+  quantity: number;
+  name: string;
+  type: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CheckOutShipment {
   checkout_id: string;
   checkout_marketplace_id: string;
@@ -21,6 +31,7 @@ export interface CheckOutShipment {
   tracking_number: string;
   shipper_date: string;
   shipping_carrier: string;
+  product_returns: CheckOutShipmentProductReturn;
 }
 
 interface CartResponseCheckOut {
@@ -60,9 +71,29 @@ export interface CheckOutPaymentRl {
   capture_id?: string;
 }
 
+export interface CheckoutMainProductRefundFile {
+  url: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CheckoutMainProductRefundItem {
+  name: string;
+  sku: string;
+  quantity: number;
+  id_provider: string;
+  unit_price: number;
+  refund_amount: number;
+  reason: string;
+  type: string;
+  files: CheckoutMainProductRefundFile[];
+}
+
 export interface CheckOutMain {
   id: string;
   checkout_code: string;
+  invoice_pdf_file?: string | null;
   status: string;
   note: string;
   total_amount_item: number;
@@ -79,6 +110,7 @@ export interface CheckOutMain {
   payment_rl: CheckOutPaymentRl;
   files: StaticFile[];
   refund_amount: number;
+  product_refund?: CheckoutMainProductRefundItem[];
   created_at: Date;
   updated_at: Date;
 }
@@ -108,7 +140,6 @@ export interface RefundOrderProduct {
 
 export interface RefundOrderItem extends CheckOutMain {
   reason?: string;
-  invoice_pdf_file?: string;
   product_refund?: RefundOrderProduct[];
 }
 

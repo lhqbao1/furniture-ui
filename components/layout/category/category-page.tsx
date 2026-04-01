@@ -134,6 +134,7 @@ const ProductCategory = ({
               isParentCategory={
                 listCategory && listCategory.child.length > 0 ? true : false
               }
+              categorySlug={categorySlug}
             />
           </div>
         </div>

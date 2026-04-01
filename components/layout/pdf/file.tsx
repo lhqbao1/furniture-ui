@@ -412,7 +412,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               </View>
             )}
 
-            {/* <View
+            <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -424,8 +424,8 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               <Text style={{ width: 115, fontWeight: "bold" }}>
                 Ihre Kundennummer:
               </Text>
-              <Text>1011</Text>
-            </View> */}
+              {/* <Text>1011</Text> */}
+            </View>
 
             {hasMarketplaceReference && (
               <View
