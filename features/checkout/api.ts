@@ -58,6 +58,11 @@ export interface UploadCheckoutFilesResponse {
   [key: string]: unknown;
 }
 
+export interface CheckoutPdfFileResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
 export interface ProductRefundFile {
   url: string;
   id?: string;
@@ -333,6 +338,26 @@ export async function uploadCheckoutFiles(
   );
 
   return data as UploadCheckoutFilesResponse;
+}
+
+export async function uploadCheckoutPdfFile(
+  main_checkout_id: string,
+  url: string,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/pdf-file/${main_checkout_id}`,
+    null,
+    {
+      params: { url },
+    },
+  );
+
+  return data as CheckoutPdfFileResponse;
+}
+
+export async function deleteCheckoutPdfFile(main_checkout_id: string) {
+  const { data } = await apiAdmin.delete(`/checkout/pdf-file/${main_checkout_id}`);
+  return data as CheckoutPdfFileResponse;
 }
 
 export async function getProductRefundByMainCheckoutId(

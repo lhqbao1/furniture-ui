@@ -13,8 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckOut, CheckOutMain } from "@/types/checkout";
-import { formatDateTime, formatDateTimeString } from "@/lib/date-formated";
+import { CheckOutMain } from "@/types/checkout";
+import { formatDateTimeString } from "@/lib/date-formated";
 
 interface DocumentTableProps {
   order?: CheckOutMain;
@@ -71,9 +71,18 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
     return baseData;
   }, [order, invoiceCode]);
 
+  const columns = useMemo(
+    () =>
+      documentColumns({
+        invoicePdfFile: order?.invoice_pdf_file ?? null,
+        mainCheckoutId: order?.id,
+      }),
+    [order?.id, order?.invoice_pdf_file],
+  );
+
   const table = useReactTable({
     data,
-    columns: documentColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -115,7 +124,7 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
           ) : (
             <TableRow>
               <TableCell
-                colSpan={documentColumns.length}
+                colSpan={columns.length}
                 className="h-24 text-center"
               >
                 No results.

@@ -21,12 +21,14 @@ interface ShopAllFilterSectionProps {
   isShopAll?: boolean;
   isParentCategory?: boolean;
   isMobileDrawer?: boolean;
+  categorySlug?: string;
 }
 
 const ShopAllFilterSection = ({
   isShopAll = true,
   isParentCategory = false,
   isMobileDrawer = false,
+  categorySlug,
 }: ShopAllFilterSectionProps) => {
   const t = useTranslations();
   const router = useRouter();
@@ -112,7 +114,10 @@ const ShopAllFilterSection = ({
               </span>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 text-balance pt-1">
-              <FilterListCategories isParentCategory={isParentCategory} />
+              <FilterListCategories
+                isParentCategory={isParentCategory}
+                categorySlug={categorySlug}
+              />
             </AccordionContent>
           </AccordionItem>
         ) : null}
