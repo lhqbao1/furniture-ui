@@ -42,10 +42,10 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1.25fr] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <ContactInfo />
 
-        <div className="rounded-3xl border border-[#E7EAEF] bg-white p-5 md:p-7 shadow-[0_10px_40px_rgba(20,34,51,0.08)]">
+        <div className="h-full rounded-3xl border border-[#E7EAEF] bg-white p-5 md:p-7 shadow-[0_10px_40px_rgba(20,34,51,0.08)]">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-[#101828]">
               Nachricht senden

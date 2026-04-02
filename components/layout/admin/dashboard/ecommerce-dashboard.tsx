@@ -54,7 +54,8 @@ interface OperationalAlert {
   title: string;
   description: string;
   count: number;
-  amount: number;
+  grossAmount: number;
+  netAmount: number;
   severity: AlertSeverity;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -259,11 +260,13 @@ function TopProductsCard({
 function ActionCenterCard({
   alerts,
   backlog,
-  atRiskValue,
+  grossAtRisk,
+  netAtRisk,
 }: {
   alerts: OperationalAlert[];
   backlog: number;
-  atRiskValue: number;
+  grossAtRisk: number;
+  netAtRisk: number;
 }) {
   const highPriorityCount = alerts.filter((item) => item.severity === "high").length;
   const busiestAlert = alerts[0];
@@ -291,9 +294,14 @@ function ActionCenterCard({
           </div>
           <div className="rounded-xl border bg-muted/30 p-3">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              Revenue at risk
+              Gross at risk
             </p>
-            <p className="mt-1 text-xl font-semibold">{formatCurrency(atRiskValue)}</p>
+            <p className="mt-1 text-xl font-semibold">
+              {formatCurrency(grossAtRisk)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Net: {formatCurrency(netAtRisk)}
+            </p>
           </div>
           <div className="rounded-xl border bg-muted/30 p-3">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -357,7 +365,10 @@ function ActionCenterCard({
                         {alert.count.toLocaleString("de-DE")} orders
                       </span>
                       <span className="rounded-md bg-muted px-2 py-0.5">
-                        Impact: {formatCurrency(alert.amount)}
+                        Gross: {formatCurrency(alert.grossAmount)}
+                      </span>
+                      <span className="rounded-md bg-muted px-2 py-0.5">
+                        Net: {formatCurrency(alert.netAmount)}
                       </span>
                     </div>
                   </div>
@@ -426,6 +437,7 @@ export default function EcommerceDashboard({
   } = useGetCheckOutStatistic({
     from_date: fromDate,
     to_date: toDate,
+    is_b2b: false,
   });
 
   const {
@@ -435,9 +447,13 @@ export default function EcommerceDashboard({
   } = useGetCheckOutDashboard({
     from_date: fromDate,
     to_date: toDate,
+    is_b2b: false,
   });
 
-  const { data: previousDashboard } = useGetCheckOutDashboard(previousRange);
+  const { data: previousDashboard } = useGetCheckOutDashboard({
+    ...previousRange,
+    is_b2b: false,
+  });
 
   const {
     data: productOverview,
@@ -446,6 +462,7 @@ export default function EcommerceDashboard({
   } = useGetProductsCheckOutDashboard({
     from_date: fromDate,
     to_date: toDate,
+    is_b2b: false,
   });
 
   const hasAnyData = Boolean(statistic || dashboard || productOverview);
@@ -476,7 +493,8 @@ export default function EcommerceDashboard({
   }
 
   const totalOrders = toNumber(statistic?.count_order);
-  const totalRevenue = toNumber(statistic?.total_order);
+  // API total_order is gross revenue.
+  const grossRevenue = toNumber(statistic?.total_order);
   const returnedOrders = toNumber(statistic?.count_return_order);
   const returnedRevenue = toNumber(statistic?.total_return_order);
   const canceledOrders = toNumber(statistic?.count_cancel_order);
@@ -490,22 +508,26 @@ export default function EcommerceDashboard({
   const dispatchedOrders = toNumber(statistic?.count_dispatched_order);
   const dispatchedRevenue = toNumber(statistic?.total_dispatched_order);
 
-  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  const avgOrderValue = totalOrders > 0 ? grossRevenue / totalOrders : 0;
   const returnRate = totalOrders > 0 ? (returnedOrders / totalOrders) * 100 : 0;
   const cancelRate = totalOrders > 0 ? (canceledOrders / totalOrders) * 100 : 0;
   const fulfillmentRate =
     totalOrders > 0 ? (dispatchedOrders / totalOrders) * 100 : 0;
   const netRevenue = Math.max(
     0,
-    totalRevenue - returnedRevenue - canceledRevenue,
+    grossRevenue - returnedRevenue - canceledRevenue,
   );
+  const revenueDeductions = returnedRevenue + canceledRevenue;
+  const netFromGrossByFormula = (gross: number) =>
+    Math.max(0, gross - revenueDeductions);
+
   const operationalBacklog =
     waitingPaymentOrders + stockReservedOrders + preparingOrders;
 
   const kpis: DashboardMetric[] = [
     {
       label: "Gross Revenue",
-      value: formatCurrency(totalRevenue),
+      value: formatCurrency(grossRevenue),
       hint: `${totalOrders.toLocaleString("de-DE")} orders`,
       icon: Euro,
       tone: "emerald",
@@ -513,7 +535,7 @@ export default function EcommerceDashboard({
     {
       label: "Net Revenue",
       value: formatCurrency(netRevenue),
-      hint: "after returns and cancellations",
+      hint: "gross - returns - cancellations",
       icon: Wallet,
       tone: "blue",
     },
@@ -544,28 +566,32 @@ export default function EcommerceDashboard({
     {
       label: "Waiting for Payment",
       count: waitingPaymentOrders,
-      amount: waitingPaymentRevenue,
+      grossAmount: waitingPaymentRevenue,
+      netAmount: netFromGrossByFormula(waitingPaymentRevenue),
       icon: Clock3,
       tone: "orange" as CardTone,
     },
     {
       label: "Stock Reserved",
       count: stockReservedOrders,
-      amount: stockReservedRevenue,
+      grossAmount: stockReservedRevenue,
+      netAmount: netFromGrossByFormula(stockReservedRevenue),
       icon: Boxes,
       tone: "violet" as CardTone,
     },
     {
       label: "Preparing Shipping",
       count: preparingOrders,
-      amount: preparingRevenue,
+      grossAmount: preparingRevenue,
+      netAmount: netFromGrossByFormula(preparingRevenue),
       icon: PackageCheck,
       tone: "blue" as CardTone,
     },
     {
       label: "Dispatched + Exchange",
       count: dispatchedOrders,
-      amount: dispatchedRevenue,
+      grossAmount: dispatchedRevenue,
+      netAmount: netFromGrossByFormula(dispatchedRevenue),
       icon: PackageCheck,
       tone: "emerald" as CardTone,
     },
@@ -579,7 +605,8 @@ export default function EcommerceDashboard({
           description:
             "Orders are blocked until payment confirmation is received.",
           count: waitingPaymentOrders,
-          amount: waitingPaymentRevenue,
+          grossAmount: waitingPaymentRevenue,
+          netAmount: netFromGrossByFormula(waitingPaymentRevenue),
           severity: waitingPaymentOrders >= 30 ? "high" : "medium",
           href: buildOrderListUrl("PENDING"),
           icon: Clock3,
@@ -592,7 +619,8 @@ export default function EcommerceDashboard({
           description:
             "Orders are waiting for stock allocation or inbound inventory.",
           count: stockReservedOrders,
-          amount: stockReservedRevenue,
+          grossAmount: stockReservedRevenue,
+          netAmount: netFromGrossByFormula(stockReservedRevenue),
           severity: stockReservedOrders >= 40 ? "high" : "medium",
           href: buildOrderListUrl("STOCK_RESERVED"),
           icon: Boxes,
@@ -605,7 +633,8 @@ export default function EcommerceDashboard({
           description:
             "Orders are in handling and need to move to dispatched quickly.",
           count: preparingOrders,
-          amount: preparingRevenue,
+          grossAmount: preparingRevenue,
+          netAmount: netFromGrossByFormula(preparingRevenue),
           severity: preparingOrders >= 50 ? "high" : "medium",
           href: buildOrderListUrl("PREPARATION_SHIPPING"),
           icon: PackageCheck,
@@ -618,7 +647,8 @@ export default function EcommerceDashboard({
           description:
             "Returned orders are increasing and should be analyzed by SKU/channel.",
           count: returnedOrders,
-          amount: returnedRevenue,
+          grossAmount: returnedRevenue,
+          netAmount: netFromGrossByFormula(returnedRevenue),
           severity: returnRate >= 7 ? "high" : "low",
           href: buildOrderListUrl("RETURN,RETURN_ISSUE"),
           icon: RotateCcw,
@@ -631,7 +661,8 @@ export default function EcommerceDashboard({
           description:
             "Cancellations impact revenue quality and customer confidence.",
           count: canceledOrders,
-          amount: canceledRevenue,
+          grossAmount: canceledRevenue,
+          netAmount: netFromGrossByFormula(canceledRevenue),
           severity: cancelRate >= 4 ? "high" : "low",
           href: buildOrderListUrl(
             "CANCELED,CANCEL_REQUEST,CANCELED_NO_STOCK,CANCELED_WRONG_PRICE",
@@ -653,8 +684,12 @@ export default function EcommerceDashboard({
       return b.count - a.count;
     });
 
-  const revenueAtRisk = operationalAlerts.reduce(
-    (sum, item) => sum + item.amount,
+  const grossAtRisk = operationalAlerts.reduce(
+    (sum, item) => sum + item.grossAmount,
+    0,
+  );
+  const netAtRisk = operationalAlerts.reduce(
+    (sum, item) => sum + item.netAmount,
     0,
   );
 
@@ -741,7 +776,7 @@ export default function EcommerceDashboard({
                   {item.count.toLocaleString("de-DE")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {formatCurrency(item.amount)}
+                  Gross: {formatCurrency(item.grossAmount)}
                 </p>
               </div>
             );
@@ -756,7 +791,8 @@ export default function EcommerceDashboard({
         <ActionCenterCard
           alerts={operationalAlerts}
           backlog={operationalBacklog}
-          atRiskValue={revenueAtRisk}
+          grossAtRisk={grossAtRisk}
+          netAtRisk={netAtRisk}
         />
       </div>
 

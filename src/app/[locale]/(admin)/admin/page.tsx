@@ -17,12 +17,8 @@ const AdminPage = () => {
               Admin Dashboard
             </p>
             <h1 className="text-2xl font-semibold tracking-tight lg:text-3xl">
-              E-Commerce Command View
+              Prestige Home GmbH
             </h1>
-            <p className="max-w-2xl text-sm text-muted-foreground">
-              Track revenue, order quality, marketplace performance, and
-              operational bottlenecks in one professional control panel.
-            </p>
           </div>
 
           <div className="rounded-xl border bg-muted/30 p-3">

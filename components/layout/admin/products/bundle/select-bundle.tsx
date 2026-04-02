@@ -12,6 +12,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -210,43 +211,47 @@ const SelectBundleComponent = ({
                 value={queryParams}
                 onValueChange={(value) => setQueryParams(value)}
               />
-              <CommandEmpty>No product found.</CommandEmpty>
-              <CommandGroup className="h-[400px] overflow-y-scroll">
-                {isLoading ||
-                  (!products && <CommandItem disabled>Loading...</CommandItem>)}
-                {isError && (
-                  <CommandItem disabled>Error loading products</CommandItem>
-                )}
-                {filteredProducts.length === 0 && !isLoading && (
-                  <CommandItem disabled>All products added</CommandItem>
-                )}
+              <CommandList className="max-h-[400px] overflow-y-auto">
+                <CommandEmpty>No product found.</CommandEmpty>
+                <CommandGroup>
+                  {isLoading ||
+                    (!products && (
+                      <CommandItem disabled>Loading...</CommandItem>
+                    ))}
+                  {isError && (
+                    <CommandItem disabled>Error loading products</CommandItem>
+                  )}
+                  {filteredProducts.length === 0 && !isLoading && (
+                    <CommandItem disabled>All products added</CommandItem>
+                  )}
 
-                {filteredProducts?.map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    value={product.id ?? ""}
-                    onSelect={() => handleSelectProduct(product)}
-                    className="flex w-full justify-between"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Image
-                        src={
-                          product.static_files.length > 0
-                            ? product.static_files[0].url
-                            : "/product-placeholder.png"
-                        }
-                        height={25}
-                        width={25}
-                        alt=""
-                        className="rounded-"
-                        unoptimized
-                      />
-                      <span>{product.name}</span>
-                    </div>
-                    <span>#{product.id_provider}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+                  {filteredProducts?.map((product) => (
+                    <CommandItem
+                      key={product.id}
+                      value={product.id ?? ""}
+                      onSelect={() => handleSelectProduct(product)}
+                      className="flex w-full justify-between"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Image
+                          src={
+                            product.static_files.length > 0
+                              ? product.static_files[0].url
+                              : "/product-placeholder.png"
+                          }
+                          height={25}
+                          width={25}
+                          alt=""
+                          className="rounded-"
+                          unoptimized
+                        />
+                        <span>{product.name}</span>
+                      </div>
+                      <span>#{product.id_provider}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
             </Command>
           </PopoverContent>
         </Popover>

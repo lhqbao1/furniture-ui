@@ -52,6 +52,7 @@ const OverViewTab = () => {
   } = useGetCheckOutDashboard({
     from_date: fromDateParam,
     to_date: endDateParam,
+    is_b2b: false,
   });
 
   // 🔹 Fetch tháng trước
@@ -59,7 +60,10 @@ const OverViewTab = () => {
     data: previousData,
     isLoading: isPrevLoading,
     isError: isPrevError,
-  } = useGetCheckOutDashboard(previousRange);
+  } = useGetCheckOutDashboard({
+    ...previousRange,
+    is_b2b: false,
+  });
 
   if (isCurrentLoading || isPrevLoading)
     return (

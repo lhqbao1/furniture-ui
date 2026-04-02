@@ -22,11 +22,13 @@ export interface GetAllCheckoutParams {
   from_date?: string;
   to_date?: string;
   search?: string;
+  is_b2b?: boolean;
 }
 
 export interface OrderStatisticsParams {
   from_date?: string;
   to_date?: string;
+  is_b2b?: boolean;
 }
 
 export interface GetRefundOrdersParams {
@@ -156,6 +158,7 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
       ...(params?.search !== undefined && { search: params.search }),
+      ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
     },
 
     paramsSerializer: (params) =>
@@ -235,6 +238,7 @@ export async function getCheckOutStatistics(params?: OrderStatisticsParams) {
     params: {
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
     },
   });
   return data as CheckOutStatistics;
@@ -356,7 +360,9 @@ export async function uploadCheckoutPdfFile(
 }
 
 export async function deleteCheckoutPdfFile(main_checkout_id: string) {
-  const { data } = await apiAdmin.delete(`/checkout/pdf-file/${main_checkout_id}`);
+  const { data } = await apiAdmin.delete(
+    `/checkout/pdf-file/${main_checkout_id}`,
+  );
   return data as CheckoutPdfFileResponse;
 }
 
@@ -423,6 +429,7 @@ export const getCheckOutDashboard = async (params: OrderStatisticsParams) => {
     params: {
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
     },
   });
   return res.data as CheckoutDashboardResponse;
@@ -435,6 +442,7 @@ export const getProductsCheckOutDashboard = async (
     params: {
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
     },
   });
   return res.data as ProviderOverviewResponse;

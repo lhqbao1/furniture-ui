@@ -52,6 +52,7 @@ const OrderList = () => {
     from_date: filters.fromDate,
     to_date: filters.toDate,
     search: filters.search,
+    is_b2b: false,
   });
 
   const multiSearchRaw = searchParams.get("multi_search") ?? "";

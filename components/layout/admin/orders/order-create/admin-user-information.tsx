@@ -383,6 +383,42 @@ export function AdminCheckOutUserInformation({
         <div className="col-span-2">
           <FormField
             control={form.control}
+            name="is_b2b"
+            render={({ field }) => (
+              <FormItem>
+                {/* <FormLabel>{t("gender")}</FormLabel> */}
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={(val) => field.onChange(val === "true")}
+                    value={
+                      typeof field.value === "boolean"
+                        ? String(field.value)
+                        : ""
+                    }
+                    className="flex gap-4"
+                  >
+                    <FormItem className="flex gap-1 items-center">
+                      <FormControl>
+                        <RadioGroupItem value="true" />
+                      </FormControl>
+                      <FormLabel className="ml-2">B2B</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex gap-1 items-center">
+                      <FormControl>
+                        <RadioGroupItem value="false" />
+                      </FormControl>
+                      <FormLabel className="ml-2">B2C</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="col-span-2">
+          <FormField
+            control={form.control}
             name="gender"
             render={({ field }) => (
               <FormItem>

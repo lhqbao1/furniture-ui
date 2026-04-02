@@ -206,6 +206,7 @@ export function useVariableCost({
   const { data: marketplaceData } = useGetCheckOutDashboard({
     from_date,
     to_date,
+    is_b2b: false,
   });
 
   useEffect(() => {

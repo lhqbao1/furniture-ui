@@ -5,7 +5,47 @@ import { orderChildColumns } from "../order-list/column";
 import { ColumnDef } from "@tanstack/react-table";
 import { formatDateTimeString } from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
-import { getDeliveryOrderColumns } from "@/components/layout/cart/columns";
+
+const DEFAULT_WAREHOUSE_NAME = "9_1 Amm GmbH";
+
+const shipmentProductColumns: ColumnDef<CartItem>[] = [
+  {
+    accessorKey: "sku",
+    header: () => <div className="text-left uppercase">SKU</div>,
+    cell: ({ row }) => (
+      <div>{row.original.purchased_products?.sku ?? row.original.products?.sku ?? "-"}</div>
+    ),
+  },
+  {
+    accessorKey: "name",
+    header: () => <div className="text-left uppercase">Name</div>,
+    cell: ({ row }) => (
+      <div>
+        {row.original.purchased_products?.name ?? row.original.products?.name ?? "-"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "quantity",
+    header: () => <div className="text-left uppercase">Quantity</div>,
+    cell: ({ row }) => <div>{row.original.quantity ?? 0}</div>,
+  },
+  {
+    accessorKey: "warehouse",
+    header: () => <div className="text-left uppercase">Warehouse</div>,
+    cell: () => <div>{DEFAULT_WAREHOUSE_NAME}</div>,
+  },
+  {
+    accessorKey: "created_at",
+    header: () => <div className="text-left uppercase">Created At</div>,
+    cell: ({ row }) =>
+      row.original.created_at ? (
+        <div>{formatDateTimeString(row.original.created_at) ?? "-"}</div>
+      ) : (
+        <div>-</div>
+      ),
+  },
+];
 
 interface OrderDeliveryOrderProps {
   data: CheckOut[];
@@ -31,8 +71,14 @@ const shipmentProductReturnColumns: ColumnDef<CheckOutShipmentProductReturn>[] =
 
     {
       accessorKey: "type",
-      header: () => <div className="text-left uppercase">Type</div>,
-      cell: ({ row }) => <div>{row.original.type ?? "-"}</div>,
+      header: () => <div className="text-left uppercase">Warehouse</div>,
+      cell: ({ row }) => (
+        <div>
+          {typeof row.original.type === "string" && row.original.type.trim()
+            ? row.original.type
+            : DEFAULT_WAREHOUSE_NAME}
+        </div>
+      ),
     },
 
     {
@@ -91,9 +137,7 @@ const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
         <div className="space-y-4">
           <ProductTable<CartItem, unknown>
             data={cartItems}
-            columns={getDeliveryOrderColumns({
-              is_multiple_delivery: checkout?.supplier?.delivery_multiple ?? false,
-            })}
+            columns={shipmentProductColumns}
             page={1}
             pageSize={100}
             setPage={() => {}}
@@ -102,10 +146,11 @@ const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
             totalItems={cartItems.length}
             totalPages={1}
             hasCount={false}
+            hasHeaderBackGround
           />
 
           {productReturns.length > 0 ? (
-            <div className="rounded-md border border-red-200 bg-red-50/30 p-2">
+            <div className="rounded-md border p-2">
               <ProductTable<CheckOutShipmentProductReturn, unknown>
                 hasHeaderBackGround
                 headerClassName="!bg-red-100"

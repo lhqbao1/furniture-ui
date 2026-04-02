@@ -33,8 +33,12 @@ export function useDashboard6Months() {
           const to_date = formatLocal(end);
 
           const [checkout, products, fixed, variable] = await Promise.all([
-            getCheckOutDashboard({ from_date, to_date }),
-            getProductsCheckOutDashboard({ from_date, to_date }),
+            getCheckOutDashboard({ from_date, to_date, is_b2b: false }),
+            getProductsCheckOutDashboard({
+              from_date,
+              to_date,
+              is_b2b: false,
+            }),
             getFixedFeeWithTime({ month, year }),
             getVariableFeeByMarketplaceAndTime({ month, year }),
           ]);
