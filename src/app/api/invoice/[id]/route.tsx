@@ -4,6 +4,7 @@ export const runtime = "nodejs";
 import { pdf } from "@react-pdf/renderer";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { RouteInvoicePDF } from "@/components/layout/pdf/route-invoice";
+import { getMainCheckOutByMainCheckOutId } from "@/features/checkout/api";
 
 export async function GET(
   _req: Request,
@@ -12,14 +13,17 @@ export async function GET(
   try {
     const { id } = await params; // ✅ BẮT BUỘC
     const invoice = await getInvoiceByCheckOut(id);
+    const checkout = await getMainCheckOutByMainCheckOutId(id);
 
     if (!invoice) {
       return new Response("Invoice not found", { status: 404 });
     }
 
-    const stream = await pdf(<RouteInvoicePDF invoice={invoice} />).toBuffer(); // ← trả ReadableStream
+    const stream = await pdf(
+      <RouteInvoicePDF invoice={invoice} checkout={checkout} />,
+    ).toBuffer(); // ← trả ReadableStream
 
-    return new Response(stream as any, {
+    return new Response(stream, {
       headers: {
         "Content-Type": "application/pdf",
         // 👇 CÁI NÀY QUYẾT ĐỊNH DOWNLOAD
