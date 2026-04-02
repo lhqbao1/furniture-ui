@@ -73,34 +73,33 @@ export async function GET() {
       typeof p.color === "string" &&
       p.color.trim().length > 0 &&
       typeof p.materials === "string" &&
-      p.materials.trim().length > 0;
-    // typeof p.ean === "string" &&
-    // p.ean.trim().length > 0 &&
-    // typeof p.id_provider === "string" &&
-    // p.id_provider.trim().length > 0 &&
-    // typeof p.name === "string" &&
-    // p.name.trim().length > 0 &&
-    // typeof p.url_key === "string" &&
-    // p.url_key.trim().length > 0 &&
-    // typeof p.color === "string" &&
-    // p.color.trim().length > 0 &&
-    // typeof p.materials === "string" &&
-    // p.materials.trim().length > 0 &&
-    // !!p.brand &&
-    // typeof p.brand.name === "string" &&
-    // p.brand.name.trim().length > 0 &&
-    // typeof p.component === "string" &&
-    // p.component.trim().length > 0 &&
-    // typeof p.carrier === "string" &&
-    // p.carrier.trim().length > 0 &&
-    // Array.isArray(p.static_files);
+      p.materials.trim().length > 0 &&
+      typeof p.ean === "string" &&
+      p.ean.trim().length > 0 &&
+      typeof p.id_provider === "string" &&
+      p.id_provider.trim().length > 0 &&
+      typeof p.name === "string" &&
+      p.name.trim().length > 0 &&
+      typeof p.url_key === "string" &&
+      p.url_key.trim().length > 0 &&
+      typeof p.color === "string" &&
+      p.color.trim().length > 0 &&
+      typeof p.materials === "string" &&
+      p.materials.trim().length > 0 &&
+      !!p.brand &&
+      typeof p.brand.name === "string" &&
+      p.brand.name.trim().length > 0 &&
+      typeof p.component === "string" &&
+      p.component.trim().length > 0 &&
+      typeof p.carrier === "string" &&
+      p.carrier.trim().length > 0 &&
+      Array.isArray(p.static_files);
 
     let skippedProducts = 0;
 
     const rows = products.flatMap((p) => {
       if (
         !hasRequiredFields(p) ||
-        !p.is_active ||
         p.final_price <= 0 ||
         p.brand.name.toLowerCase() === "prestige works"
       ) {
@@ -174,25 +173,9 @@ export async function GET() {
           p.brand.company_phone ?? "",
         ];
 
-        const imageColumnIndexes = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
-        const imageCount = imageColumnIndexes.reduce((count, index) => {
-          return hasCsvFieldValue(rowValues[index]) ? count + 1 : count;
-        }, 0);
-        if (imageCount < 3) {
-          skippedProducts += 1;
-          return [];
-        }
-
-        // Allow optional image columns Bildlink_2 ... Bildlink_10 to be empty.
-        const optionalEmptyColumnIndexes = new Set([
-          14, 15, 16, 17, 18, 19, 20, 21, 22,
-        ]);
         const hasAllCsvFields =
           rowValues.length === headers.length &&
-          rowValues.every(
-            (value, index) =>
-              optionalEmptyColumnIndexes.has(index) || hasCsvFieldValue(value),
-          );
+          rowValues.every((value) => hasCsvFieldValue(value));
 
         if (!hasAllCsvFields) {
           skippedProducts += 1;
