@@ -114,13 +114,13 @@ export function MonthlyChart() {
   }
 
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader>
         <CardTitle>Last 6 Months</CardTitle>
         <CardDescription>Revenue & Orders</CardDescription>
       </CardHeader>
 
-      <CardContent className="xl:px-6 px-2">
+      <CardContent className="flex-1 xl:px-6 px-2">
         <ChartContainer
           config={{
             total: {

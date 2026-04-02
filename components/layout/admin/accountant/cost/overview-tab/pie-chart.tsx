@@ -81,13 +81,13 @@ export function ChartPieLabelList({
   if (!chartData.length) return null;
 
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader>
         <CardTitle>Revenue Distribution</CardTitle>
         <CardDescription>Marketplace revenue share</CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="flex-1">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square max-h-[350px] xl:w-[400px] w-full pb-0"

@@ -44,13 +44,13 @@ export function ChartBarMultiple({ data }: ChartBarMultipleProps) {
   if (!chartData.length) return null;
 
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader>
         <CardTitle>Marketplace Comparison</CardTitle>
         <CardDescription>Revenue vs order volume</CardDescription>
       </CardHeader>
 
-      <CardContent className="xl:p-3">
+      <CardContent className="flex-1 xl:p-3">
         <ChartContainer config={chartConfig}>
           <BarChart data={chartData} margin={{ top: 20 }}>
             <CartesianGrid vertical={false} />

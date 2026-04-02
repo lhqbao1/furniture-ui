@@ -673,7 +673,7 @@ export default function EcommerceDashboard({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid auto-rows-fr items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {kpis.map((metric) => {
           const styles = toneStyles[metric.tone];
           const Icon = metric.icon;
@@ -681,7 +681,7 @@ export default function EcommerceDashboard({
           return (
             <Card
               key={metric.label}
-              className={cn("rounded-2xl border shadow-sm", styles.bg)}
+              className={cn("h-full rounded-2xl border shadow-sm", styles.bg)}
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -704,7 +704,7 @@ export default function EcommerceDashboard({
         })}
       </div>
 
-      <Card className="rounded-2xl border shadow-sm">
+      <Card className="h-full rounded-2xl border shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <CardTitle className="text-base">Operations Snapshot</CardTitle>
@@ -749,8 +749,8 @@ export default function EcommerceDashboard({
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 2xl:grid-cols-3">
-        <div className="2xl:col-span-2">
+      <div className="grid auto-rows-fr items-stretch gap-4 2xl:grid-cols-3">
+        <div className="h-full 2xl:col-span-2">
           <MonthlyChart />
         </div>
         <ActionCenterCard
@@ -760,8 +760,8 @@ export default function EcommerceDashboard({
         />
       </div>
 
-      <div className="grid gap-4 2xl:grid-cols-3">
-        <div className="2xl:col-span-2">
+      <div className="grid auto-rows-fr items-stretch gap-4 2xl:grid-cols-3">
+        <div className="h-full 2xl:col-span-2">
           {dashboard?.data?.length ? (
             <ChartBarMultiple data={dashboard.data} />
           ) : (
@@ -789,7 +789,7 @@ export default function EcommerceDashboard({
         )}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid auto-rows-fr items-stretch gap-4 xl:grid-cols-2">
         <MarketplaceRankingCard data={marketplaceRanking} />
         <TopProductsCard providers={topProviders} />
       </div>

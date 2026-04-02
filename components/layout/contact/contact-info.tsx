@@ -71,10 +71,10 @@ const ContactInfo = () => {
                 E-Mail
               </p>
               <Link
-                href="mailto:info@prestige-home.de"
+                href="mailto:support@prestige-home.de"
                 className="text-base font-semibold text-[#0f172a] hover:text-primary transition-colors"
               >
-                info@prestige-home.de
+                support@prestige-home.de
               </Link>
             </div>
           </div>
