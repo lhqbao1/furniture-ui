@@ -17,28 +17,34 @@ import {
   calculateProductVAT,
 } from "@/lib/caculate-vat";
 
+const deploymentBaseUrl =
+  process.env.NEXT_PUBLIC_APP_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : undefined) ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ??
+  "http://localhost:3000";
+
+const normalizedDeploymentBaseUrl = deploymentBaseUrl.replace(/\/$/, "");
+const resolvePdfFontSrc = (path: string) =>
+  typeof window === "undefined"
+    ? `${normalizedDeploymentBaseUrl}${path}`
+    : path;
+
 Font.register({
   family: "Roboto",
-  src:
-    typeof window === "undefined"
-      ? `${process.cwd()}/public/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf`
-      : "/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf",
+  src: resolvePdfFontSrc("/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf"),
 });
 
 Font.register({
   family: "Figtree",
-  src:
-    typeof window === "undefined"
-      ? `${process.cwd()}/public/fonts/Figtree/Figtree-VariableFont_wght.ttf`
-      : "/fonts/Figtree/Figtree-VariableFont_wght.ttf",
+  src: resolvePdfFontSrc("/fonts/Figtree/Figtree-VariableFont_wght.ttf"),
 });
 
 Font.register({
   family: "FigtreeBold",
-  src:
-    typeof window === "undefined"
-      ? `${process.cwd()}/public/fonts/Figtree/figtree-bold.ttf`
-      : "/fonts/Figtree/figtree-bold.ttf",
+  src: resolvePdfFontSrc("/fonts/Figtree/figtree-bold.ttf"),
 });
 
 const styles = StyleSheet.create({
