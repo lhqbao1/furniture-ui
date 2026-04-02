@@ -81,7 +81,7 @@ const UploadInvoicePdfDialog = ({
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("files", file);
 
       const uploadResult = await uploadStaticFileMutation.mutateAsync(formData);
       const uploadedUrl = uploadResult?.results?.[0]?.url?.trim();

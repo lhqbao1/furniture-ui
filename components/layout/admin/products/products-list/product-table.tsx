@@ -54,6 +54,7 @@ interface DataTableProps<TData, TValue> {
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   enableClientSorting?: boolean;
   allowMultipleExpandedRows?: boolean;
+  defaultExpandedRowPredicate?: (row: TData) => boolean;
 }
 
 export function ProductTable<TData, TValue>({
@@ -85,6 +86,7 @@ export function ProductTable<TData, TValue>({
   enableClientSorting = false,
   allowMultipleExpandedRows = false,
   renderRowSubComponent,
+  defaultExpandedRowPredicate,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "id_provider", desc: false }, // default sort by id_provider asc
@@ -92,6 +94,32 @@ export function ProductTable<TData, TValue>({
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
   const [expandedRowIds, setExpandedRowIds] = React.useState<string[]>([]);
   const [rowSelection, setRowSelection] = useState({});
+
+  useEffect(() => {
+    if (!hasExpanded || typeof defaultExpandedRowPredicate !== "function") return;
+
+    const initialExpandedRowIds = data.reduce<string[]>(
+      (acc, row, index) => {
+        if (defaultExpandedRowPredicate(row)) {
+          acc.push(String(index));
+        }
+        return acc;
+      },
+      [],
+    );
+
+    if (allowMultipleExpandedRows) {
+      setExpandedRowIds(initialExpandedRowIds);
+      return;
+    }
+
+    setExpandedRowId(initialExpandedRowIds[0] ?? null);
+  }, [
+    allowMultipleExpandedRows,
+    data,
+    defaultExpandedRowPredicate,
+    hasExpanded,
+  ]);
 
   const isRowExpanded = React.useCallback(
     (rowId: string) =>

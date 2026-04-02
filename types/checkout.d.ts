@@ -31,7 +31,10 @@ export interface CheckOutShipment {
   tracking_number: string;
   shipper_date: string;
   shipping_carrier: string;
-  product_returns: CheckOutShipmentProductReturn;
+  product_returns?:
+    | CheckOutShipmentProductReturn
+    | CheckOutShipmentProductReturn[]
+    | null;
 }
 
 interface CartResponseCheckOut {
