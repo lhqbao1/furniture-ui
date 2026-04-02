@@ -278,9 +278,9 @@ const FilterExportForm = () => {
       }
 
       const basicData = data
-        .filter((product) =>
-          (product.sku ?? "").trim().toLowerCase().startsWith("CL"),
-        )
+        // .filter((product) =>
+        //   (product.sku ?? "").trim().toLowerCase().startsWith("CL"),
+        // )
         .map((product) => ({
           // id_provider: product.id_provider ?? "",
           name: product.name ?? "",
