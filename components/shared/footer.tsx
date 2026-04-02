@@ -119,17 +119,88 @@ const Footer = () => {
         </ul>
       </div>
 
-      <div className="footer-column lg:col-span-4 col-span-6">
+      {/* <div className="footer-column lg:col-span-4 col-span-6">
         <h4 className="font-semibold mb-3">{t("companyTitle")}</h4>
 
         <div className="grid items-start">
           <ul className="space-y-2 text-black-700 text-sm">
             <li>Prestige Home GmbH</li>
-            <li>Greifswalder Straße 226, 10405 Berlin</li>
-            <li>{t("phone_number")}: +49 30 814 537 080</li>
             <li>{t("email")}: info@prestige-home.de</li>
             <li>Mo – Fr: 09:00 – 17:00 Uhr</li>
           </ul>
+        </div>
+      </div> */}
+
+      <div className="footer-column lg:col-span-4 col-span-6">
+        <h4 className="font-semibold mb-3">Auszeichnungen</h4>
+
+        <div className="lg:mt-4 flex items-center gap-4">
+          <div className="space-y-2 flex flex-col">
+            <a
+              href="https://geizhals.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-fit"
+            >
+              <Image
+                src="https://gzhls.at/b/brands/geizhals_logo_official.svg"
+                width={120}
+                height={60}
+                alt="Geizhals Preisvergleich"
+                priority
+              />
+            </a>
+            <a
+              href="https://www.idealo.de/preisvergleich/Shop/336129.html#i"
+              className="w-fit"
+            >
+              <img
+                src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
+                loading="lazy"
+                alt="zu www.idealo.de"
+                width="120"
+                height="40"
+                className="h-10 w-auto object-contain"
+              />
+            </a>
+            <a href="https://www.billiger.de" target="_blank" rel="noopener">
+              {" "}
+              <img
+                src="https://cdn.billiger.com/partnerbutton/light/30588"
+                alt="billiger.de - The price-comparison"
+                title="billiger.de - The price-comparison"
+                width="120"
+                height="40"
+                className="h-10 w-auto object-contain"
+              />{" "}
+            </a>
+          </div>
+          {/* <a
+            href="https://www.praktiker.de/marktplatz/prestige-home-5786"
+            rel="nofollow"
+          >
+            <img
+              src="https://www.praktiker.de/marktplatz/images/badges/praktiker_trust_logo_s1s.png"
+              width="120"
+              height="50"
+              alt="Praktiker Trust Logo"
+            />
+          </a> */}
+          <a
+            href="/file/FSC.pdf"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            aria-label="Open FSC Certificate PDF"
+            className="w-fit"
+          >
+            <Image
+              src="/fsc-footer.jpg"
+              width={120}
+              height={40}
+              alt="FSC Certificate"
+              priority
+            />
+          </a>
         </div>
       </div>
 
@@ -214,89 +285,8 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="footer-column xl:my-8 my-4 lg:col-span-12 col-span-6 flex items-center justify-center">
-        <div className="lg:mt-4 flex items-center gap-2 mt-2">
-          {/* <a
-            href="https://legal.trustedshops.com"
-            rel="noopener"
-          >
-            <img
-              src="https://legal-images.trustedshops.com/Rechtspartner-Logo.png"
-              alt="Legal Partner Logo"
-              width="140"
-              loading="lazy"
-              style={{ width: "140px" }}
-            />
-          </a> */}
-          <a
-            href="https://geizhals.de"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-fit"
-          >
-            <Image
-              src="https://gzhls.at/b/brands/geizhals_logo_official.svg"
-              width={120}
-              height={60}
-              alt="Geizhals Preisvergleich"
-              priority
-            />
-          </a>
-          <a
-            href="https://www.idealo.de/preisvergleich/Shop/336129.html#i"
-            className="w-fit"
-          >
-            <img
-              src="https://img.idealo.com/badges/336129/4aaf21c6-e44d-47d8-9179-c32923b7f542"
-              loading="lazy"
-              alt="zu www.idealo.de"
-              width="120"
-              height="40"
-              className="h-10 w-auto object-contain"
-            />
-          </a>
-          <a href="https://www.billiger.de" target="_blank" rel="noopener">
-            {" "}
-            <img
-              src="https://cdn.billiger.com/partnerbutton/light/30588"
-              alt="billiger.de - The price-comparison"
-              title="billiger.de - The price-comparison"
-              width="120"
-              height="40"
-              className="h-10 w-auto object-contain"
-            />{" "}
-          </a>
-          {/* <a
-            href="https://www.praktiker.de/marktplatz/prestige-home-5786"
-            rel="nofollow"
-          >
-            <img
-              src="https://www.praktiker.de/marktplatz/images/badges/praktiker_trust_logo_s1s.png"
-              width="120"
-              height="50"
-              alt="Praktiker Trust Logo"
-            />
-          </a> */}
-          <a
-            href="/file/FSC.pdf"
-            target="_blank"
-            rel="nofollow noopener noreferrer"
-            aria-label="Open FSC Certificate PDF"
-            className="w-fit"
-          >
-            <Image
-              src="/fsc-footer.jpg"
-              width={120}
-              height={40}
-              alt="FSC Certificate"
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
       {/* Cột 4: Social (ngoài, không thêm locale) */}
-      <div className="footer-column lg:col-span-12 col-span-6 flex items-center justify-start flex-col">
+      <div className="footer-column lg:col-span-12 col-span-6 flex items-center justify-start flex-col xl:mt-12 mt-6">
         {/* <h4 className="font-semibold lg:mb-3 mb-0">Mehr entdecken</h4> */}
         <div className="flex gap-1 mt-2 lg:mt-8">
           <Link

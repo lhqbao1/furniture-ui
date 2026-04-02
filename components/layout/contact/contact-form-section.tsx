@@ -10,7 +10,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -45,7 +44,7 @@ const SUBJECT_OPTIONS_DE = [
 ];
 
 const ContactFormSection = () => {
-  const [contactOrderId, setContactOrderId] = useAtom(contactOrderIdAtom);
+  const [contactOrderId] = useAtom(contactOrderIdAtom);
   const t = useTranslations();
 
   const form = useForm<z.infer<typeof contactFormSchema>>({
@@ -68,12 +67,19 @@ const ContactFormSection = () => {
       }),
     ) as unknown as ContactFormInput;
 
+    const normalizedOrderId =
+      typeof contactOrderId === "string" && contactOrderId.trim() !== ""
+        ? contactOrderId.trim()
+        : undefined;
+
+    const payload: ContactFormInput = {
+      ...cleanedValues,
+      type: "order",
+      ...(normalizedOrderId ? { order_id: normalizedOrderId } : {}),
+    };
+
     uploadContactFormMutation.mutate(
-      {
-        ...cleanedValues,
-        order_id: contactOrderId,
-        type: "order",
-      },
+      payload,
       {
         onSuccess() {
           toast.success("Ihre Nachricht wurde erfolgreich gesendet.");

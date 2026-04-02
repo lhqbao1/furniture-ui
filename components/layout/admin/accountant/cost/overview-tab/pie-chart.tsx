@@ -3,6 +3,14 @@
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
@@ -73,24 +81,31 @@ export function ChartPieLabelList({
   if (!chartData.length) return null;
 
   return (
-    <div>
-      <ChartContainer
-        config={chartConfig}
-        className="mx-auto aspect-square max-h-[350px] xl:w-[400px] w-full pb-0"
-      >
-        <PieChart>
-          <ChartTooltip
-            content={<ChartTooltipContent nameKey="marketplace" hideLabel />}
-          />
-          <Pie data={chartData} dataKey="percentage" nameKey="marketplace" />
-          <ChartLegend
-            content={<ChartLegendContent nameKey="marketplace" />}
-            className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-          />
-        </PieChart>
-      </ChartContainer>
+    <Card>
+      <CardHeader>
+        <CardTitle>Revenue Distribution</CardTitle>
+        <CardDescription>Marketplace revenue share</CardDescription>
+      </CardHeader>
 
-      <div className="mt-4 flex flex-col items-center gap-2 text-sm">
+      <CardContent>
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[350px] xl:w-[400px] w-full pb-0"
+        >
+          <PieChart>
+            <ChartTooltip
+              content={<ChartTooltipContent nameKey="marketplace" hideLabel />}
+            />
+            <Pie data={chartData} dataKey="percentage" nameKey="marketplace" />
+            <ChartLegend
+              content={<ChartLegendContent nameKey="marketplace" />}
+              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+            />
+          </PieChart>
+        </ChartContainer>
+      </CardContent>
+
+      <CardFooter className="flex-col items-center gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
           Total:{" "}
           {total.toLocaleString("de-DE", {
@@ -134,7 +149,7 @@ export function ChartPieLabelList({
         <div className="text-muted-foreground leading-none">
           Showing marketplace revenue distribution
         </div>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }

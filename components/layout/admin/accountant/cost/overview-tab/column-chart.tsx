@@ -44,74 +44,72 @@ export function ChartBarMultiple({ data }: ChartBarMultipleProps) {
   if (!chartData.length) return null;
 
   return (
-    <div>
-      <ChartContainer
-        config={chartConfig}
-        className="xl:p-3"
-      >
-        <BarChart
-          data={chartData}
-          margin={{ top: 20 }}
-        >
-          <CartesianGrid vertical={false} />
+    <Card>
+      <CardHeader>
+        <CardTitle>Marketplace Comparison</CardTitle>
+        <CardDescription>Revenue vs order volume</CardDescription>
+      </CardHeader>
 
-          <XAxis dataKey="marketplace" />
+      <CardContent className="xl:p-3">
+        <ChartContainer config={chartConfig}>
+          <BarChart data={chartData} margin={{ top: 20 }}>
+            <CartesianGrid vertical={false} />
 
-          {/* LEFT: REVENUE */}
-          <YAxis
-            yAxisId="left"
-            tickFormatter={(v) => `${v.toLocaleString("de-DE")} €`}
-          />
+            <XAxis dataKey="marketplace" />
 
-          {/* RIGHT: ORDERS */}
-          <YAxis
-            yAxisId="right"
-            orientation="right"
-            domain={[0, "auto"]}
-            tickFormatter={(v) => `${v}`}
-          />
+            <YAxis
+              yAxisId="left"
+              tickFormatter={(v) => `${v.toLocaleString("de-DE")} €`}
+            />
 
-          <ChartTooltip
-            content={
-              <ChartTooltipContent
-                formatter={(value, name) => {
-                  if (name === "total_amount") {
-                    return [`${Number(value).toLocaleString("de-DE")}€`];
-                  }
-                  return [`${value}`, "Orders"];
-                }}
-              />
-            }
-          />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={[0, "auto"]}
+              tickFormatter={(v) => `${v}`}
+            />
 
-          {/* 🔹 BAR: REVENUE */}
-          <Bar
-            yAxisId="left"
-            dataKey="total_amount"
-            fill="var(--color-total_amount)"
-            radius={[6, 6, 0, 0]}
-          />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  formatter={(value, name) => {
+                    if (name === "total_amount") {
+                      return [`${Number(value).toLocaleString("de-DE")}€`];
+                    }
+                    return [`${value}`, "Orders"];
+                  }}
+                />
+              }
+            />
 
-          {/* 🔹 LINE: ORDERS */}
-          <Line
-            yAxisId="right"
-            dataKey="total_orders"
-            type="monotone"
-            stroke="hsl(var(--chart-2))"
-            strokeWidth={3}
-            dot={false}
-            activeDot={{ r: 5 }}
-          />
-        </BarChart>
-      </ChartContainer>
-      <div className="flex flex-col items-center">
-        <div className="flex gap-2 font-medium leading-none text-sm text-secondary">
+            <Bar
+              yAxisId="left"
+              dataKey="total_amount"
+              fill="var(--color-total_amount)"
+              radius={[6, 6, 0, 0]}
+            />
+
+            <Line
+              yAxisId="right"
+              dataKey="total_orders"
+              type="monotone"
+              stroke="hsl(var(--chart-2))"
+              strokeWidth={3}
+              dot={false}
+              activeDot={{ r: 5 }}
+            />
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+
+      <CardFooter className="flex-col items-center gap-1 text-sm">
+        <div className="flex gap-2 font-medium leading-none text-secondary">
           Marketplace comparison overview <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="text-muted-foreground leading-none text-sm">
+        <div className="text-muted-foreground leading-none">
           Total revenue vs order volume
         </div>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }

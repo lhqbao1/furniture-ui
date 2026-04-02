@@ -1,71 +1,112 @@
 "use client";
 
-import { LocationEdit, Mails, MapPin, PhoneCallIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { Clock3, Mail, MapPin, Phone } from "lucide-react";
 import React from "react";
+import Link from "next/link";
 
 const ContactInfo = () => {
-  const t = useTranslations();
+  const phoneLabel = "02921 327 20 38";
+  const phoneHref = "tel:+4929213272038";
+
   return (
-    <div className="grid md:grid-cols-4 grid-cols-2 gap-4 md:w-3/4 w-full mx-auto mt-12">
-      <div className="flex md:flex-row flex-col items-center justify-center gap-4 cursor-pointer shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-3xl md:px-8 md:py-8 px-2 py-2 group transition-colors duration-400">
-        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-          <Mails
-            className="text-primary w-10 h-10"
-            strokeWidth={1}
-          />
+    <aside className="rounded-3xl border border-[#E7EAEF] bg-white p-5 md:p-7 shadow-[0_10px_40px_rgba(20,34,51,0.08)] space-y-5">
+      <div>
+        <p className="text-xs uppercase tracking-[0.18em] text-[#6b7280]">
+          Kontakt
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-[#101828]">
+          Wir sind für Sie da
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-[#475467]">
+          Sie erreichen unser Team telefonisch oder per E-Mail. Für Anfragen zu
+          Bestellungen hilft uns Ihre Bestellnummer, damit wir schneller
+          unterstützen können.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <div className="rounded-2xl border border-[#EBEEF2] bg-[#F8FAFC] p-4">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#fff3e6] text-primary">
+              <Phone className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-[#667085]">
+                Telefon
+              </p>
+              <Link
+                href={phoneHref}
+                className="text-lg font-semibold text-[#0f172a] hover:text-primary transition-colors"
+              >
+                {phoneLabel}
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className="text-center md:text-start">
-          <h3 className="font-bold text-base text-black">{t("email")}</h3>
-          <p className="text-gray-400 font-medium">info@prestige-home.de</p>
+
+        <div className="rounded-2xl border border-[#EBEEF2] bg-[#F8FAFC] p-4">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#e7f6ee] text-primary">
+              <Clock3 className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-[#667085]">
+                Öffnungszeiten
+              </p>
+              <p className="text-base font-semibold text-[#0f172a]">
+                Montag bis Freitag
+              </p>
+              <p className="text-sm text-[#475467]">08:00 - 17:00 Uhr</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#EBEEF2] bg-[#F8FAFC] p-4">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef4ff] text-primary">
+              <Mail className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-[#667085]">
+                E-Mail
+              </p>
+              <Link
+                href="mailto:info@prestige-home.de"
+                className="text-base font-semibold text-[#0f172a] hover:text-primary transition-colors"
+              >
+                info@prestige-home.de
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#EBEEF2] bg-[#F8FAFC] p-4">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-10 w-10 mt-0.5 items-center justify-center rounded-xl bg-[#f3f4f6] text-primary">
+              <MapPin className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-[#667085]">
+                Adresse
+              </p>
+              <p className="text-base font-semibold text-[#0f172a]">
+                Greifswalder Straße 226
+              </p>
+              <p className="text-sm text-[#475467]">10405 Berlin</p>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="flex md:flex-row flex-col items-center justify-center gap-4 cursor-pointer shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-3xl md:px-8 md:py-8 px-2 py-2  group transition-colors duration-400">
-        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-          <MapPin
-            className="text-primary w-10 h-10"
-            strokeWidth={1}
-          />
-        </div>
-        <div className="text-center md:text-start">
-          <h3 className="font-bold text-base text-black">{t("address")}</h3>
-          <p className="text-gray-400 font-medium">
-            Greifswalder Straße 226, 10405 Berlin
-          </p>
-        </div>
+
+      <div className="rounded-2xl bg-[#101828] px-4 py-3">
+        <p className="text-xs uppercase tracking-wide text-white/70">
+          Service-Hinweis
+        </p>
+        <p className="mt-1 text-sm text-white">
+          Unser Team antwortet in der Regel innerhalb von 1 bis 2 Werktagen.
+        </p>
       </div>
-      <div className="flex md:flex-row flex-col items-center justify-center gap-4 cursor-pointer shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-3xl md:px-8 md:py-8 px-2 py-2  group transition-colors duration-400">
-        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-          <PhoneCallIcon
-            className="text-primary w-10 h-10"
-            strokeWidth={1}
-          />
-        </div>
-        <div className="text-center md:text-start">
-          <h3 className="font-bold text-base text-black">
-            {t("phone_number")}
-          </h3>
-          <p className="text-gray-400 font-medium">+49 30 814 537 080</p>
-        </div>
-      </div>
-      <div className="flex md:flex-row flex-col items-center justify-center gap-4 cursor-pointer shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-3xl md:px-8 md:py-8 px-2 py-2  group transition-colors duration-400">
-        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-          <Mails
-            className="text-primary w-10 h-10"
-            strokeWidth={1}
-          />
-        </div>
-        <div className="text-center md:text-start">
-          <h3 className="font-bold text-base text-black">Öffnungszeiten</h3>
-          <p className="text-gray-400 font-medium">
-            Mo – Fr: 09:00 – 17:00 Uhr
-          </p>
-          <p className="text-xs text-gray-400">
-            (Wir antworten in der Regel innerhalb von 1–2 Werktagen)
-          </p>
-        </div>
-      </div>
-    </div>
+    </aside>
   );
 };
 

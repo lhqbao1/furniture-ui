@@ -83,6 +83,14 @@ const PRESET_BY_MARKETPLACE: Record<
     invoice_postal_code: "75172",
     invoice_country: "DE",
   },
+  XXXLUTZ: {
+    company_name: "XXXLutz KG",
+    tax_id: "ATU65296645",
+    invoice_address: "Römerstrasse 39",
+    invoice_city: "Wels",
+    invoice_postal_code: "4600",
+    invoice_country: "AT",
+  },
 };
 
 export function useManualCheckoutLogic(

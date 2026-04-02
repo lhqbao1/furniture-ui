@@ -79,6 +79,11 @@ const OverViewTab = () => {
 
       <CardContent className="xl:px-6 px-2">
         <div className="xl:space-y-6 space-y-12 grid grid-cols-1 2xl:grid-cols-2 xl:gap-6 gap-0">
+          <div className="2xl:col-span-1 col-span-2">
+            <div className="w-full mx-auto">
+              <MonthlyChart />
+            </div>
+          </div>
           <div className="col-span-1">
             <ChartPieLabelList
               data={currentData.data}
@@ -89,12 +94,6 @@ const OverViewTab = () => {
           </div>
 
           <ChartBarMultiple data={currentData.data} />
-
-          <div className="2xl:col-span-2">
-            <div className="xl:w-1/2 w-full mx-auto">
-              <MonthlyChart />
-            </div>
-          </div>
         </div>
       </CardContent>
     </Card>

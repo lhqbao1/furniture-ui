@@ -212,14 +212,20 @@ const getIncomingDisplayItems = (
       .filter(
         (
           state,
-        ): state is { quantityPerBundle: number; incomingByDate: Map<number, number> } =>
-          state !== null,
+        ): state is {
+          quantityPerBundle: number;
+          incomingByDate: Map<number, number>;
+        } => state !== null,
       );
 
     if (bundleStates.length === 0) return [];
 
     const allDates = Array.from(
-      new Set(bundleStates.flatMap((state) => Array.from(state.incomingByDate.keys()))),
+      new Set(
+        bundleStates.flatMap((state) =>
+          Array.from(state.incomingByDate.keys()),
+        ),
+      ),
     ).sort((a, b) => a - b);
 
     if (allDates.length === 0) return [];
@@ -1729,9 +1735,9 @@ function ActionsCell({ product }: { product: ProductItem }) {
                       key={`${index}-${pkg.weight}-${pkg.length}-${pkg.width}-${pkg.height}`}
                       className="rounded-md border border-gray-200 bg-gray-50 px-2 py-1"
                     >
-                      <span className="font-medium">#{index + 1}</span>{" "}
-                      Weight: {pkg.weight ?? 0} | Length: {pkg.length ?? 0} |
-                      Width: {pkg.width ?? 0} | Height: {pkg.height ?? 0}
+                      <span className="font-medium">#{index + 1}</span> Weight:{" "}
+                      {pkg.weight ?? 0} | Length: {pkg.length ?? 0} | Width:{" "}
+                      {pkg.width ?? 0} | Height: {pkg.height ?? 0}
                     </div>
                   ))}
                 </div>
@@ -1994,6 +2000,16 @@ export const getProductColumns = (
       );
     },
     enableSorting: true,
+  },
+
+  {
+    accessorKey: "stock_cgoods",
+    header: ({ column }) => {
+      return <div className="uppercase text-center">Stock C-GOODS</div>;
+    },
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.stock_cgoods ?? "0"}</div>
+    ),
   },
 
   {

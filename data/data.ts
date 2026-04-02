@@ -1127,7 +1127,7 @@ export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   shipped: ["exchange", "return_issue"],
   pending: ["paid", "canceled", "canceled_no_stock", "canceled_wrong_price"],
   paid: ["canceled", "canceled_no_stock", "canceled_wrong_price"],
-  return: ["items_are_checked"],
+  return: ["return_issue", "exchange"],
   exchange: ["return_issue", "exchange"],
 
   items_are_checked: ["waiting_for_return"],
