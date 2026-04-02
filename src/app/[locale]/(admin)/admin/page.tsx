@@ -1,89 +1,41 @@
 "use client";
-import OverViewTab from "@/components/layout/admin/accountant/cost/overview-tabs";
+import EcommerceDashboard from "@/components/layout/admin/dashboard/ecommerce-dashboard";
 import OrderDateFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-date";
-import OrderStatistic from "@/components/layout/admin/orders/order-list/statistics";
-import ProductStatisticSkeleton from "@/components/shared/statistic-skeleton";
-import { useGetCheckOutStatistic } from "@/features/checkout/hook";
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
-import React, { useState } from "react";
+import { CalendarRange } from "lucide-react";
+import React from "react";
 
 const AdminPage = () => {
   const filters = useOrderListFilters();
 
-  const {
-    data: statistic,
-    isLoading: isLoadingStatistic,
-    isError: isErrorStatistic,
-  } = useGetCheckOutStatistic({
-    from_date: filters.fromDate,
-    to_date: filters.toDate,
-  });
-
-  const mergedStatistic = [
-    {
-      count: statistic?.count_order,
-      total: statistic?.total_order ?? 0,
-      label: "Total",
-      textColor: "#39B54A",
-    },
-    {
-      count: statistic?.count_return_order,
-      total: statistic?.total_return_order ?? 0,
-      label: "Returned",
-      textColor: "#F7931E",
-    },
-    {
-      count: statistic?.count_cancel_order,
-      total: statistic?.total_cancel_order ?? 0,
-      label: "Canceled",
-      textColor: "#FF0000",
-    },
-  ];
-
-  const mergedStatisticOrder = [
-    {
-      count: statistic?.count_dispatched_order,
-      total: statistic?.total_dispatched_order ?? 0,
-      label: "Dispatched",
-      textColor: "#39B54A",
-    },
-    {
-      count: statistic?.count_waiting_payment_order,
-      total: statistic?.total_waiting_payment_order ?? 0,
-      label: "Waiting for payment",
-      textColor: "#9b59ff",
-    },
-    {
-      count: statistic?.count_preparing_shipping_order,
-      total: statistic?.total_preparing_shipping_order ?? 0,
-      label: "Preparing Shipping",
-      textColor: "#29ABE2",
-    },
-    {
-      count: statistic?.count_stock_reserved_order,
-      total: statistic?.total_stock_reserved_order ?? 0,
-      label: "Stock Reserved",
-      textColor: "#ff4f7b",
-    },
-  ];
   return (
-    <div className="space-y-6 pb-6">
-      <div className="mt-6">
-        <OrderDateFilter />
-      </div>
-      {isLoadingStatistic || !statistic ? (
-        <ProductStatisticSkeleton />
-      ) : (
-        <div className="space-y-4">
-          <OrderStatistic statistic={mergedStatistic} isOrder isDashBoard />
-          {isLoadingStatistic ? (
-            <ProductStatisticSkeleton />
-          ) : (
-            <OrderStatistic statistic={mergedStatisticOrder} isOrder />
-          )}
+    <div className="space-y-6 pb-8">
+      <div className="mt-6 rounded-2xl border bg-card p-4 shadow-sm lg:p-6">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Admin Dashboard
+            </p>
+            <h1 className="text-2xl font-semibold tracking-tight lg:text-3xl">
+              E-Commerce Command View
+            </h1>
+            <p className="max-w-2xl text-sm text-muted-foreground">
+              Track revenue, order quality, marketplace performance, and
+              operational bottlenecks in one professional control panel.
+            </p>
+          </div>
+
+          <div className="rounded-xl border bg-muted/30 p-3">
+            <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <CalendarRange className="h-3.5 w-3.5" />
+              Date Range
+            </div>
+            <OrderDateFilter />
+          </div>
         </div>
-      )}
-      <OverViewTab />
+      </div>
+
+      <EcommerceDashboard fromDate={filters.fromDate} toDate={filters.toDate} />
     </div>
   );
 };

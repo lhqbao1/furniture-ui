@@ -74,42 +74,6 @@ const OrderList = () => {
     );
   }, [data?.items, multiSearchValues]);
 
-  // const {
-  //   data: statistic,
-  //   isLoading: isLoadingStatistic,
-  //   isError: isErrorStatistic,
-  // } = useGetCheckOutStatistic({
-  //   from_date: filters.fromDate,
-  //   to_date: filters.toDate,
-  // });
-
-  // const mergedStatistic = [
-  //   {
-  //     count: statistic?.count_dispatched_order,
-  //     total: statistic?.total_dispatched_order ?? 0,
-  //     label: "Dispatched",
-  //     textColor: "#39B54A",
-  //   },
-  //   {
-  //     count: statistic?.count_waiting_payment_order,
-  //     total: statistic?.total_waiting_payment_order ?? 0,
-  //     label: "Waiting for payment",
-  //     textColor: "#9b59ff",
-  //   },
-  //   {
-  //     count: statistic?.count_preparing_shipping_order,
-  //     total: statistic?.total_preparing_shipping_order ?? 0,
-  //     label: "Preparing Shipping",
-  //     textColor: "#29ABE2",
-  //   },
-  //   {
-  //     count: statistic?.count_stock_reserved_order,
-  //     total: statistic?.total_stock_reserved_order ?? 0,
-  //     label: "Stock Reserved",
-  //     textColor: "#ff4f7b",
-  //   },
-  // ];
-
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -140,11 +104,6 @@ const OrderList = () => {
   return (
     <div className="relative flex flex-col gap-6 pb-4">
       <div className="space-y-6">
-        {/* {isLoadingStatistic ? (
-          <ProductStatisticSkeleton />
-        ) : (
-          <OrderStatistic statistic={mergedStatistic} isOrder />
-        )} */}
         <div className="text-3xl text-secondary font-bold text-center">
           Order List
         </div>

@@ -217,6 +217,7 @@ export type ProductItem = {
   ebay: boolean;
   unit: string;
   amount_unit: string;
+  stock_cgoods: number | null;
 
   url_key: string;
   meta_title: string;
