@@ -35,6 +35,7 @@ import { CheckOutMain } from "@/types/checkout";
 import { toast } from "sonner";
 import MultiSearch from "../../products/products-list/toolbar/multi-search";
 import B2BInvoiceDrawer from "./b2b-invoice-drawer";
+import OrderB2BFilter from "./filter/filter-order-b2b";
 
 export enum ToolbarType {
   product = "product",
@@ -85,9 +86,7 @@ export default function OrderToolbar({
   const defaultSearch = searchParams.get("search") ?? "";
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
-  const prevParamsRef = useRef(
-    Object.fromEntries(searchParams.entries()),
-  );
+  const prevParamsRef = useRef(Object.fromEntries(searchParams.entries()));
   const [debouncedSearch] = useDebounce(searchValue, 600);
 
   // push URL khi debounce hoàn thành
@@ -202,6 +201,12 @@ export default function OrderToolbar({
             )}
           </div>
         </div>
+
+        {type === ToolbarType.order ? (
+          <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full xl:w-1/2">
+            <OrderB2BFilter />
+          </div>
+        ) : null}
 
         <div className="flex w-full flex-wrap items-center gap-2">
           <DropdownMenu>

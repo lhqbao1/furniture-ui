@@ -4,14 +4,12 @@ import React from "react";
 import OrderStatusFilter from "./filter-order-status";
 import OrderChanelFilter from "./filter-order-chanel";
 import OrderDateFilter from "./filter-order-date";
-import OrderB2BFilter from "./filter-order-b2b";
 import { useSearchParams } from "next/navigation";
 
 const OrderFilterForm = () => {
   const router = useRouter();
   const pathname = usePathname(); // ví dụ "/admin/products"
   const searchParams = useSearchParams();
-  const isOrderListPage = pathname.includes("/orders/list");
 
   const handleReset = () => {
     router.push(pathname, { scroll: false });
@@ -27,7 +25,6 @@ const OrderFilterForm = () => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div className="space-y-4">
-        {isOrderListPage ? <OrderB2BFilter /> : null}
         <OrderStatusFilter />
         <OrderChanelFilter />
       </div>
