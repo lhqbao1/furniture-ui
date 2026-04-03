@@ -35,6 +35,7 @@ import { ChartPieLabelList } from "../accountant/cost/overview-tab/pie-chart";
 interface EcommerceDashboardProps {
   fromDate?: string;
   toDate?: string;
+  isB2B?: boolean;
 }
 
 type CardTone = "emerald" | "orange" | "red" | "violet" | "blue";
@@ -54,7 +55,8 @@ interface OperationalAlert {
   title: string;
   description: string;
   count: number;
-  amount: number;
+  grossAmount: number;
+  netAmount: number;
   severity: AlertSeverity;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -169,43 +171,79 @@ function DashboardLoadingSkeleton() {
   );
 }
 
-function MarketplaceRankingCard({
-  data,
-}: {
-  data: MarketplaceOverviewItem[];
-}) {
+function MarketplaceRankingCard({ data }: { data: MarketplaceOverviewItem[] }) {
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full rounded-2xl border shadow-sm">
+      <CardHeader className="pb-2">
         <CardTitle className="text-base">Top Marketplaces</CardTitle>
+        <p className="text-xs text-muted-foreground">
+          Ranked by gross revenue share
+        </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {data.length === 0 ? (
           <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
             No marketplace data available for the selected period.
           </div>
         ) : (
-          data.map((item) => {
+          data.map((item, index) => {
             const share = Math.max(0, Math.min(100, toNumber(item.percentage)));
+
+            const rankStyles =
+              index === 0
+                ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+                : index === 1
+                  ? "bg-slate-100 text-slate-700 border-slate-300"
+                  : index === 2
+                    ? "bg-orange-100 text-orange-700 border-orange-300"
+                    : "bg-muted text-muted-foreground border-border";
+
             return (
-              <div key={item.marketplace} className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-medium capitalize">
-                    {item.marketplace.replaceAll("_", " ")}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatCurrency(toNumber(item.total_amount))}
-                  </p>
+              <div
+                key={item.marketplace}
+                className="rounded-xl border bg-background/80 p-3 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "inline-flex h-6 min-w-6 items-center justify-center rounded-full border px-1.5 text-[11px] font-semibold",
+                          rankStyles,
+                        )}
+                      >
+                        #{index + 1}
+                      </span>
+                      <p className="truncate text-sm font-semibold capitalize">
+                        {item.marketplace.replaceAll("_", " ")}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {toNumber(item.total_orders).toLocaleString("de-DE")}{" "}
+                      orders
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm font-semibold">
+                      {formatCurrency(toNumber(item.total_amount))}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatPercent(share)}
+                    </p>
+                  </div>
                 </div>
-                <div className="h-2 rounded-full bg-muted">
+
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted/70">
                   <div
-                    className="h-2 rounded-full bg-secondary"
+                    className={cn(
+                      "h-full rounded-full transition-all",
+                      index < 3
+                        ? "bg-gradient-to-r from-secondary to-emerald-500"
+                        : "bg-secondary/80",
+                    )}
                     style={{ width: `${share}%` }}
                   />
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{toNumber(item.total_orders)} orders</span>
-                  <span>{formatPercent(share)}</span>
                 </div>
               </div>
             );
@@ -217,40 +255,109 @@ function MarketplaceRankingCard({
 }
 
 function TopProductsCard({
-  providers,
+  providersByRevenue,
+  providersBySold,
 }: {
-  providers: ProviderItem[];
+  providersByRevenue: ProviderItem[];
+  providersBySold: ProviderItem[];
 }) {
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full rounded-2xl border shadow-sm">
+      <CardHeader className="pb-2">
         <CardTitle className="text-base">Top Products (Provider ID)</CardTitle>
+        <p className="text-xs text-muted-foreground">
+          Revenue and sold-units leaderboards
+        </p>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {providers.length === 0 ? (
-          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-            No product revenue data available for the selected period.
+      <CardContent className="grid gap-4 lg:grid-cols-2">
+        <div className="space-y-3 rounded-xl border bg-muted/20 p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Top by Revenue</p>
+              <p className="text-xs text-muted-foreground">
+                Highest gross value
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-xs">
+              {providersByRevenue.length} items
+            </Badge>
           </div>
-        ) : (
-          providers.map((item, index) => (
-            <div
-              key={`${item.id_provider}-${index}`}
-              className="flex items-center justify-between gap-3 rounded-xl border p-3"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">
-                  {item.id_provider || "N/A"}
+
+          {providersByRevenue.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+              No revenue data available.
+            </div>
+          ) : (
+            providersByRevenue.map((item, index) => (
+              <div
+                key={`revenue-${item.id_provider}-${index}`}
+                className="flex items-center justify-between gap-3 rounded-xl border bg-background p-3 transition-all hover:border-secondary/40 hover:bg-secondary/5"
+              >
+                <div className="min-w-0 flex items-center gap-2">
+                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-secondary/10 px-1.5 text-[11px] font-semibold text-secondary">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {item.id_provider || "N/A"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {toNumber(item.total_quantity).toLocaleString("de-DE")}{" "}
+                      units
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold">
+                  {formatCurrency(toNumber(item.total_amount))}
                 </p>
-                <p className="text-xs text-muted-foreground">
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="space-y-3 rounded-xl border bg-muted/20 p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Top by Products Sold</p>
+              <p className="text-xs text-muted-foreground">
+                Highest sold quantity
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-xs text-white">
+              {providersBySold.length} items
+            </Badge>
+          </div>
+
+          {providersBySold.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+              No sold-units data available.
+            </div>
+          ) : (
+            providersBySold.map((item, index) => (
+              <div
+                key={`sold-${item.id_provider}-${index}`}
+                className="flex items-center justify-between gap-3 rounded-xl border bg-background p-3 transition-all hover:border-secondary/40 hover:bg-secondary/5"
+              >
+                <div className="min-w-0 flex items-center gap-2">
+                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-secondary/10 px-1.5 text-[11px] font-semibold text-secondary">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {item.id_provider || "N/A"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatCurrency(toNumber(item.total_amount))}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold">
                   {toNumber(item.total_quantity).toLocaleString("de-DE")} units
                 </p>
               </div>
-              <p className="text-sm font-semibold">
-                {formatCurrency(toNumber(item.total_amount))}
-              </p>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -259,20 +366,26 @@ function TopProductsCard({
 function ActionCenterCard({
   alerts,
   backlog,
-  atRiskValue,
+  grossAtRisk,
+  netAtRisk,
 }: {
   alerts: OperationalAlert[];
   backlog: number;
-  atRiskValue: number;
+  grossAtRisk: number;
+  netAtRisk: number;
 }) {
-  const highPriorityCount = alerts.filter((item) => item.severity === "high").length;
+  const highPriorityCount = alerts.filter(
+    (item) => item.severity === "high",
+  ).length;
   const busiestAlert = alerts[0];
 
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <CardTitle className="text-base">Operational Command Center</CardTitle>
+          <CardTitle className="text-base">
+            Operational Command Center
+          </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="outline">{alerts.length} active alerts</Badge>
             <Badge variant="outline">{highPriorityCount} high priority</Badge>
@@ -291,9 +404,14 @@ function ActionCenterCard({
           </div>
           <div className="rounded-xl border bg-muted/30 p-3">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              Revenue at risk
+              Gross at risk
             </p>
-            <p className="mt-1 text-xl font-semibold">{formatCurrency(atRiskValue)}</p>
+            <p className="mt-1 text-xl font-semibold">
+              {formatCurrency(grossAtRisk)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Net: {formatCurrency(netAtRisk)}
+            </p>
           </div>
           <div className="rounded-xl border bg-muted/30 p-3">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -327,62 +445,65 @@ function ActionCenterCard({
                 : 14;
 
             return (
-            <div
-              key={alert.key}
-              className={cn(
-                "rounded-xl border p-3 transition-shadow hover:shadow-sm",
-                styles.container,
-              )}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className={cn("mt-0.5 rounded-lg p-2", styles.icon)}>
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold">{alert.title}</p>
-                      <Badge
-                        variant="outline"
-                        className={cn("capitalize", styles.badge)}
-                      >
-                        {alert.severity} priority
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {alert.description}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span className="rounded-md bg-muted px-2 py-0.5">
-                        {alert.count.toLocaleString("de-DE")} orders
-                      </span>
-                      <span className="rounded-md bg-muted px-2 py-0.5">
-                        Impact: {formatCurrency(alert.amount)}
-                      </span>
+              <div
+                key={alert.key}
+                className={cn(
+                  "rounded-xl border p-3 transition-shadow hover:shadow-sm",
+                  styles.container,
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <span className={cn("mt-0.5 rounded-lg p-2", styles.icon)}>
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold">{alert.title}</p>
+                        <Badge
+                          variant="outline"
+                          className={cn("capitalize", styles.badge)}
+                        >
+                          {alert.severity} priority
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {alert.description}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span className="rounded-md bg-muted px-2 py-0.5">
+                          {alert.count.toLocaleString("de-DE")} orders
+                        </span>
+                        <span className="rounded-md bg-muted px-2 py-0.5">
+                          Gross: {formatCurrency(alert.grossAmount)}
+                        </span>
+                        <span className="rounded-md bg-muted px-2 py-0.5">
+                          Net: {formatCurrency(alert.netAmount)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <Button
-                  asChild
-                  size="sm"
-                  variant="outline"
-                  className="shrink-0"
-                  hasEffect={false}
-                >
-                  <Link href={alert.href}>
-                    Review
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </Button>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0"
+                    hasEffect={false}
+                  >
+                    <Link href={alert.href}>
+                      Review
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                </div>
+                <div className="mt-3 h-1.5 rounded-full bg-muted">
+                  <div
+                    className={cn("h-1.5 rounded-full", styles.bar)}
+                    style={{ width: `${width}%` }}
+                  />
+                </div>
               </div>
-              <div className="mt-3 h-1.5 rounded-full bg-muted">
-                <div
-                  className={cn("h-1.5 rounded-full", styles.bar)}
-                  style={{ width: `${width}%` }}
-                />
-              </div>
-            </div>
             );
           })
         )}
@@ -394,6 +515,7 @@ function ActionCenterCard({
 export default function EcommerceDashboard({
   fromDate,
   toDate,
+  isB2B,
 }: EcommerceDashboardProps) {
   const params = useParams<{ locale?: string }>();
   const localePrefix =
@@ -426,6 +548,7 @@ export default function EcommerceDashboard({
   } = useGetCheckOutStatistic({
     from_date: fromDate,
     to_date: toDate,
+    is_b2b: isB2B,
   });
 
   const {
@@ -435,9 +558,13 @@ export default function EcommerceDashboard({
   } = useGetCheckOutDashboard({
     from_date: fromDate,
     to_date: toDate,
+    is_b2b: isB2B,
   });
 
-  const { data: previousDashboard } = useGetCheckOutDashboard(previousRange);
+  const { data: previousDashboard } = useGetCheckOutDashboard({
+    ...previousRange,
+    is_b2b: isB2B,
+  });
 
   const {
     data: productOverview,
@@ -446,6 +573,7 @@ export default function EcommerceDashboard({
   } = useGetProductsCheckOutDashboard({
     from_date: fromDate,
     to_date: toDate,
+    is_b2b: isB2B,
   });
 
   const hasAnyData = Boolean(statistic || dashboard || productOverview);
@@ -476,13 +604,16 @@ export default function EcommerceDashboard({
   }
 
   const totalOrders = toNumber(statistic?.count_order);
-  const totalRevenue = toNumber(statistic?.total_order);
+  // API total_order is gross revenue.
+  const grossRevenue = toNumber(statistic?.total_order);
   const returnedOrders = toNumber(statistic?.count_return_order);
   const returnedRevenue = toNumber(statistic?.total_return_order);
   const canceledOrders = toNumber(statistic?.count_cancel_order);
   const canceledRevenue = toNumber(statistic?.total_cancel_order);
   const waitingPaymentOrders = toNumber(statistic?.count_waiting_payment_order);
-  const waitingPaymentRevenue = toNumber(statistic?.total_waiting_payment_order);
+  const waitingPaymentRevenue = toNumber(
+    statistic?.total_waiting_payment_order,
+  );
   const preparingOrders = toNumber(statistic?.count_preparing_shipping_order);
   const preparingRevenue = toNumber(statistic?.total_preparing_shipping_order);
   const stockReservedOrders = toNumber(statistic?.count_stock_reserved_order);
@@ -490,22 +621,26 @@ export default function EcommerceDashboard({
   const dispatchedOrders = toNumber(statistic?.count_dispatched_order);
   const dispatchedRevenue = toNumber(statistic?.total_dispatched_order);
 
-  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  const avgOrderValue = totalOrders > 0 ? grossRevenue / totalOrders : 0;
   const returnRate = totalOrders > 0 ? (returnedOrders / totalOrders) * 100 : 0;
   const cancelRate = totalOrders > 0 ? (canceledOrders / totalOrders) * 100 : 0;
   const fulfillmentRate =
     totalOrders > 0 ? (dispatchedOrders / totalOrders) * 100 : 0;
   const netRevenue = Math.max(
     0,
-    totalRevenue - returnedRevenue - canceledRevenue,
+    grossRevenue - returnedRevenue - canceledRevenue,
   );
+  const revenueDeductions = returnedRevenue + canceledRevenue;
+  const netFromGrossByFormula = (gross: number) =>
+    Math.max(0, gross - revenueDeductions);
+
   const operationalBacklog =
     waitingPaymentOrders + stockReservedOrders + preparingOrders;
 
   const kpis: DashboardMetric[] = [
     {
       label: "Gross Revenue",
-      value: formatCurrency(totalRevenue),
+      value: formatCurrency(grossRevenue),
       hint: `${totalOrders.toLocaleString("de-DE")} orders`,
       icon: Euro,
       tone: "emerald",
@@ -513,7 +648,7 @@ export default function EcommerceDashboard({
     {
       label: "Net Revenue",
       value: formatCurrency(netRevenue),
-      hint: "after returns and cancellations",
+      hint: "gross - returns - cancellations",
       icon: Wallet,
       tone: "blue",
     },
@@ -544,28 +679,32 @@ export default function EcommerceDashboard({
     {
       label: "Waiting for Payment",
       count: waitingPaymentOrders,
-      amount: waitingPaymentRevenue,
+      grossAmount: waitingPaymentRevenue,
+      netAmount: netFromGrossByFormula(waitingPaymentRevenue),
       icon: Clock3,
       tone: "orange" as CardTone,
     },
     {
       label: "Stock Reserved",
       count: stockReservedOrders,
-      amount: stockReservedRevenue,
+      grossAmount: stockReservedRevenue,
+      netAmount: netFromGrossByFormula(stockReservedRevenue),
       icon: Boxes,
       tone: "violet" as CardTone,
     },
     {
       label: "Preparing Shipping",
       count: preparingOrders,
-      amount: preparingRevenue,
+      grossAmount: preparingRevenue,
+      netAmount: netFromGrossByFormula(preparingRevenue),
       icon: PackageCheck,
       tone: "blue" as CardTone,
     },
     {
       label: "Dispatched + Exchange",
       count: dispatchedOrders,
-      amount: dispatchedRevenue,
+      grossAmount: dispatchedRevenue,
+      netAmount: netFromGrossByFormula(dispatchedRevenue),
       icon: PackageCheck,
       tone: "emerald" as CardTone,
     },
@@ -579,7 +718,8 @@ export default function EcommerceDashboard({
           description:
             "Orders are blocked until payment confirmation is received.",
           count: waitingPaymentOrders,
-          amount: waitingPaymentRevenue,
+          grossAmount: waitingPaymentRevenue,
+          netAmount: netFromGrossByFormula(waitingPaymentRevenue),
           severity: waitingPaymentOrders >= 30 ? "high" : "medium",
           href: buildOrderListUrl("PENDING"),
           icon: Clock3,
@@ -592,9 +732,10 @@ export default function EcommerceDashboard({
           description:
             "Orders are waiting for stock allocation or inbound inventory.",
           count: stockReservedOrders,
-          amount: stockReservedRevenue,
+          grossAmount: stockReservedRevenue,
+          netAmount: netFromGrossByFormula(stockReservedRevenue),
           severity: stockReservedOrders >= 40 ? "high" : "medium",
-          href: buildOrderListUrl("STOCK_RESERVED"),
+          href: buildOrderListUrl("TOCK_RESERVED"),
           icon: Boxes,
         }
       : null,
@@ -605,7 +746,8 @@ export default function EcommerceDashboard({
           description:
             "Orders are in handling and need to move to dispatched quickly.",
           count: preparingOrders,
-          amount: preparingRevenue,
+          grossAmount: preparingRevenue,
+          netAmount: netFromGrossByFormula(preparingRevenue),
           severity: preparingOrders >= 50 ? "high" : "medium",
           href: buildOrderListUrl("PREPARATION_SHIPPING"),
           icon: PackageCheck,
@@ -618,7 +760,8 @@ export default function EcommerceDashboard({
           description:
             "Returned orders are increasing and should be analyzed by SKU/channel.",
           count: returnedOrders,
-          amount: returnedRevenue,
+          grossAmount: returnedRevenue,
+          netAmount: netFromGrossByFormula(returnedRevenue),
           severity: returnRate >= 7 ? "high" : "low",
           href: buildOrderListUrl("RETURN,RETURN_ISSUE"),
           icon: RotateCcw,
@@ -631,7 +774,8 @@ export default function EcommerceDashboard({
           description:
             "Cancellations impact revenue quality and customer confidence.",
           count: canceledOrders,
-          amount: canceledRevenue,
+          grossAmount: canceledRevenue,
+          netAmount: netFromGrossByFormula(canceledRevenue),
           severity: cancelRate >= 4 ? "high" : "low",
           href: buildOrderListUrl(
             "CANCELED,CANCEL_REQUEST,CANCELED_NO_STOCK,CANCELED_WRONG_PRICE",
@@ -639,7 +783,7 @@ export default function EcommerceDashboard({
           icon: AlertTriangle,
         }
       : null,
-  ] 
+  ]
     .filter((item): item is OperationalAlert => Boolean(item))
     .sort((a, b) => {
       const priorityRank: Record<AlertSeverity, number> = {
@@ -653,8 +797,12 @@ export default function EcommerceDashboard({
       return b.count - a.count;
     });
 
-  const revenueAtRisk = operationalAlerts.reduce(
-    (sum, item) => sum + item.amount,
+  const grossAtRisk = operationalAlerts.reduce(
+    (sum, item) => sum + item.grossAmount,
+    0,
+  );
+  const netAtRisk = operationalAlerts.reduce(
+    (sum, item) => sum + item.netAmount,
     0,
   );
 
@@ -662,8 +810,12 @@ export default function EcommerceDashboard({
     .sort((a, b) => toNumber(b.total_amount) - toNumber(a.total_amount))
     .slice(0, 6);
 
-  const topProviders = [...(productOverview?.items ?? [])]
+  const topProvidersByRevenue = [...(productOverview?.items ?? [])]
     .sort((a, b) => toNumber(b.total_amount) - toNumber(a.total_amount))
+    .slice(0, 6);
+
+  const topProvidersBySold = [...(productOverview?.items ?? [])]
+    .sort((a, b) => toNumber(b.total_quantity) - toNumber(a.total_quantity))
     .slice(0, 6);
 
   const periodLabel =
@@ -673,7 +825,7 @@ export default function EcommerceDashboard({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid auto-rows-fr items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {kpis.map((metric) => {
           const styles = toneStyles[metric.tone];
           const Icon = metric.icon;
@@ -681,7 +833,7 @@ export default function EcommerceDashboard({
           return (
             <Card
               key={metric.label}
-              className={cn("rounded-2xl border shadow-sm", styles.bg)}
+              className={cn("h-full rounded-2xl border shadow-sm", styles.bg)}
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -697,14 +849,16 @@ export default function EcommerceDashboard({
                     <Icon className="h-4 w-4" />
                   </span>
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">{metric.hint}</p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {metric.hint}
+                </p>
               </CardContent>
             </Card>
           );
         })}
       </div>
 
-      <Card className="rounded-2xl border shadow-sm">
+      <Card className="h-full rounded-2xl border shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <CardTitle className="text-base">Operations Snapshot</CardTitle>
@@ -741,7 +895,7 @@ export default function EcommerceDashboard({
                   {item.count.toLocaleString("de-DE")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {formatCurrency(item.amount)}
+                  Gross: {formatCurrency(item.grossAmount)}
                 </p>
               </div>
             );
@@ -749,19 +903,20 @@ export default function EcommerceDashboard({
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 2xl:grid-cols-3">
-        <div className="2xl:col-span-2">
-          <MonthlyChart />
+      <div className="grid auto-rows-fr items-stretch gap-4 2xl:grid-cols-3">
+        <div className="h-full 2xl:col-span-2">
+          <MonthlyChart isB2B={isB2B} />
         </div>
         <ActionCenterCard
           alerts={operationalAlerts}
           backlog={operationalBacklog}
-          atRiskValue={revenueAtRisk}
+          grossAtRisk={grossAtRisk}
+          netAtRisk={netAtRisk}
         />
       </div>
 
-      <div className="grid gap-4 2xl:grid-cols-3">
-        <div className="2xl:col-span-2">
+      <div className="grid auto-rows-fr items-stretch gap-4 2xl:grid-cols-3">
+        <div className="h-full 2xl:col-span-2">
           {dashboard?.data?.length ? (
             <ChartBarMultiple data={dashboard.data} />
           ) : (
@@ -789,9 +944,12 @@ export default function EcommerceDashboard({
         )}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid auto-rows-fr items-stretch gap-4 xl:grid-cols-2">
         <MarketplaceRankingCard data={marketplaceRanking} />
-        <TopProductsCard providers={topProviders} />
+        <TopProductsCard
+          providersByRevenue={topProvidersByRevenue}
+          providersBySold={topProvidersBySold}
+        />
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ const ProductMarginPage = () => {
   const { data, isLoading, isError } = useGetProductsCheckOutDashboard({
     from_date,
     to_date,
+    is_b2b: false,
   });
 
   return (

@@ -27,6 +27,7 @@ const ProductSoldPage = () => {
   const { data, isLoading } = useGetProductsCheckOutDashboard({
     from_date,
     to_date,
+    is_b2b: false,
   });
 
   return (

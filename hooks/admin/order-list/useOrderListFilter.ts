@@ -15,6 +15,14 @@ function parseChannelParam(param: string | null) {
   return arr;
 }
 
+function parseIsB2BParam(param: string | null): boolean | undefined {
+  if (!param) return undefined;
+  const normalized = param.trim().toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+  return undefined;
+}
+
 export function useOrderListFilters() {
   const searchParams = useSearchParams();
 
@@ -28,5 +36,6 @@ export function useOrderListFilters() {
     fromDate: searchParams.get("from_date") || undefined,
     toDate: searchParams.get("to_date") || undefined,
     search: searchParams.get("search") || "",
+    isB2B: parseIsB2BParam(searchParams.get("is_b2b")),
   };
 }

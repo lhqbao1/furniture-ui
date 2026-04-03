@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "use-debounce";
 import {
@@ -35,6 +35,7 @@ import { CheckOutMain } from "@/types/checkout";
 import { toast } from "sonner";
 import MultiSearch from "../../products/products-list/toolbar/multi-search";
 import B2BInvoiceDrawer from "./b2b-invoice-drawer";
+import OrderB2BFilter from "./filter/filter-order-b2b";
 
 export enum ToolbarType {
   product = "product",
@@ -54,7 +55,14 @@ interface OrderToolbarProps {
   selectedOrders?: CheckOutMain[];
 }
 
-const FILTER_KEYS = ["search", "status", "channel", "from_date", "to_date"];
+const FILTER_KEYS = [
+  "search",
+  "status",
+  "channel",
+  "from_date",
+  "to_date",
+  "is_b2b",
+];
 
 export default function OrderToolbar({
   pageSize,
@@ -64,7 +72,6 @@ export default function OrderToolbar({
   isAddButtonModal,
   addButtonUrl,
   addButtonModalContent,
-  exportData,
   type,
   selectedOrders = [],
 }: OrderToolbarProps) {
@@ -79,17 +86,16 @@ export default function OrderToolbar({
   const defaultSearch = searchParams.get("search") ?? "";
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
-  const [prevParams, setPrevParams] = useState(
-    Object.fromEntries(searchParams.entries()),
-  );
+  const prevParamsRef = useRef(Object.fromEntries(searchParams.entries()));
   const [debouncedSearch] = useDebounce(searchValue, 600);
 
   // push URL khi debounce hoàn thành
   useEffect(() => {
     const current = Object.fromEntries(searchParams.entries());
+    const previous = prevParamsRef.current;
 
     // check filter changed
-    const filterChanged = FILTER_KEYS.some((k) => current[k] !== prevParams[k]);
+    const filterChanged = FILTER_KEYS.some((k) => current[k] !== previous[k]);
 
     if (filterChanged) {
       router.push(
@@ -102,8 +108,8 @@ export default function OrderToolbar({
       setPage(1);
     }
 
-    setPrevParams(current);
-  }, [searchParams]);
+    prevParamsRef.current = current;
+  }, [pathname, router, searchParams, setPage]);
 
   useEffect(() => {
     const currentSearch = searchParams.get("search") ?? "";
@@ -119,181 +125,172 @@ export default function OrderToolbar({
         { scroll: false },
       );
     }
-  }, [debouncedSearch]);
+  }, [debouncedSearch, pathname, router, searchParams]);
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
-      {/* Left group */}
-      <div className="lg:flex items-center lg:gap-4 gap-2 flex-nowrap hidden">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-1">
-              Group action <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {/* <DropdownMenuItem>Delete Selected</DropdownMenuItem> */}
-            <DropdownMenuItem>Export Selected</DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => {
-                if (selectedOrders.length === 0) {
-                  toast.info("No order selected");
-                  return;
-                }
+    <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex w-full flex-1 items-center gap-2">
+            <MultiSearch />
+            <Input
+              placeholder="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </div>
 
-                const missingExternalId = selectedOrders.filter(
-                  (order) => !order.marketplace_order_id?.trim(),
-                );
-                const missingMarketplace = selectedOrders.filter(
-                  (order) => !order.from_marketplace?.trim(),
-                );
-
-                const marketplaces = Array.from(
-                  new Set(
-                    selectedOrders
-                      .map((order) => order.from_marketplace?.trim())
-                      .filter((value): value is string => Boolean(value)),
-                  ),
-                );
-
-                const errors: string[] = [];
-
-                if (missingExternalId.length > 0) {
-                  errors.push(
-                    `Missing external ID: ${missingExternalId
-                      .map((order) => order.checkout_code || order.id)
-                      .join(", ")}`,
-                  );
-                }
-
-                if (missingMarketplace.length > 0) {
-                  errors.push(
-                    `Missing marketplace: ${missingMarketplace
-                      .map((order) => order.checkout_code || order.id)
-                      .join(", ")}`,
-                  );
-                }
-
-                if (marketplaces.length > 1) {
-                  errors.push(
-                    `Orders must be in one marketplace. Found: ${marketplaces.join(", ")}`,
-                  );
-                }
-
-                if (errors.length > 0) {
-                  toast.error("Cannot create B2B invoice", {
-                    description: (
-                      <div className="flex flex-col gap-1">
-                        {errors.map((error) => (
-                          <div key={error}>- {error}</div>
-                        ))}
-                      </div>
-                    ),
-                  });
-                  return;
-                }
-
-                const marketplace = marketplaces[0] ?? "";
-                setB2BMarketplace(marketplace);
-                setOpenB2BDrawer(true);
-              }}
+          <div className="flex w-full flex-wrap items-center gap-2 xl:w-auto xl:justify-end">
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => setPageSize(Number(value))}
             >
-              Create B2B Invoice
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <SelectTrigger className="w-[120px] border text-black cursor-pointer">
+                <SelectValue placeholder="Select size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1 rows</SelectItem>
+                <SelectItem value="5">5 rows</SelectItem>
+                <SelectItem value="10">10 rows</SelectItem>
+                <SelectItem value="20">20 rows</SelectItem>
+                <SelectItem value="50">50 rows</SelectItem>
+                <SelectItem value="300">300 rows</SelectItem>
+                <SelectItem value="500">500 rows</SelectItem>
+                <SelectItem value="1000">1000 rows</SelectItem>
+                <SelectItem value="2000">2000 rows</SelectItem>
+              </SelectContent>
+            </Select>
 
-        <div className="flex gap-2 text-sm font-medium">
-          <ExportOrderExcelButton />
-          <OrderImport />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" className="flex items-center gap-1">
+                  Filter <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[95vw] max-w-[920px] p-4 md:p-6">
+                {type === ToolbarType.order && <OrderFilterForm />}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-1">
+                  Columns <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>Name</DropdownMenuItem>
+                <DropdownMenuItem>Stock</DropdownMenuItem>
+                <DropdownMenuItem>Price</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {addButtonText && (
+              <Button
+                className="bg-primary hover:bg-primary font-semibold"
+                onClick={() => {
+                  if (addButtonUrl) {
+                    router.push(addButtonUrl, { locale });
+                  } else if (isAddButtonModal) {
+                    setOpenAddModal(true);
+                  }
+                }}
+              >
+                {addButtonText}
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Search (auto, no button) */}
-      <div className="flex items-center w-full flex-1 flex-nowrap gap-2">
-        <MultiSearch />
-        <Input
-          placeholder="Search"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-      </div>
+        {type === ToolbarType.order ? (
+          <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full xl:w-1/2">
+            <OrderB2BFilter />
+          </div>
+        ) : null}
 
-      {/* Right group */}
-      <div className="flex items-center gap-4 flex-wrap lg:flex-nowrap justify-center lg:justify-start">
-        <div>
-          <Select
-            value={String(pageSize)}
-            onValueChange={(value) => setPageSize(Number(value))}
-          >
-            <SelectTrigger className="border text-black cursor-pointer">
-              <SelectValue placeholder="Select size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1 rows</SelectItem>
-              <SelectItem value="5">5 rows</SelectItem>
-              <SelectItem value="10">10 rows</SelectItem>
-              <SelectItem value="20">20 rows</SelectItem>
-              <SelectItem value="50">50 rows</SelectItem>
-              <SelectItem value="300">300 rows</SelectItem>
-              <SelectItem value="500">500 rows</SelectItem>
-              <SelectItem value="1000">1000 rows</SelectItem>
-              <SelectItem value="2000">2000 rows</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex w-full flex-wrap items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-1">
+                Group action <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Export Selected</DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  if (selectedOrders.length === 0) {
+                    toast.info("No order selected");
+                    return;
+                  }
+
+                  const missingExternalId = selectedOrders.filter(
+                    (order) => !order.marketplace_order_id?.trim(),
+                  );
+                  const missingMarketplace = selectedOrders.filter(
+                    (order) => !order.from_marketplace?.trim(),
+                  );
+
+                  const marketplaces = Array.from(
+                    new Set(
+                      selectedOrders
+                        .map((order) => order.from_marketplace?.trim())
+                        .filter((value): value is string => Boolean(value)),
+                    ),
+                  );
+
+                  const errors: string[] = [];
+
+                  if (missingExternalId.length > 0) {
+                    errors.push(
+                      `Missing external ID: ${missingExternalId
+                        .map((order) => order.checkout_code || order.id)
+                        .join(", ")}`,
+                    );
+                  }
+
+                  if (missingMarketplace.length > 0) {
+                    errors.push(
+                      `Missing marketplace: ${missingMarketplace
+                        .map((order) => order.checkout_code || order.id)
+                        .join(", ")}`,
+                    );
+                  }
+
+                  if (marketplaces.length > 1) {
+                    errors.push(
+                      `Orders must be in one marketplace. Found: ${marketplaces.join(", ")}`,
+                    );
+                  }
+
+                  if (errors.length > 0) {
+                    toast.error("Cannot create B2B invoice", {
+                      description: (
+                        <div className="flex flex-col gap-1">
+                          {errors.map((error) => (
+                            <div key={error}>- {error}</div>
+                          ))}
+                        </div>
+                      ),
+                    });
+                    return;
+                  }
+
+                  const marketplace = marketplaces[0] ?? "";
+                  setB2BMarketplace(marketplace);
+                  setOpenB2BDrawer(true);
+                }}
+              >
+                Create B2B Invoice
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="flex flex-wrap items-center gap-2 text-sm font-medium">
+            <ExportOrderExcelButton />
+            <OrderImport />
+          </div>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1">
-              Filter <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[800px] px-8 py-4">
-            {/* {type === ToolbarType.product && <FilterForm />} */}
-            {type === ToolbarType.order && <OrderFilterForm />}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1">
-              View <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Compact</DropdownMenuItem>
-            <DropdownMenuItem>Comfortable</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1">
-              Columns <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Name</DropdownMenuItem>
-            <DropdownMenuItem>Stock</DropdownMenuItem>
-            <DropdownMenuItem>Price</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {addButtonText && (
-          <Button
-            className="bg-primary hover:bg-primary font-semibold"
-            onClick={() => {
-              if (addButtonUrl) {
-                router.push(addButtonUrl, { locale });
-              } else if (isAddButtonModal) {
-                setOpenAddModal(true);
-              }
-            }}
-          >
-            {addButtonText}
-          </Button>
-        )}
       </div>
 
       {isAddButtonModal && (

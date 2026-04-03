@@ -34,11 +34,13 @@ const OverviewPage = () => {
   } = useGetCheckOutDashboard({
     from_date: from_date,
     to_date: to_date,
+    is_b2b: false,
   });
 
   const { data, isLoading, isError } = useGetProductsCheckOutDashboard({
     from_date,
     to_date,
+    is_b2b: false,
   });
 
   const { data: fixedFee, isLoading: isLoadingFixedFee } = useQuery({

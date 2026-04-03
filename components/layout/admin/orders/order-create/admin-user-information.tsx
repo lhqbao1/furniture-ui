@@ -50,8 +50,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Trash2 } from "lucide-react";
+import { Building2, Loader2, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface AdminCheckOutUserInformationProps {
   isAdmin?: boolean;
@@ -306,8 +307,8 @@ export function AdminCheckOutUserInformation({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between bg-secondary/10 p-2">
-        <h2 className="text-lg text-black font-semibold ">User Information</h2>
+      <div className="flex items-center justify-between rounded-xl border border-secondary/20 bg-secondary/10 px-4 py-3">
+        <h2 className="text-lg font-semibold text-black">User Information</h2>
         <div className="flex items-center gap-2">
           <Checkbox
             id="save-user-information"
@@ -325,6 +326,85 @@ export function AdminCheckOutUserInformation({
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
+        <div className="col-span-2">
+          <FormField
+            control={form.control}
+            name="is_b2b"
+            render={({ field }) => (
+              <FormItem className="space-y-2 rounded-xl border border-secondary/20 bg-secondary/5 p-3">
+                <FormLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Order Type
+                </FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={(val) => field.onChange(val === "true")}
+                    value={
+                      typeof field.value === "boolean"
+                        ? String(field.value)
+                        : ""
+                    }
+                    className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                  >
+                    <FormItem className="space-y-0">
+                      <FormControl>
+                        <RadioGroupItem
+                          value="true"
+                          id="order-type-b2b"
+                          className="peer sr-only"
+                        />
+                      </FormControl>
+                      <Label
+                        htmlFor="order-type-b2b"
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-all",
+                          field.value === true
+                            ? "border-secondary bg-secondary/15 text-secondary shadow-sm"
+                            : "border-border bg-background hover:border-secondary/40 hover:bg-secondary/5",
+                        )}
+                      >
+                        <Building2 className="size-5 shrink-0" />
+                        <div className="flex flex-col">
+                          <span className="font-semibold">B2B</span>
+                          <span className="text-xs text-muted-foreground">
+                            Business customer
+                          </span>
+                        </div>
+                      </Label>
+                    </FormItem>
+
+                    <FormItem className="space-y-0">
+                      <FormControl>
+                        <RadioGroupItem
+                          value="false"
+                          id="order-type-b2c"
+                          className="peer sr-only"
+                        />
+                      </FormControl>
+                      <Label
+                        htmlFor="order-type-b2c"
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-all",
+                          field.value === false
+                            ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
+                            : "border-border bg-background hover:border-blue-300 hover:bg-blue-50/60",
+                        )}
+                      >
+                        <UserRound className="size-5 shrink-0" />
+                        <div className="flex flex-col">
+                          <span className="font-semibold">B2C</span>
+                          <span className="text-xs text-muted-foreground">
+                            Consumer customer
+                          </span>
+                        </div>
+                      </Label>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
         <div className="col-span-2">
           <FormItem>
             <FormLabel>Saved User Information</FormLabel>

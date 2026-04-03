@@ -171,15 +171,13 @@ export function useGetCheckOutMainByUserIdAdmin(user_id: string) {
   });
 }
 
-export function useGetCheckOutStatistic(params?: {
-  from_date?: string;
-  to_date?: string;
-}) {
+export function useGetCheckOutStatistic(params?: OrderStatisticsParams) {
   return useQuery({
     queryKey: [
       "checkout-statistic",
       params?.from_date ?? null,
       params?.to_date ?? null,
+      params?.is_b2b ?? null,
     ],
     queryFn: () => getCheckOutStatistics(params),
     placeholderData: (previousData) => previousData,
@@ -189,8 +187,16 @@ export function useGetCheckOutStatistic(params?: {
 }
 
 export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
-  const { page, page_size, status, channel, from_date, to_date, search } =
-    params;
+  const {
+    page,
+    page_size,
+    status,
+    channel,
+    from_date,
+    to_date,
+    search,
+    is_b2b,
+  } = params;
 
   return useQuery({
     queryKey: [
@@ -202,6 +208,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       from_date ?? null,
       to_date ?? null,
       search ?? null,
+      is_b2b,
     ],
     queryFn: () => getCheckOutMain(params),
     placeholderData: (previousData) => previousData,
@@ -549,7 +556,12 @@ export const useCancelMainCheckout = () => {
 
 export const useGetCheckOutDashboard = (params: OrderStatisticsParams) => {
   return useQuery({
-    queryKey: ["checkout-dashboard", params.from_date, params.to_date],
+    queryKey: [
+      "checkout-dashboard",
+      params.from_date,
+      params.to_date,
+      params.is_b2b ?? null,
+    ],
     queryFn: () => getCheckOutDashboard(params),
     retry: false,
   });
@@ -563,22 +575,24 @@ export const useGetProductsCheckOutDashboard = (
       "checkout-dashboard-products",
       params?.from_date,
       params?.to_date,
+      params?.is_b2b ?? null,
     ],
     queryFn: () => getProductsCheckOutDashboard(params),
     retry: false,
   });
 };
 
-export function useCheckoutDashboardLast6Months() {
+export function useCheckoutDashboardLast6Months(is_b2b?: boolean) {
   const months = React.useMemo(() => getLast6Months(), []);
 
   const queries = useQueries({
     queries: months.map((m) => ({
-      queryKey: ["checkout-dashboard", m.from_date, m.to_date],
+      queryKey: ["checkout-dashboard", m.from_date, m.to_date, is_b2b ?? null],
       queryFn: () =>
         getCheckOutDashboard({
           from_date: m.from_date,
           to_date: m.to_date,
+          is_b2b,
         }),
     })),
   });

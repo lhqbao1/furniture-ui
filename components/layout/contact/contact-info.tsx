@@ -9,7 +9,7 @@ const ContactInfo = () => {
   const phoneHref = "tel:+4929213272038";
 
   return (
-    <aside className="rounded-3xl border border-[#E7EAEF] bg-white p-5 md:p-7 shadow-[0_10px_40px_rgba(20,34,51,0.08)] space-y-5">
+    <aside className="h-full rounded-3xl border border-[#E7EAEF] bg-white p-5 md:p-7 shadow-[0_10px_40px_rgba(20,34,51,0.08)] flex flex-col gap-5">
       <div>
         <p className="text-xs uppercase tracking-[0.18em] text-[#6b7280]">
           Kontakt
@@ -24,7 +24,7 @@ const ContactInfo = () => {
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 flex-1">
         <div className="rounded-2xl border border-[#EBEEF2] bg-[#F8FAFC] p-4">
           <div className="flex items-center gap-3">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#fff3e6] text-primary">
@@ -71,10 +71,10 @@ const ContactInfo = () => {
                 E-Mail
               </p>
               <Link
-                href="mailto:info@prestige-home.de"
+                href="mailto:support@prestige-home.de"
                 className="text-base font-semibold text-[#0f172a] hover:text-primary transition-colors"
               >
-                info@prestige-home.de
+                support@prestige-home.de
               </Link>
             </div>
           </div>
@@ -98,7 +98,7 @@ const ContactInfo = () => {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-[#101828] px-4 py-3">
+      <div className="rounded-2xl bg-[#101828] px-4 py-3 mt-auto">
         <p className="text-xs uppercase tracking-wide text-white/70">
           Service-Hinweis
         </p>

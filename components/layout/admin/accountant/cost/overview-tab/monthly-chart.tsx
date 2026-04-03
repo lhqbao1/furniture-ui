@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  CartesianGrid,
-  LabelList,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -24,103 +17,28 @@ import {
 import { useCheckoutDashboardLast6Months } from "@/features/checkout/hook";
 import { useMediaQuery } from "react-responsive";
 
-interface ChartData {
-  month: string;
-  total: number;
-  total_order: number;
+interface MonthlyChartProps {
+  isB2B?: boolean;
 }
 
-type RevenueLabelProps = {
-  x?: number;
-  y?: number;
-  value?: number;
-  index?: number;
-  payload?: any;
-  chartData: ChartData[];
-};
-
-type OrdersLabelProps = {
-  x?: number;
-  y?: number;
-  value?: number;
-  payload?: any;
-  chartData: ChartData[];
-  index?: number;
-};
-
-function RevenueLabel({
-  x = 0,
-  y = 0,
-  value,
-  index,
-  chartData,
-}: RevenueLabelProps) {
-  if (value == null || index == null) return null;
-
-  const row = chartData[index];
-  if (!row) return null;
-
-  return (
-    <text
-      x={x}
-      y={y - 8}
-      textAnchor="middle"
-      className="fill-foreground text-xs"
-    >
-      €{" "}
-      {value.toLocaleString("de-DE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}
-    </text>
-  );
-}
-
-function OrdersLabel({
-  x = 0,
-  y = 0,
-  value,
-  index,
-  chartData,
-}: OrdersLabelProps) {
-  if (value == null || index == null) return null;
-
-  const row = chartData[index];
-  if (!row) return null;
-
-  // nếu revenue === order count → ẩn label orders
-  if (row.total === row.total_order) return null;
-
-  return (
-    <text
-      x={x}
-      y={y - 8}
-      textAnchor="middle"
-      className="fill-muted-foreground text-xs"
-    >
-      {value} orders
-    </text>
-  );
-}
-
-export function MonthlyChart() {
+export function MonthlyChart({ isB2B }: MonthlyChartProps) {
   const isMobile = useMediaQuery({
     maxWidth: 768,
   });
-  const { chartData, isLoading } = useCheckoutDashboardLast6Months();
+  const { chartData, isLoading } = useCheckoutDashboardLast6Months(isB2B);
 
   if (isLoading) {
     return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   }
 
   return (
-    <Card>
+    <Card className="flex h-full flex-col">
       <CardHeader>
         <CardTitle>Last 6 Months</CardTitle>
         <CardDescription>Revenue & Orders</CardDescription>
       </CardHeader>
 
-      <CardContent className="xl:px-6 px-2">
+      <CardContent className="flex-1 xl:px-6 px-2">
         <ChartContainer
           config={{
             total: {

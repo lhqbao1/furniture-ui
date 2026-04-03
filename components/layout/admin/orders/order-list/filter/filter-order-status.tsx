@@ -60,11 +60,11 @@ export default function OrderStatusFilter() {
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>Status:</Label>
+      <Label>Status</Label>
 
       <Select>
         <SelectTrigger
-          className="w-[200px] cursor-pointer border text-black justify-center"
+          className="w-full cursor-pointer border text-black justify-between"
           placeholderColor
           iconColor="black"
         >

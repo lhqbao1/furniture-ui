@@ -75,10 +75,10 @@ export default function OrderChanelFilter() {
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>Chanel:</Label>
+      <Label>Channel</Label>
       <Select>
         <SelectTrigger
-          className="w-50 cursor-pointer border text-black justify-center"
+          className="w-full cursor-pointer border text-black justify-between"
           placeholderColor
           iconColor="black"
         >

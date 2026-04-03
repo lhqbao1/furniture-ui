@@ -1,4 +1,18 @@
-import { optional, z } from "zod";
+import { z } from "zod";
+
+const BooleanLikeSchema = z.preprocess((value) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true" || normalized === "1") return true;
+    if (normalized === "false" || normalized === "0") return false;
+  }
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+  }
+  return value;
+}, z.boolean());
 
 export const ManualOrderItemSchema = z.object({
   id_provider: z.string().min(1, { message: "Product ID is required" }),
@@ -63,6 +77,7 @@ export const ManualCreateOrderSchema = z
       message: "You must select at least one product",
     }),
     note: z.string().optional().nullable(),
+    is_b2b: BooleanLikeSchema,
   })
   .superRefine((data, ctx) => {
     if (
@@ -103,4 +118,5 @@ export const manualCheckoutDefaultValues: ManualCreateOrderFormValues = {
   phone: "",
   invoice_phone: "",
   tax: 19,
+  is_b2b: false,
 };
