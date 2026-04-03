@@ -1,12 +1,11 @@
 "use client";
 
 import { useGetCheckOutDashboard } from "@/features/checkout/hook";
-import { Loader2, TrendingUp } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { ChartPieLabelList } from "./overview-tab/pie-chart";
 import {
-  getMonthRange,
   getPreviousMonthRange,
 } from "@/hooks/get-previous-month";
 import { ChartBarMultiple } from "./overview-tab/column-chart";
@@ -14,7 +13,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,12 +30,6 @@ const OverViewTab = () => {
     [fromDateParam],
   );
 
-  // 🔹 Range tháng hiện tại
-  const currentRange = React.useMemo(
-    () => getMonthRange(selectedMonth),
-    [selectedMonth],
-  );
-
   // 🔹 Range tháng trước
   const previousRange = React.useMemo(
     () => getPreviousMonthRange(selectedMonth),
@@ -48,7 +40,6 @@ const OverViewTab = () => {
   const {
     data: currentData,
     isLoading: isCurrentLoading,
-    isError: isCurrentError,
   } = useGetCheckOutDashboard({
     from_date: fromDateParam,
     to_date: endDateParam,
@@ -85,7 +76,7 @@ const OverViewTab = () => {
         <div className="xl:space-y-6 space-y-12 grid grid-cols-1 2xl:grid-cols-2 xl:gap-6 gap-0">
           <div className="2xl:col-span-1 col-span-2">
             <div className="w-full mx-auto">
-              <MonthlyChart />
+              <MonthlyChart isB2B={false} />
             </div>
           </div>
           <div className="col-span-1">

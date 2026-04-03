@@ -3,20 +3,12 @@ import { orderColumns } from "@/components/layout/admin/orders/order-list/column
 import OrderExpandTable from "@/components/layout/admin/orders/order-list/expand-delivery";
 import OrderToolbar from "@/components/layout/admin/orders/order-list/order-toolbar";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
-import TableToolbar, {
-  ToolbarType,
-} from "@/components/layout/admin/products/products-list/toolbar";
+import { ToolbarType } from "@/components/layout/admin/products/products-list/toolbar";
 import { useGetCheckOutMain } from "@/features/checkout/hook";
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { CheckOutMain } from "@/types/checkout";
 
@@ -28,8 +20,7 @@ const OrderList = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const filters = useOrderListFilters();
-  const tableWrapRef = useRef<HTMLDivElement | null>(null);
-  const [tableHeight, setTableHeight] = useState<number | null>(null);
+
   // ⚡ Cập nhật URL mỗi khi page thay đổi
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -52,7 +43,7 @@ const OrderList = () => {
     from_date: filters.fromDate,
     to_date: filters.toDate,
     search: filters.search,
-    is_b2b: false,
+    is_b2b: filters.isB2B,
   });
 
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
@@ -81,22 +72,6 @@ const OrderList = () => {
       behavior: "smooth",
     });
   }, [page]);
-
-  useLayoutEffect(() => {
-    const updateHeight = () => {
-      const wrapper = tableWrapRef.current;
-      if (!wrapper) return;
-      const rect = wrapper.getBoundingClientRect();
-      const bottomPadding = 24; // matches pb-6
-      const available = window.innerHeight - rect.top - bottomPadding;
-      const isMobile = window.innerWidth < 768;
-      setTableHeight(isMobile ? 580 : Math.max(500, available));
-    };
-
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
-  }, [data, isLoading]);
 
   if (!data && isError) {
     return <div>No data</div>;

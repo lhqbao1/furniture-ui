@@ -28,24 +28,69 @@ const toNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-export function ChartBarMultiple({ data }: ChartBarMultipleProps) {
-  const sortedData = [...data].sort(
-    (a, b) => toNumber(b.total_amount) - toNumber(a.total_amount),
-  );
+const REQUIRED_MARKETPLACES = ["prestige_home", "econelo"] as const;
 
-  const topNine = sortedData.slice(0, 9).map((item) => ({
+const normalizeMarketplaceKey = (value: string) =>
+  value.trim().toLowerCase().replace(/[\s-]+/g, "_");
+
+export function ChartBarMultiple({ data }: ChartBarMultipleProps) {
+  const normalizedData = data.map((item) => ({
     marketplace: item.marketplace,
     total_amount: toNumber(item.total_amount),
     total_orders: toNumber(item.total_orders),
   }));
 
-  const rest = sortedData.slice(9);
+  const existingMarketplaceKeys = new Set(
+    normalizedData.map((item) => normalizeMarketplaceKey(item.marketplace)),
+  );
+
+  // Always keep Prestige Home + Econelo on chart even when revenue is low.
+  const withRequiredMarketplaces = [...normalizedData];
+  REQUIRED_MARKETPLACES.forEach((requiredKey) => {
+    if (!existingMarketplaceKeys.has(requiredKey)) {
+      withRequiredMarketplaces.push({
+        marketplace: requiredKey,
+        total_amount: 0,
+        total_orders: 0,
+      });
+    }
+  });
+
+  const sortedData = withRequiredMarketplaces.sort(
+    (a, b) => b.total_amount - a.total_amount,
+  );
+
+  const requiredSet = new Set(REQUIRED_MARKETPLACES);
+  const mandatoryItems = sortedData.filter((item) =>
+    requiredSet.has(normalizeMarketplaceKey(item.marketplace)),
+  );
+
+  const mandatoryKeys = new Set(
+    mandatoryItems.map((item) => normalizeMarketplaceKey(item.marketplace)),
+  );
+
+  const nonMandatoryItems = sortedData.filter(
+    (item) => !mandatoryKeys.has(normalizeMarketplaceKey(item.marketplace)),
+  );
+
+  const MAX_VISIBLE_MARKETPLACES = 9;
+  const remainingSlots = Math.max(0, MAX_VISIBLE_MARKETPLACES - mandatoryItems.length);
+
+  const topNine = [...mandatoryItems, ...nonMandatoryItems.slice(0, remainingSlots)]
+    .sort((a, b) => b.total_amount - a.total_amount)
+    .map((item) => ({
+      marketplace: item.marketplace,
+      total_amount: item.total_amount,
+      total_orders: item.total_orders,
+    }));
+
+  const rest = nonMandatoryItems.slice(remainingSlots);
   const othersRevenue = rest.reduce(
-    (sum, item) => sum + toNumber(item.total_amount),
+    (sum, item) => sum + item.total_amount,
     0,
   );
   const othersOrders = rest.reduce(
-    (sum, item) => sum + toNumber(item.total_orders),
+    (sum, item) => sum + item.total_orders,
     0,
   );
 

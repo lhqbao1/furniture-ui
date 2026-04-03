@@ -70,11 +70,11 @@ const FilterExportForm = () => {
       params.is_inventory = isInventory;
     }
 
-    if (isEconeloParam === "true") {
-      params.is_econelo = true;
-    } else if (isEconeloParam === "false") {
-      params.is_econelo = false;
-    }
+    // if (isEconeloParam === "true") {
+    //   params.is_econelo = true;
+    // } else if (isEconeloParam === "false") {
+    //   params.is_econelo = false;
+    // }
 
     return params;
   };

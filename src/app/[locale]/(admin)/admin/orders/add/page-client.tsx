@@ -256,27 +256,38 @@ export default function CreateOrderPageClient() {
             }
           },
         )}
-        className="flex flex-col gap-8 pb-12"
+        className="mx-auto flex w-full max-w-[1800px] flex-col gap-8 pb-12"
       >
-        <h2 className="section-header">Create Order</h2>
+        <div className="rounded-2xl border border-secondary/20 bg-gradient-to-r from-secondary/5 via-background to-secondary/5 px-6 py-5">
+          <h2 className="section-header mb-1">Create Order</h2>
+          <p className="text-center text-sm text-muted-foreground">
+            Create a manual order with clear customer type and complete checkout
+            information.
+          </p>
+        </div>
 
         {/* Main container */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* User information and address */}
-          <div className="col-span-1 space-y-4 lg:space-y-12">
-            <AdminCheckOutUserInformation
-              isAdmin
-              disabledFields={disabledFields}
-              saveUserInformation={saveUserInformation}
-              onSaveUserInformationChange={setSaveUserInformation}
-              onSavedUserSelectionChange={setHasSelectedSavedUser}
-            />
-            <ManualCheckOutShippingAddress isAdmin />
+          <div className="col-span-1 space-y-6">
+            <div className="rounded-2xl border border-secondary/15 bg-white p-4 shadow-sm">
+              <AdminCheckOutUserInformation
+                isAdmin
+                disabledFields={disabledFields}
+                saveUserInformation={saveUserInformation}
+                onSaveUserInformationChange={setSaveUserInformation}
+                onSavedUserSelectionChange={setHasSelectedSavedUser}
+              />
+            </div>
+
+            <div className="rounded-2xl border border-secondary/15 bg-white p-4 shadow-sm">
+              <ManualCheckOutShippingAddress isAdmin />
+            </div>
             {/* <ManualCheckOutInvoiceAddress isAdmin /> */}
           </div>
 
           {/* Table cart and total */}
-          <div className="col-span-1 space-y-4 lg:space-y-4">
+          <div className="col-span-1 space-y-4 rounded-2xl border border-secondary/15 bg-white p-4 shadow-sm">
             <ManualAdditionalInformation />
             <SelectOrderItems
               listProducts={listProducts}
@@ -304,8 +315,11 @@ export default function CreateOrderPageClient() {
                 </FormItem>
               )}
             />
-            <div className="flex lg:justify-end justify-center gap-2">
-              <Button type="submit" className="text-lg lg:w-1/3 w-1/2 py-6">
+            <div className="pt-1 flex lg:justify-end justify-center gap-2">
+              <Button
+                type="submit"
+                className="text-lg lg:w-1/3 w-1/2 py-6 shadow-sm"
+              >
                 {t("continue")}
               </Button>
             </div>

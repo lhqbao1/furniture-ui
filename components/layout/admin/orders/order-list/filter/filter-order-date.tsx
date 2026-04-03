@@ -31,14 +31,8 @@ export default function OrderDateFilter() {
     searchParams.get("to_date") || undefined,
   );
 
-  const param = searchParams.get("status") || "";
-  const initialSelected = param ? param.split(",") : [];
-
-  const [selected, setSelected] = useState<string[]>(initialSelected);
-
   // Sync params -> UI khi user back/forward
   useEffect(() => {
-    setSelected(searchParams.get("status")?.split(",") || []);
     setFromDate(searchParams.get("from_date") || undefined);
     setEndDate(searchParams.get("to_date") || undefined);
   }, [searchParams]);
@@ -88,16 +82,16 @@ export default function OrderDateFilter() {
   };
 
   return (
-    <div className="flex gap-4">
-      <div className="flex flex-col gap-2 items-start w-fit">
-        <Label>From:</Label>
+    <div className="flex flex-col gap-4 sm:flex-row">
+      <div className="flex w-full flex-col gap-2 sm:w-1/2">
+        <Label>From</Label>
 
         <div className="flex items-center gap-2 w-full">
           <SingleDatePicker
             label=""
             value={fromDate}
             onChange={(v) => handleFromDateChange(v ?? undefined)}
-            className="w-[200px]"
+            className="w-full"
           />
 
           {fromDate && (
@@ -114,15 +108,15 @@ export default function OrderDateFilter() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 items-start w-fit">
-        <Label>To:</Label>
+      <div className="flex w-full flex-col gap-2 sm:w-1/2">
+        <Label>To</Label>
 
         <div className="flex items-center gap-2 w-full">
           <SingleDatePicker
             label=""
             value={endDate}
             onChange={(v) => handleToDateChange(v ?? undefined)}
-            className="w-[200px]"
+            className="w-full"
           />
 
           {endDate && (

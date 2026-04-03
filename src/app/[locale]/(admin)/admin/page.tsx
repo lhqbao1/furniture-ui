@@ -1,8 +1,9 @@
 "use client";
 import EcommerceDashboard from "@/components/layout/admin/dashboard/ecommerce-dashboard";
+import OrderB2BFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-b2b";
 import OrderDateFilter from "@/components/layout/admin/orders/order-list/filter/filter-order-date";
 import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter";
-import { CalendarRange } from "lucide-react";
+import { Building2, CalendarRange } from "lucide-react";
 import React from "react";
 
 const AdminPage = () => {
@@ -21,17 +22,31 @@ const AdminPage = () => {
             </h1>
           </div>
 
-          <div className="rounded-xl border bg-muted/30 p-3">
-            <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              <CalendarRange className="h-3.5 w-3.5" />
-              Date Range
+          <div className="grid w-full gap-3 md:grid-cols-2 xl:max-w-[920px]">
+            <div className="rounded-xl border bg-muted/30 p-3">
+              <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <CalendarRange className="h-3.5 w-3.5" />
+                Date Range
+              </div>
+              <OrderDateFilter />
             </div>
-            <OrderDateFilter />
+
+            <div className="rounded-xl border bg-muted/30 p-3">
+              <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <Building2 className="h-3.5 w-3.5" />
+                Customer Segment
+              </div>
+              <OrderB2BFilter />
+            </div>
           </div>
         </div>
       </div>
 
-      <EcommerceDashboard fromDate={filters.fromDate} toDate={filters.toDate} />
+      <EcommerceDashboard
+        fromDate={filters.fromDate}
+        toDate={filters.toDate}
+        isB2B={filters.isB2B}
+      />
     </div>
   );
 };

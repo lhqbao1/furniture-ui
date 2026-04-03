@@ -35,6 +35,7 @@ import { ChartPieLabelList } from "../accountant/cost/overview-tab/pie-chart";
 interface EcommerceDashboardProps {
   fromDate?: string;
   toDate?: string;
+  isB2B?: boolean;
 }
 
 type CardTone = "emerald" | "orange" | "red" | "violet" | "blue";
@@ -170,43 +171,79 @@ function DashboardLoadingSkeleton() {
   );
 }
 
-function MarketplaceRankingCard({
-  data,
-}: {
-  data: MarketplaceOverviewItem[];
-}) {
+function MarketplaceRankingCard({ data }: { data: MarketplaceOverviewItem[] }) {
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full rounded-2xl border shadow-sm">
+      <CardHeader className="pb-2">
         <CardTitle className="text-base">Top Marketplaces</CardTitle>
+        <p className="text-xs text-muted-foreground">
+          Ranked by gross revenue share
+        </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {data.length === 0 ? (
           <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
             No marketplace data available for the selected period.
           </div>
         ) : (
-          data.map((item) => {
+          data.map((item, index) => {
             const share = Math.max(0, Math.min(100, toNumber(item.percentage)));
+
+            const rankStyles =
+              index === 0
+                ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+                : index === 1
+                  ? "bg-slate-100 text-slate-700 border-slate-300"
+                  : index === 2
+                    ? "bg-orange-100 text-orange-700 border-orange-300"
+                    : "bg-muted text-muted-foreground border-border";
+
             return (
-              <div key={item.marketplace} className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-medium capitalize">
-                    {item.marketplace.replaceAll("_", " ")}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatCurrency(toNumber(item.total_amount))}
-                  </p>
+              <div
+                key={item.marketplace}
+                className="rounded-xl border bg-background/80 p-3 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "inline-flex h-6 min-w-6 items-center justify-center rounded-full border px-1.5 text-[11px] font-semibold",
+                          rankStyles,
+                        )}
+                      >
+                        #{index + 1}
+                      </span>
+                      <p className="truncate text-sm font-semibold capitalize">
+                        {item.marketplace.replaceAll("_", " ")}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {toNumber(item.total_orders).toLocaleString("de-DE")}{" "}
+                      orders
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm font-semibold">
+                      {formatCurrency(toNumber(item.total_amount))}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatPercent(share)}
+                    </p>
+                  </div>
                 </div>
-                <div className="h-2 rounded-full bg-muted">
+
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted/70">
                   <div
-                    className="h-2 rounded-full bg-secondary"
+                    className={cn(
+                      "h-full rounded-full transition-all",
+                      index < 3
+                        ? "bg-gradient-to-r from-secondary to-emerald-500"
+                        : "bg-secondary/80",
+                    )}
                     style={{ width: `${share}%` }}
                   />
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{toNumber(item.total_orders)} orders</span>
-                  <span>{formatPercent(share)}</span>
                 </div>
               </div>
             );
@@ -218,40 +255,109 @@ function MarketplaceRankingCard({
 }
 
 function TopProductsCard({
-  providers,
+  providersByRevenue,
+  providersBySold,
 }: {
-  providers: ProviderItem[];
+  providersByRevenue: ProviderItem[];
+  providersBySold: ProviderItem[];
 }) {
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full rounded-2xl border shadow-sm">
+      <CardHeader className="pb-2">
         <CardTitle className="text-base">Top Products (Provider ID)</CardTitle>
+        <p className="text-xs text-muted-foreground">
+          Revenue and sold-units leaderboards
+        </p>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {providers.length === 0 ? (
-          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-            No product revenue data available for the selected period.
+      <CardContent className="grid gap-4 lg:grid-cols-2">
+        <div className="space-y-3 rounded-xl border bg-muted/20 p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Top by Revenue</p>
+              <p className="text-xs text-muted-foreground">
+                Highest gross value
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-xs">
+              {providersByRevenue.length} items
+            </Badge>
           </div>
-        ) : (
-          providers.map((item, index) => (
-            <div
-              key={`${item.id_provider}-${index}`}
-              className="flex items-center justify-between gap-3 rounded-xl border p-3"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">
-                  {item.id_provider || "N/A"}
+
+          {providersByRevenue.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+              No revenue data available.
+            </div>
+          ) : (
+            providersByRevenue.map((item, index) => (
+              <div
+                key={`revenue-${item.id_provider}-${index}`}
+                className="flex items-center justify-between gap-3 rounded-xl border bg-background p-3 transition-all hover:border-secondary/40 hover:bg-secondary/5"
+              >
+                <div className="min-w-0 flex items-center gap-2">
+                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-secondary/10 px-1.5 text-[11px] font-semibold text-secondary">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {item.id_provider || "N/A"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {toNumber(item.total_quantity).toLocaleString("de-DE")}{" "}
+                      units
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold">
+                  {formatCurrency(toNumber(item.total_amount))}
                 </p>
-                <p className="text-xs text-muted-foreground">
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="space-y-3 rounded-xl border bg-muted/20 p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Top by Products Sold</p>
+              <p className="text-xs text-muted-foreground">
+                Highest sold quantity
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-xs text-white">
+              {providersBySold.length} items
+            </Badge>
+          </div>
+
+          {providersBySold.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+              No sold-units data available.
+            </div>
+          ) : (
+            providersBySold.map((item, index) => (
+              <div
+                key={`sold-${item.id_provider}-${index}`}
+                className="flex items-center justify-between gap-3 rounded-xl border bg-background p-3 transition-all hover:border-secondary/40 hover:bg-secondary/5"
+              >
+                <div className="min-w-0 flex items-center gap-2">
+                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-secondary/10 px-1.5 text-[11px] font-semibold text-secondary">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {item.id_provider || "N/A"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatCurrency(toNumber(item.total_amount))}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold">
                   {toNumber(item.total_quantity).toLocaleString("de-DE")} units
                 </p>
               </div>
-              <p className="text-sm font-semibold">
-                {formatCurrency(toNumber(item.total_amount))}
-              </p>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -268,14 +374,18 @@ function ActionCenterCard({
   grossAtRisk: number;
   netAtRisk: number;
 }) {
-  const highPriorityCount = alerts.filter((item) => item.severity === "high").length;
+  const highPriorityCount = alerts.filter(
+    (item) => item.severity === "high",
+  ).length;
   const busiestAlert = alerts[0];
 
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <CardTitle className="text-base">Operational Command Center</CardTitle>
+          <CardTitle className="text-base">
+            Operational Command Center
+          </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="outline">{alerts.length} active alerts</Badge>
             <Badge variant="outline">{highPriorityCount} high priority</Badge>
@@ -335,65 +445,65 @@ function ActionCenterCard({
                 : 14;
 
             return (
-            <div
-              key={alert.key}
-              className={cn(
-                "rounded-xl border p-3 transition-shadow hover:shadow-sm",
-                styles.container,
-              )}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className={cn("mt-0.5 rounded-lg p-2", styles.icon)}>
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold">{alert.title}</p>
-                      <Badge
-                        variant="outline"
-                        className={cn("capitalize", styles.badge)}
-                      >
-                        {alert.severity} priority
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {alert.description}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span className="rounded-md bg-muted px-2 py-0.5">
-                        {alert.count.toLocaleString("de-DE")} orders
-                      </span>
-                      <span className="rounded-md bg-muted px-2 py-0.5">
-                        Gross: {formatCurrency(alert.grossAmount)}
-                      </span>
-                      <span className="rounded-md bg-muted px-2 py-0.5">
-                        Net: {formatCurrency(alert.netAmount)}
-                      </span>
+              <div
+                key={alert.key}
+                className={cn(
+                  "rounded-xl border p-3 transition-shadow hover:shadow-sm",
+                  styles.container,
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <span className={cn("mt-0.5 rounded-lg p-2", styles.icon)}>
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold">{alert.title}</p>
+                        <Badge
+                          variant="outline"
+                          className={cn("capitalize", styles.badge)}
+                        >
+                          {alert.severity} priority
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {alert.description}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span className="rounded-md bg-muted px-2 py-0.5">
+                          {alert.count.toLocaleString("de-DE")} orders
+                        </span>
+                        <span className="rounded-md bg-muted px-2 py-0.5">
+                          Gross: {formatCurrency(alert.grossAmount)}
+                        </span>
+                        <span className="rounded-md bg-muted px-2 py-0.5">
+                          Net: {formatCurrency(alert.netAmount)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <Button
-                  asChild
-                  size="sm"
-                  variant="outline"
-                  className="shrink-0"
-                  hasEffect={false}
-                >
-                  <Link href={alert.href}>
-                    Review
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </Button>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0"
+                    hasEffect={false}
+                  >
+                    <Link href={alert.href}>
+                      Review
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                </div>
+                <div className="mt-3 h-1.5 rounded-full bg-muted">
+                  <div
+                    className={cn("h-1.5 rounded-full", styles.bar)}
+                    style={{ width: `${width}%` }}
+                  />
+                </div>
               </div>
-              <div className="mt-3 h-1.5 rounded-full bg-muted">
-                <div
-                  className={cn("h-1.5 rounded-full", styles.bar)}
-                  style={{ width: `${width}%` }}
-                />
-              </div>
-            </div>
             );
           })
         )}
@@ -405,6 +515,7 @@ function ActionCenterCard({
 export default function EcommerceDashboard({
   fromDate,
   toDate,
+  isB2B,
 }: EcommerceDashboardProps) {
   const params = useParams<{ locale?: string }>();
   const localePrefix =
@@ -437,7 +548,7 @@ export default function EcommerceDashboard({
   } = useGetCheckOutStatistic({
     from_date: fromDate,
     to_date: toDate,
-    is_b2b: false,
+    is_b2b: isB2B,
   });
 
   const {
@@ -447,12 +558,12 @@ export default function EcommerceDashboard({
   } = useGetCheckOutDashboard({
     from_date: fromDate,
     to_date: toDate,
-    is_b2b: false,
+    is_b2b: isB2B,
   });
 
   const { data: previousDashboard } = useGetCheckOutDashboard({
     ...previousRange,
-    is_b2b: false,
+    is_b2b: isB2B,
   });
 
   const {
@@ -462,7 +573,7 @@ export default function EcommerceDashboard({
   } = useGetProductsCheckOutDashboard({
     from_date: fromDate,
     to_date: toDate,
-    is_b2b: false,
+    is_b2b: isB2B,
   });
 
   const hasAnyData = Boolean(statistic || dashboard || productOverview);
@@ -500,7 +611,9 @@ export default function EcommerceDashboard({
   const canceledOrders = toNumber(statistic?.count_cancel_order);
   const canceledRevenue = toNumber(statistic?.total_cancel_order);
   const waitingPaymentOrders = toNumber(statistic?.count_waiting_payment_order);
-  const waitingPaymentRevenue = toNumber(statistic?.total_waiting_payment_order);
+  const waitingPaymentRevenue = toNumber(
+    statistic?.total_waiting_payment_order,
+  );
   const preparingOrders = toNumber(statistic?.count_preparing_shipping_order);
   const preparingRevenue = toNumber(statistic?.total_preparing_shipping_order);
   const stockReservedOrders = toNumber(statistic?.count_stock_reserved_order);
@@ -622,7 +735,7 @@ export default function EcommerceDashboard({
           grossAmount: stockReservedRevenue,
           netAmount: netFromGrossByFormula(stockReservedRevenue),
           severity: stockReservedOrders >= 40 ? "high" : "medium",
-          href: buildOrderListUrl("STOCK_RESERVED"),
+          href: buildOrderListUrl("TOCK_RESERVED"),
           icon: Boxes,
         }
       : null,
@@ -670,7 +783,7 @@ export default function EcommerceDashboard({
           icon: AlertTriangle,
         }
       : null,
-  ] 
+  ]
     .filter((item): item is OperationalAlert => Boolean(item))
     .sort((a, b) => {
       const priorityRank: Record<AlertSeverity, number> = {
@@ -697,8 +810,12 @@ export default function EcommerceDashboard({
     .sort((a, b) => toNumber(b.total_amount) - toNumber(a.total_amount))
     .slice(0, 6);
 
-  const topProviders = [...(productOverview?.items ?? [])]
+  const topProvidersByRevenue = [...(productOverview?.items ?? [])]
     .sort((a, b) => toNumber(b.total_amount) - toNumber(a.total_amount))
+    .slice(0, 6);
+
+  const topProvidersBySold = [...(productOverview?.items ?? [])]
+    .sort((a, b) => toNumber(b.total_quantity) - toNumber(a.total_quantity))
     .slice(0, 6);
 
   const periodLabel =
@@ -732,7 +849,9 @@ export default function EcommerceDashboard({
                     <Icon className="h-4 w-4" />
                   </span>
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">{metric.hint}</p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {metric.hint}
+                </p>
               </CardContent>
             </Card>
           );
@@ -786,7 +905,7 @@ export default function EcommerceDashboard({
 
       <div className="grid auto-rows-fr items-stretch gap-4 2xl:grid-cols-3">
         <div className="h-full 2xl:col-span-2">
-          <MonthlyChart />
+          <MonthlyChart isB2B={isB2B} />
         </div>
         <ActionCenterCard
           alerts={operationalAlerts}
@@ -827,7 +946,10 @@ export default function EcommerceDashboard({
 
       <div className="grid auto-rows-fr items-stretch gap-4 xl:grid-cols-2">
         <MarketplaceRankingCard data={marketplaceRanking} />
-        <TopProductsCard providers={topProviders} />
+        <TopProductsCard
+          providersByRevenue={topProvidersByRevenue}
+          providersBySold={topProvidersBySold}
+        />
       </div>
     </div>
   );

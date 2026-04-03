@@ -582,17 +582,17 @@ export const useGetProductsCheckOutDashboard = (
   });
 };
 
-export function useCheckoutDashboardLast6Months() {
+export function useCheckoutDashboardLast6Months(is_b2b?: boolean) {
   const months = React.useMemo(() => getLast6Months(), []);
 
   const queries = useQueries({
     queries: months.map((m) => ({
-      queryKey: ["checkout-dashboard", m.from_date, m.to_date, false],
+      queryKey: ["checkout-dashboard", m.from_date, m.to_date, is_b2b ?? null],
       queryFn: () =>
         getCheckOutDashboard({
           from_date: m.from_date,
           to_date: m.to_date,
-          is_b2b: false,
+          is_b2b,
         }),
     })),
   });
