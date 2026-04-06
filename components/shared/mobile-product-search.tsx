@@ -52,7 +52,7 @@ export default function MobileProductSearch() {
     shouldFetch
       ? {
           query: debouncedQuery,
-          is_econelo: undefined,
+          is_econelo: false,
           is_active: true,
           page_size: 15,
         }

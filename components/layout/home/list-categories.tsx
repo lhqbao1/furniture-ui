@@ -66,7 +66,9 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                           <NavigationMenuLink
                             key={child.id}
                             onClick={() => {
-                              router.push(`/category/${child.slug}`, { locale });
+                              router.push(`/category/${child.slug}`, {
+                                locale,
+                              });
                             }}
                             className="
                             relative cursor-pointer px-2 py-2 text-sm
@@ -88,7 +90,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                 </NavigationMenuItem>
               );
             })}
-            {econeloCategories.length > 0 && (
+            {/* {econeloCategories.length > 0 && (
               <NavigationMenuItem className="md:static">
                 <NavigationMenuTrigger className="uppercase bg-transparent font-semibold text-sm hover:bg-transparent data-[state=open]:bg-transparent cursor-pointer px-2">
                   E-Mobilität
@@ -122,7 +124,7 @@ const ListCategoriesHome = ({ categories }: ListCategoriesHomeProps) => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-            )}
+            )} */}
             <NavigationMenuItem>
               <NavigationMenuLink
                 asChild

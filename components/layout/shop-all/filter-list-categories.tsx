@@ -36,12 +36,16 @@ const findCategoryBySlug = (
   return null;
 };
 
-const collectLeafCategories = (category: CategoryResponse): CategoryResponse[] => {
+const collectLeafCategories = (
+  category: CategoryResponse,
+): CategoryResponse[] => {
   if (!hasChildren(category)) return [category];
   return category.children.flatMap((child) => collectLeafCategories(child));
 };
 
-const dedupeCategoriesById = (categories: CategoryResponse[]): CategoryResponse[] => {
+const dedupeCategoriesById = (
+  categories: CategoryResponse[],
+): CategoryResponse[] => {
   const seen = new Set<string>();
   return categories.filter((category) => {
     if (seen.has(category.id)) return false;
@@ -57,7 +61,9 @@ const buildGroupedCategories = (
     .map((header) => ({
       header,
       items: dedupeCategoriesById(
-        (header.children ?? []).flatMap((child) => collectLeafCategories(child)),
+        (header.children ?? []).flatMap((child) =>
+          collectLeafCategories(child),
+        ),
       ),
     }))
     .filter((group) => group.items.length > 0);
@@ -92,7 +98,9 @@ const FilterListCategories = ({
     if (!isParentCategory || !categorySlug) {
       return {
         mode: "flat",
-        flatCategories: parentCategories.flatMap((parent) => parent.children ?? []),
+        flatCategories: parentCategories.flatMap(
+          (parent) => parent.children ?? [],
+        ),
         groupedCategories: [],
       };
     }
@@ -101,7 +109,9 @@ const FilterListCategories = ({
     if (!selectedCategory) {
       return {
         mode: "flat",
-        flatCategories: parentCategories.flatMap((parent) => parent.children ?? []),
+        flatCategories: parentCategories.flatMap(
+          (parent) => parent.children ?? [],
+        ),
         groupedCategories: [],
       };
     }
@@ -115,7 +125,9 @@ const FilterListCategories = ({
     }
 
     const directChildren = selectedCategory.children;
-    const hasNestedChildren = directChildren.some((child) => hasChildren(child));
+    const hasNestedChildren = directChildren.some((child) =>
+      hasChildren(child),
+    );
 
     if (!hasNestedChildren) {
       return {
@@ -145,7 +157,9 @@ const FilterListCategories = ({
         .filter((categoryName) => categoryName !== value)
         .forEach((categoryName) => params.append("categories", categoryName));
     } else {
-      current.forEach((categoryName) => params.append("categories", categoryName));
+      current.forEach((categoryName) =>
+        params.append("categories", categoryName),
+      );
       params.append("categories", value);
     }
 
@@ -164,6 +178,8 @@ const FilterListCategories = ({
 
   if (isError) return <div>Error loading categories</div>;
   if (categoryRenderData.mode === "hidden") return null;
+
+  console.log(categoryRenderData);
 
   return (
     <div className="space-y-3">
@@ -192,21 +208,23 @@ const FilterListCategories = ({
               </div>
             </div>
           ))
-        : categoryRenderData.flatCategories.map((item) => {
-            const checked = selectedCategories.includes(item.name);
-            return (
-              <label
-                key={item.id}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <Checkbox
-                  checked={checked}
-                  onCheckedChange={() => toggleCategory(item.name)}
-                />
-                <span className="text-base font-light">{item.name}</span>
-              </label>
-            );
-          })}
+        : categoryRenderData.flatCategories
+            .filter((c) => c.is_econelo === false || c.is_econelo === null)
+            .map((item) => {
+              const checked = selectedCategories.includes(item.name);
+              return (
+                <label
+                  key={item.id}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={() => toggleCategory(item.name)}
+                  />
+                  <span className="text-base font-light">{item.name}</span>
+                </label>
+              );
+            })}
     </div>
   );
 };

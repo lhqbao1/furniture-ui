@@ -73,10 +73,7 @@ const ProductCategory = ({
     setPageSize(pageSizeFromUrl);
   }, [pageFromUrl, pageSizeFromUrl]);
 
-  const {
-    data: listCategory,
-    isLoading: isLoadingList,
-  } = useQuery({
+  const { data: listCategory, isLoading: isLoadingList } = useQuery({
     queryKey: ["category-children", categorySlugs],
     queryFn: () =>
       getChildrenCategoryByParent(categorySlugs[categorySlugs.length - 1]),
@@ -93,7 +90,7 @@ const ProductCategory = ({
       page,
       page_size: pageSize,
       is_active: true,
-      is_econelo: undefined,
+      is_econelo: false,
       query,
       brand: brands,
       brandsKey,
@@ -113,7 +110,9 @@ const ProductCategory = ({
     });
 
   const categorySlug = categorySlugs[categorySlugs.length - 1];
-  const isEmptyCategory = Boolean(algoliaData && algoliaData.items?.length === 0);
+  const isEmptyCategory = Boolean(
+    algoliaData && algoliaData.items?.length === 0,
+  );
 
   const categoryTrackingPayload = React.useMemo(() => {
     const items = algoliaData?.items ?? [];
@@ -134,7 +133,14 @@ const ProductCategory = ({
       category: categoryName,
       productids: productIds,
     };
-  }, [algoliaData?.items, category?.name, category?.slug, categorySlug, categorySlugs, listCategory?.name]);
+  }, [
+    algoliaData?.items,
+    category?.name,
+    category?.slug,
+    categorySlug,
+    categorySlugs,
+    listCategory?.name,
+  ]);
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());

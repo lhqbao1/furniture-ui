@@ -67,7 +67,7 @@ export default function ShopAllPage() {
     page_size: SHOP_ALL_PAGE_SIZE,
     query,
     is_active: true,
-    is_econelo: undefined,
+    is_econelo: false,
     brand: brands,
     categories, // 👈 gửi array cho API
     categoriesKey, // 👈 chỉ dùng cho cache
@@ -118,7 +118,9 @@ export default function ShopAllPage() {
       validItems.map((item) => item.productName),
     );
     const amounts = toTrackingCsv(validItems.map((item) => item.amount));
-    const categoriesValue = toTrackingCsv(validItems.map((item) => item.category));
+    const categoriesValue = toTrackingCsv(
+      validItems.map((item) => item.category),
+    );
     const levelValues = toTrackingCsv(validItems.map(() => "product"));
 
     return {
