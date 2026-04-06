@@ -21,12 +21,12 @@ import { getBlogsByProductSlug } from "@/features/blog/api";
 import RelatedBlogs from "@/components/layout/single-product/related-blogs";
 import BoughtTogetherSection from "@/components/layout/single-product/bought-together";
 import Script from "next/script";
+import dynamic from "next/dynamic";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import ProductReviewTab from "@/components/layout/single-product/tabs/review";
 import { getInventoryPoByProductId } from "@/features/incoming-inventory/inventory/api";
 import { calculateDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
-import ProductDetailTrackingClient from "@/components/layout/single-product/product-detail-tracking-client";
 import {
   getBrandName,
   getFirstCategoryName,
@@ -34,12 +34,17 @@ import {
   toTrackingString,
 } from "@/components/shared/tracking/tracking-utils";
 
+const ProductDetailTrackingClient = dynamic(
+  () => import("@/components/layout/single-product/product-detail-tracking-client"),
+  { ssr: false },
+);
+
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
  * ------------------------------------------------------*/
-export const experimental_ppr = true;
 export const revalidate = 3600;
 export const dynamicParams = true;
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string[]; locale: string }>;
