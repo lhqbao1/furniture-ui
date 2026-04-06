@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import IntlClientProviderWithAuth from "./intlProviderWithAuth";
 import { getMessages } from "next-intl/server";
 import LocaleClientBoot from "@/components/shared/locale-client-boot";
+import DynamicOtherTracker from "@/components/shared/tracking/dynamic-other-tracker";
 
 type Props = {
   children: React.ReactNode;
@@ -48,6 +49,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       timeZone="Europe/Berlin"
     >
       <LocaleClientBoot />
+      <DynamicOtherTracker />
 
       {/* <SaleFixedIcon /> */}
       {children}

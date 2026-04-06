@@ -26,6 +26,13 @@ import ProductReviewTab from "@/components/layout/single-product/tabs/review";
 import { getInventoryPoByProductId } from "@/features/incoming-inventory/inventory/api";
 import { calculateDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
+import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
+import {
+  getBrandName,
+  getFirstCategoryName,
+  getTrackingId,
+  toTrackingString,
+} from "@/components/shared/tracking/tracking-utils";
 
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
@@ -381,8 +388,28 @@ export default async function Page({
     ],
   };
 
+  const productDetailTrackingPayload = {
+    type: "detailpage",
+    country: "DE",
+    productid: getTrackingId(plainProduct.id_provider, plainProduct.id),
+    productname: toTrackingString(plainProduct.name),
+    productbrand: getBrandName(plainProduct.brand),
+    description: toTrackingString(schemaDescription),
+    amount: Number(plainProduct.final_price ?? 0).toFixed(2),
+    currency: "EUR",
+    item_url: toTrackingString(
+      `https://www.prestige-home.de/de/product/${plainProduct.url_key ?? ""}`,
+    ),
+    img_url: toTrackingString(plainProduct.static_files?.[0]?.url),
+    category: getFirstCategoryName(plainProduct.categories),
+  };
+
   return (
     <>
+      <DynamicTMTracker
+        eventId={`dynamic_detail_${plainProduct.url_key}`}
+        payload={productDetailTrackingPayload}
+      />
       <Script
         id="product-structured-data"
         type="application/ld+json"

@@ -26,7 +26,17 @@ import {
   formatDateToTrustedShops,
   getOrderLatestDeliveryDate,
 } from "@/hooks/get-latest-delivery-date";
-import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
+import {
+  calculateOrderTaxWithDiscount,
+  calculateProductVAT,
+} from "@/lib/caculate-vat";
+import {
+  getBrandName,
+  getFirstCategoryName,
+  getTrackingId,
+  toTrackingCsv,
+  toTrackingString,
+} from "@/components/shared/tracking/tracking-utils";
 
 function waitForAwinReady(timeout = 3000): Promise<boolean> {
   return new Promise((resolve) => {
@@ -47,6 +57,23 @@ function waitForAwinReady(timeout = 3000): Promise<boolean> {
     check();
   });
 }
+
+const getAwinSentKey = (orderRef: string) =>
+  `awin_sent_${orderRef || "unknown"}`;
+const getDynamicConversionSentKey = (orderRef: string) =>
+  `dynamic_conversion_sent_${orderRef || "unknown"}`;
+const getDynamicTmSaleSentKey = (orderRef: string) =>
+  `dynamic_tm_sale_sent_${orderRef || "unknown"}`;
+
+const normalizeTrackingDomain = (domain?: string | null) =>
+  (domain ?? "")
+    .trim()
+    .replace(/^https?:\/\//, "")
+    .replace(/\/+$/, "");
+
+type DynamicTrackingWindow = Window & {
+  dynamic_tm_data?: Record<string, string>;
+};
 
 const OrderPlaced = () => {
   const router = useRouter();
@@ -178,6 +205,102 @@ const OrderPlaced = () => {
     enabled: !!checkout, // chỉ fetch khi checkout đã có dữ liệu
   });
 
+  const dynamicTrackingDomain = normalizeTrackingDomain(
+    process.env.NEXT_PUBLIC_DYNAMIC_TRACKING_DOMAIN,
+  );
+  const dynamicTrackingCode =
+    process.env.NEXT_PUBLIC_DYNAMIC_TRACKING_CODE?.trim() ?? "";
+
+  const checkoutItems = React.useMemo(
+    () => checkout?.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [],
+    [checkout],
+  );
+
+  const conversionTrackingData = React.useMemo(() => {
+    if (!checkout) return null;
+
+    const calc = calculateOrderTaxWithDiscount(
+      checkoutItems,
+      checkout.voucher_amount ?? 0,
+    );
+
+    const amountNetWithoutShipping = Number(calc?.totalNetWithoutShipping ?? 0);
+    const amount = Number.isFinite(amountNetWithoutShipping)
+      ? amountNetWithoutShipping.toFixed(2)
+      : "0.00";
+
+    const country =
+      toTrackingString(
+        checkout.checkouts?.[0]?.shipping_address?.country ?? "DE",
+      ).toUpperCase() || "DE";
+    const currency = "EUR";
+    const orderRef = toTrackingString(checkout.checkout_code);
+    const customerId = getTrackingId(
+      checkout.checkouts?.[0]?.user?.user_code,
+      checkout.checkouts?.[0]?.user?.id,
+    );
+
+    const lineItems = checkoutItems
+      .map((item) => {
+        const product = item?.products;
+        const quantity = Math.max(0, Number(item?.quantity) || 0);
+        const lineGross = Math.max(0, Number(item?.final_price) || 0);
+        const lineNet = Math.max(
+          0,
+          Number(calculateProductVAT(lineGross, product?.tax).net) || 0,
+        );
+        const singleAmount = quantity > 0 ? lineNet / quantity : lineNet;
+
+        const firstCategory = getFirstCategoryName(product?.categories);
+        const brandName = getBrandName(product?.brand);
+
+        return {
+          productId: getTrackingId(product?.id_provider, product?.id),
+          quantity,
+          lineAmount: lineNet,
+          singleAmount,
+          category: firstCategory,
+          brand: brandName,
+        };
+      })
+      .filter((item) => item.productId !== "");
+
+    const productIds = toTrackingCsv(lineItems.map((item) => item.productId));
+    const productPcs = toTrackingCsv(lineItems.map((item) => item.quantity));
+    const singleAmount = toTrackingCsv(
+      lineItems.map((item) => item.singleAmount.toFixed(2)),
+    );
+    const amounts = toTrackingCsv(
+      lineItems.map((item) => item.lineAmount.toFixed(2)),
+    );
+    const quantities = toTrackingCsv(lineItems.map((item) => item.quantity));
+    const categories = toTrackingCsv(lineItems.map((item) => item.category));
+    const productBrands = toTrackingCsv(lineItems.map((item) => item.brand));
+    const levelValues = toTrackingCsv(lineItems.map(() => "product"));
+    const totalQuantity = lineItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0,
+    );
+
+    return {
+      amount,
+      currency,
+      orderRef,
+      customerId,
+      country,
+      productIds,
+      productPcs,
+      singleAmount,
+      amounts,
+      quantities,
+      categories,
+      productBrands,
+      levelValues,
+      totalQuantity,
+      paymentType: toTrackingString(checkout.payment_method),
+    };
+  }, [checkout, checkoutItems]);
+
   // Gọi hook trực tiếp
   const { data: user } = useGetUserById(userId || "");
 
@@ -227,10 +350,13 @@ const OrderPlaced = () => {
   // AWIN Conversion Tracking
   // ====================
   useEffect(() => {
-    if (!checkout) return;
+    if (!checkout || !conversionTrackingData) return;
+
+    const { amount, orderRef } = conversionTrackingData;
+    const awinSentKey = getAwinSentKey(orderRef);
 
     // 🔒 chống double fire
-    if (sessionStorage.getItem("awin_sent")) return;
+    if (sessionStorage.getItem(awinSentKey)) return;
 
     // 🔥 chỉ track khi có awc
     const awcAwin = localStorage.getItem("awc_awin");
@@ -240,14 +366,6 @@ const OrderPlaced = () => {
 
     const track = async () => {
       const isReady = await waitForAwinReady();
-
-      const calc = calculateOrderTaxWithDiscount(
-        checkout.checkouts.flatMap((c) => c.cart.items),
-        checkout.voucher_amount ?? 0,
-      );
-
-      const amount = Number(calc.totalNetWithoutShipping).toFixed(2);
-      const orderRef = checkout.checkout_code;
 
       // 👉 CASE 1: MasterTag OK → JS Conversion
       if (isReady && !cancelled) {
@@ -262,7 +380,7 @@ const OrderPlaced = () => {
         };
 
         (window as any).AWIN.Tracking.run();
-        sessionStorage.setItem("awin_sent", "1");
+        sessionStorage.setItem(awinSentKey, "1");
         return;
       }
 
@@ -283,7 +401,7 @@ const OrderPlaced = () => {
         img.style.display = "none";
 
         document.body.appendChild(img);
-        sessionStorage.setItem("awin_sent", "1");
+        sessionStorage.setItem(awinSentKey, "1");
       }
     };
 
@@ -292,7 +410,122 @@ const OrderPlaced = () => {
     return () => {
       cancelled = true;
     };
-  }, [checkout]);
+  }, [checkout, conversionTrackingData]);
+
+  // Dynamic Conversion Pixel (SunnySales)
+  useEffect(() => {
+    if (!checkout || !conversionTrackingData) return;
+    if (!dynamicTrackingDomain || !dynamicTrackingCode) return;
+    const conversionSentKey = getDynamicConversionSentKey(
+      conversionTrackingData.orderRef,
+    );
+    if (sessionStorage.getItem(conversionSentKey)) return;
+
+    const scriptId = `dynamic-conversion-${conversionTrackingData.orderRef}`;
+    if (document.getElementById(scriptId)) return;
+
+    const params = new URLSearchParams({
+      dtc: dynamicTrackingCode,
+      dt_ttype: "pps",
+      dt_rt: "js",
+      orderid: conversionTrackingData.orderRef,
+      level: "",
+      amount: conversionTrackingData.amount,
+      currency: conversionTrackingData.currency,
+      custid: conversionTrackingData.customerId,
+      grouplevel1: "",
+      grouplevel2: "",
+      comment: "",
+      vouchercode: "",
+      country: conversionTrackingData.country,
+      leadtype: "",
+      categories: conversionTrackingData.categories,
+      productbrands: conversionTrackingData.productBrands,
+      productids: conversionTrackingData.productIds,
+      productpcs: conversionTrackingData.productPcs,
+      singleamount: conversionTrackingData.singleAmount,
+    });
+
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.type = "text/javascript";
+    script.async = true;
+    script.src = `https://${dynamicTrackingDomain}/get.aspx?${params.toString()}`;
+
+    script.onerror = () => {
+      const iframeId = `${scriptId}-iframe`;
+      if (document.getElementById(iframeId)) return;
+
+      const iframeParams = new URLSearchParams(params);
+      iframeParams.set("dt_rt", "iframe");
+
+      const iframe = document.createElement("iframe");
+      iframe.id = iframeId;
+      iframe.height = "0";
+      iframe.width = "0";
+      iframe.style.display = "none";
+      iframe.setAttribute("frameborder", "0");
+      iframe.src = `https://${dynamicTrackingDomain}/get.aspx?${iframeParams.toString()}`;
+      document.body.appendChild(iframe);
+    };
+
+    document.body.appendChild(script);
+    sessionStorage.setItem(conversionSentKey, "1");
+  }, [
+    checkout,
+    conversionTrackingData,
+    dynamicTrackingCode,
+    dynamicTrackingDomain,
+  ]);
+
+  // Dynamic Tag Manager: sale event
+  useEffect(() => {
+    if (!checkout || !conversionTrackingData) return;
+    if (!dynamicTrackingDomain || !dynamicTrackingCode) return;
+    const tmSaleSentKey = getDynamicTmSaleSentKey(
+      conversionTrackingData.orderRef,
+    );
+    if (sessionStorage.getItem(tmSaleSentKey)) return;
+
+    const scriptId = `dynamic-tm-sale-${conversionTrackingData.orderRef}`;
+    if (document.getElementById(scriptId)) return;
+
+    const trackingWindow = window as DynamicTrackingWindow;
+    trackingWindow.dynamic_tm_data = {
+      type: "sale",
+      orderid: conversionTrackingData.orderRef,
+      amount: conversionTrackingData.amount,
+      custid: conversionTrackingData.customerId,
+      currency: conversionTrackingData.currency,
+      quantity: String(conversionTrackingData.totalQuantity),
+      country: conversionTrackingData.country,
+      productids: conversionTrackingData.productIds,
+      amounts: conversionTrackingData.amounts,
+      quantities: conversionTrackingData.quantities,
+      categories: conversionTrackingData.categories,
+      levelvalues: conversionTrackingData.levelValues,
+      vouchercode: "",
+      customerstatus: "",
+      paymenttype: conversionTrackingData.paymentType,
+    };
+
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.type = "text/javascript";
+    script.async = true;
+    script.src =
+      `https://${dynamicTrackingDomain}/tm_js.aspx?` +
+      `trackid=${encodeURIComponent(dynamicTrackingCode)}` +
+      `&mode=2&dt_freetext=&dt_subid1=&dt_subid2=&dt_keywords=`;
+
+    document.body.appendChild(script);
+    sessionStorage.setItem(tmSaleSentKey, "1");
+  }, [
+    checkout,
+    conversionTrackingData,
+    dynamicTrackingCode,
+    dynamicTrackingDomain,
+  ]);
 
   //Billiger Tracking
   useEffect(() => {
@@ -339,13 +572,13 @@ const OrderPlaced = () => {
 
   const estimatedDeliveryDate = formatDateToTrustedShops(
     getOrderLatestDeliveryDate(
-      checkout?.checkouts.flatMap((c) =>
-        c.cart.items.map((item) => ({
-          stock: item.products.stock,
-          inventory: item.products.inventory_pos,
-          deliveryTime: item.products.delivery_time,
+      (checkout?.checkouts ?? []).flatMap((checkoutGroup) =>
+        (checkoutGroup?.cart?.items ?? []).map((item) => ({
+          stock: item?.products?.stock,
+          inventory: item?.products?.inventory_pos,
+          deliveryTime: item?.products?.delivery_time,
         })),
-      ) ?? [],
+      ),
     ),
   );
 
@@ -354,16 +587,23 @@ const OrderPlaced = () => {
     if (!checkout) return;
     if (trustedShopData) return; // ❗ chỉ set 1 lần
 
+    const orderNumber = toTrackingString(checkout.checkout_code);
+    const buyerEmail = toTrackingString(checkout?.checkouts?.[0]?.user?.email);
+    const products = (checkout?.checkouts ?? [])
+      .flatMap((checkoutGroup) => checkoutGroup?.cart?.items ?? [])
+      .map((item) => item?.products)
+      .filter(Boolean);
+
+    if (!orderNumber || !buyerEmail) return;
+
     setTrustedShopData({
-      orderNumber: checkout.checkout_code,
-      buyerEmail: checkout.checkouts[0].user.email,
-      amount: checkout.total_amount,
+      orderNumber,
+      buyerEmail,
+      amount: Number(checkout.total_amount ?? 0),
       currency: "EUR",
-      paymentType: checkout.payment_method,
+      paymentType: toTrackingString(checkout.payment_method),
       estimatedDeliveryDate: estimatedDeliveryDate ?? "",
-      products: checkout.checkouts
-        .flatMap((c) => c.cart.items)
-        .map((i) => i.products),
+      products,
     });
   }, [checkout, estimatedDeliveryDate, trustedShopData]);
 

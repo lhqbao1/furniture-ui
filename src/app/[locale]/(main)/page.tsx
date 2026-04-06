@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 
 import { Suspense } from "react";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
+import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
 
 export const revalidate = 60;
 export const experimental_ppr = true;
@@ -23,6 +24,13 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   return (
     <div id="home" className="w-full min-h-[200vh] flex flex-col items-center">
+      <DynamicTMTracker
+        eventId="dynamic_landingpage_de"
+        payload={{
+          type: "landingpage",
+          country: "DE",
+        }}
+      />
       <div className="md:w-[95%] xl:w-3/4 w-[95%]">
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           <BestSellerSection />
