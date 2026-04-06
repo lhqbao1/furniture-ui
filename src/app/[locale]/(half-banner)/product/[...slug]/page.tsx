@@ -26,7 +26,7 @@ import ProductReviewTab from "@/components/layout/single-product/tabs/review";
 import { getInventoryPoByProductId } from "@/features/incoming-inventory/inventory/api";
 import { calculateDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
-import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
+import ProductDetailTrackingClient from "@/components/layout/single-product/product-detail-tracking-client";
 import {
   getBrandName,
   getFirstCategoryName,
@@ -388,8 +388,8 @@ export default async function Page({
     ],
   };
 
-  const productDetailTrackingPayload = {
-    type: "detailpage",
+  const detailTrackingPayload = {
+    type: "detailpage" as const,
     country: "DE",
     productid: getTrackingId(plainProduct.id_provider, plainProduct.id),
     productname: toTrackingString(plainProduct.name),
@@ -403,12 +403,13 @@ export default async function Page({
     img_url: toTrackingString(plainProduct.static_files?.[0]?.url),
     category: getFirstCategoryName(plainProduct.categories),
   };
+  const detailTrackingEventId = `dynamic_detail_${toTrackingString(plainProduct.url_key)}`;
 
   return (
     <>
-      <DynamicTMTracker
-        eventId={`dynamic_detail_${plainProduct.url_key}`}
-        payload={productDetailTrackingPayload}
+      <ProductDetailTrackingClient
+        eventId={detailTrackingEventId}
+        payload={detailTrackingPayload}
       />
       <Script
         id="product-structured-data"
