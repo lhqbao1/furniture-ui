@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { usePathname } from "next/navigation";
 
 type PayloadValue = string | number | boolean | null | undefined;
 type DynamicTmPayload = Record<string, PayloadValue>;
@@ -47,8 +46,6 @@ export default function DynamicTMTracker({
   enabled = true,
   eventId,
 }: DynamicTMTrackerProps) {
-  const pathname = usePathname();
-
   const trackingDomain = normalizeTrackingDomain(
     process.env.NEXT_PUBLIC_DYNAMIC_TRACKING_DOMAIN,
   );
@@ -61,9 +58,9 @@ export default function DynamicTMTracker({
   );
 
   const trackingKey = React.useMemo(() => {
-    const base = eventId || `${pathname || "/"}|${JSON.stringify(normalizedPayload)}`;
+    const base = eventId || JSON.stringify(normalizedPayload);
     return hashString(base);
-  }, [eventId, normalizedPayload, pathname]);
+  }, [eventId, normalizedPayload]);
 
   React.useEffect(() => {
     if (!enabled) return;
