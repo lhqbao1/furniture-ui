@@ -51,14 +51,14 @@ export default async function HomePage() {
           {" "}
           <CategorySection slug="gartenhaeuser" />
         </Suspense>
-        <Suspense fallback={<ProductGridSkeleton length={4} />}>
+        {/* <Suspense fallback={<ProductGridSkeleton length={4} />}>
           {" "}
           <CategorySection slug="verkleidung-vorne" />
         </Suspense>
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           {" "}
           <CategorySection slug="ladegeraet" />
-        </Suspense>
+        </Suspense> */}
         <Suspense fallback={<ProductGridSkeleton length={4} />}>
           {" "}
           <CategorySection slug="sofas" />

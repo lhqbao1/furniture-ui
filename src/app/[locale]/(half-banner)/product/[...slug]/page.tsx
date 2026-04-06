@@ -26,7 +26,6 @@ import ProductReviewTab from "@/components/layout/single-product/tabs/review";
 import { getInventoryPoByProductId } from "@/features/incoming-inventory/inventory/api";
 import { calculateDeliveryEstimate } from "@/hooks/get-estimated-shipping";
 import ComparePriceSection from "@/components/layout/single-product/compare-price/compare-price-section";
-import ProductDetailTrackingClient from "@/components/layout/single-product/product-detail-tracking-client";
 import {
   getBrandName,
   getFirstCategoryName,
@@ -37,9 +36,9 @@ import {
 /* --------------------------------------------------------
  * ENABLE PARTIAL PRERENDERING
  * ------------------------------------------------------*/
-export const experimental_ppr = true;
 export const revalidate = 3600;
 export const dynamicParams = true;
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string[]; locale: string }>;
@@ -404,13 +403,58 @@ export default async function Page({
     category: getFirstCategoryName(plainProduct.categories),
   };
   const detailTrackingEventId = `dynamic_detail_${toTrackingString(plainProduct.url_key)}`;
+  const trackingDomain = (process.env.NEXT_PUBLIC_DYNAMIC_TRACKING_DOMAIN ?? "")
+    .trim()
+    .replace(/^https?:\/\//, "")
+    .replace(/\/+$/, "");
+  const trackingCode = (
+    process.env.NEXT_PUBLIC_DYNAMIC_TRACKING_CODE ?? ""
+  ).trim();
+  const canRenderDetailTrackingScript = Boolean(trackingDomain && trackingCode);
+  const detailTrackingScript = `
+    (function () {
+      try {
+        var payload = ${JSON.stringify(detailTrackingPayload)};
+        var trackingDomain = ${JSON.stringify(trackingDomain)};
+        var trackingCode = ${JSON.stringify(trackingCode)};
+        var trackingKey = ${JSON.stringify(detailTrackingEventId)};
+
+        if (!payload || !payload.type || !trackingDomain || !trackingCode) return;
+
+        var storageKey = "dynamic_tm_sent_" + trackingKey;
+        if (window.sessionStorage && window.sessionStorage.getItem(storageKey)) return;
+
+        window.dynamic_tm_data = payload;
+
+        var script = document.createElement("script");
+        script.id = "dynamic_tm_script_" + trackingKey;
+        script.type = "text/javascript";
+        script.async = true;
+        script.src =
+          "https://" +
+          trackingDomain +
+          "/tm_js.aspx?trackid=" +
+          encodeURIComponent(trackingCode) +
+          "&mode=2&dt_freetext=&dt_subid1=&dt_subid2=&dt_keywords=";
+
+        document.body.appendChild(script);
+
+        if (window.sessionStorage) {
+          window.sessionStorage.setItem(storageKey, "1");
+        }
+      } catch (error) {
+        console.error("dynamic detail tracker failed", error);
+      }
+    })();
+  `;
 
   return (
     <>
-      <ProductDetailTrackingClient
-        eventId={detailTrackingEventId}
-        payload={detailTrackingPayload}
-      />
+      {canRenderDetailTrackingScript && (
+        <Script id={detailTrackingEventId} strategy="afterInteractive">
+          {detailTrackingScript}
+        </Script>
+      )}
       <Script
         id="product-structured-data"
         type="application/ld+json"
