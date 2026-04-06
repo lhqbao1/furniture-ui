@@ -311,381 +311,425 @@ const OrderDetails = () => {
   const updatedAt = formatDateTimeString(order.updated_at);
 
   return (
-    <div className="space-y-12 pb-20 mt-6">
+    <div className="space-y-8 pb-20 mt-6">
       <AdminBackButton />
-      <div className="grid lg:grid-cols-4 grid-cols-2 lg:gap-12 gap-4">
-        <OrderDetailOverView
-          order={order}
-          created_at={createdAt}
-          updated_at={updatedAt}
-          status={order.status}
+
+      <section className="rounded-2xl border border-slate-200 bg-gradient-to-br from-[#fbfefc] to-white p-4 md:p-6 shadow-sm">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <OrderDetailOverView
+            order={order}
+            created_at={createdAt}
+            updated_at={updatedAt}
+            status={order.status}
+          />
+          <div className="lg:col-span-2 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <OrderDetailUser
+              user={order.checkouts[0].user}
+              shippingAddress={order.checkouts[0].shipping_address}
+              invoiceAddress={order.checkouts[0].invoice_address}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-3 md:p-4 shadow-sm">
+        <div className="mb-3 px-1">
+          <h3 className="text-base font-semibold text-slate-900">
+            Order items
+          </h3>
+        </div>
+        <ProductTable
+          data={cartItems}
+          columns={getOrderDetailColumns({
+            country_code:
+              order?.checkouts[0]?.shipping_address?.country ??
+              order?.checkouts[0]?.invoice_address?.country ??
+              "DE",
+            tax_id: invoice?.main_checkout.checkouts[0].user.tax_id,
+          })}
+          page={page}
+          setPage={setPage}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          totalItems={cartItems.length}
+          totalPages={Math.ceil(
+            extractCartItemsFromMain(order).length / pageSize,
+          )}
+          hasPagination={false}
+          hasCount={false}
+          hasHeaderBackGround
         />
-        <OrderDetailUser
-          user={order.checkouts[0].user}
-          shippingAddress={order.checkouts[0].shipping_address}
-          invoiceAddress={order.checkouts[0].invoice_address}
-        />
-      </div>
-      <ProductTable
-        data={cartItems}
-        columns={getOrderDetailColumns({
-          country_code:
-            order?.checkouts[0]?.shipping_address?.country ??
-            order?.checkouts[0]?.invoice_address?.country ??
-            "DE",
-          tax_id: invoice?.main_checkout.checkouts[0].user.tax_id,
-        })}
-        page={page}
-        setPage={setPage}
-        pageSize={pageSize}
-        setPageSize={setPageSize}
-        totalItems={cartItems.length}
-        totalPages={Math.ceil(
-          extractCartItemsFromMain(order).length / pageSize,
-        )}
-        hasPagination={false}
-        hasCount={false}
-        hasHeaderBackGround
-      />
+      </section>
+
       {(isLoadingProductRefund || productRefunds.length > 0) && (
-        <Accordion
-          type="single"
-          collapsible
-          defaultValue="refund-details"
-          className="rounded-lg border bg-white px-4"
-        >
-          <AccordionItem value="refund-details" className="border-none">
-            <AccordionTrigger hasIcon className="py-4">
-              <div className="flex w-full items-center justify-between pr-2 text-left">
-                <div>
-                  <h3 className="text-base font-semibold">Refund details</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Product refund information from marketplace response.
-                  </p>
+        <section>
+          <Accordion
+            type="single"
+            collapsible
+            defaultValue="refund-details"
+            className="rounded-2xl border border-slate-200 bg-white px-4 shadow-sm"
+          >
+            <AccordionItem value="refund-details" className="border-none">
+              <AccordionTrigger hasIcon className="py-4">
+                <div className="flex w-full items-center justify-between pr-2 text-left">
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900">
+                      Refund details
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Product refund information from marketplace response.
+                    </p>
+                  </div>
+                  <div className="text-right text-sm">
+                    <div className="font-medium">
+                      Items:{" "}
+                      {isLoadingProductRefund ? "..." : productRefunds.length}
+                    </div>
+                    <div className="text-muted-foreground">
+                      Total refund:{" "}
+                      {isLoadingProductRefund
+                        ? "..."
+                        : formatCurrency(totalProductRefundAmount)}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right text-sm">
-                  <div className="font-medium">
-                    Items:{" "}
-                    {isLoadingProductRefund ? "..." : productRefunds.length}
+              </AccordionTrigger>
+              <AccordionContent>
+                {isLoadingProductRefund ? (
+                  <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                    Loading refund details...
                   </div>
-                  <div className="text-muted-foreground">
-                    Total refund:{" "}
-                    {isLoadingProductRefund
-                      ? "..."
-                      : formatCurrency(totalProductRefundAmount)}
+                ) : (
+                  <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                    {productRefunds.map((item, index) => (
+                      <div
+                        key={`${item?.sku ?? "refund"}-${index}`}
+                        className="col-span-1 rounded-xl border border-slate-200 bg-slate-50/50 p-3"
+                      >
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <span className="font-medium">Name:</span>{" "}
+                            {item?.name ?? "-"}
+                          </div>
+                          <div>
+                            <span className="font-medium">SKU:</span>{" "}
+                            {item?.sku ?? "-"}
+                          </div>
+                          <div>
+                            <span className="font-medium">Quantity:</span>{" "}
+                            {toSafeNumber(item?.quantity)}
+                          </div>
+                          <div>
+                            <span className="font-medium">Refund amount:</span>{" "}
+                            {formatCurrency(item?.refund_amount)}
+                          </div>
+                          <div>
+                            <span className="font-medium">Reason:</span>{" "}
+                            {item?.reason ?? "-"}
+                          </div>
+                          <div>
+                            <span className="font-medium">Type:</span>{" "}
+                            {item?.type ?? "-"}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </section>
+      )}
+
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8">
+          {order.status !== "Pending" ? (
+            <div className="flex flex-col gap-5">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="mb-3">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    Documents
+                  </h3>
+                </div>
+                <DocumentTable order={order} invoiceCode={invoice?.invoice_code} />
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="space-y-2 w-full">
+                  <div className="text-sm font-semibold text-slate-900">
+                    Order note
+                  </div>
+                  <Textarea
+                    placeholder="Type note and press Enter to save"
+                    value={noteValue}
+                    disabled={updateNoteMutation.isPending}
+                    onChange={(event) => setNoteValue(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key !== "Enter" || event.shiftKey) return;
+                      event.preventDefault();
+
+                      if (!checkoutId) return;
+
+                      updateNoteMutation.mutate(
+                        {
+                          main_checkout_id: checkoutId,
+                          note: noteValue.trim(),
+                        },
+                        {
+                          onSuccess: () => {
+                            toast.success("Note updated");
+                          },
+                          onError: () => {
+                            toast.error("Failed to update note");
+                          },
+                        },
+                      );
+                    }}
+                  />
                 </div>
               </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              {isLoadingProductRefund ? (
-                <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                  Loading refund details...
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-                  {productRefunds.map((item, index) => (
-                    <div
-                      key={`${item?.sku ?? "refund"}-${index}`}
-                      className="col-span-1 rounded-md border p-3"
-                    >
-                      <div className="space-y-2 text-sm">
-                        <div>
-                          <span className="font-medium">Name:</span>{" "}
-                          {item?.name ?? "-"}
-                        </div>
-                        <div>
-                          <span className="font-medium">SKU:</span>{" "}
-                          {item?.sku ?? "-"}
-                        </div>
-                        <div>
-                          <span className="font-medium">Quantity:</span>{" "}
-                          {toSafeNumber(item?.quantity)}
-                        </div>
-                        <div>
-                          <span className="font-medium">Refund amount:</span>{" "}
-                          {formatCurrency(item?.refund_amount)}
-                        </div>
-                        <div>
-                          <span className="font-medium">Reason:</span>{" "}
-                          {item?.reason ?? "-"}
-                        </div>
-                        <div>
-                          <span className="font-medium">Type:</span>{" "}
-                          {item?.type ?? "-"}
-                        </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="space-y-3 w-full">
+                  <div className="text-sm font-semibold text-slate-900">
+                    Order files ({orderFileEntries.length})
+                  </div>
+
+                  {orderFileEntries.length === 0 ? (
+                    <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                      No files uploaded yet.
+                    </div>
+                  ) : (
+                    <div className="space-y-5 rounded-xl border border-slate-200 p-3">
+                      <div className="space-y-2">
+                        <div className="text-sm font-semibold">Images</div>
+                        {imageOrderFiles.length === 0 ? (
+                          <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+                            No images uploaded.
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                            {imageOrderFiles.map((entry) => {
+                              const url = entry.url;
+                              const fileName = getFileNameFromUrl(url);
+
+                              return (
+                                <div
+                                  key={`image-${url}-${entry.index}`}
+                                  className="group relative overflow-hidden rounded-md border border-slate-200"
+                                >
+                                  <button
+                                    type="button"
+                                    className="absolute right-2 top-2 z-10 rounded-md bg-black/60 p-1.5 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
+                                    onClick={(event) => {
+                                      event.preventDefault();
+                                      event.stopPropagation();
+                                      setPendingDeleteFileUrl(url);
+                                    }}
+                                    disabled={isSavingFileList}
+                                    aria-label="Delete file"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                  <a
+                                    href={url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="block hover:bg-muted/20"
+                                  >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                      src={url}
+                                      alt={fileName}
+                                      className="h-44 w-full object-cover"
+                                    />
+                                    <div className="border-t px-3 py-2 text-sm">
+                                      {fileName}
+                                    </div>
+                                  </a>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-sm font-semibold">Files</div>
+                        {documentOrderFiles.length === 0 ? (
+                          <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+                            No documents uploaded.
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                            {documentOrderFiles.map((entry) => {
+                              const url = entry.url;
+                              const fileName = getFileNameFromUrl(url);
+
+                              return (
+                                <div
+                                  key={`file-${url}-${entry.index}`}
+                                  className="group relative rounded-md border border-slate-200"
+                                >
+                                  <button
+                                    type="button"
+                                    className="absolute right-2 top-2 z-10 rounded-md bg-black/60 p-1.5 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
+                                    onClick={(event) => {
+                                      event.preventDefault();
+                                      event.stopPropagation();
+                                      setPendingDeleteFileUrl(url);
+                                    }}
+                                    disabled={isSavingFileList}
+                                    aria-label="Delete file"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </button>
+                                  <a
+                                    href={url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center gap-2 rounded-md px-3 py-4 hover:bg-muted/20"
+                                  >
+                                    <FileText className="size-4 text-muted-foreground" />
+                                    <span className="line-clamp-2 text-sm">
+                                      {fileName}
+                                    </span>
+                                  </a>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ))}
+                  )}
+
+                  <div
+                    className={`rounded-md border border-dashed p-4 transition-colors ${
+                      isDragOverFiles
+                        ? "border-primary bg-primary/5"
+                        : "border-input"
+                    }`}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (isUploadingFiles) return;
+                      setIsDragOverFiles(true);
+                    }}
+                    onDragEnter={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (isUploadingFiles) return;
+                      setIsDragOverFiles(true);
+                    }}
+                    onDragLeave={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setIsDragOverFiles(false);
+                    }}
+                    onDrop={handleDropFiles}
+                  >
+                    <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
+                      <Upload className="size-4" />
+                      <span>Drag and drop files here</span>
+                      <span>or</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={isUploadingFiles}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {isUploadingFiles ? "Uploading..." : "Choose files"}
+                      </Button>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={async (event) => {
+                        await handleUploadFiles(event.target.files);
+                        event.currentTarget.value = "";
+                      }}
+                      disabled={isUploadingFiles}
+                    />
+                  </div>
                 </div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      )}
-      <div className="grid grid-cols-3 gap-8">
-        {order.status !== "Pending" ? (
-          <div className="flex flex-col gap-4 col-span-2">
-            <DocumentTable order={order} invoiceCode={invoice?.invoice_code} />
-            <div className="space-y-2 w-1/2">
-              <div className="text-sm font-semibold">Order note</div>
-              <Textarea
-                placeholder="Type note and press Enter to save"
-                value={noteValue}
-                disabled={updateNoteMutation.isPending}
-                onChange={(event) => setNoteValue(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key !== "Enter" || event.shiftKey) return;
-                  event.preventDefault();
-
-                  if (!checkoutId) return;
-
-                  updateNoteMutation.mutate(
-                    {
-                      main_checkout_id: checkoutId,
-                      note: noteValue.trim(),
-                    },
-                    {
-                      onSuccess: () => {
-                        toast.success("Note updated");
-                      },
-                      onError: () => {
-                        toast.error("Failed to update note");
-                      },
-                    },
-                  );
-                }}
-              />
-            </div>
-
-            <div className="space-y-3 w-full max-w-5xl">
-              <div className="text-sm font-semibold">
-                Order files ({orderFileEntries.length})
               </div>
 
-              {orderFileEntries.length === 0 ? (
-                <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                  No files uploaded yet.
-                </div>
-              ) : (
-                <div className="space-y-5 rounded-md border p-3">
-                  <div className="space-y-2">
-                    <div className="text-sm font-semibold">Images</div>
-                    {imageOrderFiles.length === 0 ? (
-                      <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
-                        No images uploaded.
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                        {imageOrderFiles.map((entry) => {
-                          const url = entry.url;
-                          const fileName = getFileNameFromUrl(url);
-
-                          return (
-                            <div
-                              key={`image-${url}-${entry.index}`}
-                              className="group relative overflow-hidden rounded-md border"
-                            >
-                              <button
-                                type="button"
-                                className="absolute right-2 top-2 z-10 rounded-md bg-black/60 p-1.5 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
-                                onClick={(event) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  setPendingDeleteFileUrl(url);
-                                }}
-                                disabled={isSavingFileList}
-                                aria-label="Delete file"
-                              >
-                                <Trash2 className="size-4" />
-                              </button>
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="block hover:bg-muted/20"
-                              >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={url}
-                                  alt={fileName}
-                                  className="h-44 w-full object-cover"
-                                />
-                                <div className="border-t px-3 py-2 text-sm">
-                                  {fileName}
-                                </div>
-                              </a>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-sm font-semibold">Files</div>
-                    {documentOrderFiles.length === 0 ? (
-                      <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
-                        No documents uploaded.
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                        {documentOrderFiles.map((entry) => {
-                          const url = entry.url;
-                          const fileName = getFileNameFromUrl(url);
-
-                          return (
-                            <div
-                              key={`file-${url}-${entry.index}`}
-                              className="group relative rounded-md border"
-                            >
-                              <button
-                                type="button"
-                                className="absolute right-2 top-2 z-10 rounded-md bg-black/60 p-1.5 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
-                                onClick={(event) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  setPendingDeleteFileUrl(url);
-                                }}
-                                disabled={isSavingFileList}
-                                aria-label="Delete file"
-                              >
-                                <Trash2 className="size-4" />
-                              </button>
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center gap-2 rounded-md px-3 py-4 hover:bg-muted/20"
-                              >
-                                <FileText className="size-4 text-muted-foreground" />
-                                <span className="line-clamp-2 text-sm">
-                                  {fileName}
-                                </span>
-                              </a>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div
-                className={`rounded-md border border-dashed p-4 transition-colors ${
-                  isDragOverFiles
-                    ? "border-primary bg-primary/5"
-                    : "border-input"
-                }`}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  if (isUploadingFiles) return;
-                  setIsDragOverFiles(true);
+              <Dialog
+                open={Boolean(pendingDeleteFileUrl)}
+                onOpenChange={(open) => {
+                  if (!open) setPendingDeleteFileUrl(null);
                 }}
-                onDragEnter={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  if (isUploadingFiles) return;
-                  setIsDragOverFiles(true);
-                }}
-                onDragLeave={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setIsDragOverFiles(false);
-                }}
-                onDrop={handleDropFiles}
               >
-                <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
-                  <Upload className="size-4" />
-                  <span>Drag and drop files here</span>
-                  <span>or</span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={isUploadingFiles}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {isUploadingFiles ? "Uploading..." : "Choose files"}
-                  </Button>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={async (event) => {
-                    await handleUploadFiles(event.target.files);
-                    event.currentTarget.value = "";
-                  }}
-                  disabled={isUploadingFiles}
-                />
-              </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Delete file</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete this file?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setPendingDeleteFileUrl(null)}
+                      disabled={isSavingFileList}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleConfirmDeleteOrderFile}
+                      disabled={isSavingFileList}
+                    >
+                      {isSavingFileList ? "Deleting..." : "Confirm"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-
-            <Dialog
-              open={Boolean(pendingDeleteFileUrl)}
-              onOpenChange={(open) => {
-                if (!open) setPendingDeleteFileUrl(null);
-              }}
-            >
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Delete file</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to delete this file?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setPendingDeleteFileUrl(null)}
-                    disabled={isSavingFileList}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={handleConfirmDeleteOrderFile}
-                    disabled={isSavingFileList}
-                  >
-                    {isSavingFileList ? "Deleting..." : "Confirm"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        ) : (
-          ""
-        )}
-        <OrderSummary
-          language={order.checkouts[0].user.language ?? ""}
-          sub_total={order.total_amount_item}
-          shipping_amount={order.total_shipping}
-          discount_amount={Math.abs(order.voucher_amount)}
-          tax={
-            calculateOrderTaxWithDiscount(
-              invoice?.main_checkout.checkouts
-                .flatMap((c) => c.cart)
-                .flatMap((c) => c.items) ?? [],
-              invoice?.voucher_amount,
-              order?.checkouts[0]?.shipping_address?.country ??
-                order?.checkouts[0]?.invoice_address?.country ??
-                "DE",
-              invoice?.main_checkout.checkouts[0].user.tax_id,
-              order.total_shipping,
-            ).totalVat
-          }
-          total_amount={order.total_amount}
-          payment_method={order.payment_method}
-          entry_date={order.created_at}
-          is_Ebay={order.from_marketplace === "ebay" ? true : false}
-          refund_amount={order.refund_amount}
-        />
-      </div>
-      <OrderDeliveryOrder data={order.checkouts} />
+          ) : (
+            ""
+          )}
+        </div>
+        <div className="lg:col-span-4">
+          <OrderSummary
+            language={order.checkouts[0].user.language ?? ""}
+            sub_total={order.total_amount_item}
+            shipping_amount={order.total_shipping}
+            discount_amount={Math.abs(order.voucher_amount)}
+            tax={
+              calculateOrderTaxWithDiscount(
+                invoice?.main_checkout.checkouts
+                  .flatMap((c) => c.cart)
+                  .flatMap((c) => c.items) ?? [],
+                invoice?.voucher_amount,
+                order?.checkouts[0]?.shipping_address?.country ??
+                  order?.checkouts[0]?.invoice_address?.country ??
+                  "DE",
+                invoice?.main_checkout.checkouts[0].user.tax_id,
+                order.total_shipping,
+              ).totalVat
+            }
+            total_amount={order.total_amount}
+            payment_method={order.payment_method}
+            entry_date={order.created_at}
+            is_Ebay={order.from_marketplace === "ebay" ? true : false}
+            refund_amount={order.refund_amount}
+          />
+        </div>
+      </section>
+      <section className="rounded-2xl border border-slate-200 bg-white p-3 md:p-4 shadow-sm">
+        <div className="mb-3 px-1">
+          <h3 className="text-base font-semibold text-slate-900">
+            Delivery orders
+          </h3>
+        </div>
+        <OrderDeliveryOrder data={order.checkouts} />
+      </section>
     </div>
   );
 };

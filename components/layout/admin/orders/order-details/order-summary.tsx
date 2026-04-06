@@ -42,73 +42,61 @@ const OrderSummary = ({
   refund_amount,
   is_Ebay = false,
 }: OrderInformationProps) => {
+  const formatEuro = (value: number | undefined) =>
+    `€${(value ?? 0).toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
   return (
-    <div className="flex flex-col items-end space-y-3">
-      <div className="grid grid-cols-3 lg:w-1/2 w-1/2">
-        <div className="text-end col-span-2">Sub total</div>
-        <div className="text-end">
-          €
-          {sub_total?.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
+      <div className="mb-4">
+        <h3 className="text-base font-semibold text-slate-900">Summary</h3>
       </div>
-      <div className="grid grid-cols-3 lg:w-1/2 w-1/2">
-        <div className="text-end col-span-2">Shipping</div>
-        <div className="text-end">
-          €
-          {(shipping_amount ?? 0)?.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
-      </div>
-      {discount_amount && discount_amount > 0 ? (
-        <div className="grid grid-cols-3 lg:w-1/2 w-1/2">
-          <div className="text-end col-span-2">Discount</div>
-          <div className="text-end">
-            €
-            {discount_amount?.toLocaleString("de-DE", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+
+      <div className="space-y-3 text-sm">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-slate-600">Sub total</div>
+          <div className="text-right font-medium text-slate-900">
+            {formatEuro(sub_total)}
           </div>
         </div>
-      ) : (
-        ""
-      )}
-      <div className="grid grid-cols-3 lg:w-1/2 w-1/2">
-        <div className="text-end col-span-2">VAT</div>
-        <div className="text-end">
-          €
-          {tax?.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
-      </div>
-      {refund_amount && refund_amount > 0 ? (
-        <div className="grid grid-cols-3 lg:w-1/2 w-1/2">
-          <div className="text-end col-span-2">Refund Amount</div>
-          <div className="text-end">
-            € -
-            {(refund_amount ?? 0)?.toLocaleString("de-DE", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-slate-600">Shipping</div>
+          <div className="text-right font-medium text-slate-900">
+            {formatEuro(shipping_amount)}
           </div>
         </div>
-      ) : (
-        ""
-      )}
-      <div className="text-end text-xl text-primary font-bold">
-        <div className="">
-          Total €
-          {total_amount?.toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
+        {discount_amount && discount_amount > 0 ? (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-slate-600">Discount</div>
+            <div className="text-right font-medium text-slate-900">
+              {formatEuro(discount_amount)}
+            </div>
+          </div>
+        ) : null}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-slate-600">VAT</div>
+          <div className="text-right font-medium text-slate-900">
+            {formatEuro(tax)}
+          </div>
+        </div>
+        {refund_amount && refund_amount > 0 ? (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-slate-600">Refund Amount</div>
+            <div className="text-right font-medium text-red-600">
+              -{formatEuro(refund_amount)}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="my-2 h-px w-full bg-slate-200" />
+
+        <div className="grid grid-cols-2 gap-3 text-base">
+          <div className="font-semibold text-slate-900">Total</div>
+          <div className="text-right text-xl font-bold text-primary">
+            {formatEuro(total_amount)}
+          </div>
         </div>
       </div>
     </div>

@@ -84,17 +84,17 @@ export default function OrderStatusSelector({
   };
 
   return (
-    <div className="flex items-center justify-between text-sm py-1 px-2 border rounded-md font-bold">
-      <div className="flex gap-1 items-center flex-1">
-        <div>Status:</div>
-        <span>{getStatusLabel(status)}</span>
+    <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+      <div className="flex items-center gap-2 flex-1">
+        <div className="text-slate-500 font-medium">Status:</div>
+        <span className="font-semibold text-slate-900">{getStatusLabel(status)}</span>
       </div>
 
       <div className="flex items-center gap-2">
         <Select value={selectValue} onValueChange={handleChange}>
           <SelectTrigger
-            className="w-fit px-0 py-0 border-none"
-            iconColor="black"
+            className="w-fit h-7 min-h-7 px-2 rounded-md border border-slate-200 bg-white"
+            iconColor="#334155"
           >
             {/* <SelectValue placeholder={labelFor(value) || "Select"} /> */}
           </SelectTrigger>

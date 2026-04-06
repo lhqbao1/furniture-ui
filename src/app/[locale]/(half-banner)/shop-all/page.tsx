@@ -13,6 +13,14 @@ import MobileFilter from "@/components/layout/shop-all/mobile-filter";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
+import { calculateProductVAT } from "@/lib/caculate-vat";
+import {
+  getFirstCategoryName,
+  getTrackingId,
+  toTrackingCsv,
+  toTrackingString,
+} from "@/components/shared/tracking/tracking-utils";
 
 const SHOP_ALL_PAGE_SIZE = 20;
 
@@ -59,7 +67,7 @@ export default function ShopAllPage() {
     page_size: SHOP_ALL_PAGE_SIZE,
     query,
     is_active: true,
-    is_econelo: undefined,
+    is_econelo: false,
     brand: brands,
     categories, // 👈 gửi array cho API
     categoriesKey, // 👈 chỉ dùng cho cache
@@ -82,6 +90,50 @@ export default function ShopAllPage() {
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const showSkeleton =
+    isLoading || !data || (isFetching && (data?.items?.length ?? 0) === 0);
+
+  const normalizedSearch = (query ?? "").trim();
+  const searchTrackingPayload = React.useMemo(() => {
+    const items = Array.isArray(data?.items) ? data.items : [];
+    const normalizedItems = items.map((item) => {
+      const productId = getTrackingId(item?.id_provider, item?.id);
+      const categoryName = getFirstCategoryName(item?.categories);
+      const gross = Number(item?.final_price ?? 0);
+      const net = Number(calculateProductVAT(gross, item?.tax).net) || 0;
+
+      return {
+        productId,
+        productName: toTrackingString(item?.name),
+        amount: net.toFixed(2),
+        category: categoryName,
+      };
+    });
+
+    const validItems = normalizedItems.filter((item) => item.productId !== "");
+
+    const productIds = toTrackingCsv(validItems.map((item) => item.productId));
+    const productNames = toTrackingCsv(
+      validItems.map((item) => item.productName),
+    );
+    const amounts = toTrackingCsv(validItems.map((item) => item.amount));
+    const categoriesValue = toTrackingCsv(
+      validItems.map((item) => item.category),
+    );
+    const levelValues = toTrackingCsv(validItems.map(() => "product"));
+
+    return {
+      type: "search",
+      country: "DE",
+      productids: productIds,
+      productnames: productNames,
+      amounts,
+      categories: categoriesValue,
+      levelvalues: levelValues,
+      searchstring: toTrackingString(normalizedSearch),
+    };
+  }, [data?.items, normalizedSearch]);
 
   if (isError) {
     return (
@@ -106,11 +158,15 @@ export default function ShopAllPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const showSkeleton =
-    isLoading || !data || (isFetching && (data?.items?.length ?? 0) === 0);
-
   return (
     <div className="pt-3 xl:pb-16 pb-6 relative">
+      {normalizedSearch ? (
+        <DynamicTMTracker
+          enabled={!showSkeleton}
+          eventId={`dynamic_search_shop_all_${normalizedSearch}_page_${page}`}
+          payload={searchTrackingPayload}
+        />
+      ) : null}
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-2 md:block md:col-span-4 lg:col-span-3 xl:col-span-2 hidden">
           <div className="sticky top-48 max-h-[calc(100vh-6rem)] pr-2 overflow-y-auto no-scrollbar">

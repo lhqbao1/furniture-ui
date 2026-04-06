@@ -14,6 +14,12 @@ import { useRouter } from "@/src/i18n/navigation";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, SearchX } from "lucide-react";
+import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
+import {
+  getTrackingId,
+  toTrackingCsv,
+  toTrackingString,
+} from "@/components/shared/tracking/tracking-utils";
 
 interface ProductCategoryProps {
   categorySlugs: string[];
@@ -67,10 +73,7 @@ const ProductCategory = ({
     setPageSize(pageSizeFromUrl);
   }, [pageFromUrl, pageSizeFromUrl]);
 
-  const {
-    data: listCategory,
-    isLoading: isLoadingList,
-  } = useQuery({
+  const { data: listCategory, isLoading: isLoadingList } = useQuery({
     queryKey: ["category-children", categorySlugs],
     queryFn: () =>
       getChildrenCategoryByParent(categorySlugs[categorySlugs.length - 1]),
@@ -87,7 +90,7 @@ const ProductCategory = ({
       page,
       page_size: pageSize,
       is_active: true,
-      is_econelo: undefined,
+      is_econelo: false,
       query,
       brand: brands,
       brandsKey,
@@ -107,7 +110,37 @@ const ProductCategory = ({
     });
 
   const categorySlug = categorySlugs[categorySlugs.length - 1];
-  const isEmptyCategory = Boolean(algoliaData && algoliaData.items?.length === 0);
+  const isEmptyCategory = Boolean(
+    algoliaData && algoliaData.items?.length === 0,
+  );
+
+  const categoryTrackingPayload = React.useMemo(() => {
+    const items = algoliaData?.items ?? [];
+    const productIds = toTrackingCsv(
+      items.map((item) => getTrackingId(item?.id_provider, item?.id)),
+    );
+    const catLevel1 = toTrackingString(categorySlugs?.[0]);
+    const catLevel2 = toTrackingString(categorySlugs?.[1]);
+    const categoryId = toTrackingString(category?.slug ?? categorySlug);
+    const categoryName = toTrackingString(category?.name ?? listCategory?.name);
+
+    return {
+      type: "categorypage",
+      catlevel1: catLevel1,
+      catlevel2: catLevel2,
+      country: "DE",
+      categoryid: categoryId,
+      category: categoryName,
+      productids: productIds,
+    };
+  }, [
+    algoliaData?.items,
+    category?.name,
+    category?.slug,
+    categorySlug,
+    categorySlugs,
+    listCategory?.name,
+  ]);
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -126,6 +159,11 @@ const ProductCategory = ({
 
   return (
     <div className="pt-3 xl:pb-16 pb-6">
+      <DynamicTMTracker
+        enabled={!isAlgoliaLoading}
+        eventId={`dynamic_category_${categorySlug}_page_${page}`}
+        payload={categoryTrackingPayload}
+      />
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-2 md:block md:col-span-4 lg:col-span-3 xl:col-span-2 hidden">
           <div className="sticky top-48 max-h-[calc(100vh-6rem)] pr-2 overflow-y-auto no-scrollbar">

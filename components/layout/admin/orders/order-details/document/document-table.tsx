@@ -87,14 +87,14 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
   });
 
   return (
-    <div className="overflow-hidden rounded-md border w-1/2">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm w-full">
       <Table>
-        <TableHeader className="bg-secondary/10">
+        <TableHeader className="bg-[#f3faf6]">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-[13px] font-semibold text-slate-700">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -125,7 +125,7 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="h-24 text-center"
+                className="h-24 text-center text-slate-500"
               >
                 No results.
               </TableCell>

@@ -2,6 +2,7 @@ import { getCountryName } from "@/lib/country-name";
 import { Address } from "@/types/address";
 import { User } from "@/types/user";
 import React from "react";
+import { Building2, FileText, MapPinHouse, UserRound } from "lucide-react";
 
 interface OrderDetailUserProps {
   user?: User | null;
@@ -17,78 +18,95 @@ const OrderDetailUser = ({
   const fullName = [user?.first_name, user?.last_name]
     .filter(Boolean)
     .join(" ");
-  const customerName = fullName || user?.company_name || "-";
+  const customerName = fullName || user?.company_name || "";
   const shippingName =
     (user?.company_name && !shippingAddress?.recipient_name
       ? user.company_name
       : shippingAddress?.recipient_name) || customerName;
   const invoiceCountry = invoiceAddress?.country
     ? getCountryName(invoiceAddress.country)
-    : "-";
+    : "";
   const shippingCountry = shippingAddress?.country
     ? getCountryName(shippingAddress.country)
-    : "-";
+    : "";
+  const invoiceCityLine = [invoiceAddress?.postal_code, invoiceAddress?.city]
+    .filter(Boolean)
+    .join(" ");
+  const shippingCityLine = [shippingAddress?.postal_code, shippingAddress?.city]
+    .filter(Boolean)
+    .join(" ");
+  const shippingEmail =
+    shippingAddress?.email ||
+    ((user?.email ?? "").toLowerCase() !== "guest" ? user?.email ?? "" : "");
 
   return (
     <>
       {user?.is_real ? (
-        <div className="col-span-1 pt-2 pb-6 px-3 rounded-sm border space-y-2.5">
-          <h5 className="font-bold">Customer</h5>
-          <div className="flex items-start gap-2.5">
-            <div className="text-sm">
-              <div>{customerName}</div>
-              <div>{user?.email || "-"}</div>
-              <div>{user?.phone_number || "-"}</div>
-              {!!user?.tax_id && <div>{user.tax_id}</div>}
-            </div>
+        <div className="col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <h5 className="inline-flex items-center gap-2 text-base font-semibold text-slate-900">
+              <UserRound className="size-4 text-slate-500" />
+              Customer
+            </h5>
+          </div>
+          <div className="text-sm leading-6 text-slate-700">
+            <div className="font-medium text-slate-900">{customerName}</div>
+            {user?.email ? <div>{user.email}</div> : null}
+            {user?.phone_number ? <div>{user.phone_number}</div> : null}
+            {!!user?.tax_id && <div>{user.tax_id}</div>}
           </div>
         </div>
-      ) : (
-        ""
-      )}
+      ) : null}
 
-      {invoiceAddress && (
-        <div className="col-span-1 py-2 px-3 rounded-sm border space-y-2.5 flex-1">
-          <h5 className="font-bold">Invoice address</h5>
-          <div className="space-y-2.5">
-            <div className="text-sm">
-              {user?.company_name ? (
-                user.company_name
-              ) : (
-                <div>{invoiceAddress?.recipient_name || customerName}</div>
-              )}
-              <div>{user?.tax_id || ""}</div>
-              <div>{invoiceAddress?.address_line || "-"}</div>
-              <div>{invoiceAddress?.additional_address_line || ""}</div>
-              <div className="flex gap-1">
-                <div>{invoiceAddress?.postal_code || "-"}</div>
-                <div>{invoiceAddress?.city || "-"}</div>
-              </div>
-              <div>{invoiceCountry}</div>
+      {invoiceAddress ? (
+        <div className="col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <h5 className="inline-flex items-center gap-2 text-base font-semibold text-slate-900">
+              <FileText className="size-4 text-slate-500" />
+              Invoice address
+            </h5>
+          </div>
+          <div className="text-sm leading-6 text-slate-700">
+            <div className="font-medium text-slate-900">
+              {user?.company_name
+                ? user.company_name
+                : invoiceAddress?.recipient_name || customerName}
             </div>
+            {user?.tax_id ? <div>{user.tax_id}</div> : null}
+            {invoiceAddress?.address_line ? (
+              <div>{invoiceAddress.address_line}</div>
+            ) : null}
+            {invoiceAddress?.additional_address_line ? (
+              <div>{invoiceAddress.additional_address_line}</div>
+            ) : null}
+            {invoiceCityLine ? <div>{invoiceCityLine}</div> : null}
+            {invoiceCountry ? <div>{invoiceCountry}</div> : null}
           </div>
         </div>
-      )}
+      ) : null}
 
-      <div className="col-span-1 py-2 px-3 rounded-sm border space-y-2.5 flex-1">
-        <h5 className="font-bold">Shipping address</h5>
-        <div className="space-y-2.5">
-          <div className="text-sm">
-            <div>{shippingName}</div>
-            <div>{shippingAddress?.phone_number || ""}</div>
-            <div>{shippingAddress?.address_line || ""}</div>
-            <div>{shippingAddress?.additional_address_line || ""}</div>
-            <div className="flex gap-1">
-              <div>{shippingAddress?.postal_code || ""}</div>
-              <div>{shippingAddress?.city || ""}</div>
-            </div>
-            <div>{shippingCountry}</div>
-            <div>
-              {shippingAddress?.email ||
-                user?.email.toLowerCase() !== "guest" ||
-                ""}
-            </div>
-          </div>
+      <div className="col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <h5 className="inline-flex items-center gap-2 text-base font-semibold text-slate-900">
+            <MapPinHouse className="size-4 text-slate-500" />
+            Shipping address
+          </h5>
+          <Building2 className="size-4 text-slate-400" />
+        </div>
+        <div className="text-sm leading-6 text-slate-700">
+          <div className="font-medium text-slate-900">{shippingName}</div>
+          {shippingAddress?.phone_number ? (
+            <div>{shippingAddress.phone_number}</div>
+          ) : null}
+          {shippingAddress?.address_line ? (
+            <div>{shippingAddress.address_line}</div>
+          ) : null}
+          {shippingAddress?.additional_address_line ? (
+            <div>{shippingAddress.additional_address_line}</div>
+          ) : null}
+          {shippingCityLine ? <div>{shippingCityLine}</div> : null}
+          {shippingCountry ? <div>{shippingCountry}</div> : null}
+          {shippingEmail ? <div>{shippingEmail}</div> : null}
         </div>
       </div>
     </>

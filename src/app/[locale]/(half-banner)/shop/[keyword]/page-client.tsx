@@ -6,6 +6,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { ProductResponse } from "@/types/products";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
+import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
+import { calculateProductVAT } from "@/lib/caculate-vat";
+import {
+  getFirstCategoryName,
+  getTrackingId,
+  toTrackingCsv,
+  toTrackingString,
+} from "@/components/shared/tracking/tracking-utils";
 
 interface ShopKeywordClientProps {
   initialData: ProductResponse;
@@ -49,6 +57,46 @@ export default function ShopKeywordClient({
     };
   }, [initialData, queryData]);
 
+  const searchTrackingPayload = useMemo(() => {
+    const items = data.items ?? [];
+    const normalizedItems = items
+      .map((item) => {
+        const productId = getTrackingId(item?.id_provider, item?.id);
+        const gross = Number(item?.final_price ?? 0);
+        const net = Number(calculateProductVAT(gross, item?.tax).net) || 0;
+        return {
+          productId,
+          productName: toTrackingString(item?.name),
+          amount: net.toFixed(2),
+          category: getFirstCategoryName(item?.categories),
+        };
+      })
+      .filter((item) => item.productId !== "");
+
+    const productIds = toTrackingCsv(
+      normalizedItems.map((item) => item.productId),
+    );
+    const productNames = toTrackingCsv(
+      normalizedItems.map((item) => item.productName),
+    );
+    const amounts = toTrackingCsv(normalizedItems.map((item) => item.amount));
+    const categories = toTrackingCsv(
+      normalizedItems.map((item) => item.category),
+    );
+    const levelValues = toTrackingCsv(normalizedItems.map(() => "product"));
+
+    return {
+      type: "search",
+      country: "DE",
+      productids: productIds,
+      productnames: productNames,
+      amounts,
+      categories,
+      levelvalues: levelValues,
+      searchstring: toTrackingString(searchText),
+    };
+  }, [data.items, searchText]);
+
   const handlePageChange = (newPage: number) => {
     if (newPage === page) return;
 
@@ -63,6 +111,10 @@ export default function ShopKeywordClient({
 
   return (
     <>
+      <DynamicTMTracker
+        eventId={`dynamic_search_keyword_${searchText}_page_${page}`}
+        payload={searchTrackingPayload}
+      />
       <div className="lg:pt-10 md:pt-3 pt-0 pb-12">
         <ProductsGridLayout hasBadge data={data.items} />
       </div>
