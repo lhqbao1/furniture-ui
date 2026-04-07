@@ -329,26 +329,17 @@ export const BauhausReturnSlipPdf = ({
               <Text style={[styles.label, styles.rowLabel]}>
                 Auftragsnummer:
               </Text>
-              <Text>
-                {/* {checkout.checkout_code ?? invoice?.invoice_code ?? "—"} */}
-                1048174124
-              </Text>
+              <Text>{checkout.marketplace_order_id ?? "—"}</Text>
             </View>
             <View style={styles.row}>
               <Text style={[styles.label, styles.rowLabel]}>
                 Online-Bestellnummer:
               </Text>
-              <Text>
-                {/* {checkout.marketplace_order_id ?? "—"} */}
-                39221612
-              </Text>
+              <Text>{/* {checkout.marketplace_order_id ?? "—"} */}</Text>
             </View>
             <View style={styles.row}>
               <Text style={[styles.label, styles.rowLabel]}>Bestelldatum:</Text>
-              <Text>
-                {/* {formatDateToNum(checkout.created_at)} */}
-                23.02.2026
-              </Text>
+              <Text>{formatDateToNum(checkout.created_at)}</Text>
             </View>
           </View>
         </View>
@@ -441,7 +432,7 @@ export const BauhausReturnSlipPdf = ({
           </View>
 
           <View style={styles.tableBody}>
-            {/* {rows.map((item, idx) => (
+            {rows.map((item, idx) => (
               <View key={idx} style={styles.rowWrap}>
                 <View style={[styles.gridLineRow, { left: "8%" }]} />
                 <View style={[styles.gridLineRow, { left: "26%" }]} />
@@ -478,169 +469,7 @@ export const BauhausReturnSlipPdf = ({
                   </View>
                 </View>
               </View>
-            ))} */}
-            <View style={styles.rowWrap}>
-              <View style={[styles.gridLineRow, { left: "8%" }]} />
-              <View style={[styles.gridLineRow, { left: "26%" }]} />
-              <View style={[styles.gridLineRow, { left: "58%" }]} />
-              <View style={[styles.gridLineRow, { left: "72%" }]} />
-              <View style={[styles.gridLineRow, { left: "86%" }]} />
-
-              <View style={styles.rowContent}>
-                <View style={[styles.cell, styles.colPos]}>
-                  <Text style={[styles.cellContent, { textAlign: "center" }]}>
-                    1
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.colNumber]}>
-                  <Text style={styles.cellContent}>33754376</Text>
-                </View>
-                <View style={[styles.cell, styles.colName]}>
-                  <Text style={styles.cellContent}>
-                    KLAPPBARER LIEGESTUHL ADIRONDACK BR AUN
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.colQty]}>
-                  <Text style={[styles.cellContent, { textAlign: "center" }]}>
-                    1
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.colReturnQty]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-                <View style={[styles.cell, styles.colReason]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.rowWrap}>
-              <View style={[styles.gridLineRow, { left: "8%" }]} />
-              <View style={[styles.gridLineRow, { left: "26%" }]} />
-              <View style={[styles.gridLineRow, { left: "58%" }]} />
-              <View style={[styles.gridLineRow, { left: "72%" }]} />
-              <View style={[styles.gridLineRow, { left: "86%" }]} />
-
-              <View style={styles.rowContent}>
-                <View style={[styles.cell, styles.colPos]}>
-                  <Text style={[styles.cellContent, { textAlign: "center" }]}>
-                    2
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.colNumber]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colName]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colQty]}>
-                  <Text
-                    style={[styles.cellContent, { textAlign: "center" }]}
-                  ></Text>
-                </View>
-                <View style={[styles.cell, styles.colReturnQty]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-                <View style={[styles.cell, styles.colReason]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.rowWrap}>
-              <View style={[styles.gridLineRow, { left: "8%" }]} />
-              <View style={[styles.gridLineRow, { left: "26%" }]} />
-              <View style={[styles.gridLineRow, { left: "58%" }]} />
-              <View style={[styles.gridLineRow, { left: "72%" }]} />
-              <View style={[styles.gridLineRow, { left: "86%" }]} />
-
-              <View style={styles.rowContent}>
-                <View style={[styles.cell, styles.colPos]}>
-                  <Text style={[styles.cellContent, { textAlign: "center" }]}>
-                    3
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.colNumber]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colName]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colQty]}>
-                  <Text
-                    style={[styles.cellContent, { textAlign: "center" }]}
-                  ></Text>
-                </View>
-                <View style={[styles.cell, styles.colReturnQty]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-                <View style={[styles.cell, styles.colReason]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.rowWrap}>
-              <View style={[styles.gridLineRow, { left: "8%" }]} />
-              <View style={[styles.gridLineRow, { left: "26%" }]} />
-              <View style={[styles.gridLineRow, { left: "58%" }]} />
-              <View style={[styles.gridLineRow, { left: "72%" }]} />
-              <View style={[styles.gridLineRow, { left: "86%" }]} />
-
-              <View style={styles.rowContent}>
-                <View style={[styles.cell, styles.colPos]}>
-                  <Text style={[styles.cellContent, { textAlign: "center" }]}>
-                    4
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.colNumber]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colName]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colQty]}>
-                  <Text
-                    style={[styles.cellContent, { textAlign: "center" }]}
-                  ></Text>
-                </View>
-                <View style={[styles.cell, styles.colReturnQty]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-                <View style={[styles.cell, styles.colReason]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.rowWrap}>
-              <View style={[styles.gridLineRow, { left: "8%" }]} />
-              <View style={[styles.gridLineRow, { left: "26%" }]} />
-              <View style={[styles.gridLineRow, { left: "58%" }]} />
-              <View style={[styles.gridLineRow, { left: "72%" }]} />
-              <View style={[styles.gridLineRow, { left: "86%" }]} />
-
-              <View style={styles.rowContent}>
-                <View style={[styles.cell, styles.colPos]}>
-                  <Text style={[styles.cellContent, { textAlign: "center" }]}>
-                    5
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.colNumber]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colName]}>
-                  <Text style={styles.cellContent}></Text>
-                </View>
-                <View style={[styles.cell, styles.colQty]}>
-                  <Text
-                    style={[styles.cellContent, { textAlign: "center" }]}
-                  ></Text>
-                </View>
-                <View style={[styles.cell, styles.colReturnQty]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-                <View style={[styles.cell, styles.colReason]}>
-                  <Text style={styles.cellContent}> </Text>
-                </View>
-              </View>
-            </View>
+            ))}
           </View>
         </View>
 
