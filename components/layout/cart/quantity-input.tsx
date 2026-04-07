@@ -3,6 +3,9 @@ interface QuantityControlProps {
   onDecrease: () => void;
   onIncrease: () => void;
   isLoading?: boolean;
+  decreaseLabel: string;
+  increaseLabel: string;
+  quantityLabel: string;
   // stock: number;
 }
 
@@ -11,6 +14,9 @@ const QuantityControl = ({
   onDecrease,
   onIncrease,
   isLoading,
+  decreaseLabel,
+  increaseLabel,
+  quantityLabel,
 }: // stock,
 QuantityControlProps) => {
   return (
@@ -18,7 +24,8 @@ QuantityControlProps) => {
       <button
         type="button"
         onClick={onDecrease}
-        className="px-3 py-1 hover:bg-gray-100 disabled:opacity-40 cursor-pointer"
+        aria-label={decreaseLabel}
+        className="min-h-9 min-w-9 px-3 py-1 hover:bg-gray-100 disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-1"
         // disabled={isLoading}
       >
         −
@@ -28,13 +35,15 @@ QuantityControlProps) => {
         type="number"
         value={quantity ?? 0}
         readOnly
-        className="w-10 text-center border-x focus:outline-none bg-white"
+        aria-label={quantityLabel}
+        className="w-12 text-center border-x focus:outline-none bg-white"
       />
 
       <button
         type="button"
         onClick={onIncrease}
-        className="px-3 py-1 hover:bg-gray-100 cursor-pointer"
+        aria-label={increaseLabel}
+        className="min-h-9 min-w-9 px-3 py-1 hover:bg-gray-100 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-1"
         // disabled={isLoading}
       >
         +
