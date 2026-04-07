@@ -154,20 +154,20 @@ export function getStatusStyleDe(raw: string) {
 
     case "tock_reserved":
       return {
-        text: "Wird vorbereitet",
+        text: "In Bearbeitung",
         bg: "bg-[#ffe4e9]",
         color: "text-[#ff4f7b]",
       };
     case "reserved":
       return {
-        text: "Wird vorbereitet",
+        text: "In Bearbeitung",
         bg: "bg-[#ffe4e9]",
         color: "text-[#ff4f7b]",
       };
 
     case "preparation_shipping":
       return {
-        text: "Wird vorbereitet",
+        text: "In Bearbeitung",
         bg: "bg-[#D4EEF9]",
         color: "text-[#29ABE2]",
       };
@@ -188,14 +188,14 @@ export function getStatusStyleDe(raw: string) {
 
     case "shipped":
       return {
-        text: "Versendet",
+        text: "Versandt",
         bg: "bg-[#dcfce7]",
         color: "text-[#22c55e]",
       };
 
     case "completed":
       return {
-        text: "Versendet",
+        text: "Zugestellt",
         bg: "bg-[#dcfce7]",
         color: "text-[#39B54A]",
       };
@@ -237,15 +237,35 @@ export function getStatusStyleDe(raw: string) {
 
     case "return":
       return {
-        text: "Zurückgesendet",
+        text: "Rücksendung",
         bg: "bg-[#FDE9D2]",
         color: "text-[#F7931E]",
       };
     case "return_issue":
       return {
-        text: "Rückerstattung veranlassen",
+        text: "Erstattet",
         bg: "bg-[#FDE9D2]",
         color: "text-[#F7931E]",
+      };
+    case "canceled_no_stock":
+      return {
+        text: "Storniert",
+        bg: "bg-[#FFD2D3]",
+        color: "text-[#FF0000]",
+      };
+
+    case "canceled_wrong_price":
+      return {
+        text: "Storniert",
+        bg: "bg-[#FFD2D3]",
+        color: "text-[#FF0000]",
+      };
+
+    case "canceled":
+      return {
+        text: "Storniert",
+        bg: "bg-[#FFD2D3]",
+        color: "text-[#FF0000]",
       };
 
     default:

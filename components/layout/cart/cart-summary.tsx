@@ -163,6 +163,12 @@ const CartSummary = ({
   ]);
 
   const totalWithDiscount = Math.max(0, total + shipping - discount);
+  const formatCurrency = React.useCallback((value: number) => {
+    return `${Number(value ?? 0).toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} €`;
+  }, []);
 
   return (
     <div className="border-0 shadow-none sticky top-6">
@@ -176,13 +182,13 @@ const CartSummary = ({
             {/* Subtotal */}
             <div className="flex justify-between">
               <span className="text-gray-700">{t("subtotal")}</span>
-              <span>{total.toFixed(2)} €</span>
+              <span>{formatCurrency(total)}</span>
             </div>
 
             {/* Shipping */}
             <div className="flex justify-between">
               <span className="text-gray-700">{t("shipping")}</span>
-              <span>{shipping.toFixed(2)} €</span>
+              <span>{formatCurrency(shipping)}</span>
             </div>
 
             {/* Shipping */}
@@ -191,14 +197,16 @@ const CartSummary = ({
                 <span className="text-secondary underline cursor-pointer">
                   {t("discount")}
                 </span>
-                <span className="text-secondary">-{discount.toFixed(2)} €</span>
+                <span className="text-secondary">
+                  -{formatCurrency(discount)}
+                </span>
               </div>
             )}
 
             {/* Total */}
             <div className="flex justify-between font-semibold text-base">
               <span>{t("totalWithTax")}</span>
-              <span>{totalWithDiscount.toFixed(2)} €</span>
+              <span>{formatCurrency(totalWithDiscount)}</span>
             </div>
           </div>
         )}

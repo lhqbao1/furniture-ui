@@ -388,11 +388,16 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
               onIncrease={handleIncrease}
               onDecrease={handleDecrease}
               isLoading={false} // ❌ KHÔNG block UI
+              decreaseLabel={t("decreaseQuantityAria")}
+              increaseLabel={t("increaseQuantityAria")}
+              quantityLabel={t("quantityAria")}
             />
             <div className="space-x-2">
               <button
-                className="cursor-pointer group"
-                aria-label="Add to wishlist"
+                type="button"
+                onClick={() => handleAddToWishlist(item.id)}
+                className="cursor-pointer group rounded-sm p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-1"
+                aria-label={t("addToWishlistAria")}
               >
                 <Heart
                   size={18}
@@ -402,12 +407,13 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
                   group-hover:text-secondary
                   group-hover:fill-secondary
                 "
-                  onClick={() => handleAddToWishlist(item.id)}
                 />
               </button>
               <button
-                className="cursor-pointer group"
-                aria-label="Add to wishlist"
+                type="button"
+                onClick={() => handleRemove(item.id)}
+                className="cursor-pointer group rounded-sm p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1"
+                aria-label={t("removeFromCartAria")}
               >
                 <Trash
                   size={18}
@@ -417,7 +423,6 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
                   group-hover:text-red-600
                   group-hover:fill-red-600
                 "
-                  onClick={() => handleRemove(item.id)}
                 />
               </button>
             </div>

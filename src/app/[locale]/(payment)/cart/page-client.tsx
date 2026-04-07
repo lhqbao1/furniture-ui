@@ -15,7 +15,7 @@ import {
 import CartTitleSkeleton from "@/components/layout/cart/skeleton/cart-page-heading-skeleton";
 import CartItemSkeleton from "@/components/layout/cart/skeleton/cart-item-card-skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { useRouter } from "@/src/i18n/navigation";
 import { flattenCartItems } from "@/hooks/cart/flattenCart";
 import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
@@ -65,6 +65,15 @@ const CartPageClient = () => {
   const shippingCost = normalized?.length
     ? (calculateShipping(normalized) ?? 0)
     : 0;
+  const activeServerItems = React.useMemo(
+    () => flatItems.filter((item) => item?.is_active),
+    [flatItems],
+  );
+  const activeLocalItems = React.useMemo(
+    () => (localCart ?? []).filter((item) => item?.is_active),
+    [localCart],
+  );
+  const itemCount = userId ? activeServerItems.length : activeLocalItems.length;
 
   const basketTrackingPayload = React.useMemo(() => {
     const lineItems = userId
@@ -181,10 +190,7 @@ const CartPageClient = () => {
               <h3 className="text-3xl font-normal">
                 Warenkorb{" "}
                 <span className="mb-6 capitalize">
-                  (
-                  {userId
-                    ? (cart?.reduce((acc, g) => acc + g.items.length, 0) ?? 0)
-                    : localCart.length}{" "}
+                  ({itemCount}{" "}
                   <span className="capitalize">{t("items")}</span>)
                 </span>
               </h3>
@@ -193,12 +199,28 @@ const CartPageClient = () => {
             <div className="mt-2 md:mt-8 lg:mt-12">
               {!authHydrated || (userId && isLoadingCart) ? (
                 <CartItemSkeleton count={2} />
+              ) : itemCount === 0 ? (
+                <div className="border rounded-xl p-8 md:p-10 text-center bg-white">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+                    <ShoppingCart className="h-7 w-7 text-muted-foreground" />
+                  </div>
+                  <h4 className="text-2xl font-semibold">{t("cartEmptyTitle")}</h4>
+                  <p className="mx-auto mt-2 max-w-xl text-muted-foreground">
+                    {t("cartEmptyDescription")}
+                  </p>
+                  <Button
+                    className="mt-6 h-11 px-7 bg-secondary hover:bg-secondary/90 text-white"
+                    onClick={() => router.push("/shop-all")}
+                  >
+                    {t("continueShopping")}
+                  </Button>
+                </div>
               ) : userId ? (
-                flatItems.map((item) => (
+                activeServerItems.map((item) => (
                   <CartItemCard cartServer={item} key={item.id} />
                 ))
               ) : (
-                localCart.map((item) => (
+                activeLocalItems.map((item) => (
                   <CartItemCard localProducts={item} key={item.product_id} />
                 ))
               )}
