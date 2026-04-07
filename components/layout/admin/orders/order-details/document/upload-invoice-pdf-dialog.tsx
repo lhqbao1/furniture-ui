@@ -17,6 +17,7 @@ import { useUploadCheckoutPdfFile } from "@/features/checkout/hook";
 
 interface UploadInvoicePdfDialogProps {
   mainCheckoutId: string;
+  existingUrls?: string[];
 }
 
 const getErrorMessage = (error: unknown): string => {
@@ -42,6 +43,7 @@ const getErrorMessage = (error: unknown): string => {
 
 const UploadInvoicePdfDialog = ({
   mainCheckoutId,
+  existingUrls = [],
 }: UploadInvoicePdfDialogProps) => {
   const uploadStaticFileMutation = useUploadStaticFile();
   const uploadCheckoutPdfFileMutation = useUploadCheckoutPdfFile();
@@ -51,6 +53,7 @@ const UploadInvoicePdfDialog = ({
 
   const isUploading =
     uploadStaticFileMutation.isPending || uploadCheckoutPdfFileMutation.isPending;
+  const currentFileCount = existingUrls.filter((url) => url?.trim()).length;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -72,6 +75,16 @@ const UploadInvoicePdfDialog = ({
   }, []);
 
   const handleUpload = async () => {
+    if (!mainCheckoutId) {
+      toast.error("Missing checkout id");
+      return;
+    }
+
+    if (currentFileCount >= 2) {
+      toast.error("Maximum 2 package slip files are allowed");
+      return;
+    }
+
     if (!file) {
       toast.error("Please choose a PDF file");
       return;
@@ -90,10 +103,22 @@ const UploadInvoicePdfDialog = ({
         throw new Error("Upload failed: missing file URL");
       }
 
-      await uploadCheckoutPdfFileMutation.mutateAsync({
-        main_checkout_id: mainCheckoutId,
-        url: uploadedUrl,
-      });
+      const normalizedExistingUrls = existingUrls
+        .map((url) => url?.trim())
+        .filter((url): url is string => Boolean(url));
+
+      if (normalizedExistingUrls.length === 0) {
+        await uploadCheckoutPdfFileMutation.mutateAsync({
+          main_checkout_id: mainCheckoutId,
+          url: uploadedUrl,
+        });
+      } else {
+        await uploadCheckoutPdfFileMutation.mutateAsync({
+          main_checkout_id: mainCheckoutId,
+          url: normalizedExistingUrls[0],
+          url_2: uploadedUrl,
+        });
+      }
 
       toast.success("Package slip PDF uploaded", { id: toastId });
       setOpen(false);
@@ -115,11 +140,17 @@ const UploadInvoicePdfDialog = ({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" type="button" size="icon">
+        <Button
+          variant="outline"
+          type="button"
+          className="gap-2"
+          disabled={currentFileCount >= 2}
+        >
           <Upload className="size-4" />
+          Upload ({currentFileCount}/2)
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[560px]">
+      <DialogContent className="sm:max-w-[560px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Upload Package Slip PDF</DialogTitle>
         </DialogHeader>

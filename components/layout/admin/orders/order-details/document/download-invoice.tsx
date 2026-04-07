@@ -16,6 +16,7 @@ interface DownloadInvoiceProps {
   checkoutId: string;
   type: string;
   invoicePdfFile?: string | null;
+  invoicePdfFile2?: string | null;
   mainCheckoutId?: string;
 }
 
@@ -23,13 +24,21 @@ const DownloadInvoice = ({
   checkoutId,
   type,
   invoicePdfFile,
+  invoicePdfFile2,
   mainCheckoutId,
 }: DownloadInvoiceProps) => {
   const deleteCheckoutPdfFileMutation = useDeleteCheckoutPdfFile();
   const normalizedType = String(type ?? "").toLowerCase();
   const isPackageType = normalizedType === "package";
+  const uploadedPackageSlipFiles = React.useMemo(
+    () =>
+      [invoicePdfFile, invoicePdfFile2]
+        .map((url) => url?.trim() ?? "")
+        .filter((url): url is string => Boolean(url)),
+    [invoicePdfFile, invoicePdfFile2],
+  );
   const hasUploadedPackageSlipFile =
-    isPackageType && Boolean(invoicePdfFile && invoicePdfFile.trim().length > 0);
+    isPackageType && uploadedPackageSlipFiles.length > 0;
   const needsGeneratedDocument = !hasUploadedPackageSlipFile;
   const effectiveMainCheckoutId = mainCheckoutId || checkoutId;
   const isDeletingPackageSlip = deleteCheckoutPdfFileMutation.isPending;
@@ -59,7 +68,7 @@ const DownloadInvoice = ({
       ? `package-slip-${effectiveMainCheckoutId}.pdf`
       : `invoice-${effectiveMainCheckoutId}.pdf`;
 
-  const downloadUploadedInvoiceFile = async (url: string) => {
+  const downloadUploadedInvoiceFile = async (url: string, fileIndex?: number) => {
     try {
       const response = await fetch(url, { mode: "cors" });
       const blob = await response.blob();
@@ -67,7 +76,8 @@ const DownloadInvoice = ({
 
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = `package-slip-${effectiveMainCheckoutId}.pdf`;
+      const suffix = typeof fileIndex === "number" ? `-${fileIndex + 1}` : "";
+      a.download = `package-slip-${effectiveMainCheckoutId}${suffix}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -77,18 +87,24 @@ const DownloadInvoice = ({
     }
   };
 
-  const handleDeleteUploadedPackageSlip = async () => {
+  const handleDeleteUploadedPackageSlip = async (targetUrl: string) => {
     if (!effectiveMainCheckoutId) {
       toast.error("Missing checkout id");
       return;
     }
 
-    if (!window.confirm("Delete uploaded package slip PDF?")) return;
+    if (!targetUrl?.trim()) {
+      toast.error("Missing file URL");
+      return;
+    }
+
+    if (!window.confirm("Delete this package slip PDF?")) return;
 
     const toastId = toast.loading("Deleting package slip PDF...");
     try {
       await deleteCheckoutPdfFileMutation.mutateAsync({
         main_checkout_id: effectiveMainCheckoutId,
+        urls: [targetUrl],
       });
       toast.success("Package slip PDF deleted", { id: toastId });
     } catch (error) {
@@ -103,29 +119,40 @@ const DownloadInvoice = ({
 
   return (
     <div className="flex items-center justify-center gap-2">
-      {hasUploadedPackageSlipFile ? (
-        <>
-          <Button
-            variant={"outline"}
-            type="button"
-            onClick={() => void downloadUploadedInvoiceFile(invoicePdfFile!)}
-            disabled={isDeletingPackageSlip}
-          >
-            <DownloadCloud />
-          </Button>
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => void handleDeleteUploadedPackageSlip()}
-            disabled={isDeletingPackageSlip}
-          >
-            {isDeletingPackageSlip ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Trash2 className="size-4 text-red-500" />
-            )}
-          </Button>
-        </>
+      {isPackageType && hasUploadedPackageSlipFile ? (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {uploadedPackageSlipFiles.map((url, index) => (
+            <div
+              key={`${url}-${index}`}
+              className="flex items-center gap-1"
+            >
+              <Button
+                variant={"outline"}
+                size="sm"
+                type="button"
+                onClick={() => void downloadUploadedInvoiceFile(url, index)}
+                disabled={isDeletingPackageSlip}
+                className="gap-1.5"
+              >
+                <DownloadCloud className="size-4" />
+                PDF {index + 1}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                type="button"
+                onClick={() => void handleDeleteUploadedPackageSlip(url)}
+                disabled={isDeletingPackageSlip}
+              >
+                {isDeletingPackageSlip ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Trash2 className="size-4 text-red-500" />
+                )}
+              </Button>
+            </div>
+          ))}
+        </div>
       ) : isCheckoutLoading || isInvoiceLoading || !checkout || !invoice ? (
         <Button variant={"outline"} disabled>
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -172,8 +199,11 @@ const DownloadInvoice = ({
         </Button>
       )}
 
-      {isPackageType && !hasUploadedPackageSlipFile ? (
-        <UploadInvoicePdfDialog mainCheckoutId={effectiveMainCheckoutId} />
+      {isPackageType ? (
+        <UploadInvoicePdfDialog
+          mainCheckoutId={effectiveMainCheckoutId}
+          existingUrls={uploadedPackageSlipFiles}
+        />
       ) : null}
     </div>
   );

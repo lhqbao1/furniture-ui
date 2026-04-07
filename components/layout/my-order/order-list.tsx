@@ -18,7 +18,10 @@ import { cn } from "@/lib/utils";
 import { useAtom } from "jotai";
 import { useRouter } from "@/src/i18n/navigation";
 import { userIdAtom } from "@/store/auth";
-import { getStatusStyle } from "../admin/orders/order-list/status-styles";
+import {
+  getStatusStyle,
+  getStatusStyleDe,
+} from "../admin/orders/order-list/status-styles";
 
 import { getInvoiceByUserId } from "@/features/invoice/api";
 import OrderDetailsDrawer from "./details-drawer";
@@ -84,7 +87,7 @@ const OrderList = () => {
                   <div
                     className={cn(
                       "border-gray-300 rounded-tr-md rounded-tl-md",
-                      getStatusStyle(item.status.toLocaleLowerCase()).bg,
+                      getStatusStyleDe(item.status.toLocaleLowerCase()).bg,
                     )}
                   >
                     <div className="px-2 flex gap-2 items-center">

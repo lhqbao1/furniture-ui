@@ -457,15 +457,19 @@ export function useUploadCheckoutFiles() {
 
 export function useUploadCheckoutPdfFile() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       main_checkout_id,
       url,
+      url_2,
     }: {
       main_checkout_id: string;
       url: string;
-    }) => uploadCheckoutPdfFile(main_checkout_id, url),
-    onSuccess: (data, variables) => {
+      url_2?: string;
+    }) => uploadCheckoutPdfFile(main_checkout_id, url, url_2),
+
+    onSuccess: (_data, variables) => {
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables.main_checkout_id],
       });
@@ -477,10 +481,17 @@ export function useUploadCheckoutPdfFile() {
 
 export function useDeleteCheckoutPdfFile() {
   const qc = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ main_checkout_id }: { main_checkout_id: string }) =>
-      deleteCheckoutPdfFile(main_checkout_id),
-    onSuccess: (data, variables) => {
+    mutationFn: ({
+      main_checkout_id,
+      urls,
+    }: {
+      main_checkout_id: string;
+      urls: string[];
+    }) => deleteCheckoutPdfFile(main_checkout_id, urls),
+
+    onSuccess: (_data, variables) => {
       qc.refetchQueries({
         queryKey: ["checkout-main-id", variables.main_checkout_id],
       });

@@ -15,10 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { CheckOut } from "@/types/checkout";
 import { CartItem, CartResponse, CartResponseItem } from "@/types/cart";
-import { ProductItem } from "@/types/products";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -129,10 +127,7 @@ export default function ReturnItemsPage({ params }: PageProps) {
           const value = selected[item.product_id];
 
           return (
-            <div
-              key={item.product_id}
-              className="space-y-3"
-            >
+            <div key={item.product_id} className="space-y-3">
               <div className="space-y-3">
                 <div className="flex gap-6 items-center">
                   <Checkbox
@@ -205,18 +200,12 @@ export default function ReturnItemsPage({ params }: PageProps) {
                       }))
                     }
                   >
-                    <SelectTrigger
-                      placeholderColor
-                      className="border"
-                    >
+                    <SelectTrigger placeholderColor className="border">
                       <SelectValue placeholder={t("selectReason")} />
                     </SelectTrigger>
                     <SelectContent>
                       {RETURN_REASONS.map((r) => (
-                        <SelectItem
-                          key={r}
-                          value={r}
-                        >
+                        <SelectItem key={r} value={r}>
                           {t(`returnReasons.${r}`)}
                         </SelectItem>
                       ))}
@@ -232,10 +221,7 @@ export default function ReturnItemsPage({ params }: PageProps) {
 
         <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline">{t("cancel")}</Button>
-          <Button
-            disabled={!isValid}
-            onClick={handleSubmit}
-          >
+          <Button disabled={!isValid} onClick={handleSubmit}>
             {t("return")}
           </Button>
         </div>

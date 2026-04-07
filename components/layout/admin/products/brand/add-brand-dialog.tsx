@@ -2,10 +2,7 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -29,7 +26,7 @@ const AddBrandDialog = () => {
         <DialogTrigger asChild>
           <Button variant="secondary">Add Brand</Button>
         </DialogTrigger>
-        <DialogContent className="w-[600px]">
+        <DialogContent className="w-[95vw] max-w-[960px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Brand</DialogTitle>
           </DialogHeader>

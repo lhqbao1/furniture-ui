@@ -19,16 +19,12 @@ import { Input } from "@/components/ui/input";
 import type { BrandResponse } from "@/types/brand";
 import { useCreateBrand, useEditBrand } from "@/features/brand/hook";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { BRAND_COUNTRY_OPTIONS, COUNTRY_OPTIONS } from "@/data/data";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { BRAND_COUNTRY_OPTIONS } from "@/data/data";
 import FormImageUpload from "./image-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 type AddOrEditBrandFormProps = {
   onSuccess?: (brand: BrandResponse) => void;
@@ -43,6 +39,8 @@ export default function AddOrEditBrandForm({
   onClose,
   brandValues,
 }: AddOrEditBrandFormProps) {
+  const [openCountry, setOpenCountry] = React.useState(false);
+
   const form = useForm<BrandFormValues>({
     resolver: zodResolver(brandFormSchema),
     defaultValues: brandValues
@@ -242,32 +240,75 @@ export default function AddOrEditBrandForm({
             control={form.control}
             name="company_country"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
                 <FormLabel>Country</FormLabel>
 
                 <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                  <Popover
+                    open={openCountry}
+                    onOpenChange={setOpenCountry}
                   >
-                    <SelectTrigger
-                      className="w-full border"
-                      placeholderColor
-                    >
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-full justify-between font-normal",
+                          !field.value && "text-muted-foreground",
+                        )}
+                        type="button"
+                        aria-expanded={openCountry}
+                      >
+                        {field.value
+                          ? (BRAND_COUNTRY_OPTIONS.find((c) => c.value === field.value)?.label ?? "Select country")
+                          : "Select country"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
 
-                    <SelectContent className="max-h-80">
-                      {BRAND_COUNTRY_OPTIONS.map((c) => (
-                        <SelectItem
-                          key={c.value}
-                          value={c.value}
-                        >
-                          {c.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <PopoverContent
+                      usePortal={false}
+                      align="start"
+                      className="w-[var(--radix-popover-trigger-width)] p-0"
+                    >
+                      <Command>
+                        <CommandInput placeholder="Search country..." />
+                        <CommandList className="max-h-64 overflow-y-auto">
+                          <CommandEmpty>No country found.</CommandEmpty>
+                          <CommandGroup>
+                            {BRAND_COUNTRY_OPTIONS.map((c) => {
+                              const optionLabel =
+                                c.value === "US"
+                                  ? `${c.label} (USA)`
+                                  : c.label;
+
+                              return (
+                                <CommandItem
+                                  key={c.value}
+                                  value={`${c.label} ${c.value} ${optionLabel}`.toLowerCase()}
+                                  className="cursor-pointer"
+                                  onSelect={() => {
+                                    field.onChange(c.value);
+                                    setOpenCountry(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === c.value
+                                        ? "opacity-100"
+                                        : "opacity-0",
+                                    )}
+                                  />
+                                  {optionLabel}
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </FormControl>
 
                 <FormMessage />

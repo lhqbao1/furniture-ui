@@ -15,6 +15,9 @@ const OrderDetailOverView = ({
   status,
   order,
 }: OrderDetailOverViewProps) => {
+  const rawChannel = order.from_marketplace?.trim();
+  const channelLabel = rawChannel ? rawChannel.toUpperCase() : "Prestige Home";
+
   return (
     <div className="col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
       <div className="flex items-center justify-between">
@@ -27,8 +30,8 @@ const OrderDetailOverView = ({
       <div className="space-y-2.5 text-sm">
         <div className="flex items-center justify-between gap-3">
           <div className="text-slate-500">Channel</div>
-          <div className="font-semibold uppercase text-slate-900">
-            {order.from_marketplace || "-"}
+          <div className="font-semibold text-slate-900">
+            {channelLabel}
           </div>
         </div>
         <div className="flex items-center justify-between gap-3">
