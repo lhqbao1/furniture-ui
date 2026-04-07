@@ -32,9 +32,12 @@ const DownloadInvoice = ({
   const isPackageType = normalizedType === "package";
   const uploadedPackageSlipFiles = React.useMemo(
     () =>
-      [invoicePdfFile, invoicePdfFile2]
-        .map((url) => url?.trim() ?? "")
-        .filter((url): url is string => Boolean(url)),
+      [
+        { key: "url" as const, url: invoicePdfFile?.trim() ?? "" },
+        { key: "url_2" as const, url: invoicePdfFile2?.trim() ?? "" },
+      ].filter((file): file is { key: "url" | "url_2"; url: string } =>
+        Boolean(file.url),
+      ),
     [invoicePdfFile, invoicePdfFile2],
   );
   const hasUploadedPackageSlipFile =
@@ -87,14 +90,16 @@ const DownloadInvoice = ({
     }
   };
 
-  const handleDeleteUploadedPackageSlip = async (targetUrl: string) => {
+  const handleDeleteUploadedPackageSlip = async (
+    targetKey: "url" | "url_2",
+  ) => {
     if (!effectiveMainCheckoutId) {
       toast.error("Missing checkout id");
       return;
     }
 
-    if (!targetUrl?.trim()) {
-      toast.error("Missing file URL");
+    if (!targetKey) {
+      toast.error("Missing file key");
       return;
     }
 
@@ -104,7 +109,7 @@ const DownloadInvoice = ({
     try {
       await deleteCheckoutPdfFileMutation.mutateAsync({
         main_checkout_id: effectiveMainCheckoutId,
-        urls: [targetUrl],
+        urls: [targetKey],
       });
       toast.success("Package slip PDF deleted", { id: toastId });
     } catch (error) {
@@ -121,16 +126,16 @@ const DownloadInvoice = ({
     <div className="flex items-center justify-center gap-2">
       {isPackageType && hasUploadedPackageSlipFile ? (
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {uploadedPackageSlipFiles.map((url, index) => (
+          {uploadedPackageSlipFiles.map((file, index) => (
             <div
-              key={`${url}-${index}`}
+              key={`${file.key}-${file.url}-${index}`}
               className="flex items-center gap-1"
             >
               <Button
                 variant={"outline"}
                 size="sm"
                 type="button"
-                onClick={() => void downloadUploadedInvoiceFile(url, index)}
+                onClick={() => void downloadUploadedInvoiceFile(file.url, index)}
                 disabled={isDeletingPackageSlip}
                 className="gap-1.5"
               >
@@ -141,7 +146,7 @@ const DownloadInvoice = ({
                 variant="outline"
                 size="icon"
                 type="button"
-                onClick={() => void handleDeleteUploadedPackageSlip(url)}
+                onClick={() => void handleDeleteUploadedPackageSlip(file.key)}
                 disabled={isDeletingPackageSlip}
               >
                 {isDeletingPackageSlip ? (
@@ -202,7 +207,7 @@ const DownloadInvoice = ({
       {isPackageType ? (
         <UploadInvoicePdfDialog
           mainCheckoutId={effectiveMainCheckoutId}
-          existingUrls={uploadedPackageSlipFiles}
+          existingUrls={uploadedPackageSlipFiles.map((file) => file.url)}
         />
       ) : null}
     </div>
