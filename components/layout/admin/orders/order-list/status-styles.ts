@@ -188,7 +188,7 @@ export function getStatusStyleDe(raw: string) {
 
     case "shipped":
       return {
-        text: "Zugestellt",
+        text: "Versendet",
         bg: "bg-[#dcfce7]",
         color: "text-[#22c55e]",
       };

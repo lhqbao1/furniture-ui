@@ -149,6 +149,22 @@ export function AdminCheckOutUserInformation({
     name: "email",
   });
 
+  const fromMarketplace = useWatch({
+    control: form.control,
+    name: "from_marketplace",
+  });
+
+  const normalizedMarketplace = String(fromMarketplace ?? "")
+    .trim()
+    .toLowerCase();
+  const isPrestigeMarketplace =
+    normalizedMarketplace === "" ||
+    normalizedMarketplace === "prestige" ||
+    normalizedMarketplace === "prestige home" ||
+    normalizedMarketplace === "prestige-home" ||
+    normalizedMarketplace === "prestige_home";
+  const shouldForceB2C = !isPrestigeMarketplace;
+
   const applySavedUserToForm = (savedUser: InformationManualOrderResponse) => {
     const fullName = [savedUser.first_name?.trim(), savedUser.last_name?.trim()]
       .filter(Boolean)
@@ -305,6 +321,17 @@ export function AdminCheckOutUserInformation({
     );
   }, [email, phoneNumber, firstName, lastName, setValue]);
 
+  useEffect(() => {
+    if (!shouldForceB2C) return;
+
+    if (form.getValues("is_b2b") === true) {
+      form.setValue("is_b2b", false, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+  }, [shouldForceB2C, form]);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between rounded-xl border border-secondary/20 bg-secondary/10 px-4 py-3">
@@ -337,7 +364,13 @@ export function AdminCheckOutUserInformation({
                 </FormLabel>
                 <FormControl>
                   <RadioGroup
-                    onValueChange={(val) => field.onChange(val === "true")}
+                    onValueChange={(val) => {
+                      if (shouldForceB2C && val === "true") {
+                        field.onChange(false);
+                        return;
+                      }
+                      field.onChange(val === "true");
+                    }}
                     value={
                       typeof field.value === "boolean"
                         ? String(field.value)
@@ -351,6 +384,7 @@ export function AdminCheckOutUserInformation({
                           value="true"
                           id="order-type-b2b"
                           className="peer sr-only"
+                          disabled={shouldForceB2C}
                         />
                       </FormControl>
                       <Label
@@ -360,6 +394,8 @@ export function AdminCheckOutUserInformation({
                           field.value === true
                             ? "border-secondary bg-secondary/15 text-secondary shadow-sm"
                             : "border-border bg-background hover:border-secondary/40 hover:bg-secondary/5",
+                          shouldForceB2C &&
+                            "cursor-not-allowed opacity-50 hover:border-border hover:bg-background",
                         )}
                       >
                         <Building2 className="size-5 shrink-0" />
@@ -368,6 +404,11 @@ export function AdminCheckOutUserInformation({
                           <span className="text-xs text-muted-foreground">
                             Business customer
                           </span>
+                          {shouldForceB2C && (
+                            <span className="text-xs text-muted-foreground">
+                              Available only for Prestige Home
+                            </span>
+                          )}
                         </div>
                       </Label>
                     </FormItem>

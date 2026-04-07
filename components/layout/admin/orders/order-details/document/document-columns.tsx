@@ -12,11 +12,13 @@ export type DocumentRow = {
 
 interface DocumentColumnsProps {
   invoicePdfFile?: string | null;
+  invoicePdfFile2?: string | null;
   mainCheckoutId?: string;
 }
 
 export const documentColumns = ({
   invoicePdfFile,
+  invoicePdfFile2,
   mainCheckoutId,
 }: DocumentColumnsProps): ColumnDef<DocumentRow>[] => [
   {
@@ -43,6 +45,7 @@ export const documentColumns = ({
           checkoutId={row.original.checkOutId ?? ""}
           type={row.original.viewType ?? ""}
           invoicePdfFile={invoicePdfFile}
+          invoicePdfFile2={invoicePdfFile2}
           mainCheckoutId={mainCheckoutId ?? row.original.checkOutId}
         />
       );

@@ -97,6 +97,7 @@ export interface CheckOutMain {
   id: string;
   checkout_code: string;
   invoice_pdf_file?: string | null;
+  invoice_pdf_file_2?: string | null;
   status: string;
   note: string;
   total_amount_item: number;

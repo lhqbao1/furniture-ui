@@ -347,22 +347,33 @@ export async function uploadCheckoutFiles(
 export async function uploadCheckoutPdfFile(
   main_checkout_id: string,
   url: string,
+  url_2?: string,
 ) {
   const { data } = await apiAdmin.put(
     `/checkout/pdf-file/${main_checkout_id}`,
     null,
     {
-      params: { url },
+      params: {
+        url,
+        ...(url_2 ? { url_2 } : {}),
+      },
     },
   );
 
   return data as CheckoutPdfFileResponse;
 }
 
-export async function deleteCheckoutPdfFile(main_checkout_id: string) {
+export async function deleteCheckoutPdfFile(
+  main_checkout_id: string,
+  urls: string[],
+) {
   const { data } = await apiAdmin.delete(
     `/checkout/pdf-file/${main_checkout_id}`,
+    {
+      data: urls, // 👈 QUAN TRỌNG
+    },
   );
+
   return data as CheckoutPdfFileResponse;
 }
 
