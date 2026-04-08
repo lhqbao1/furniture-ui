@@ -13,10 +13,11 @@ interface SendTrackingVariables {
   payload: SendTrackingInput;
 }
 // --- GET ALL BRANDS ---
-export function useGetSuppliers() {
+export function useGetSuppliers(enabled = true) {
   return useQuery({
     queryKey: ["suppliers"],
     queryFn: () => getSupplier(),
+    enabled,
     retry: false,
   });
 }

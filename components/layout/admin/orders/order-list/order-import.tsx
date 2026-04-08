@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,20 +10,26 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useDropzone } from "react-dropzone";
-import { File } from "lucide-react";
+import { Check, ChevronsUpDown, File } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
 import { createManualCheckOut } from "@/features/checkout/api";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import ExportExampleOrderExcelButton from "./export-example-button";
+import { cn } from "@/lib/utils";
 
 type MarketplacePreset = {
   company_name: string;
@@ -74,6 +80,25 @@ type NormalizedOrder = {
 };
 
 type GroupedOrder = ManualCreateOrderFormValues;
+
+const CHANNEL_OPTIONS = [
+  { value: "amazon", label: "Amazon" },
+  { value: "inprodius", label: "Inprodius" },
+  { value: "netto", label: "Netto" },
+  { value: "freakout", label: "FreakOut" },
+  { value: "praktiker", label: "Praktiker" },
+  { value: "norma", label: "Norma24" },
+  { value: "check24", label: "Check24" },
+  { value: "channel21", label: "Channel21" },
+  { value: "hornbach", label: "Hornbach" },
+  { value: "forstinger", label: "Forstinger" },
+  { value: "neckermann", label: "Neckermann" },
+  { value: "bauhaus", label: "Bauhaus" },
+  { value: "bader", label: "Bader" },
+  { value: "euro-tops", label: "Euro Tops" },
+  { value: "XXXLUTZ", label: "XXXLUTZ" },
+  { value: "prestige", label: "Prestige Home" },
+] as const;
 
 const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
   netto: {
@@ -262,10 +287,19 @@ const OrderImport = () => {
   const [channel, setChannel] = useState<string | null>(null);
   const [orders, setOrders] = useState<GroupedOrder[]>([]);
   const [open, setOpen] = useState(false);
+  const [openChannel, setOpenChannel] = useState(false);
+  const sortedChannelOptions = useMemo(
+    () =>
+      [...CHANNEL_OPTIONS].sort((a, b) =>
+        a.label.localeCompare(b.label, "de", { sensitivity: "base" }),
+      ),
+    [],
+  );
 
   const clearFormState = () => {
     setFile(null);
     setOrders([]);
+    setOpenChannel(false);
   };
 
   const onDrop = (files: File[]) => {
@@ -444,33 +478,51 @@ const OrderImport = () => {
 
         {/* CHOOSE CHANNEL FIRST */}
         <div className="mt-2">
-          <Select
-            onValueChange={setChannel}
-            defaultValue={channel ?? undefined}
-          >
-            <SelectTrigger className="border" placeholderColor>
-              <SelectValue placeholder="Select channel" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="amazon">Amazon</SelectItem>
-              <SelectItem value="inprodius">Inprodius</SelectItem>
-              <SelectItem value="netto">Netto</SelectItem>
-              <SelectItem value="freakout">FreakOut</SelectItem>
-              <SelectItem value="praktiker">Praktiker</SelectItem>
-              <SelectItem value="norma">Norma24</SelectItem>
-              <SelectItem value="check24">Check24</SelectItem>
-              <SelectItem value="channel21">Channel21</SelectItem>
-              <SelectItem value="hornbach">Hornbach</SelectItem>
-              <SelectItem value="forstinger">Forstinger</SelectItem>
-              <SelectItem value="neckermann">Neckermann</SelectItem>
-              <SelectItem value="bauhaus">Bauhaus</SelectItem>
-              <SelectItem value="bader">Bader</SelectItem>
-
-              <SelectItem value="euro-tops">Euro Tops</SelectItem>
-              <SelectItem value="XXXLUTZ">XXXLUTZ</SelectItem>
-              <SelectItem value="prestige">Prestige Home</SelectItem>
-            </SelectContent>
-          </Select>
+          <Popover open={openChannel} onOpenChange={setOpenChannel}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between font-normal"
+              >
+                {channel
+                  ? CHANNEL_OPTIONS.find((item) => item.value === channel)
+                      ?.label
+                  : "Select channel"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              usePortal={false}
+              className="w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto z-[120]"
+            >
+              <Command>
+                <CommandInput placeholder="Search channel..." />
+                <CommandEmpty>No channel found.</CommandEmpty>
+                <CommandGroup className="max-h-56 overflow-y-auto">
+                  {sortedChannelOptions.map((item) => (
+                    <CommandItem
+                      key={item.value}
+                      value={`${item.label} ${item.value}`}
+                      onSelect={() => {
+                        setChannel(item.value);
+                        setOpenChannel(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          channel === item.value ? "opacity-100" : "opacity-0",
+                        )}
+                      />
+                      {item.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* DROPZONE */}

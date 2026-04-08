@@ -6,37 +6,34 @@ const StaticFileSchema = z.object({
   url: z.string(),
 });
 
+const requiredNonNegativeNumber = (label: string) =>
+  z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) {
+        return null;
+      }
+      return value;
+    },
+    z
+      .number({
+        error: (issue) =>
+          issue.input === null || issue.input === undefined
+            ? `${label} is required`
+            : `${label} must be a valid number`,
+      })
+      .nonnegative({
+        message: `${label} must be at least 0`,
+      }),
+  );
+
 export const packageSchema = z
   .object({
-    weight: z.number().nonnegative().optional().nullable(),
-    length: z.number().nonnegative().optional().nullable(),
-    width: z.number().nonnegative().optional().nullable(),
-    height: z.number().nonnegative().optional().nullable(),
+    weight: requiredNonNegativeNumber("Package weight"),
+    length: requiredNonNegativeNumber("Package length"),
+    width: requiredNonNegativeNumber("Package width"),
+    height: requiredNonNegativeNumber("Package height"),
   })
-  .superRefine((pkg, ctx) => {
-    const fields = ["length", "width", "height", "weight"] as const;
-
-    const filledFields = fields.filter(
-      (key) => pkg[key] !== null && pkg[key] !== undefined,
-    );
-
-    // ❌ nhập dở dang (1–3 field)
-    if (filledFields.length > 0 && filledFields.length < 4) {
-      fields.forEach((key) => {
-        const value = pkg[key];
-
-        // 👉 CHỈ báo lỗi cho field còn thiếu
-        if (value === null || value === undefined) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              "If you enter package dimensions, all fields are required.",
-            path: [key], // 👈 field cụ thể
-          });
-        }
-      });
-    }
-  });
+  .strict();
 
 export const addProductDSPSchema = z.object({
   name: z
@@ -45,8 +42,8 @@ export const addProductDSPSchema = z.object({
     .max(80, "Product name must be less than 80 characters"),
   description: z.string().optional().nullable(),
   price: z.number().nonnegative().optional().nullable(),
-  cost: z.number().optional().nullable(),
-  delivery_cost: z.number().optional().nullable(),
+  cost: requiredNonNegativeNumber("Purchase price"),
+  delivery_cost: requiredNonNegativeNumber("Delivery cost"),
   discount_percent: z.number().nonnegative().optional(),
   discount_amount: z.number().nonnegative().optional(),
   final_price: z.number().optional().nullable(),
@@ -67,13 +64,13 @@ export const addProductDSPSchema = z.object({
   delivery_time: z.string().optional().nullable(),
   manufacture_country: z.string().optional().nullable(),
   tariff_number: z.string().optional().nullable(),
-  brand_id: z.string().min(1, { message: "Brand is required" }),
+  brand_id: z.string().optional().nullable(),
   ebay: z.boolean().optional().nullable(),
   // weight: z.number().min(1, "You must provide product weight").nonnegative(),
-  weight: z.number().optional().nullable(),
-  length: z.number().optional().nullable(),
-  width: z.number().optional().nullable(),
-  height: z.number().optional().nullable(),
+  weight: requiredNonNegativeNumber("Weight"),
+  length: requiredNonNegativeNumber("Length"),
+  width: requiredNonNegativeNumber("Width"),
+  height: requiredNonNegativeNumber("Height"),
 
   is_active: z.boolean(),
   tag: z.string().optional().nullable(),
@@ -93,7 +90,9 @@ export const addProductDSPSchema = z.object({
   meta_keywords: z.string().optional().nullable(),
 
   pallet_unit: z.string().optional().nullable(),
-  packages: z.array(packageSchema).optional(),
+  packages: z
+    .array(packageSchema)
+    .min(1, { message: "At least one package is required" }),
   // category_ids: z.array(z.string()).min(1, { message: "Please select at least one category" })
 });
 

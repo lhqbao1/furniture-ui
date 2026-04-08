@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import { addProductSchema, ProductInput } from "@/lib/schema/product";
 import { useRouter } from "@/src/i18n/navigation";
 import { useLocale } from "next-intl";
-import { useAddProduct, useEditProduct } from "@/features/products/hook";
 import { ProductItem } from "@/types/products";
 import { normalizeProductValues } from "@/components/layout/admin/products/products-form/normalize-product-values";
 import { submitProductDSP } from "./submit-handler";
@@ -14,7 +12,7 @@ import {
   addProductDSPSchema,
   defaultValuesDSP,
 } from "@/lib/schema/dsp/product";
-import { useAddProductDSP } from "@/features/dsp/products/hook";
+import { useAddProductDSP, useEditProductDSP } from "@/features/dsp/products/hook";
 
 export const useProductFormDSP = ({
   productValues,
@@ -25,15 +23,15 @@ export const useProductFormDSP = ({
 }) => {
   const router = useRouter();
   const locale = useLocale();
-  const editProductMutation = useEditProduct();
+  const editProductMutation = useEditProductDSP();
   const addProductMutation = useAddProductDSP();
   const [isLoadingSEO, setIsLoadingSEO] = useState(false);
 
   type FormValues = z.infer<typeof addProductDSPSchema>;
 
   const initialValues: FormValues = normalizeProductValues(
-  productValuesClone || defaultValuesDSP,
-);
+    productValuesClone || defaultValuesDSP,
+  );
 
   const form = useForm<z.infer<typeof addProductDSPSchema>>({
     resolver: zodResolver(addProductDSPSchema),
@@ -49,9 +47,8 @@ export const useProductFormDSP = ({
     }
   }, [productValuesClone, productValues, form]);
 
-  const onSubmit = (values: ProductInput) => {
+  const onSubmit = () => {
     submitProductDSP({
-      values,
       productValues,
       productValuesClone,
       addProductMutation,

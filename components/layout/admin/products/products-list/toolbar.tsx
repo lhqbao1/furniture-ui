@@ -63,6 +63,7 @@ interface TableToolbarProps {
   columnOptions?: { id: string; label: string; alwaysVisible?: boolean }[];
   columnVisibility?: Record<string, boolean>;
   onColumnVisibilityChange?: (columnId: string, visible: boolean) => void;
+  isDSP?: boolean;
 }
 
 type ImageFile = {
@@ -87,6 +88,7 @@ export default function TableToolbar({
   columnOptions,
   columnVisibility,
   onColumnVisibilityChange,
+  isDSP = false,
 }: TableToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -148,58 +150,62 @@ export default function TableToolbar({
     <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
       <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-1">
-              Group action <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              onClick={() => setOpenUpdateStatus(true)}
-              className="cursor-pointer"
-            >
-              Update Status
-            </DropdownMenuItem>
+        {!isDSP && (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-1">
+                  Group action <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() => setOpenUpdateStatus(true)}
+                  className="cursor-pointer"
+                >
+                  Update Status
+                </DropdownMenuItem>
 
-            <DropdownMenuItem>
-              <ExportSelectedProducts product_ids={product_ids ?? []} />
-            </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <ExportSelectedProducts product_ids={product_ids ?? []} />
+                </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onSelect={() => setOpenEanDrawer(true)}
-            >
-              EAN
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onSelect={() => setOpenEanDrawer(true)}
+                >
+                  EAN
+                </DropdownMenuItem>
+              </DropdownMenuContent>
 
-          <UpdateStatusDialog
-            open={openUpdateStatus}
-            onOpenChange={setOpenUpdateStatus}
-            productIds={product_ids ?? []}
-          />
-          <EANDrawer
-            product_ids={product_ids ?? []}
-            open={openEanDrawer}
-            onOpenChange={setOpenEanDrawer}
-          />
-        </DropdownMenu>
+              <UpdateStatusDialog
+                open={openUpdateStatus}
+                onOpenChange={setOpenUpdateStatus}
+                productIds={product_ids ?? []}
+              />
+              <EANDrawer
+                product_ids={product_ids ?? []}
+                open={openEanDrawer}
+                onOpenChange={setOpenEanDrawer}
+              />
+            </DropdownMenu>
 
-        <div className="flex gap-2 text-sm font-medium">
-          <DropdownMenu>
-            {/* <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Export <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger> */}
+            <div className="flex gap-2 text-sm font-medium">
+              <DropdownMenu>
+                {/* <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    Export <ChevronDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger> */}
 
-            <DropdownMenuContent className="w-150 p-4 space-y-4">
-              <FilterExportForm />
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <ImportDialog setIsImporting={setIsImporting} isSupplier />
-        </div>
+                <DropdownMenuContent className="w-150 p-4 space-y-4">
+                  <FilterExportForm />
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ImportDialog setIsImporting={setIsImporting} isSupplier />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Search (auto, no button) */}
@@ -262,7 +268,7 @@ export default function TableToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[800px] px-8 py-4">
-            {type === ToolbarType.product && <FilterForm />}
+            {type === ToolbarType.product && <FilterForm isDSP={isDSP} />}
             {type === ToolbarType.order && <OrderFilterForm />}
           </DropdownMenuContent>
         </DropdownMenu>

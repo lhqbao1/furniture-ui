@@ -28,6 +28,10 @@ const SupplierOrderDetails = () => {
   if (isLoading) return <SupplierOrderDetailsSkeleton />;
   if (isError) return <div>Error loading order</div>;
   if (!order) return <div>Error loading order</div>;
+  const orderStatus = order.status?.toLowerCase?.() ?? "";
+  const shouldShowShipmentInput =
+    !order.shipment &&
+    (orderStatus === "preparation_shipping" || orderStatus === "paid");
 
   return (
     <div className="space-y-12 pb-20 mt-6">
@@ -61,13 +65,11 @@ const SupplierOrderDetails = () => {
         hasHeaderBackGround
       />
 
-      {(!order.shipment &&
-        order.status.toLowerCase() === "preparation_shipping") ||
-        (order.status.toLowerCase() === "paid" && (
-          <div className="w-full md:w-1/2">
-            <ShipmentInput checkoutId={order.id} />
-          </div>
-        ))}
+      {shouldShowShipmentInput && (
+        <div className="w-full md:w-1/2">
+          <ShipmentInput checkoutId={order.id} />
+        </div>
+      )}
     </div>
   );
 };

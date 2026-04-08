@@ -1,7 +1,54 @@
 import { toast } from "sonner";
 
+type SubmitProductValues = {
+  brand_id?: string | null;
+  weight?: number | null;
+  delivery_cost?: number | null;
+  width?: number | null;
+  height?: number | null;
+  length?: number | null;
+  cost?: number | null;
+  final_price?: number | null;
+  price?: number | null;
+  stock?: number | null;
+  bundles?: unknown[] | null;
+  tag?: string | null;
+  is_active?: boolean | null;
+  pdf_files?: unknown[] | null;
+  [key: string]: unknown;
+};
+
+type MutationLike = {
+  mutate: (
+    payload: unknown,
+    options?: {
+      onSuccess?: () => void;
+      onError?: () => void;
+    },
+  ) => void;
+};
+
+type RouterLike = {
+  push: (url: string, options?: { locale?: string }) => void;
+  refresh: () => void;
+};
+
+type FormLike = {
+  getValues: () => SubmitProductValues;
+  reset: () => void;
+};
+
+type SubmitProductDSPArgs = {
+  productValues?: { id?: string | null } | null;
+  productValuesClone?: unknown;
+  addProductMutation: MutationLike;
+  editProductMutation: MutationLike;
+  router: RouterLike;
+  locale: string;
+  form: FormLike;
+};
+
 export const submitProductDSP = async ({
-  values,
   productValues,
   productValuesClone,
   addProductMutation,
@@ -9,8 +56,13 @@ export const submitProductDSP = async ({
   router,
   locale,
   form,
-}: any) => {
+}: SubmitProductDSPArgs) => {
   const latestValues = form.getValues();
+  const normalizedBrandId =
+    typeof latestValues.brand_id === "string" &&
+    latestValues.brand_id.trim().length > 0
+      ? latestValues.brand_id.trim()
+      : null;
 
   const payload = {
     ...latestValues, // 👈 Thay values bằng latestValues
@@ -45,20 +97,20 @@ export const submitProductDSP = async ({
       latestValues.bundles && latestValues.bundles?.length > 0 ? true : false,
     tag: latestValues.tag === "" ? undefined : latestValues.tag,
     is_active: productValuesClone ? false : latestValues.is_active ?? true,
-    brand_id: latestValues.brand_id,
+    brand_id: normalizedBrandId ?? undefined,
     pdf_files: latestValues.pdf_files ?? [],
   };
 
   if (productValuesClone) {
-    const { marketplace_products, ...cleanPayload } = payload;
-
-    const { url_key, meta_title, meta_description, meta_keywords, ...rest } =
-      cleanPayload;
-
     const finalPayload = {
-      ...rest,
+      ...payload,
       ebay: false,
     };
+    delete finalPayload.marketplace_products;
+    delete finalPayload.url_key;
+    delete finalPayload.meta_title;
+    delete finalPayload.meta_description;
+    delete finalPayload.meta_keywords;
 
     addProductMutation.mutate(finalPayload, {
       onSuccess: () => {
@@ -77,7 +129,7 @@ export const submitProductDSP = async ({
 
   if (productValues) {
     editProductMutation.mutate(
-      { id: productValues.id ?? "", input: payload },
+      { product_id: productValues.id ?? "", input: payload },
       {
         onSuccess: () => {
           toast.success("Product updated successfully");

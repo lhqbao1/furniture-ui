@@ -85,6 +85,21 @@ const GpsrInput = () => {
                       <CommandEmpty>No brand found.</CommandEmpty>
                       <CommandList className="max-h-[400px]">
                         <CommandGroup>
+                          <CommandItem
+                            value="No brand"
+                            onSelect={() => {
+                              field.onChange(null);
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                !field.value ? "opacity-100" : "opacity-0",
+                              )}
+                            />
+                            No brand
+                          </CommandItem>
                           {brands?.map((b) => (
                             <CommandItem
                               key={b.id}
