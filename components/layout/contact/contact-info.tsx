@@ -79,23 +79,6 @@ const ContactInfo = () => {
             </div>
           </div>
         </div>
-
-        <div className="rounded-2xl border border-[#EBEEF2] bg-[#F8FAFC] p-4">
-          <div className="flex items-start gap-3">
-            <span className="inline-flex h-10 w-10 mt-0.5 items-center justify-center rounded-xl bg-[#f3f4f6] text-primary">
-              <MapPin className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-[#667085]">
-                Adresse
-              </p>
-              <p className="text-base font-semibold text-[#0f172a]">
-                Greifswalder Straße 226
-              </p>
-              <p className="text-sm text-[#475467]">10405 Berlin</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="rounded-2xl bg-[#101828] px-4 py-3 mt-auto">
