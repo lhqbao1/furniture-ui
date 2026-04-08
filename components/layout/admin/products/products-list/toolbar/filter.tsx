@@ -8,7 +8,11 @@ import SupplierFilter from "./filter/supplier-filter";
 import BrandFilter from "./filter/brand/brand-filter";
 import FilterExportForm from "./filter-export-dialog";
 
-export default function FilterForm() {
+interface FilterFormProps {
+  isDSP?: boolean;
+}
+
+export default function FilterForm({ isDSP = false }: FilterFormProps) {
   const router = useRouter();
   const pathname = usePathname(); // ví dụ "/admin/products"
 
@@ -22,7 +26,7 @@ export default function FilterForm() {
 
       <ProductStatusFilter />
 
-      <SupplierFilter />
+      {!isDSP && <SupplierFilter />}
 
       <BrandFilter />
 

@@ -47,7 +47,7 @@ const ImportDialog = ({
   const [openSupplier, setOpenSupplier] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
 
-  const { data: listSuppliers } = useGetSuppliers();
+  const { data: listSuppliers } = useGetSuppliers(isSupplier && open);
 
   const importProductMutation = useImportProducts();
   const importProductForSupplierMutation = useImportProductsSupplier();

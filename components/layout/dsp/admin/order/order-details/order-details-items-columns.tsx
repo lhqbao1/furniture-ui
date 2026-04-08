@@ -1,13 +1,8 @@
 import { getShippingStatusStyle } from "@/components/layout/admin/orders/order-list/status-styles";
-import {
-  formatDate,
-  formatDateString,
-  formatDateTimeString,
-} from "@/lib/date-formated";
+import { formatDateString } from "@/lib/date-formated";
 import { CartItem } from "@/types/cart";
 import { CheckOut } from "@/types/checkout";
 import { ColumnDef } from "@tanstack/react-table";
-import Image from "next/image";
 
 export function orderDetailItemColumnSupplier(
   order: CheckOut,
@@ -39,7 +34,7 @@ export function orderDetailItemColumnSupplier(
 
     {
       accessorKey: "status",
-      header: () => <div className="text-center w-full">STATUS</div>,
+      header: () => <div className="text-center w-full">Status</div>,
       cell: ({ row }) => {
         const raw = order.status?.toLowerCase() ?? "";
         const { text, bg, color } = getShippingStatusStyle(raw);
@@ -71,15 +66,20 @@ export function orderDetailItemColumnSupplier(
     },
 
     {
+      accessorKey: "quantity",
+      header: () => <div className="text-center w-full">Quantity</div>,
+      cell: ({ row }) => (
+        <div className="text-center">{row.original.quantity}</div>
+      ),
+    },
+
+    {
       accessorKey: "invoice_amount",
-      header: () => <div className="text-center w-full">UNIT PRICE</div>,
+      header: () => <div className="text-center w-full">Unit Price</div>,
       cell: ({ row }) => (
         <div className="text-center">
           €
-          {(row.original.purchased_products
-            ? row.original.purchased_products.final_price
-            : row.original.products.final_price
-          ).toLocaleString("de-DE", {
+          {(row.original.products.cost ?? 0).toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
@@ -88,25 +88,12 @@ export function orderDetailItemColumnSupplier(
     },
 
     {
-      accessorKey: "quantity",
-      header: () => <div className="text-center w-full">QUANTITY</div>,
-      cell: ({ row }) => (
-        <div className="text-center">{row.original.quantity}</div>
-      ),
-    },
-
-    {
       accessorKey: "total_invoice_amount",
-      header: () => <div className="text-center w-full">TOTAL AMOUNT</div>,
+      header: () => <div className="text-center w-full">Shipping Costs</div>,
       cell: ({ row }) => (
         <div className="text-center">
           €
-          {(
-            row.original.quantity *
-            (row.original.purchased_products
-              ? row.original.purchased_products.final_price
-              : row.original.products.final_price)
-          ).toLocaleString("de-DE", {
+          {(row.original.products.delivery_cost ?? 0).toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}

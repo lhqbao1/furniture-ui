@@ -46,6 +46,7 @@ const ProductListDSP = () => {
         setSearchQuery={setSearchQuery}
         setPage={setPage}
         type={ToolbarType.product}
+        isDSP
         // type={ToolbarType.product}
         // showAll={showAll}
         // setShowAll={setShowAll} // 🔥 truyền vào toolbar

@@ -86,10 +86,7 @@ function EditDSPriceCell({ product }: { product: ProductItem }) {
           )}
         />
       ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
           {product.ds_price ? (
             <div className="text-right">€{product.ds_price?.toFixed(2)}</div>
           ) : (
@@ -172,10 +169,7 @@ function EditDeliveryChargeCell({ product }: { product: ProductItem }) {
           )}
         />
       ) : (
-        <div
-          className="cursor-pointer"
-          onClick={() => setEditing(true)}
-        >
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
           {product.delivery_charge ? (
             <div className="text-right">
               €{product.delivery_charge?.toFixed(2)}
@@ -199,10 +193,7 @@ export const getDsPriceColumn = (
       const image = row.original.static_files?.[0]?.url;
 
       return (
-        <HoverCard
-          openDelay={100}
-          closeDelay={100}
-        >
+        <HoverCard openDelay={100} closeDelay={100}>
           <HoverCardTrigger asChild>
             <div className="w-12 h-12 relative cursor-pointer">
               {image ? (

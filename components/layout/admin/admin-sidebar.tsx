@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  ChevronRight,
-  CornerDownRight,
-  Lock,
-  LockOpen,
-  Pin,
-  PinOff,
-} from "lucide-react";
+import { ChevronRight, CornerDownRight, Pin, PinOff } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -72,6 +65,12 @@ export function AdminSideBar() {
           url: "/admin/products/marketplace",
           icon: CornerDownRight,
         },
+        {
+          title: "Analytics",
+          url: "/admin/products/analytics",
+          icon: CornerDownRight,
+        },
+
         // {
         //   title: "Price Matching",
         //   url: "/admin/products/matching",
