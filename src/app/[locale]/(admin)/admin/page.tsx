@@ -36,7 +36,7 @@ const AdminPage = () => {
                 <Building2 className="h-3.5 w-3.5" />
                 Customer Segment
               </div>
-              <OrderB2BFilter />
+              <OrderB2BFilter showRevenue={false} />
             </div>
           </div>
         </div>

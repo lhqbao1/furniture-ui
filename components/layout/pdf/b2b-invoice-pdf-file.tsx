@@ -529,9 +529,9 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
             <Text style={{ width: "7%", textAlign: "center", fontSize: 8 }}>
               Pos.
             </Text>
-            <Text style={{ width: "14%", fontSize: 8 }}>Ref.-Nr .</Text>
+            <Text style={{ width: "12%", fontSize: 8 }}>Ref.-Nr .</Text>
             <Text style={{ width: "12%", fontSize: 8 }}>Artikelnummer</Text>
-            <Text style={{ width: "30%", fontSize: 8 }}>Produktname</Text>
+            <Text style={{ width: "33%", fontSize: 8 }}>Produktname</Text>
             <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
               Versand
             </Text>
@@ -562,7 +562,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 <Text style={{ width: "7%", textAlign: "center", fontSize: 8 }}>
                   {row.index + 1}
                 </Text>
-                <Text style={{ width: "14%", fontSize: 8 }}>
+                <Text style={{ width: "12%", fontSize: 8 }}>
                   {row.order.marketplace_order_id ||
                     row.order.checkout_code ||
                     row.order.id}
@@ -570,7 +570,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 <Text style={{ width: "12%", fontSize: 8 }}>
                   {truncateText(row.idProvider)}
                 </Text>
-                <Text style={{ width: "30%", fontSize: 8 }}>
+                <Text style={{ width: "33%", fontSize: 8 }}>
                   {truncateText(String(row.productName), 70)}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
