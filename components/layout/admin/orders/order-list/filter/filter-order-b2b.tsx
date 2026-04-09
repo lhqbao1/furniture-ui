@@ -6,8 +6,13 @@ import { Building2, UserRound, UsersRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import type { ComponentType } from "react";
+import { useGetCheckOutStatistic } from "@/features/checkout/hook";
 
 type B2BFilterValue = "all" | "true" | "false";
+
+interface OrderB2BFilterProps {
+  showRevenue?: boolean;
+}
 
 function parseB2BFilter(param: string | null): B2BFilterValue {
   if (!param) return "all";
@@ -17,9 +22,33 @@ function parseB2BFilter(param: string | null): B2BFilterValue {
   return "all";
 }
 
-export default function OrderB2BFilter() {
+export default function OrderB2BFilter({
+  showRevenue = true,
+}: OrderB2BFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const fromDate = searchParams.get("from_date") || undefined;
+  const toDate = searchParams.get("to_date") || undefined;
+
+  const { data: allStatistic, isLoading: isAllStatisticLoading } =
+    useGetCheckOutStatistic({
+      from_date: fromDate,
+      to_date: toDate,
+    });
+
+  const { data: b2bStatistic, isLoading: isB2BStatisticLoading } =
+    useGetCheckOutStatistic({
+      from_date: fromDate,
+      to_date: toDate,
+      is_b2b: true,
+    });
+
+  const { data: b2cStatistic, isLoading: isB2CStatisticLoading } =
+    useGetCheckOutStatistic({
+      from_date: fromDate,
+      to_date: toDate,
+      is_b2b: false,
+    });
 
   const [selected, setSelected] = useState<B2BFilterValue>(
     parseB2BFilter(searchParams.get("is_b2b")),
@@ -42,10 +71,19 @@ export default function OrderB2BFilter() {
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  const formatAmount = (value?: number, isLoading?: boolean) => {
+    if (isLoading && value === undefined) return "…";
+    return Number(value ?? 0).toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
   const options: Array<{
     key: B2BFilterValue;
     label: string;
     description: string;
+    amount?: string;
     icon: ComponentType<{ className?: string }>;
     activeClassName: string;
     hoverClassName: string;
@@ -54,6 +92,9 @@ export default function OrderB2BFilter() {
       key: "all",
       label: "All",
       description: "B2B + B2C",
+      amount: showRevenue
+        ? `${formatAmount(allStatistic?.total_order, isAllStatisticLoading)} €`
+        : undefined,
       icon: UsersRound,
       activeClassName: "border-secondary bg-secondary/10 text-secondary",
       hoverClassName: "hover:border-secondary/40 hover:bg-secondary/5",
@@ -62,6 +103,9 @@ export default function OrderB2BFilter() {
       key: "true",
       label: "B2B",
       description: "Business customers",
+      amount: showRevenue
+        ? `${formatAmount(b2bStatistic?.total_order, isB2BStatisticLoading)} €`
+        : undefined,
       icon: Building2,
       activeClassName: "border-blue-500 bg-blue-50 text-blue-700",
       hoverClassName: "hover:border-blue-300 hover:bg-blue-50/70",
@@ -70,6 +114,9 @@ export default function OrderB2BFilter() {
       key: "false",
       label: "B2C",
       description: "Consumer customers",
+      amount: showRevenue
+        ? `${formatAmount(b2cStatistic?.total_order, isB2CStatisticLoading)} €`
+        : undefined,
       icon: UserRound,
       activeClassName: "border-orange-500 bg-orange-50 text-orange-700",
       hoverClassName: "hover:border-orange-300 hover:bg-orange-50/70",
@@ -97,8 +144,13 @@ export default function OrderB2BFilter() {
               )}
             >
               <Icon className="size-4 shrink-0" />
-              <div className="min-w-0">
-                <div className="text-sm font-semibold">{option.label}</div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm font-semibold">{option.label}</div>
+                  {option.amount ? (
+                    <div className="text-sm font-semibold">{option.amount}</div>
+                  ) : null}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {option.description}
                 </div>

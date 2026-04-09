@@ -3,23 +3,16 @@
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
-import { ProductItem } from "@/types/products";
 import { Loader2 } from "lucide-react";
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useQuery } from "@tanstack/react-query";
 import { getAllCheckOutMain } from "@/features/checkout/api";
 import { getStatusStyle } from "./status-styles";
-import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
 import { CheckOutMain } from "@/types/checkout";
-import { formatDateDE } from "@/lib/format-date-DE";
-import { formatDateDDMMYYYY, formatDateString } from "@/lib/date-formated";
+import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import {
   Select,
@@ -33,19 +26,6 @@ import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
 import { STATUS_OPTIONS } from "@/data/data";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-
-function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
-  const range = XLSX.utils.decode_range(worksheet["!ref"]!);
-  for (let r = range.s.r + 1; r <= range.e.r; r++) {
-    columns.forEach((c) => {
-      const addr = `${c}${r + 1}`;
-      if (worksheet[addr]) {
-        worksheet[addr].t = "s"; // string
-        worksheet[addr].z = "@"; // TEXT format (QUAN TRỌNG)
-      }
-    });
-  }
-}
 
 function getPrimaryCheckout(p: CheckOutMain) {
   if (!Array.isArray(p.checkouts)) return undefined;
@@ -107,12 +87,18 @@ export default function ExportOrderExcelButton() {
 
       return {
         code: clean(p.checkout_code),
-        marketplace: clean(p.from_marketplace),
+        marketplace: clean(p.from_marketplace ?? "Prestige Home"),
         marketplace_order_id: clean(p.marketplace_order_id),
         date: clean(formatDateDDMMYYYY(p.created_at)),
         status: clean(getStatusStyle(p.status).text),
         payment_method: clean(p.payment_method),
         note: clean(p.note ?? ""),
+        product_id: clean(
+          allItems
+            .map((i) => i.products.id_provider)
+            .filter(Boolean)
+            .join(" | "),
+        ),
         product_names: clean(
           allItems
             .map((i) => i.products.name)

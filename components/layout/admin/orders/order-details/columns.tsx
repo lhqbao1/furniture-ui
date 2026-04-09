@@ -76,7 +76,7 @@ export function getOrderDetailColumns({
           €
           {(row.original.purchased_products
             ? row.original.purchased_products.final_price
-            : row.original.products.cost
+            : (row.original.products.cost ?? 0)
           ).toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
