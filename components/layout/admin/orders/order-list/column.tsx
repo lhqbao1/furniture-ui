@@ -370,7 +370,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
         isRowExpanded={table.options.meta?.isRowExpanded}
         currentRowId={row.id}
         note={row.original.note}
-        marketplaceOrderId={row.original.marketplace_order_id}
+        marketplaceOrderId={row.original.checkout_code}
       />
     ),
   },
