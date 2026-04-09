@@ -1,5 +1,4 @@
 import { formatDateToNum } from "@/lib/ios-to-num";
-import { parseTaxRate } from "@/lib/parse-tax";
 import { CheckOutMain } from "@/types/checkout";
 import {
   Document,
@@ -11,6 +10,10 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { B2BInvoiceFooter } from "./b2b-invoice-footer";
+import {
+  calculateOrderTaxWithDiscount,
+  calculateProductVAT,
+} from "@/lib/caculate-vat";
 
 Font.register({
   family: "Figtree",
@@ -197,6 +200,8 @@ export const B2BInvoicePDFFile = ({
   const isGermanyInvoice = invoiceCountry === "DE";
   const isEuInvoice = EU_COUNTRIES.has(invoiceCountry);
   const cleanedOrderNumber = orderNumber?.trim() ?? "";
+  const invoiceTaxId =
+    marketplacePreset?.tax_id ?? orders?.[0]?.checkouts?.[0]?.user?.tax_id;
   const titleLine = cleanedOrderNumber
     ? `Rechnung Nr. ${invoiceId} - Ihre Bestellung ${cleanedOrderNumber}`
     : `Rechnung Nr. ${invoiceId}`;
@@ -215,36 +220,76 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     ? paymentNote
     : defaultPaymentText;
   const paymentLines = resolvedPaymentNote.replace(/\r\n/g, "\n").split("\n");
+  const flattenedCartItems = orders.flatMap((order) =>
+    (order.checkouts ?? [])
+      .filter((checkout) => {
+        const status = checkout.status?.toLowerCase();
+        return status !== "exchange" && status !== "cancel_exchange";
+      })
+      .flatMap((checkout) => {
+        if (Array.isArray(checkout.cart)) {
+          return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
+        }
+        return checkout.cart?.items ?? [];
+      }),
+  );
+  const totalShippingGross = orders.reduce(
+    (sum, order) => sum + (Number(order.total_shipping) || 0),
+    0,
+  );
+  const orderTaxSummary = calculateOrderTaxWithDiscount(
+    flattenedCartItems,
+    0,
+    invoiceCountry,
+    invoiceTaxId,
+    totalShippingGross,
+  );
   const displayRows = orders.map((order, index) => {
-    const orderItems = (order.checkouts ?? []).flatMap(
-      (checkout) => checkout.cart?.items ?? [],
-    );
+    const orderItems = (order.checkouts ?? []).flatMap((checkout) => {
+      if (Array.isArray(checkout.cart)) {
+        return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
+      }
+      return checkout.cart?.items ?? [];
+    });
     const firstItem = orderItems[0];
     const quantity =
       orderItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) ||
       1;
     const unitGross =
       Number(
-        firstItem?.purchased_products?.final_price ??
+        firstItem?.item_price ??
+          firstItem?.purchased_products?.final_price ??
           firstItem?.products?.final_price ??
           firstItem?.final_price ??
           0,
       ) || 0;
     const rowGross = unitGross * quantity;
     const shippingGross = Number(order.total_shipping) || 0;
-    const taxRate = parseTaxRate(
-      firstItem?.purchased_products?.tax ?? firstItem?.products?.tax ?? null,
+    const orderTaxSummary = calculateOrderTaxWithDiscount(
+      orderItems,
+      0,
+      invoiceCountry,
+      invoiceTaxId,
+      shippingGross,
     );
+    const vatCalculation = calculateProductVAT(
+      unitGross,
+      firstItem?.purchased_products?.tax ?? firstItem?.products?.tax ?? null,
+      invoiceCountry,
+      invoiceTaxId,
+    );
+    const unitNet = Number(vatCalculation.net) || 0;
+    const rowNet = unitNet * quantity;
 
     return {
       order,
       index,
       quantity,
-      unitGross,
-      rowGross,
+      unitNet,
+      rowNet,
+      shippingNet: Number(orderTaxSummary?.shipping?.net) || 0,
       shippingGross,
       rowTotalGross: rowGross + shippingGross,
-      taxRate,
       idProvider:
         firstItem?.purchased_products?.id_provider ??
         firstItem?.products?.id_provider ??
@@ -259,31 +304,23 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     0,
   );
 
-  const taxBuckets = displayRows.reduce(
-    (acc, item) => {
-      const rate = item.taxRate;
-      const gross = item.rowTotalGross;
+  const taxBuckets = (orderTaxSummary?.buckets ?? []).reduce(
+    (acc, bucket) => {
+      const rawRate = Number(bucket?.vatRate) || 0;
+      const normalizedRate = rawRate > 1 ? rawRate / 100 : rawRate;
+      const vatValue = Number(bucket?.vat) || 0;
 
-      if (rate <= 0) {
-        acc.net += gross;
-        return acc;
-      }
-
-      const net = gross / (1 + rate);
-      const vat = gross - net;
-      acc.net += net;
-
-      if (Math.abs(rate - 0.19) < 0.0001) {
-        acc.vat19 += vat;
-      } else if (Math.abs(rate - 0.07) < 0.0001) {
-        acc.vat7 += vat;
+      if (Math.abs(normalizedRate - 0.19) < 0.0001) {
+        acc.vat19 += vatValue;
+      } else if (Math.abs(normalizedRate - 0.07) < 0.0001) {
+        acc.vat7 += vatValue;
       } else {
-        acc.otherVat += vat;
+        acc.otherVat += vatValue;
       }
 
       return acc;
     },
-    { net: 0, vat19: 0, vat7: 0, otherVat: 0 },
+    { vat19: 0, vat7: 0, otherVat: 0 },
   );
 
   const totalVat19 = isGermanyInvoice ? taxBuckets.vat19 : 0;
@@ -291,10 +328,17 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
   const totalVatOther = isGermanyInvoice ? taxBuckets.otherVat : 0;
   // Keep summary fully aligned with table rows:
   // each row contributes G.-Preis + Versand.
-  const totalGross = displayGrossTotal;
-  const totalNet = isGermanyInvoice
-    ? totalGross - totalVat19 - totalVat7 - totalVatOther
-    : totalGross;
+  const totalGross =
+    Number.isFinite(orderTaxSummary?.totalGross) &&
+    orderTaxSummary.totalGross > 0
+      ? orderTaxSummary.totalGross
+      : displayGrossTotal;
+  const totalNet =
+    Number.isFinite(orderTaxSummary?.totalNet) && orderTaxSummary.totalNet >= 0
+      ? orderTaxSummary.totalNet
+      : isGermanyInvoice
+        ? totalGross - totalVat19 - totalVat7 - totalVatOther
+        : totalGross;
   const intraCommunityVat = !isGermanyInvoice && isEuInvoice ? 0 : null;
 
   return (
@@ -422,7 +466,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
               <Text style={{ width: 115, fontWeight: "bold" }}>
                 Ihre Kundennummer
               </Text>
-              <Text>1011</Text>
+              <Text></Text>
             </View>
             <View
               style={{
@@ -482,14 +526,24 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
               backgroundColor: PDF_GRAY_BG,
             }}
           >
-            <Text style={{ width: "7%", textAlign: "center" }}>Pos.</Text>
-            <Text style={{ width: "16%" }}>Ref.-Nr .</Text>
-            <Text style={{ width: "14%" }}>Artikelnummer</Text>
-            <Text style={{ width: "25%" }}>Produktname</Text>
-            <Text style={{ width: "10%", textAlign: "right" }}>Versand</Text>
-            <Text style={{ width: "8%", textAlign: "center" }}>Menge</Text>
-            <Text style={{ width: "10%", textAlign: "right" }}>E.-Preis</Text>
-            <Text style={{ width: "10%", textAlign: "right" }}>G.-Preis</Text>
+            <Text style={{ width: "7%", textAlign: "center", fontSize: 8 }}>
+              Pos.
+            </Text>
+            <Text style={{ width: "14%", fontSize: 8 }}>Ref.-Nr .</Text>
+            <Text style={{ width: "12%", fontSize: 8 }}>Artikelnummer</Text>
+            <Text style={{ width: "30%", fontSize: 8 }}>Produktname</Text>
+            <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
+              Versand
+            </Text>
+            <Text style={{ width: "8%", textAlign: "center", fontSize: 8 }}>
+              Menge
+            </Text>
+            <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
+              E.-Preis
+            </Text>
+            <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
+              G.-Preis
+            </Text>
           </View>
 
           {displayRows.map((row) => {
@@ -505,40 +559,40 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                   alignItems: "center",
                 }}
               >
-                <Text style={{ width: "7%", textAlign: "center" }}>
+                <Text style={{ width: "7%", textAlign: "center", fontSize: 8 }}>
                   {row.index + 1}
                 </Text>
-                <Text style={{ width: "16%" }}>
+                <Text style={{ width: "14%", fontSize: 8 }}>
                   {row.order.marketplace_order_id ||
                     row.order.checkout_code ||
                     row.order.id}
                 </Text>
-                <Text style={{ width: "14%" }}>
+                <Text style={{ width: "12%", fontSize: 8 }}>
                   {truncateText(row.idProvider)}
                 </Text>
-                <Text style={{ width: "25%" }}>
-                  {truncateText(String(row.productName), 34)}
+                <Text style={{ width: "30%", fontSize: 8 }}>
+                  {truncateText(String(row.productName), 70)}
                 </Text>
-                <Text style={{ width: "10%", textAlign: "right" }}>
+                <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
                   €
-                  {row.shippingGross.toLocaleString("de-DE", {
+                  {row.shippingNet.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </Text>
-                <Text style={{ width: "8%", textAlign: "center" }}>
+                <Text style={{ width: "8%", textAlign: "center", fontSize: 8 }}>
                   {row.quantity}
                 </Text>
-                <Text style={{ width: "10%", textAlign: "right" }}>
+                <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
                   €
-                  {row.unitGross.toLocaleString("de-DE", {
+                  {row.unitNet.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </Text>
-                <Text style={{ width: "10%", textAlign: "right" }}>
+                <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
                   €
-                  {row.rowGross.toLocaleString("de-DE", {
+                  {row.rowNet.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -559,8 +613,10 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
               paddingHorizontal: 8,
             }}
           >
-            <Text style={{ width: "60%" }}>Gesamtbetrag netto</Text>
-            <Text style={{ width: "40%", textAlign: "right" }}>
+            <Text style={{ width: "60%", fontSize: 8 }}>
+              Gesamtbetrag netto
+            </Text>
+            <Text style={{ width: "40%", textAlign: "right", fontSize: 8 }}>
               {formatEur(totalNet)}
             </Text>
           </View>
@@ -576,8 +632,10 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                   paddingHorizontal: 8,
                 }}
               >
-                <Text style={{ width: "60%" }}>Umsatzsteuer 19%</Text>
-                <Text style={{ width: "40%", textAlign: "right" }}>
+                <Text style={{ width: "60%", fontSize: 8 }}>
+                  Umsatzsteuer 19%
+                </Text>
+                <Text style={{ width: "40%", textAlign: "right", fontSize: 8 }}>
                   {formatEur(totalVat19)}
                 </Text>
               </View>
@@ -591,8 +649,10 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                   paddingHorizontal: 8,
                 }}
               >
-                <Text style={{ width: "60%" }}>Umsatzsteuer 7%</Text>
-                <Text style={{ width: "40%", textAlign: "right" }}>
+                <Text style={{ width: "60%", fontSize: 8 }}>
+                  Umsatzsteuer 7%
+                </Text>
+                <Text style={{ width: "40%", textAlign: "right", fontSize: 8 }}>
                   {formatEur(totalVat7)}
                 </Text>
               </View>
@@ -607,8 +667,12 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                     paddingHorizontal: 8,
                   }}
                 >
-                  <Text style={{ width: "60%" }}>Weitere Umsatzsteuer</Text>
-                  <Text style={{ width: "40%", textAlign: "right" }}>
+                  <Text style={{ width: "60%", fontSize: 8 }}>
+                    Weitere Umsatzsteuer
+                  </Text>
+                  <Text
+                    style={{ width: "40%", textAlign: "right", fontSize: 8 }}
+                  >
                     {formatEur(totalVatOther)}
                   </Text>
                 </View>
@@ -625,10 +689,10 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                   paddingHorizontal: 8,
                 }}
               >
-                <Text style={{ width: "60%" }}>
+                <Text style={{ width: "60%", fontSize: 8 }}>
                   Innergemeinschaftliche Lieferung 0%
                 </Text>
-                <Text style={{ width: "40%", textAlign: "right" }}>
+                <Text style={{ width: "40%", textAlign: "right", fontSize: 8 }}>
                   {formatEur(intraCommunityVat)}
                 </Text>
               </View>
@@ -667,6 +731,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 width: "60%",
                 fontFamily: "Helvetica-Bold",
                 fontWeight: "bold",
+                fontSize: 8,
               }}
             >
               Gesamtbetrag brutto
@@ -677,6 +742,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 textAlign: "right",
                 fontFamily: "Helvetica-Bold",
                 fontWeight: "bold",
+                fontSize: 8,
               }}
             >
               {formatEur(totalGross)}
