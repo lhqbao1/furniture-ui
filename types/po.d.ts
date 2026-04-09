@@ -124,6 +124,8 @@ export type POContainerInventoryDetail = {
   total_cost: number;
   description: string;
   list_delivery_date?: string;
+  stock_from_amm?: number | null;
+  updated_stock?: boolean | null;
   product: POContainerInventoryProductDetail;
 
   created_at: string; // ISO string
@@ -153,6 +155,8 @@ export type InventoryPOItem = {
     ];
     id: string;
   };
+  stock_from_amm: number | nul;
+  updated_stock: boolean | null;
   created_at: string;
   updated_at: string;
   container: {

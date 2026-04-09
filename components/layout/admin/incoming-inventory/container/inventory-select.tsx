@@ -1,4 +1,3 @@
-import { useGetProductsSelect } from "@/features/product-group/hook";
 import { useGetAllProducts } from "@/features/products/hook";
 import React, { useEffect, useState } from "react";
 import {
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import {
+  CheckCircle2,
   Loader2,
   Pencil,
   PencilOffIcon,
@@ -31,7 +31,15 @@ import {
   updateInventoryPo,
 } from "@/features/incoming-inventory/inventory/api";
 import { useDeleteInventoryPo } from "@/features/incoming-inventory/inventory/hook";
-import { useUpdatePurchaseOrder } from "@/features/incoming-inventory/po/hook";
+import { useUpdateProductStockFromInventoryPo } from "@/features/incoming-inventory/po/hook";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface SelectedInventoryItem {
   inventory_po_id?: string;
@@ -45,6 +53,8 @@ interface SelectedInventoryItem {
   unit_cost: number;
   description?: string;
   total_cost: number;
+  stock_from_amm?: number | null;
+  updated_stock?: boolean | null;
 
   isNew?: boolean;
   isEditing?: boolean; // 👈 thêm
@@ -80,11 +90,12 @@ function useDebounce<T>(value: T, delay = 400): T {
 }
 
 const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
+  void po_id;
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 400);
 
-  const { mutate: deleteInventoryPoMutate, isPending } =
-    useDeleteInventoryPo(containerId);
+  const { mutate: deleteInventoryPoMutate } = useDeleteInventoryPo(containerId);
+  const updateStockMutation = useUpdateProductStockFromInventoryPo();
 
   const { data: products, isLoading } = useGetAllProducts({
     search: debouncedSearch,
@@ -93,6 +104,11 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
   const [items, setItems] = React.useState<SelectedInventoryItem[]>([]);
   const [open, setOpen] = React.useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmStock, setConfirmStock] = useState<number | "">("");
+  const [confirmTargetIndex, setConfirmTargetIndex] = useState<number | null>(
+    null,
+  );
   const productOptions = React.useMemo<ProductItem[]>(() => {
     const rawProducts = products as
       | { items?: ProductItem[]; results?: ProductItem[] }
@@ -125,6 +141,8 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
           quantity: 0,
           unit_cost: 0,
           total_cost: 0,
+          stock_from_amm: null,
+          updated_stock: null,
           isNew: true,
           isEditing: true, // 👈 NEW item edit được ngay
         },
@@ -252,14 +270,14 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
       );
 
       await fetchInventory(); // reload lại state chuẩn từ backend
-    } catch (error) {
+    } catch {
       toast.error("Failed to save inventory", {
         description: "Please try again.",
       });
     }
   };
 
-  const fetchInventory = async () => {
+  const fetchInventory = React.useCallback(async () => {
     try {
       const data = await getContainerInventory(containerId);
 
@@ -275,6 +293,8 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
         unit_cost: item.unit_cost,
         total_cost: item.total_cost,
         description: item.description ?? "",
+        stock_from_amm: item.stock_from_amm ?? null,
+        updated_stock: item.updated_stock ?? null,
 
         isNew: false,
         isEditing: false, // 👈 LOCK
@@ -288,11 +308,68 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
       }));
 
       setItems(mappedItems);
-    } catch (error) {
+    } catch {
       toast.error("Failed to load inventory", {
         description: "Could not fetch container inventory.",
       });
     }
+  }, [containerId]);
+
+  const handleOpenConfirmStock = (index: number) => {
+    const item = items[index];
+    if (!item || !item.inventory_po_id) {
+      toast.error("This item must be saved before confirming stock.");
+      return;
+    }
+
+    setConfirmTargetIndex(index);
+    setConfirmStock(item.stock_from_amm ?? "");
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmStock = () => {
+    if (confirmTargetIndex === null) return;
+    const target = items[confirmTargetIndex];
+    if (!target?.inventory_po_id) return;
+
+    const parsedStock = Number(confirmStock);
+    if (!Number.isFinite(parsedStock) || parsedStock < 0) {
+      toast.error("Stock must be a valid number greater than or equal to 0.");
+      return;
+    }
+    if (!Number.isInteger(parsedStock)) {
+      toast.error("Stock must be an integer.");
+      return;
+    }
+
+    updateStockMutation.mutate(
+      {
+        inventoryPoId: target.inventory_po_id,
+        stock: parsedStock,
+      },
+      {
+        onSuccess: () => {
+          setItems((prev) =>
+            prev.map((item, idx) =>
+              idx === confirmTargetIndex
+                ? {
+                    ...item,
+                    stock_from_amm: parsedStock,
+                    updated_stock: true,
+                  }
+                : item,
+            ),
+          );
+          toast.success("Stock confirmed successfully.");
+          void fetchInventory();
+          setConfirmOpen(false);
+          setConfirmTargetIndex(null);
+        },
+        onError: () => {
+          toast.error("Failed to confirm stock.");
+        },
+      },
+    );
   };
 
   const isItemChanged = (item: SelectedInventoryItem) => {
@@ -310,7 +387,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
     if (!containerId) return;
 
     fetchInventory();
-  }, [containerId]);
+  }, [containerId, fetchInventory]);
 
   console.log(isLoading);
 
@@ -351,7 +428,10 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                 <CommandGroup>
                   {productOptions.map((product: ProductItem, index) => (
                     <CommandItem
-                      key={product.id ?? `${product.id_provider ?? "product"}-${index}`}
+                      key={
+                        product.id ??
+                        `${product.id_provider ?? "product"}-${index}`
+                      }
                       value={
                         product.id ??
                         product.id_provider ??
@@ -369,6 +449,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                             ? product.static_files[0].url
                             : "/1.png"
                         }
+                        alt={product.name || "product"}
                         className="h-8 w-8 rounded object-cover"
                       />
 
@@ -406,11 +487,16 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
               {items.map((item, index) => (
                 <React.Fragment key={item.product_id}>
                   {/* MAIN ROW */}
-                  <tr className="border-t">
+                  <tr
+                    className={`border-t ${
+                      item.updated_stock === true ? "bg-emerald-50/70" : ""
+                    }`}
+                  >
                     <td className="p-2">
                       <div className="flex gap-2 items-center">
                         <img
                           src={item.image}
+                          alt={item.name || "product"}
                           className="h-8 w-8 rounded object-cover"
                         />
                         <div>
@@ -517,8 +603,54 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                     </td>
                   </tr>
 
+                  <tr
+                    className={
+                      item.updated_stock === true
+                        ? "bg-emerald-50/40 border-t"
+                        : "bg-muted/20 border-t"
+                    }
+                  >
+                    <td colSpan={5} className="px-2 py-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="font-medium text-muted-foreground">
+                            Stock from AMM:
+                          </span>
+                          <span className="font-semibold">
+                            {item.stock_from_amm ?? "-"}
+                          </span>
+                          {item.updated_stock === true && (
+                            <span className="text-emerald-700 text-xs font-medium">
+                              Confirmed
+                            </span>
+                          )}
+                        </div>
+
+                        {(item.updated_stock === null ||
+                          item.updated_stock === false) &&
+                        item.inventory_po_id ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-2"
+                            onClick={() => handleOpenConfirmStock(index)}
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                            Confirm
+                          </Button>
+                        ) : null}
+                      </div>
+                    </td>
+                  </tr>
+
                   {/* DESCRIPTION ROW */}
-                  <tr className="bg-muted/40">
+                  <tr
+                    className={
+                      item.updated_stock === true
+                        ? "bg-emerald-50/40"
+                        : "bg-muted/40"
+                    }
+                  >
                     <td colSpan={5} className="p-2 pt-0">
                       <textarea
                         className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm
@@ -554,6 +686,54 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
           Save inventory
         </Button>
       </div>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm stock from AMM</DialogTitle>
+            <DialogDescription>
+              Enter the stock value to confirm for this inventory item.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Stock</p>
+            <Input
+              type="number"
+              min={0}
+              step={1}
+              value={confirmStock}
+              onChange={(e) =>
+                setConfirmStock(
+                  e.target.value === "" ? "" : Number(e.target.value),
+                )
+              }
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setConfirmOpen(false)}
+              disabled={updateStockMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmStock}
+              disabled={updateStockMutation.isPending}
+            >
+              {updateStockMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Confirm"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

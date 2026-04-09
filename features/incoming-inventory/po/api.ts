@@ -6,6 +6,28 @@ export interface UpdatePONumberOfContainerInput {
   number_of_containers: number;
 }
 
+export async function updateProductStockFromInventoryPo(
+  inventoryPoId: string,
+  stock: number,
+) {
+  const { data } = await apiAdmin.put(
+    `/po/product/updated-stock/${inventoryPoId}`,
+    null,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+      params: {
+        stock,
+      },
+    },
+  );
+
+  return data;
+}
+
 export async function createPurchaseOrder(input: IncomingInventoryValues) {
   const { data } = await apiAdmin.post("/po/purchase-order", input, {
     headers: {

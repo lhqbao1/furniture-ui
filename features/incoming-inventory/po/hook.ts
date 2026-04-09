@@ -5,11 +5,13 @@ import {
   getAllPurchaseOrders,
   getPurchaseOrderDetail,
   UpdatePONumberOfContainerInput,
+  updateProductStockFromInventoryPo,
   updatePurchaseOrder,
   updatePurchaseOrderNumberOfContainer,
 } from "./api";
 import { IncomingInventoryValues } from "@/lib/schema/incoming-inventory";
 import { PurchaseOrderDetail } from "@/types/po";
+import { inventoryPoKeys } from "../inventory/inventory-po.keys";
 
 type UpdatePurchaseOrderInput = {
   purchaseOrderId: string;
@@ -19,6 +21,11 @@ type UpdatePurchaseOrderInput = {
 type UpdatePONumberOfContainersInput = {
   purchaseOrderId: string;
   input: UpdatePONumberOfContainerInput;
+};
+
+type UpdateProductStockFromInventoryPoInput = {
+  inventoryPoId: string;
+  stock: number;
 };
 
 export const PURCHASE_ORDER_QUERY_KEY = ["purchase-orders"];
@@ -70,6 +77,29 @@ export function useUpdatePONumberOfContainers() {
 
       queryClient.invalidateQueries({
         queryKey: ["purchase-order-detail", variables.purchaseOrderId],
+      });
+    },
+  });
+}
+
+export function useUpdateProductStockFromInventoryPo() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ inventoryPoId, stock }: UpdateProductStockFromInventoryPoInput) =>
+      updateProductStockFromInventoryPo(inventoryPoId, stock),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: PURCHASE_ORDER_QUERY_KEY,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: inventoryPoKeys.all,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: inventoryPoKeys.detail(variables.inventoryPoId),
       });
     },
   });

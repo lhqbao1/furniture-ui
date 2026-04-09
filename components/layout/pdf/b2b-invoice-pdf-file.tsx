@@ -422,7 +422,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
               <Text style={{ width: 115, fontWeight: "bold" }}>
                 Ihre Kundennummer
               </Text>
-              <Text>1011</Text>
+              <Text></Text>
             </View>
             <View
               style={{
