@@ -20,6 +20,8 @@ import { X } from "lucide-react";
 import { ProductItem } from "@/types/products";
 import { useGetAllProducts } from "@/features/products/hook";
 import { toast } from "sonner";
+import { calculateProductVATFromNet } from "@/lib/caculate-vat";
+import { getCountryCode } from "@/components/shared/getCountryNameDe";
 
 interface SelectedProduct {
   product: ProductItem;
@@ -39,6 +41,9 @@ const SelectOrderItems = ({
 }: SelectOrderItemsProps) => {
   const form = useFormContext();
   const { setValue } = form;
+  const priceMode = form.watch("price_mode") ?? "gross";
+  const countryCode = getCountryCode(form.watch("country"));
+  const taxId = form.watch("tax_id") ?? null;
 
   const [queryParams, setQueryParams] = useState("");
   const [open, setOpen] = useState(false);
@@ -101,6 +106,12 @@ const SelectOrderItems = ({
       (p: ProductItem) => !listProducts.some((lp) => lp.product.id === p.id),
     );
   }, [products?.items, listProducts]);
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
   // 🔹 Auto update form.items khi listProducts thay đổi
   useEffect(() => {
@@ -181,58 +192,77 @@ const SelectOrderItems = ({
             <div></div>
           </div>
 
-          {listProducts.map(({ product, quantity, final_price }) => (
-            <div
-              key={product.id}
-              className="grid grid-cols-6 gap-3 items-center border rounded-md p-2"
-            >
-              <div className="flex items-center gap-3 col-span-3">
-                <Image
-                  src={
-                    product.static_files?.[0]?.url ?? "/product-placeholder.png"
-                  }
-                  width={50}
-                  height={50}
-                  alt=""
-                  className="rounded-sm !h-[40px] object-cover"
-                  unoptimized
-                />
-                <div>
-                  <div className="font-medium">{product.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    #{product.id_provider}
+          {listProducts.map(({ product, quantity, final_price }) => {
+            const grossPreview =
+              priceMode === "net"
+                ? calculateProductVATFromNet(
+                    Number(final_price) || 0,
+                    product?.tax ?? null,
+                    countryCode,
+                    taxId,
+                  ).gross
+                : null;
+
+            return (
+              <div
+                key={product.id}
+                className="grid grid-cols-6 gap-3 items-center border rounded-md p-2"
+              >
+                <div className="flex items-center gap-3 col-span-3">
+                  <Image
+                    src={
+                      product.static_files?.[0]?.url ?? "/product-placeholder.png"
+                    }
+                    width={50}
+                    height={50}
+                    alt=""
+                    className="rounded-sm !h-[40px] object-cover"
+                    unoptimized
+                  />
+                  <div>
+                    <div className="font-medium">{product.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      #{product.id_provider}
+                    </div>
                   </div>
                 </div>
+
+                <Input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={quantity}
+                  onChange={(e) =>
+                    handleQuantityChange(product.id, Number(e.target.value))
+                  }
+                />
+
+                <div>
+                  <Input
+                    type="number"
+                    step="0.001"
+                    min={0}
+                    value={final_price}
+                    onChange={(e) =>
+                      handlePriceChange(product.id, Number(e.target.value))
+                    }
+                  />
+                  {priceMode === "net" && (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Gross: € {formatCurrency(Number(grossPreview) || 0)}
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  variant="ghost"
+                  onClick={() => handleRemoveProduct(product.id)}
+                >
+                  <X className="text-red-400" />
+                </Button>
               </div>
-
-              <Input
-                type="number"
-                min={0}
-                step="0.01"
-                value={quantity}
-                onChange={(e) =>
-                  handleQuantityChange(product.id, Number(e.target.value))
-                }
-              />
-
-              <Input
-                type="number"
-                step="0.01"
-                min={0}
-                value={final_price}
-                onChange={(e) =>
-                  handlePriceChange(product.id, Number(e.target.value))
-                }
-              />
-
-              <Button
-                variant="ghost"
-                onClick={() => handleRemoveProduct(product.id)}
-              >
-                <X className="text-red-400" />
-              </Button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

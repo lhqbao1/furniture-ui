@@ -1,7 +1,6 @@
 import { calculateProductVAT } from "@/lib/caculate-vat";
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
-import Image from "next/image";
 
 interface OrderDetailColumnsProps {
   country_code?: string | null;
@@ -47,10 +46,14 @@ export function getOrderDetailColumns({
       id: "vat",
       header: () => <div className="text-center w-full">VAT</div>,
       cell: ({ row }) => {
+        const unitGross =
+          Number(
+            row.original.purchased_products
+              ? row.original?.purchased_products?.final_price
+              : row.original.products.final_price,
+          ) || 0;
         const { vat } = calculateProductVAT(
-          row.original.purchased_products
-            ? row.original?.purchased_products?.final_price
-            : row.original.products.final_price,
+          unitGross,
           row.original.products.tax,
           country_code,
           tax_id,
@@ -88,18 +91,30 @@ export function getOrderDetailColumns({
     {
       id: "unit_price",
       header: () => <div className="text-right w-full">UNIT PRICE</div>,
-      cell: ({ row }) => (
-        <div className="text-right">
-          €
-          {(row.original.purchased_products
-            ? row.original.purchased_products.final_price
-            : row.original.products.final_price
-          ).toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const unitGross =
+          Number(
+            row.original.purchased_products
+              ? row.original.purchased_products.final_price
+              : row.original.products.final_price,
+          ) || 0;
+        const unitNet = calculateProductVAT(
+          unitGross,
+          row.original.products.tax,
+          country_code,
+          tax_id,
+        ).net;
+
+        return (
+          <div className="text-right">
+            €
+            {unitNet.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </div>
+        );
+      },
     },
 
     {
@@ -112,20 +127,32 @@ export function getOrderDetailColumns({
     {
       id: "total_amount",
       header: () => <div className="text-right w-full">TOTAL AMOUNT</div>,
-      cell: ({ row }) => (
-        <div className="text-right">
-          €
-          {(
-            row.original.quantity *
-            (row.original.purchased_products
+      cell: ({ row }) => {
+        const quantity = Number(row.original.quantity) || 0;
+        const unitGross =
+          Number(
+            row.original.purchased_products
               ? row.original.purchased_products.final_price
-              : row.original.products.final_price)
-          ).toLocaleString("de-DE", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </div>
-      ),
+              : row.original.products.final_price,
+          ) || 0;
+        const unitNet = calculateProductVAT(
+          unitGross,
+          row.original.products.tax,
+          country_code,
+          tax_id,
+        ).net;
+        const lineNet = unitNet * quantity;
+
+        return (
+          <div className="text-right">
+            €
+            {lineNet.toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </div>
+        );
+      },
     },
   ];
 }

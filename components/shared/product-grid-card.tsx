@@ -120,7 +120,7 @@ export default function ProductCard({
 
           <div className="product-details py-2 mt-0 md:mt-4 xl:mt-4 flex flex-col gap-1">
             <ProductBrand
-              brand={product.brand.name}
+              brand={product.brand ? product.brand?.name : ""}
               brand_image={product.brand ? product.brand.img_url : ""}
               isProductDetail={isProductDetails}
             />
