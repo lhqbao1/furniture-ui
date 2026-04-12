@@ -1325,8 +1325,9 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
                 <CommandGroup>
                   {flatOptions.map((option) => {
                     const isSelected = selectedIds.includes(option.id);
+                    const isTopLevelCategory = option.depth === 0;
 
-                    if (option.isParent) {
+                    if (isTopLevelCategory) {
                       return (
                         <div
                           key={option.id}

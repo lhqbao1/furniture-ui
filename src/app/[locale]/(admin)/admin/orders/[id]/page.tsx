@@ -123,6 +123,67 @@ const OrderDetails = () => {
     if (!order) return [];
     return extractCartItemsFromMain(order);
   }, [order]);
+  const checkoutCountryCode = useMemo(
+    () =>
+      order?.checkouts?.[0]?.shipping_address?.country ??
+      order?.checkouts?.[0]?.invoice_address?.country ??
+      "DE",
+    [order],
+  );
+  const checkoutTaxId = useMemo(
+    () =>
+      order?.checkouts?.[0]?.user?.tax_id ??
+      invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id ??
+      "",
+    [invoice?.main_checkout?.checkouts, order],
+  );
+  const orderTaxSummary = useMemo(
+    () =>
+      calculateOrderTaxWithDiscount(
+        cartItems,
+        Number(invoice?.voucher_amount ?? order?.voucher_amount ?? 0),
+        checkoutCountryCode,
+        checkoutTaxId,
+        Number(order?.total_shipping ?? 0),
+      ),
+    [
+      cartItems,
+      checkoutCountryCode,
+      checkoutTaxId,
+      invoice?.voucher_amount,
+      order?.total_shipping,
+      order?.voucher_amount,
+    ],
+  );
+  const orderVatRows = useMemo(() => {
+    const rows = (orderTaxSummary?.buckets ?? [])
+      .map((bucket) => {
+        const rawRate = Number(bucket?.vatRate) || 0;
+        const normalizedRate = rawRate > 1 ? rawRate / 100 : rawRate;
+        const percent = normalizedRate * 100;
+        const gross = Number(bucket?.gross) || 0;
+        const netFromGross =
+          normalizedRate > 0 ? gross / (1 + normalizedRate) : gross;
+        const vatFromGross =
+          normalizedRate > 0 ? netFromGross * normalizedRate : 0;
+
+        return {
+          percent,
+          vat: Number.isFinite(vatFromGross) ? vatFromGross : 0,
+        };
+      })
+      .filter((row) => Number.isFinite(row.percent))
+      .sort((a, b) => b.percent - a.percent);
+
+    if (rows.length > 0) return rows;
+
+    return [
+      {
+        percent: 0,
+        vat: Number(orderTaxSummary?.totalVat) || 0,
+      },
+    ];
+  }, [orderTaxSummary]);
   const productRefunds = useMemo(
     () =>
       Array.isArray(productRefundData)
@@ -341,11 +402,8 @@ const OrderDetails = () => {
         <ProductTable
           data={cartItems}
           columns={getOrderDetailColumns({
-            country_code:
-              order?.checkouts[0]?.shipping_address?.country ??
-              order?.checkouts[0]?.invoice_address?.country ??
-              "DE",
-            tax_id: invoice?.main_checkout.checkouts[0].user.tax_id,
+            country_code: checkoutCountryCode,
+            tax_id: checkoutTaxId,
           })}
           page={page}
           setPage={setPage}
@@ -698,22 +756,11 @@ const OrderDetails = () => {
         <div className="lg:col-span-4">
           <OrderSummary
             language={order.checkouts[0].user.language ?? ""}
-            sub_total={order.total_amount_item}
-            shipping_amount={order.total_shipping}
+            sub_total={orderTaxSummary.totalNetWithoutShipping}
+            shipping_amount={orderTaxSummary.shipping.net}
             discount_amount={Math.abs(order.voucher_amount)}
-            tax={
-              calculateOrderTaxWithDiscount(
-                invoice?.main_checkout.checkouts
-                  .flatMap((c) => c.cart)
-                  .flatMap((c) => c.items) ?? [],
-                invoice?.voucher_amount,
-                order?.checkouts[0]?.shipping_address?.country ??
-                  order?.checkouts[0]?.invoice_address?.country ??
-                  "DE",
-                invoice?.main_checkout.checkouts[0].user.tax_id,
-                order.total_shipping,
-              ).totalVat
-            }
+            tax={orderTaxSummary.totalVat}
+            vat_rows={orderVatRows}
             total_amount={order.total_amount}
             payment_method={order.payment_method}
             entry_date={order.created_at}

@@ -23,7 +23,11 @@ import ManualCheckOutShippingAddress from "@/components/layout/admin/orders/orde
 import ManualAdditionalInformation from "@/components/layout/admin/orders/order-create/manual-additional-details";
 import SelectOrderItems from "@/components/layout/admin/orders/order-create/select-product";
 import { useManualCheckoutLogic } from "@/hooks/admin/order-create/useOrderCreate";
-import { calculateShippingCostManual } from "@/lib/caculate-vat";
+import {
+  calculateProductVATFromNet,
+  calculateShippingCostManual,
+  calculateShippingGrossFromNet,
+} from "@/lib/caculate-vat";
 import { getCountryCode } from "@/components/shared/getCountryNameDe";
 import { getCarrierFromItems } from "@/lib/get-carrier";
 import {
@@ -188,11 +192,52 @@ export default function CreateOrderPageClient() {
   }
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
+    const { price_mode: priceMode, ...restValues } = values;
+    const itemTaxByIdProvider = new Map(
+      listProducts.map((item) => [
+        String(item.product.id_provider ?? ""),
+        item.product.tax ?? null,
+      ]),
+    );
+
+    const normalizedItems = values.items.map((item) => {
+      if (priceMode !== "net") return item;
+
+      const vatInfo = calculateProductVATFromNet(
+        Number(item.final_price) || 0,
+        itemTaxByIdProvider.get(String(item.id_provider ?? "")) ?? null,
+        countryCode,
+        taxId,
+      );
+
+      return {
+        ...item,
+        final_price: Number(vatInfo.gross) || 0,
+      };
+    });
+
+    const shippingInputValue =
+      Number(values.total_shipping ?? shipping ?? 0) || 0;
+    const normalizedShipping =
+      priceMode === "net"
+        ? calculateShippingGrossFromNet(
+            values.items.map((item) => ({
+              unitNet: Number(item.final_price) || 0,
+              quantity: Number(item.quantity) || 0,
+              tax:
+                itemTaxByIdProvider.get(String(item.id_provider ?? "")) ?? null,
+            })),
+            shippingInputValue,
+            countryCode,
+            taxId,
+          ).gross
+        : shippingInputValue;
+
     createOrderManualMutation.mutate(
       {
-        ...values,
-        total_shipping:
-          values.total_shipping !== shipping ? values.total_shipping : shipping,
+        ...restValues,
+        items: normalizedItems,
+        total_shipping: normalizedShipping,
         carrier: values.carrier?.toUpperCase(),
         email:
           values.email && values.email?.length > 0 ? values.email : "guest",
@@ -288,7 +333,7 @@ export default function CreateOrderPageClient() {
 
           {/* Table cart and total */}
           <div className="col-span-1 space-y-4 rounded-2xl border border-secondary/15 bg-white p-4 shadow-sm">
-            <ManualAdditionalInformation />
+            <ManualAdditionalInformation listProducts={listProducts} />
             <SelectOrderItems
               listProducts={listProducts}
               setListProducts={setListProducts}

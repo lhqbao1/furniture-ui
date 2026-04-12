@@ -1,6 +1,11 @@
 import { User } from "@/types/user";
 import React from "react";
 
+type VatSummaryRow = {
+  percent: number;
+  vat: number;
+};
+
 interface OrderInformationProps {
   payment_method?: string;
   language: string;
@@ -17,6 +22,7 @@ interface OrderInformationProps {
   shipping_amount?: number;
   discount_amount?: number;
   tax?: number;
+  vat_rows?: VatSummaryRow[];
   total_amount?: number;
   is_Ebay?: boolean;
   refund_amount: number | null;
@@ -38,6 +44,7 @@ const OrderSummary = ({
   shipping_amount,
   discount_amount,
   tax,
+  vat_rows = [],
   total_amount,
   refund_amount,
   is_Ebay = false,
@@ -47,6 +54,16 @@ const OrderSummary = ({
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
+
+  const formatVatLabel = (percent: number) => {
+    const safePercent = Number(percent) || 0;
+    const isInteger = Number.isInteger(safePercent);
+
+    return `VAT (${safePercent.toLocaleString("de-DE", {
+      minimumFractionDigits: isInteger ? 0 : 2,
+      maximumFractionDigits: isInteger ? 0 : 2,
+    })}%)`;
+  };
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
@@ -75,12 +92,26 @@ const OrderSummary = ({
             </div>
           </div>
         ) : null}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-slate-600">VAT</div>
-          <div className="text-right font-medium text-slate-900">
-            {formatEuro(tax)}
+        {vat_rows.length > 0 ? (
+          vat_rows.map((row) => (
+            <div
+              className="grid grid-cols-2 gap-3"
+              key={`vat-row-${row.percent}`}
+            >
+              <div className="text-slate-600">{formatVatLabel(row.percent)}</div>
+              <div className="text-right font-medium text-slate-900">
+                {formatEuro(row.vat)}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-slate-600">VAT</div>
+            <div className="text-right font-medium text-slate-900">
+              {formatEuro(tax)}
+            </div>
           </div>
-        </div>
+        )}
         {refund_amount && refund_amount > 0 ? (
           <div className="grid grid-cols-2 gap-3">
             <div className="text-slate-600">Refund Amount</div>

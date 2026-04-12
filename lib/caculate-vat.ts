@@ -47,6 +47,18 @@ function splitGross(gross: number, vatRate: number) {
   return { net, vat };
 }
 
+function splitNet(net: number, vatRate: number) {
+  const gross = +(net * (1 + vatRate)).toFixed(2);
+  const vat = +(gross - net).toFixed(2);
+  return { gross, vat };
+}
+
+type NetShippingInputItem = {
+  unitNet: number;
+  quantity: number;
+  tax?: string | null;
+};
+
 export function calculateShippingCostManual(
   items: ManualOrderItem[],
   country_code?: string | null,
@@ -282,6 +294,113 @@ export function calculateOrderTaxWithDiscount(
     totalVat: +totalVat.toFixed(2),
     totalGross,
     totalNetWithoutShipping: +totalNetWithoutShipping.toFixed(2),
+  };
+}
+
+export function calculateProductVATFromNet(
+  net: number,
+  tax?: string | null,
+  country_code?: string | null,
+  tax_id?: string | null,
+) {
+  const vatRate = parseTaxRate(tax, country_code, tax_id);
+  const normalizedNet = Number(net) || 0;
+  const { gross, vat } = splitNet(normalizedNet, vatRate);
+
+  return {
+    gross,
+    net: +normalizedNet.toFixed(2),
+    vat,
+    vatRate,
+  };
+}
+
+export function calculateShippingGrossFromNet(
+  items: NetShippingInputItem[],
+  shippingNet: number,
+  country_code?: string | null,
+  tax_id?: string | null,
+) {
+  const normalizedShippingNet = Math.max(0, Number(shippingNet) || 0);
+
+  if (normalizedShippingNet <= 0) {
+    return {
+      gross: 0,
+      net: 0,
+      vat: 0,
+      vatRate: 0,
+    };
+  }
+
+  const buckets = new Map<number, number>();
+
+  for (const item of items) {
+    const vatRate = parseTaxRate(item.tax, country_code, tax_id);
+    const rowNet =
+      (Math.max(0, Number(item.unitNet) || 0) *
+        Math.max(0, Number(item.quantity) || 0)) ||
+      0;
+
+    if (rowNet <= 0) continue;
+    buckets.set(vatRate, +(Number(buckets.get(vatRate)) + rowNet).toFixed(2));
+  }
+
+  const productBuckets = Array.from(buckets.entries())
+    .map(([vatRate, net]) => ({ vatRate, net: +(Number(net) || 0).toFixed(2) }))
+    .filter((bucket) => bucket.net > 0);
+
+  let grossTotal = 0;
+  let vatTotal = 0;
+  const shippingRates = new Set<number>();
+
+  const applyShippingNetToBucket = (vatRate: number, allocatedNet: number) => {
+    const netRounded = +allocatedNet.toFixed(2);
+    if (netRounded <= 0) return;
+
+    const split = splitNet(netRounded, vatRate);
+    grossTotal = +(grossTotal + split.gross).toFixed(2);
+    vatTotal = +(vatTotal + split.vat).toFixed(2);
+    shippingRates.add(vatRate);
+  };
+
+  if (productBuckets.length === 0) {
+    const fallbackRate = parseTaxRate("19%", country_code, tax_id);
+    applyShippingNetToBucket(fallbackRate, normalizedShippingNet);
+  } else {
+    const totalProductNet = +productBuckets
+      .reduce((sum, bucket) => sum + bucket.net, 0)
+      .toFixed(2);
+    let remainingNet = +normalizedShippingNet.toFixed(2);
+
+    productBuckets.forEach((bucket, index) => {
+      const isLast = index === productBuckets.length - 1;
+      let allocatedNet = isLast
+        ? remainingNet
+        : +((normalizedShippingNet * bucket.net) / totalProductNet).toFixed(2);
+
+      allocatedNet = Math.max(
+        0,
+        Math.min(+remainingNet.toFixed(2), allocatedNet),
+      );
+      remainingNet = +(remainingNet - allocatedNet).toFixed(2);
+
+      applyShippingNetToBucket(bucket.vatRate, allocatedNet);
+    });
+
+    if (remainingNet > 0) {
+      const fallbackRate = productBuckets[productBuckets.length - 1].vatRate;
+      applyShippingNetToBucket(fallbackRate, remainingNet);
+    }
+  }
+
+  return {
+    gross: +grossTotal.toFixed(2),
+    net: +normalizedShippingNet.toFixed(2),
+    vat: +vatTotal.toFixed(2),
+    vatRate:
+      shippingRates.size === 1
+        ? Number(Array.from(shippingRates)[0]) || 0
+        : 0,
   };
 }
 

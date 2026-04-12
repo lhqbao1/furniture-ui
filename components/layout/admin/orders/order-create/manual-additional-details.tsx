@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import {
   Command,
   CommandEmpty,
@@ -32,23 +34,59 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Calendar, Check, ChevronsUpDown } from "lucide-react";
+import { Calendar, Check, ChevronsUpDown, Receipt, Wallet } from "lucide-react";
 import Image from "next/image";
+import { ProductItem } from "@/types/products";
+import { calculateShippingGrossFromNet } from "@/lib/caculate-vat";
+import { getCountryCode } from "@/components/shared/getCountryNameDe";
+
+type ManualSelectedProduct = {
+  product: ProductItem;
+  quantity: number;
+  final_price: number;
+};
 
 interface ManualAdditionalInformationProps {
-  isAdmin?: boolean;
+  listProducts?: ManualSelectedProduct[];
 }
 
 export default function ManualAdditionalInformation({
-  isAdmin = false,
+  listProducts = [],
 }: ManualAdditionalInformationProps) {
   const form = useFormContext();
   const [marketplaceDisplay, setMarketplaceDisplay] = useState("");
   const [openMarketplacePopover, setOpenMarketplacePopover] = useState(false);
   const marketplace = form.watch("from_marketplace");
+  const priceMode = form.watch("price_mode") ?? "gross";
+  const totalShippingInput = Number(form.watch("total_shipping") ?? 0) || 0;
+  const countryCode = getCountryCode(form.watch("country"));
+  const taxId = form.watch("tax_id") ?? null;
   const isDirty = form.formState.isDirty;
   const isNettoMarketplace =
     String(marketplace ?? marketplaceDisplay ?? "").toLowerCase() === "netto";
+
+  const shippingGrossPreview = useMemo(() => {
+    if (priceMode !== "net") return 0;
+
+    const converted = calculateShippingGrossFromNet(
+      listProducts.map((item) => ({
+        unitNet: Number(item.final_price) || 0,
+        quantity: Number(item.quantity) || 0,
+        tax: item.product?.tax ?? null,
+      })),
+      totalShippingInput,
+      countryCode,
+      taxId,
+    );
+
+    return Number(converted.gross) || 0;
+  }, [countryCode, listProducts, priceMode, taxId, totalShippingInput]);
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
   const carriers = [
     { id: "spedition", logo: "/amm.jpeg" },
@@ -120,6 +158,70 @@ export default function ManualAdditionalInformation({
           Additional Information
         </h2>
       </div>
+      <FormField
+        control={form.control}
+        name="price_mode"
+        render={({ field }) => (
+          <FormItem className="space-y-2 rounded-xl border border-secondary/20 bg-secondary/5 p-3">
+            <FormLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Price Mode
+            </FormLabel>
+            <FormControl>
+              <RadioGroup
+                value={field.value ?? "gross"}
+                onValueChange={(value) => field.onChange(value)}
+                className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+              >
+                <FormItem className="space-y-0">
+                  <FormControl>
+                    <RadioGroupItem
+                      value="gross"
+                      id="price-mode-gross"
+                      className="peer sr-only"
+                    />
+                  </FormControl>
+                  <Label
+                    htmlFor="price-mode-gross"
+                    className={cn(
+                      "flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-all",
+                      (field.value ?? "gross") === "gross"
+                        ? "border-secondary bg-secondary/15 text-secondary shadow-sm"
+                        : "border-border bg-background hover:border-secondary/40 hover:bg-secondary/5",
+                    )}
+                  >
+                    <Wallet className="size-5 shrink-0" />
+                    <span className="font-semibold">Gross</span>
+                  </Label>
+                </FormItem>
+
+                <FormItem className="space-y-0">
+                  <FormControl>
+                    <RadioGroupItem
+                      value="net"
+                      id="price-mode-net"
+                      className="peer sr-only"
+                    />
+                  </FormControl>
+                  <Label
+                    htmlFor="price-mode-net"
+                    className={cn(
+                      "flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-all",
+                      field.value === "net"
+                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
+                        : "border-border bg-background hover:border-blue-300 hover:bg-blue-50/60",
+                    )}
+                  >
+                    <Receipt className="size-5 shrink-0" />
+                    <span className="font-semibold">Net</span>
+                  </Label>
+                </FormItem>
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
       <div className="grid grid-cols-2 gap-4">
         {/* Address Line */}
         <FormField
@@ -366,6 +468,11 @@ export default function ManualAdditionalInformation({
                   <span className="absolute left-3 text-gray-500">€</span>
                 </div>
               </FormControl>
+              {priceMode === "net" && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Gross: € {formatCurrency(shippingGrossPreview)}
+                </p>
+              )}
               <FormMessage />
             </FormItem>
           )}
