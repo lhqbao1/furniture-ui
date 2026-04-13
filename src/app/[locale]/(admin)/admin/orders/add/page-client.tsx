@@ -71,14 +71,16 @@ export default function CreateOrderPageClient() {
   });
 
   const listItems = form.watch("items");
+  const priceMode = form.watch("price_mode") ?? "gross";
   const countryCode = getCountryCode(form.watch("country"));
   const taxId = form.watch("tax_id") || null;
 
-  const shipping = calculateShippingCostManual(
+  const shippingResult = calculateShippingCostManual(
     listItems,
     countryCode,
     taxId,
-  ).gross;
+  );
+  const shipping = priceMode === "net" ? shippingResult.net : shippingResult.gross;
 
   useEffect(() => {
     const productIds = listProducts.map((item) => item.product.id);
@@ -105,7 +107,7 @@ export default function CreateOrderPageClient() {
       taxId,
     );
 
-    const autoShipping = result.gross;
+    const autoShipping = priceMode === "net" ? result.net : result.gross;
     const autoCarrier = getCarrierFromItems(
       listProducts.map((item) => ({
         id_provider: item.product.id_provider,
@@ -128,7 +130,7 @@ export default function CreateOrderPageClient() {
     if (autoCarrier && autoCarrier !== currentCarrier) {
       form.setValue("carrier", autoCarrier, { shouldDirty: true });
     }
-  }, [listProducts, countryCode, taxId, form]);
+  }, [listProducts, countryCode, taxId, form, priceMode]);
 
   useManualCheckoutLogic(form, setDisabledFields, {
     skipMarketplacePreset: hasSelectedSavedUser,

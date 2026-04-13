@@ -3,7 +3,7 @@
 import { ColumnDef, Row } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CopyCheck, Eye, Loader2, Pencil, Upload } from "lucide-react";
+import { Check, CopyCheck, Eye, Loader2, Pencil, Upload } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductItem } from "@/types/products";
 import { useEffect, useMemo, useState } from "react";
@@ -1123,15 +1123,26 @@ function EditTableSupplierCell({ product }: { product: ProductItem }) {
 
 function EditableBrandCell({ product }: { product: ProductItem }) {
   const [value, setValue] = useState(product.brand?.id ?? "");
-  const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState(false);
   const editProductMutation = useEditProduct();
-  const { data: brands, isLoading } = useGetBrands();
+  const { data: brands, isLoading, isError } = useGetBrands();
 
   useEffect(() => {
     setValue(product.brand?.id ?? "");
-  }, [product.brand]);
+  }, [product.brand?.id]);
+
+  const sortedBrands = useMemo(
+    () =>
+      [...(brands ?? [])].sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+      ),
+    [brands],
+  );
 
   const handleEditBrand = (brandId: string) => {
+    const previousValue = value;
+    setValue(brandId);
+
     const toastId = toast.loading("Updating brand...");
     const selectedBrand = brands?.find((brand) => brand.id === brandId);
     const isBrandEconelo = selectedBrand?.name
@@ -1164,13 +1175,14 @@ function EditableBrandCell({ product }: { product: ProductItem }) {
       {
         onSuccess() {
           toast.success("Brand updated successfully", { id: toastId });
-          setEditing(false);
+          setOpen(false);
         },
         onError(error) {
           toast.error("Update brand failed", {
             id: toastId,
             description: getErrorDescription(error),
           });
+          setValue(previousValue);
         },
       },
     );
@@ -1178,36 +1190,67 @@ function EditableBrandCell({ product }: { product: ProductItem }) {
 
   return (
     <div className="flex justify-center text-center w-full">
-      {editing ? (
-        <Select
-          value={value}
-          onOpenChange={(open) => {
-            if (!open && !editProductMutation.isPending) {
-              setEditing(false);
-            }
-          }}
-          onValueChange={(val) => {
-            setValue(val);
-            handleEditBrand(val);
-          }}
-          disabled={editProductMutation.isPending || isLoading}
-        >
-          <SelectTrigger className="w-36 border">
-            <SelectValue placeholder={isLoading ? "Loading..." : ""} />
-          </SelectTrigger>
-          <SelectContent>
-            {brands?.map((brand) => (
-              <SelectItem key={brand.id} value={brand.id}>
-                {brand.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      ) : (
-        <div className="cursor-pointer" onClick={() => setEditing(true)}>
-          {product.brand ? product.brand.name : "—"}
-        </div>
-      )}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            className="w-full justify-center px-2 text-sm hover:text-foreground"
+            disabled={isLoading || isError || editProductMutation.isPending}
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading...
+              </span>
+            ) : (
+              <span className="line-clamp-2">{product.brand?.name ?? "—"}</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[260px] p-0" align="start">
+          {isLoading ? (
+            <div className="flex items-center justify-center p-4">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : isError ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              Error loading brands
+            </div>
+          ) : (
+            <Command>
+              <CommandInput placeholder="Search brands..." className="h-10" />
+              <CommandList className="max-h-[320px]">
+                <CommandEmpty>No brands available</CommandEmpty>
+                <CommandGroup>
+                  {sortedBrands.map((brand) => (
+                    <CommandItem
+                      key={brand.id}
+                      value={`${brand.name} ${brand.id}`}
+                      onSelect={() => {
+                        if (editProductMutation.isPending) return;
+                        if (value === brand.id) {
+                          setOpen(false);
+                          return;
+                        }
+                        handleEditBrand(brand.id);
+                      }}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Check
+                        className={cn(
+                          "h-4 w-4",
+                          value === brand.id ? "opacity-100" : "opacity-0",
+                        )}
+                      />
+                      <span className="truncate">{brand.name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          )}
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

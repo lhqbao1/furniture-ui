@@ -1,5 +1,4 @@
 "use client";
-import CustomBreadCrumb from "@/components/shared/breadcrumb";
 import ProductsGridLayout from "@/components/shared/products-grid-layout";
 import React, { useEffect, useState } from "react";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
@@ -10,26 +9,39 @@ import { useQuery } from "@tanstack/react-query";
 import { getChildrenCategoryByParent } from "@/features/category/api";
 import ShopAllFilterSection from "../shop-all/shop-all-filter-section";
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 import { useProductsAlgoliaSearch } from "@/features/products/hook";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, SearchX } from "lucide-react";
+import { ArrowRight, Home, SearchX } from "lucide-react";
 import DynamicTMTracker from "@/components/shared/tracking/dynamic-tm-tracker";
 import {
   getTrackingId,
   toTrackingCsv,
   toTrackingString,
 } from "@/components/shared/tracking/tracking-utils";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface ProductCategoryProps {
   categorySlugs: string[];
-  tag?: string;
   category?: CategoryBySlugResponse;
 }
 
+const formatCategoryLabelFromSlug = (value: string) =>
+  decodeURIComponent(value)
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
 const ProductCategory = ({
   categorySlugs,
-  tag,
   category,
 }: ProductCategoryProps) => {
   const t = useTranslations();
@@ -113,6 +125,21 @@ const ProductCategory = ({
   const isEmptyCategory = Boolean(
     algoliaData && algoliaData.items?.length === 0,
   );
+  const breadcrumbItems = React.useMemo(
+    () =>
+      categorySlugs.map((slug, index) => {
+        const isCurrent = index === categorySlugs.length - 1;
+
+        return {
+          label: isCurrent
+            ? category?.name || formatCategoryLabelFromSlug(slug)
+            : formatCategoryLabelFromSlug(slug),
+          href: `/category/${categorySlugs.slice(0, index + 1).join("/")}`,
+          isCurrent,
+        };
+      }),
+    [category?.name, categorySlugs],
+  );
 
   const categoryTrackingPayload = React.useMemo(() => {
     const items = algoliaData?.items ?? [];
@@ -177,7 +204,45 @@ const ProductCategory = ({
           </div>
         </div>
         <div className="pt-0 pb-12 lg:w-[90%] md:w-[95%] xl:w-[90%] w-full mx-auto col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10">
-          <CustomBreadCrumb currentPage={category?.name ?? ""} />
+          <div className="mb-3 md:mb-4">
+            <Breadcrumb>
+              <BreadcrumbList className="inline-flex rounded-full border border-emerald-100 bg-white/80 px-4 py-2 text-sm shadow-sm backdrop-blur-sm">
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link
+                      href="/"
+                      className="inline-flex items-center gap-1.5 font-medium text-slate-600 hover:text-emerald-700"
+                    >
+                      <Home className="size-3.5" />
+                      <span>Home</span>
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+
+                {breadcrumbItems.map((item) => (
+                  <React.Fragment key={item.href}>
+                    <BreadcrumbSeparator className="text-slate-400" />
+                    <BreadcrumbItem>
+                      {item.isCurrent ? (
+                        <BreadcrumbPage className="font-semibold text-slate-900">
+                          {item.label}
+                        </BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink asChild>
+                          <Link
+                            href={item.href}
+                            className="font-medium text-slate-600 hover:text-emerald-700"
+                          >
+                            {item.label}
+                          </Link>
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
           <h1 className="section-header">{category?.name}</h1>
 
           {!listCategory &&

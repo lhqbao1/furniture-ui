@@ -688,7 +688,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
       </div>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent>
+        <DialogContent className="w-[400px]">
           <DialogHeader>
             <DialogTitle>Confirm stock from AMM</DialogTitle>
             <DialogDescription>
