@@ -24,7 +24,10 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -37,21 +40,40 @@ interface ReturnConfirmDialogProps {
   onClose: () => void;
 }
 
-const REFUND_REASONS = [
-  "Shipping not possible",
-  "Customer return",
-  "General account adjustment",
-  "Shipment refused",
-  "Buyer cancellation",
-  "Different item",
-  "Delay caused by carrier",
+const ELIGIBLE_SHIPPING_REFUND_REASONS = [
+  "Incorrect item received",
   "Item not as described",
-  "Delivery address undeliverable",
-  "Out of stock",
-  "Item not received",
-  "Delivery promise not met",
-  "Pricing error.",
+  "Damaged or defective item",
+  "Item out of stock",
+  "Pricing or listing error",
+  "Cancelled by customer",
+  "Shipping unavailable to customer location",
+  "Carrier delay / delivery timeframe not met",
+  "Item not received (lost in transit)",
 ] as const;
+
+const NOT_ELIGIBLE_SHIPPING_REFUND_REASONS = [
+  "Customer-initiated return",
+  "Shipment refused by customer",
+  "Freight No-Show: No response to delivery Avis",
+  "Invalid or undeliverable shipping address",
+  "Account adjustment (Goodwill)",
+] as const;
+
+const REFUND_REASON_GROUPS = [
+  {
+    label: "Eligible for Shipping Cost Refund",
+    options: ELIGIBLE_SHIPPING_REFUND_REASONS,
+  },
+  {
+    label: "Not Eligible for Shipping Cost Refund",
+    options: NOT_ELIGIBLE_SHIPPING_REFUND_REASONS,
+  },
+] as const;
+
+const SHIPPING_REFUND_ELIGIBLE_REASON_SET = new Set<string>(
+  ELIGIBLE_SHIPPING_REFUND_REASONS,
+);
 
 type RefundMode = "full" | "partial";
 type ItemQuality = "A-Goods" | "C-Goods" | "No return";
@@ -190,7 +212,7 @@ const IssueRefundDialog = ({
   );
 
   const [shippingUnits, setShippingUnits] = React.useState(0);
-  const [shippingAmountInput, setShippingAmountInput] = React.useState("");
+  const [shippingAmountInput, setShippingAmountInput] = React.useState("0");
 
   const isSubmitting =
     createRefundMutation.isPending ||
@@ -225,7 +247,7 @@ const IssueRefundDialog = ({
       return initialLineForms;
     });
     setShippingUnits(0);
-    setShippingAmountInput("");
+    setShippingAmountInput("0");
   }, [open, refundLines]);
 
   const updateLineForm = React.useCallback(
@@ -278,13 +300,35 @@ const IssueRefundDialog = ({
     [lineFormByKey, refundLines, refundMode],
   );
 
+  const isShippingRefundAllowed = React.useMemo(
+    () =>
+      Object.values(lineFormByKey).some((lineForm) =>
+        SHIPPING_REFUND_ELIGIBLE_REASON_SET.has(lineForm.reason?.trim() ?? ""),
+      ),
+    [lineFormByKey],
+  );
+
+  React.useEffect(() => {
+    if (isShippingRefundAllowed) return;
+    setShippingUnits(0);
+    setShippingAmountInput("0");
+  }, [isShippingRefundAllowed]);
+
   const shippingRefundAmount = React.useMemo(() => {
+    if (!isShippingRefundAllowed) return 0;
+
     if (refundMode === "full") {
       const unit = shippingUnits > 0 ? 1 : 0;
       return unit * shippingMaxAmount;
     }
     return clamp(parseAmountInput(shippingAmountInput), 0, shippingMaxAmount);
-  }, [refundMode, shippingAmountInput, shippingMaxAmount, shippingUnits]);
+  }, [
+    isShippingRefundAllowed,
+    refundMode,
+    shippingAmountInput,
+    shippingMaxAmount,
+    shippingUnits,
+  ]);
 
   const totalRefundAmount = React.useMemo(
     () =>
@@ -643,10 +687,22 @@ const IssueRefundDialog = ({
                       <SelectValue placeholder="Select a reason" />
                     </SelectTrigger>
                     <SelectContent>
-                      {REFUND_REASONS.map((reason) => (
-                        <SelectItem key={reason} value={reason}>
-                          {reason}
-                        </SelectItem>
+                      {REFUND_REASON_GROUPS.map((group, groupIndex) => (
+                        <React.Fragment key={group.label}>
+                          <SelectGroup>
+                            <SelectLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wide text-foreground">
+                              {group.label}
+                            </SelectLabel>
+                            {group.options.map((reason) => (
+                              <SelectItem key={reason} value={reason}>
+                                {reason}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                          {groupIndex < REFUND_REASON_GROUPS.length - 1 ? (
+                            <SelectSeparator />
+                          ) : null}
+                        </React.Fragment>
                       ))}
                     </SelectContent>
                   </Select>
@@ -774,7 +830,7 @@ const IssueRefundDialog = ({
                     <Select
                       value={String(shippingUnits > 0 ? 1 : 0)}
                       onValueChange={(value) => setShippingUnits(Number(value))}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !isShippingRefundAllowed}
                     >
                       <SelectTrigger className="w-full border border-input">
                         <SelectValue placeholder="Select units" />
@@ -795,12 +851,12 @@ const IssueRefundDialog = ({
                       min={0}
                       max={shippingMaxAmount}
                       step="0.01"
-                      value={shippingAmountInput}
+                      value={isShippingRefundAllowed ? shippingAmountInput : "0"}
                       onChange={(event) => {
                         const rawValue = event.target.value;
 
                         if (!rawValue.trim()) {
-                          setShippingAmountInput("");
+                          setShippingAmountInput("0");
                           return;
                         }
 
@@ -814,7 +870,7 @@ const IssueRefundDialog = ({
                             : formatAmountInput(clampedValue),
                         );
                       }}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !isShippingRefundAllowed}
                     />
                   </>
                 )}
