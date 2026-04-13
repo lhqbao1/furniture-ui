@@ -48,15 +48,15 @@ export default async function FAQ() {
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <div className="w-full min-h-screen overflow-scroll">
+      <main className="w-full min-h-screen overflow-x-hidden bg-slate-50/40">
         {firstTopic ? (
           <ListFAQ topic_id={firstTopic} />
         ) : (
-          <div className="text-center py-20 text-gray-500">
-            No FAQ topics available
+          <div className="px-4 py-24 text-center text-sm text-slate-500 md:text-base">
+            Aktuell sind keine FAQ-Kategorien verfügbar.
           </div>
         )}
-      </div>
+      </main>
     </HydrationBoundary>
   );
 }
