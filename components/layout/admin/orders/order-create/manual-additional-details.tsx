@@ -61,6 +61,7 @@ export default function ManualAdditionalInformation({
   const totalShippingInput = Number(form.watch("total_shipping") ?? 0) || 0;
   const countryCode = getCountryCode(form.watch("country"));
   const taxId = form.watch("tax_id") ?? null;
+  const effectiveTaxIdForVat = countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;
   const isDirty = form.formState.isDirty;
   const isNettoMarketplace =
     String(marketplace ?? marketplaceDisplay ?? "").toLowerCase() === "netto";
@@ -76,11 +77,17 @@ export default function ManualAdditionalInformation({
       })),
       totalShippingInput,
       countryCode,
-      taxId,
+      effectiveTaxIdForVat,
     );
 
     return Number(converted.gross) || 0;
-  }, [countryCode, listProducts, priceMode, taxId, totalShippingInput]);
+  }, [
+    countryCode,
+    effectiveTaxIdForVat,
+    listProducts,
+    priceMode,
+    totalShippingInput,
+  ]);
 
   const formatCurrency = (value: number) =>
     value.toLocaleString("de-DE", {
@@ -114,7 +121,6 @@ export default function ManualAdditionalInformation({
         { value: "neckermann", label: "Neckermann" },
         { value: "bauhaus", label: "Bauhaus" },
         { value: "bader", label: "Bader" },
-
         { value: "euro-tops", label: "Euro Tops" },
         { value: "XXXLUTZ", label: "XXXLUTZ" },
         { value: "prestige", label: "Prestige Home" },
