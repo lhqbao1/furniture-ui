@@ -44,6 +44,8 @@ const SelectOrderItems = ({
   const priceMode = form.watch("price_mode") ?? "gross";
   const countryCode = getCountryCode(form.watch("country"));
   const taxId = form.watch("tax_id") ?? null;
+  const effectiveTaxIdForVat =
+    countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;
 
   const [queryParams, setQueryParams] = useState("");
   const [open, setOpen] = useState(false);
@@ -153,11 +155,21 @@ const SelectOrderItems = ({
                   <CommandItem disabled>Error loading products</CommandItem>
                 )}
                 {filteredProducts.map((product) => (
+                  (() => {
+                    const hasPrice =
+                      product.final_price !== null &&
+                      product.final_price !== undefined &&
+                      !Number.isNaN(Number(product.final_price));
+                    const priceLabel = hasPrice
+                      ? `€${formatCurrency(Number(product.final_price))}`
+                      : "No price";
+
+                    return (
                   <CommandItem
                     key={product.id}
                     value={product.id ?? ""}
                     onSelect={() => handleSelectProduct(product)}
-                    className="flex justify-between"
+                    className="flex items-center gap-3"
                   >
                     <div className="flex items-center gap-3">
                       <Image
@@ -171,10 +183,18 @@ const SelectOrderItems = ({
                         className="rounded-sm"
                         unoptimized
                       />
-                      <span>{product.name}</span>
+                      <div className="min-w-0">
+                        <p className="truncate">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          ID: {product.id_provider ?? "-"} | SKU:{" "}
+                          {product.sku?.trim() ? product.sku : "-"} |{" "}
+                          {priceLabel}
+                        </p>
+                      </div>
                     </div>
-                    <span>€{product.final_price}</span>
                   </CommandItem>
+                    );
+                  })()
                 ))}
               </CommandGroup>
             </Command>
@@ -199,7 +219,7 @@ const SelectOrderItems = ({
                     Number(final_price) || 0,
                     product?.tax ?? null,
                     countryCode,
-                    taxId,
+                    effectiveTaxIdForVat,
                   ).gross
                 : null;
 

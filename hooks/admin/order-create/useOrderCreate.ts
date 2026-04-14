@@ -102,7 +102,6 @@ export function useManualCheckoutLogic(
   const marketplace = form.watch("from_marketplace");
   const status = form.watch("status");
   const country = form.watch("country");
-  const company_name = form.watch("company_name")?.trim();
 
   // -------------------------------------------------------------
   // 1️⃣ Apply marketplace preset + disable fields
@@ -157,7 +156,7 @@ export function useManualCheckoutLogic(
     }
 
     if (country === "AT") {
-      form.setValue("tax", company_name ? 0 : 20);
+      form.setValue("tax", 0);
     }
-  }, [country, company_name]);
+  }, [country]);
 }

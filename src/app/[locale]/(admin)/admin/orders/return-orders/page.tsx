@@ -85,6 +85,10 @@ const ReturnOrdersPage = () => {
           setPageSize={setPageSize}
           type={ToolbarType.order}
           selectedOrders={selectedOrders}
+          showB2BRevenue={false}
+          exportPresetStatuses={["return_issue"]}
+          lockExportStatuses
+          expandExportByRefundItems
         />
 
         <ProductTable

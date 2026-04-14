@@ -74,11 +74,13 @@ export default function CreateOrderPageClient() {
   const priceMode = form.watch("price_mode") ?? "gross";
   const countryCode = getCountryCode(form.watch("country"));
   const taxId = form.watch("tax_id") || null;
+  const effectiveTaxIdForVat =
+    countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;
 
   const shippingResult = calculateShippingCostManual(
     listItems,
     countryCode,
-    taxId,
+    effectiveTaxIdForVat,
   );
   const shipping = priceMode === "net" ? shippingResult.net : shippingResult.gross;
 
@@ -104,7 +106,7 @@ export default function CreateOrderPageClient() {
     const result = calculateShippingCostManual(
       currentItems,
       countryCode,
-      taxId,
+      effectiveTaxIdForVat,
     );
 
     const autoShipping = priceMode === "net" ? result.net : result.gross;
@@ -130,7 +132,7 @@ export default function CreateOrderPageClient() {
     if (autoCarrier && autoCarrier !== currentCarrier) {
       form.setValue("carrier", autoCarrier, { shouldDirty: true });
     }
-  }, [listProducts, countryCode, taxId, form, priceMode]);
+  }, [listProducts, countryCode, effectiveTaxIdForVat, form, priceMode]);
 
   useManualCheckoutLogic(form, setDisabledFields, {
     skipMarketplacePreset: hasSelectedSavedUser,
@@ -209,7 +211,7 @@ export default function CreateOrderPageClient() {
         Number(item.final_price) || 0,
         itemTaxByIdProvider.get(String(item.id_provider ?? "")) ?? null,
         countryCode,
-        taxId,
+        effectiveTaxIdForVat,
       );
 
       return {
@@ -231,7 +233,7 @@ export default function CreateOrderPageClient() {
             })),
             shippingInputValue,
             countryCode,
-            taxId,
+            effectiveTaxIdForVat,
           ).gross
         : shippingInputValue;
 
