@@ -53,6 +53,10 @@ interface OrderToolbarProps {
   exportData?: ProductItem[];
   type: ToolbarType;
   selectedOrders?: CheckOutMain[];
+  showB2BRevenue?: boolean;
+  exportPresetStatuses?: string[];
+  lockExportStatuses?: boolean;
+  expandExportByRefundItems?: boolean;
 }
 
 const FILTER_KEYS = [
@@ -74,6 +78,10 @@ export default function OrderToolbar({
   addButtonModalContent,
   type,
   selectedOrders = [],
+  showB2BRevenue = true,
+  exportPresetStatuses,
+  lockExportStatuses = false,
+  expandExportByRefundItems = false,
 }: OrderToolbarProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -204,7 +212,7 @@ export default function OrderToolbar({
 
         {type === ToolbarType.order ? (
           <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full xl:w-1/2">
-            <OrderB2BFilter />
+            <OrderB2BFilter showRevenue={showB2BRevenue} />
           </div>
         ) : null}
 
@@ -287,7 +295,11 @@ export default function OrderToolbar({
           </DropdownMenu>
 
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium">
-            <ExportOrderExcelButton />
+            <ExportOrderExcelButton
+              presetStatuses={exportPresetStatuses}
+              lockStatusSelection={lockExportStatuses}
+              expandByProductRefund={expandExportByRefundItems}
+            />
             <OrderImport />
           </div>
         </div>
