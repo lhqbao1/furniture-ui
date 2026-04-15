@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import MultiSearch from "../../products/products-list/toolbar/multi-search";
 import B2BInvoiceDrawer from "./b2b-invoice-drawer";
 import OrderB2BFilter from "./filter/filter-order-b2b";
+import { exportOrderListTemplateToExcel } from "./export-order-template";
 
 export enum ToolbarType {
   product = "product",
@@ -224,7 +225,21 @@ export default function OrderToolbar({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Export Selected</DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  if (selectedOrders.length === 0) {
+                    toast.info("No order selected");
+                    return;
+                  }
+
+                  exportOrderListTemplateToExcel(
+                    selectedOrders,
+                    "order_export_selected.xlsx",
+                  );
+                }}
+              >
+                Export Selected
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={() => {
                   if (selectedOrders.length === 0) {

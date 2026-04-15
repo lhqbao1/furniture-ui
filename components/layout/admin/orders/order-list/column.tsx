@@ -8,6 +8,7 @@ import { CheckOut, CheckOutMain } from "@/types/checkout";
 import {
   ChevronDown,
   ChevronRight,
+  Download,
   ExternalLink,
   Eye,
   NotebookPen,
@@ -30,6 +31,11 @@ import { cartSupplierColumn } from "@/components/layout/cart/columns";
 import { getStatusStyle } from "./status-styles";
 import CancelExchangeDialog from "../order-details/dialog/cancel-exchange-dialog";
 import Link from "next/link";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const ActionCell = ({
   id,
@@ -110,6 +116,7 @@ const ActionCell = ({
 };
 
 const ActionCellChild = ({
+  checkout,
   items,
   checkoutId,
   isSupplier = false,
@@ -120,6 +127,7 @@ const ActionCellChild = ({
   currentRowId,
   status,
 }: {
+  checkout: CheckOut;
   items: CartItem[];
   checkoutId: string;
   isSupplier?: boolean;
@@ -133,6 +141,92 @@ const ActionCellChild = ({
   const isExpanded = currentRowId
     ? (isRowExpanded?.(currentRowId) ?? expandedRowId === currentRowId)
     : false;
+
+  const escapeXml = (value: unknown) => {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
+  };
+
+  const handleDownloadXml = () => {
+    const marketplace = (checkout?.from_marketplace ?? "").toLowerCase();
+    const userName =
+      `${checkout?.user?.first_name ?? ""} ${checkout?.user?.last_name ?? ""}`.trim();
+    const shippingAddress = checkout?.shipping_address;
+    const positions = Array.isArray(items) ? items : [];
+
+    const positionsXml = positions
+      .map((item) => {
+        const lineItemId =
+          (
+            item as CartItem & {
+              line_item_id?: string | null;
+              products?: { line_item_id?: string | null };
+            }
+          )?.line_item_id ??
+          (
+            item as CartItem & {
+              line_item_id?: string | null;
+              products?: { line_item_id?: string | null };
+            }
+          )?.products?.line_item_id ??
+          "";
+
+        const sku = item?.products?.sku ?? "";
+        const name = item?.products?.name ?? "";
+        const quantity = Number(item?.quantity ?? 0);
+
+        return [
+          "        <Position>",
+          `            <Referenz>${escapeXml(lineItemId)}</Referenz>`,
+          `            <Artikel>${escapeXml(sku)}</Artikel>`,
+          `            <Bezeichner>${escapeXml(name)}</Bezeichner>`,
+          `            <Menge_SOLL>${escapeXml(Number.isFinite(quantity) ? quantity : 0)}</Menge_SOLL>`,
+          "        </Position>",
+        ].join("\n");
+      })
+      .join("\n");
+
+    const xml = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      "<Lieferauftrag>",
+      "    <Kopfdaten>",
+      "        <Mandant>243</Mandant>",
+      `        <Auftrag>${escapeXml(checkout?.shipment?.ship_code ?? "")}</Auftrag>`,
+      "        <Lager>Amm GmbH</Lager>",
+      `        <Auftraggeber>${escapeXml(marketplace)}</Auftraggeber>`,
+      `        <Kunde>${escapeXml(userName)}</Kunde>`,
+      `        <Versandname1>${escapeXml(shippingAddress?.recipient_name ?? "")}</Versandname1>`,
+      "        <Versandname2/>",
+      `        <Versandstrasse>${escapeXml(shippingAddress?.address_line ?? "")}</Versandstrasse>`,
+      `        <Versandplz>${escapeXml(shippingAddress?.postal_code ?? "")}</Versandplz>`,
+      `        <Versandort>${escapeXml(shippingAddress?.city ?? "")}</Versandort>`,
+      `        <Versandland>${escapeXml(shippingAddress?.country ?? "")}</Versandland>`,
+      `        <Versandart>${escapeXml(checkout?.carrier ?? "")}</Versandart>`,
+      `        <Telefon>${escapeXml(shippingAddress?.phone_number ?? "")}</Telefon>`,
+      `        <Mail>${escapeXml(shippingAddress?.email ?? "")}</Mail>`,
+      "    </Kopfdaten>",
+      "    <Positionen>",
+      positionsXml,
+      "    </Positionen>",
+      "</Lieferauftrag>",
+    ].join("\n");
+
+    const blob = new Blob([xml], { type: "application/xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const fileName = `delivery-order-${checkout?.shipment?.ship_code || checkoutId}.xml`;
+
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="flex justify-center items-center gap-2">
@@ -173,6 +267,21 @@ const ActionCellChild = ({
       {status?.toLowerCase() === "exchange" && (
         <CancelExchangeDialog id={checkoutId} main_checkout_id={checkoutId} />
       )}
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            type="button"
+            onClick={handleDownloadXml}
+            className="hover:bg-amber-50"
+          >
+            <Download className="w-4 h-4 text-amber-500" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>download xml</TooltipContent>
+      </Tooltip>
 
       {/* Expand button */}
       <Button
@@ -684,6 +793,7 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     header: () => <div className="text-center w-full">ACTIONS</div>,
     cell: ({ row, table }) => (
       <ActionCellChild
+        checkout={row.original}
         checkoutId={row.original.id}
         items={row.original.cart.items}
         expandedRowId={table.options.meta?.expandedRowId || null}
