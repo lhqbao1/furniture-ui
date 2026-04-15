@@ -288,3 +288,18 @@ export type ProductResponse = {
   pagination: Pagination;
   items: ProductItem[];
 };
+
+export type ProductAndSoldItem = Partial<ProductItem> & {
+  sold?: number | null;
+  sold_stock?: number | null;
+  total_sold?: number | null;
+  total_quantity?: number | null;
+  stock_sold?: number | null;
+  min_stock?: number | null;
+  minimum_stock?: number | null;
+};
+
+export type ProductAndSoldResponse = {
+  pagination: Pagination;
+  items: ProductAndSoldItem[];
+};

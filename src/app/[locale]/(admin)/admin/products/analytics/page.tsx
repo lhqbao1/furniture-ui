@@ -2,8 +2,8 @@
 
 import React from "react";
 import { useGetProductsCheckOutDashboard } from "@/features/checkout/hook";
-import { useGetAllProducts } from "@/features/products/hook";
-import { ProductItem } from "@/types/products";
+import { useGetAllProductAndSold } from "@/features/products/hook";
+import { ProductAndSoldItem } from "@/types/products";
 import { format, getISOWeek } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,10 +16,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { CustomPagination } from "@/components/shared/custom-pagination";
+import { useDebounce } from "use-debounce";
 
-const STOCK_PAGE_SIZE = 50;
+const STOCK_PAGE_SIZE = 20;
+type SoldStockSort = "asc" | "desc";
 
 type IncomingDisplayItem = {
   id: string;
@@ -38,11 +41,32 @@ const formatCurrency = (value: number): string =>
     maximumFractionDigits: 2,
   }).format(value);
 
-const getIncomingDisplayItems = (product: ProductItem): IncomingDisplayItem[] => {
+const getSoldStockValue = (product: ProductAndSoldItem): number | null => {
+  const rawValue = product.sold;
+
+  if (rawValue === null || rawValue === undefined || rawValue === "") {
+    return null;
+  }
+
+  return toNumber(rawValue);
+};
+
+const getMinStockValue = (product: ProductAndSoldItem): number | null => {
+  const rawValue = product.min_stock;
+  if (rawValue === null || rawValue === undefined || rawValue === "") {
+    return null;
+  }
+
+  return toNumber(rawValue);
+};
+
+const getIncomingDisplayItems = (
+  product: ProductAndSoldItem,
+): IncomingDisplayItem[] => {
   const now = new Date();
 
   const buildFutureIncomingRows = (
-    inventoryPos: ProductItem["inventory_pos"] | undefined,
+    inventoryPos: ProductAndSoldItem["inventory_pos"] | undefined,
   ) =>
     (inventoryPos ?? [])
       .map((item) => {
@@ -140,7 +164,7 @@ const getIncomingDisplayItems = (product: ProductItem): IncomingDisplayItem[] =>
   return buildFutureIncomingRows(product.inventory_pos);
 };
 
-function IncomingStockDisplay({ product }: { product: ProductItem }) {
+function IncomingStockDisplay({ product }: { product: ProductAndSoldItem }) {
   const today = React.useMemo(() => {
     const current = new Date();
     current.setHours(0, 0, 0, 0);
@@ -152,17 +176,17 @@ function IncomingStockDisplay({ product }: { product: ProductItem }) {
   );
 
   if (!incomingItems.length) {
-    return <span>-</span>;
+    return <div className="text-center">—</div>;
   }
 
   return (
-    <div className="space-y-1 text-xs">
+    <div className="space-y-1.5 text-sm text-center">
       {incomingItems.map((item) => {
         const date = item.date;
         const formattedDate =
           date && !Number.isNaN(date.getTime())
             ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(date, "MMMM d")}`
-            : "-";
+            : "—";
 
         const sixWeeksFromNow = new Date(today);
         sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
@@ -173,8 +197,11 @@ function IncomingStockDisplay({ product }: { product: ProductItem }) {
           date <= sixWeeksFromNow;
 
         return (
-          <div key={item.id} className={cn(isSoon && "text-secondary")}>
-            {item.quantity ?? 0} | {formattedDate}
+          <div
+            key={item.id}
+            className={isSoon ? "text-secondary" : undefined}
+          >
+            {item.quantity ?? 0} | {formattedDate ?? "—"}
           </div>
         );
       })}
@@ -183,16 +210,25 @@ function IncomingStockDisplay({ product }: { product: ProductItem }) {
 }
 
 export default function ProductAnalyticsPage() {
-  const [page, setPage] = React.useState(1);
+  const [stockPage, setStockPage] = React.useState(1);
+  const [searchInput, setSearchInput] = React.useState("");
+  const [soldStockSort, setSoldStockSort] =
+    React.useState<SoldStockSort>("desc");
+  const [debouncedSearch] = useDebounce(searchInput.trim(), 450);
+
+  React.useEffect(() => {
+    setStockPage(1);
+  }, [debouncedSearch, soldStockSort]);
 
   const {
     data: productsData,
     isLoading: isStockLoading,
-    isFetching: isStockFetching,
     isError: isStockError,
-  } = useGetAllProducts({
-    page,
+  } = useGetAllProductAndSold({
+    page: stockPage,
     page_size: STOCK_PAGE_SIZE,
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    sort_by_stock: soldStockSort,
   });
 
   const {
@@ -200,14 +236,6 @@ export default function ProductAnalyticsPage() {
     isLoading: isRevenueLoading,
     isError: isRevenueError,
   } = useGetProductsCheckOutDashboard();
-
-  const soldStockByProviderId = React.useMemo(() => {
-    const map = new Map<string, number>();
-    for (const item of providerOverview?.items ?? []) {
-      map.set(String(item.id_provider ?? ""), toNumber(item.total_quantity));
-    }
-    return map;
-  }, [providerOverview?.items]);
 
   const topRevenueProducts = React.useMemo(
     () =>
@@ -220,6 +248,10 @@ export default function ProductAnalyticsPage() {
   const totalPages = productsData?.pagination.total_pages ?? 1;
   const totalItems = productsData?.pagination.total_items ?? 0;
   const stockItems = productsData?.items ?? [];
+  const soldStockSortLabel =
+    soldStockSort === "asc"
+      ? "Sold stock: low to high"
+      : "Sold stock: high to low";
 
   return (
     <div className="h-screen overflow-hidden pb-6">
@@ -235,6 +267,47 @@ export default function ProductAnalyticsPage() {
               </p>
             </CardHeader>
             <CardContent className="min-h-0 space-y-4">
+              <div className="flex flex-col gap-3 rounded-xl border border-secondary/15 bg-muted/20 p-3 md:flex-row md:items-center md:justify-between">
+                <div className="relative w-full md:max-w-md">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    placeholder="Search by product id or name..."
+                    className="h-10 border-secondary/20 bg-white pl-9 pr-9"
+                  />
+                  {searchInput ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+                      onClick={() => setSearchInput("")}
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  ) : null}
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-10 w-full border-secondary/25 bg-white md:w-auto"
+                  onClick={() =>
+                    setSoldStockSort((prev) => (prev === "desc" ? "asc" : "desc"))
+                  }
+                >
+                  {soldStockSort === "asc" ? (
+                    <ArrowUp className="h-4 w-4" />
+                  ) : soldStockSort === "desc" ? (
+                    <ArrowDown className="h-4 w-4" />
+                  ) : (
+                    <ArrowUpDown className="h-4 w-4" />
+                  )}
+                  {soldStockSortLabel}
+                </Button>
+              </div>
+
               {isStockLoading ? (
                 <div className="space-y-2">
                   {Array.from({ length: 8 }).map((_, index) => (
@@ -257,7 +330,25 @@ export default function ProductAnalyticsPage() {
                             Physical stock
                           </TableHead>
                           <TableHead className="h-11 px-3 text-right">
-                            Sold stock
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="ml-auto h-auto px-0 text-right font-medium hover:bg-transparent"
+                              onClick={() =>
+                                setSoldStockSort((prev) =>
+                                  prev === "desc" ? "asc" : "desc",
+                                )
+                              }
+                            >
+                              Sold stock
+                              {soldStockSort === "asc" ? (
+                                <ArrowUp className="ml-1 h-3.5 w-3.5" />
+                              ) : soldStockSort === "desc" ? (
+                                <ArrowDown className="ml-1 h-3.5 w-3.5" />
+                              ) : (
+                                <ArrowUpDown className="ml-1 h-3.5 w-3.5" />
+                              )}
+                            </Button>
                           </TableHead>
                           <TableHead className="h-11 px-3">Incoming stock</TableHead>
                           <TableHead className="h-11 px-3 text-right">
@@ -278,10 +369,11 @@ export default function ProductAnalyticsPage() {
                         ) : (
                           stockItems.map((product) => {
                             const productId = String(product.id_provider ?? "-");
-                            const soldStock = soldStockByProviderId.get(productId);
+                            const soldStock = getSoldStockValue(product);
+                            const minStock = getMinStockValue(product);
 
                             return (
-                              <TableRow key={product.id}>
+                              <TableRow key={String(product.id ?? productId)}>
                                 <TableCell className="px-3 font-medium">
                                   {productId || "-"}
                                 </TableCell>
@@ -292,14 +384,18 @@ export default function ProductAnalyticsPage() {
                                   {toNumber(product.stock).toLocaleString("de-DE")}
                                 </TableCell>
                                 <TableCell className="px-3 text-right">
-                                  {soldStock === undefined
+                                  {soldStock === null
                                     ? "-"
                                     : soldStock.toLocaleString("de-DE")}
                                 </TableCell>
                                 <TableCell className="px-3">
                                   <IncomingStockDisplay product={product} />
                                 </TableCell>
-                                <TableCell className="px-3 text-right">-</TableCell>
+                                <TableCell className="px-3 text-right">
+                                  {minStock === null
+                                    ? "-"
+                                    : minStock.toLocaleString("de-DE")}
+                                </TableCell>
                               </TableRow>
                             );
                           })
@@ -308,37 +404,12 @@ export default function ProductAnalyticsPage() {
                     </Table>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-sm text-muted-foreground">
-                      {totalItems.toLocaleString("de-DE")} items
-                    </p>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                        disabled={page <= 1 || isStockFetching}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <div className="min-w-24 text-center text-sm text-muted-foreground">
-                        Page {page} / {Math.max(1, totalPages)}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setPage((prev) => Math.min(totalPages, prev + 1))
-                        }
-                        disabled={page >= totalPages || isStockFetching}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+                  <CustomPagination
+                    page={stockPage}
+                    totalPages={Math.max(1, totalPages)}
+                    totalItems={totalItems}
+                    onPageChange={setStockPage}
+                  />
                 </>
               )}
             </CardContent>
