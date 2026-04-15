@@ -26,7 +26,7 @@ const getBlogDetailCached = (slug: string) =>
   })();
 
 const getSidebarBlogsCached = unstable_cache(
-  () => getBlogsByProduct({ is_econelo: false }),
+  () => getBlogsByProduct({ is_econelo: undefined }),
   ["blog-sidebar-products"],
   { revalidate: 600 },
 );
@@ -49,7 +49,10 @@ function getFirstSlug(slug?: string[]): string {
 
 function toMetaDescription(value?: string | null): string {
   if (!value) return FALLBACK_DESCRIPTION;
-  const plainText = value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const plainText = value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return plainText.slice(0, 160) || FALLBACK_DESCRIPTION;
 }
 
@@ -104,7 +107,8 @@ function buildBlogSchemas(
 
   const canonicalUrl = buildBlogUrl(locale, postSlug);
   const description = toMetaDescription(post.content);
-  const imageUrl = extractFirstImageFromContent(post.content) ?? FALLBACK_OG_IMAGE;
+  const imageUrl =
+    extractFirstImageFromContent(post.content) ?? FALLBACK_OG_IMAGE;
   const datePublished = toIsoDate(post.created_at);
   const dateModified = toIsoDate(post.updated_at) ?? datePublished;
 
@@ -183,10 +187,11 @@ export async function generateMetadata({
   const postSlug = post.slug?.trim() || lastSlug;
   const canonicalUrl = buildBlogUrl(locale, postSlug);
   const description = toMetaDescription(post.content);
-  const ogImage = extractFirstImageFromContent(post.content) ?? FALLBACK_OG_IMAGE;
+  const ogImage =
+    extractFirstImageFromContent(post.content) ?? FALLBACK_OG_IMAGE;
   const publishedTime = toIsoDate(post.created_at);
-  const modifiedTime = toIsoDate((post as { updated_at?: string }).updated_at)
-    ?? publishedTime;
+  const modifiedTime =
+    toIsoDate((post as { updated_at?: string }).updated_at) ?? publishedTime;
   const title = post.title?.trim() || "Blog | Prestige Home";
 
   return {
@@ -249,7 +254,7 @@ export default async function BlogDetailPage({
   if (!post) return notFound();
 
   if (!sidebarData || (sidebarData.products?.length ?? 0) === 0) {
-    sidebarData = await getBlogsByProduct({ is_econelo: false }).catch(
+    sidebarData = await getBlogsByProduct({ is_econelo: undefined }).catch(
       () =>
         ({
           products: [],

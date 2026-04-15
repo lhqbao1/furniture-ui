@@ -88,7 +88,7 @@ export async function generateStaticParams() {
   let products: ProductItem[] = [];
   try {
     products = await getAllProductsSelect({
-      is_econelo: false,
+      is_econelo: undefined,
       all_products: true,
     });
   } catch (error) {

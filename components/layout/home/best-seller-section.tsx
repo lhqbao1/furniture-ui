@@ -6,7 +6,7 @@ import FeaturedProducts from "./featured-products";
 const getBestSellerCached = unstable_cache(
   async () =>
     getProductByTag("BEST_SELLER", {
-      is_econelo: false,
+      is_econelo: undefined,
       is_customer: true,
     }).catch(() => []),
   ["home-best-seller"],

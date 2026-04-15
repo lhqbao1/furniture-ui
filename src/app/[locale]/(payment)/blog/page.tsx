@@ -34,16 +34,16 @@ export default async function BlogPage() {
       safeRequest(
         getBlogs({
           pageSize: 16,
-          is_econelo: false,
+          is_econelo: undefined,
         }),
         {
-        items: [],
-        pagination: {
-          page: 1,
-          page_size: 16,
-          total_items: 0,
-          total_pages: 0,
-        },
+          items: [],
+          pagination: {
+            page: 1,
+            page_size: 16,
+            total_items: 0,
+            total_pages: 0,
+          },
         },
       ),
     ["blog-main", "page-size-16"],
@@ -52,7 +52,7 @@ export default async function BlogPage() {
 
   const getSidebarBlogsCached = unstable_cache(
     async () =>
-      safeRequest(getBlogsByProduct({ is_econelo: false }), {
+      safeRequest(getBlogsByProduct({ is_econelo: undefined }), {
         products: [],
         pagination_product: {
           page: 1,

@@ -27,7 +27,7 @@ export default function BlogListClient({
             })
           : getBlogs({
               page: pageParam,
-              is_econelo: false,
+              is_econelo: undefined,
             }),
 
       getNextPageParam: (lastPage) => {
@@ -54,10 +54,7 @@ export default function BlogListClient({
       {/* GRID POSTS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         {posts.map((post, index) => (
-          <BlogCard
-            key={post.blog_id ?? index}
-            post={post}
-          />
+          <BlogCard key={post.blog_id ?? index} post={post} />
         ))}
 
         {isFetchingNextPage &&
