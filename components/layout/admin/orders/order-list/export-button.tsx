@@ -7,7 +7,6 @@ import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllCheckOutMain, getCheckOutRefundOrders } from "@/features/checkout/api";
 import { getStatusStyle } from "./status-styles";
-import { CheckOutMain } from "@/types/checkout";
 import { formatDateDDMMYYYY } from "@/lib/date-formated";
 import {
   DropdownMenu,
@@ -35,17 +34,12 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { exportOrderListTemplateToExcel } from "./export-order-template";
 
 interface ExportOrderExcelButtonProps {
   presetStatuses?: string[];
   lockStatusSelection?: boolean;
   expandByProductRefund?: boolean;
-}
-
-function getPrimaryCheckout(p: CheckOutMain) {
-  if (!Array.isArray(p.checkouts)) return undefined;
-
-  return p.checkouts.find((c) => c.invoice_address) ?? p.checkouts[0];
 }
 
 export default function ExportOrderExcelButton({
@@ -149,169 +143,172 @@ export default function ExportOrderExcelButton({
     // Hàm xử lý giá trị null / undefined / "None"
     const clean = (val: unknown) =>
       val === null || val === undefined || val === "None" ? "" : val;
+    const mapRefundType = (value: unknown) => {
+      const normalized = String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[_\s]+/g, "-");
 
-    const exportData = data.flatMap((p) => {
-      const checkout = getPrimaryCheckout(p);
-      const invoice = checkout?.invoice_address;
-      const shipping = checkout?.shipping_address;
-      const user = checkout?.user;
-      const allItems = p.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [];
-
-      const buyerAddressRow = {
-        // -------- Invoice --------
-        invoice_name: clean(invoice?.recipient_name ?? ""),
-        invoice_company_name: clean(user?.company_name ?? ""),
-        invoice_tax_number: clean(user?.tax_id ?? ""),
-        invoice_phone_number: clean(invoice?.phone_number ?? ""),
-        invoice_address: clean(invoice?.address_line ?? ""),
-        invoice_additional_address: clean(
-          invoice?.additional_address_line ?? "",
-        ),
-        invoice_city: clean(invoice?.city ?? ""),
-        invoice_postal_code: clean(invoice?.postal_code ?? ""),
-        invoice_country: clean(invoice?.country ?? ""),
-
-        // -------- Shipping --------
-        recipient_name: clean(shipping?.recipient_name ?? ""),
-        recipient_phone_number: clean(shipping?.phone_number ?? ""),
-        shipping_address: clean(shipping?.address_line ?? ""),
-        shipping_additional_address: clean(
-          shipping?.additional_address_line ?? "",
-        ),
-        shipping_city: clean(shipping?.city ?? ""),
-        shipping_postal_code: clean(shipping?.postal_code ?? ""),
-        shipping_country: clean(shipping?.country ?? ""),
-      };
-
-      const baseRow = {
-        code: clean(p.checkout_code),
-        marketplace: clean(p.from_marketplace ?? "Prestige Home"),
-        marketplace_order_id: clean(p.marketplace_order_id),
-        date: clean(formatDateDDMMYYYY(p.created_at)),
-        status: clean(getStatusStyle(p.status).text),
-        payment_method: clean(p.payment_method),
-        note: clean(p.note ?? ""),
-        product_id: clean(
-          allItems
-            .map((i) => i.products.id_provider)
-            .filter(Boolean)
-            .join(" | "),
-        ),
-        product_names: clean(
-          allItems
-            .map((i) => i.products.name)
-            .filter(Boolean)
-            .join(" | "),
-        ),
-        total_quantity: allItems.reduce((sum, i) => sum + (i.quantity ?? 0), 0),
-        shipping_cost: clean(p.total_shipping),
-        discount_amout: clean(p.voucher_amount),
-        total_amount: clean(p.total_amount),
-        ...(expandByProductRefund ? {} : buyerAddressRow),
-
-        carrier: clean(
-          checkout?.shipment ? checkout.shipment.shipping_carrier : "",
-        ),
-        suppliers: clean(
-          allItems
-            .map((i) =>
-              i.products.owner && i.products.owner.business_name
-                ? i.products.owner.business_name
-                : "Prestige Home",
-            )
-            .filter(Boolean)
-            .join(" | "),
-        ),
-        shipping_date: clean(
-          checkout?.shipment
-            ? formatDateDDMMYYYY(checkout.shipment.shipper_date)
-            : "",
-        ),
-        tracking_number: clean(
-          checkout?.shipment && checkout.shipment.tracking_number
-            ? checkout.shipment.tracking_number
-            : "",
-        ),
-        shipping_code: clean(
-          checkout?.shipment && checkout.shipment.ship_code
-            ? checkout.shipment.ship_code
-            : "",
-        ),
-        // delivery_order_id: clean(
-        //  checkout.
-        // ),
-      };
-
-      if (!expandByProductRefund) {
-        return [baseRow];
+      if (normalized === "a-goods" || normalized === "agoods") {
+        return "Return A Goods";
       }
 
-      const refundItems = Array.isArray(p.product_refund) ? p.product_refund : [];
+      if (normalized === "c-goods" || normalized === "cgoods") {
+        return "Return C Goods";
+      }
 
-      if (refundItems.length === 0) {
-        return [
-          {
+      if (normalized === "no-return" || normalized === "noreturn") {
+        return "No Item Return";
+      }
+
+      return "";
+    };
+
+    if (expandByProductRefund) {
+      const baseRefundHeaders = [
+        "STT",
+        "Order ID",
+        "Marketplace",
+        "Date",
+        "Status",
+        "Note",
+        "Refund items",
+        "Refund items sku",
+        "Refund items ean",
+        "Refund quantity",
+        "Item price",
+        "Refund amount",
+        "Reason",
+        "Refund type",
+      ] as const;
+      const maxImageCount = Math.max(
+        data.reduce((max, order) => {
+          const imageCount = (order.files ?? [])
+            .map((file) => String(file?.url ?? "").trim())
+            .filter(Boolean).length;
+          return Math.max(max, imageCount);
+        }, 0),
+        1,
+      );
+      const imageHeaders = Array.from(
+        { length: maxImageCount },
+        (_, index) => `Image items refund ${index + 1}`,
+      );
+      const refundHeaders = [...baseRefundHeaders, ...imageHeaders] as string[];
+
+      const refundRows = data.flatMap((p) => {
+        const allItems = p.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [];
+        const refundItems = Array.isArray(p.product_refund) ? p.product_refund : [];
+        const checkoutImageUrls = (p.files ?? [])
+          .map((file) => String(file?.url ?? "").trim())
+          .filter(Boolean);
+        const imageColumns = Object.fromEntries(
+          imageHeaders.map((header, index) => [header, clean(checkoutImageUrls[index] ?? "")]),
+        );
+
+        const baseRow = {
+          "Order ID": clean(p.marketplace_order_id || p.checkout_code),
+          Marketplace: clean(p.from_marketplace ?? "Prestige Home"),
+          Date: clean(formatDateDDMMYYYY(p.created_at)),
+          Status: clean(getStatusStyle(p.status).text),
+          Note: clean(p.note ?? ""),
+        };
+
+        const rowCount = Math.max(refundItems.length, 1);
+
+        return Array.from({ length: rowCount }).map((_, index) => {
+          const refundItem = refundItems[index];
+          const matchedCartItem =
+            refundItem
+              ? allItems.find(
+                  (item) =>
+                    (item?.purchased_products?.sku ?? "") ===
+                    (refundItem.sku ?? ""),
+                ) ??
+                allItems.find(
+                  (item) =>
+                    (item?.purchased_products?.id_provider ?? "") ===
+                    (refundItem.id_provider ?? ""),
+                )
+              : undefined;
+
+          return {
             ...baseRow,
-            refund_item_name: "",
-            refund_item_sku: "",
-            refund_item_quantity: "",
-            refund_item_id_provider: "",
-            refund_item_unit_price: "",
-            refund_item_refund_amount: "",
-            refund_item_reason: "",
-            refund_item_type: "",
-            refund_item_files_url: "",
-            refund_item_files_id: "",
-            refund_item_files_created_at: "",
-            refund_item_files_updated_at: "",
-          },
-        ];
-      }
+            "Refund items": clean(refundItem?.name ?? ""),
+            "Refund items sku": clean(refundItem?.sku ?? ""),
+            "Refund items ean": clean(
+              matchedCartItem?.purchased_products?.ean ??
+                matchedCartItem?.products?.ean ??
+                "",
+            ),
+            "Refund quantity": clean(refundItem?.quantity ?? ""),
+            "Item price": clean(refundItem?.unit_price ?? ""),
+            "Refund amount": clean(refundItem?.refund_amount ?? ""),
+            Reason: clean(refundItem?.reason ?? ""),
+            "Refund type": clean(mapRefundType(refundItem?.type)),
+            ...imageColumns,
+          };
+        });
+      });
 
-      return refundItems.map((refundItem) => ({
-        ...baseRow,
-        refund_item_name: clean(refundItem.name),
-        refund_item_sku: clean(refundItem.sku),
-        refund_item_quantity: clean(refundItem.quantity),
-        refund_item_id_provider: clean(refundItem.id_provider),
-        refund_item_unit_price: clean(refundItem.unit_price),
-        refund_item_refund_amount: clean(refundItem.refund_amount),
-        refund_item_reason: clean(refundItem.reason),
-        refund_item_type: clean(refundItem.type),
-        refund_item_files_url: clean(
-          (refundItem.files ?? []).map((file) => file.url).filter(Boolean).join(" | "),
-        ),
-        refund_item_files_id: clean(
-          (refundItem.files ?? []).map((file) => file.id).filter(Boolean).join(" | "),
-        ),
-        refund_item_files_created_at: clean(
-          (refundItem.files ?? [])
-            .map((file) => file.created_at)
-            .filter(Boolean)
-            .join(" | "),
-        ),
-        refund_item_files_updated_at: clean(
-          (refundItem.files ?? [])
-            .map((file) => file.updated_at)
-            .filter(Boolean)
-            .join(" | "),
-        ),
+      const indexedRows = refundRows.map((row, index) => ({
+        STT: index + 1,
+        ...row,
       }));
-    });
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const worksheet = XLSX.utils.json_to_sheet(indexedRows, {
+        header: [...refundHeaders],
+      });
 
-    // Ép TEXT cho các cột đã chốt
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+      imageHeaders.forEach((header) => {
+        const colIndex = refundHeaders.indexOf(header);
+        if (colIndex < 0) return;
 
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+        indexedRows.forEach((row, index) => {
+          const imageUrl = String(
+            (row as Record<string, unknown>)[header] ?? "",
+          ).trim();
+          if (!imageUrl) return;
 
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, getExportFileName(marketplace));
+          const cellRef = XLSX.utils.encode_cell({ r: index + 1, c: colIndex });
+          const safeUrl = imageUrl.replace(/"/g, '""');
+
+          worksheet[cellRef] = { f: `IMAGE("${safeUrl}")` };
+        });
+      });
+
+      worksheet["!cols"] = [
+        { wch: 6 },
+        { wch: 18 },
+        { wch: 14 },
+        { wch: 14 },
+        { wch: 16 },
+        { wch: 24 },
+        { wch: 34 },
+        { wch: 22 },
+        { wch: 20 },
+        { wch: 14 },
+        { wch: 14 },
+        { wch: 14 },
+        { wch: 34 },
+        { wch: 20 },
+        ...imageHeaders.map(() => ({ wch: 24 })),
+      ];
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+      saveAs(blob, getExportFileName(marketplace));
+      return;
+    }
+
+    exportOrderListTemplateToExcel(data, getExportFileName(marketplace));
   };
 
   const handleResetFilters = () => {

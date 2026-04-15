@@ -202,7 +202,7 @@ export default function TableToolbar({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="secondary"
-                  className="h-10 bg-white hover:bg-white/90 flex items-center gap-1"
+                  className="h-10 bg-secondary text-white hover:bg-secondary/90 flex items-center gap-1"
                 >
                   Filter <ChevronDown className="h-4 w-4" />
                 </Button>
