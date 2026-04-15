@@ -143,6 +143,26 @@ export default function ExportOrderExcelButton({
     // Hàm xử lý giá trị null / undefined / "None"
     const clean = (val: unknown) =>
       val === null || val === undefined || val === "None" ? "" : val;
+    const mapRefundType = (value: unknown) => {
+      const normalized = String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[_\s]+/g, "-");
+
+      if (normalized === "a-goods" || normalized === "agoods") {
+        return "Return A Goods";
+      }
+
+      if (normalized === "c-goods" || normalized === "cgoods") {
+        return "Return C Goods";
+      }
+
+      if (normalized === "no-return" || normalized === "noreturn") {
+        return "No Item Return";
+      }
+
+      return "";
+    };
 
     if (expandByProductRefund) {
       const baseRefundHeaders = [
@@ -159,6 +179,7 @@ export default function ExportOrderExcelButton({
         "Item price",
         "Refund amount",
         "Reason",
+        "Refund type",
       ] as const;
       const maxImageCount = Math.max(
         data.reduce((max, order) => {
@@ -224,6 +245,7 @@ export default function ExportOrderExcelButton({
             "Item price": clean(refundItem?.unit_price ?? ""),
             "Refund amount": clean(refundItem?.refund_amount ?? ""),
             Reason: clean(refundItem?.reason ?? ""),
+            "Refund type": clean(mapRefundType(refundItem?.type)),
             ...imageColumns,
           };
         });
@@ -269,6 +291,7 @@ export default function ExportOrderExcelButton({
         { wch: 14 },
         { wch: 14 },
         { wch: 34 },
+        { wch: 20 },
         ...imageHeaders.map(() => ({ wch: 24 })),
       ];
 
