@@ -2047,16 +2047,6 @@ export const getProductColumns = (
   },
 
   {
-    accessorKey: "stock_cgoods",
-    header: ({ column }) => {
-      return <div className="uppercase text-center">Stock C-GOODS</div>;
-    },
-    cell: ({ row }) => (
-      <div className="text-center">{row.original.stock_cgoods ?? "0"}</div>
-    ),
-  },
-
-  {
     accessorKey: "is_active",
     header: "STATUS",
     cell: ({ row }) => <ToggleProductStatus product={row.original} />,

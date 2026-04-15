@@ -56,9 +56,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const productSlug =
-    typeof slug?.[0] === "string" && slug[0].trim().length > 0
-      ? slug[0]
-      : "";
+    typeof slug?.[0] === "string" && slug[0].trim().length > 0 ? slug[0] : "";
 
   const fallbackName = productSlug ? humanizeSlug(productSlug) : "Produkt";
   const categoryUrl = productSlug
@@ -97,9 +95,7 @@ export async function generateMetadata({
 export default async function BlogCategoryPage({ params }: PageProps) {
   const { slug } = await params;
   const productSlug =
-    typeof slug?.[0] === "string" && slug[0].trim().length > 0
-      ? slug[0]
-      : "";
+    typeof slug?.[0] === "string" && slug[0].trim().length > 0 ? slug[0] : "";
   const fallbackName = productSlug ? humanizeSlug(productSlug) : "Produkt";
   const categoryUrl = productSlug
     ? `https://www.prestige-home.de/de/blog/category/${productSlug}`
@@ -115,7 +111,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
           })
         : Promise.resolve(EMPTY_BLOGS_RESPONSE),
       productSlug ? getProductBySlug(productSlug) : Promise.resolve(null),
-      getBlogsByProduct({ is_econelo: false }),
+      getBlogsByProduct({ is_econelo: undefined }),
     ]);
 
   const categoryBlogs =
@@ -224,10 +220,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
           <div className="lg:col-span-8 space-y-20">
             {featured && <FeaturedPost post={featured} />}
 
-            <BlogListClient
-              initialData={listData}
-              productSlug={productSlug}
-            />
+            <BlogListClient initialData={listData} productSlug={productSlug} />
           </div>
 
           {/* SIDEBAR */}

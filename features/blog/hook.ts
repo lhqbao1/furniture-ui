@@ -18,7 +18,7 @@ export function useGetBlogsByProduct(params?: GetBlogsByProductParams) {
     queryFn: () =>
       getBlogsByProduct({
         ...params,
-        is_econelo: false,
+        is_econelo: undefined,
       }),
     retry: false,
   });
@@ -30,7 +30,7 @@ export function useGetBlogs(params?: GetAllBlogsParams) {
     queryFn: () =>
       getBlogs({
         ...params,
-        is_econelo: false,
+        is_econelo: undefined,
       }),
     retry: false,
     placeholderData: (prev) => prev, // giữ lại data trước khi trang thay đổi (optional)

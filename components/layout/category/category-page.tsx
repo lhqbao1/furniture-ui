@@ -40,10 +40,7 @@ const formatCategoryLabelFromSlug = (value: string) =>
     .trim()
     .replace(/\b\w/g, (char) => char.toUpperCase());
 
-const ProductCategory = ({
-  categorySlugs,
-  category,
-}: ProductCategoryProps) => {
+const ProductCategory = ({ categorySlugs, category }: ProductCategoryProps) => {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -102,7 +99,7 @@ const ProductCategory = ({
       page,
       page_size: pageSize,
       is_active: true,
-      is_econelo: false,
+      is_econelo: undefined,
       query,
       brand: brands,
       brandsKey,
