@@ -29,6 +29,8 @@ export interface OrderStatisticsParams {
   from_date?: string;
   to_date?: string;
   is_b2b?: boolean;
+  sort_by_quantity?: "asc" | "desc";
+  sort_by_revenue?: "asc" | "desc";
 }
 
 export interface GetRefundOrdersParams {
@@ -454,6 +456,12 @@ export const getProductsCheckOutDashboard = async (
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
       ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
+      ...(params?.sort_by_quantity !== undefined && {
+        sort_by_quantity: params.sort_by_quantity,
+      }),
+      ...(params?.sort_by_revenue !== undefined && {
+        sort_by_revenue: params.sort_by_revenue,
+      }),
     },
   });
   return res.data as ProviderOverviewResponse;
