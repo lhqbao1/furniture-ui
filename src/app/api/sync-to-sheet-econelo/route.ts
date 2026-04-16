@@ -52,7 +52,7 @@ function normalizeEan(value: unknown): string {
 }
 
 function parseGoogleServiceAccount() {
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_ECONELO_JSON;
   if (!raw) return null;
 
   try {
@@ -215,9 +215,6 @@ export async function GET() {
       if (googleApiError.message) message = googleApiError.message;
     }
 
-    return NextResponse.json(
-      { success: false, error: message },
-      { status },
-    );
+    return NextResponse.json({ success: false, error: message }, { status });
   }
 }
