@@ -148,6 +148,14 @@ export function AdminCheckOutUserInformation({
     control: form.control,
     name: "email",
   });
+  const marketplace = useWatch({
+    control: form.control,
+    name: "from_marketplace",
+  });
+  const isPrestigeMarketplace =
+    marketplace === null ||
+    (typeof marketplace === "string" &&
+      ["prestige", "prestige home"].includes(marketplace.toLowerCase()));
 
   const applySavedUserToForm = (savedUser: InformationManualOrderResponse) => {
     const fullName = [savedUser.first_name?.trim(), savedUser.last_name?.trim()]
@@ -567,7 +575,11 @@ export function AdminCheckOutUserInformation({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email (Optional)</FormLabel>
+              <FormLabel>
+                {isPrestigeMarketplace
+                  ? "Email (Required for Prestige Home)"
+                  : "Email (Optional)"}
+              </FormLabel>
               <FormControl>
                 <Input {...field} value={field.value ?? ""} />
               </FormControl>
