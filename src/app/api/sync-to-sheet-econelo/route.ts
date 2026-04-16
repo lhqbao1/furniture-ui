@@ -185,9 +185,11 @@ export async function GET() {
         p.sku,
         imageUrl,
         "new",
-        shippingLabel,
+        "Econelo",
         shipping,
         additionalImages,
+        shippingLabel,
+        p.color ?? "",
       ];
     });
     await sheets.spreadsheets.values.update({
