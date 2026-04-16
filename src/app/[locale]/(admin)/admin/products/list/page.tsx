@@ -22,6 +22,8 @@ import { useProductListFilters } from "@/hooks/admin/product-list/useProductList
 import { OnChangeFn, VisibilityState } from "@tanstack/react-table";
 import { adminIdAtom } from "@/store/auth";
 import { Loader2 } from "lucide-react";
+import { AlertTriangle, PackageSearch, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const PRODUCT_COLUMN_OPTIONS: {
   id: string;
@@ -155,7 +157,7 @@ const ProductList = () => {
     }
   }, [searchParams]);
 
-  const { data, isLoading, isFetching, isError } = useGetAllProducts({
+  const { data, isLoading, isFetching, isError, refetch } = useGetAllProducts({
     page,
     page_size: pageSize,
     all_products: filters.all_products,
@@ -216,7 +218,8 @@ const ProductList = () => {
     return () => window.removeEventListener("resize", updateHeight);
   }, [data, isLoading]);
 
-  if (isError) return <div>No data</div>;
+  const showEmptyState =
+    !isLoading && !isFetching && !isError && filteredItems.length === 0;
 
   return (
     <div className="relative h-screen flex flex-col gap-6 pb-6 overflow-hidden">
@@ -242,35 +245,107 @@ const ProductList = () => {
         className="min-h-0"
         style={tableHeight ? { height: `${tableHeight}px` } : undefined}
       >
-        <ProductTable
-          data={filteredItems}
-          columns={getProductColumns(
-            handleSortByStock,
-            setSortByIncomingStock,
-            normalizedIncomingStockSort,
-          )}
-          page={page}
-          pageSize={pageSize}
-          setPage={handlePageChange}
-          setPageSize={setPageSize}
-          totalItems={
-            multiSearchValues.length > 0
-              ? filteredItems.length
-              : (data?.pagination.total_items ?? 0)
-          }
-          totalPages={
-            multiSearchValues.length > 0
-              ? 1
-              : (data?.pagination.total_pages ?? 0)
-          }
-          hasHeaderBackGround
-          isSticky
-          stickyContainerClassName="h-full"
-          onSelectionChange={setSelectedProductIds} // 👈 đây
-          columnVisibility={columnVisibility}
-          onColumnVisibilityChange={handleTableColumnVisibilityChange}
-          enableClientSorting
-        />
+        {isError ? (
+          <div className="flex h-full items-center justify-center rounded-2xl border border-destructive/30 bg-destructive/5 p-6">
+            <div className="max-w-xl text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+                <AlertTriangle className="h-7 w-7 text-destructive" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground">
+                Unable to load products
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                The browser may have been idle too long or the network request
+                failed. You can try fetching again or reload this page.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  className="bg-secondary text-white hover:bg-secondary/90"
+                  onClick={() => {
+                    void refetch();
+                  }}
+                  disabled={isFetching}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Try again
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                >
+                  Reload page
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : showEmptyState ? (
+          <div className="flex h-full items-center justify-center rounded-2xl border bg-muted/20 p-6">
+            <div className="max-w-xl text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-secondary/10">
+                <PackageSearch className="h-7 w-7 text-secondary" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground">
+                No products found
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No product matches the current search/filter values. You can
+                adjust filters or reload data.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  className="bg-secondary text-white hover:bg-secondary/90"
+                  onClick={() => {
+                    void refetch();
+                  }}
+                  disabled={isFetching}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Reload list
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                >
+                  Reload page
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ProductTable
+            data={filteredItems}
+            columns={getProductColumns(
+              handleSortByStock,
+              setSortByIncomingStock,
+              normalizedIncomingStockSort,
+            )}
+            page={page}
+            pageSize={pageSize}
+            setPage={handlePageChange}
+            setPageSize={setPageSize}
+            totalItems={
+              multiSearchValues.length > 0
+                ? filteredItems.length
+                : (data?.pagination.total_items ?? 0)
+            }
+            totalPages={
+              multiSearchValues.length > 0
+                ? 1
+                : (data?.pagination.total_pages ?? 0)
+            }
+            hasHeaderBackGround
+            isSticky
+            stickyContainerClassName="h-full"
+            onSelectionChange={setSelectedProductIds} // 👈 đây
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={handleTableColumnVisibilityChange}
+            enableClientSorting
+          />
+        )}
       </div>
 
       {(isLoading || isFetching) && (

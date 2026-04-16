@@ -10,8 +10,10 @@ import {
   editProduct,
   generateSEO,
   getAllColor,
+  getAllProductAndSold,
   getAllMaterials,
   getAllProducts,
+  GetAllProductAndSoldParams,
   GetAllProductsParams,
   getProductLogs,
   getProductById,
@@ -25,6 +27,7 @@ import {
 import { ProductInput } from "@/lib/schema/product";
 import {
   ProductDetailLog,
+  ProductAndSoldResponse,
   ProductItem,
   ProductResponse,
 } from "@/types/products";
@@ -87,6 +90,33 @@ export function useGetAllProducts({
         supplier_id,
         brand_id,
         sort_by_incoming_stock,
+      }),
+    placeholderData: keepPreviousData,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useGetAllProductAndSold({
+  search,
+  sort_by_stock,
+  page,
+  page_size,
+}: GetAllProductAndSoldParams = {}) {
+  return useQuery<ProductAndSoldResponse>({
+    queryKey: [
+      "products-and-sold",
+      search,
+      sort_by_stock,
+      page,
+      page_size,
+    ],
+    queryFn: () =>
+      getAllProductAndSold({
+        search,
+        sort_by_stock,
+        page,
+        page_size,
       }),
     placeholderData: keepPreviousData,
     retry: false,

@@ -3,6 +3,7 @@ import { ProductInput } from "@/lib/schema/product";
 import { KeywordResponse } from "@/types/keyword";
 import {
   ProductDetailLog,
+  ProductAndSoldResponse,
   ProductItem,
   ProductResponse,
 } from "@/types/products";
@@ -21,6 +22,13 @@ export interface GetAllProductsParams {
   supplier_id?: string;
   brand_id?: string;
   sort_by_incoming_stock?: string;
+}
+
+export interface GetAllProductAndSoldParams {
+  search?: string;
+  sort_by_stock?: "asc" | "desc" | string;
+  page?: number;
+  page_size?: number;
 }
 
 export type GetProductsSearchParams = {
@@ -127,6 +135,23 @@ export async function getAllProducts(params?: GetAllProductsParams) {
   });
 
   return data as ProductResponse;
+}
+
+export async function getAllProductAndSold(
+  params?: GetAllProductAndSoldParams,
+) {
+  const { data } = await apiAdmin.get("/products/get-all-product-and-sold", {
+    params: {
+      ...(params?.search !== undefined && { search: params.search }),
+      ...(params?.sort_by_stock !== undefined && {
+        sort_by_stock: params.sort_by_stock,
+      }),
+      ...(params?.page !== undefined && { page: params.page }),
+      ...(params?.page_size !== undefined && { page_size: params.page_size }),
+    },
+  });
+
+  return data as ProductAndSoldResponse;
 }
 
 export async function getProductsAlgoliaSearch(
