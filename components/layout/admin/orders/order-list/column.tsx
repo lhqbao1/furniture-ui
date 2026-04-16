@@ -27,7 +27,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { ProductTable } from "../../products/products-list/product-table";
-import { cartSupplierColumn } from "@/components/layout/cart/columns";
 import { getStatusStyle } from "./status-styles";
 import CancelExchangeDialog from "../order-details/dialog/cancel-exchange-dialog";
 import Link from "next/link";
@@ -36,6 +35,55 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+const toNumber = (value: unknown) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const deliveryPreviewColumns: ColumnDef<CartItem>[] = [
+  {
+    accessorKey: "id_provider",
+    header: "ID",
+    cell: ({ row }) => (
+      <div className="font-medium">
+        #{row.original?.products?.id_provider ?? "-"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "sku",
+    header: () => <div className="text-center">SKU</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original?.products?.sku ?? "-"}</div>
+    ),
+  },
+  {
+    accessorKey: "ean",
+    header: () => <div className="text-center">EAN</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original?.products?.ean ?? "-"}</div>
+    ),
+  },
+  {
+    accessorKey: "name",
+    header: () => <div className="text-left">NAME</div>,
+    cell: ({ row }) => (
+      <div className="max-w-[420px] truncate">
+        {row.original?.products?.name ?? "-"}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "quantity",
+    header: () => <div className="text-center">MENGE</div>,
+    cell: ({ row }) => (
+      <div className="text-center font-medium">
+        {toNumber(row.original?.quantity).toLocaleString("de-DE")}
+      </div>
+    ),
+  },
+];
 
 const ActionCell = ({
   id,
@@ -142,6 +190,46 @@ const ActionCellChild = ({
     ? (isRowExpanded?.(currentRowId) ?? expandedRowId === currentRowId)
     : false;
 
+  const normalizeDeliveryItems = (cartItems: CartItem[]): CartItem[] => {
+    return cartItems.flatMap((item) => {
+      const bundles = item?.products?.bundles;
+      const parentQuantity = Number(item?.quantity ?? 0);
+
+      if (!Array.isArray(bundles) || bundles.length === 0) {
+        return item;
+      }
+
+      const normalizedBundleItems = bundles
+        .map((bundle) => {
+          const bundleItem = bundle?.bundle_item;
+          const quantityPerBundle = Number(bundle?.quantity ?? 0);
+
+          if (!bundleItem || quantityPerBundle <= 0) return null;
+
+          const normalizedQuantity = Math.max(
+            0,
+            parentQuantity * quantityPerBundle,
+          );
+          const normalizedUnitPrice = toNumber(
+            bundleItem?.final_price ?? item?.item_price,
+          );
+
+          return {
+            ...item,
+            products: bundleItem,
+            quantity: normalizedQuantity,
+            item_price: normalizedUnitPrice,
+            final_price: normalizedUnitPrice * normalizedQuantity,
+          } as CartItem;
+        })
+        .filter((bundleItem): bundleItem is CartItem => bundleItem !== null);
+
+      return normalizedBundleItems.length > 0 ? normalizedBundleItems : item;
+    });
+  };
+
+  const normalizedItems = normalizeDeliveryItems(Array.isArray(items) ? items : []);
+
   const escapeXml = (value: unknown) => {
     return String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -156,7 +244,7 @@ const ActionCellChild = ({
     const userName =
       `${checkout?.user?.first_name ?? ""} ${checkout?.user?.last_name ?? ""}`.trim();
     const shippingAddress = checkout?.shipping_address;
-    const positions = Array.isArray(items) ? items : [];
+    const positions = normalizedItems;
 
     const positionsXml = positions
       .map((item) => {
@@ -238,19 +326,32 @@ const ActionCellChild = ({
               <Eye className="w-4 h-4 text-amber-500" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="lg:w-[800px]">
-            <ProductTable
-              data={items}
-              columns={cartSupplierColumn}
-              page={1}
-              pageSize={1}
-              setPage={() => {}}
-              setPageSize={() => {}}
-              hasPagination={false}
-              totalItems={items.length}
-              totalPages={1}
-            />
-            <DialogFooter>
+          <DialogContent className="w-[96vw] max-w-[1150px] p-0">
+            <DialogHeader className="border-b px-6 py-4">
+              <DialogTitle>Delivery Order Items</DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                {normalizedItems.length} Positionen im Auftrag
+              </p>
+            </DialogHeader>
+            <div className="px-6 py-4">
+              <ProductTable
+                data={normalizedItems}
+                columns={deliveryPreviewColumns}
+                page={1}
+                pageSize={100}
+                setPage={() => {}}
+                setPageSize={() => {}}
+                hasPagination={false}
+                totalItems={normalizedItems.length}
+                totalPages={1}
+                hasHeaderBackGround
+                hasBackground
+                hasCount={false}
+                isSticky
+                stickyContainerClassName="max-h-[52vh]"
+              />
+            </div>
+            <DialogFooter className="border-t px-6 py-4">
               <DialogClose asChild>
                 <Button variant="secondary">Close</Button>
               </DialogClose>
@@ -258,12 +359,6 @@ const ActionCellChild = ({
           </DialogContent>
         </Dialog>
       )}
-      {/* 
-      <ViewFileChildDialog
-        checkoutId={checkoutId}
-        data={items}
-      /> */}
-
       {status?.toLowerCase() === "exchange" && (
         <CancelExchangeDialog id={checkoutId} main_checkout_id={checkoutId} />
       )}

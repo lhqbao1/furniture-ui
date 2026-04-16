@@ -9,8 +9,9 @@ import { useOrderListFilters } from "@/hooks/admin/order-list/useOrderListFilter
 import { useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2, PackageSearch, RefreshCw } from "lucide-react";
 import { CheckOutMain } from "@/types/checkout";
+import { Button } from "@/components/ui/button";
 
 const OrderList = () => {
   const [page, setPage] = useState(1);
@@ -35,7 +36,7 @@ const OrderList = () => {
     setPage(urlPage);
   }, [searchParams]);
 
-  const { data, isLoading, isFetching, isError } = useGetCheckOutMain({
+  const { data, isLoading, isFetching, isError, refetch } = useGetCheckOutMain({
     page,
     page_size: pageSize,
     status: filters.status, // <-- thêm
@@ -73,9 +74,8 @@ const OrderList = () => {
     });
   }, [page]);
 
-  if (!data && isError) {
-    return <div>No data</div>;
-  }
+  const showEmptyState =
+    !isLoading && !isFetching && !isError && filteredItems.length === 0;
 
   return (
     <div className="relative flex flex-col gap-6 pb-4">
@@ -90,32 +90,104 @@ const OrderList = () => {
           type={ToolbarType.order}
           selectedOrders={selectedOrders}
         />
-        <ProductTable
-          data={filteredItems}
-          columns={orderColumns}
-          page={page}
-          setPage={handlePageChange}
-          pageSize={pageSize}
-          setPageSize={setPageSize}
-          totalItems={
-            multiSearchValues.length > 0
-              ? filteredItems.length
-              : (data?.pagination.total_items ?? 0)
-          }
-          totalPages={
-            multiSearchValues.length > 0
-              ? 1
-              : (data?.pagination.total_pages ?? 0)
-          }
-          hasBackground
-          hasExpanded
-          allowMultipleExpandedRows
-          renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
-          hasHeaderBackGround
-          isSticky
-          stickyContainerClassName="h-full"
-          onSelectedRowsChange={(rows) => setSelectedOrders(rows)}
-        />
+        {isError ? (
+          <div className="flex h-[60vh] items-center justify-center rounded-2xl border border-destructive/30 bg-destructive/5 p-6">
+            <div className="max-w-xl text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+                <AlertTriangle className="h-7 w-7 text-destructive" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground">
+                Unable to load orders
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                The browser may have been idle too long or the network request
+                failed. You can try fetching again or reload this page.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  className="bg-secondary text-white hover:bg-secondary/90"
+                  onClick={() => {
+                    void refetch();
+                  }}
+                  disabled={isFetching}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Try again
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                >
+                  Reload page
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : showEmptyState ? (
+          <div className="flex h-[60vh] items-center justify-center rounded-2xl border bg-muted/20 p-6">
+            <div className="max-w-xl text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-secondary/10">
+                <PackageSearch className="h-7 w-7 text-secondary" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground">
+                No orders found
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No order matches the current search/filter values. You can
+                adjust filters or reload data.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  className="bg-secondary text-white hover:bg-secondary/90"
+                  onClick={() => {
+                    void refetch();
+                  }}
+                  disabled={isFetching}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Reload list
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                >
+                  Reload page
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ProductTable
+            data={filteredItems}
+            columns={orderColumns}
+            page={page}
+            setPage={handlePageChange}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            totalItems={
+              multiSearchValues.length > 0
+                ? filteredItems.length
+                : (data?.pagination.total_items ?? 0)
+            }
+            totalPages={
+              multiSearchValues.length > 0
+                ? 1
+                : (data?.pagination.total_pages ?? 0)
+            }
+            hasBackground
+            hasExpanded
+            allowMultipleExpandedRows
+            renderRowSubComponent={(row) => <OrderExpandTable row={row} />}
+            hasHeaderBackGround
+            isSticky
+            stickyContainerClassName="h-full"
+            onSelectedRowsChange={(rows) => setSelectedOrders(rows)}
+          />
+        )}
       </div>
 
       {(isLoading || isFetching) && (
