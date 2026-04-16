@@ -42,7 +42,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileText, Trash2, Upload } from "lucide-react";
+import {
+  AlertTriangle,
+  FileText,
+  PackageSearch,
+  RefreshCw,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { StaticFile } from "@/types/products";
 
 function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
@@ -108,6 +115,8 @@ const OrderDetails = () => {
     data: order,
     isLoading,
     isError,
+    isFetching,
+    refetch,
   } = useGetMainCheckOutByMainCheckOutId(checkoutId);
   const { data: productRefundData, isLoading: isLoadingProductRefund } =
     useGetProductRefundByMainCheckoutId(checkoutId);
@@ -365,8 +374,86 @@ const OrderDetails = () => {
   }, [order?.files]);
 
   if (isLoading) return <OrderDetailsSkeleton />;
-  if (isError) return <div>Error loading order</div>;
-  if (!order) return <div>Error loading order</div>;
+  if (isError)
+    return (
+      <div className="space-y-6 pb-10 mt-6">
+        <AdminBackButton />
+        <div className="flex min-h-[60vh] items-center justify-center rounded-2xl border border-destructive/30 bg-destructive/5 p-6">
+          <div className="max-w-xl text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+              <AlertTriangle className="h-7 w-7 text-destructive" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground">
+              Unable to load order details
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              The request may have failed after a long idle period. You can try
+              fetching the order again or reload this page.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+              <Button
+                type="button"
+                className="bg-secondary text-white hover:bg-secondary/90"
+                onClick={() => {
+                  void refetch();
+                }}
+                disabled={isFetching}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Try again
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => window.location.reload()}
+              >
+                Reload page
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  if (!order)
+    return (
+      <div className="space-y-6 pb-10 mt-6">
+        <AdminBackButton />
+        <div className="flex min-h-[60vh] items-center justify-center rounded-2xl border bg-muted/20 p-6">
+          <div className="max-w-xl text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-secondary/10">
+              <PackageSearch className="h-7 w-7 text-secondary" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground">
+              Order not found
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              This order may no longer exist or does not match current filters.
+              You can reload and try again.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+              <Button
+                type="button"
+                className="bg-secondary text-white hover:bg-secondary/90"
+                onClick={() => {
+                  void refetch();
+                }}
+                disabled={isFetching}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Reload data
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => window.location.reload()}
+              >
+                Reload page
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
 
   const createdAt = formatDate(order.created_at);
   const updatedAt = formatDateTimeString(order.updated_at);
