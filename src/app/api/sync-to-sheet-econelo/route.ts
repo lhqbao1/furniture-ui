@@ -99,7 +99,7 @@ export async function GET() {
     });
 
     const products = await getAllProductsSelect({
-      is_econelo: false,
+      is_econelo: true,
       all_products: true,
       supplier_id: "prestige_home",
     });
