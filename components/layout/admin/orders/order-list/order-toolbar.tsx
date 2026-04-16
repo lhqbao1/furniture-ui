@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -37,6 +37,8 @@ import MultiSearch from "../../products/products-list/toolbar/multi-search";
 import B2BInvoiceDrawer from "./b2b-invoice-drawer";
 import OrderB2BFilter from "./filter/filter-order-b2b";
 import { exportOrderListTemplateToExcel } from "./export-order-template";
+import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
+import { STATUS_OPTIONS } from "@/data/data";
 
 export enum ToolbarType {
   product = "product",
@@ -97,6 +99,162 @@ export default function OrderToolbar({
   const [searchValue, setSearchValue] = useState(defaultSearch);
   const prevParamsRef = useRef(Object.fromEntries(searchParams.entries()));
   const [debouncedSearch] = useDebounce(searchValue, 600);
+
+  const statusLabelMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+
+    STATUS_OPTIONS.forEach((item) => {
+      const statuses = item.statuses ?? [item.key];
+      statuses.forEach((statusKey) => {
+        if (!map.has(statusKey)) map.set(statusKey, item.label);
+      });
+    });
+
+    return map;
+  }, []);
+
+  const channelLabelMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+
+    CHANEL_OPTIONS.forEach((item) => {
+      map.set(item.key.toLowerCase(), item.label);
+    });
+
+    return map;
+  }, []);
+
+  const parseCsvParam = React.useCallback(
+    (value: string | null) =>
+      (value ?? "")
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    [],
+  );
+
+  const pushWithParams = React.useCallback(
+    (params: URLSearchParams) => {
+      router.push(
+        {
+          pathname,
+          query: {
+            ...Object.fromEntries(params.entries()),
+            page: 1,
+          },
+        },
+        { scroll: false },
+      );
+      setPage(1);
+    },
+    [pathname, router, setPage],
+  );
+
+  const removeFilterValue = React.useCallback(
+    (paramKey: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      const currentValues = parseCsvParam(params.get(paramKey));
+      const nextValues = currentValues.filter((item) => item !== value);
+
+      if (nextValues.length === 0) {
+        params.delete(paramKey);
+      } else {
+        params.set(paramKey, nextValues.join(","));
+      }
+
+      pushWithParams(params);
+    },
+    [parseCsvParam, pushWithParams, searchParams],
+  );
+
+  const removeFilterParam = React.useCallback(
+    (paramKey: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete(paramKey);
+      pushWithParams(params);
+    },
+    [pushWithParams, searchParams],
+  );
+
+  const resetAllFilters = React.useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    FILTER_KEYS.forEach((key) => params.delete(key));
+    pushWithParams(params);
+    setSearchValue("");
+  }, [pushWithParams, searchParams]);
+
+  const activeFilterChips = React.useMemo(() => {
+    type FilterChip = {
+      id: string;
+      label: string;
+      onRemove: () => void;
+    };
+
+    const chips: FilterChip[] = [];
+
+    const search = (searchParams.get("search") ?? "").trim();
+    if (search) {
+      chips.push({
+        id: "search",
+        label: `Search: ${search}`,
+        onRemove: () => removeFilterParam("search"),
+      });
+    }
+
+    const statusValues = parseCsvParam(searchParams.get("status"));
+    statusValues.forEach((statusKey) => {
+      chips.push({
+        id: `status-${statusKey}`,
+        label: `Status: ${statusLabelMap.get(statusKey) ?? statusKey}`,
+        onRemove: () => removeFilterValue("status", statusKey),
+      });
+    });
+
+    const channelValues = parseCsvParam(searchParams.get("channel"));
+    channelValues.forEach((channelKey) => {
+      const normalized = channelKey.toLowerCase();
+      chips.push({
+        id: `channel-${channelKey}`,
+        label: `Channel: ${channelLabelMap.get(normalized) ?? channelKey}`,
+        onRemove: () => removeFilterValue("channel", channelKey),
+      });
+    });
+
+    const fromDate = searchParams.get("from_date");
+    if (fromDate) {
+      chips.push({
+        id: "from-date",
+        label: `From: ${fromDate.split("T")[0] ?? fromDate}`,
+        onRemove: () => removeFilterParam("from_date"),
+      });
+    }
+
+    const toDate = searchParams.get("to_date");
+    if (toDate) {
+      chips.push({
+        id: "to-date",
+        label: `To: ${toDate.split("T")[0] ?? toDate}`,
+        onRemove: () => removeFilterParam("to_date"),
+      });
+    }
+
+    const isB2B = searchParams.get("is_b2b");
+    if (isB2B === "true" || isB2B === "false") {
+      chips.push({
+        id: "is-b2b",
+        label: `Customer: ${isB2B === "true" ? "B2B" : "B2C"}`,
+        onRemove: () => removeFilterParam("is_b2b"),
+      });
+    }
+
+    return chips;
+  }, [
+    searchParams,
+    statusLabelMap,
+    channelLabelMap,
+    parseCsvParam,
+    removeFilterParam,
+    removeFilterValue,
+  ]);
 
   // push URL khi debounce hoàn thành
   useEffect(() => {
@@ -214,6 +372,44 @@ export default function OrderToolbar({
         {type === ToolbarType.order ? (
           <div className="rounded-xl border border-secondary/10 bg-muted/20 p-3 w-full xl:w-1/2">
             <OrderB2BFilter showRevenue={showB2BRevenue} />
+          </div>
+        ) : null}
+
+        {type === ToolbarType.order && activeFilterChips.length > 0 ? (
+          <div className="rounded-xl border border-secondary/15 bg-secondary/5 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="mr-1 inline-flex items-center gap-1.5 rounded-md bg-secondary/10 px-2 py-1 text-xs font-semibold text-secondary">
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                Active filters
+              </div>
+
+              {activeFilterChips.map((chip) => (
+                <div
+                  key={chip.id}
+                  className="inline-flex items-center gap-1 rounded-full border border-secondary/20 bg-white px-2.5 py-1 text-xs text-slate-700"
+                >
+                  <span>{chip.label}</span>
+                  <button
+                    type="button"
+                    onClick={chip.onRemove}
+                    className="rounded-full p-0.5 text-slate-500 transition-colors hover:bg-secondary/10 hover:text-secondary"
+                    aria-label={`Remove ${chip.label}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="ml-auto text-xs font-medium text-muted-foreground hover:text-foreground"
+                onClick={resetAllFilters}
+              >
+                Clear all
+              </Button>
+            </div>
           </div>
         ) : null}
 
