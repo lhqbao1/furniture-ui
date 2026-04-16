@@ -62,6 +62,34 @@ function parseGoogleServiceAccount() {
   }
 }
 
+function resolveSpreadsheetId(value?: string) {
+  if (!value) return "";
+
+  const trimmed = value.trim();
+  const match = trimmed.match(
+    /docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/,
+  );
+
+  return match?.[1] ?? trimmed;
+}
+
+function getGoogleApiError(error: unknown) {
+  if (!error || typeof error !== "object") return null;
+
+  const maybeResponse = (
+    error as {
+      response?: { status?: number; data?: { error?: { message?: string } } };
+    }
+  ).response;
+
+  if (!maybeResponse) return null;
+
+  return {
+    status: maybeResponse.status,
+    message: maybeResponse.data?.error?.message,
+  };
+}
+
 export async function GET() {
   const serviceAccount = parseGoogleServiceAccount();
   if (!serviceAccount) {
@@ -74,10 +102,10 @@ export async function GET() {
     );
   }
 
-  const sheetId = process.env.GOOGLE_SHEET_ECONELO_ID;
+  const sheetId = resolveSpreadsheetId(process.env.GOOGLE_SHEET_ECONELO_ID);
   if (!sheetId) {
     return NextResponse.json(
-      { success: false, error: "Missing GOOGLE_SHEET_ID" },
+      { success: false, error: "Missing GOOGLE_SHEET_ECONELO_ID" },
       { status: 500 },
     );
   }
@@ -176,11 +204,20 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Sync error:", error);
-    const message =
+
+    let message =
       error instanceof Error ? error.message : "Unknown error occurred";
+    let status = 500;
+
+    const googleApiError = getGoogleApiError(error);
+    if (googleApiError) {
+      status = googleApiError.status ?? 500;
+      if (googleApiError.message) message = googleApiError.message;
+    }
+
     return NextResponse.json(
       { success: false, error: message },
-      { status: 500 },
+      { status },
     );
   }
 }

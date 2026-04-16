@@ -81,6 +81,24 @@ export const ManualCreateOrderSchema = z
     is_b2b: BooleanLikeSchema,
   })
   .superRefine((data, ctx) => {
+    const normalizedMarketplace =
+      typeof data.from_marketplace === "string"
+        ? data.from_marketplace.trim().toLowerCase()
+        : "";
+    const isPrestigeMarketplace =
+      data.from_marketplace === null ||
+      normalizedMarketplace === "prestige" ||
+      normalizedMarketplace === "prestige home";
+    const invoiceEmail = (data.email ?? "").trim();
+
+    if (isPrestigeMarketplace && invoiceEmail.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invoice email is required for Prestige Home channel",
+        path: ["email"],
+      });
+    }
+
     if (
       data.status === "PENDING" &&
       (data.payment_term === null || data.payment_term === undefined)
