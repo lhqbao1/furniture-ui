@@ -200,6 +200,11 @@ export interface QuantityAmount {
 
 export interface ProviderItem {
   id_provider: string;
+  product_name?: string;
+  static_files?: Array<{
+    id?: string;
+    url?: string;
+  }>;
 
   total_quantity: number;
   total_amount: number;

@@ -587,6 +587,8 @@ export const useGetProductsCheckOutDashboard = (
       params?.from_date,
       params?.to_date,
       params?.is_b2b ?? null,
+      params?.sort_by_quantity ?? null,
+      params?.sort_by_revenue ?? null,
     ],
     queryFn: () => getProductsCheckOutDashboard(params),
     retry: false,

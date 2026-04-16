@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useGetProductsCheckOutDashboard } from "@/features/checkout/hook";
 import { useGetAllProductAndSold } from "@/features/products/hook";
 import { ProductAndSoldItem } from "@/types/products";
+import { ProviderItem } from "@/types/checkout";
 import { format, getISOWeek } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -20,6 +22,13 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { CustomPagination } from "@/components/shared/custom-pagination";
 import { useDebounce } from "use-debounce";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const STOCK_PAGE_SIZE = 20;
 type SoldStockSort = "asc" | "desc";
@@ -29,6 +38,9 @@ type IncomingDisplayItem = {
   quantity: number;
   date: Date;
 };
+
+type RevenueSortValue = "none" | "asc" | "desc";
+type RevenueCustomerType = "all" | "b2b" | "b2c";
 
 const toNumber = (value: unknown): number =>
   typeof value === "number" ? value : Number(value) || 0;
@@ -40,6 +52,49 @@ const formatCurrency = (value: number): string =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+
+const toTitleCase = (value: string) =>
+  value
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const normalizeBreakdownLabel = (value: string, fallback: string) => {
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.toLowerCase() === "null") return fallback;
+  return toTitleCase(trimmed.replace(/_/g, " "));
+};
+
+type BreakdownItem = {
+  label: string;
+  quantity: number;
+  amount: number;
+};
+
+const getBreakdownItems = (
+  data: ProviderItem["by_marketplace"] | ProviderItem["by_status"] | undefined,
+  fallbackLabel: string,
+): BreakdownItem[] =>
+  Object.entries(data ?? {})
+    .map(([key, value]) => ({
+      label: normalizeBreakdownLabel(key, fallbackLabel),
+      quantity: toNumber(value?.total_quantity),
+      amount: toNumber(value?.total_amount),
+    }))
+    .filter((item) => item.quantity > 0 || item.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+
+const getMainImageUrl = (item: ProviderItem) =>
+  (item.static_files ?? []).find((file) => (file?.url ?? "").trim())?.url ?? "";
+
+const toIsoDateTime = (value: string) => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date.toISOString();
+};
 
 const getSoldStockValue = (product: ProductAndSoldItem): number | null => {
   const rawValue = product.sold;
@@ -121,7 +176,9 @@ const getIncomingDisplayItems = (
 
     const allDates = Array.from(
       new Set(
-        bundleStates.flatMap((state) => Array.from(state.incomingByDate.keys())),
+        bundleStates.flatMap((state) =>
+          Array.from(state.incomingByDate.keys()),
+        ),
       ),
     ).sort((a, b) => a - b);
 
@@ -197,10 +254,7 @@ function IncomingStockDisplay({ product }: { product: ProductAndSoldItem }) {
           date <= sixWeeksFromNow;
 
         return (
-          <div
-            key={item.id}
-            className={isSoon ? "text-secondary" : undefined}
-          >
+          <div key={item.id} className={isSoon ? "text-secondary" : undefined}>
             {item.quantity ?? 0} | {formattedDate ?? "—"}
           </div>
         );
@@ -214,7 +268,17 @@ export default function ProductAnalyticsPage() {
   const [searchInput, setSearchInput] = React.useState("");
   const [soldStockSort, setSoldStockSort] =
     React.useState<SoldStockSort>("desc");
+  const [revenueFromDate, setRevenueFromDate] = React.useState("");
+  const [revenueToDate, setRevenueToDate] = React.useState("");
+  const [revenueCustomerType, setRevenueCustomerType] =
+    React.useState<RevenueCustomerType>("all");
+  const [sortByQuantity, setSortByQuantity] =
+    React.useState<RevenueSortValue>("none");
+  const [sortByRevenue, setSortByRevenue] =
+    React.useState<RevenueSortValue>("desc");
   const [debouncedSearch] = useDebounce(searchInput.trim(), 450);
+  const [debouncedRevenueFromDate] = useDebounce(revenueFromDate, 450);
+  const [debouncedRevenueToDate] = useDebounce(revenueToDate, 450);
 
   React.useEffect(() => {
     setStockPage(1);
@@ -231,17 +295,39 @@ export default function ProductAnalyticsPage() {
     sort_by_stock: soldStockSort,
   });
 
+  const revenueQueryParams = React.useMemo(
+    () => ({
+      ...(toIsoDateTime(debouncedRevenueFromDate)
+        ? { from_date: toIsoDateTime(debouncedRevenueFromDate) }
+        : {}),
+      ...(toIsoDateTime(debouncedRevenueToDate)
+        ? { to_date: toIsoDateTime(debouncedRevenueToDate) }
+        : {}),
+      ...(revenueCustomerType !== "all"
+        ? { is_b2b: revenueCustomerType === "b2b" }
+        : {}),
+      ...(sortByQuantity !== "none"
+        ? { sort_by_quantity: sortByQuantity }
+        : {}),
+      ...(sortByRevenue !== "none" ? { sort_by_revenue: sortByRevenue } : {}),
+    }),
+    [
+      debouncedRevenueFromDate,
+      debouncedRevenueToDate,
+      revenueCustomerType,
+      sortByQuantity,
+      sortByRevenue,
+    ],
+  );
+
   const {
     data: providerOverview,
     isLoading: isRevenueLoading,
     isError: isRevenueError,
-  } = useGetProductsCheckOutDashboard();
+  } = useGetProductsCheckOutDashboard(revenueQueryParams);
 
   const topRevenueProducts = React.useMemo(
-    () =>
-      [...(providerOverview?.items ?? [])]
-        .sort((a, b) => toNumber(b.total_amount) - toNumber(a.total_amount))
-        .slice(0, 20),
+    () => providerOverview?.items ?? [],
     [providerOverview?.items],
   );
 
@@ -254,12 +340,12 @@ export default function ProductAnalyticsPage() {
       : "Sold stock: high to low";
 
   return (
-    <div className="h-screen overflow-hidden pb-6">
-      <div className="flex h-full flex-col gap-6">
+    <div className="pb-6">
+      <div className="flex flex-col gap-6">
         <div className="section-header">Products Analytics</div>
 
-        <div className="grid min-h-0 flex-1 gap-6 xl:grid-cols-5">
-          <Card className="xl:col-span-3 min-h-0">
+        <div className="grid grid-cols-1 gap-6">
+          <Card>
             <CardHeader className="space-y-1 pb-3">
               <CardTitle className="text-base">Stock Overview</CardTitle>
               <p className="text-sm text-muted-foreground">
@@ -294,7 +380,9 @@ export default function ProductAnalyticsPage() {
                   variant="outline"
                   className="h-10 w-full border-secondary/25 bg-white md:w-auto"
                   onClick={() =>
-                    setSoldStockSort((prev) => (prev === "desc" ? "asc" : "desc"))
+                    setSoldStockSort((prev) =>
+                      prev === "desc" ? "asc" : "desc",
+                    )
                   }
                 >
                   {soldStockSort === "asc" ? (
@@ -324,7 +412,9 @@ export default function ProductAnalyticsPage() {
                     <Table className="text-sm">
                       <TableHeader className="sticky top-0 z-10 bg-muted/90 backdrop-blur">
                         <TableRow className="hover:bg-transparent">
-                          <TableHead className="h-11 px-3">Product ID</TableHead>
+                          <TableHead className="h-11 px-3">
+                            Product ID
+                          </TableHead>
                           <TableHead className="h-11 px-3">Name</TableHead>
                           <TableHead className="h-11 px-3 text-right">
                             Physical stock
@@ -350,7 +440,9 @@ export default function ProductAnalyticsPage() {
                               )}
                             </Button>
                           </TableHead>
-                          <TableHead className="h-11 px-3">Incoming stock</TableHead>
+                          <TableHead className="h-11 px-3">
+                            Incoming stock
+                          </TableHead>
                           <TableHead className="h-11 px-3 text-right">
                             Min stock
                           </TableHead>
@@ -368,7 +460,9 @@ export default function ProductAnalyticsPage() {
                           </TableRow>
                         ) : (
                           stockItems.map((product) => {
-                            const productId = String(product.id_provider ?? "-");
+                            const productId = String(
+                              product.id_provider ?? "-",
+                            );
                             const soldStock = getSoldStockValue(product);
                             const minStock = getMinStockValue(product);
 
@@ -381,7 +475,9 @@ export default function ProductAnalyticsPage() {
                                   {product.name?.trim() || "-"}
                                 </TableCell>
                                 <TableCell className="px-3 text-right">
-                                  {toNumber(product.stock).toLocaleString("de-DE")}
+                                  {toNumber(product.stock).toLocaleString(
+                                    "de-DE",
+                                  )}
                                 </TableCell>
                                 <TableCell className="px-3 text-right">
                                   {soldStock === null
@@ -415,7 +511,7 @@ export default function ProductAnalyticsPage() {
             </CardContent>
           </Card>
 
-          <Card className="xl:col-span-2 min-h-0">
+          <Card>
             <CardHeader className="space-y-1 pb-3">
               <CardTitle className="text-base">Top Revenue Products</CardTitle>
               <p className="text-sm text-muted-foreground">
@@ -423,6 +519,88 @@ export default function ProductAnalyticsPage() {
               </p>
             </CardHeader>
             <CardContent className="min-h-0">
+              <div className="mb-4 rounded-xl border border-secondary/15 bg-muted/20 p-2.5">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                  <Input
+                    type="datetime-local"
+                    value={revenueFromDate}
+                    onChange={(event) => setRevenueFromDate(event.target.value)}
+                    className="h-9 border bg-white text-sm"
+                  />
+                  <Input
+                    type="datetime-local"
+                    value={revenueToDate}
+                    onChange={(event) => setRevenueToDate(event.target.value)}
+                    className="h-9 border bg-white text-sm"
+                  />
+
+                  <Select
+                    value={revenueCustomerType}
+                    onValueChange={(value: RevenueCustomerType) =>
+                      setRevenueCustomerType(value)
+                    }
+                  >
+                    <SelectTrigger className="h-9 border bg-white text-sm">
+                      <SelectValue placeholder="Customer type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All customers</SelectItem>
+                      <SelectItem value="b2b">B2B only</SelectItem>
+                      <SelectItem value="b2c">B2C only</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={sortByQuantity}
+                    onValueChange={(value: RevenueSortValue) =>
+                      setSortByQuantity(value)
+                    }
+                  >
+                    <SelectTrigger className="h-9 border bg-white text-sm">
+                      <SelectValue placeholder="Sort by quantity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Quantity: default</SelectItem>
+                      <SelectItem value="desc">
+                        Quantity: high to low
+                      </SelectItem>
+                      <SelectItem value="asc">Quantity: low to high</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={sortByRevenue}
+                    onValueChange={(value: RevenueSortValue) =>
+                      setSortByRevenue(value)
+                    }
+                  >
+                    <SelectTrigger className="h-9 border bg-white text-sm">
+                      <SelectValue placeholder="Sort by revenue" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Revenue: default</SelectItem>
+                      <SelectItem value="desc">Revenue: high to low</SelectItem>
+                      <SelectItem value="asc">Revenue: low to high</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-9 w-full text-sm xl:w-auto"
+                    onClick={() => {
+                      setRevenueFromDate("");
+                      setRevenueToDate("");
+                      setRevenueCustomerType("all");
+                      setSortByQuantity("none");
+                      setSortByRevenue("desc");
+                    }}
+                  >
+                    Reset filters
+                  </Button>
+                </div>
+              </div>
+
               {isRevenueLoading ? (
                 <div className="space-y-2">
                   {Array.from({ length: 8 }).map((_, index) => (
@@ -434,12 +612,12 @@ export default function ProductAnalyticsPage() {
                   Could not load top revenue data.
                 </div>
               ) : (
-                <div className="max-h-[73vh] overflow-y-auto rounded-xl border">
+                <div className="max-h-[46vh] overflow-y-auto rounded-xl border">
                   <Table>
                     <TableHeader className="sticky top-0 z-10 bg-muted/90 backdrop-blur">
                       <TableRow className="hover:bg-transparent">
                         <TableHead className="h-11 px-3">#</TableHead>
-                        <TableHead className="h-11 px-3">Product ID</TableHead>
+                        <TableHead className="h-11 px-3">Product</TableHead>
                         <TableHead className="h-11 px-3 text-right">
                           Sold qty
                         </TableHead>
@@ -459,22 +637,80 @@ export default function ProductAnalyticsPage() {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        topRevenueProducts.map((item, index) => (
-                          <TableRow key={`${item.id_provider}-${index}`}>
-                            <TableCell className="px-3 font-medium">
-                              {index + 1}
-                            </TableCell>
-                            <TableCell className="px-3">
-                              {item.id_provider || "-"}
-                            </TableCell>
-                            <TableCell className="px-3 text-right">
-                              {toNumber(item.total_quantity).toLocaleString("de-DE")}
-                            </TableCell>
-                            <TableCell className="px-3 text-right font-semibold">
-                              {formatCurrency(toNumber(item.total_amount))}
-                            </TableCell>
-                          </TableRow>
-                        ))
+                        topRevenueProducts.map((item, index) => {
+                          const imageUrl = getMainImageUrl(item);
+                          const marketplaces = getBreakdownItems(
+                            item.by_marketplace,
+                            "Prestige Home",
+                          )
+                            .slice(0, 2)
+                            .map(
+                              (entry) =>
+                                `${entry.label}: ${entry.quantity.toLocaleString("de-DE")}`,
+                            )
+                            .join(" • ");
+                          const statuses = getBreakdownItems(
+                            item.by_status,
+                            "Unknown",
+                          )
+                            .slice(0, 2)
+                            .map(
+                              (entry) =>
+                                `${entry.label}: ${entry.quantity.toLocaleString("de-DE")}`,
+                            )
+                            .join(" • ");
+
+                          return (
+                            <TableRow key={`${item.id_provider}-${index}`}>
+                              <TableCell className="px-3 font-medium">
+                                {index + 1}
+                              </TableCell>
+                              <TableCell className="px-3">
+                                <div className="flex items-start gap-3">
+                                  <div className="size-12 shrink-0 overflow-hidden rounded-md border bg-muted/30">
+                                    {imageUrl ? (
+                                      <Image
+                                        src={imageUrl}
+                                        alt={
+                                          item.product_name ?? item.id_provider
+                                        }
+                                        className="size-full object-cover"
+                                        width={48}
+                                        height={48}
+                                      />
+                                    ) : null}
+                                  </div>
+                                  <div className="min-w-0 space-y-1">
+                                    <div className="line-clamp-2 font-medium">
+                                      {item.product_name?.trim() || "-"}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      ID: {item.id_provider || "-"}
+                                    </div>
+                                    {marketplaces ? (
+                                      <div className="text-xs text-muted-foreground line-clamp-1">
+                                        MP: {marketplaces}
+                                      </div>
+                                    ) : null}
+                                    {statuses ? (
+                                      <div className="text-xs text-muted-foreground line-clamp-1">
+                                        Status: {statuses}
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-3 text-right">
+                                {toNumber(item.total_quantity).toLocaleString(
+                                  "de-DE",
+                                )}
+                              </TableCell>
+                              <TableCell className="px-3 text-right font-semibold">
+                                {formatCurrency(toNumber(item.total_amount))}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
                       )}
                     </TableBody>
                   </Table>
