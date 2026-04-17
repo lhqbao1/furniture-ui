@@ -39,6 +39,7 @@ import OrderB2BFilter from "./filter/filter-order-b2b";
 import { exportOrderListTemplateToExcel } from "./export-order-template";
 import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
 import { STATUS_OPTIONS } from "@/data/data";
+import { ORDER_LIST_STATUS_FILTER_OPTIONS } from "./filter/order-status-filter-options";
 
 export enum ToolbarType {
   product = "product",
@@ -102,6 +103,13 @@ export default function OrderToolbar({
 
   const statusLabelMap = React.useMemo(() => {
     const map = new Map<string, string>();
+
+    ORDER_LIST_STATUS_FILTER_OPTIONS.forEach((item) => {
+      const statuses = item.statuses ?? [item.key];
+      statuses.forEach((statusKey) => {
+        if (!map.has(statusKey)) map.set(statusKey, item.label);
+      });
+    });
 
     STATUS_OPTIONS.forEach((item) => {
       const statuses = item.statuses ?? [item.key];
@@ -196,7 +204,10 @@ export default function OrderToolbar({
       chips.push({
         id: "search",
         label: `Search: ${search}`,
-        onRemove: () => removeFilterParam("search"),
+        onRemove: () => {
+          setSearchValue("");
+          removeFilterParam("search");
+        },
       });
     }
 
@@ -280,6 +291,8 @@ export default function OrderToolbar({
 
   useEffect(() => {
     const currentSearch = searchParams.get("search") ?? "";
+    if (debouncedSearch !== searchValue) return;
+
     if (debouncedSearch !== currentSearch) {
       router.push(
         {
@@ -292,7 +305,7 @@ export default function OrderToolbar({
         { scroll: false },
       );
     }
-  }, [debouncedSearch, pathname, router, searchParams]);
+  }, [debouncedSearch, pathname, router, searchParams, searchValue]);
 
   return (
     <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">

@@ -12,16 +12,13 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ProductItem } from "@/types/products";
-import Link from "next/link";
-import { Eye } from "lucide-react";
+import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useGetAllProducts } from "@/features/products/hook";
-import RemoveBundleDialog from "./remove-dialog";
 
 type SelectedProduct = {
   product: ProductItem;
@@ -79,10 +76,12 @@ const getPreferredPackageSize = (product: ProductItem): PackageSize => {
 
 interface SelectBundleComponentProps {
   currentProduct?: Partial<ProductItem>;
+  isInDrawer?: boolean;
 }
 
 const SelectBundleComponent = ({
   currentProduct,
+  isInDrawer = false,
 }: SelectBundleComponentProps) => {
   const form = useFormContext();
   const { setValue } = form;
@@ -96,7 +95,7 @@ const SelectBundleComponent = ({
     isError,
   } = useGetAllProducts({
     search: queryParams,
-    page_size: 100,
+    page_size: 20,
   });
 
   const handleSelectProduct = (product: ProductItem) => {
@@ -119,11 +118,16 @@ const SelectBundleComponent = ({
   };
 
   const handleAmountChange = (id: string, value: number) => {
+    const normalizedValue = Number.isFinite(value) && value > 0 ? value : 1;
     setListProducts((prev) =>
       prev.map((item) =>
-        item.product.id === id ? { ...item, amount: value } : item,
+        item.product.id === id ? { ...item, amount: normalizedValue } : item,
       ),
     );
+  };
+
+  const handleRemoveProduct = (id: string) => {
+    setListProducts((prev) => prev.filter((p) => p.product.id !== id));
   };
 
   const filteredProducts = useMemo(() => {
@@ -192,142 +196,129 @@ const SelectBundleComponent = ({
 
   return (
     <div className="space-y-6">
-      <div className="col-span-2 flex gap-2 items-center">
+      <div className="flex gap-2 items-center">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
+              type="button"
               variant="outline"
-              role="combobox"
               className="flex-1 justify-between py-1 h-12"
             >
               Select Products
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)] z-[80] pointer-events-auto">
+          <PopoverContent
+            usePortal={!isInDrawer}
+            className="w-150 p-0 pointer-events-auto z-[120]"
+          >
             <Command shouldFilter={false}>
               <CommandInput
                 placeholder="Search product..."
                 value={queryParams}
                 onValueChange={(value) => setQueryParams(value)}
               />
-              <CommandList className="max-h-[400px] overflow-y-auto">
-                <CommandEmpty>No product found.</CommandEmpty>
-                <CommandGroup>
-                  {isLoading ||
-                    (!products && (
-                      <CommandItem disabled>Loading...</CommandItem>
-                    ))}
-                  {isError && (
-                    <CommandItem disabled>Error loading products</CommandItem>
-                  )}
-                  {filteredProducts.length === 0 && !isLoading && (
-                    <CommandItem disabled>All products added</CommandItem>
-                  )}
+              <CommandEmpty>No product found.</CommandEmpty>
+              <CommandGroup className="h-100 overflow-y-scroll">
+                {isLoading && <CommandItem disabled>Loading...</CommandItem>}
+                {isError && (
+                  <CommandItem disabled>Error loading products</CommandItem>
+                )}
+                {filteredProducts.length === 0 && !isLoading && !isError && (
+                  <CommandItem disabled>All products added</CommandItem>
+                )}
 
-                  {filteredProducts?.map((product) => (
-                    <CommandItem
-                      key={product.id}
-                      value={product.id ?? ""}
-                      onSelect={() => handleSelectProduct(product)}
-                      className="flex w-full justify-between"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Image
-                          src={
-                            product.static_files.length > 0
-                              ? product.static_files[0].url
-                              : "/product-placeholder.png"
-                          }
-                          height={25}
-                          width={25}
-                          alt=""
-                          className="rounded-"
-                          unoptimized
-                        />
-                        <span>{product.name}</span>
+                {filteredProducts.map((product) => (
+                  <CommandItem
+                    key={product.id}
+                    value={product.id ?? ""}
+                    onSelect={() => {
+                      handleSelectProduct(product);
+                      setOpen(false);
+                    }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={
+                          product.static_files?.[0]?.url ??
+                          "/product-placeholder.png"
+                        }
+                        height={25}
+                        width={25}
+                        alt=""
+                        className="rounded-sm"
+                        unoptimized
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          ID: {product.id_provider ?? "-"} | SKU:{" "}
+                          {product.sku?.trim() ? product.sku : "-"}
+                        </p>
                       </div>
-                      <span>#{product.id_provider}</span>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
             </Command>
           </PopoverContent>
         </Popover>
       </div>
 
       {/* Danh sách sản phẩm đã chọn */}
-      <div className="flex flex-col gap-3">
-        {listProducts.length > 0 && (
-          <div className="space-y-2">
-            <div className="grid grid-cols-4 gap-3">
-              <h3 className="text-sm font-medium text-muted-foreground col-span-3">
-                Selected products
-              </h3>
-              <h3 className="text-sm font-medium text-muted-foreground col-span-1">
-                Amount
-              </h3>
-            </div>
-            <div className="flex flex-col gap-4">
-              {listProducts.map(({ product, amount }) => (
-                <div
-                  className="flex gap-3 items-center justify-between"
-                  key={product.id}
-                >
-                  <div
-                    key={product.id}
-                    className="grid grid-cols-4 gap-3 flex-1"
-                  >
-                    <div className="flex lg:col-span-3 col-span-4 items-center gap-3 border rounded-md p-2 hover:bg-accent/40 transition">
-                      <Image
-                        src={
-                          product.static_files?.[0]?.url ??
-                          "/product-placeholder.png"
-                        }
-                        width={50}
-                        height={50}
-                        alt=""
-                        className="rounded-sm !h-[40px] object-cover"
-                        unoptimized
-                      />
-                      <div className="flex flex-col flex-1">
-                        <span className="font-medium">{product.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          #{product.id_provider}
-                        </span>
-                      </div>
-                      <Link
-                        href={`/product/${product.url_key}`}
-                        target="_blank"
-                      >
-                        <Eye
-                          className="text-secondary cursor-pointer"
-                          size={18}
-                        />
-                      </Link>
-                    </div>
-
-                    <Input
-                      type="number"
-                      min={1}
-                      value={amount}
-                      onChange={(e) =>
-                        handleAmountChange(product.id, Number(e.target.value))
-                      }
-                      className="lg:h-full lg:col-span-1 col-span-4 h-10"
-                    />
-                  </div>
-                  <RemoveBundleDialog
-                    product={product}
-                    setListProducts={setListProducts}
-                  />
-                </div>
-              ))}
-            </div>
+      {listProducts.length > 0 && (
+        <div className="space-y-3">
+          <div className="grid grid-cols-5 gap-3 text-sm font-medium text-muted-foreground">
+            <div className="col-span-3">Product</div>
+            <div>Quantity</div>
+            <div></div>
           </div>
-        )}
-      </div>
+
+          {listProducts.map(({ product, amount }) => (
+            <div
+              key={product.id}
+              className="grid grid-cols-5 gap-3 items-center border rounded-md p-2"
+            >
+              <div className="flex items-center gap-3 col-span-3">
+                <Image
+                  src={product.static_files?.[0]?.url ?? "/product-placeholder.png"}
+                  width={50}
+                  height={50}
+                  alt=""
+                  className="rounded-sm !h-[40px] object-cover"
+                  unoptimized
+                />
+                <div>
+                  <div className="font-medium">{product.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    ID: {product.id_provider ?? "-"} | SKU:{" "}
+                    {product.sku?.trim() ? product.sku : "-"}
+                  </div>
+                </div>
+              </div>
+
+              <Input
+                type="number"
+                min={1}
+                step="1"
+                value={amount}
+                onChange={(e) =>
+                  handleAmountChange(product.id, Number(e.target.value))
+                }
+              />
+
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => handleRemoveProduct(product.id)}
+              >
+                <X className="text-red-400" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

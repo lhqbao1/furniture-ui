@@ -764,7 +764,7 @@ export const listChanel = [
   {
     id: 19,
     name: "neckermann",
-    icon: "neckermann.png",
+    icon: "necker1.png",
   },
 ];
 
@@ -1179,9 +1179,9 @@ export const SHIPMENT_CARRIERS = [
   { id: "gls", logo: "/gls-new.png", label: "GLS" },
   { id: "ups", logo: "/ups.png", label: "UPS" },
   { id: "hermes", logo: "/hermes.png", label: "Hermes" },
-  { id: "spedition", logo: "/dsv.png", label: "DSV" },
-  { id: "spedition", logo: "/schenker.png", label: "DB Schenker" },
-  { id: "spedition", logo: "/kunel.webp", label: "Kühne + Nagel" },
+  { id: "dsv", logo: "/dsv.png", label: "DSV" },
+  { id: "db_schenker", logo: "/schenker.png", label: "DB Schenker" },
+  { id: "kuhne_nagel", logo: "/kunel.webp", label: "Kühne + Nagel" },
 ] as const;
 
 export const COUNTRY_OPTIONS = [

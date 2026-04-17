@@ -317,7 +317,10 @@ const ProductForm = ({
                   >
                     <Card>
                       <CardContent>
-                        <SelectBundleComponent currentProduct={productValues} />
+                        <SelectBundleComponent
+                          currentProduct={productValues}
+                          isInDrawer={Boolean(isDrawer)}
+                        />
                       </CardContent>
                     </Card>
                   </div>
