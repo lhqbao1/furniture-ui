@@ -107,6 +107,18 @@ type RefundLineFormState = {
   images: RefundLineImage[];
 };
 
+type RefundApiErrorPayload = {
+  detail?: unknown;
+  message?: unknown;
+};
+
+type RefundApiError = {
+  response?: {
+    data?: RefundApiErrorPayload;
+  };
+  message?: unknown;
+};
+
 const ITEM_QUALITY_OPTIONS: ItemQuality[] = [
   "A-Goods",
   "C-Goods",
@@ -132,6 +144,47 @@ const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
 const isImageFile = (file: File) => file.type.startsWith("image/");
+
+const extractRefundErrorMessage = (error: unknown) => {
+  const err = error as RefundApiError;
+  const responseData = err.response?.data;
+  const detail = responseData?.detail;
+
+  if (typeof detail === "object" && detail !== null) {
+    const detailObj = detail as {
+      details?: Array<{ description?: unknown }>;
+      message?: unknown;
+    };
+    const paypalDescription = detailObj.details?.find(
+      (item) => typeof item?.description === "string" && item.description.trim(),
+    )?.description;
+
+    if (typeof paypalDescription === "string") {
+      return paypalDescription;
+    }
+
+    if (typeof detailObj.message === "string" && detailObj.message.trim()) {
+      return detailObj.message;
+    }
+  }
+
+  if (typeof detail === "string" && detail.trim()) {
+    return detail;
+  }
+
+  if (
+    typeof responseData?.message === "string" &&
+    responseData.message.trim()
+  ) {
+    return responseData.message;
+  }
+
+  if (typeof err.message === "string" && err.message.trim()) {
+    return err.message;
+  }
+
+  return "Failed to issue refund";
+};
 
 const getUnitPrice = (item: CartItem) => {
   if (item.purchased_products?.final_price)
@@ -503,19 +556,9 @@ const IssueRefundDialog = ({
       toast.success("Issue refund successfully");
       handleClose();
     } catch (error) {
-      const err = error as {
-        response?: { data?: { detail?: unknown; message?: unknown } };
-        message?: unknown;
-      };
-
-      const message =
-        err.response?.data?.detail ??
-        err.response?.data?.message ??
-        err.message ??
-        "Failed to issue refund";
-
+      const message = extractRefundErrorMessage(error);
       toast.error("Failed to issue refund", {
-        description: String(message),
+        description: message,
       });
     }
   };

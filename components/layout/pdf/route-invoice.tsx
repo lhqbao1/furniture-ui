@@ -261,6 +261,10 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
   const giftCouponGross =
     (invoice?.coupon_amount ?? 0) + Math.abs(invoice?.voucher_amount ?? 0);
   const showGiftCouponRow = giftCouponGross > 0;
+  const refundDiscountGross = Math.abs(
+    Number(invoice?.main_checkout?.refund_amount ?? checkout?.refund_amount ?? 0),
+  );
+  const showRefundDiscountRow = refundDiscountGross > 0;
 
   return (
     <Document>
@@ -711,6 +715,42 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   }}
                 >
                   {giftCouponGross.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  {" €"}
+                </Text>
+              </View>
+            )}
+
+            {showRefundDiscountRow && (
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  paddingVertical: 3,
+                  paddingHorizontal: 6,
+                }}
+              >
+                <Text
+                  style={{
+                    width: "60%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Rabatt (Rückerstattung, brutto)
+                </Text>
+                <Text
+                  style={{
+                    width: "20%",
+                    textAlign: "right",
+                    fontWeight: "bold",
+                  }}
+                >
+                  -{" "}
+                  {refundDiscountGross.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}

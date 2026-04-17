@@ -1,4 +1,4 @@
-import { ChevronRight, Eye, Plus, Trash2 } from "lucide-react";
+import { ChevronRight, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,6 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-import Link from "next/link";
-import { useLocale } from "next-intl";
 import { useGetAllProducts } from "@/features/products/hook";
 
 interface VariantCombinationsProps {
@@ -69,8 +67,6 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
   const [queryParams, setQueryParams] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [localCombinations, setLocalCombinations] = useState(combinations);
-  const locale = useLocale();
-
   const [selectedAction, setSelectedAction] =
     useState<Record<number, string>>(filteredProduct);
   const [selectedProductsById, setSelectedProductsById] = useState<
@@ -237,45 +233,19 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                   >
                     <PopoverTrigger asChild>
                       <Button
+                        type="button"
                         variant="outline"
                         role="combobox"
-                        className="h-auto w-full justify-between gap-2 py-2 text-left"
+                        className="flex-1 justify-between py-1 h-12"
                       >
                         {(() => {
                           const selectedId = String(selectedAction[idx] ?? "");
                           const selectedProduct = selectedProductsById[selectedId];
 
                           return selectedAction[idx] ? (
-                            <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                              <Image
-                                src={
-                                  selectedProduct?.static_files?.[0]?.url ??
-                                  "/placeholder-product.webp"
-                                }
-                                width={40}
-                                height={40}
-                                alt=""
-                                className="h-9 w-9 shrink-0 rounded-sm"
-                                unoptimized
-                              />
-                              <div className="truncate text-sm sm:text-base">
-                                {selectedProduct?.name ?? "Product selected"}
-                              </div>
-                              {selectedProduct?.url_key && (
-                                <Link
-                                  href={`/de/product/${selectedProduct.url_key}`}
-                                  locale={locale}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="ml-auto shrink-0"
-                                >
-                                  <Eye
-                                    className="cursor-pointer text-secondary"
-                                    size={18}
-                                  />
-                                </Link>
-                              )}
-                            </div>
+                            <span className="truncate text-left">
+                              {selectedProduct?.name ?? "Product selected"}
+                            </span>
                           ) : (
                             <span className="text-sm">Select product</span>
                           );
@@ -284,7 +254,7 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                       </Button>
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-[calc(100vw-3rem)] max-w-[600px] p-0">
+                    <PopoverContent className="w-150 p-0 pointer-events-auto z-[120]">
                       <Command shouldFilter={false}>
                         <CommandInput
                           placeholder="Search product..."
@@ -339,9 +309,9 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                     setDebouncedQuery("");
                                     setOpenIdx(null);
                                   }}
-                                  className="flex w-full justify-between gap-3"
+                                  className="flex items-center gap-3"
                                 >
-                                  <div className="flex min-w-0 items-center space-x-3">
+                                  <div className="flex items-center gap-3">
                                     <Image
                                       src={
                                         (product.static_files?.length ?? 0) > 0
@@ -351,12 +321,17 @@ export const VariantCombinations: React.FC<VariantCombinationsProps> = ({
                                       height={25}
                                       width={25}
                                       alt=""
-                                      className="shrink-0 rounded"
+                                      className="rounded-sm"
                                       unoptimized
                                     />
-                                    <span className="truncate">{product.name}</span>
+                                    <div className="min-w-0">
+                                      <p className="truncate">{product.name}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        ID: {product.id_provider ?? "-"} | SKU:{" "}
+                                        {product.sku?.trim() ? product.sku : "-"}
+                                      </p>
+                                    </div>
                                   </div>
-                                  <span className="shrink-0">#{product.id_provider}</span>
                                 </CommandItem>
                               ))}
                         </CommandGroup>

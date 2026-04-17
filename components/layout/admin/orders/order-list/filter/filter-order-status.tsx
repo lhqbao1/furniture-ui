@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { STATUS_OPTIONS } from "@/data/data";
+import { ORDER_LIST_STATUS_FILTER_OPTIONS } from "./order-status-filter-options";
 
 export default function OrderStatusFilter() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function OrderStatusFilter() {
     setSelected(current ? current.split(",") : []);
   }, [searchParams]);
 
-  const toggleStatus = (item: (typeof STATUS_OPTIONS)[number]) => {
+  const toggleStatus = (item: (typeof ORDER_LIST_STATUS_FILTER_OPTIONS)[number]) => {
     // danh sách backend statuses mà item đại diện
     const backendStatuses = item.statuses ?? [item.key];
 
@@ -72,7 +72,7 @@ export default function OrderStatusFilter() {
         </SelectTrigger>
 
         <SelectContent className="max-h-96">
-          {STATUS_OPTIONS.map((item) => (
+          {ORDER_LIST_STATUS_FILTER_OPTIONS.map((item) => (
             <div
               key={item.key}
               className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-accent rounded-md"

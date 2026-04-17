@@ -17,6 +17,29 @@ import IssueRefundDialog from "./dialog/issue-refund-dialog";
 
 const EMPTY_STATUS_VALUE = "__status_empty__";
 
+const ORDER_STATUS_ACTION_LABELS: Record<string, string> = {
+  paid: "Mark payment as received",
+  canceled: "Cancel order",
+  canceled_no_stock: "Cancel order (out of stock)",
+  canceled_wrong_price: "Cancel order (wrong price)",
+  return: "Mark as returned",
+  return_issue: "Issue refund",
+  exchange: "Start exchange",
+  items_are_checked: "Mark items as checked",
+  waiting_for_return: "Mark as waiting for return",
+  warranty_initiated: "Start warranty process",
+  exchange_initiated: "Start exchange process",
+  credit_note_created: "Mark credit note as created",
+  preparation_shipping: "Move to preparing",
+  ds_informed: "Mark DS as informed",
+  shipped: "Mark as shipped",
+  completed: "Mark as delivered",
+  tock_reserved: "Move to stock reserved",
+};
+
+const getOrderStatusActionLabel = (key: string, fallback: string) =>
+  ORDER_STATUS_ACTION_LABELS[key] ?? fallback;
+
 export const getStatusLabel = (status: string) => {
   const normalized = status.toLowerCase();
 
@@ -102,13 +125,13 @@ export default function OrderStatusSelector({
             <SelectItem value={EMPTY_STATUS_VALUE} className="hidden" disabled>
               Select
             </SelectItem>
-            {options.map((opt) => (
+            {options.map((opt, index) => (
               <SelectItem
                 key={opt.key}
                 value={opt.key}
                 className="cursor-pointer"
               >
-                {opt.key === "completed" ? "" : `${opt.pos - 1}.`} {opt.label}
+                {index + 1}. {getOrderStatusActionLabel(opt.key, opt.label)}
               </SelectItem>
             ))}
           </SelectContent>

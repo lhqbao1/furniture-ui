@@ -17,12 +17,17 @@ import { Button } from "@/components/ui/button";
 import { ShipmentFormValues, shipmentSchema } from "@/lib/schema/shipment";
 import { useSendSupplierTracking } from "@/features/supplier/hook";
 import CarrierSelect from "./carrier-select";
+import { toast } from "sonner";
+import { useRouter } from "@/src/i18n/navigation";
+import { useLocale } from "next-intl";
 
 interface ShipmentInputProps {
   checkoutId: string;
 }
 
 const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
+  const router = useRouter();
+  const locale = useLocale();
   const form = useForm<ShipmentFormValues>({
     resolver: zodResolver(shipmentSchema),
     defaultValues: {
@@ -34,16 +39,28 @@ const ShipmentInput = ({ checkoutId }: ShipmentInputProps) => {
   const { mutate, isPending } = useSendSupplierTracking();
 
   const onSubmit = (values: ShipmentFormValues) => {
+    const toastId = toast.loading("Sending tracking...");
     const shippedDate = new Date().toISOString().replace("Z", "");
     const payload = {
       ...values,
       shipped_date: shippedDate,
     };
 
-    mutate({
-      checkoutId,
-      payload,
-    });
+    mutate(
+      {
+        checkoutId,
+        payload,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Tracking sent successfully", { id: toastId });
+          router.push("/dsp/admin/orders/list/preparing", { locale });
+        },
+        onError: () => {
+          toast.error("Failed to send tracking", { id: toastId });
+        },
+      },
+    );
   };
 
   return (

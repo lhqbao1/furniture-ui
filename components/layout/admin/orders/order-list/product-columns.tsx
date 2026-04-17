@@ -131,13 +131,23 @@ export const orderListExpandColumns = (
     accessorKey: "invoice_amount",
     header: () => <div className="text-right w-full">UNIT PRICE</div>,
     cell: ({ row }) => {
+      const unitGross =
+        Number(
+          row.original.purchased_products
+            ? row.original.purchased_products.final_price
+            : row.original.products.final_price,
+        ) || 0;
+      const unitNet = calculateProductVAT(
+        unitGross,
+        row.original.products.tax,
+        country,
+        tax_id,
+      ).net;
+
       return (
         <div className="text-right">
           €
-          {(row.original.purchased_products
-            ? row.original.purchased_products.final_price
-            : row.original.products.final_price
-          ).toLocaleString("de-DE", {
+          {unitNet.toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
@@ -157,15 +167,25 @@ export const orderListExpandColumns = (
     accessorKey: "total_invoice_amount",
     header: () => <div className="text-right w-full">TOTAL AMOUNT</div>,
     cell: ({ row }) => {
+      const quantity = Number(row.original.quantity) || 0;
+      const unitGross =
+        Number(
+          row.original.purchased_products
+            ? row.original.purchased_products.final_price
+            : row.original.products.final_price,
+        ) || 0;
+      const unitNet = calculateProductVAT(
+        unitGross,
+        row.original.products.tax,
+        country,
+        tax_id,
+      ).net;
+      const lineNet = unitNet * quantity;
+
       return (
         <div className="text-right">
           €
-          {(
-            row.original.quantity *
-            (row.original.purchased_products
-              ? row.original.purchased_products.final_price
-              : row.original.products.final_price)
-          ).toLocaleString("de-DE", {
+          {lineNet.toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
@@ -176,7 +196,7 @@ export const orderListExpandColumns = (
 
   {
     accessorKey: "stock",
-    header: ({ column }) => {
+    header: () => {
       return <div className="text-center">STOCK LEFT</div>;
     },
     cell: ({ row }) => {
