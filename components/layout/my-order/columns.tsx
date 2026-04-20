@@ -10,28 +10,33 @@ export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
   return [
     {
       accessorKey: "product_name",
-      header: t("product"),
+      header: () => <span>{t("product")}</span>,
       meta: { width: "400px" },
       cell: ({ row }) => (
-        <div className="line-clamp-2 text-wrap">
-          {row.original.products.name}
+        <div className="space-y-1">
+          <div className="line-clamp-2 text-wrap font-medium text-foreground">
+            {row.original.products.name}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            #{row.original.products.id_provider ?? "-"}
+          </div>
         </div>
       ),
     },
     {
       accessorKey: "quantity",
-      header: t("quantity"),
+      header: () => <span>{t("quantity")}</span>,
       meta: { width: "100px" },
       cell: ({ row }) => (
-        <div className="text-center">x{row.original.quantity}</div>
+        <div className="text-center font-medium text-foreground">x{row.original.quantity}</div>
       ),
     },
     {
       accessorKey: "product_price",
-      header: t("total"),
+      header: () => <span>{t("total")}</span>,
       meta: { width: "150px" },
       cell: ({ row }) => (
-        <div className="text-right">
+        <div className="text-right font-semibold text-foreground">
           €
           {(row.original.item_price * row.original.quantity).toLocaleString(
             "de-DE",
