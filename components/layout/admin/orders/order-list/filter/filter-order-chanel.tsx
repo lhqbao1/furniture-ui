@@ -28,7 +28,7 @@ export const CHANEL_OPTIONS = [
   { key: "hornbach", label: "Hornbach", icon: "horn.png" },
   { key: "inprodius", label: "Inprodius", icon: "inprodius.png" },
   { key: "kaufland", label: "Kaufland", icon: "kau.png" },
-  { key: "neckermann", label: "Neckermann", icon: "neckermann.png" },
+  { key: "neckermann", label: "Neckermann", icon: "necker3.png" },
   { key: "netto", label: "Netto", icon: "netto-logo.svg" },
   { key: "norma", label: "Norma24", icon: "norma.png" },
   { key: "praktiker", label: "Praktiker", icon: "praktiker.jpg" },

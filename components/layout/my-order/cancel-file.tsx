@@ -305,7 +305,7 @@ export const CancelInvoicePDF = ({
           </Text>
 
           <View style={{ marginTop: 10 }}>
-            <Text>Sehr geehrte Damen und Herren,</Text>
+            <Text>Sehr geehrte Damen und Herren, </Text>
           </View>
 
           <View style={{ marginTop: 6 }}>

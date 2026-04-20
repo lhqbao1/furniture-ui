@@ -17,6 +17,7 @@ import {
   calculateOrderTaxWithDiscount,
   calculateProductVAT,
 } from "@/lib/caculate-vat";
+import { parseTaxRate } from "@/lib/parse-tax";
 
 Font.register({
   family: "Roboto",
@@ -123,12 +124,42 @@ const styles = StyleSheet.create({
 interface InvoicePDFProps {
   checkout: CheckOutMain;
   invoice: InvoiceResponse;
+  variant?: "default" | "refund";
+  refundProducts?: RefundInvoiceProduct[];
 }
 
 const normalizeRecipientName = (value?: string | null) =>
   (value ?? "").replace(/\s{2,}/g, " ").trim();
 
-export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
+interface RefundInvoiceProduct {
+  name?: string;
+  sku?: string;
+  id_provider?: string;
+  refund_amount?: number;
+  tax?: string;
+}
+
+const REFUND_DEFAULT_VAT_RATE = 0.19;
+
+const normalizeRate = (rawRate: unknown) => {
+  const parsed = Number(rawRate);
+  if (!Number.isFinite(parsed)) return 0;
+  return parsed > 1 ? parsed / 100 : parsed;
+};
+
+const toSafeNumber = (value: unknown) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+export const InvoicePDF = ({
+  checkout,
+  invoice,
+  variant = "default",
+  refundProducts = [],
+}: InvoicePDFProps) => {
+  const isRefundInvoice = variant === "refund";
+
   const flattenedCartItems = useMemo(() => {
     const checkouts = invoice?.main_checkout?.checkouts;
     if (!checkouts) return [];
@@ -154,6 +185,14 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
     );
   }, [invoice]);
 
+  const normalizedRefundProducts = useMemo(
+    () =>
+      Array.isArray(refundProducts)
+        ? refundProducts.filter((item) => item && typeof item === "object")
+        : [],
+    [refundProducts],
+  );
+
   const primaryCheckout = checkout?.checkouts?.[0];
   const useShippingAddressForInvoice =
     (checkout?.from_marketplace ?? "").toLowerCase() === "ebay";
@@ -178,6 +217,146 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
     : "";
   const marketplaceReference = checkout?.marketplace_order_id?.trim() ?? "";
   const hasMarketplaceReference = marketplaceReference.length > 0;
+  const checkoutCode =
+    checkout?.checkout_code ?? invoice?.main_checkout?.checkout_code ?? "";
+  const refundInvoiceNumber = checkoutCode
+    ? `RK${checkoutCode}`
+    : `RK${invoice?.invoice_code ?? ""}`;
+
+  const refundVatSummary = useMemo(() => {
+    const normalizeLookup = (value?: string | null) =>
+      (value ?? "").trim().toLowerCase();
+
+    const bucketMap = new Map<
+      number,
+      { gross: number; net: number; vat: number }
+    >();
+    let grossTotalFromProducts = 0;
+
+    const addBucket = (rate: number, grossValue: number) => {
+      const vatRate = Number.isFinite(rate)
+        ? Math.max(0, rate)
+        : REFUND_DEFAULT_VAT_RATE;
+      const gross = Math.max(0, toSafeNumber(grossValue));
+      if (gross <= 0) return;
+
+      const vatFactor = 1 + vatRate;
+      const net = vatFactor > 0 ? gross / vatFactor : gross;
+      const vat = gross - net;
+
+      const current = bucketMap.get(vatRate) ?? { gross: 0, net: 0, vat: 0 };
+      bucketMap.set(vatRate, {
+        gross: current.gross + gross,
+        net: current.net + net,
+        vat: current.vat + vat,
+      });
+    };
+
+    normalizedRefundProducts.forEach((refundItem) => {
+      const refundGross = Math.abs(toSafeNumber(refundItem?.refund_amount));
+      if (refundGross <= 0) return;
+      grossTotalFromProducts += refundGross;
+
+      const refundIdProvider = normalizeLookup(refundItem?.id_provider);
+      const refundSku = normalizeLookup(refundItem?.sku);
+      const refundName = normalizeLookup(refundItem?.name);
+
+      const matchedOrderItem = flattenedCartItems.find((orderItem) => {
+        const itemIdProvider = normalizeLookup(
+          orderItem?.products?.id_provider ??
+            orderItem?.purchased_products?.id_provider,
+        );
+        const itemSku = normalizeLookup(
+          orderItem?.products?.sku ?? orderItem?.purchased_products?.sku,
+        );
+        const itemName = normalizeLookup(
+          orderItem?.products?.name ?? orderItem?.purchased_products?.name,
+        );
+
+        if (
+          refundIdProvider &&
+          itemIdProvider &&
+          refundIdProvider === itemIdProvider
+        ) {
+          return true;
+        }
+        if (refundSku && itemSku && refundSku === itemSku) {
+          return true;
+        }
+        if (refundName && itemName && refundName === itemName) {
+          return true;
+        }
+
+        return false;
+      });
+
+      const orderItemTax =
+        matchedOrderItem?.products?.tax ??
+        matchedOrderItem?.purchased_products?.tax;
+      const calculatedRate = normalizeRate(
+        calculateProductVAT(
+          matchedOrderItem?.final_price ?? matchedOrderItem?.item_price ?? 0,
+          orderItemTax,
+          checkoutCountryCode,
+          checkoutTaxId,
+        )?.vatRate,
+      );
+
+      const refundTaxRaw = parseTaxRate(refundItem?.tax);
+      const hasRefundTaxString =
+        typeof refundItem?.tax === "string" && refundItem.tax.trim() !== "";
+      const parsedRefundTaxRate = Number.isFinite(refundTaxRaw)
+        ? Math.max(0, refundTaxRaw)
+        : null;
+
+      const vatRate =
+        hasRefundTaxString && parsedRefundTaxRate !== null
+          ? parsedRefundTaxRate
+          : matchedOrderItem && (orderItemTax ?? "").toString().trim() !== ""
+            ? calculatedRate
+            : REFUND_DEFAULT_VAT_RATE;
+
+      addBucket(vatRate, refundGross);
+    });
+
+    const checkoutRefundGross = Math.abs(
+      toSafeNumber(
+        invoice?.main_checkout?.refund_amount ?? checkout?.refund_amount,
+      ),
+    );
+    const grossTotal =
+      checkoutRefundGross > 0 ? checkoutRefundGross : grossTotalFromProducts;
+
+    if (bucketMap.size === 0 && grossTotal > 0) {
+      addBucket(REFUND_DEFAULT_VAT_RATE, grossTotal);
+    }
+
+    const buckets = Array.from(bucketMap.entries())
+      .map(([rate, values]) => ({
+        percent: rate * 100,
+        gross: values.gross,
+        net: values.net,
+        vat: values.vat,
+      }))
+      .sort((a, b) => b.percent - a.percent);
+
+    const netTotal = buckets.reduce((sum, bucket) => sum + bucket.net, 0);
+    const vatTotal = buckets.reduce((sum, bucket) => sum + bucket.vat, 0);
+
+    return {
+      grossTotal,
+      netTotal,
+      vatTotal,
+      buckets,
+    };
+  }, [
+    checkout?.refund_amount,
+    checkoutCountryCode,
+    checkoutTaxId,
+    flattenedCartItems,
+    invoice?.main_checkout?.refund_amount,
+    normalizedRefundProducts,
+  ]);
 
   const productNetTotal = useMemo(
     () =>
@@ -261,25 +440,32 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
     ];
   }, [orderTaxSummary]);
 
-  const introLines = [
-    "Rechnung",
-    "Sehr geehrte Damen und Herren,",
-    "vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!",
-    "Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:",
-  ];
+  const introLines = isRefundInvoice
+    ? [
+        `Rechnungskorrektur zu ${checkoutCode}`,
+        "Sehr geehrte Damen und Herren, hiermit schreiben wir Ihnen aufgrund der Mängelrüge einen Teilbetrag aus oben genannter Rechnung als Kulanz gut.",
+      ]
+    : [
+        "Rechnung",
+        "Sehr geehrte Damen und Herren,",
+        "vielen Dank für Ihren Auftrag und das damit verbundene Vertrauen!",
+        "Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:",
+      ];
 
   const paymentLines = [
     "Zahlungsbedingungen:",
     `Zahlung innerhalb von ${resolvedPaymentTermDays} Tagen ab Rechnungseingang ohne Abzüge. Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto.`,
   ];
   const isWaitingForPayment =
-    (checkout?.status ?? "").toLowerCase() === "pending";
+    !isRefundInvoice && (checkout?.status ?? "").toLowerCase() === "pending";
 
   const giftCouponGross =
     (invoice?.coupon_amount ?? 0) + Math.abs(invoice?.voucher_amount ?? 0);
   const showGiftCouponRow = giftCouponGross > 0;
   const refundDiscountGross = Math.abs(
-    Number(invoice?.main_checkout?.refund_amount ?? checkout?.refund_amount ?? 0),
+    Number(
+      invoice?.main_checkout?.refund_amount ?? checkout?.refund_amount ?? 0,
+    ),
   );
   const showRefundDiscountRow = refundDiscountGross > 0;
 
@@ -368,7 +554,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 paddingHorizontal: 8,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>Rechnung</Text>
+              <Text style={{ fontWeight: "bold" }}>
+                {isRefundInvoice ? "Rechnungskorrektur" : "Rechnung"}
+              </Text>
             </View>
 
             {/* Rows */}
@@ -383,7 +571,9 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               <Text style={{ width: 115, fontWeight: "bold" }}>
                 Rechnungs-Nr:
               </Text>
-              <Text>{invoice.invoice_code}</Text>
+              <Text>
+                {isRefundInvoice ? refundInvoiceNumber : invoice.invoice_code}
+              </Text>
             </View>
 
             <View
@@ -515,80 +705,124 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             <Text style={{ width: "11%", textAlign: "right" }}>G.-Preis</Text>
           </View>
 
-          {/* Item 1 */}
-          {flattenedCartItems.map((item, index) => {
-            const vatRateRaw = Number(
-              calculateProductVAT(
-                item.final_price,
-                item.products.tax,
-                checkoutCountryCode,
-                checkoutTaxId,
-              ).vatRate,
-            );
-            const normalizedVatRate =
-              Number.isFinite(vatRateRaw) && vatRateRaw > 1
-                ? vatRateRaw / 100
-                : Number.isFinite(vatRateRaw)
-                  ? vatRateRaw
-                  : 0;
-            const vatPercent = normalizedVatRate * 100;
-            const vatFactor = normalizedVatRate + 1;
-            const netUnitPriceRaw = Number(item.item_price) / vatFactor;
-            const netUnitPrice = Number.isFinite(netUnitPriceRaw)
-              ? netUnitPriceRaw
-              : 0;
-            const quantityNumber = Number(item.quantity);
-            const safeQuantity = Number.isFinite(quantityNumber)
-              ? quantityNumber
-              : 0;
-            const netLineTotal = netUnitPrice * safeQuantity;
-
-            return (
-              <View
-                key={index}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  borderBottom: "1pt solid #ccc",
-                  padding: 4,
-                }}
-              >
-                <Text style={{ width: "6%", textAlign: "center" }}>
-                  {index + 1}
-                </Text>
-                <Text style={{ width: "14%" }}>
-                  {item.products.id_provider}
-                </Text>
-                <View style={{ width: "38%" }}>
-                  <Text>{item.products.name}</Text>
-                </View>
-                <Text style={{ width: "10%", textAlign: "center" }}>
-                  {item.quantity}
-                </Text>
-                <Text style={{ width: "10%", textAlign: "right" }}>
-                  {vatPercent.toLocaleString("de-DE", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  })}
-                  %
-                </Text>
-                <Text style={{ width: "11%", textAlign: "right" }}>
-                  {netUnitPrice.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  €
-                </Text>
-                <Text style={{ width: "11%", textAlign: "right" }}>
-                  {netLineTotal.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  €
-                </Text>
+          {/* Item rows */}
+          {isRefundInvoice ? (
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                borderBottom: "1pt solid #ccc",
+                padding: 4,
+              }}
+            >
+              <Text style={{ width: "6%", textAlign: "center" }}>1</Text>
+              <Text style={{ width: "14%" }}>{""}</Text>
+              <View style={{ width: "38%" }}>
+                <Text>Nachträgliche Preisminderung (Kulanz/Mangel)</Text>
               </View>
-            );
-          })}
+              <Text style={{ width: "10%", textAlign: "center" }}>1</Text>
+              <Text style={{ width: "10%", textAlign: "right" }}>
+                {(
+                  refundVatSummary.buckets[0]?.percent ??
+                  REFUND_DEFAULT_VAT_RATE * 100
+                ).toLocaleString("de-DE", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                })}
+                %
+              </Text>
+              <Text style={{ width: "11%", textAlign: "right" }}>
+                -
+                {Math.abs(refundVatSummary.netTotal).toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                €
+              </Text>
+              <Text style={{ width: "11%", textAlign: "right" }}>
+                -
+                {Math.abs(refundVatSummary.netTotal).toLocaleString("de-DE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                €
+              </Text>
+            </View>
+          ) : (
+            flattenedCartItems.map((item, index) => {
+              const vatRateRaw = Number(
+                calculateProductVAT(
+                  item.final_price,
+                  item.products.tax,
+                  checkoutCountryCode,
+                  checkoutTaxId,
+                ).vatRate,
+              );
+              const normalizedVatRate =
+                Number.isFinite(vatRateRaw) && vatRateRaw > 1
+                  ? vatRateRaw / 100
+                  : Number.isFinite(vatRateRaw)
+                    ? vatRateRaw
+                    : 0;
+              const vatPercent = normalizedVatRate * 100;
+              const vatFactor = normalizedVatRate + 1;
+              const netUnitPriceRaw = Number(item.item_price) / vatFactor;
+              const netUnitPrice = Number.isFinite(netUnitPriceRaw)
+                ? netUnitPriceRaw
+                : 0;
+              const quantityNumber = Number(item.quantity);
+              const safeQuantity = Number.isFinite(quantityNumber)
+                ? quantityNumber
+                : 0;
+              const netLineTotal = netUnitPrice * safeQuantity;
+
+              return (
+                <View
+                  key={index}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    borderBottom: "1pt solid #ccc",
+                    padding: 4,
+                  }}
+                >
+                  <Text style={{ width: "6%", textAlign: "center" }}>
+                    {index + 1}
+                  </Text>
+                  <Text style={{ width: "14%" }}>
+                    {item.products.id_provider}
+                  </Text>
+                  <View style={{ width: "38%" }}>
+                    <Text>{item.products.name}</Text>
+                  </View>
+                  <Text style={{ width: "10%", textAlign: "center" }}>
+                    {item.quantity}
+                  </Text>
+                  <Text style={{ width: "10%", textAlign: "right" }}>
+                    {vatPercent.toLocaleString("de-DE", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}
+                    %
+                  </Text>
+                  <Text style={{ width: "11%", textAlign: "right" }}>
+                    {netUnitPrice.toLocaleString("de-DE", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    €
+                  </Text>
+                  <Text style={{ width: "11%", textAlign: "right" }}>
+                    {netLineTotal.toLocaleString("de-DE", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    €
+                  </Text>
+                </View>
+              );
+            })
+          )}
         </View>
 
         {/* Summary */}
@@ -600,117 +834,78 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
             borderBottom: "1pt solid #e6e6e6",
           }}
         >
-          {/* Net and VAT */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              paddingVertical: 3,
-              paddingHorizontal: 6,
-            }}
-          >
-            <Text style={{ width: "60%", textAlign: "right" }}>
-              Warenwert (netto)
-            </Text>
-            <Text style={{ width: "20%", textAlign: "right" }}>
-              {productNetTotal.toLocaleString("de-DE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              {" €"}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              paddingVertical: 3,
-              paddingHorizontal: 6,
-            }}
-          >
-            <Text style={{ width: "60%", textAlign: "right" }}>
-              Versandkosten (netto)
-            </Text>
-            <Text style={{ width: "20%", textAlign: "right" }}>
-              {(Number(orderTaxSummary?.shipping?.net) || 0).toLocaleString(
-                "de-DE",
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                },
-              )}
-              {" €"}
-            </Text>
-          </View>
-
-          {/* Invoice total */}
-          {/* <View
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'flex-end',
-                            paddingVertical: 4,
-                            paddingHorizontal: 6,
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        <Text style={{ width: '60%', textAlign: 'right' }}>Summe (netto)</Text>
-                        <Text style={{ width: '20%', textAlign: 'right' }}>
-                            {((invoice?.total_amount ?? 0) - (invoice?.total_vat ?? 0)).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
-                        </Text>
-                    </View> */}
-
-          <View>
-            {vatRows.map((row, index) => (
+          {isRefundInvoice ? (
+            <View>
               <View
-                key={`vat-row-${index}-${row.percent}`}
                 style={{
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "flex-end",
-                  paddingVertical: 2,
+                  paddingVertical: 3,
                   paddingHorizontal: 6,
                 }}
               >
-                <Text
-                  style={{
-                    width: "60%",
-                    textAlign: "right",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Mehrwertsteuer{" "}
-                  {row.percent.toLocaleString("de-DE", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  })}
-                  %
+                <Text style={{ width: "60%", textAlign: "right" }}>
+                  Warenwert (netto)
                 </Text>
-                <Text
-                  style={{
-                    width: "20%",
-                    textAlign: "right",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {row.vat.toLocaleString("de-DE", {
+                <Text style={{ width: "20%", textAlign: "right" }}>
+                  -
+                  {Math.abs(refundVatSummary.netTotal).toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                   {" €"}
                 </Text>
               </View>
-            ))}
 
-            {showGiftCouponRow && (
+              {refundVatSummary.buckets.map((row, index) => (
+                <View
+                  key={`refund-vat-row-${index}-${row.percent}`}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    paddingVertical: 2,
+                    paddingHorizontal: 6,
+                  }}
+                >
+                  <Text
+                    style={{
+                      width: "60%",
+                      textAlign: "right",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Mehrwertsteuer{" "}
+                    {row.percent.toLocaleString("de-DE", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}
+                    %
+                  </Text>
+                  <Text
+                    style={{
+                      width: "20%",
+                      textAlign: "right",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    -{" "}
+                    {Math.abs(row.vat).toLocaleString("de-DE", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    {" €"}
+                  </Text>
+                </View>
+              ))}
+
               <View
                 style={{
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "flex-end",
+                  backgroundColor: "#ededed",
                   paddingVertical: 3,
                   paddingHorizontal: 6,
                 }}
@@ -722,42 +917,7 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                     fontWeight: "bold",
                   }}
                 >
-                  Wertgutschein (brutto)
-                </Text>
-                <Text
-                  style={{
-                    width: "20%",
-                    textAlign: "right",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {giftCouponGross.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                  {" €"}
-                </Text>
-              </View>
-            )}
-
-            {showRefundDiscountRow && (
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  paddingVertical: 3,
-                  paddingHorizontal: 6,
-                }}
-              >
-                <Text
-                  style={{
-                    width: "60%",
-                    textAlign: "right",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Rabatt (Rückerstattung, brutto)
+                  Rechnungsbetrag (brutto)
                 </Text>
                 <Text
                   style={{
@@ -767,56 +927,20 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   }}
                 >
                   -{" "}
-                  {refundDiscountGross.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {Math.abs(refundVatSummary.grossTotal).toLocaleString(
+                    "de-DE",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    },
+                  )}
                   {" €"}
                 </Text>
               </View>
-            )}
-
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                backgroundColor: "#ededed",
-                paddingVertical: 3,
-                paddingHorizontal: 6,
-              }}
-            >
-              <Text
-                style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                Rechnungsbetrag (brutto)
-              </Text>
-              <Text
-                style={{
-                  width: "20%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                {(
-                  (invoice?.total_amount_item ?? 0) +
-                  (invoice?.total_shipping ?? 0) -
-                  Math.abs(invoice?.voucher_amount ?? 0)
-                ).toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                {" €"}
-              </Text>
             </View>
-
-            {/* {checkout.status.toLowerCase() === "pending" ? (
-              ""
-            ) : (
+          ) : (
+            <>
+              {/* Net and VAT */}
               <View
                 style={{
                   display: "flex",
@@ -826,74 +950,195 @@ export const InvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   paddingHorizontal: 6,
                 }}
               >
-                <Text
-                  style={{
-                    width: "60%",
-                    textAlign: "right",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Zahlung vom {formatDateToNum(invoice.created_at)}
+                <Text style={{ width: "60%", textAlign: "right" }}>
+                  Warenwert (netto)
                 </Text>
-                <Text
-                  style={{
-                    width: "20%",
-                    textAlign: "right",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {(
-                    (invoice?.total_amount_item ?? 0) +
-                    (invoice?.total_shipping ?? 0) -
-                    Math.abs(invoice?.voucher_amount ?? 0)
-                  ).toLocaleString("de-DE", {
+                <Text style={{ width: "20%", textAlign: "right" }}>
+                  {productNetTotal.toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                   {" €"}
                 </Text>
               </View>
-            )} */}
 
-            {/* <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                paddingVertical: 3,
-                paddingHorizontal: 6,
-              }}
-            >
-              <Text
+              <View
                 style={{
-                  width: "60%",
-                  textAlign: "right",
-                  fontWeight: "bold",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  paddingVertical: 3,
+                  paddingHorizontal: 6,
                 }}
               >
-                Offener Betrag
-              </Text>
-              <Text
-                style={{
-                  width: "20%",
-                  textAlign: "right",
-                  fontWeight: "bold",
-                }}
-              >
-                {checkout.status.toLowerCase() === "pending"
-                  ? (
+                <Text style={{ width: "60%", textAlign: "right" }}>
+                  Versandkosten (netto)
+                </Text>
+                <Text style={{ width: "20%", textAlign: "right" }}>
+                  {(Number(orderTaxSummary?.shipping?.net) || 0).toLocaleString(
+                    "de-DE",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    },
+                  )}
+                  {" €"}
+                </Text>
+              </View>
+
+              <View>
+                {vatRows.map((row, index) => (
+                  <View
+                    key={`vat-row-${index}-${row.percent}`}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                      paddingVertical: 2,
+                      paddingHorizontal: 6,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        width: "60%",
+                        textAlign: "right",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Mehrwertsteuer{" "}
+                      {row.percent.toLocaleString("de-DE", {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      })}
+                      %
+                    </Text>
+                    <Text
+                      style={{
+                        width: "20%",
+                        textAlign: "right",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {row.vat.toLocaleString("de-DE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      {" €"}
+                    </Text>
+                  </View>
+                ))}
+
+                {showGiftCouponRow && (
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                      paddingVertical: 3,
+                      paddingHorizontal: 6,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        width: "60%",
+                        textAlign: "right",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Wertgutschein (brutto)
+                    </Text>
+                    <Text
+                      style={{
+                        width: "20%",
+                        textAlign: "right",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {giftCouponGross.toLocaleString("de-DE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      {" €"}
+                    </Text>
+                  </View>
+                )}
+
+                {showRefundDiscountRow && (
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                      paddingVertical: 3,
+                      paddingHorizontal: 6,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        width: "60%",
+                        textAlign: "right",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Rabatt (Rückerstattung, brutto)
+                    </Text>
+                    <Text
+                      style={{
+                        width: "20%",
+                        textAlign: "right",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      -{" "}
+                      {refundDiscountGross.toLocaleString("de-DE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      {" €"}
+                    </Text>
+                  </View>
+                )}
+
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    backgroundColor: "#ededed",
+                    paddingVertical: 3,
+                    paddingHorizontal: 6,
+                  }}
+                >
+                  <Text
+                    style={{
+                      width: "60%",
+                      textAlign: "right",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Rechnungsbetrag (brutto)
+                  </Text>
+                  <Text
+                    style={{
+                      width: "20%",
+                      textAlign: "right",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {(
                       (invoice?.total_amount_item ?? 0) +
                       (invoice?.total_shipping ?? 0) -
                       Math.abs(invoice?.voucher_amount ?? 0)
                     ).toLocaleString("de-DE", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    })
-                  : "00,00"}
-                {" €"}
-              </Text>
-            </View> */}
-          </View>
+                    })}
+                    {" €"}
+                  </Text>
+                </View>
+              </View>
+            </>
+          )}
         </View>
 
         <View style={styles.flexColBlockWithTop}>

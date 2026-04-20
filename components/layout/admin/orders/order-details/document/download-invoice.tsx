@@ -1,6 +1,9 @@
 import { InvoicePDF } from "@/components/layout/pdf/file";
 import { Button } from "@/components/ui/button";
-import { getMainCheckOutByMainCheckOutId } from "@/features/checkout/api";
+import {
+  getMainCheckOutByMainCheckOutId,
+  getProductRefundByMainCheckoutId,
+} from "@/features/checkout/api";
 import { getInvoiceByCheckOut } from "@/features/invoice/api";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useQuery } from "@tanstack/react-query";
@@ -30,6 +33,7 @@ const DownloadInvoice = ({
   const deleteCheckoutPdfFileMutation = useDeleteCheckoutPdfFile();
   const normalizedType = String(type ?? "").toLowerCase();
   const isPackageType = normalizedType === "package";
+  const isRefundInvoiceType = normalizedType === "refund-invoice";
   const uploadedPackageSlipFiles = React.useMemo(
     () =>
       [
@@ -65,11 +69,33 @@ const DownloadInvoice = ({
     retry: false,
   });
 
-  const defaultGeneratedFileName = invoice?.invoice_code
-    ? `${invoice.invoice_code}.pdf`
-    : isPackageType
-      ? `package-slip-${effectiveMainCheckoutId}.pdf`
-      : `invoice-${effectiveMainCheckoutId}.pdf`;
+  const { data: productRefundData, isLoading: isProductRefundLoading } =
+    useQuery({
+      queryKey: ["product-refund", effectiveMainCheckoutId],
+      queryFn: () => getProductRefundByMainCheckoutId(effectiveMainCheckoutId),
+      enabled: Boolean(
+        effectiveMainCheckoutId && isRefundInvoiceType && needsGeneratedDocument,
+      ),
+      retry: false,
+    });
+
+  const normalizedProductRefundData = React.useMemo(
+    () =>
+      Array.isArray(productRefundData)
+        ? productRefundData.filter((item) => item && typeof item === "object")
+        : [],
+    [productRefundData],
+  );
+
+  const defaultGeneratedFileName = isRefundInvoiceType
+    ? checkout?.checkout_code
+      ? `RK${checkout.checkout_code}.pdf`
+      : `refund-invoice-${effectiveMainCheckoutId}.pdf`
+    : invoice?.invoice_code
+      ? `${invoice.invoice_code}.pdf`
+      : isPackageType
+        ? `package-slip-${effectiveMainCheckoutId}.pdf`
+        : `invoice-${effectiveMainCheckoutId}.pdf`;
 
   const downloadUploadedInvoiceFile = async (url: string, fileIndex?: number) => {
     try {
@@ -158,7 +184,11 @@ const DownloadInvoice = ({
             </div>
           ))}
         </div>
-      ) : isCheckoutLoading || isInvoiceLoading || !checkout || !invoice ? (
+      ) : isCheckoutLoading ||
+        isInvoiceLoading ||
+        (isRefundInvoiceType && isProductRefundLoading) ||
+        !checkout ||
+        !invoice ? (
         <Button variant={"outline"} disabled>
           <Loader2 className="h-4 w-4 animate-spin" />
         </Button>
@@ -172,6 +202,28 @@ const DownloadInvoice = ({
                 ) : (
                   <PackageSlipPdf checkout={checkout} invoice={invoice} />
                 )
+              }
+              fileName={defaultGeneratedFileName}
+            >
+              {({ loading }) =>
+                loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <div className="cursor-pointer">
+                    <DownloadCloud />
+                  </div>
+                )
+              }
+            </PDFDownloadLink>
+          ) : isRefundInvoiceType ? (
+            <PDFDownloadLink
+              document={
+                <InvoicePDF
+                  checkout={checkout}
+                  invoice={invoice}
+                  variant="refund"
+                  refundProducts={normalizedProductRefundData}
+                />
               }
               fileName={defaultGeneratedFileName}
             >
