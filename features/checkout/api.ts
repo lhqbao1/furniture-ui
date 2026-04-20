@@ -83,6 +83,7 @@ export interface ProductRefundItem {
   refund_amount: number;
   reason: string;
   type: string;
+  tax: string;
   files: ProductRefundFile[];
 }
 

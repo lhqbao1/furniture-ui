@@ -24,6 +24,7 @@ interface DocumentTableProps {
 const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
   const data = useMemo<DocumentRow[]>(() => {
     if (!order) return [];
+    const normalizedStatus = String(order.status ?? "").toLowerCase();
 
     const baseData: DocumentRow[] = [
       {
@@ -54,7 +55,7 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
       });
     }
 
-    if (order.status.toLowerCase() === "return") {
+    if (normalizedStatus === "return") {
       baseData.push({
         document: "Credit Node",
         code: order.checkout_code ?? "",
@@ -64,6 +65,20 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
             : new Date().toString(),
         ),
         viewType: "credit-node",
+        checkOutId: order.id,
+      });
+    }
+
+    if (normalizedStatus === "return_issue") {
+      baseData.push({
+        document: "Refund invoice",
+        code: order.checkout_code ? `RK${order.checkout_code}` : "",
+        dateSent: formatDateTimeString(
+          order.created_at
+            ? order.created_at.toString()
+            : new Date().toString(),
+        ),
+        viewType: "refund-invoice",
         checkOutId: order.id,
       });
     }

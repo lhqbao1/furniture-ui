@@ -152,11 +152,6 @@ export function AdminSideBar() {
           url: "/admin/amm/we-avis",
           icon: CornerDownRight,
         },
-        {
-          title: "AMM Product Import",
-          url: "/admin/amm/import-product",
-          icon: CornerDownRight,
-        },
       ],
     },
     {

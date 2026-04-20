@@ -42,6 +42,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.pexels.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.prestige-home.de",
+      },
     ],
     minimumCacheTTL: 2678400, // 31 ngày
     formats: ["image/webp"],
