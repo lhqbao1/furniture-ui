@@ -4,20 +4,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function OrderListSkeleton() {
   return (
-    <div className="lg:w-1/2 mx-auto space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-5 px-2 sm:px-0">
       {Array.from({ length: 5 }).map((_, i) => (
         <div
           key={i}
-          className="rounded-md border border-gray-300 overflow-hidden"
+          className="overflow-hidden rounded-2xl border border-secondary/20 bg-white shadow-sm"
         >
           {/* Header */}
-          <div className="px-3 py-2 border-b bg-muted/40 flex justify-between items-center">
+          <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-3">
             <Skeleton className="h-5 w-32" /> {/* Order ID */}
-            <Skeleton className="h-5 w-24" /> {/* Date */}
+            <Skeleton className="h-5 w-32" /> {/* Date + delivery range */}
           </div>
 
           {/* Table rows placeholder */}
-          <div className="px-3 py-4 space-y-3">
+          <div className="space-y-3 px-4 py-4">
             {Array.from({ length: 3 }).map((_, r) => (
               <div
                 key={r}
@@ -40,7 +40,7 @@ export function OrderListSkeleton() {
           </div>
 
           {/* Footer */}
-          <div className="px-3 py-3 border-t space-y-3">
+          <div className="space-y-3 border-t bg-secondary/5 px-4 py-3">
             <div className="flex justify-between items-center">
               <Skeleton className="h-5 w-20" /> {/* Total */}
               <Skeleton className="h-5 w-24" /> {/* Price */}

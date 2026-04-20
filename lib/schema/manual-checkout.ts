@@ -70,6 +70,8 @@ export const ManualCreateOrderSchema = z
     carrier: z.string().optional().nullable(),
     tax: z.number().min(0, "Tax is required"),
     payment_term: z.number().optional().nullable(),
+    delivery_from: z.string().optional().nullable(),
+    delivery_to: z.string().optional().nullable(),
 
     status: z.string().min(1, "Status is required"),
     netto_buyer_id: z.string().optional().nullable(),

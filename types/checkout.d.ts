@@ -62,6 +62,8 @@ interface CheckOut {
   total_shipping: number;
   from_marketplace: string;
   marketplace_order_id: string;
+  delivery_from?: string | null;
+  delivery_to?: string | null;
   total_amount: number;
   supplier: SupplierResponse;
   carrier: string;
@@ -108,6 +110,8 @@ export interface CheckOutMain {
   voucher_amount: number;
   from_marketplace: string;
   marketplace_order_id: string;
+  delivery_from?: string | null;
+  delivery_to?: string | null;
   payment_method: string;
   checkouts: CheckOut[];
   tax: number;

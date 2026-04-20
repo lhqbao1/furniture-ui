@@ -31,6 +31,12 @@ import {
 import { getCountryCode } from "@/components/shared/getCountryNameDe";
 import { getCarrierFromItems } from "@/lib/get-carrier";
 import {
+  addBusinessDays,
+  getDeliveryDayRange,
+} from "@/hooks/get-estimated-shipping";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
+import {
   FormControl,
   FormField,
   FormItem,
@@ -54,6 +60,67 @@ interface SelectedProduct {
   final_price: number;
   carrier: string;
 }
+
+const addCalendarDays = (startDate: Date, days: number) => {
+  const result = new Date(startDate);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+
+const formatCheckoutDateTime = (date: Date): string =>
+  date.toISOString().replace(/Z$/, "");
+
+const calculateProductDeliveryRange = (
+  product?: Partial<ProductItem> | null,
+): { from: Date; to: Date } | null => {
+  if (!product) return null;
+
+  const deliveryRange = getDeliveryDayRange(product.delivery_time);
+  if (!deliveryRange) return null;
+
+  const currentStock = calculateAvailableStock(product);
+  const incomingSummary = calculateIncomingStockSummary(product);
+  const isBundleProduct = (product.bundles?.length ?? 0) > 0;
+  const nextIncomingDate = isBundleProduct
+    ? incomingSummary.latestIncomingDate
+    : incomingSummary.nearestIncomingDate;
+
+  if (currentStock > 0 || !nextIncomingDate) {
+    const today = new Date();
+    return {
+      from: addCalendarDays(today, deliveryRange.min),
+      to: addCalendarDays(today, deliveryRange.max),
+    };
+  }
+
+  return {
+    from: addBusinessDays(nextIncomingDate, deliveryRange.min),
+    to: addBusinessDays(nextIncomingDate, deliveryRange.max),
+  };
+};
+
+const calculateManualCheckoutDeliveryRange = (
+  products: Array<Partial<ProductItem> | null | undefined>,
+): { from: Date; to: Date } | null => {
+  const itemRanges = products
+    .map((product) => calculateProductDeliveryRange(product))
+    .filter(
+      (range): range is { from: Date; to: Date } =>
+        !!range &&
+        !Number.isNaN(range.from.getTime()) &&
+        !Number.isNaN(range.to.getTime()),
+    );
+
+  if (itemRanges.length === 0) return null;
+
+  const from = new Date(
+    Math.min(...itemRanges.map((range) => range.from.getTime())),
+  );
+  const to = new Date(Math.max(...itemRanges.map((range) => range.to.getTime())));
+
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return null;
+  return { from, to };
+};
 
 export default function CreateOrderPageClient() {
   const t = useTranslations();
@@ -197,6 +264,9 @@ export default function CreateOrderPageClient() {
 
   function handleSubmit(values: z.infer<typeof ManualCreateOrderSchema>) {
     const { price_mode: priceMode, ...restValues } = values;
+    const deliveryRange = calculateManualCheckoutDeliveryRange(
+      listProducts.map((item) => item.product),
+    );
     const itemTaxByIdProvider = new Map(
       listProducts.map((item) => [
         String(item.product.id_provider ?? ""),
@@ -257,6 +327,10 @@ export default function CreateOrderPageClient() {
             : values.invoice_additional_address,
         tax: 0,
         note: values.note?.trim() ? values.note.trim() : null,
+        ...(deliveryRange && {
+          delivery_from: formatCheckoutDateTime(deliveryRange.from),
+          delivery_to: formatCheckoutDateTime(deliveryRange.to),
+        }),
       },
       {
         onSuccess() {

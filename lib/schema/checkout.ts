@@ -1,4 +1,4 @@
-import { optional, z } from "zod";
+import { z } from "zod";
 
 export const CreateOrderSchema = (t: (key: string) => string) =>
   z
@@ -54,6 +54,8 @@ export const CreateOrderSchema = (t: (key: string) => string) =>
         )
         .optional(),
       total_shipping: z.number().optional().nullable(),
+      delivery_from: z.string().optional().nullable(),
+      delivery_to: z.string().optional().nullable(),
     })
     .superRefine((values, ctx) => {
       // 1️⃣ Nếu có company → tax_id bắt buộc

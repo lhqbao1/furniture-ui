@@ -1063,42 +1063,6 @@ export const InvoicePDF = ({
                   </View>
                 )}
 
-                {showRefundDiscountRow && (
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "flex-end",
-                      paddingVertical: 3,
-                      paddingHorizontal: 6,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        width: "60%",
-                        textAlign: "right",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Rabatt (Rückerstattung, brutto)
-                    </Text>
-                    <Text
-                      style={{
-                        width: "20%",
-                        textAlign: "right",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      -{" "}
-                      {refundDiscountGross.toLocaleString("de-DE", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                      {" €"}
-                    </Text>
-                  </View>
-                )}
-
                 <View
                   style={{
                     display: "flex",

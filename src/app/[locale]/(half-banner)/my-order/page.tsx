@@ -23,7 +23,13 @@ const MyOrder = () => {
   const t = useTranslations();
   return (
     <div className="min-h-screen w-full py-8 space-y-6">
-      <h1 className="section-header">{t("myOrder")}</h1>
+      <div className="mx-auto w-full max-w-6xl rounded-3xl border border-secondary/15 bg-gradient-to-r from-secondary/10 via-background to-secondary/5 px-6 py-8 shadow-sm">
+        <h1 className="section-header mb-2">{t("myOrder")}</h1>
+        <p className="text-center text-sm text-muted-foreground">
+          Verwalten Sie Ihre Bestellungen, Sendungen und Rechnungen an einem
+          Ort.
+        </p>
+      </div>
       <OrderList />
     </div>
   );
