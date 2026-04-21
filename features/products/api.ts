@@ -4,6 +4,7 @@ import { KeywordResponse } from "@/types/keyword";
 import {
   ProductDetailLog,
   ProductAndSoldResponse,
+  ProductAndSoldItem,
   ProductItem,
   ProductResponse,
 } from "@/types/products";
@@ -151,7 +152,21 @@ export async function getAllProductAndSold(
     },
   });
 
-  return data as ProductAndSoldResponse;
+  const normalizedItems = ((data?.items ?? []) as ProductAndSoldItem[]).map(
+    (item) => ({
+      ...item,
+      inventory_pos:
+        item.inventory_pos ??
+        item.inventories_po ??
+        item.inventory_po ??
+        [],
+    }),
+  );
+
+  return {
+    ...data,
+    items: normalizedItems,
+  } as ProductAndSoldResponse;
 }
 
 export async function getProductsAlgoliaSearch(
@@ -215,8 +230,10 @@ export async function getProductBySlug(product_slug: string) {
   try {
     const { data } = await apiPublic.get(`/products/by-slug/${product_slug}`);
     return data as ProductItem;
-  } catch (error: any) {
-    if (error.response?.status === 404) {
+  } catch (error: unknown) {
+    const status = (error as { response?: { status?: number } })?.response
+      ?.status;
+    if (status === 404) {
       return null; // ⭐ Trả null khi slug không tồn tại
     }
     throw error; // lỗi khác thì throw để debug

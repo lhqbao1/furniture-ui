@@ -297,6 +297,8 @@ export type ProductAndSoldItem = Partial<ProductItem> & {
   stock_sold?: number | null;
   min_stock?: number | null;
   minimum_stock?: number | null;
+  inventory_po?: InventoryPosItem[] | null;
+  inventories_po?: InventoryPosItem[] | null;
 };
 
 export type ProductAndSoldResponse = {
