@@ -301,6 +301,55 @@ const OrderPlaced = () => {
     };
   }, [checkout, checkoutItems]);
 
+  const awinTrackingData = React.useMemo(() => {
+    if (!checkout) return null;
+
+    const orderRef = toTrackingString(checkout.checkout_code);
+    if (!orderRef) return null;
+
+    const countryCode = checkout.checkouts?.[0]?.shipping_address?.country ?? "DE";
+    const taxId = checkout.checkouts?.[0]?.user?.tax_id ?? null;
+
+    const partsNetTotals: Record<"OWNBRAND" | "DEFAULT", number> = {
+      OWNBRAND: 0,
+      DEFAULT: 0,
+    };
+
+    checkoutItems.forEach((item) => {
+      const product = item?.products;
+      const quantity = Math.max(0, Number(item?.quantity) || 0);
+      const unitGross = Math.max(0, Number(item?.item_price) || 0);
+      const lineGross = unitGross * quantity;
+
+      if (lineGross <= 0) return;
+
+      const lineNet = Math.max(
+        0,
+        Number(calculateProductVAT(lineGross, product?.tax, countryCode, taxId).net) ||
+          0,
+      );
+
+      const partKey = product?.owner == null ? "OWNBRAND" : "DEFAULT";
+      partsNetTotals[partKey] = +(partsNetTotals[partKey] + lineNet).toFixed(2);
+    });
+
+    const partEntries = (["OWNBRAND", "DEFAULT"] as const)
+      .filter((key) => partsNetTotals[key] > 0)
+      .map((key) => `${key}:${partsNetTotals[key].toFixed(2)}`);
+
+    const partsForPixel =
+      partEntries.length > 0 ? partEntries.join("|") : "DEFAULT:0.00";
+    const partsForMasterTag = `${partsForPixel}|`;
+    const amount = (partsNetTotals.OWNBRAND + partsNetTotals.DEFAULT).toFixed(2);
+
+    return {
+      orderRef,
+      amount,
+      partsForMasterTag,
+      partsForPixel,
+    };
+  }, [checkout, checkoutItems]);
+
   // Gọi hook trực tiếp
   const { data: user } = useGetUserById(userId || "");
 
@@ -350,9 +399,10 @@ const OrderPlaced = () => {
   // AWIN Conversion Tracking
   // ====================
   useEffect(() => {
-    if (!checkout || !conversionTrackingData) return;
+    if (!checkout || !awinTrackingData) return;
 
-    const { amount, orderRef } = conversionTrackingData;
+    const { amount, orderRef, partsForMasterTag, partsForPixel } =
+      awinTrackingData;
     const awinSentKey = getAwinSentKey(orderRef);
 
     // 🔒 chống double fire
@@ -372,7 +422,7 @@ const OrderPlaced = () => {
         (window as any).AWIN.Tracking.Sale = {
           amount,
           orderRef,
-          parts: `DEFAULT:${11}|OWNBRAND:12`,
+          parts: partsForMasterTag,
           currency: "EUR",
           channel: "aw",
           customerAcquisition: "NEW",
@@ -393,7 +443,7 @@ const OrderPlaced = () => {
           `&amount=${amount}` +
           `&cr=EUR` +
           `&ref=${encodeURIComponent(orderRef)}` +
-          `&parts=DEFAULT:${amount}` +
+          `&parts=${encodeURIComponent(partsForPixel)}` +
           `&ch=aw`;
 
         img.width = 0;
@@ -410,7 +460,7 @@ const OrderPlaced = () => {
     return () => {
       cancelled = true;
     };
-  }, [checkout, conversionTrackingData]);
+  }, [checkout, awinTrackingData]);
 
   // Dynamic Conversion Pixel (SunnySales)
   useEffect(() => {

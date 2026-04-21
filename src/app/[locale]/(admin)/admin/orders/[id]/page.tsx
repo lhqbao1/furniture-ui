@@ -365,6 +365,27 @@ const OrderDetails = () => {
     await handleUploadFiles(event.dataTransfer.files);
   };
 
+  const hasNoteChanged = noteValue.trim() !== (order?.note ?? "").trim();
+
+  const handleSaveNote = () => {
+    if (!checkoutId) return;
+
+    updateNoteMutation.mutate(
+      {
+        main_checkout_id: checkoutId,
+        note: noteValue.trim(),
+      },
+      {
+        onSuccess: () => {
+          toast.success("Note updated");
+        },
+        onError: () => {
+          toast.error("Failed to update note");
+        },
+      },
+    );
+  };
+
   useEffect(() => {
     setNoteValue(order?.note ?? "");
   }, [order?.note]);
@@ -606,32 +627,26 @@ const OrderDetails = () => {
                     Order note
                   </div>
                   <Textarea
-                    placeholder="Type note and press Enter to save"
+                    placeholder="Type note and press Enter to save, or click Save"
                     value={noteValue}
                     disabled={updateNoteMutation.isPending}
                     onChange={(event) => setNoteValue(event.target.value)}
                     onKeyDown={(event) => {
                       if (event.key !== "Enter" || event.shiftKey) return;
                       event.preventDefault();
-
-                      if (!checkoutId) return;
-
-                      updateNoteMutation.mutate(
-                        {
-                          main_checkout_id: checkoutId,
-                          note: noteValue.trim(),
-                        },
-                        {
-                          onSuccess: () => {
-                            toast.success("Note updated");
-                          },
-                          onError: () => {
-                            toast.error("Failed to update note");
-                          },
-                        },
-                      );
+                      handleSaveNote();
                     }}
                   />
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      className="bg-secondary text-white hover:bg-secondary/90"
+                      onClick={handleSaveNote}
+                      disabled={!hasNoteChanged || updateNoteMutation.isPending}
+                    >
+                      Save
+                    </Button>
+                  </div>
                 </div>
               </div>
 

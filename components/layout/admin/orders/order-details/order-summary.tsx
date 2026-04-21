@@ -86,7 +86,7 @@ const OrderSummary = ({
         </div>
         {discount_amount && discount_amount > 0 ? (
           <div className="grid grid-cols-2 gap-3">
-            <div className="text-slate-600">Discount</div>
+            <div className="text-slate-600">Discount (gross)</div>
             <div className="text-right font-medium text-slate-900">
               {formatEuro(discount_amount)}
             </div>
@@ -98,7 +98,9 @@ const OrderSummary = ({
               className="grid grid-cols-2 gap-3"
               key={`vat-row-${row.percent}`}
             >
-              <div className="text-slate-600">{formatVatLabel(row.percent)}</div>
+              <div className="text-slate-600">
+                {formatVatLabel(row.percent)}
+              </div>
               <div className="text-right font-medium text-slate-900">
                 {formatEuro(row.vat)}
               </div>
