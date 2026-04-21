@@ -263,7 +263,9 @@ const ActionCellChild = ({
     });
   };
 
-  const normalizedItems = normalizeDeliveryItems(Array.isArray(items) ? items : []);
+  const normalizedItems = normalizeDeliveryItems(
+    Array.isArray(items) ? items : [],
+  );
 
   const escapeXml = (value: unknown) => {
     return String(value ?? "")
@@ -557,7 +559,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
   },
   {
     accessorKey: "delivery_range",
-    header: () => <div className="text-center w-full">DELIVERY RANGE</div>,
+    header: () => <div className="text-center w-full">ESTIMATED DELIVERY</div>,
     cell: ({ row }) => (
       <div className="text-center text-[#4D4D4D]">
         {formatDeliveryRangeLabel(
