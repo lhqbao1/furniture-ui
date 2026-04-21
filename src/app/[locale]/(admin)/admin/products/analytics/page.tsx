@@ -40,9 +40,9 @@ type IncomingDisplayItem = {
 };
 
 type InventorySource = {
-  inventory_pos?: ProductAndSoldItem["inventory_pos"];
-  inventories_po?: ProductAndSoldItem["inventory_pos"];
-  inventory_po?: ProductAndSoldItem["inventory_pos"];
+  inventory_pos?: ProductAndSoldItem["inventory_pos"] | null;
+  inventories_po?: ProductAndSoldItem["inventory_pos"] | null;
+  inventory_po?: ProductAndSoldItem["inventory_pos"] | null;
 };
 
 type RevenueSortValue = "none" | "asc" | "desc";
@@ -108,7 +108,7 @@ const toApiDateTime = (value: string) => {
 const getSoldStockValue = (product: ProductAndSoldItem): number | null => {
   const rawValue = product.sold;
 
-  if (rawValue === null || rawValue === undefined || rawValue === "") {
+  if (rawValue === null || rawValue === undefined) {
     return null;
   }
 
@@ -117,7 +117,7 @@ const getSoldStockValue = (product: ProductAndSoldItem): number | null => {
 
 const getMinStockValue = (product: ProductAndSoldItem): number | null => {
   const rawValue = product.min_stock;
-  if (rawValue === null || rawValue === undefined || rawValue === "") {
+  if (rawValue === null || rawValue === undefined) {
     return null;
   }
 

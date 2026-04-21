@@ -23,7 +23,7 @@ export const refundProductSchema = z.object({
 
 export const createRefundMainCheckoutSchema = z.object({
   amount: z.number().nonnegative("Amount must be greater than or equal to 0"),
-  products: z.array(refundProductSchema),
+  products: z.array(refundProductSchema).optional(),
 });
 
 export type RefundProductFile = z.infer<typeof refundProductFileSchema>;
@@ -31,4 +31,3 @@ export type RefundProductInput = z.infer<typeof refundProductSchema>;
 export type CreateRefundMainCheckoutPayload = z.infer<
   typeof createRefundMainCheckoutSchema
 >;
-

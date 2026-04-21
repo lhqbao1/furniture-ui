@@ -112,42 +112,56 @@ export default function MobileProductSearch() {
             />
           </button>
         </DrawerTrigger>
-        <DrawerContent className="w-full h-full flex flex-col p-0 data-[vaul-drawer-direction=left]:w-full duration-500 overflow-hidden">
-          <DrawerTitle className="border-b-2 p-4 flex justify-between">
-            <div className="uppercase font-bold text-xl">
-              {t("searchProduct")}
+        <DrawerContent className="z-[1200] flex h-full w-full flex-col overflow-hidden p-0 data-[vaul-drawer-direction=left]:w-full">
+          <DrawerTitle className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-lg font-bold uppercase tracking-tight text-slate-900">
+                {t("searchProduct")}
+              </div>
+              <DrawerClose
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800"
+                aria-label="Close search drawer"
+              >
+                <X className="h-4 w-4" />
+              </DrawerClose>
             </div>
-            <DrawerClose>
-              <X />
-            </DrawerClose>
           </DrawerTitle>
-          <Command className="h-full w-full" shouldFilter={false}>
-            <div className="p-2 border-b">
-              <CommandInput
-                placeholder={t("searchProduct")}
-                value={query}
-                onValueChange={setQuery}
-                autoFocus
-                className="border-b-0"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-              />
+          <Command
+            className="h-full w-full bg-slate-50/65"
+            shouldFilter={false}
+          >
+            <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 p-3 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+              <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+                <CommandInput
+                  placeholder={t("searchProduct")}
+                  value={query}
+                  onValueChange={setQuery}
+                  autoFocus
+                  className="h-11 text-[15px]"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSubmit();
+                    }
+                  }}
+                />
+              </div>
             </div>
-            <CommandList className="flex-1 overflow-auto pt-2">
-              {isLoading && <CommandEmpty>{t("loading")}...</CommandEmpty>}
+            <CommandList className="flex-1 overflow-auto px-2 py-2">
+              {isLoading && (
+                <CommandEmpty className="py-10 text-sm text-slate-500">
+                  {t("loading")}...
+                </CommandEmpty>
+              )}
               {!isLoading && results.length === 0 && (
-                <CommandEmpty>
+                <CommandEmpty className="py-10 text-sm text-slate-500">
                   {query.trim().length === 0
                     ? t("searchPrompt")
                     : t("noResult")}
                 </CommandEmpty>
               )}
               {results.length > 0 && (
-                <CommandGroup>
+                <CommandGroup className="space-y-2 p-1">
                   {results.map((product: ProductItem) => (
                     <CommandItem
                       key={product.id}
@@ -157,10 +171,10 @@ export default function MobileProductSearch() {
                         setQuery("");
                         setOpen(false);
                       }}
-                      className="cursor-pointer"
+                      className="cursor-pointer rounded-xl border border-transparent bg-white px-2 py-2.5 mb-3 shadow-sm transition-all duration-200 hover:border-slate-200 hover:bg-white data-[selected=true]:border-slate-200 data-[selected=true]:bg-white"
                     >
-                      <div className="flex justify-between items-center w-full">
-                        <div className="flex gap-3 flex-1 items-center">
+                      <div className="flex w-full items-center justify-between gap-2">
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
                           <Image
                             src={
                               product.static_files &&
@@ -168,18 +182,18 @@ export default function MobileProductSearch() {
                                 ? product.static_files[0].url
                                 : "/placeholder-product.webp"
                             }
-                            height={50}
-                            width={50}
+                            height={56}
+                            width={56}
                             alt=""
-                            className="h-12 w-12"
-                            sizes="48px"
+                            className="h-14 w-14 rounded-lg object-cover"
+                            sizes="56px"
                           />
-                          <div className="font-semibold line-clamp-2">
+                          <div className="line-clamp-2 text-[14px] font-semibold leading-5 text-slate-800">
                             {product.name}
                           </div>
                         </div>
-                        <div className="text-[#666666]">
-                          {product.id_provider}
+                        <div className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                          {product.id_provider ?? "-"}
                         </div>
                       </div>
                     </CommandItem>

@@ -28,6 +28,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -153,42 +154,47 @@ const ImportStockSupplierDialog = ({
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-full p-0 pointer-events-auto">
+              <PopoverContent
+                usePortal={false}
+                sideOffset={6}
+                align="start"
+                className="z-[120] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto shadow-xl"
+              >
                 <Command>
                   <CommandInput placeholder="Search supplier..." />
-
-                  <CommandEmpty>No supplier found.</CommandEmpty>
-
-                  <CommandGroup className="max-h-[460px] overflow-y-auto">
-                    {/* Suppliers from API */}
-                    {listSuppliers
-                      ?.slice() // tránh mutate array gốc
-                      .sort((a, b) =>
-                        a.business_name.localeCompare(b.business_name, "de", {
-                          sensitivity: "base",
-                        }),
-                      )
-                      .map((item) => (
-                        <CommandItem
-                          key={item.id}
-                          value={item.business_name}
-                          onSelect={() => {
-                            setSupplierId(item.id);
-                            setOpenSupplier(false); // ✅ đóng popover
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              supplierId === item.id
-                                ? "opacity-100"
-                                : "opacity-0",
-                            )}
-                          />
-                          {item.business_name}
-                        </CommandItem>
-                      ))}
-                  </CommandGroup>
+                  <CommandList className="max-h-[320px] overflow-y-auto overscroll-contain">
+                    <CommandEmpty>No supplier found.</CommandEmpty>
+                    <CommandGroup>
+                      {/* Suppliers from API */}
+                      {listSuppliers
+                        ?.slice() // tránh mutate array gốc
+                        .sort((a, b) =>
+                          a.business_name.localeCompare(b.business_name, "de", {
+                            sensitivity: "base",
+                          }),
+                        )
+                        .map((item) => (
+                          <CommandItem
+                            key={item.id}
+                            value={item.business_name}
+                            onSelect={() => {
+                              setSupplierId(item.id);
+                              setOpenSupplier(false); // ✅ đóng popover
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                supplierId === item.id
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                            {item.business_name}
+                          </CommandItem>
+                        ))}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>

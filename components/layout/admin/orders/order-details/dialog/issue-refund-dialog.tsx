@@ -75,7 +75,7 @@ const SHIPPING_REFUND_ELIGIBLE_REASON_SET = new Set<string>(
   ELIGIBLE_SHIPPING_REFUND_REASONS,
 );
 
-type RefundMode = "full" | "partial";
+type RefundMode = "full" | "partial" | "money";
 type ItemQuality = "A-Goods" | "C-Goods" | "No return";
 
 type RefundLine = {
@@ -119,11 +119,7 @@ type RefundApiError = {
   message?: unknown;
 };
 
-const ITEM_QUALITY_OPTIONS: ItemQuality[] = [
-  "A-Goods",
-  "C-Goods",
-  "No return",
-];
+const ITEM_QUALITY_OPTIONS: ItemQuality[] = ["A-Goods", "C-Goods", "No return"];
 
 const normalizeCurrency = (amount: number) =>
   amount.toLocaleString("de-DE", {
@@ -156,7 +152,8 @@ const extractRefundErrorMessage = (error: unknown) => {
       message?: unknown;
     };
     const paypalDescription = detailObj.details?.find(
-      (item) => typeof item?.description === "string" && item.description.trim(),
+      (item) =>
+        typeof item?.description === "string" && item.description.trim(),
     )?.description;
 
     if (typeof paypalDescription === "string") {
@@ -228,9 +225,7 @@ const buildRefundLines = (order: CheckOutMain): RefundLine[] =>
       null;
     const sourceItemId = String(item.id ?? `item-${index}`);
     const idProvider =
-      item.purchased_products?.id_provider ||
-      item.products?.id_provider ||
-      "";
+      item.purchased_products?.id_provider || item.products?.id_provider || "";
 
     return Array.from({ length: totalUnits }, (_, unitIndex) => ({
       key: `${sourceItemId}-${index}-unit-${unitIndex + 1}`,
@@ -266,6 +261,7 @@ const IssueRefundDialog = ({
 
   const [shippingUnits, setShippingUnits] = React.useState(0);
   const [shippingAmountInput, setShippingAmountInput] = React.useState("0");
+  const [moneyRefundInput, setMoneyRefundInput] = React.useState("0");
 
   const isSubmitting =
     createRefundMutation.isPending ||
@@ -301,10 +297,14 @@ const IssueRefundDialog = ({
     });
     setShippingUnits(0);
     setShippingAmountInput("0");
+    setMoneyRefundInput("0");
   }, [open, refundLines]);
 
   const updateLineForm = React.useCallback(
-    (lineKey: string, updater: (prev: RefundLineFormState) => RefundLineFormState) => {
+    (
+      lineKey: string,
+      updater: (prev: RefundLineFormState) => RefundLineFormState,
+    ) => {
       setLineFormByKey((prev) => {
         const previousLine = prev[lineKey] ?? {
           units: 0,
@@ -339,7 +339,8 @@ const IssueRefundDialog = ({
           line.maxAmount,
         );
 
-        const amount = refundMode === "full" ? units * line.unitPrice : partialAmount;
+        const amount =
+          refundMode === "full" ? units * line.unitPrice : partialAmount;
 
         return {
           ...line,
@@ -383,12 +384,24 @@ const IssueRefundDialog = ({
     shippingUnits,
   ]);
 
-  const totalRefundAmount = React.useMemo(
+  const moneyRefundAmount = React.useMemo(
+    () => clamp(parseAmountInput(moneyRefundInput), 0, orderTotal),
+    [moneyRefundInput, orderTotal],
+  );
+  const moneyRefundPercentage = React.useMemo(() => {
+    if (orderTotal <= 0) return 0;
+    return (moneyRefundAmount / orderTotal) * 100;
+  }, [moneyRefundAmount, orderTotal]);
+
+  const productAndShippingRefundAmount = React.useMemo(
     () =>
       lineRefunds.reduce((sum, line) => sum + line.amount, 0) +
       shippingRefundAmount,
     [lineRefunds, shippingRefundAmount],
   );
+
+  const totalRefundAmount =
+    refundMode === "money" ? moneyRefundAmount : productAndShippingRefundAmount;
 
   const amountAfterRefund = Math.max(orderTotal - totalRefundAmount, 0);
 
@@ -446,9 +459,7 @@ const IssueRefundDialog = ({
     setDraggingLineKey(lineKey);
   };
 
-  const handleLineDragLeave = (
-    event: React.DragEvent<HTMLDivElement>,
-  ) => {
+  const handleLineDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
     setDraggingLineKey(null);
@@ -467,6 +478,33 @@ const IssueRefundDialog = ({
   };
 
   const handleConfirm = async () => {
+    if (refundMode === "money") {
+      const amount = Number(moneyRefundAmount.toFixed(2));
+
+      if (amount <= 0) {
+        toast.error("Refund amount must be greater than 0");
+        return;
+      }
+
+      try {
+        await createRefundMutation.mutateAsync({
+          main_checkout_id: id,
+          payload: {
+            amount,
+          },
+        });
+
+        toast.success("Issue refund successfully");
+        handleClose();
+      } catch (error) {
+        const message = extractRefundErrorMessage(error);
+        toast.error("Failed to issue refund", {
+          description: message,
+        });
+      }
+      return;
+    }
+
     const productRefundLines = lineRefunds.filter((line) => line.amount > 0);
     const hasShippingRefund = shippingRefundAmount > 0;
 
@@ -505,7 +543,9 @@ const IssueRefundDialog = ({
 
     try {
       const uploadedCheckoutUrls: string[] = [];
-      const linesWithImages = lineRefunds.filter((line) => line.images.length > 0);
+      const linesWithImages = lineRefunds.filter(
+        (line) => line.images.length > 0,
+      );
 
       await Promise.all(
         linesWithImages.map(async (line) => {
@@ -514,9 +554,11 @@ const IssueRefundDialog = ({
             formData.append("files", image.file);
           });
 
-          const uploadResult = await uploadStaticFileMutation.mutateAsync(formData);
+          const uploadResult =
+            await uploadStaticFileMutation.mutateAsync(formData);
           const urls =
-            uploadResult.results?.map((result) => result.url).filter(Boolean) ?? [];
+            uploadResult.results?.map((result) => result.url).filter(Boolean) ??
+            [];
           uploadedCheckoutUrls.push(...urls);
         }),
       );
@@ -528,7 +570,8 @@ const IssueRefundDialog = ({
           products: productRefundLines.map((line) => ({
             name: line.name,
             sku: line.sku,
-            quantity: refundMode === "full" ? line.units : line.amount > 0 ? 1 : 0,
+            quantity:
+              refundMode === "full" ? line.units : line.amount > 0 ? 1 : 0,
             id_provider: line.idProvider,
             unit_price: Number(line.unitPrice.toFixed(2)),
             refund_amount: Number(line.amount.toFixed(2)),
@@ -574,7 +617,8 @@ const IssueRefundDialog = ({
           <DrawerTitle>Issue Refund</DrawerTitle>
           <DrawerDescription>
             Full refund uses units by quantity. Partial refund accepts direct
-            amount per product and shipping.
+            amount per product and shipping. Money refund accepts only a single
+            amount.
           </DrawerDescription>
         </DrawerHeader>
 
@@ -598,336 +642,440 @@ const IssueRefundDialog = ({
             >
               Partial refund
             </Button>
+            <Button
+              type="button"
+              variant={refundMode === "money" ? "secondary" : "ghost"}
+              className="rounded-full px-4"
+              disabled={isSubmitting}
+              onClick={() => setRefundMode("money")}
+            >
+              Fixed amount
+            </Button>
           </div>
 
-          <div className="space-y-4">
-            {lineRefunds.map((line) => (
-              <div key={line.key} className="rounded-lg border p-4">
-                <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-12 flex items-start gap-3 md:col-span-6">
-                    {line.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={line.image}
-                        alt={line.name}
-                        className="h-16 w-16 rounded-md border object-cover"
-                      />
-                    ) : (
-                      <div className="h-16 w-16 rounded-md border bg-muted" />
-                    )}
-                    <div className="min-w-0">
-                      <div className="line-clamp-2 font-medium">{line.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        SKU: {line.sku}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Unit: {line.unitIndex}/{line.totalUnits}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-span-6 md:col-span-2">
-                    <div className="text-xs text-muted-foreground">Unit price</div>
-                    <div className="font-medium">
-                      €{normalizeCurrency(line.unitPrice)}
-                    </div>
-                  </div>
-
-                  <div className="col-span-6 md:col-span-2">
-                    {refundMode === "full" ? (
-                      <>
-                        <Label className="mb-1 block text-xs text-muted-foreground">
-                          Units (0-{line.quantity})
-                        </Label>
-                        <Select
-                          value={String(line.units)}
-                          onValueChange={(value) =>
-                            updateLineForm(line.key, (prev) => ({
-                              ...prev,
-                              units: Number(value),
-                            }))
-                          }
-                          disabled={isSubmitting}
-                        >
-                          <SelectTrigger className="w-full border border-input">
-                            <SelectValue placeholder="Select units" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from(
-                              { length: line.quantity + 1 },
-                              (_, index) => index,
-                            ).map((option) => (
-                              <SelectItem key={option} value={String(option)}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </>
-                    ) : (
-                      <>
-                        <Label className="mb-1 block text-xs text-muted-foreground">
-                          Amount (0-{normalizeCurrency(line.maxAmount)})
-                        </Label>
-                        <Input
-                          type="number"
-                          min={0}
-                          max={line.maxAmount}
-                          step="0.01"
-                          value={lineFormByKey[line.key]?.amountInput ?? ""}
-                          onChange={(event) => {
-                            const rawValue = event.target.value;
-
-                            if (!rawValue.trim()) {
-                              updateLineForm(line.key, (prev) => ({
-                                ...prev,
-                                amountInput: "",
-                              }));
-                              return;
-                            }
-
-                            const parsedValue = Number(rawValue.replace(",", "."));
-                            if (Number.isNaN(parsedValue)) return;
-
-                            const clampedValue = clamp(parsedValue, 0, line.maxAmount);
-                            updateLineForm(line.key, (prev) => ({
-                              ...prev,
-                              amountInput:
-                                parsedValue === clampedValue
-                                  ? rawValue
-                                  : formatAmountInput(clampedValue),
-                            }));
-                          }}
-                          disabled={isSubmitting}
-                        />
-                      </>
-                    )}
-                  </div>
-
-                  <div className="col-span-12 md:col-span-2">
-                    <div className="text-xs text-muted-foreground">Refund amount</div>
-                    <div className="font-semibold">
-                      €{normalizeCurrency(line.amount)}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4">
+          {refundMode === "money" ? (
+            <div className="rounded-lg border p-4">
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
                   <Label className="mb-1 block text-xs text-muted-foreground">
-                    Reason for refund
+                    Refund amount
                   </Label>
-                  <Select
-                    value={line.reason || undefined}
-                    onValueChange={(value) =>
-                      updateLineForm(line.key, (prev) => ({
-                        ...prev,
-                        reason: value,
-                      }))
-                    }
+                  <Input
+                    type="number"
+                    min={0}
+                    max={orderTotal}
+                    step="0.01"
+                    value={moneyRefundInput}
+                    onChange={(event) => {
+                      const rawValue = event.target.value;
+
+                      if (!rawValue.trim()) {
+                        setMoneyRefundInput("0");
+                        return;
+                      }
+
+                      const parsedValue = Number(rawValue.replace(",", "."));
+                      if (Number.isNaN(parsedValue)) return;
+
+                      const clampedValue = clamp(parsedValue, 0, orderTotal);
+                      setMoneyRefundInput(
+                        parsedValue === clampedValue
+                          ? rawValue
+                          : formatAmountInput(clampedValue),
+                      );
+                    }}
                     disabled={isSubmitting}
-                  >
-                    <SelectTrigger className="w-full border border-input">
-                      <SelectValue placeholder="Select a reason" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {REFUND_REASON_GROUPS.map((group, groupIndex) => (
-                        <React.Fragment key={group.label}>
-                          <SelectGroup>
-                            <SelectLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wide text-foreground">
-                              {group.label}
-                            </SelectLabel>
-                            {group.options.map((reason) => (
-                              <SelectItem key={reason} value={reason}>
-                                {reason}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                          {groupIndex < REFUND_REASON_GROUPS.length - 1 ? (
-                            <SelectSeparator />
-                          ) : null}
-                        </React.Fragment>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
 
-                <div className="mt-4">
-                  <Label className="mb-2 block text-xs text-muted-foreground">
-                    Item quality
-                  </Label>
-                  <RadioGroup
-                    value={line.quality}
-                    onValueChange={(value) =>
-                      updateLineForm(line.key, (prev) => ({
-                        ...prev,
-                        quality: value as ItemQuality,
-                      }))
-                    }
-                    className="grid grid-cols-2 gap-2 md:grid-cols-4"
-                  >
-                    {ITEM_QUALITY_OPTIONS.map((option) => (
-                      <div key={option} className="flex items-center gap-2 rounded border px-3 py-2">
-                        <RadioGroupItem value={option} id={`${line.key}-${option}`} />
-                        <Label htmlFor={`${line.key}-${option}`} className="cursor-pointer">
-                          {option}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-
-                <div className="mt-4">
-                  <Label className="mb-2 block text-xs text-muted-foreground">
-                    Upload files
-                  </Label>
-                  <div
-                    onDragOver={(event) => handleLineDragOver(line.key, event)}
-                    onDragEnter={(event) => handleLineDragOver(line.key, event)}
-                    onDragLeave={handleLineDragLeave}
-                    onDrop={(event) => handleLineDrop(line.key, event)}
-                    className={`rounded-md border border-dashed p-4 transition-colors ${
-                      draggingLineKey === line.key
-                        ? "border-primary bg-primary/5"
-                        : "border-input"
-                    }`}
-                  >
-                    <label className="flex cursor-pointer flex-col items-center gap-2 text-sm text-muted-foreground">
-                      <Upload className="size-4" />
-                      <span>Drag and drop files here</span>
-                      <span>or click to browse</span>
-                      <input
-                        type="file"
-                        multiple
-                        className="hidden"
-                        onChange={(event) => {
-                          handleLineImageUpload(line.key, event.target.files);
-                          event.currentTarget.value = "";
-                        }}
-                        disabled={isSubmitting}
-                      />
-                    </label>
+                <div className="self-end space-y-1 text-sm text-muted-foreground">
+                  <div>Max refundable amount: €{normalizeCurrency(orderTotal)}</div>
+                  <div>
+                    Refund percentage:{" "}
+                    {moneyRefundPercentage.toLocaleString("de-DE", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    %
                   </div>
-
-                  {line.images.length > 0 ? (
-                    <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
-                      {line.images.map((image) => (
-                        <div
-                          key={image.id}
-                          className="relative overflow-hidden rounded-md border bg-muted/20"
-                        >
-                          {image.isImage && image.previewUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={image.previewUrl}
-                              alt={image.file.name}
-                              className="h-24 w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-24 w-full items-center gap-2 px-3">
-                              <FileText className="size-4 text-muted-foreground" />
-                              <span className="line-clamp-2 text-xs">
-                                {image.file.name}
-                              </span>
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            className="absolute right-1 top-1 rounded bg-black/60 p-1 text-white hover:bg-black/80"
-                            onClick={() => handleRemoveLineImage(line.key, image.id)}
-                            disabled={isSubmitting}
-                            aria-label="Remove image"
-                          >
-                            <X className="size-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="rounded-lg border p-4">
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-12 md:col-span-6">
-                <div className="font-medium">Shipping fee</div>
-                <div className="text-sm text-muted-foreground">
-                  Max refundable shipping: €{normalizeCurrency(shippingMaxAmount)}
-                </div>
-              </div>
-
-              <div className="col-span-6 md:col-span-2">
-                <div className="text-xs text-muted-foreground">Shipping cost</div>
-                <div className="font-medium">
-                  €{normalizeCurrency(shippingMaxAmount)}
-                </div>
-              </div>
-
-              <div className="col-span-6 md:col-span-2">
-                {refundMode === "full" ? (
-                  <>
-                    <Label className="mb-1 block text-xs text-muted-foreground">
-                      Units (0-1)
-                    </Label>
-                    <Select
-                      value={String(shippingUnits > 0 ? 1 : 0)}
-                      onValueChange={(value) => setShippingUnits(Number(value))}
-                      disabled={isSubmitting || !isShippingRefundAllowed}
-                    >
-                      <SelectTrigger className="w-full border border-input">
-                        <SelectValue placeholder="Select units" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0">0</SelectItem>
-                        <SelectItem value="1">1</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </>
-                ) : (
-                  <>
-                    <Label className="mb-1 block text-xs text-muted-foreground">
-                      Amount (0-{normalizeCurrency(shippingMaxAmount)})
-                    </Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={shippingMaxAmount}
-                      step="0.01"
-                      value={isShippingRefundAllowed ? shippingAmountInput : "0"}
-                      onChange={(event) => {
-                        const rawValue = event.target.value;
-
-                        if (!rawValue.trim()) {
-                          setShippingAmountInput("0");
-                          return;
-                        }
-
-                        const parsedValue = Number(rawValue.replace(",", "."));
-                        if (Number.isNaN(parsedValue)) return;
-
-                        const clampedValue = clamp(parsedValue, 0, shippingMaxAmount);
-                        setShippingAmountInput(
-                          parsedValue === clampedValue
-                            ? rawValue
-                            : formatAmountInput(clampedValue),
-                        );
-                      }}
-                      disabled={isSubmitting || !isShippingRefundAllowed}
-                    />
-                  </>
-                )}
-              </div>
-
-              <div className="col-span-12 md:col-span-2">
-                <div className="text-xs text-muted-foreground">Refund amount</div>
-                <div className="font-semibold">
-                  €{normalizeCurrency(shippingRefundAmount)}
                 </div>
               </div>
             </div>
+          ) : null}
 
-          </div>
+          {refundMode !== "money" ? (
+            <div className="space-y-4">
+              {lineRefunds.map((line) => (
+                <div key={line.key} className="rounded-lg border p-4">
+                  <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-12 flex items-start gap-3 md:col-span-6">
+                      {line.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={line.image}
+                          alt={line.name}
+                          className="h-16 w-16 rounded-md border object-cover"
+                        />
+                      ) : (
+                        <div className="h-16 w-16 rounded-md border bg-muted" />
+                      )}
+                      <div className="min-w-0">
+                        <div className="line-clamp-2 font-medium">
+                          {line.name}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          SKU: {line.sku}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Unit: {line.unitIndex}/{line.totalUnits}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-span-6 md:col-span-2">
+                      <div className="text-xs text-muted-foreground">
+                        Unit price
+                      </div>
+                      <div className="font-medium">
+                        €{normalizeCurrency(line.unitPrice)}
+                      </div>
+                    </div>
+
+                    <div className="col-span-6 md:col-span-2">
+                      {refundMode === "full" ? (
+                        <>
+                          <Label className="mb-1 block text-xs text-muted-foreground">
+                            Units (0-{line.quantity})
+                          </Label>
+                          <Select
+                            value={String(line.units)}
+                            onValueChange={(value) =>
+                              updateLineForm(line.key, (prev) => ({
+                                ...prev,
+                                units: Number(value),
+                              }))
+                            }
+                            disabled={isSubmitting}
+                          >
+                            <SelectTrigger className="w-full border border-input">
+                              <SelectValue placeholder="Select units" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from(
+                                { length: line.quantity + 1 },
+                                (_, index) => index,
+                              ).map((option) => (
+                                <SelectItem key={option} value={String(option)}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </>
+                      ) : (
+                        <>
+                          <Label className="mb-1 block text-xs text-muted-foreground">
+                            Amount (0-{normalizeCurrency(line.maxAmount)})
+                          </Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            max={line.maxAmount}
+                            step="0.01"
+                            value={lineFormByKey[line.key]?.amountInput ?? ""}
+                            onChange={(event) => {
+                              const rawValue = event.target.value;
+
+                              if (!rawValue.trim()) {
+                                updateLineForm(line.key, (prev) => ({
+                                  ...prev,
+                                  amountInput: "",
+                                }));
+                                return;
+                              }
+
+                              const parsedValue = Number(
+                                rawValue.replace(",", "."),
+                              );
+                              if (Number.isNaN(parsedValue)) return;
+
+                              const clampedValue = clamp(
+                                parsedValue,
+                                0,
+                                line.maxAmount,
+                              );
+                              updateLineForm(line.key, (prev) => ({
+                                ...prev,
+                                amountInput:
+                                  parsedValue === clampedValue
+                                    ? rawValue
+                                    : formatAmountInput(clampedValue),
+                              }));
+                            }}
+                            disabled={isSubmitting}
+                          />
+                        </>
+                      )}
+                    </div>
+
+                    <div className="col-span-12 md:col-span-2">
+                      <div className="text-xs text-muted-foreground">
+                        Refund amount
+                      </div>
+                      <div className="font-semibold">
+                        €{normalizeCurrency(line.amount)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <Label className="mb-1 block text-xs text-muted-foreground">
+                      Reason for refund
+                    </Label>
+                    <Select
+                      value={line.reason || undefined}
+                      onValueChange={(value) =>
+                        updateLineForm(line.key, (prev) => ({
+                          ...prev,
+                          reason: value,
+                        }))
+                      }
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger className="w-full border border-input">
+                        <SelectValue placeholder="Select a reason" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {REFUND_REASON_GROUPS.map((group, groupIndex) => (
+                          <React.Fragment key={group.label}>
+                            <SelectGroup>
+                              <SelectLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wide text-foreground">
+                                {group.label}
+                              </SelectLabel>
+                              {group.options.map((reason) => (
+                                <SelectItem key={reason} value={reason}>
+                                  {reason}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                            {groupIndex < REFUND_REASON_GROUPS.length - 1 ? (
+                              <SelectSeparator />
+                            ) : null}
+                          </React.Fragment>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="mt-4">
+                    <Label className="mb-2 block text-xs text-muted-foreground">
+                      Item quality
+                    </Label>
+                    <RadioGroup
+                      value={line.quality}
+                      onValueChange={(value) =>
+                        updateLineForm(line.key, (prev) => ({
+                          ...prev,
+                          quality: value as ItemQuality,
+                        }))
+                      }
+                      className="grid grid-cols-2 gap-2 md:grid-cols-4"
+                    >
+                      {ITEM_QUALITY_OPTIONS.map((option) => (
+                        <div
+                          key={option}
+                          className="flex items-center gap-2 rounded border px-3 py-2"
+                        >
+                          <RadioGroupItem
+                            value={option}
+                            id={`${line.key}-${option}`}
+                          />
+                          <Label
+                            htmlFor={`${line.key}-${option}`}
+                            className="cursor-pointer"
+                          >
+                            {option}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+
+                  <div className="mt-4">
+                    <Label className="mb-2 block text-xs text-muted-foreground">
+                      Upload files
+                    </Label>
+                    <div
+                      onDragOver={(event) =>
+                        handleLineDragOver(line.key, event)
+                      }
+                      onDragEnter={(event) =>
+                        handleLineDragOver(line.key, event)
+                      }
+                      onDragLeave={handleLineDragLeave}
+                      onDrop={(event) => handleLineDrop(line.key, event)}
+                      className={`rounded-md border border-dashed p-4 transition-colors ${
+                        draggingLineKey === line.key
+                          ? "border-primary bg-primary/5"
+                          : "border-input"
+                      }`}
+                    >
+                      <label className="flex cursor-pointer flex-col items-center gap-2 text-sm text-muted-foreground">
+                        <Upload className="size-4" />
+                        <span>Drag and drop files here</span>
+                        <span>or click to browse</span>
+                        <input
+                          type="file"
+                          multiple
+                          className="hidden"
+                          onChange={(event) => {
+                            handleLineImageUpload(line.key, event.target.files);
+                            event.currentTarget.value = "";
+                          }}
+                          disabled={isSubmitting}
+                        />
+                      </label>
+                    </div>
+
+                    {line.images.length > 0 ? (
+                      <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+                        {line.images.map((image) => (
+                          <div
+                            key={image.id}
+                            className="relative overflow-hidden rounded-md border bg-muted/20"
+                          >
+                            {image.isImage && image.previewUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={image.previewUrl}
+                                alt={image.file.name}
+                                className="h-24 w-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-24 w-full items-center gap-2 px-3">
+                                <FileText className="size-4 text-muted-foreground" />
+                                <span className="line-clamp-2 text-xs">
+                                  {image.file.name}
+                                </span>
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              className="absolute right-1 top-1 rounded bg-black/60 p-1 text-white hover:bg-black/80"
+                              onClick={() =>
+                                handleRemoveLineImage(line.key, image.id)
+                              }
+                              disabled={isSubmitting}
+                              aria-label="Remove image"
+                            >
+                              <X className="size-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {refundMode !== "money" ? (
+            <div className="rounded-lg border p-4">
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12 md:col-span-6">
+                  <div className="font-medium">Shipping fee</div>
+                  <div className="text-sm text-muted-foreground">
+                    Max refundable shipping: €
+                    {normalizeCurrency(shippingMaxAmount)}
+                  </div>
+                </div>
+
+                <div className="col-span-6 md:col-span-2">
+                  <div className="text-xs text-muted-foreground">
+                    Shipping cost
+                  </div>
+                  <div className="font-medium">
+                    €{normalizeCurrency(shippingMaxAmount)}
+                  </div>
+                </div>
+
+                <div className="col-span-6 md:col-span-2">
+                  {refundMode === "full" ? (
+                    <>
+                      <Label className="mb-1 block text-xs text-muted-foreground">
+                        Units (0-1)
+                      </Label>
+                      <Select
+                        value={String(shippingUnits > 0 ? 1 : 0)}
+                        onValueChange={(value) =>
+                          setShippingUnits(Number(value))
+                        }
+                        disabled={isSubmitting || !isShippingRefundAllowed}
+                      >
+                        <SelectTrigger className="w-full border border-input">
+                          <SelectValue placeholder="Select units" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">0</SelectItem>
+                          <SelectItem value="1">1</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </>
+                  ) : (
+                    <>
+                      <Label className="mb-1 block text-xs text-muted-foreground">
+                        Amount (0-{normalizeCurrency(shippingMaxAmount)})
+                      </Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        max={shippingMaxAmount}
+                        step="0.01"
+                        value={
+                          isShippingRefundAllowed ? shippingAmountInput : "0"
+                        }
+                        onChange={(event) => {
+                          const rawValue = event.target.value;
+
+                          if (!rawValue.trim()) {
+                            setShippingAmountInput("0");
+                            return;
+                          }
+
+                          const parsedValue = Number(
+                            rawValue.replace(",", "."),
+                          );
+                          if (Number.isNaN(parsedValue)) return;
+
+                          const clampedValue = clamp(
+                            parsedValue,
+                            0,
+                            shippingMaxAmount,
+                          );
+                          setShippingAmountInput(
+                            parsedValue === clampedValue
+                              ? rawValue
+                              : formatAmountInput(clampedValue),
+                          );
+                        }}
+                        disabled={isSubmitting || !isShippingRefundAllowed}
+                      />
+                    </>
+                  )}
+                </div>
+
+                <div className="col-span-12 md:col-span-2">
+                  <div className="text-xs text-muted-foreground">
+                    Refund amount
+                  </div>
+                  <div className="font-semibold">
+                    €{normalizeCurrency(shippingRefundAmount)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="ml-auto w-full max-w-md rounded-lg border bg-muted/20 p-4">
             <div className="space-y-2 text-sm">

@@ -15,17 +15,20 @@ import { useAtom } from "jotai";
 import { userIdAtom } from "@/store/auth";
 import QuantityControl from "./quantity-input";
 
-import { addBusinessDays } from "date-fns";
 import { InventoryPosItem } from "@/types/products";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/src/i18n/navigation";
 import { useAddToWishList } from "@/features/wishlist/hook";
 import { HandleApiError } from "@/lib/api-helper";
 import ProductBrand from "../single-product/product-brand";
-import { getDeliveryDayRange } from "@/hooks/get-estimated-shipping";
+import {
+  addBusinessDays,
+  getDeliveryDayRange,
+} from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
+import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 
 interface CartItemProps {
   cartServer?: CartItem;
@@ -229,52 +232,26 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     [item?.stock, item?.result_stock],
   );
 
-  const incomingStock = React.useMemo(() => {
-    const items = Array.isArray(inventoryPo)
-      ? inventoryPo
-      : inventoryPo
-        ? [inventoryPo]
-        : [];
+  const incomingSummary = React.useMemo(() => {
+    if (cartServer?.products) {
+      return calculateIncomingStockSummary(cartServer.products, { inventoryPo });
+    }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    if (localProducts) {
+      return calculateIncomingStockSummary(
+        {
+          stock: localProducts.stock,
+          result_stock: localProducts.result_stock,
+          inventory_pos: localProducts.inventory,
+        },
+        { inventoryPo },
+      );
+    }
 
-    return items.reduce((sum, inv) => {
-      if ((inv.quantity ?? 0) <= 0) return sum;
-      if (!inv.list_delivery_date) return sum;
-      const date = new Date(inv.list_delivery_date);
-      if (Number.isNaN(date.getTime())) return sum;
-      date.setHours(0, 0, 0, 0);
-      if (date < today) return sum;
-      return sum + (inv.quantity ?? 0);
-    }, 0);
-  }, [inventoryPo]);
+    return calculateIncomingStockSummary(null);
+  }, [cartServer?.products, localProducts, inventoryPo]);
 
-  const totalStock = availableStock + incomingStock;
-
-  const nextIncomingDate = React.useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const items = Array.isArray(inventoryPo)
-      ? inventoryPo
-      : inventoryPo
-        ? [inventoryPo]
-        : [];
-
-    const futureDates = items
-      .filter((inv) => (inv.quantity ?? 0) > 0 && inv.list_delivery_date)
-      .map((inv) => new Date(inv.list_delivery_date))
-      .filter((date) => {
-        if (Number.isNaN(date.getTime())) return false;
-        date.setHours(0, 0, 0, 0);
-        return date >= today;
-      })
-      .sort((a, b) => a.getTime() - b.getTime());
-
-    if (futureDates.length === 0) return null;
-    return futureDates[0];
-  }, [inventoryPo]);
+  const nextIncomingDate = incomingSummary.nearestIncomingDate;
 
   const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
     const result = new Date(startDate);
@@ -284,7 +261,8 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
 
   const estimatedDeliveryRange = React.useMemo(() => {
     if (!deliveryDayRange) return null;
-    if (totalStock > 0) {
+
+    if (availableStock > 0) {
       const today = new Date();
       return {
         from: addCalendarDays(today, deliveryDayRange.min),
@@ -304,7 +282,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
       from: addBusinessDays(nextIncomingDate, deliveryDayRange.min),
       to: addBusinessDays(nextIncomingDate, deliveryDayRange.max),
     };
-  }, [deliveryDayRange, totalStock, nextIncomingDate, addCalendarDays]);
+  }, [deliveryDayRange, availableStock, nextIncomingDate, addCalendarDays]);
 
   const handleAddToWishlist = (id: string) => {
     if (!id) return;
