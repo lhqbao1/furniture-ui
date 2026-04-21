@@ -247,16 +247,23 @@ const ExchangeConfirmDialog = ({
                 Select Products
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="z-[200] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto">
+            <PopoverContent
+              data-vaul-no-drag
+              className="z-[200] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto"
+            >
               <Command shouldFilter={false}>
                 <CommandInput
                   placeholder="Search product..."
                   value={queryParams}
                   onValueChange={(value) => setQueryParams(value)}
                 />
-                <CommandList>
+                <CommandList
+                  data-vaul-no-drag
+                  className="max-h-96 overscroll-contain touch-pan-y"
+                  onWheelCapture={(event) => event.stopPropagation()}
+                >
                   <CommandEmpty>No product found.</CommandEmpty>
-                  <CommandGroup className="h-96 overflow-y-auto">
+                  <CommandGroup>
                     {isLoading && <CommandItem disabled>Loading...</CommandItem>}
                     {isError && (
                       <CommandItem disabled>Error loading products</CommandItem>

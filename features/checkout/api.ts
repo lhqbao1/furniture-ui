@@ -40,6 +40,13 @@ export interface GetRefundOrdersParams {
   search?: string;
 }
 
+const sanitizeDateTimeParam = (value?: string) => {
+  if (value === undefined) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  return trimmed.replace(/\.\d{3}Z$/, "").replace(/Z$/, "");
+};
+
 export interface DeliveryOrderItem {
   product_id: string;
   quantity: number;
@@ -439,10 +446,13 @@ export const cancelMainCheckout = async (mainCheckoutId: string) => {
 };
 
 export const getCheckOutDashboard = async (params: OrderStatisticsParams) => {
+  const fromDate = sanitizeDateTimeParam(params?.from_date);
+  const toDate = sanitizeDateTimeParam(params?.to_date);
+
   const res = await api.get(`/checkout/dash-board/market-place`, {
     params: {
-      ...(params?.from_date !== undefined && { from_date: params.from_date }),
-      ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(fromDate !== undefined && { from_date: fromDate }),
+      ...(toDate !== undefined && { to_date: toDate }),
       ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
     },
   });
@@ -452,10 +462,13 @@ export const getCheckOutDashboard = async (params: OrderStatisticsParams) => {
 export const getProductsCheckOutDashboard = async (
   params?: OrderStatisticsParams,
 ) => {
+  const fromDate = sanitizeDateTimeParam(params?.from_date);
+  const toDate = sanitizeDateTimeParam(params?.to_date);
+
   const res = await api.get(`/checkout/dash-board/products`, {
     params: {
-      ...(params?.from_date !== undefined && { from_date: params.from_date }),
-      ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(fromDate !== undefined && { from_date: fromDate }),
+      ...(toDate !== undefined && { to_date: toDate }),
       ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
       ...(params?.sort_by_quantity !== undefined && {
         sort_by_quantity: params.sort_by_quantity,

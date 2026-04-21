@@ -372,7 +372,7 @@ const OrderPlaced = () => {
         (window as any).AWIN.Tracking.Sale = {
           amount,
           orderRef,
-          parts: `DEFAULT:${amount}`,
+          parts: `DEFAULT:${11}|OWNBRAND:12`,
           currency: "EUR",
           channel: "aw",
           customerAcquisition: "NEW",

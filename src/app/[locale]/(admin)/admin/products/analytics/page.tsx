@@ -89,11 +89,14 @@ const getBreakdownItems = (
 const getMainImageUrl = (item: ProviderItem) =>
   (item.static_files ?? []).find((file) => (file?.url ?? "").trim())?.url ?? "";
 
-const toIsoDateTime = (value: string) => {
+const toApiDateTime = (value: string) => {
   if (!value) return undefined;
-  const date = new Date(value);
+  const normalized = value.trim();
+  const date = new Date(normalized);
   if (Number.isNaN(date.getTime())) return undefined;
-  return date.toISOString();
+  const withSeconds =
+    normalized.length === 16 ? `${normalized}:00` : normalized;
+  return withSeconds.replace(/Z$/, "");
 };
 
 const getSoldStockValue = (product: ProductAndSoldItem): number | null => {
@@ -295,14 +298,13 @@ export default function ProductAnalyticsPage() {
     sort_by_stock: soldStockSort,
   });
 
-  const revenueQueryParams = React.useMemo(
-    () => ({
-      ...(toIsoDateTime(debouncedRevenueFromDate)
-        ? { from_date: toIsoDateTime(debouncedRevenueFromDate) }
-        : {}),
-      ...(toIsoDateTime(debouncedRevenueToDate)
-        ? { to_date: toIsoDateTime(debouncedRevenueToDate) }
-        : {}),
+  const revenueQueryParams = React.useMemo(() => {
+    const fromDate = toApiDateTime(debouncedRevenueFromDate);
+    const toDate = toApiDateTime(debouncedRevenueToDate);
+
+    return {
+      ...(fromDate ? { from_date: fromDate } : {}),
+      ...(toDate ? { to_date: toDate } : {}),
       ...(revenueCustomerType !== "all"
         ? { is_b2b: revenueCustomerType === "b2b" }
         : {}),
@@ -310,15 +312,14 @@ export default function ProductAnalyticsPage() {
         ? { sort_by_quantity: sortByQuantity }
         : {}),
       ...(sortByRevenue !== "none" ? { sort_by_revenue: sortByRevenue } : {}),
-    }),
-    [
-      debouncedRevenueFromDate,
-      debouncedRevenueToDate,
-      revenueCustomerType,
-      sortByQuantity,
-      sortByRevenue,
-    ],
-  );
+    };
+  }, [
+    debouncedRevenueFromDate,
+    debouncedRevenueToDate,
+    revenueCustomerType,
+    sortByQuantity,
+    sortByRevenue,
+  ]);
 
   const {
     data: providerOverview,
@@ -339,6 +340,7 @@ export default function ProductAnalyticsPage() {
       ? "Sold stock: low to high"
       : "Sold stock: high to low";
 
+  console.log(stockItems);
   return (
     <div className="pb-6">
       <div className="flex flex-col gap-6">
@@ -420,6 +422,10 @@ export default function ProductAnalyticsPage() {
                             Physical stock
                           </TableHead>
                           <TableHead className="h-11 px-3 text-right">
+                            Available stock
+                          </TableHead>
+
+                          <TableHead className="h-11 px-3 text-right">
                             <Button
                               type="button"
                               variant="ghost"
@@ -479,6 +485,13 @@ export default function ProductAnalyticsPage() {
                                     "de-DE",
                                   )}
                                 </TableCell>
+                                <TableCell className="px-3 text-right">
+                                  {toNumber(
+                                    (product.stock ?? 0) -
+                                      (product.result_stock ?? 0),
+                                  ).toLocaleString("de-DE")}
+                                </TableCell>
+
                                 <TableCell className="px-3 text-right">
                                   {soldStock === null
                                     ? "-"
