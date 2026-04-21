@@ -39,6 +39,12 @@ type IncomingDisplayItem = {
   date: Date;
 };
 
+type InventorySource = {
+  inventory_pos?: ProductAndSoldItem["inventory_pos"];
+  inventories_po?: ProductAndSoldItem["inventory_pos"];
+  inventory_po?: ProductAndSoldItem["inventory_pos"];
+};
+
 type RevenueSortValue = "none" | "asc" | "desc";
 type RevenueCustomerType = "all" | "b2b" | "b2c";
 
@@ -123,10 +129,16 @@ const getIncomingDisplayItems = (
 ): IncomingDisplayItem[] => {
   const now = new Date();
 
+  const getInventoryItems = (source?: InventorySource) =>
+    source?.inventory_pos ??
+    source?.inventories_po ??
+    source?.inventory_po ??
+    [];
+
   const buildFutureIncomingRows = (
-    inventoryPos: ProductAndSoldItem["inventory_pos"] | undefined,
+    inventoryItems: ProductAndSoldItem["inventory_pos"] | undefined,
   ) =>
-    (inventoryPos ?? [])
+    (inventoryItems ?? [])
       .map((item) => {
         if ((item.quantity ?? 0) <= 0) return null;
         if (!item.list_delivery_date) return null;
@@ -155,7 +167,7 @@ const getIncomingDisplayItems = (
 
         const incomingByDate = new Map<number, number>();
         for (const entry of buildFutureIncomingRows(
-          bundle.bundle_item.inventory_pos,
+          getInventoryItems(bundle.bundle_item),
         )) {
           const timestamp = entry.date.getTime();
           incomingByDate.set(
@@ -221,7 +233,7 @@ const getIncomingDisplayItems = (
     return bundleRows;
   }
 
-  return buildFutureIncomingRows(product.inventory_pos);
+  return buildFutureIncomingRows(getInventoryItems(product));
 };
 
 function IncomingStockDisplay({ product }: { product: ProductAndSoldItem }) {
