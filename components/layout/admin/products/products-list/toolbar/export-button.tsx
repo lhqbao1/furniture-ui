@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllProductsSelect } from "@/features/product-group/api";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 
 function forceTextColumns(worksheet: XLSX.WorkSheet, columns: string[]) {
   const range = XLSX.utils.decode_range(worksheet["!ref"]!);
@@ -42,7 +43,7 @@ const normalizeDescription = (html?: string) => {
 };
 
 export default function ExportExcelButton() {
-  const { data, isFetching, refetch } = useQuery({
+  const { isFetching, refetch } = useQuery({
     queryKey: ["all-products"],
     queryFn: () => getAllProductsSelect({}),
     enabled: false, // ❌ không auto call
@@ -55,7 +56,8 @@ export default function ExportExcelButton() {
     if (!data || data.length === 0) return;
 
     // Hàm xử lý giá trị null / undefined / "None"
-    const clean = (val: any) => (val === null || val === undefined ? "" : val);
+    const clean = (val: unknown) =>
+      val === null || val === undefined ? "" : val;
 
     const exportData = data
       // .filter((p) => p.is_active === true)
@@ -83,7 +85,7 @@ export default function ExportExcelButton() {
         original_price: clean(p.price),
         sale_price: clean(p.final_price),
         vat: clean(p.tax),
-        stock: clean(p.stock),
+        stock: clean(calculateAvailableStock(p)),
         img_url: clean(
           p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
         ),

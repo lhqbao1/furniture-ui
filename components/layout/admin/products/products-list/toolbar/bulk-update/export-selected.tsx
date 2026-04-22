@@ -1,4 +1,5 @@
 import { getAllProductsSelect } from "@/features/product-group/api";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { ProductItem } from "@/types/products";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
@@ -13,7 +14,7 @@ interface ExportSelectedProductsProps {
 const ExportSelectedProducts = ({
   product_ids,
 }: ExportSelectedProductsProps) => {
-  const { data, isFetching, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["all-products", status],
     queryFn: () =>
       getAllProductsSelect({
@@ -23,7 +24,8 @@ const ExportSelectedProducts = ({
   });
 
   const buildExportData = (data: ProductItem[]) => {
-    const clean = (val: any) => (val === null || val === undefined ? "" : val);
+    const clean = (val: unknown) =>
+      val === null || val === undefined ? "" : val;
 
     return data.map((p) => {
       const rawTariff = clean(p.tariff_number);
@@ -62,7 +64,7 @@ const ExportSelectedProducts = ({
         original_price: clean(p.price),
         sale_price: clean(p.final_price),
         vat: vat,
-        stock: clean(p.stock),
+        stock: clean(calculateAvailableStock(p)),
         img_url: clean(
           p.static_files?.map((f) => f.url.replaceAll(" ", "%20")).join("|"),
         ),
