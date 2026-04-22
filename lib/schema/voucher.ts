@@ -51,6 +51,8 @@ export const voucherDefaultValues: VoucherFormValues = {
 export const voucherUpdateSchema = z.object({
   type: z.string().min(1, "type is required"),
   name: z.string().min(1, "name is required"),
+  code: z.string().min(1, "code is required"),
+
   discount_value: z.number().min(0, "discount_value is required"),
   max_discount: z.number().optional().nullable(),
   min_order_value: z.number().optional().nullable(),
@@ -70,6 +72,7 @@ export const voucherUpdateDefaultValues: VoucherUpdateValues = {
   max_discount: 0,
   min_order_value: 0,
   start_at: "",
+  code: "",
   end_at: "",
   is_active: false,
   total_usage_limit: 0,

@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { useGetProductsCheckOutDashboard } from "@/features/checkout/hook";
 import { useGetAllProductAndSold } from "@/features/products/hook";
+import { getAllProductAndSold } from "@/features/products/api";
 import { ProductAndSoldItem } from "@/types/products";
 import { ProviderItem } from "@/types/checkout";
 import { format, getISOWeek } from "date-fns";
@@ -18,10 +19,19 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowDown, ArrowUp, ArrowUpDown, Search, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Download,
+  Loader2,
+  Search,
+  X,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { CustomPagination } from "@/components/shared/custom-pagination";
 import { useDebounce } from "use-debounce";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -29,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 const STOCK_PAGE_SIZE = 20;
 type SoldStockSort = "asc" | "desc";
@@ -47,6 +58,7 @@ type InventorySource = {
 
 type RevenueSortValue = "none" | "asc" | "desc";
 type RevenueCustomerType = "all" | "b2b" | "b2c";
+type EconeloFilterValue = "all" | "true" | "false";
 
 const toNumber = (value: unknown): number =>
   typeof value === "number" ? value : Number(value) || 0;
@@ -59,41 +71,25 @@ const formatCurrency = (value: number): string =>
     maximumFractionDigits: 2,
   }).format(value);
 
-const toTitleCase = (value: string) =>
-  value
-    .toLowerCase()
-    .split(" ")
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-
-const normalizeBreakdownLabel = (value: string, fallback: string) => {
-  const trimmed = value.trim();
-  if (!trimmed || trimmed.toLowerCase() === "null") return fallback;
-  return toTitleCase(trimmed.replace(/_/g, " "));
-};
-
-type BreakdownItem = {
-  label: string;
-  quantity: number;
-  amount: number;
-};
-
-const getBreakdownItems = (
-  data: ProviderItem["by_marketplace"] | ProviderItem["by_status"] | undefined,
-  fallbackLabel: string,
-): BreakdownItem[] =>
-  Object.entries(data ?? {})
-    .map(([key, value]) => ({
-      label: normalizeBreakdownLabel(key, fallbackLabel),
-      quantity: toNumber(value?.total_quantity),
-      amount: toNumber(value?.total_amount),
-    }))
-    .filter((item) => item.quantity > 0 || item.amount > 0)
-    .sort((a, b) => b.amount - a.amount);
-
 const getMainImageUrl = (item: ProviderItem) =>
   (item.static_files ?? []).find((file) => (file?.url ?? "").trim())?.url ?? "";
+
+const getIncomingStockExportValue = (product: ProductAndSoldItem): string => {
+  const incomingItems = getIncomingDisplayItems(product);
+  if (incomingItems.length === 0) return "—";
+
+  return incomingItems
+    .map((item) => {
+      const date = item.date;
+      const formattedDate =
+        date && !Number.isNaN(date.getTime())
+          ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(date, "MMMM d")}`
+          : "—";
+
+      return `${item.quantity ?? 0} | ${formattedDate}`;
+    })
+    .join(" ; ");
+};
 
 const toApiDateTime = (value: string) => {
   if (!value) return undefined;
@@ -281,8 +277,12 @@ function IncomingStockDisplay({ product }: { product: ProductAndSoldItem }) {
 export default function ProductAnalyticsPage() {
   const [stockPage, setStockPage] = React.useState(1);
   const [searchInput, setSearchInput] = React.useState("");
+  const [searchTerms, setSearchTerms] = React.useState<string[]>([]);
   const [soldStockSort, setSoldStockSort] =
     React.useState<SoldStockSort>("desc");
+  const [isExportingStockExcel, setIsExportingStockExcel] = React.useState(false);
+  const [isEconeloFilter, setIsEconeloFilter] =
+    React.useState<EconeloFilterValue>("all");
   const [revenueFromDate, setRevenueFromDate] = React.useState("");
   const [revenueToDate, setRevenueToDate] = React.useState("");
   const [revenueCustomerType, setRevenueCustomerType] =
@@ -291,24 +291,141 @@ export default function ProductAnalyticsPage() {
     React.useState<RevenueSortValue>("none");
   const [sortByRevenue, setSortByRevenue] =
     React.useState<RevenueSortValue>("desc");
-  const [debouncedSearch] = useDebounce(searchInput.trim(), 450);
   const [debouncedRevenueFromDate] = useDebounce(revenueFromDate, 450);
   const [debouncedRevenueToDate] = useDebounce(revenueToDate, 450);
 
+  const parseSearchTerms = React.useCallback((value: string) => {
+    return value
+      .split(/[,\n]/g)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }, []);
+
+  const commitSearchInput = React.useCallback(() => {
+    const nextTerms = parseSearchTerms(searchInput);
+    if (nextTerms.length === 0) return;
+
+    setSearchTerms((prev) => {
+      const merged = new Set([...prev, ...nextTerms]);
+      return Array.from(merged);
+    });
+    setSearchInput("");
+  }, [parseSearchTerms, searchInput]);
+
+  const removeSearchTerm = React.useCallback((targetTerm: string) => {
+    setSearchTerms((prev) => prev.filter((term) => term !== targetTerm));
+  }, []);
+
+  const normalizedSearchTerms = React.useMemo(
+    () =>
+      Array.from(
+        new Set(
+          searchTerms
+            .map((term) => term.trim())
+            .filter((term) => term.length > 0),
+        ),
+      ),
+    [searchTerms],
+  );
+
+  const stockSearchParam = React.useMemo(() => {
+    if (normalizedSearchTerms.length === 0) return undefined;
+    return normalizedSearchTerms;
+  }, [normalizedSearchTerms]);
+
+  const stockIsEconeloParam = React.useMemo<boolean | undefined>(() => {
+    if (isEconeloFilter === "all") return undefined;
+    return isEconeloFilter === "true";
+  }, [isEconeloFilter]);
+
+  const stockQueryParams = React.useMemo(
+    () => ({
+      ...(stockSearchParam ? { search: stockSearchParam } : {}),
+      ...(stockIsEconeloParam !== undefined
+        ? { is_econelo: stockIsEconeloParam }
+        : {}),
+      sort_by_stock: soldStockSort,
+    }),
+    [stockSearchParam, stockIsEconeloParam, soldStockSort],
+  );
+
   React.useEffect(() => {
     setStockPage(1);
-  }, [debouncedSearch, soldStockSort]);
+  }, [stockSearchParam, soldStockSort, stockIsEconeloParam]);
 
   const {
     data: productsData,
     isLoading: isStockLoading,
+    isFetching: isStockFetching,
     isError: isStockError,
   } = useGetAllProductAndSold({
     page: stockPage,
     page_size: STOCK_PAGE_SIZE,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    sort_by_stock: soldStockSort,
+    ...stockQueryParams,
   });
+
+  const handleExportStockExcel = React.useCallback(async () => {
+    setIsExportingStockExcel(true);
+
+    try {
+      const firstPage = await getAllProductAndSold({
+        ...stockQueryParams,
+        page: 1,
+        page_size: STOCK_PAGE_SIZE,
+      });
+
+      const totalPagesForExport = Math.max(
+        1,
+        firstPage?.pagination?.total_pages ?? 1,
+      );
+
+      const exportItems: ProductAndSoldItem[] = [...(firstPage?.items ?? [])];
+
+      if (totalPagesForExport > 1) {
+        const pageRequests = Array.from(
+          { length: totalPagesForExport - 1 },
+          (_, index) =>
+            getAllProductAndSold({
+              ...stockQueryParams,
+              page: index + 2,
+              page_size: STOCK_PAGE_SIZE,
+            }),
+        );
+
+        const pageResponses = await Promise.all(pageRequests);
+        pageResponses.forEach((response) => {
+          exportItems.push(...(response?.items ?? []));
+        });
+      }
+
+      const exportRows = exportItems.map((product) => ({
+        "Product ID": String(product.id_provider ?? "-"),
+        Name: product.name?.trim() || "-",
+        "Physical stock": toNumber(product.stock),
+        "Reserved stock": toNumber(product.result_stock),
+        "Available stock": toNumber(
+          (product.stock ?? 0) - (product.result_stock ?? 0),
+        ),
+        "Sold stock": getSoldStockValue(product) ?? "",
+        "Incoming stock": getIncomingStockExportValue(product),
+        "Min stock": getMinStockValue(product) ?? "",
+      }));
+
+      const XLSX = await import("xlsx");
+      const worksheet = XLSX.utils.json_to_sheet(exportRows);
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Stock Overview");
+
+      const timestamp = format(new Date(), "yyyyMMdd-HHmm");
+      XLSX.writeFile(workbook, `stock-overview-${timestamp}.xlsx`);
+      toast.success(`Exported ${exportRows.length} rows`);
+    } catch {
+      toast.error("Failed to export stock excel");
+    } finally {
+      setIsExportingStockExcel(false);
+    }
+  }, [stockQueryParams]);
 
   const revenueQueryParams = React.useMemo(() => {
     const fromDate = toApiDateTime(debouncedRevenueFromDate);
@@ -347,12 +464,12 @@ export default function ProductAnalyticsPage() {
   const totalPages = productsData?.pagination.total_pages ?? 1;
   const totalItems = productsData?.pagination.total_items ?? 0;
   const stockItems = productsData?.items ?? [];
+  const shouldShowStockSkeleton =
+    isStockLoading || (isStockFetching && !isStockError);
   const soldStockSortLabel =
     soldStockSort === "asc"
-      ? "Sold stock: low to high"
-      : "Sold stock: high to low";
-
-  console.log(stockItems);
+      ? "Physical stock: low to high"
+      : "Physical stock: high to low";
   return (
     <div className="pb-6">
       <div className="flex flex-col gap-6">
@@ -368,50 +485,136 @@ export default function ProductAnalyticsPage() {
             </CardHeader>
             <CardContent className="min-h-0 space-y-4">
               <div className="flex flex-col gap-3 rounded-xl border border-secondary/15 bg-muted/20 p-3 md:flex-row md:items-center md:justify-between">
-                <div className="relative w-full md:max-w-md">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={searchInput}
-                    onChange={(event) => setSearchInput(event.target.value)}
-                    placeholder="Search by product id or name..."
-                    className="h-10 border-secondary/20 bg-white pl-9 pr-9"
-                  />
-                  {searchInput ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
-                      onClick={() => setSearchInput("")}
-                    >
-                      <X className="h-4 w-4 text-muted-foreground" />
-                    </Button>
+                <div className="w-full md:max-w-2xl">
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={searchInput}
+                      onChange={(event) => setSearchInput(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === ",") {
+                          event.preventDefault();
+                          commitSearchInput();
+                          return;
+                        }
+
+                        if (
+                          event.key === "Backspace" &&
+                          !searchInput.trim() &&
+                          normalizedSearchTerms.length > 0
+                        ) {
+                          event.preventDefault();
+                          setSearchTerms((prev) => prev.slice(0, -1));
+                        }
+                      }}
+                      placeholder="Type keyword and press Enter (multiple search)"
+                      className="h-10 border-secondary/20 bg-white pl-9 pr-9"
+                    />
+                    {searchInput ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+                        onClick={() => setSearchInput("")}
+                      >
+                        <X className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    ) : null}
+                  </div>
+
+                  {normalizedSearchTerms.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {normalizedSearchTerms.map((term) => (
+                        <Badge
+                          key={term}
+                          className="flex items-center gap-1.5 bg-secondary/90 text-white hover:bg-secondary/60"
+                        >
+                          <span>{term}</span>
+                          <button
+                            type="button"
+                            className="inline-flex text-white/80 hover:text-white"
+                            onClick={() => removeSearchTerm(term)}
+                            aria-label={`Remove ${term}`}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </Badge>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setSearchTerms([])}
+                      >
+                        Clear all
+                      </Button>
+                    </div>
                   ) : null}
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-10 w-full border-secondary/25 bg-white md:w-auto"
-                  onClick={() =>
-                    setSoldStockSort((prev) =>
-                      prev === "desc" ? "asc" : "desc",
-                    )
-                  }
-                >
-                  {soldStockSort === "asc" ? (
-                    <ArrowUp className="h-4 w-4" />
-                  ) : soldStockSort === "desc" ? (
-                    <ArrowDown className="h-4 w-4" />
-                  ) : (
-                    <ArrowUpDown className="h-4 w-4" />
-                  )}
-                  {soldStockSortLabel}
-                </Button>
+                <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:items-center">
+                  <Select
+                    value={isEconeloFilter}
+                    onValueChange={(value: EconeloFilterValue) =>
+                      setIsEconeloFilter(value)
+                    }
+                  >
+                    <SelectTrigger className="h-10 w-full rounded-md border border-secondary/40 bg-white shadow-sm transition-colors hover:border-secondary/60 focus:ring-2 focus:ring-secondary/30 md:w-[210px]">
+                      <SelectValue placeholder="Filter by brand scope" />
+                    </SelectTrigger>
+                    <SelectContent className="border border-secondary/30">
+                      <SelectItem value="all">All products</SelectItem>
+                      <SelectItem value="true">Econelo only</SelectItem>
+                      <SelectItem value="false">Non-Econelo only</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 w-full border-secondary/25 bg-white md:w-auto"
+                    onClick={() =>
+                      setSoldStockSort((prev) =>
+                        prev === "desc" ? "asc" : "desc",
+                      )
+                    }
+                  >
+                    {soldStockSort === "asc" ? (
+                      <ArrowUp className="h-4 w-4" />
+                    ) : soldStockSort === "desc" ? (
+                      <ArrowDown className="h-4 w-4" />
+                    ) : (
+                      <ArrowUpDown className="h-4 w-4" />
+                    )}
+                    {soldStockSortLabel}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 w-full border-secondary/25 bg-white md:w-auto"
+                    disabled={shouldShowStockSkeleton || isExportingStockExcel}
+                    onClick={() => {
+                      void handleExportStockExcel();
+                    }}
+                  >
+                    {isExportingStockExcel ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                    Export Excel
+                  </Button>
+                </div>
               </div>
 
-              {isStockLoading ? (
+              {shouldShowStockSkeleton ? (
                 <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground">
+                    Updating stock data...
+                  </div>
                   {Array.from({ length: 8 }).map((_, index) => (
                     <Skeleton key={index} className="h-9 w-full" />
                   ))}
@@ -431,13 +634,6 @@ export default function ProductAnalyticsPage() {
                           </TableHead>
                           <TableHead className="h-11 px-3">Name</TableHead>
                           <TableHead className="h-11 px-3 text-right">
-                            Physical stock
-                          </TableHead>
-                          <TableHead className="h-11 px-3 text-right">
-                            Available stock
-                          </TableHead>
-
-                          <TableHead className="h-11 px-3 text-right">
                             <Button
                               type="button"
                               variant="ghost"
@@ -448,7 +644,7 @@ export default function ProductAnalyticsPage() {
                                 )
                               }
                             >
-                              Sold stock
+                              Physical stock
                               {soldStockSort === "asc" ? (
                                 <ArrowUp className="ml-1 h-3.5 w-3.5" />
                               ) : soldStockSort === "desc" ? (
@@ -457,6 +653,16 @@ export default function ProductAnalyticsPage() {
                                 <ArrowUpDown className="ml-1 h-3.5 w-3.5" />
                               )}
                             </Button>
+                          </TableHead>
+                          <TableHead className="h-11 px-3 text-right">
+                            Reserved stock
+                          </TableHead>
+                          <TableHead className="h-11 px-3 text-right">
+                            Available stock
+                          </TableHead>
+
+                          <TableHead className="h-11 px-3 text-right">
+                            Sold stock
                           </TableHead>
                           <TableHead className="h-11 px-3">
                             Incoming stock
@@ -470,7 +676,7 @@ export default function ProductAnalyticsPage() {
                         {stockItems.length === 0 ? (
                           <TableRow>
                             <TableCell
-                              colSpan={6}
+                              colSpan={8}
                               className="h-24 text-center text-muted-foreground"
                             >
                               No products found.
@@ -494,6 +700,11 @@ export default function ProductAnalyticsPage() {
                                 </TableCell>
                                 <TableCell className="px-3 text-right">
                                   {toNumber(product.stock).toLocaleString(
+                                    "de-DE",
+                                  )}
+                                </TableCell>
+                                <TableCell className="px-3 text-right">
+                                  {toNumber(product.result_stock).toLocaleString(
                                     "de-DE",
                                   )}
                                 </TableCell>
@@ -664,26 +875,6 @@ export default function ProductAnalyticsPage() {
                       ) : (
                         topRevenueProducts.map((item, index) => {
                           const imageUrl = getMainImageUrl(item);
-                          const marketplaces = getBreakdownItems(
-                            item.by_marketplace,
-                            "Prestige Home",
-                          )
-                            .slice(0, 2)
-                            .map(
-                              (entry) =>
-                                `${entry.label}: ${entry.quantity.toLocaleString("de-DE")}`,
-                            )
-                            .join(" • ");
-                          const statuses = getBreakdownItems(
-                            item.by_status,
-                            "Unknown",
-                          )
-                            .slice(0, 2)
-                            .map(
-                              (entry) =>
-                                `${entry.label}: ${entry.quantity.toLocaleString("de-DE")}`,
-                            )
-                            .join(" • ");
 
                           return (
                             <TableRow key={`${item.id_provider}-${index}`}>
@@ -712,16 +903,6 @@ export default function ProductAnalyticsPage() {
                                     <div className="text-xs text-muted-foreground">
                                       ID: {item.id_provider || "-"}
                                     </div>
-                                    {marketplaces ? (
-                                      <div className="text-xs text-muted-foreground line-clamp-1">
-                                        MP: {marketplaces}
-                                      </div>
-                                    ) : null}
-                                    {statuses ? (
-                                      <div className="text-xs text-muted-foreground line-clamp-1">
-                                        Status: {statuses}
-                                      </div>
-                                    ) : null}
                                   </div>
                                 </div>
                               </TableCell>

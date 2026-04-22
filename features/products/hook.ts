@@ -28,7 +28,6 @@ import { ProductInput } from "@/lib/schema/product";
 import {
   ProductDetailLog,
   ProductAndSoldResponse,
-  ProductItem,
   ProductResponse,
 } from "@/types/products";
 import { toast } from "sonner";
@@ -102,6 +101,7 @@ export function useGetAllProductAndSold({
   sort_by_stock,
   page,
   page_size,
+  is_econelo,
 }: GetAllProductAndSoldParams = {}) {
   return useQuery<ProductAndSoldResponse>({
     queryKey: [
@@ -110,6 +110,7 @@ export function useGetAllProductAndSold({
       sort_by_stock,
       page,
       page_size,
+      is_econelo,
     ],
     queryFn: () =>
       getAllProductAndSold({
@@ -117,6 +118,7 @@ export function useGetAllProductAndSold({
         sort_by_stock,
         page,
         page_size,
+        is_econelo,
       }),
     placeholderData: keepPreviousData,
     retry: false,
@@ -164,10 +166,15 @@ export const useUpdateBulkActiveProducts = () => {
       });
     },
 
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const message = (
+        error as {
+          response?: { data?: { message?: string } };
+        }
+      )?.response?.data?.message;
+
       toast.error("Failed to update products", {
-        description:
-          error?.response?.data?.message ?? "Please try again later.",
+        description: message ?? "Please try again later.",
       });
     },
   });
@@ -177,7 +184,7 @@ export function useDeleteProduct() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteProduct(id),
-    onSuccess: (res) => {
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
     },
   });
@@ -228,7 +235,7 @@ export function useAddProduct() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: ProductInput) => CreateProduct(input),
-    onSuccess: (res) => {
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
     },
   });
@@ -246,7 +253,7 @@ export function useEditProduct() {
       skipInvalidateProducts?: boolean;
     }) =>
       editProduct(input, id),
-    onSuccess: (res, variables) => {
+    onSuccess: (_, variables) => {
       if (!variables.skipInvalidateProducts) {
         qc.invalidateQueries({ queryKey: ["all-products"] });
         qc.invalidateQueries({ queryKey: ["products"] });
@@ -257,7 +264,6 @@ export function useEditProduct() {
 }
 
 export function useGenerateSEO() {
-  const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: SEOInput) => generateSEO(input),
     // onSuccess: (res) => {

@@ -13,11 +13,9 @@ import {
 } from "@/features/vouchers/hook";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { CartResponseItem } from "@/types/cart";
-import { useAtom } from "jotai";
 import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import { currentVoucherAtom } from "@/store/voucher";
 import VoucherApply from "./voucher-apply";
 
 interface CheckoutSummaryProps {
@@ -37,8 +35,8 @@ const CheckoutSummary = ({
 }: CheckoutSummaryProps) => {
   const form = useFormContext();
   const t = useTranslations();
-  const [currentVoucher, setCurrentVoucher] = useAtom(currentVoucherAtom);
-  const [voucherId, setVoucherId] = useState<string | null>(currentVoucher);
+  // Keep voucher local to current checkout session.
+  const [voucherId, setVoucherId] = useState<string | null>(null);
 
   const hasServerCart = !!userLoginId;
 
@@ -112,8 +110,7 @@ const CheckoutSummary = ({
   //   true,
   // );
 
-  const { data: selectedVoucher, isLoading: isLoadingVoucher } =
-    useGetVoucherById(currentVoucher ?? "");
+  const { data: selectedVoucher } = useGetVoucherById(voucherId ?? "");
 
   React.useEffect(() => {
     if (!selectedVoucher) return;
