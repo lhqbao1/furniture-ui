@@ -280,7 +280,8 @@ export default function ProductAnalyticsPage() {
   const [searchTerms, setSearchTerms] = React.useState<string[]>([]);
   const [soldStockSort, setSoldStockSort] =
     React.useState<SoldStockSort>("desc");
-  const [isExportingStockExcel, setIsExportingStockExcel] = React.useState(false);
+  const [isExportingStockExcel, setIsExportingStockExcel] =
+    React.useState(false);
   const [isEconeloFilter, setIsEconeloFilter] =
     React.useState<EconeloFilterValue>("all");
   const [revenueFromDate, setRevenueFromDate] = React.useState("");
@@ -406,7 +407,7 @@ export default function ProductAnalyticsPage() {
         "Available stock": toNumber(
           (product.stock ?? 0) - (product.result_stock ?? 0),
         ),
-        "Sold stock": getSoldStockValue(product) ?? "",
+        "Units sold": getSoldStockValue(product) ?? "",
         "Incoming stock": getIncomingStockExportValue(product),
         "Min stock": getMinStockValue(product) ?? "",
       }));
@@ -662,7 +663,7 @@ export default function ProductAnalyticsPage() {
                           </TableHead>
 
                           <TableHead className="h-11 px-3 text-right">
-                            Sold stock
+                            Units sold
                           </TableHead>
                           <TableHead className="h-11 px-3">
                             Incoming stock
@@ -704,9 +705,9 @@ export default function ProductAnalyticsPage() {
                                   )}
                                 </TableCell>
                                 <TableCell className="px-3 text-right">
-                                  {toNumber(product.result_stock).toLocaleString(
-                                    "de-DE",
-                                  )}
+                                  {toNumber(
+                                    product.result_stock,
+                                  ).toLocaleString("de-DE")}
                                 </TableCell>
                                 <TableCell className="px-3 text-right">
                                   {toNumber(
