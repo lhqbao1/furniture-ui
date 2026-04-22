@@ -55,14 +55,48 @@ const discountTypeOptions = [
 
 const parseIsoDate = (value?: string | null) => {
   if (!value) return undefined;
+
+  const datePartMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (datePartMatch) {
+    const year = Number(datePartMatch[1]);
+    const month = Number(datePartMatch[2]);
+    const day = Number(datePartMatch[3]);
+    const localDate = new Date(year, month - 1, day);
+
+    return Number.isNaN(localDate.getTime()) ? undefined : localDate;
+  }
+
   const parsedDate = new Date(value);
-  return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate;
+  if (Number.isNaN(parsedDate.getTime())) return undefined;
+
+  return new Date(
+    parsedDate.getFullYear(),
+    parsedDate.getMonth(),
+    parsedDate.getDate(),
+  );
 };
 
-function removeZ(dateString?: string) {
-  if (!dateString) return dateString;
-  return dateString.replace(/Z$/, "");
-}
+const toVoucherDateTimeString = (
+  date: Date | null | undefined,
+  boundary: "start" | "end",
+) => {
+  if (!date) return "";
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const time = boundary === "start" ? "00:00:00" : "23:59:59";
+
+  return `${year}-${month}-${day}T${time}`;
+};
+
+const normalizeVoucherDateValue = (
+  value: string | null | undefined,
+  boundary: "start" | "end",
+) => {
+  const parsedDate = parseIsoDate(value);
+  return toVoucherDateTimeString(parsedDate, boundary);
+};
 
 export default function AddOrEditVouchersForm({
   submitText,
@@ -108,8 +142,8 @@ export default function AddOrEditVouchersForm({
   async function handleSubmit(values: VoucherFormValues) {
     const payload = {
       ...values,
-      start_at: removeZ(values.start_at) ?? "",
-      end_at: removeZ(values.end_at) ?? "",
+      start_at: normalizeVoucherDateValue(values.start_at, "start"),
+      end_at: normalizeVoucherDateValue(values.end_at, "end"),
     };
 
     if (voucherValues) {
@@ -123,6 +157,7 @@ export default function AddOrEditVouchersForm({
             is_active: payload.is_active,
             max_discount: payload.max_discount,
             min_order_value: payload.min_order_value,
+            code: payload.code,
             name: payload.name,
             start_at: payload.start_at ?? "",
             total_usage_limit: payload.total_usage_limit,
@@ -492,7 +527,9 @@ export default function AddOrEditVouchersForm({
                         mode="single"
                         selected={parsedStartDate}
                         onSelect={(date) => {
-                          field.onChange(date?.toISOString() ?? null);
+                          field.onChange(
+                            toVoucherDateTimeString(date, "start") || null,
+                          );
                         }}
                         initialFocus
                       />
@@ -541,7 +578,9 @@ export default function AddOrEditVouchersForm({
                         mode="single"
                         selected={parsedEndDate}
                         onSelect={(date) => {
-                          field.onChange(date?.toISOString() ?? null);
+                          field.onChange(
+                            toVoucherDateTimeString(date, "end") || null,
+                          );
                         }}
                         initialFocus
                       />

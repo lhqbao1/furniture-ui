@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ProductItem } from "@/types/products";
 import { toast } from "sonner";
+import Image from "next/image";
 import {
   createInventoryPo,
   getContainerInventory,
@@ -121,6 +122,14 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
     return [];
   }, [products]);
+
+  const filteredProductOptions = React.useMemo(
+    () =>
+      productOptions.filter(
+        (product) => !items.some((selected) => selected.product_id === product.id),
+      ),
+    [productOptions, items],
+  );
 
   const handleSelectProduct = (product: ProductItem) => {
     setItems((prev) => {
@@ -420,13 +429,13 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                 </div>
               )}
 
-              {!isLoading && productOptions.length === 0 && (
+              {!isLoading && filteredProductOptions.length === 0 && (
                 <CommandEmpty>No product found.</CommandEmpty>
               )}
 
-              {!isLoading && productOptions.length > 0 && (
+              {!isLoading && filteredProductOptions.length > 0 && (
                 <CommandGroup>
-                  {productOptions.map((product: ProductItem, index) => (
+                  {filteredProductOptions.map((product: ProductItem, index) => (
                     <CommandItem
                       key={
                         product.id ??
@@ -440,9 +449,9 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                         `product-${index}`
                       }
                       onSelect={() => handleSelectProduct(product)}
-                      className="flex gap-3 items-center"
+                      className="flex items-center gap-3"
                     >
-                      <img
+                      <Image
                         src={
                           product.static_files &&
                           product.static_files.length > 0
@@ -450,15 +459,19 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                             : "/1.png"
                         }
                         alt={product.name || "product"}
-                        className="h-8 w-8 rounded object-cover"
+                        height={25}
+                        width={25}
+                        className="rounded-sm object-cover"
+                        unoptimized
                       />
 
-                      <div className="flex flex-col text-sm">
-                        <span className="font-medium">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">
                           {product.name || "Unnamed product"}
-                        </span>
+                        </p>
                         <span className="text-xs text-muted-foreground">
-                          Provider: {product.id_provider || "-"}
+                          ID: {product.id_provider || "-"} | SKU:{" "}
+                          {product.sku?.trim() ? product.sku : "-"}
                         </span>
                       </div>
                     </CommandItem>
@@ -494,10 +507,13 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                   >
                     <td className="p-2">
                       <div className="flex gap-2 items-center">
-                        <img
+                        <Image
                           src={item.image}
                           alt={item.name || "product"}
+                          width={32}
+                          height={32}
                           className="h-8 w-8 rounded object-cover"
+                          unoptimized
                         />
                         <div>
                           <div className="font-medium">{item.name}</div>

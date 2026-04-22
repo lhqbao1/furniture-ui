@@ -1,4 +1,4 @@
-import { api, apiAdmin, apiPublic } from "@/lib/axios";
+import { apiAdmin, apiPublic } from "@/lib/axios";
 import { ProductInput } from "@/lib/schema/product";
 import { KeywordResponse } from "@/types/keyword";
 import {
@@ -26,10 +26,11 @@ export interface GetAllProductsParams {
 }
 
 export interface GetAllProductAndSoldParams {
-  search?: string;
+  search?: string | string[];
   sort_by_stock?: "asc" | "desc" | string;
   page?: number;
   page_size?: number;
+  is_econelo?: boolean | null;
 }
 
 export type GetProductsSearchParams = {
@@ -141,25 +142,39 @@ export async function getAllProducts(params?: GetAllProductsParams) {
 export async function getAllProductAndSold(
   params?: GetAllProductAndSoldParams,
 ) {
+  const normalizedSearch = Array.isArray(params?.search)
+    ? params.search.map((value) => value.trim()).filter(Boolean)
+    : params?.search?.trim();
+
   const { data } = await apiAdmin.get("/products/get-all-product-and-sold", {
     params: {
-      ...(params?.search !== undefined && { search: params.search }),
+      ...(Array.isArray(normalizedSearch) && normalizedSearch.length > 0
+        ? { search: normalizedSearch }
+        : {}),
+      ...(typeof normalizedSearch === "string" && normalizedSearch
+        ? { search: normalizedSearch }
+        : {}),
       ...(params?.sort_by_stock !== undefined && {
         sort_by_stock: params.sort_by_stock,
       }),
       ...(params?.page !== undefined && { page: params.page }),
+      ...(params?.is_econelo !== undefined && params?.is_econelo !== null && {
+        is_econelo: params.is_econelo,
+      }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
     },
+    paramsSerializer: (nextParams) =>
+      qs.stringify(nextParams, {
+        arrayFormat: "repeat",
+        encodeValuesOnly: true,
+      }),
   });
 
   const normalizedItems = ((data?.items ?? []) as ProductAndSoldItem[]).map(
     (item) => ({
       ...item,
       inventory_pos:
-        item.inventory_pos ??
-        item.inventories_po ??
-        item.inventory_po ??
-        [],
+        item.inventory_pos ?? item.inventories_po ?? item.inventory_po ?? [],
     }),
   );
 
