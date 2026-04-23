@@ -64,7 +64,11 @@ const IncomingInventoryList = () => {
       accessorKey: "static_files",
       header: "IMAGE",
       cell: ({ row }) => {
-        const image = row.original.product.static_files[0].url;
+        const image =
+          row.original.product.static_files &&
+          row.original.product.static_files.length > 0
+            ? row.original.product.static_files[0].url
+            : "";
 
         return (
           <HoverCard openDelay={100} closeDelay={100}>

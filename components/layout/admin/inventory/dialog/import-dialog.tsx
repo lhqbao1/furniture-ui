@@ -10,28 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useDropzone } from "react-dropzone";
-import {
-  useImportProductInventory,
-  useImportProducts,
-  useImportProductsSupplier,
-} from "@/features/file/hook";
+import { useImportProductInventory } from "@/features/file/hook";
 import { toast } from "sonner"; // hoặc react-hot-toast nếu bạn dùng lib khác
 import { File, Loader2 } from "lucide-react";
-import { useGetSuppliers } from "@/features/supplier/hook";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface ImportInventoryDialogProps {
   setIsImporting: React.Dispatch<React.SetStateAction<boolean>>;

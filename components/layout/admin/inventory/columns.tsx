@@ -473,7 +473,7 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "physical",
-    header: ({}) => <div className="text-center uppercase">Physical Stock</div>,
+    header: ({}) => <div className="text-center uppercase">Physical</div>,
     cell: ({ row }) => {
       return (
         <div className="text-center">
@@ -489,7 +489,7 @@ export const getInventoryColumns = (
   },
   {
     id: "incoming_stock",
-    header: () => <div className="text-center uppercase">incoming stock</div>,
+    header: () => <div className="text-center uppercase">incoming</div>,
     cell: ({ row }) => {
       const inventoryPos = row.original.inventory_pos ?? [];
       const today = new Date();
@@ -546,7 +546,7 @@ export const getInventoryColumns = (
   {
     accessorKey: "available_purchase_value",
     header: ({}) => (
-      <div className="text-center uppercase">Available Purchase Value</div>
+      <div className="text-center uppercase">Available Value</div>
     ),
     cell: ({ row }) => {
       const isBundle =
@@ -579,9 +579,7 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "reserved_purchase_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Reserved Purchase Value</div>
-    ),
+    header: ({}) => <div className="text-center uppercase">Reserved Value</div>,
     cell: ({ row }) => {
       return (
         <div className="text-center">
@@ -606,9 +604,7 @@ export const getInventoryColumns = (
 
   {
     accessorKey: "physical_purchase_value",
-    header: ({}) => (
-      <div className="text-center uppercase">Physical Purchase Value</div>
-    ),
+    header: ({}) => <div className="text-center uppercase">Physical Value</div>,
     cell: ({ row }) => {
       return (
         <div className="text-center">

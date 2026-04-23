@@ -12,6 +12,8 @@ import {
   useGetProductRefundByMainCheckoutId,
   useGetMainCheckOutByMainCheckOutId,
   useUploadCheckoutFiles,
+  useUpdateIsClaimedFactoryMainCheckout,
+  useUpdateIsClaimedMarketplaceMainCheckout,
   useUpdateNoteForMainCheckout,
 } from "@/features/checkout/hook";
 import { useUploadStaticFile } from "@/features/file/hook";
@@ -44,9 +46,11 @@ import {
 } from "@/components/ui/dialog";
 import {
   AlertTriangle,
+  Factory,
   FileText,
   PackageSearch,
   RefreshCw,
+  Store,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -104,12 +108,18 @@ const OrderDetails = () => {
   const [pendingDeleteFileUrl, setPendingDeleteFileUrl] = useState<
     string | null
   >(null);
+  const [pendingClaimTarget, setPendingClaimTarget] = useState<
+    "factory" | "marketplace" | null
+  >(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const params = useParams<{ id: string }>(); // type-safe
   const checkoutId = params?.id;
   const updateNoteMutation = useUpdateNoteForMainCheckout();
   const uploadStaticFileMutation = useUploadStaticFile();
   const uploadCheckoutFilesMutation = useUploadCheckoutFiles();
+  const updateIsClaimedFactoryMutation = useUpdateIsClaimedFactoryMainCheckout();
+  const updateIsClaimedMarketplaceMutation =
+    useUpdateIsClaimedMarketplaceMainCheckout();
 
   const {
     data: order,
@@ -267,6 +277,9 @@ const OrderDetails = () => {
   const isUploadingFiles =
     uploadStaticFileMutation.isPending || uploadCheckoutFilesMutation.isPending;
   const isSavingFileList = uploadCheckoutFilesMutation.isPending;
+  const isUpdatingClaim =
+    updateIsClaimedFactoryMutation.isPending ||
+    updateIsClaimedMarketplaceMutation.isPending;
 
   const handleUploadFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -366,6 +379,45 @@ const OrderDetails = () => {
   };
 
   const hasNoteChanged = noteValue.trim() !== (order?.note ?? "").trim();
+  const isFactoryClaimed = Boolean(order?.is_claimed_factory);
+  const isMarketplaceClaimed = Boolean(order?.is_claimed_marketplace);
+
+  const handleConfirmClaim = async () => {
+    if (!checkoutId || !pendingClaimTarget) return;
+
+    try {
+      if (pendingClaimTarget === "factory") {
+        await updateIsClaimedFactoryMutation.mutateAsync({
+          main_checkout_id: checkoutId,
+          is_claimed: true,
+        });
+        toast.success("Factory claimed successfully");
+      } else {
+        await updateIsClaimedMarketplaceMutation.mutateAsync({
+          main_checkout_id: checkoutId,
+          is_claimed: true,
+        });
+        toast.success("Marketplace claimed successfully");
+      }
+
+      setPendingClaimTarget(null);
+    } catch (error) {
+      const err = error as {
+        response?: { data?: { detail?: unknown; message?: unknown } };
+        message?: unknown;
+      };
+
+      const message =
+        err.response?.data?.detail ??
+        err.response?.data?.message ??
+        err.message ??
+        "Failed to update claimed status";
+
+      toast.error("Failed to update claimed status", {
+        description: String(message),
+      });
+    }
+  };
 
   const handleSaveNote = () => {
     if (!checkoutId) return;
@@ -561,6 +613,29 @@ const OrderDetails = () => {
                 </div>
               </AccordionTrigger>
               <AccordionContent>
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant={isFactoryClaimed ? "secondary" : "outline"}
+                    className="gap-2"
+                    disabled={isUpdatingClaim || isFactoryClaimed}
+                    onClick={() => setPendingClaimTarget("factory")}
+                  >
+                    <Factory className="h-4 w-4" />
+                    Factory claimed
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={isMarketplaceClaimed ? "secondary" : "outline"}
+                    className="gap-2"
+                    disabled={isUpdatingClaim || isMarketplaceClaimed}
+                    onClick={() => setPendingClaimTarget("marketplace")}
+                  >
+                    <Store className="h-4 w-4" />
+                    Marketplace claimed
+                  </Button>
+                </div>
+
                 {isLoadingProductRefund ? (
                   <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     Loading refund details...
@@ -607,6 +682,47 @@ const OrderDetails = () => {
           </Accordion>
         </section>
       )}
+
+      <Dialog
+        open={Boolean(pendingClaimTarget)}
+        onOpenChange={(open) => {
+          if (!open) setPendingClaimTarget(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingClaimTarget === "factory"
+                ? "Confirm factory claimed"
+                : "Confirm marketplace claimed"}
+            </DialogTitle>
+            <DialogDescription>
+              {pendingClaimTarget === "factory"
+                ? "Are you sure you want to mark this order as FACTORY claimed?"
+                : "Are you sure you want to mark this order as MARKETPLACE claimed?"}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPendingClaimTarget(null)}
+              disabled={isUpdatingClaim}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                void handleConfirmClaim();
+              }}
+              disabled={isUpdatingClaim}
+            >
+              {isUpdatingClaim ? "Updating..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-8">

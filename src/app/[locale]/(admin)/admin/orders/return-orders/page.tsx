@@ -12,6 +12,54 @@ import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { CheckOutMain } from "@/types/checkout";
+import { ColumnDef } from "@tanstack/react-table";
+
+const getClaimedLabel = (order: CheckOutMain) => {
+  const isFactoryClaimed = Boolean(order.is_claimed_factory);
+  const isMarketplaceClaimed = Boolean(order.is_claimed_marketplace);
+
+  if (isFactoryClaimed && isMarketplaceClaimed) {
+    return "FACTORY AND MARKETPLACE";
+  }
+
+  if (isFactoryClaimed) return "FACTORY";
+  if (isMarketplaceClaimed) return "MARKETPLACE";
+
+  return "-";
+};
+
+const refundOrderColumns: ColumnDef<CheckOutMain>[] = (() => {
+  const filteredColumns = orderColumns.filter((column) => {
+    const accessorKey =
+      "accessorKey" in column ? String(column.accessorKey ?? "") : "";
+
+    return accessorKey !== "customer" && accessorKey !== "delivery_range";
+  });
+
+  const claimedColumn: ColumnDef<CheckOutMain> = {
+    accessorKey: "claimed",
+    header: () => <div className="text-center w-full">CLAIMED</div>,
+    cell: ({ row }) => (
+      <div className="text-center text-[#4D4D4D] font-medium">
+        {getClaimedLabel(row.original)}
+      </div>
+    ),
+  };
+
+  const statusColumnIndex = filteredColumns.findIndex(
+    (column) =>
+      "accessorKey" in column &&
+      String(column.accessorKey ?? "") === "status",
+  );
+
+  if (statusColumnIndex === -1) {
+    return [...filteredColumns, claimedColumn];
+  }
+
+  const columns = [...filteredColumns];
+  columns.splice(statusColumnIndex, 0, claimedColumn);
+  return columns;
+})();
 
 const ReturnOrdersPage = () => {
   const [page, setPage] = useState(1);
@@ -39,6 +87,8 @@ const ReturnOrdersPage = () => {
     page_size: pageSize,
     channel: filters.channel,
     search: filters.search,
+    is_claimed_factory: filters.isClaimedFactory,
+    is_claimed_marketplace: filters.isClaimedMarketplace,
   });
 
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
@@ -60,6 +110,8 @@ const ReturnOrdersPage = () => {
       target.has((item.marketplace_order_id ?? "").trim().toLowerCase()),
     );
   }, [data?.items, multiSearchValues]);
+
+  const tableData = filteredItems as unknown as CheckOutMain[];
 
   useEffect(() => {
     window.scrollTo({
@@ -86,14 +138,15 @@ const ReturnOrdersPage = () => {
           type={ToolbarType.order}
           selectedOrders={selectedOrders}
           showB2BRevenue={false}
+          showClaimedFilters
           exportPresetStatuses={["return_issue"]}
           lockExportStatuses
           expandExportByRefundItems
         />
 
         <ProductTable
-          data={filteredItems}
-          columns={orderColumns}
+          data={tableData}
+          columns={refundOrderColumns}
           page={page}
           setPage={handlePageChange}
           pageSize={pageSize}

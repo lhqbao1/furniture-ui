@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import React from "react";
 import ProductStatusFilter from "../products/products-list/toolbar/filter/status";
-import ProductHasInventoryFilter from "./filter/hasInventoryFilter";
 import SupplierFilter from "../products/products-list/toolbar/filter/supplier-filter";
 import BrandFilter from "../products/products-list/toolbar/filter/brand/brand-filter";
+import InventoryFilterExportButton from "./filter-export-button";
 
 const InventoryFilterForm = () => {
   const router = useRouter();
@@ -21,7 +21,8 @@ const InventoryFilterForm = () => {
         <SupplierFilter />
         <BrandFilter />
       </div>
-      <div className="flex justify-end pt-3 col-span-3">
+      <div className="flex justify-end gap-2 pt-3 col-span-3">
+        <InventoryFilterExportButton />
         <Button
           variant="outline"
           size="sm"

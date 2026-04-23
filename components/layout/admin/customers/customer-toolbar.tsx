@@ -85,28 +85,7 @@ export default function CustomerToolbar({
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center gap-4 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
-      <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap ">
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex items-center gap-1"
-            >
-              Group action <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Delete Selected</DropdownMenuItem>
-            <DropdownMenuItem>Export Selected</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
-
-        {/* <div className="flex gap-2 text-sm font-medium">
-          <Button variant="ghost" className="">Export</Button>
-          <ExportExcelButton data={exportData ?? []} />
-          <ImportDialog setIsImporting={setIsImporting} />
-        </div> */}
-      </div>
+      <div className="flex items-center lg:gap-4 gap-2 flex-wrap lg:flex-nowrap "></div>
 
       {/* Search (auto, no button) */}
       <div className="flex items-center lg:w-1/2 w-full flex-wrap lg:flex-nowrap">
@@ -199,10 +178,7 @@ export default function CustomerToolbar({
       </div>
 
       {isAddButtonModal && (
-        <Dialog
-          open={openAddModal}
-          onOpenChange={setOpenAddModal}
-        >
+        <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
           <DialogContent className="w-1/3">
             <DialogHeader>
               <DialogTitle>{addButtonText}</DialogTitle>

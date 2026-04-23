@@ -196,6 +196,27 @@ const toNumberOrDefault = (value: unknown, fallback: number): number => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const toVatMultiplier = (value: unknown): number => {
+  if (value == null) return 1;
+
+  const normalized = String(value).trim().replace(",", ".");
+  if (!normalized) return 1;
+
+  const hasPercentSuffix = normalized.includes("%");
+  const numeric = Number(normalized.replace("%", ""));
+
+  if (!Number.isFinite(numeric)) return 1;
+  if (numeric <= 0) return 1;
+
+  if (hasPercentSuffix) return 1 + numeric / 100;
+
+  // Excel/CSV may store VAT as rate (0.19), percentage (19), or multiplier (1.19).
+  if (numeric > 1 && numeric < 2) return numeric; // already multiplier
+  if (numeric <= 1) return 1 + numeric; // rate
+  if (numeric <= 100) return 1 + numeric / 100; // percentage
+  return numeric;
+};
+
 const toNumberOrNull = (value: unknown): number | null => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -277,7 +298,7 @@ const normalize = (
     status: toStringOrNull(row["status"]) ?? "PAID",
     payment_term: toNumberOrNull(row["payment_term"]),
     total_shipping: toNumberOrDefault(row["total_shipping"], 35.95),
-    vat: Number(row["vat"]),
+    vat: toVatMultiplier(row["vat"]),
     carrier: toStringOrNull(row["carrier"]),
   };
 };
@@ -372,7 +393,7 @@ const OrderImport = () => {
           id_provider: row.id_provider ?? "",
           title: row.title ?? null,
           sku: row.sku ?? "",
-          final_price: row.final_price * (1 + row.vat),
+          final_price: row.final_price * row.vat,
           carrier: row.carrier ?? "",
         });
       });
