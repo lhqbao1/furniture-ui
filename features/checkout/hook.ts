@@ -42,6 +42,8 @@ import {
   uploadCheckoutPdfFile,
   uploadCheckoutFiles,
   UploadCheckoutFilesPayload,
+  updateIsClaimedFactoryMainCheckout,
+  updateIsClaimedMarketplaceMainCheckout,
   updateReasonForMainCheckout,
   updateNoteForMainCheckout,
 } from "./api";
@@ -218,7 +220,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
 }
 
 export function useGetCheckOutRefundOrders(params: GetRefundOrdersParams = {}) {
-  const { page, page_size, channel, search } = params;
+  const { page, page_size, channel, search, is_claimed_factory, is_claimed_marketplace } = params;
 
   return useQuery({
     queryKey: [
@@ -227,6 +229,8 @@ export function useGetCheckOutRefundOrders(params: GetRefundOrdersParams = {}) {
       page_size ?? 50,
       (channel ?? []).join(","),
       search ?? null,
+      is_claimed_factory ?? null,
+      is_claimed_marketplace ?? null,
     ],
     queryFn: () => getCheckOutRefundOrders(params),
     placeholderData: (previousData) => previousData,
@@ -431,6 +435,48 @@ export function useUpdateReasonForMainCheckout() {
         queryKey: ["checkout-main-id", variables.main_checkout_id],
       });
       qc.refetchQueries({ queryKey: ["checkout-main"] });
+    },
+  });
+}
+
+export function useUpdateIsClaimedMarketplaceMainCheckout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      is_claimed,
+    }: {
+      main_checkout_id: string;
+      is_claimed: boolean;
+    }) =>
+      updateIsClaimedMarketplaceMainCheckout(main_checkout_id, is_claimed),
+    onSuccess: (_data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+    },
+  });
+}
+
+export function useUpdateIsClaimedFactoryMainCheckout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      is_claimed,
+    }: {
+      main_checkout_id: string;
+      is_claimed: boolean;
+    }) =>
+      updateIsClaimedFactoryMainCheckout(main_checkout_id, is_claimed),
+    onSuccess: (_data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
     },
   });
 }

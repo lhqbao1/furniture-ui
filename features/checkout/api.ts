@@ -38,6 +38,8 @@ export interface GetRefundOrdersParams {
   page_size?: number;
   channel?: string[] | null;
   search?: string;
+  is_claimed_factory?: boolean;
+  is_claimed_marketplace?: boolean;
 }
 
 const sanitizeDateTimeParam = (value?: string) => {
@@ -185,6 +187,12 @@ export async function getCheckOutRefundOrders(params?: GetRefundOrdersParams) {
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
       ...(params?.channel !== undefined && { channel: params.channel }),
       ...(params?.search !== undefined && { search: params.search }),
+      ...(params?.is_claimed_factory !== undefined && {
+        is_claimed_factory: params.is_claimed_factory,
+      }),
+      ...(params?.is_claimed_marketplace !== undefined && {
+        is_claimed_marketplace: params.is_claimed_marketplace,
+      }),
     },
     paramsSerializer: (params) =>
       qs.stringify(params, { arrayFormat: "repeat" }),
@@ -331,6 +339,36 @@ export async function updateReasonForMainCheckout(
     null,
     {
       params: { reason },
+    },
+  );
+
+  return data;
+}
+
+export async function updateIsClaimedMarketplaceMainCheckout(
+  main_checkout_id: string,
+  is_claimed: boolean,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/is-claimed-market-place/${main_checkout_id}`,
+    null,
+    {
+      params: { is_claimed },
+    },
+  );
+
+  return data;
+}
+
+export async function updateIsClaimedFactoryMainCheckout(
+  main_checkout_id: string,
+  is_claimed: boolean,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/is-claimed-factory/${main_checkout_id}`,
+    null,
+    {
+      params: { is_claimed },
     },
   );
 

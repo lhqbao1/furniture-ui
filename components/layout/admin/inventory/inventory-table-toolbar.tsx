@@ -6,7 +6,6 @@ import { useDebounce } from "use-debounce";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
@@ -18,24 +17,10 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
-import { useLocale } from "next-intl";
-import { ProductItem } from "@/types/products";
-import { toast } from "sonner";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
 import InventoryFilterForm from "./filter-form";
 import ImportInventoryDialog from "./dialog/import-dialog";
-import FilterExportForm from "../products/products-list/toolbar/filter-export-dialog";
-import ExportInventoryDialog from "./dialog/export-dialog";
-import ImportDialog from "../products/products-list/toolbar/import";
 import ImportStockSupplierDialog from "./import-stock-supplier";
 
 export enum ToolbarType {
@@ -51,30 +36,19 @@ interface InventoryTableToolbarProps {
   isAddButtonModal?: boolean;
   addButtonUrl?: string;
   addButtonModalContent?: React.ReactNode;
-  exportData?: ProductItem[];
   isInventory?: boolean;
 }
-
-type ImageFile = {
-  url: string;
-};
 
 export default function InventoryTableToolbar({
   pageSize,
   setPageSize,
   setPage,
-  addButtonText,
-  isAddButtonModal,
-  addButtonUrl,
-  addButtonModalContent,
-  exportData,
   isInventory,
 }: InventoryTableToolbarProps) {
   const router = useRouter();
-  const locale = useLocale();
   const searchParams = useSearchParams();
 
-  const [isImporting, setIsImporting] = useState(false);
+  const [, setIsImporting] = useState(false);
   const pathname = usePathname();
   const defaultSearch = searchParams.get("search") ?? "";
 
@@ -97,35 +71,18 @@ export default function InventoryTableToolbar({
     );
 
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, pathname, router, setPage]);
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center gap-2 p-2 w-full flex-wrap lg:flex-nowrap">
       {/* Left group */}
       <div className="flex items-center lg:gap-2 gap-2 flex-wrap lg:flex-nowrap ">
         <div className="flex gap-2 text-sm font-medium">
-          {/* <Button variant="ghost" className="">Export</Button> */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Export <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent className="w-[600px] p-4 space-y-4">
-              {/* Filter here */}
-              <ExportInventoryDialog />
-            </DropdownMenuContent>
-            <ImportStockSupplierDialog
-              setIsImporting={setIsImporting}
-              isSupplier
-            />
-          </DropdownMenu>
+          <ImportStockSupplierDialog setIsImporting={setIsImporting} isSupplier />
         </div>
 
         {!isInventory && (
           <div className="flex gap-2 text-sm font-medium">
-            {/* <Button variant="ghost" className="">Export</Button> */}
             <ImportInventoryDialog setIsImporting={setIsImporting} />
           </div>
         )}

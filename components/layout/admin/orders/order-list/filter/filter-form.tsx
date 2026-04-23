@@ -4,9 +4,14 @@ import React from "react";
 import OrderStatusFilter from "./filter-order-status";
 import OrderChanelFilter from "./filter-order-chanel";
 import OrderDateFilter from "./filter-order-date";
+import OrderClaimedFilter from "./filter-order-claimed";
 import { useSearchParams } from "next/navigation";
 
-const OrderFilterForm = () => {
+interface OrderFilterFormProps {
+  showClaimedFilters?: boolean;
+}
+
+const OrderFilterForm = ({ showClaimedFilters = false }: OrderFilterFormProps) => {
   const router = useRouter();
   const pathname = usePathname(); // ví dụ "/admin/products"
   const searchParams = useSearchParams();
@@ -20,13 +25,16 @@ const OrderFilterForm = () => {
     searchParams.get("channel") ||
     searchParams.get("from_date") ||
     searchParams.get("to_date") ||
-    searchParams.get("is_b2b");
+    searchParams.get("is_b2b") ||
+    searchParams.get("is_claimed_factory") ||
+    searchParams.get("is_claimed_marketplace");
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div className="space-y-4">
         <OrderStatusFilter />
         <OrderChanelFilter />
+        {showClaimedFilters ? <OrderClaimedFilter /> : null}
       </div>
       <div className="space-y-4">
         <OrderDateFilter />

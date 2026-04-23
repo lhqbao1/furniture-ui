@@ -115,6 +115,8 @@ export interface CheckOutMain {
   payment_method: string;
   checkouts: CheckOut[];
   tax: number;
+  is_claimed_factory?: boolean;
+  is_claimed_marketplace?: boolean;
   payment_rl: CheckOutPaymentRl;
   files: StaticFile[];
   refund_amount: number;

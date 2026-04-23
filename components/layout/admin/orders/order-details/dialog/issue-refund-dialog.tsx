@@ -31,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface ReturnConfirmDialogProps {
   id: string;
@@ -76,7 +75,6 @@ const SHIPPING_REFUND_ELIGIBLE_REASON_SET = new Set<string>(
 );
 
 type RefundMode = "full" | "partial" | "money";
-type ItemQuality = "A-Goods" | "C-Goods" | "No return";
 
 type RefundLine = {
   key: string;
@@ -103,7 +101,6 @@ type RefundLineFormState = {
   units: number;
   amountInput: string;
   reason: string;
-  quality: ItemQuality;
   images: RefundLineImage[];
 };
 
@@ -118,8 +115,6 @@ type RefundApiError = {
   };
   message?: unknown;
 };
-
-const ITEM_QUALITY_OPTIONS: ItemQuality[] = ["A-Goods", "C-Goods", "No return"];
 
 const normalizeCurrency = (amount: number) =>
   amount.toLocaleString("de-DE", {
@@ -281,7 +276,6 @@ const IssueRefundDialog = ({
         units: 0,
         amountInput: "",
         reason: "",
-        quality: "No return",
         images: [],
       };
     }
@@ -310,7 +304,6 @@ const IssueRefundDialog = ({
           units: 0,
           amountInput: "",
           reason: "",
-          quality: "No return" as ItemQuality,
           images: [],
         };
 
@@ -347,7 +340,6 @@ const IssueRefundDialog = ({
           units,
           amount,
           reason: lineForm?.reason?.trim() ?? "",
-          quality: lineForm?.quality ?? ("No return" as ItemQuality),
           images: lineForm?.images ?? [],
         };
       }),
@@ -576,7 +568,7 @@ const IssueRefundDialog = ({
             unit_price: Number(line.unitPrice.toFixed(2)),
             refund_amount: Number(line.amount.toFixed(2)),
             reason: line.reason,
-            type: line.quality,
+            type: "No return",
             file: [],
           })),
         },
@@ -865,40 +857,6 @@ const IssueRefundDialog = ({
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-
-                  <div className="mt-4">
-                    <Label className="mb-2 block text-xs text-muted-foreground">
-                      Item quality
-                    </Label>
-                    <RadioGroup
-                      value={line.quality}
-                      onValueChange={(value) =>
-                        updateLineForm(line.key, (prev) => ({
-                          ...prev,
-                          quality: value as ItemQuality,
-                        }))
-                      }
-                      className="grid grid-cols-2 gap-2 md:grid-cols-4"
-                    >
-                      {ITEM_QUALITY_OPTIONS.map((option) => (
-                        <div
-                          key={option}
-                          className="flex items-center gap-2 rounded border px-3 py-2"
-                        >
-                          <RadioGroupItem
-                            value={option}
-                            id={`${line.key}-${option}`}
-                          />
-                          <Label
-                            htmlFor={`${line.key}-${option}`}
-                            className="cursor-pointer"
-                          >
-                            {option}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
                   </div>
 
                   <div className="mt-4">

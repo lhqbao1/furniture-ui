@@ -23,6 +23,14 @@ function parseIsB2BParam(param: string | null): boolean | undefined {
   return undefined;
 }
 
+function parseBooleanParam(param: string | null): boolean | undefined {
+  if (!param) return undefined;
+  const normalized = param.trim().toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+  return undefined;
+}
+
 export function useOrderListFilters() {
   const searchParams = useSearchParams();
 
@@ -37,5 +45,9 @@ export function useOrderListFilters() {
     toDate: searchParams.get("to_date") || undefined,
     search: searchParams.get("search") || "",
     isB2B: parseIsB2BParam(searchParams.get("is_b2b")),
+    isClaimedFactory: parseBooleanParam(searchParams.get("is_claimed_factory")),
+    isClaimedMarketplace: parseBooleanParam(
+      searchParams.get("is_claimed_marketplace"),
+    ),
   };
 }

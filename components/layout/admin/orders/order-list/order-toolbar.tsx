@@ -58,6 +58,7 @@ interface OrderToolbarProps {
   type: ToolbarType;
   selectedOrders?: CheckOutMain[];
   showB2BRevenue?: boolean;
+  showClaimedFilters?: boolean;
   exportPresetStatuses?: string[];
   lockExportStatuses?: boolean;
   expandExportByRefundItems?: boolean;
@@ -70,6 +71,8 @@ const FILTER_KEYS = [
   "from_date",
   "to_date",
   "is_b2b",
+  "is_claimed_factory",
+  "is_claimed_marketplace",
 ];
 
 export default function OrderToolbar({
@@ -83,6 +86,7 @@ export default function OrderToolbar({
   type,
   selectedOrders = [],
   showB2BRevenue = true,
+  showClaimedFilters = false,
   exportPresetStatuses,
   lockExportStatuses = false,
   expandExportByRefundItems = false,
@@ -257,6 +261,24 @@ export default function OrderToolbar({
       });
     }
 
+    const isClaimedFactory = searchParams.get("is_claimed_factory");
+    if (isClaimedFactory === "true" || isClaimedFactory === "false") {
+      chips.push({
+        id: "is-claimed-factory",
+        label: `Claimed: Factory ${isClaimedFactory === "true" ? "Yes" : "No"}`,
+        onRemove: () => removeFilterParam("is_claimed_factory"),
+      });
+    }
+
+    const isClaimedMarketplace = searchParams.get("is_claimed_marketplace");
+    if (isClaimedMarketplace === "true" || isClaimedMarketplace === "false") {
+      chips.push({
+        id: "is-claimed-marketplace",
+        label: `Claimed: Marketplace ${isClaimedMarketplace === "true" ? "Yes" : "No"}`,
+        onRemove: () => removeFilterParam("is_claimed_marketplace"),
+      });
+    }
+
     return chips;
   }, [
     searchParams,
@@ -348,7 +370,9 @@ export default function OrderToolbar({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[95vw] max-w-[920px] p-4 md:p-6">
-                {type === ToolbarType.order && <OrderFilterForm />}
+                {type === ToolbarType.order && (
+                  <OrderFilterForm showClaimedFilters={showClaimedFilters} />
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
