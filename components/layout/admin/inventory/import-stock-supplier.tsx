@@ -121,11 +121,15 @@ const ImportStockSupplierDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="ghost"
-          className=""
-          disabled={importProductMutation.isPending || updateStockSupplierMutation.isPending}
+          variant="outline"
+          className="border"
+          disabled={
+            importProductMutation.isPending ||
+            updateStockSupplierMutation.isPending
+          }
         >
-          {importProductMutation.isPending || updateStockSupplierMutation.isPending ? (
+          {importProductMutation.isPending ||
+          updateStockSupplierMutation.isPending ? (
             <Loader2 className="animate-spin" />
           ) : (
             "Import"
@@ -144,7 +148,7 @@ const ImportStockSupplierDialog = ({
                   type="button"
                   variant="outline"
                   role="combobox"
-                  className="w-full justify-between"
+                  className="w-full justify-between border"
                 >
                   {supplierId
                     ? listSuppliers.find((s) => s.id === supplierId)

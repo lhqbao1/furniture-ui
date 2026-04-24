@@ -11,9 +11,11 @@ import {
   generateSEO,
   getAllColor,
   getAllProductAndSold,
+  getAllRevenueInventory,
   getAllMaterials,
   getAllProducts,
   GetAllProductAndSoldParams,
+  GetAllRevenueInventoryParams,
   GetAllProductsParams,
   getProductLogs,
   getProductById,
@@ -28,6 +30,7 @@ import { ProductInput } from "@/lib/schema/product";
 import {
   ProductDetailLog,
   ProductAndSoldResponse,
+  ProductRevenueInventoryResponse,
   ProductResponse,
 } from "@/types/products";
 import { toast } from "sonner";
@@ -116,6 +119,33 @@ export function useGetAllProductAndSold({
       getAllProductAndSold({
         search,
         sort_by_stock,
+        page,
+        page_size,
+        is_econelo,
+      }),
+    placeholderData: keepPreviousData,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useGetAllRevenueInventory({
+  search,
+  page,
+  page_size,
+  is_econelo,
+}: GetAllRevenueInventoryParams = {}) {
+  return useQuery<ProductRevenueInventoryResponse>({
+    queryKey: [
+      "products-revenue-inventory",
+      search,
+      page,
+      page_size,
+      is_econelo,
+    ],
+    queryFn: () =>
+      getAllRevenueInventory({
+        search,
         page,
         page_size,
         is_econelo,

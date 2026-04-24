@@ -1,5 +1,13 @@
 import { useSearchParams } from "next/navigation";
 
+function parseBooleanParam(param: string | null): boolean | undefined {
+  if (!param) return undefined;
+  const normalized = param.trim().toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+  return undefined;
+}
+
 export function useProductInventoryFilters() {
   const searchParams = useSearchParams();
 
@@ -11,5 +19,6 @@ export function useProductInventoryFilters() {
     is_inventory: searchParams.get("is_inventory") || "true",
     supplier_id: searchParams.get("supplier_id") || "",
     brand: searchParams.get("brand_id") || "",
+    is_econelo: parseBooleanParam(searchParams.get("is_econelo")),
   };
 }
