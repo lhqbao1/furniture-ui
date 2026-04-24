@@ -14,6 +14,7 @@ import { FileText, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   useCreateRefundMainCheckout,
+  useUpdateReasonForMainCheckout,
   useUploadCheckoutFiles,
 } from "@/features/checkout/hook";
 import { useUploadStaticFile } from "@/features/file/hook";
@@ -75,19 +76,17 @@ const SHIPPING_REFUND_ELIGIBLE_REASON_SET = new Set<string>(
 );
 
 type RefundMode = "full" | "partial" | "money";
+type ProductRefundMode = Exclude<RefundMode, "money">;
 
 type RefundLine = {
   key: string;
   sourceItemId: string;
   idProvider: string;
-  unitIndex: number;
-  totalUnits: number;
   name: string;
   sku: string;
   image: string | null;
   quantity: number;
   unitPrice: number;
-  maxAmount: number;
 };
 
 type RefundLineImage = {
@@ -102,6 +101,11 @@ type RefundLineFormState = {
   amountInput: string;
   reason: string;
   images: RefundLineImage[];
+};
+
+type ShippingRefundFormState = {
+  units: number;
+  amountInput: string;
 };
 
 type RefundApiErrorPayload = {
@@ -203,8 +207,8 @@ const getOrderCartItems = (order: CheckOutMain): CartItem[] => {
 };
 
 const buildRefundLines = (order: CheckOutMain): RefundLine[] =>
-  getOrderCartItems(order).flatMap((item, index) => {
-    const totalUnits = Math.max(0, Number(item.quantity) || 0);
+  getOrderCartItems(order).map((item, index) => {
+    const quantity = Math.max(0, Number(item.quantity) || 0);
     const unitPrice = getUnitPrice(item);
     const name =
       item.purchased_products?.name || item.products?.name || "Unnamed product";
@@ -222,20 +226,34 @@ const buildRefundLines = (order: CheckOutMain): RefundLine[] =>
     const idProvider =
       item.purchased_products?.id_provider || item.products?.id_provider || "";
 
-    return Array.from({ length: totalUnits }, (_, unitIndex) => ({
-      key: `${sourceItemId}-${index}-unit-${unitIndex + 1}`,
+    return {
+      key: `${sourceItemId}-${index}`,
       sourceItemId,
       idProvider,
-      unitIndex: unitIndex + 1,
-      totalUnits,
       name,
       sku,
       image,
-      quantity: 1,
+      quantity,
       unitPrice,
-      maxAmount: unitPrice,
-    }));
+    };
   });
+
+const createInitialLineFormState = (): RefundLineFormState => ({
+  units: 0,
+  amountInput: "",
+  reason: "",
+  images: [],
+});
+
+const buildInitialLineFormMap = (lines: RefundLine[]) =>
+  Object.fromEntries(
+    lines.map((line) => [line.key, createInitialLineFormState()]),
+  ) as Record<string, RefundLineFormState>;
+
+const createInitialShippingRefundFormState = (): ShippingRefundFormState => ({
+  units: 0,
+  amountInput: "0",
+});
 
 const IssueRefundDialog = ({
   id,
@@ -244,92 +262,148 @@ const IssueRefundDialog = ({
   onClose,
 }: ReturnConfirmDialogProps) => {
   const createRefundMutation = useCreateRefundMainCheckout();
+  const updateReasonMutation = useUpdateReasonForMainCheckout();
   const uploadCheckoutFilesMutation = useUploadCheckoutFiles();
   const uploadStaticFileMutation = useUploadStaticFile();
   const [refundMode, setRefundMode] = React.useState<RefundMode>("full");
-  const [lineFormByKey, setLineFormByKey] = React.useState<
-    Record<string, RefundLineFormState>
-  >({});
+  const [lineFormByMode, setLineFormByMode] = React.useState<
+    Record<ProductRefundMode, Record<string, RefundLineFormState>>
+  >({
+    full: {},
+    partial: {},
+  });
   const [draggingLineKey, setDraggingLineKey] = React.useState<string | null>(
     null,
   );
-
-  const [shippingUnits, setShippingUnits] = React.useState(0);
-  const [shippingAmountInput, setShippingAmountInput] = React.useState("0");
+  const [shippingFormByMode, setShippingFormByMode] = React.useState<
+    Record<ProductRefundMode, ShippingRefundFormState>
+  >({
+    full: createInitialShippingRefundFormState(),
+    partial: createInitialShippingRefundFormState(),
+  });
   const [moneyRefundInput, setMoneyRefundInput] = React.useState("0");
+  const [moneyRefundReason, setMoneyRefundReason] = React.useState("");
 
   const isSubmitting =
     createRefundMutation.isPending ||
+    updateReasonMutation.isPending ||
     uploadStaticFileMutation.isPending ||
     uploadCheckoutFilesMutation.isPending;
 
   const refundLines = React.useMemo(() => buildRefundLines(order), [order]);
   const shippingMaxAmount = Math.max(0, Number(order.total_shipping ?? 0));
   const orderTotal = Math.max(0, Number(order.total_amount ?? 0));
+  const activeProductRefundMode = refundMode === "money" ? null : refundMode;
+  const activeLineFormByKey = React.useMemo(
+    () =>
+      activeProductRefundMode
+        ? lineFormByMode[activeProductRefundMode] ?? {}
+        : {},
+    [activeProductRefundMode, lineFormByMode],
+  );
+  const activeShippingForm = React.useMemo(
+    () =>
+      activeProductRefundMode
+        ? shippingFormByMode[activeProductRefundMode]
+        : createInitialShippingRefundFormState(),
+    [activeProductRefundMode, shippingFormByMode],
+  );
 
   React.useEffect(() => {
     if (!open) return;
 
-    const initialLineForms: Record<string, RefundLineFormState> = {};
-    for (const line of refundLines) {
-      initialLineForms[line.key] = {
-        units: 0,
-        amountInput: "",
-        reason: "",
-        images: [],
-      };
-    }
-
     setRefundMode("full");
-    setLineFormByKey((prev) => {
-      for (const lineKey of Object.keys(prev)) {
-        for (const image of prev[lineKey]?.images ?? []) {
-          if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+    setLineFormByMode((prev) => {
+      for (const mode of Object.keys(prev) as ProductRefundMode[]) {
+        for (const lineKey of Object.keys(prev[mode] ?? {})) {
+          for (const image of prev[mode][lineKey]?.images ?? []) {
+            if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+          }
         }
       }
-      return initialLineForms;
+
+      return {
+        full: buildInitialLineFormMap(refundLines),
+        partial: buildInitialLineFormMap(refundLines),
+      };
     });
-    setShippingUnits(0);
-    setShippingAmountInput("0");
+    setShippingFormByMode({
+      full: createInitialShippingRefundFormState(),
+      partial: createInitialShippingRefundFormState(),
+    });
     setMoneyRefundInput("0");
+    setMoneyRefundReason("");
   }, [open, refundLines]);
 
   const updateLineForm = React.useCallback(
     (
+      mode: ProductRefundMode,
       lineKey: string,
       updater: (prev: RefundLineFormState) => RefundLineFormState,
     ) => {
-      setLineFormByKey((prev) => {
-        const previousLine = prev[lineKey] ?? {
-          units: 0,
-          amountInput: "",
-          reason: "",
-          images: [],
-        };
+      setLineFormByMode((prev) => {
+        const previousLine =
+          prev[mode]?.[lineKey] ?? createInitialLineFormState();
 
         return {
           ...prev,
-          [lineKey]: updater(previousLine),
+          [mode]: {
+            ...prev[mode],
+            [lineKey]: updater(previousLine),
+          },
         };
       });
     },
     [],
   );
 
+  const updateActiveLineForm = React.useCallback(
+    (
+      lineKey: string,
+      updater: (prev: RefundLineFormState) => RefundLineFormState,
+    ) => {
+      if (!activeProductRefundMode) return;
+      updateLineForm(activeProductRefundMode, lineKey, updater);
+    },
+    [activeProductRefundMode, updateLineForm],
+  );
+
+  const updateShippingForm = React.useCallback(
+    (
+      mode: ProductRefundMode,
+      updater: (prev: ShippingRefundFormState) => ShippingRefundFormState,
+    ) => {
+      setShippingFormByMode((prev) => ({
+        ...prev,
+        [mode]: updater(prev[mode] ?? createInitialShippingRefundFormState()),
+      }));
+    },
+    [],
+  );
+
+  const updateActiveShippingForm = React.useCallback(
+    (updater: (prev: ShippingRefundFormState) => ShippingRefundFormState) => {
+      if (!activeProductRefundMode) return;
+      updateShippingForm(activeProductRefundMode, updater);
+    },
+    [activeProductRefundMode, updateShippingForm],
+  );
+
   const lineRefunds = React.useMemo(
     () =>
       refundLines.map((line) => {
-        const lineForm = lineFormByKey[line.key];
+        const lineForm = activeLineFormByKey[line.key];
         const units = clamp(
           Math.floor(Number(lineForm?.units ?? 0)),
           0,
           line.quantity,
         );
 
+        const partialMaxAmount = units * line.unitPrice;
         const partialAmount = clamp(
           parseAmountInput(lineForm?.amountInput ?? ""),
           0,
-          line.maxAmount,
+          partialMaxAmount,
         );
 
         const amount =
@@ -339,41 +413,62 @@ const IssueRefundDialog = ({
           ...line,
           units,
           amount,
+          partialMaxAmount,
           reason: lineForm?.reason?.trim() ?? "",
           images: lineForm?.images ?? [],
         };
       }),
-    [lineFormByKey, refundLines, refundMode],
+    [activeLineFormByKey, refundLines, refundMode],
   );
 
   const isShippingRefundAllowed = React.useMemo(
     () =>
-      Object.values(lineFormByKey).some((lineForm) =>
+      Object.values(activeLineFormByKey).some((lineForm) =>
         SHIPPING_REFUND_ELIGIBLE_REASON_SET.has(lineForm.reason?.trim() ?? ""),
       ),
-    [lineFormByKey],
+    [activeLineFormByKey],
   );
 
   React.useEffect(() => {
-    if (isShippingRefundAllowed) return;
-    setShippingUnits(0);
-    setShippingAmountInput("0");
-  }, [isShippingRefundAllowed]);
+    if (!activeProductRefundMode || isShippingRefundAllowed) return;
+
+    if (
+      activeShippingForm.units === 0 &&
+      activeShippingForm.amountInput === "0"
+    ) {
+      return;
+    }
+
+    updateShippingForm(
+      activeProductRefundMode,
+      createInitialShippingRefundFormState,
+    );
+  }, [
+    activeProductRefundMode,
+    activeShippingForm.amountInput,
+    activeShippingForm.units,
+    isShippingRefundAllowed,
+    updateShippingForm,
+  ]);
 
   const shippingRefundAmount = React.useMemo(() => {
     if (!isShippingRefundAllowed) return 0;
 
     if (refundMode === "full") {
-      const unit = shippingUnits > 0 ? 1 : 0;
+      const unit = activeShippingForm.units > 0 ? 1 : 0;
       return unit * shippingMaxAmount;
     }
-    return clamp(parseAmountInput(shippingAmountInput), 0, shippingMaxAmount);
+    return clamp(
+      parseAmountInput(activeShippingForm.amountInput),
+      0,
+      shippingMaxAmount,
+    );
   }, [
+    activeShippingForm.amountInput,
+    activeShippingForm.units,
     isShippingRefundAllowed,
     refundMode,
-    shippingAmountInput,
     shippingMaxAmount,
-    shippingUnits,
   ]);
 
   const moneyRefundAmount = React.useMemo(
@@ -398,7 +493,7 @@ const IssueRefundDialog = ({
   const amountAfterRefund = Math.max(orderTotal - totalRefundAmount, 0);
 
   const handleLineImageUpload = (lineKey: string, files: FileList | null) => {
-    if (!files || files.length === 0) return;
+    if (!activeProductRefundMode || !files || files.length === 0) return;
 
     const incomingImages: RefundLineImage[] = Array.from(files).map(
       (file, idx) => {
@@ -413,14 +508,16 @@ const IssueRefundDialog = ({
       },
     );
 
-    updateLineForm(lineKey, (prev) => ({
+    updateLineForm(activeProductRefundMode, lineKey, (prev) => ({
       ...prev,
       images: [...prev.images, ...incomingImages],
     }));
   };
 
   const handleRemoveLineImage = (lineKey: string, imageId: string) => {
-    updateLineForm(lineKey, (prev) => {
+    if (!activeProductRefundMode) return;
+
+    updateLineForm(activeProductRefundMode, lineKey, (prev) => {
       const target = prev.images.find((img) => img.id === imageId);
       if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
 
@@ -432,9 +529,11 @@ const IssueRefundDialog = ({
   };
 
   const handleClose = () => {
-    for (const lineKey of Object.keys(lineFormByKey)) {
-      for (const image of lineFormByKey[lineKey]?.images ?? []) {
-        if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+    for (const mode of Object.keys(lineFormByMode) as ProductRefundMode[]) {
+      for (const lineKey of Object.keys(lineFormByMode[mode] ?? {})) {
+        for (const image of lineFormByMode[mode][lineKey]?.images ?? []) {
+          if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+        }
       }
     }
     setDraggingLineKey(null);
@@ -478,6 +577,11 @@ const IssueRefundDialog = ({
         return;
       }
 
+      if (!moneyRefundReason.trim()) {
+        toast.error("Please select reason for refund");
+        return;
+      }
+
       try {
         await createRefundMutation.mutateAsync({
           main_checkout_id: id,
@@ -485,6 +589,18 @@ const IssueRefundDialog = ({
             amount,
           },
         });
+
+        try {
+          await updateReasonMutation.mutateAsync({
+            main_checkout_id: id,
+            reason: moneyRefundReason.trim(),
+          });
+        } catch (reasonError) {
+          const reasonMessage = extractRefundErrorMessage(reasonError);
+          toast.error("Refund created but failed to update reason", {
+            description: reasonMessage,
+          });
+        }
 
         toast.success("Issue refund successfully");
         handleClose();
@@ -508,10 +624,11 @@ const IssueRefundDialog = ({
     const invalidRefundLines = productRefundLines
       .map((line) => {
         const missingFields: string[] = [];
+        if (line.units <= 0) missingFields.push("units");
         if (!line.reason) missingFields.push("reason");
         if (missingFields.length === 0) return null;
 
-        return `${line.name} (unit ${line.unitIndex}/${line.totalUnits}): missing ${missingFields.join(", ")}`;
+        return `${line.name}: missing ${missingFields.join(", ")}`;
       })
       .filter((line): line is string => Boolean(line));
 
@@ -562,8 +679,7 @@ const IssueRefundDialog = ({
           products: productRefundLines.map((line) => ({
             name: line.name,
             sku: line.sku,
-            quantity:
-              refundMode === "full" ? line.units : line.amount > 0 ? 1 : 0,
+            quantity: line.units,
             id_provider: line.idProvider,
             unit_price: Number(line.unitPrice.toFixed(2)),
             refund_amount: Number(line.amount.toFixed(2)),
@@ -610,7 +726,7 @@ const IssueRefundDialog = ({
           <DrawerDescription>
             Full refund uses units by quantity. Partial refund accepts direct
             amount per product and shipping. Money refund accepts only a single
-            amount.
+            amount and reason.
           </DrawerDescription>
         </DrawerHeader>
 
@@ -691,6 +807,41 @@ const IssueRefundDialog = ({
                     %
                   </div>
                 </div>
+
+                <div className="md:col-span-2">
+                  <Label className="mb-1 block text-xs text-muted-foreground">
+                    Reason for refund
+                  </Label>
+                  <Select
+                    key="money-reason"
+                    value={moneyRefundReason || undefined}
+                    onValueChange={setMoneyRefundReason}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger className="w-full border border-input">
+                      <SelectValue placeholder="Select a reason" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {REFUND_REASON_GROUPS.map((group, groupIndex) => (
+                        <React.Fragment key={group.label}>
+                          <SelectGroup>
+                            <SelectLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wide text-foreground">
+                              {group.label}
+                            </SelectLabel>
+                            {group.options.map((reason) => (
+                              <SelectItem key={reason} value={reason}>
+                                {reason}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                          {groupIndex < REFUND_REASON_GROUPS.length - 1 ? (
+                            <SelectSeparator />
+                          ) : null}
+                        </React.Fragment>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           ) : null}
@@ -700,7 +851,7 @@ const IssueRefundDialog = ({
               {lineRefunds.map((line) => (
                 <div key={line.key} className="rounded-lg border p-4">
                   <div className="grid grid-cols-12 gap-4">
-                    <div className="col-span-12 flex items-start gap-3 md:col-span-6">
+                    <div className="col-span-12 flex items-start gap-3 md:col-span-4">
                       {line.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -719,7 +870,7 @@ const IssueRefundDialog = ({
                           SKU: {line.sku}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          Unit: {line.unitIndex}/{line.totalUnits}
+                          Quantity: {line.quantity}
                         </div>
                       </div>
                     </div>
@@ -734,52 +885,69 @@ const IssueRefundDialog = ({
                     </div>
 
                     <div className="col-span-6 md:col-span-2">
-                      {refundMode === "full" ? (
-                        <>
-                          <Label className="mb-1 block text-xs text-muted-foreground">
-                            Units (0-{line.quantity})
-                          </Label>
-                          <Select
-                            value={String(line.units)}
-                            onValueChange={(value) =>
-                              updateLineForm(line.key, (prev) => ({
-                                ...prev,
-                                units: Number(value),
-                              }))
-                            }
+                      <Label className="mb-1 block text-xs text-muted-foreground">
+                        Units (0-{line.quantity})
+                      </Label>
+                      <Select
+                        key={`${refundMode}-${line.key}-units`}
+                        value={String(line.units)}
+                        onValueChange={(value) =>
+                          updateActiveLineForm(line.key, (prev) => ({
+                            ...prev,
+                            units: Number(value),
+                            amountInput:
+                              refundMode === "partial"
+                                ? formatAmountInput(
+                                    clamp(
+                                      parseAmountInput(prev.amountInput),
+                                      0,
+                                      Number(value) * line.unitPrice,
+                                    ),
+                                  )
+                                : prev.amountInput,
+                          }))
+                        }
                             disabled={isSubmitting}
-                          >
-                            <SelectTrigger className="w-full border border-input">
-                              <SelectValue placeholder="Select units" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Array.from(
-                                { length: line.quantity + 1 },
-                                (_, index) => index,
-                              ).map((option) => (
-                                <SelectItem key={option} value={String(option)}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </>
-                      ) : (
+                      >
+                        <SelectTrigger className="w-full border border-input">
+                          <SelectValue placeholder="Select units" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(
+                            refundMode === "full"
+                              ? [0, line.quantity]
+                              : Array.from(
+                                  { length: line.quantity + 1 },
+                                  (_, index) => index,
+                                )
+                          ).map((option) => (
+                            <SelectItem key={option} value={String(option)}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="col-span-6 md:col-span-2">
+                      {refundMode === "partial" ? (
                         <>
                           <Label className="mb-1 block text-xs text-muted-foreground">
-                            Amount (0-{normalizeCurrency(line.maxAmount)})
+                            Amount (0-{normalizeCurrency(line.partialMaxAmount)})
                           </Label>
                           <Input
                             type="number"
                             min={0}
-                            max={line.maxAmount}
+                            max={line.partialMaxAmount}
                             step="0.01"
-                            value={lineFormByKey[line.key]?.amountInput ?? ""}
+                            value={
+                              activeLineFormByKey[line.key]?.amountInput ?? ""
+                            }
                             onChange={(event) => {
                               const rawValue = event.target.value;
 
                               if (!rawValue.trim()) {
-                                updateLineForm(line.key, (prev) => ({
+                                updateActiveLineForm(line.key, (prev) => ({
                                   ...prev,
                                   amountInput: "",
                                 }));
@@ -794,9 +962,9 @@ const IssueRefundDialog = ({
                               const clampedValue = clamp(
                                 parsedValue,
                                 0,
-                                line.maxAmount,
+                                line.partialMaxAmount,
                               );
-                              updateLineForm(line.key, (prev) => ({
+                              updateActiveLineForm(line.key, (prev) => ({
                                 ...prev,
                                 amountInput:
                                   parsedValue === clampedValue
@@ -804,10 +972,10 @@ const IssueRefundDialog = ({
                                     : formatAmountInput(clampedValue),
                               }));
                             }}
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || line.units <= 0}
                           />
                         </>
-                      )}
+                      ) : null}
                     </div>
 
                     <div className="col-span-12 md:col-span-2">
@@ -825,9 +993,10 @@ const IssueRefundDialog = ({
                       Reason for refund
                     </Label>
                     <Select
+                      key={`${refundMode}-${line.key}-reason`}
                       value={line.reason || undefined}
                       onValueChange={(value) =>
-                        updateLineForm(line.key, (prev) => ({
+                        updateActiveLineForm(line.key, (prev) => ({
                           ...prev,
                           reason: value,
                         }))
@@ -965,9 +1134,13 @@ const IssueRefundDialog = ({
                         Units (0-1)
                       </Label>
                       <Select
-                        value={String(shippingUnits > 0 ? 1 : 0)}
+                        key={`${refundMode}-shipping-units`}
+                        value={String(activeShippingForm.units > 0 ? 1 : 0)}
                         onValueChange={(value) =>
-                          setShippingUnits(Number(value))
+                          updateActiveShippingForm((prev) => ({
+                            ...prev,
+                            units: Number(value),
+                          }))
                         }
                         disabled={isSubmitting || !isShippingRefundAllowed}
                       >
@@ -991,13 +1164,18 @@ const IssueRefundDialog = ({
                         max={shippingMaxAmount}
                         step="0.01"
                         value={
-                          isShippingRefundAllowed ? shippingAmountInput : "0"
+                          isShippingRefundAllowed
+                            ? activeShippingForm.amountInput
+                            : "0"
                         }
                         onChange={(event) => {
                           const rawValue = event.target.value;
 
                           if (!rawValue.trim()) {
-                            setShippingAmountInput("0");
+                            updateActiveShippingForm((prev) => ({
+                              ...prev,
+                              amountInput: "0",
+                            }));
                             return;
                           }
 
@@ -1011,11 +1189,13 @@ const IssueRefundDialog = ({
                             0,
                             shippingMaxAmount,
                           );
-                          setShippingAmountInput(
-                            parsedValue === clampedValue
-                              ? rawValue
-                              : formatAmountInput(clampedValue),
-                          );
+                          updateActiveShippingForm((prev) => ({
+                            ...prev,
+                            amountInput:
+                              parsedValue === clampedValue
+                                ? rawValue
+                                : formatAmountInput(clampedValue),
+                          }));
                         }}
                         disabled={isSubmitting || !isShippingRefundAllowed}
                       />

@@ -2,7 +2,6 @@ import { BrandResponse } from "./brand";
 import { CategoryResponse } from "./categories";
 import { CheckOutMain } from "./checkout";
 import { Pagination } from "./pagination";
-import { POContainerInventoryDetail } from "./po";
 import { Customer } from "./user";
 import { VariantOptionResponse } from "./variant";
 import { VoucherItem } from "./voucher";
@@ -304,4 +303,16 @@ export type ProductAndSoldItem = Partial<ProductItem> & {
 export type ProductAndSoldResponse = {
   pagination: Pagination;
   items: ProductAndSoldItem[];
+};
+
+export type ProductRevenueInventoryItem = Partial<ProductItem> & {
+  inventory_po?: InventoryPosItem[] | null;
+  inventories_po?: InventoryPosItem[] | null;
+};
+
+export type ProductRevenueInventoryResponse = {
+  pagination: Pagination;
+  items: ProductRevenueInventoryItem[];
+  inventory_value: number;
+  final_price_value: number;
 };

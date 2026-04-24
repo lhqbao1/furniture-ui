@@ -37,6 +37,8 @@ interface InventoryTableToolbarProps {
   addButtonUrl?: string;
   addButtonModalContent?: React.ReactNode;
   isInventory?: boolean;
+  filterContent?: React.ReactNode;
+  searchContent?: React.ReactNode;
 }
 
 export default function InventoryTableToolbar({
@@ -44,6 +46,8 @@ export default function InventoryTableToolbar({
   setPageSize,
   setPage,
   isInventory,
+  filterContent,
+  searchContent,
 }: InventoryTableToolbarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -53,49 +57,75 @@ export default function InventoryTableToolbar({
   const defaultSearch = searchParams.get("search") ?? "";
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
+  const resolvedFilterContent = filterContent ?? <InventoryFilterForm />;
+  const usesCustomSearch = Boolean(searchContent);
 
   // debounce inputValue
   const [debouncedSearch] = useDebounce(searchValue, 600);
 
   // push URL khi debounce hoàn thành
   useEffect(() => {
+    if (usesCustomSearch) return;
+
+    const currentSearch = searchParams.get("search") ?? "";
+    if (debouncedSearch === currentSearch) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", "1");
+
+    if (debouncedSearch) {
+      params.set("search", debouncedSearch);
+    } else {
+      params.delete("search");
+    }
+
     router.push(
       {
         pathname,
-        query: {
-          page: 1,
-          search: debouncedSearch || "",
-        },
+        query: Object.fromEntries(params.entries()),
       },
       { scroll: false },
     );
 
     setPage(1);
-  }, [debouncedSearch, pathname, router, setPage]);
+  }, [
+    debouncedSearch,
+    pathname,
+    router,
+    searchParams,
+    setPage,
+    usesCustomSearch,
+  ]);
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-center gap-2 p-2 w-full flex-wrap lg:flex-nowrap">
-      {/* Left group */}
-      <div className="flex items-center lg:gap-2 gap-2 flex-wrap lg:flex-nowrap ">
-        <div className="flex gap-2 text-sm font-medium">
-          <ImportStockSupplierDialog setIsImporting={setIsImporting} isSupplier />
+    <div className="w-full p-2">
+      <div className="flex items-start justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex text-sm font-medium">
+            <ImportStockSupplierDialog
+              setIsImporting={setIsImporting}
+              isSupplier
+            />
+          </div>
+
+          {!isInventory && (
+            <div className="flex text-sm font-medium">
+              <ImportInventoryDialog setIsImporting={setIsImporting} />
+            </div>
+          )}
         </div>
 
-        {!isInventory && (
-          <div className="flex gap-2 text-sm font-medium">
-            <ImportInventoryDialog setIsImporting={setIsImporting} />
-          </div>
-        )}
-      </div>
+        <div className="w-full min-w-0 max-w-2xl">
+          {searchContent ?? (
+            <Input
+              placeholder="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          )}
+        </div>
 
-      {/* Search (auto, no button) */}
-      <div className="flex items-center w-1/2 flex-wrap lg:flex-nowrap space-x-2">
-        <Input
-          placeholder="Search"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-        <div>
+        <div className="w-full sm:w-[140px]">
           <Select
             value={String(pageSize)}
             onValueChange={(value) => setPageSize(Number(value))}
@@ -112,10 +142,7 @@ export default function InventoryTableToolbar({
             </SelectContent>
           </Select>
         </div>
-      </div>
 
-      {/* Right group */}
-      <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap justify-center lg:justify-start">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-1">
@@ -123,7 +150,7 @@ export default function InventoryTableToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[800px] px-8 py-4">
-            <InventoryFilterForm />
+            {resolvedFilterContent}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -137,22 +164,6 @@ export default function InventoryTableToolbar({
             Add PO
           </Button>
         )}
-
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1"
-            >
-              Columns <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>Name</DropdownMenuItem>
-            <DropdownMenuItem>Stock</DropdownMenuItem>
-            <DropdownMenuItem>Price</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
       </div>
     </div>
   );

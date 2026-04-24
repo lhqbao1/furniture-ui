@@ -6,6 +6,8 @@ import {
   ProductAndSoldResponse,
   ProductAndSoldItem,
   ProductItem,
+  ProductRevenueInventoryItem,
+  ProductRevenueInventoryResponse,
   ProductResponse,
 } from "@/types/products";
 import qs from "qs";
@@ -31,6 +33,13 @@ export interface GetAllProductAndSoldParams {
   page?: number;
   page_size?: number;
   is_econelo?: boolean | null;
+}
+
+export interface GetAllRevenueInventoryParams {
+  search?: string | string[];
+  page?: number;
+  page_size?: number;
+  is_econelo?: boolean;
 }
 
 export type GetProductsSearchParams = {
@@ -182,6 +191,51 @@ export async function getAllProductAndSold(
     ...data,
     items: normalizedItems,
   } as ProductAndSoldResponse;
+}
+
+export async function getAllRevenueInventory(
+  params?: GetAllRevenueInventoryParams,
+) {
+  const normalizedSearch = Array.isArray(params?.search)
+    ? params.search.map((value) => value.trim()).filter(Boolean)
+    : params?.search?.trim();
+
+  const { data } = await apiAdmin.get("/products/get-all-revenue-inventory", {
+    params: {
+      ...(Array.isArray(normalizedSearch) && normalizedSearch.length > 0
+        ? { search: normalizedSearch }
+        : {}),
+      ...(typeof normalizedSearch === "string" && normalizedSearch
+        ? { search: normalizedSearch }
+        : {}),
+      ...(params?.page !== undefined && { page: params.page }),
+      ...(params?.page_size !== undefined && { page_size: params.page_size }),
+      ...(params?.is_econelo !== undefined && {
+        is_econelo: params.is_econelo,
+      }),
+    },
+    paramsSerializer: (nextParams) =>
+      qs.stringify(nextParams, {
+        arrayFormat: "repeat",
+        encodeValuesOnly: true,
+      }),
+  });
+
+  const normalizedItems = ((data?.items ?? []) as ProductRevenueInventoryItem[]).map((item) => ({
+    ...item,
+    inventory_pos:
+      item.inventory_pos ??
+      item.inventories_po ??
+      // `inventory_po` still exists on some API variants.
+      (item as ProductItem & { inventory_po?: ProductItem["inventory_pos"] })
+        .inventory_po ??
+      [],
+  }));
+
+  return {
+    ...data,
+    items: normalizedItems,
+  } as ProductRevenueInventoryResponse;
 }
 
 export async function getProductsAlgoliaSearch(
