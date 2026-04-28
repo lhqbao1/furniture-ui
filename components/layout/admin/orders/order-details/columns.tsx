@@ -1,4 +1,4 @@
-import { calculateProductVAT } from "@/lib/caculate-vat";
+import { calculateCartItemDisplayPricing } from "@/lib/caculate-vat";
 import { CartItem } from "@/types/cart";
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -46,18 +46,12 @@ export function getOrderDetailColumns({
       id: "vat",
       header: () => <div className="text-center w-full">VAT</div>,
       cell: ({ row }) => {
-        const unitGross =
-          Number(
-            row.original.purchased_products
-              ? row.original?.purchased_products?.final_price
-              : row.original.products.final_price,
-          ) || 0;
-        const { vat } = calculateProductVAT(
-          unitGross,
-          row.original.products.tax,
+        const { unitGross, unitNet } = calculateCartItemDisplayPricing(
+          row.original,
           country_code,
           tax_id,
         );
+        const vat = +(unitGross - unitNet).toFixed(2);
 
         return (
           <div className="text-right">
@@ -92,18 +86,11 @@ export function getOrderDetailColumns({
       id: "unit_price",
       header: () => <div className="text-right w-full">UNIT PRICE</div>,
       cell: ({ row }) => {
-        const unitGross =
-          Number(
-            row.original.purchased_products
-              ? row.original.purchased_products.final_price
-              : row.original.products.final_price,
-          ) || 0;
-        const unitNet = calculateProductVAT(
-          unitGross,
-          row.original.products.tax,
+        const { unitNet } = calculateCartItemDisplayPricing(
+          row.original,
           country_code,
           tax_id,
-        ).net;
+        );
 
         return (
           <div className="text-right">
@@ -128,20 +115,11 @@ export function getOrderDetailColumns({
       id: "total_amount",
       header: () => <div className="text-right w-full">TOTAL AMOUNT</div>,
       cell: ({ row }) => {
-        const quantity = Number(row.original.quantity) || 0;
-        const unitGross =
-          Number(
-            row.original.purchased_products
-              ? row.original.purchased_products.final_price
-              : row.original.products.final_price,
-          ) || 0;
-        const unitNet = calculateProductVAT(
-          unitGross,
-          row.original.products.tax,
+        const { lineNet } = calculateCartItemDisplayPricing(
+          row.original,
           country_code,
           tax_id,
-        ).net;
-        const lineNet = unitNet * quantity;
+        );
 
         return (
           <div className="text-right">
