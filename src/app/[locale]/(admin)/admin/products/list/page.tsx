@@ -21,6 +21,7 @@ import { getProductColumns } from "@/components/layout/admin/products/products-l
 import { useProductListFilters } from "@/hooks/admin/product-list/useProductListFilter";
 import { OnChangeFn, VisibilityState } from "@tanstack/react-table";
 import { adminIdAtom } from "@/store/auth";
+import { ProductItem } from "@/types/products";
 import { Loader2 } from "lucide-react";
 import { AlertTriangle, PackageSearch, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,7 @@ const ProductList = () => {
   const [sortByStock, setSortByStock] = useState<"asc" | "desc" | undefined>();
   const [hasStockSortInteracted, setHasStockSortInteracted] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<ProductItem[]>([]);
   const adminId = useAtomValue(adminIdAtom);
   const [columnVisibilityByUser, setColumnVisibilityByUser] = useAtom(
     productListColumnVisibilityByUserAtom,
@@ -235,6 +237,7 @@ const ProductList = () => {
         setPage={setPage}
         type={ToolbarType.product}
         product_ids={selectedProductIds} // 👈 thêm prop nếu cần
+        selectedProducts={selectedProducts}
         columnOptions={PRODUCT_COLUMN_OPTIONS}
         columnVisibility={columnVisibility}
         onColumnVisibilityChange={handleColumnVisibilityChange}
@@ -341,6 +344,7 @@ const ProductList = () => {
             isSticky
             stickyContainerClassName="h-full"
             onSelectionChange={setSelectedProductIds} // 👈 đây
+            onSelectedRowsChange={setSelectedProducts}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={handleTableColumnVisibilityChange}
             enableClientSorting

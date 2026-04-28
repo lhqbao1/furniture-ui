@@ -60,6 +60,7 @@ interface TableToolbarProps {
   exportData?: ProductItem[];
   type: ToolbarType;
   product_ids?: string[];
+  selectedProducts?: ProductItem[];
   columnOptions?: { id: string; label: string; alwaysVisible?: boolean }[];
   columnVisibility?: Record<string, boolean>;
   onColumnVisibilityChange?: (columnId: string, visible: boolean) => void;
@@ -85,6 +86,7 @@ export default function TableToolbar({
   exportData,
   type,
   product_ids,
+  selectedProducts,
   columnOptions,
   columnVisibility,
   onColumnVisibilityChange,
@@ -312,7 +314,10 @@ export default function TableToolbar({
                   </DropdownMenuItem>
 
                   <DropdownMenuItem>
-                    <ExportSelectedProducts product_ids={product_ids ?? []} />
+                    <ExportSelectedProducts
+                      product_ids={product_ids ?? []}
+                      products={selectedProducts ?? []}
+                    />
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
