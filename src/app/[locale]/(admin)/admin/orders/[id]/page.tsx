@@ -25,7 +25,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import OrderDetailsSkeleton from "./skeleton";
-import { calculateOrderTaxWithDiscount } from "@/lib/caculate-vat";
+import { calculateDisplayOrderTaxSummary } from "@/lib/caculate-vat";
 import { getOrderDetailColumns } from "@/components/layout/admin/orders/order-details/columns";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -158,7 +158,7 @@ const OrderDetails = () => {
   );
   const orderTaxSummary = useMemo(
     () =>
-      calculateOrderTaxWithDiscount(
+      calculateDisplayOrderTaxSummary(
         cartItems,
         Number(invoice?.voucher_amount ?? order?.voucher_amount ?? 0),
         checkoutCountryCode,
@@ -180,15 +180,10 @@ const OrderDetails = () => {
         const rawRate = Number(bucket?.vatRate) || 0;
         const normalizedRate = rawRate > 1 ? rawRate / 100 : rawRate;
         const percent = normalizedRate * 100;
-        const gross = Number(bucket?.gross) || 0;
-        const netFromGross =
-          normalizedRate > 0 ? gross / (1 + normalizedRate) : gross;
-        const vatFromGross =
-          normalizedRate > 0 ? netFromGross * normalizedRate : 0;
 
         return {
           percent,
-          vat: Number.isFinite(vatFromGross) ? vatFromGross : 0,
+          vat: Number(bucket?.vat) || 0,
         };
       })
       .filter((row) => Number.isFinite(row.percent))
@@ -979,7 +974,7 @@ const OrderDetails = () => {
             discount_amount={Math.abs(order.voucher_amount)}
             tax={orderTaxSummary.totalVat}
             vat_rows={orderVatRows}
-            total_amount={order.total_amount}
+            total_amount={orderTaxSummary.totalGross}
             payment_method={order.payment_method}
             entry_date={order.created_at}
             is_Ebay={order.from_marketplace === "ebay" ? true : false}

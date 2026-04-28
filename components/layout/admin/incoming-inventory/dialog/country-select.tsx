@@ -14,6 +14,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ export const CountryField = ({
   onChange,
   required,
 }: CountryFieldProps) => {
+  const [open, setOpen] = React.useState(false);
   const selected = EN_COUNTRY_OPTIONS.find((c) => c.value === value);
 
   return (
@@ -40,13 +42,14 @@ export const CountryField = ({
         {required && <span className="text-destructive">*</span>}
       </Label>
 
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
+            type="button"
             variant="outline"
             role="combobox"
             className={cn(
-              "w-full justify-between",
+              "h-11 w-full justify-between font-normal",
               !value && "text-muted-foreground",
             )}
           >
@@ -55,28 +58,36 @@ export const CountryField = ({
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-0 pointer-events-auto">
+        <PopoverContent
+          align="start"
+          className="w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto"
+        >
           <Command>
             <CommandInput placeholder="Search country..." />
-            <CommandEmpty>No country found.</CommandEmpty>
-
-            <CommandGroup className="max-h-72 overflow-auto">
-              {EN_COUNTRY_OPTIONS.map((c) => (
-                <CommandItem
-                  key={c.value}
-                  value={c.label} // 🔥 SEARCH THEO LABEL
-                  onSelect={() => onChange(c.value)}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === c.value ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  {c.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <CommandList className="max-h-72">
+              <CommandEmpty>No country found.</CommandEmpty>
+              <CommandGroup>
+                {EN_COUNTRY_OPTIONS.map((c) => (
+                  <CommandItem
+                    key={c.value}
+                    value={c.label}
+                    className="cursor-pointer"
+                    onSelect={() => {
+                      onChange(c.value);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === c.value ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                    {c.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>

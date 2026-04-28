@@ -14,7 +14,8 @@ import { useMemo } from "react";
 import { FooterSection } from "./file-footer";
 import { getCountryName } from "@/lib/country-name";
 import {
-  calculateOrderTaxWithDiscount,
+  calculateCartItemDisplayPricing,
+  calculateDisplayOrderTaxSummary,
   calculateProductVAT,
 } from "@/lib/caculate-vat";
 import { parseTaxRate } from "@/lib/parse-tax";
@@ -358,41 +359,9 @@ export const InvoicePDF = ({
     normalizedRefundProducts,
   ]);
 
-  const productNetTotal = useMemo(
-    () =>
-      flattenedCartItems.reduce((sum, item) => {
-        const vatRateRaw = Number(
-          calculateProductVAT(
-            item?.final_price,
-            item?.products?.tax,
-            checkoutCountryCode,
-            checkoutTaxId,
-          ).vatRate,
-        );
-        const normalizedVatRate =
-          Number.isFinite(vatRateRaw) && vatRateRaw > 1
-            ? vatRateRaw / 100
-            : Number.isFinite(vatRateRaw)
-              ? vatRateRaw
-              : 0;
-        const vatFactor = normalizedVatRate + 1;
-        const netUnitPriceRaw = Number(item?.item_price) / vatFactor;
-        const netUnitPrice = Number.isFinite(netUnitPriceRaw)
-          ? netUnitPriceRaw
-          : 0;
-        const quantityNumber = Number(item?.quantity);
-        const safeQuantity = Number.isFinite(quantityNumber)
-          ? quantityNumber
-          : 0;
-
-        return sum + netUnitPrice * safeQuantity;
-      }, 0),
-    [checkoutCountryCode, checkoutTaxId, flattenedCartItems],
-  );
-
   const orderTaxSummary = useMemo(
     () =>
-      calculateOrderTaxWithDiscount(
+      calculateDisplayOrderTaxSummary(
         flattenedCartItems,
         invoice?.voucher_amount,
         checkoutCountryCode,
@@ -414,17 +383,10 @@ export const InvoicePDF = ({
         const rawRate = Number(bucket?.vatRate) || 0;
         const normalizedRate = rawRate > 1 ? rawRate / 100 : rawRate;
         const percent = normalizedRate * 100;
-        const gross = Number(bucket?.gross) || 0;
-
-        // Recalculate VAT from gross -> net -> VAT to reduce rounding drift.
-        const netFromGross =
-          normalizedRate > 0 ? gross / (1 + normalizedRate) : gross;
-        const vatFromGross =
-          normalizedRate > 0 ? netFromGross * normalizedRate : 0;
 
         return {
           percent,
-          vat: Number.isFinite(vatFromGross) ? vatFromGross : 0,
+          vat: Number(bucket?.vat) || 0,
         };
       })
       .filter((row) => Number.isFinite(row.percent))
@@ -462,12 +424,6 @@ export const InvoicePDF = ({
   const giftCouponGross =
     (invoice?.coupon_amount ?? 0) + Math.abs(invoice?.voucher_amount ?? 0);
   const showGiftCouponRow = giftCouponGross > 0;
-  const refundDiscountGross = Math.abs(
-    Number(
-      invoice?.main_checkout?.refund_amount ?? checkout?.refund_amount ?? 0,
-    ),
-  );
-  const showRefundDiscountRow = refundDiscountGross > 0;
 
   return (
     <Document>
@@ -750,31 +706,13 @@ export const InvoicePDF = ({
             </View>
           ) : (
             flattenedCartItems.map((item, index) => {
-              const vatRateRaw = Number(
-                calculateProductVAT(
-                  item.final_price,
-                  item.products.tax,
+              const { quantity, unitNet, vatRate, lineNet } =
+                calculateCartItemDisplayPricing(
+                  item,
                   checkoutCountryCode,
                   checkoutTaxId,
-                ).vatRate,
-              );
-              const normalizedVatRate =
-                Number.isFinite(vatRateRaw) && vatRateRaw > 1
-                  ? vatRateRaw / 100
-                  : Number.isFinite(vatRateRaw)
-                    ? vatRateRaw
-                    : 0;
-              const vatPercent = normalizedVatRate * 100;
-              const vatFactor = normalizedVatRate + 1;
-              const netUnitPriceRaw = Number(item.item_price) / vatFactor;
-              const netUnitPrice = Number.isFinite(netUnitPriceRaw)
-                ? netUnitPriceRaw
-                : 0;
-              const quantityNumber = Number(item.quantity);
-              const safeQuantity = Number.isFinite(quantityNumber)
-                ? quantityNumber
-                : 0;
-              const netLineTotal = netUnitPrice * safeQuantity;
+                );
+              const vatPercent = vatRate * 100;
 
               return (
                 <View
@@ -796,7 +734,7 @@ export const InvoicePDF = ({
                     <Text>{item.products.name}</Text>
                   </View>
                   <Text style={{ width: "10%", textAlign: "center" }}>
-                    {item.quantity}
+                    {quantity}
                   </Text>
                   <Text style={{ width: "10%", textAlign: "right" }}>
                     {vatPercent.toLocaleString("de-DE", {
@@ -806,14 +744,14 @@ export const InvoicePDF = ({
                     %
                   </Text>
                   <Text style={{ width: "11%", textAlign: "right" }}>
-                    {netUnitPrice.toLocaleString("de-DE", {
+                    {unitNet.toLocaleString("de-DE", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{" "}
                     €
                   </Text>
                   <Text style={{ width: "11%", textAlign: "right" }}>
-                    {netLineTotal.toLocaleString("de-DE", {
+                    {lineNet.toLocaleString("de-DE", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{" "}
@@ -954,7 +892,7 @@ export const InvoicePDF = ({
                   Warenwert (netto)
                 </Text>
                 <Text style={{ width: "20%", textAlign: "right" }}>
-                  {productNetTotal.toLocaleString("de-DE", {
+                  {(Number(orderTaxSummary?.totalNetWithoutShipping) || 0).toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -1090,9 +1028,7 @@ export const InvoicePDF = ({
                     }}
                   >
                     {(
-                      (invoice?.total_amount_item ?? 0) +
-                      (invoice?.total_shipping ?? 0) -
-                      Math.abs(invoice?.voucher_amount ?? 0)
+                      Number(orderTaxSummary?.totalGross) || 0
                     ).toLocaleString("de-DE", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,

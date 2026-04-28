@@ -9,6 +9,57 @@ type TaxBucket = {
   discountGross?: number;
 };
 
+function normalizeVatRate(vatRate: number) {
+  if (!Number.isFinite(vatRate)) return 0;
+  return vatRate > 1 ? vatRate / 100 : vatRate;
+}
+
+function getCartItemTax(item: CartItem) {
+  return item.purchased_products?.tax ?? item.products?.tax;
+}
+
+function getCartItemUnitGross(item: CartItem) {
+  return (
+    Number(
+      item.purchased_products?.final_price ??
+        item.products?.final_price ??
+        item.final_price ??
+        item.item_price,
+    ) || 0
+  );
+}
+
+export function calculateCartItemDisplayPricing(
+  item: CartItem,
+  country_code?: string | null,
+  tax_id?: string | null,
+) {
+  const tax = getCartItemTax(item);
+  const unitGross = getCartItemUnitGross(item);
+  const quantity = Math.max(0, Number(item.quantity) || 0);
+  const { net: unitNet, vatRate } = calculateProductVAT(
+    unitGross,
+    tax,
+    country_code,
+    tax_id,
+  );
+  const normalizedVatRate = normalizeVatRate(Number(vatRate) || 0);
+  const lineNet = +(unitNet * quantity).toFixed(2);
+  const lineVat = +(lineNet * normalizedVatRate).toFixed(2);
+  const lineGross = +(lineNet + lineVat).toFixed(2);
+
+  return {
+    tax,
+    quantity,
+    unitGross: +unitGross.toFixed(2),
+    unitNet: +unitNet.toFixed(2),
+    vatRate: normalizedVatRate,
+    lineNet,
+    lineVat,
+    lineGross,
+  };
+}
+
 function parseTaxRate(
   tax?: string | null,
   country_code?: string | null,
@@ -294,6 +345,92 @@ export function calculateOrderTaxWithDiscount(
     totalVat: +totalVat.toFixed(2),
     totalGross,
     totalNetWithoutShipping: +totalNetWithoutShipping.toFixed(2),
+  };
+}
+
+export function calculateDisplayOrderTaxSummary(
+  items: CartItem[],
+  discountGross: number = 0,
+  country_code?: string | null,
+  tax_id?: string | null,
+  total_shipping?: number,
+) {
+  const buckets = new Map<number, TaxBucket>();
+
+  for (const item of items) {
+    const pricing = calculateCartItemDisplayPricing(item, country_code, tax_id);
+
+    if (!buckets.has(pricing.vatRate)) {
+      buckets.set(pricing.vatRate, {
+        vatRate: pricing.vatRate,
+        gross: 0,
+        net: 0,
+        vat: 0,
+      });
+    }
+
+    const bucket = buckets.get(pricing.vatRate)!;
+    bucket.net = +(bucket.net + pricing.lineNet).toFixed(2);
+    bucket.vat = +(bucket.vat + pricing.lineVat).toFixed(2);
+    bucket.gross = +(bucket.gross + pricing.lineGross).toFixed(2);
+  }
+
+  const shippingBase = calculateShippingCost(
+    items,
+    country_code,
+    tax_id,
+    total_shipping,
+  );
+  const shippingRate = normalizeVatRate(Number(shippingBase.vatRate) || 0);
+  const shippingNet = +(Number(shippingBase.net) || 0).toFixed(2);
+  const shippingVat = +(shippingNet * shippingRate).toFixed(2);
+  const shippingGross = +(shippingNet + shippingVat).toFixed(2);
+
+  if (shippingGross > 0) {
+    if (!buckets.has(shippingRate)) {
+      buckets.set(shippingRate, {
+        vatRate: shippingRate,
+        gross: 0,
+        net: 0,
+        vat: 0,
+      });
+    }
+
+    const shippingBucket = buckets.get(shippingRate)!;
+    shippingBucket.net = +(shippingBucket.net + shippingNet).toFixed(2);
+    shippingBucket.vat = +(shippingBucket.vat + shippingVat).toFixed(2);
+    shippingBucket.gross = +(shippingBucket.gross + shippingGross).toFixed(2);
+  }
+
+  const totalNet = +Array.from(buckets.values())
+    .reduce((sum, bucket) => sum + (Number(bucket.net) || 0), 0)
+    .toFixed(2);
+  const totalVat = +Array.from(buckets.values())
+    .reduce((sum, bucket) => sum + (Number(bucket.vat) || 0), 0)
+    .toFixed(2);
+  const totalGrossBeforeDiscount = +(totalNet + totalVat).toFixed(2);
+  const appliedDiscountGross = +Math.min(
+    Math.max(0, Number(discountGross) || 0),
+    totalGrossBeforeDiscount,
+  ).toFixed(2);
+  const totalGross = +(totalGrossBeforeDiscount - appliedDiscountGross).toFixed(
+    2,
+  );
+  const totalNetWithoutShipping = +(totalNet - shippingNet).toFixed(2);
+
+  return {
+    buckets: Array.from(buckets.values()),
+    shipping: {
+      gross: shippingGross,
+      net: shippingNet,
+      vat: shippingVat,
+      vatRate: shippingRate,
+    },
+    discountGross: appliedDiscountGross,
+    totalNet,
+    totalVat,
+    totalGross,
+    totalNetWithoutShipping,
   };
 }
 
