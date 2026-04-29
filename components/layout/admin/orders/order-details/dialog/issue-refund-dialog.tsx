@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface ReturnConfirmDialogProps {
   id: string;
@@ -75,17 +76,14 @@ const SHIPPING_REFUND_ELIGIBLE_REASON_SET = new Set<string>(
   ELIGIBLE_SHIPPING_REFUND_REASONS,
 );
 
-type RefundMode = "full" | "partial" | "money";
-type ProductRefundMode = Exclude<RefundMode, "money">;
-
 type RefundLine = {
   key: string;
-  sourceItemId: string;
   idProvider: string;
   name: string;
   sku: string;
   image: string | null;
-  quantity: number;
+  originalQuantity: number;
+  unitIndex: number;
   unitPrice: number;
 };
 
@@ -98,14 +96,12 @@ type RefundLineImage = {
 
 type RefundLineFormState = {
   units: number;
-  amountInput: string;
   reason: string;
   images: RefundLineImage[];
 };
 
 type ShippingRefundFormState = {
   units: number;
-  amountInput: string;
 };
 
 type RefundApiErrorPayload = {
@@ -207,8 +203,10 @@ const getOrderCartItems = (order: CheckOutMain): CartItem[] => {
 };
 
 const buildRefundLines = (order: CheckOutMain): RefundLine[] =>
-  getOrderCartItems(order).map((item, index) => {
-    const quantity = Math.max(0, Number(item.quantity) || 0);
+  getOrderCartItems(order).flatMap((item, index) => {
+    const originalQuantity = Math.max(0, Number(item.quantity) || 0);
+    if (originalQuantity <= 0) return [];
+
     const unitPrice = getUnitPrice(item);
     const name =
       item.purchased_products?.name || item.products?.name || "Unnamed product";
@@ -226,21 +224,20 @@ const buildRefundLines = (order: CheckOutMain): RefundLine[] =>
     const idProvider =
       item.purchased_products?.id_provider || item.products?.id_provider || "";
 
-    return {
-      key: `${sourceItemId}-${index}`,
-      sourceItemId,
+    return Array.from({ length: originalQuantity }, (_, unitIndex) => ({
+      key: `${sourceItemId}-${index}-${unitIndex + 1}`,
       idProvider,
       name,
       sku,
       image,
-      quantity,
+      originalQuantity,
+      unitIndex: unitIndex + 1,
       unitPrice,
-    };
+    }));
   });
 
 const createInitialLineFormState = (): RefundLineFormState => ({
   units: 0,
-  amountInput: "",
   reason: "",
   images: [],
 });
@@ -252,8 +249,36 @@ const buildInitialLineFormMap = (lines: RefundLine[]) =>
 
 const createInitialShippingRefundFormState = (): ShippingRefundFormState => ({
   units: 0,
-  amountInput: "0",
 });
+
+const revokeLineFormPreviewUrls = (
+  forms: Record<string, RefundLineFormState>,
+) => {
+  Object.values(forms).forEach((form) => {
+    form.images.forEach((image) => {
+      if (image.previewUrl) {
+        URL.revokeObjectURL(image.previewUrl);
+      }
+    });
+  });
+};
+
+const renderRefundReasonOptions = () =>
+  REFUND_REASON_GROUPS.map((group, groupIndex) => (
+    <React.Fragment key={group.label}>
+      <SelectGroup>
+        <SelectLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wide text-foreground">
+          {group.label}
+        </SelectLabel>
+        {group.options.map((reason) => (
+          <SelectItem key={reason} value={reason}>
+            {reason}
+          </SelectItem>
+        ))}
+      </SelectGroup>
+      {groupIndex < REFUND_REASON_GROUPS.length - 1 ? <SelectSeparator /> : null}
+    </React.Fragment>
+  ));
 
 const IssueRefundDialog = ({
   id,
@@ -265,22 +290,15 @@ const IssueRefundDialog = ({
   const updateReasonMutation = useUpdateReasonForMainCheckout();
   const uploadCheckoutFilesMutation = useUploadCheckoutFiles();
   const uploadStaticFileMutation = useUploadStaticFile();
-  const [refundMode, setRefundMode] = React.useState<RefundMode>("full");
-  const [lineFormByMode, setLineFormByMode] = React.useState<
-    Record<ProductRefundMode, Record<string, RefundLineFormState>>
-  >({
-    full: {},
-    partial: {},
-  });
+  const [lineFormByKey, setLineFormByKey] = React.useState<
+    Record<string, RefundLineFormState>
+  >({});
   const [draggingLineKey, setDraggingLineKey] = React.useState<string | null>(
     null,
   );
-  const [shippingFormByMode, setShippingFormByMode] = React.useState<
-    Record<ProductRefundMode, ShippingRefundFormState>
-  >({
-    full: createInitialShippingRefundFormState(),
-    partial: createInitialShippingRefundFormState(),
-  });
+  const [shippingForm, setShippingForm] = React.useState<ShippingRefundFormState>(
+    createInitialShippingRefundFormState(),
+  );
   const [moneyRefundInput, setMoneyRefundInput] = React.useState("0");
   const [moneyRefundReason, setMoneyRefundReason] = React.useState("");
 
@@ -293,188 +311,86 @@ const IssueRefundDialog = ({
   const refundLines = React.useMemo(() => buildRefundLines(order), [order]);
   const shippingMaxAmount = Math.max(0, Number(order.total_shipping ?? 0));
   const orderTotal = Math.max(0, Number(order.total_amount ?? 0));
-  const activeProductRefundMode = refundMode === "money" ? null : refundMode;
-  const activeLineFormByKey = React.useMemo(
-    () =>
-      activeProductRefundMode
-        ? lineFormByMode[activeProductRefundMode] ?? {}
-        : {},
-    [activeProductRefundMode, lineFormByMode],
-  );
-  const activeShippingForm = React.useMemo(
-    () =>
-      activeProductRefundMode
-        ? shippingFormByMode[activeProductRefundMode]
-        : createInitialShippingRefundFormState(),
-    [activeProductRefundMode, shippingFormByMode],
-  );
 
   React.useEffect(() => {
     if (!open) return;
 
-    setRefundMode("full");
-    setLineFormByMode((prev) => {
-      for (const mode of Object.keys(prev) as ProductRefundMode[]) {
-        for (const lineKey of Object.keys(prev[mode] ?? {})) {
-          for (const image of prev[mode][lineKey]?.images ?? []) {
-            if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
-          }
-        }
-      }
-
-      return {
-        full: buildInitialLineFormMap(refundLines),
-        partial: buildInitialLineFormMap(refundLines),
-      };
+    setLineFormByKey((prev) => {
+      revokeLineFormPreviewUrls(prev);
+      return buildInitialLineFormMap(refundLines);
     });
-    setShippingFormByMode({
-      full: createInitialShippingRefundFormState(),
-      partial: createInitialShippingRefundFormState(),
-    });
+    setShippingForm(createInitialShippingRefundFormState());
     setMoneyRefundInput("0");
     setMoneyRefundReason("");
+    setDraggingLineKey(null);
   }, [open, refundLines]);
 
   const updateLineForm = React.useCallback(
     (
-      mode: ProductRefundMode,
       lineKey: string,
       updater: (prev: RefundLineFormState) => RefundLineFormState,
     ) => {
-      setLineFormByMode((prev) => {
-        const previousLine =
-          prev[mode]?.[lineKey] ?? createInitialLineFormState();
+      setLineFormByKey((prev) => {
+        const previousLine = prev[lineKey] ?? createInitialLineFormState();
 
         return {
           ...prev,
-          [mode]: {
-            ...prev[mode],
-            [lineKey]: updater(previousLine),
-          },
+          [lineKey]: updater(previousLine),
         };
       });
     },
     [],
   );
 
-  const updateActiveLineForm = React.useCallback(
-    (
-      lineKey: string,
-      updater: (prev: RefundLineFormState) => RefundLineFormState,
-    ) => {
-      if (!activeProductRefundMode) return;
-      updateLineForm(activeProductRefundMode, lineKey, updater);
-    },
-    [activeProductRefundMode, updateLineForm],
-  );
-
-  const updateShippingForm = React.useCallback(
-    (
-      mode: ProductRefundMode,
-      updater: (prev: ShippingRefundFormState) => ShippingRefundFormState,
-    ) => {
-      setShippingFormByMode((prev) => ({
-        ...prev,
-        [mode]: updater(prev[mode] ?? createInitialShippingRefundFormState()),
-      }));
-    },
-    [],
-  );
-
-  const updateActiveShippingForm = React.useCallback(
-    (updater: (prev: ShippingRefundFormState) => ShippingRefundFormState) => {
-      if (!activeProductRefundMode) return;
-      updateShippingForm(activeProductRefundMode, updater);
-    },
-    [activeProductRefundMode, updateShippingForm],
-  );
-
   const lineRefunds = React.useMemo(
     () =>
       refundLines.map((line) => {
-        const lineForm = activeLineFormByKey[line.key];
-        const units = clamp(
-          Math.floor(Number(lineForm?.units ?? 0)),
-          0,
-          line.quantity,
-        );
-
-        const partialMaxAmount = units * line.unitPrice;
-        const partialAmount = clamp(
-          parseAmountInput(lineForm?.amountInput ?? ""),
-          0,
-          partialMaxAmount,
-        );
-
-        const amount =
-          refundMode === "full" ? units * line.unitPrice : partialAmount;
+        const lineForm = lineFormByKey[line.key];
+        const units = clamp(Math.floor(Number(lineForm?.units ?? 0)), 0, 1);
+        const amount = units * line.unitPrice;
 
         return {
           ...line,
           units,
           amount,
-          partialMaxAmount,
           reason: lineForm?.reason?.trim() ?? "",
           images: lineForm?.images ?? [],
         };
       }),
-    [activeLineFormByKey, refundLines, refundMode],
+    [lineFormByKey, refundLines],
+  );
+
+  const hasSelectedItemRefund = React.useMemo(
+    () => lineRefunds.some((line) => line.units > 0),
+    [lineRefunds],
   );
 
   const isShippingRefundAllowed = React.useMemo(
     () =>
-      Object.values(activeLineFormByKey).some((lineForm) =>
-        SHIPPING_REFUND_ELIGIBLE_REASON_SET.has(lineForm.reason?.trim() ?? ""),
+      lineRefunds.some(
+        (line) =>
+          line.units > 0 && SHIPPING_REFUND_ELIGIBLE_REASON_SET.has(line.reason),
       ),
-    [activeLineFormByKey],
+    [lineRefunds],
   );
 
   React.useEffect(() => {
-    if (!activeProductRefundMode || isShippingRefundAllowed) return;
+    if (isShippingRefundAllowed) return;
+    if (shippingForm.units === 0) return;
 
-    if (
-      activeShippingForm.units === 0 &&
-      activeShippingForm.amountInput === "0"
-    ) {
-      return;
-    }
-
-    updateShippingForm(
-      activeProductRefundMode,
-      createInitialShippingRefundFormState,
-    );
-  }, [
-    activeProductRefundMode,
-    activeShippingForm.amountInput,
-    activeShippingForm.units,
-    isShippingRefundAllowed,
-    updateShippingForm,
-  ]);
+    setShippingForm(createInitialShippingRefundFormState());
+  }, [isShippingRefundAllowed, shippingForm.units]);
 
   const shippingRefundAmount = React.useMemo(() => {
     if (!isShippingRefundAllowed) return 0;
-
-    if (refundMode === "full") {
-      const unit = activeShippingForm.units > 0 ? 1 : 0;
-      return unit * shippingMaxAmount;
-    }
-    return clamp(
-      parseAmountInput(activeShippingForm.amountInput),
-      0,
-      shippingMaxAmount,
-    );
-  }, [
-    activeShippingForm.amountInput,
-    activeShippingForm.units,
-    isShippingRefundAllowed,
-    refundMode,
-    shippingMaxAmount,
-  ]);
+    return shippingForm.units > 0 ? shippingMaxAmount : 0;
+  }, [isShippingRefundAllowed, shippingForm.units, shippingMaxAmount]);
 
   const moneyRefundAmount = React.useMemo(
     () => clamp(parseAmountInput(moneyRefundInput), 0, orderTotal),
     [moneyRefundInput, orderTotal],
   );
+
   const moneyRefundPercentage = React.useMemo(() => {
     if (orderTotal <= 0) return 0;
     return (moneyRefundAmount / orderTotal) * 100;
@@ -487,13 +403,21 @@ const IssueRefundDialog = ({
     [lineRefunds, shippingRefundAmount],
   );
 
-  const totalRefundAmount =
-    refundMode === "money" ? moneyRefundAmount : productAndShippingRefundAmount;
+  const standardRefundActive = hasSelectedItemRefund || shippingRefundAmount > 0;
+  const fixedAmountActive = moneyRefundAmount > 0;
+  const itemSectionDisabled = fixedAmountActive;
+  const fixedAmountSectionDisabled = standardRefundActive;
+
+  const totalRefundAmount = standardRefundActive
+    ? productAndShippingRefundAmount
+    : fixedAmountActive
+      ? moneyRefundAmount
+      : 0;
 
   const amountAfterRefund = Math.max(orderTotal - totalRefundAmount, 0);
 
   const handleLineImageUpload = (lineKey: string, files: FileList | null) => {
-    if (!activeProductRefundMode || !files || files.length === 0) return;
+    if (itemSectionDisabled || !files || files.length === 0) return;
 
     const incomingImages: RefundLineImage[] = Array.from(files).map(
       (file, idx) => {
@@ -508,34 +432,28 @@ const IssueRefundDialog = ({
       },
     );
 
-    updateLineForm(activeProductRefundMode, lineKey, (prev) => ({
+    updateLineForm(lineKey, (prev) => ({
       ...prev,
       images: [...prev.images, ...incomingImages],
     }));
   };
 
   const handleRemoveLineImage = (lineKey: string, imageId: string) => {
-    if (!activeProductRefundMode) return;
-
-    updateLineForm(activeProductRefundMode, lineKey, (prev) => {
-      const target = prev.images.find((img) => img.id === imageId);
-      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+    updateLineForm(lineKey, (prev) => {
+      const target = prev.images.find((image) => image.id === imageId);
+      if (target?.previewUrl) {
+        URL.revokeObjectURL(target.previewUrl);
+      }
 
       return {
         ...prev,
-        images: prev.images.filter((img) => img.id !== imageId),
+        images: prev.images.filter((image) => image.id !== imageId),
       };
     });
   };
 
   const handleClose = () => {
-    for (const mode of Object.keys(lineFormByMode) as ProductRefundMode[]) {
-      for (const lineKey of Object.keys(lineFormByMode[mode] ?? {})) {
-        for (const image of lineFormByMode[mode][lineKey]?.images ?? []) {
-          if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
-        }
-      }
-    }
+    revokeLineFormPreviewUrls(lineFormByKey);
     setDraggingLineKey(null);
     onClose();
   };
@@ -546,7 +464,7 @@ const IssueRefundDialog = ({
   ) => {
     event.preventDefault();
     event.stopPropagation();
-    if (isSubmitting) return;
+    if (isSubmitting || itemSectionDisabled) return;
     setDraggingLineKey(lineKey);
   };
 
@@ -563,13 +481,108 @@ const IssueRefundDialog = ({
     event.preventDefault();
     event.stopPropagation();
     setDraggingLineKey(null);
-    if (isSubmitting) return;
+    if (isSubmitting || itemSectionDisabled) return;
 
     handleLineImageUpload(lineKey, event.dataTransfer.files);
   };
 
   const handleConfirm = async () => {
-    if (refundMode === "money") {
+    if (standardRefundActive) {
+      const productRefundLines = lineRefunds.filter((line) => line.units > 0);
+
+      const invalidRefundLines = productRefundLines
+        .map((line) => {
+          if (line.reason) return null;
+
+          return `${line.name} (unit ${line.unitIndex}/${line.originalQuantity}): missing reason`;
+        })
+        .filter((line): line is string => Boolean(line));
+
+      if (invalidRefundLines.length > 0) {
+        const previewMessages = invalidRefundLines.slice(0, 3).join(" | ");
+        const restCount = invalidRefundLines.length - 3;
+
+        toast.error("Missing required fields", {
+          description:
+            restCount > 0
+              ? `${previewMessages} | +${restCount} more item(s)`
+              : previewMessages,
+        });
+        return;
+      }
+
+      if (totalRefundAmount <= 0) {
+        toast.error("Refund amount must be greater than 0");
+        return;
+      }
+
+      try {
+        const uploadedCheckoutUrls: string[] = [];
+        const linesWithImages = productRefundLines.filter(
+          (line) => line.images.length > 0,
+        );
+
+        await Promise.all(
+          linesWithImages.map(async (line) => {
+            const formData = new FormData();
+            line.images.forEach((image) => {
+              formData.append("files", image.file);
+            });
+
+            const uploadResult =
+              await uploadStaticFileMutation.mutateAsync(formData);
+            const urls =
+              uploadResult.results
+                ?.map((result) => result.url)
+                .filter(Boolean) ?? [];
+            uploadedCheckoutUrls.push(...urls);
+          }),
+        );
+
+        await createRefundMutation.mutateAsync({
+          main_checkout_id: id,
+          payload: {
+            amount: Number(totalRefundAmount.toFixed(2)),
+            products: productRefundLines.map((line) => ({
+              name: line.name,
+              sku: line.sku,
+              quantity: 1,
+              id_provider: line.idProvider,
+              unit_price: Number(line.unitPrice.toFixed(2)),
+              refund_amount: Number(line.amount.toFixed(2)),
+              reason: line.reason,
+              type: "No return",
+              file: [],
+            })),
+          },
+        });
+
+        if (uploadedCheckoutUrls.length > 0) {
+          const existingCheckoutUrls = (order.files ?? [])
+            .map((file) => file?.url)
+            .filter((url): url is string => Boolean(url));
+          const mergedCheckoutUrls = Array.from(
+            new Set([...existingCheckoutUrls, ...uploadedCheckoutUrls]),
+          );
+
+          await uploadCheckoutFilesMutation.mutateAsync({
+            main_checkout_id: id,
+            payload: mergedCheckoutUrls,
+          });
+        }
+
+        toast.success("Issue refund successfully");
+        handleClose();
+      } catch (error) {
+        const message = extractRefundErrorMessage(error);
+        toast.error("Failed to issue refund", {
+          description: message,
+        });
+      }
+      return;
+    }
+
+    if (fixedAmountActive) {
       const amount = Number(moneyRefundAmount.toFixed(2));
 
       if (amount <= 0) {
@@ -613,105 +626,7 @@ const IssueRefundDialog = ({
       return;
     }
 
-    const productRefundLines = lineRefunds.filter((line) => line.amount > 0);
-    const hasShippingRefund = shippingRefundAmount > 0;
-
-    if (productRefundLines.length === 0 && !hasShippingRefund) {
-      toast.error("Please add refund amount for products or shipping");
-      return;
-    }
-
-    const invalidRefundLines = productRefundLines
-      .map((line) => {
-        const missingFields: string[] = [];
-        if (line.units <= 0) missingFields.push("units");
-        if (!line.reason) missingFields.push("reason");
-        if (missingFields.length === 0) return null;
-
-        return `${line.name}: missing ${missingFields.join(", ")}`;
-      })
-      .filter((line): line is string => Boolean(line));
-
-    if (invalidRefundLines.length > 0) {
-      const previewMessages = invalidRefundLines.slice(0, 3).join(" | ");
-      const restCount = invalidRefundLines.length - 3;
-
-      toast.error("Missing required fields", {
-        description:
-          restCount > 0
-            ? `${previewMessages} | +${restCount} more item(s)`
-            : previewMessages,
-      });
-      return;
-    }
-
-    if (totalRefundAmount <= 0) {
-      toast.error("Refund amount must be greater than 0");
-      return;
-    }
-
-    try {
-      const uploadedCheckoutUrls: string[] = [];
-      const linesWithImages = lineRefunds.filter(
-        (line) => line.images.length > 0,
-      );
-
-      await Promise.all(
-        linesWithImages.map(async (line) => {
-          const formData = new FormData();
-          line.images.forEach((image) => {
-            formData.append("files", image.file);
-          });
-
-          const uploadResult =
-            await uploadStaticFileMutation.mutateAsync(formData);
-          const urls =
-            uploadResult.results?.map((result) => result.url).filter(Boolean) ??
-            [];
-          uploadedCheckoutUrls.push(...urls);
-        }),
-      );
-
-      await createRefundMutation.mutateAsync({
-        main_checkout_id: id,
-        payload: {
-          amount: Number(totalRefundAmount.toFixed(2)),
-          products: productRefundLines.map((line) => ({
-            name: line.name,
-            sku: line.sku,
-            quantity: line.units,
-            id_provider: line.idProvider,
-            unit_price: Number(line.unitPrice.toFixed(2)),
-            refund_amount: Number(line.amount.toFixed(2)),
-            reason: line.reason,
-            type: "No return",
-            file: [],
-          })),
-        },
-      });
-
-      if (uploadedCheckoutUrls.length > 0) {
-        const existingCheckoutUrls = (order.files ?? [])
-          .map((file) => file?.url)
-          .filter((url): url is string => Boolean(url));
-        const mergedCheckoutUrls = Array.from(
-          new Set([...existingCheckoutUrls, ...uploadedCheckoutUrls]),
-        );
-
-        await uploadCheckoutFilesMutation.mutateAsync({
-          main_checkout_id: id,
-          payload: mergedCheckoutUrls,
-        });
-      }
-
-      toast.success("Issue refund successfully");
-      handleClose();
-    } catch (error) {
-      const message = extractRefundErrorMessage(error);
-      toast.error("Failed to issue refund", {
-        description: message,
-      });
-    }
+    toast.error("Please select item units or enter a fixed amount");
   };
 
   return (
@@ -720,138 +635,51 @@ const IssueRefundDialog = ({
       onOpenChange={(nextOpen) => !nextOpen && handleClose()}
       direction="right"
     >
-      <DrawerContent className="w-[1000px] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[1000px] overflow-y-auto p-0">
+      <DrawerContent className="w-[1000px] max-w-none overflow-y-auto p-0 data-[vaul-drawer-direction=right]:sm:max-w-[1000px]">
         <DrawerHeader className="border-b px-6 py-5">
           <DrawerTitle>Issue Refund</DrawerTitle>
           <DrawerDescription>
-            Full refund uses units by quantity. Partial refund accepts direct
-            amount per product and shipping. Money refund accepts only a single
-            amount and reason.
+            Refund item units individually or use a fixed amount. Fixed amount
+            cannot be combined with item or shipping refunds.
           </DrawerDescription>
         </DrawerHeader>
 
         <div className="space-y-6 px-6 py-5">
-          <div className="inline-flex items-center gap-2 rounded-full border p-1">
-            <Button
-              type="button"
-              variant={refundMode === "full" ? "secondary" : "ghost"}
-              className="rounded-full px-4"
-              disabled={isSubmitting}
-              onClick={() => setRefundMode("full")}
-            >
-              Full refund
-            </Button>
-            <Button
-              type="button"
-              variant={refundMode === "partial" ? "secondary" : "ghost"}
-              className="rounded-full px-4"
-              disabled={isSubmitting}
-              onClick={() => setRefundMode("partial")}
-            >
-              Partial refund
-            </Button>
-            <Button
-              type="button"
-              variant={refundMode === "money" ? "secondary" : "ghost"}
-              className="rounded-full px-4"
-              disabled={isSubmitting}
-              onClick={() => setRefundMode("money")}
-            >
-              Fixed amount
-            </Button>
-          </div>
-
-          {refundMode === "money" ? (
-            <div className="rounded-lg border p-4">
-              <div className="grid gap-3 md:grid-cols-2">
-                <div>
-                  <Label className="mb-1 block text-xs text-muted-foreground">
-                    Refund amount
-                  </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={orderTotal}
-                    step="0.01"
-                    value={moneyRefundInput}
-                    onChange={(event) => {
-                      const rawValue = event.target.value;
-
-                      if (!rawValue.trim()) {
-                        setMoneyRefundInput("0");
-                        return;
-                      }
-
-                      const parsedValue = Number(rawValue.replace(",", "."));
-                      if (Number.isNaN(parsedValue)) return;
-
-                      const clampedValue = clamp(parsedValue, 0, orderTotal);
-                      setMoneyRefundInput(
-                        parsedValue === clampedValue
-                          ? rawValue
-                          : formatAmountInput(clampedValue),
-                      );
-                    }}
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                <div className="self-end space-y-1 text-sm text-muted-foreground">
-                  <div>Max refundable amount: €{normalizeCurrency(orderTotal)}</div>
-                  <div>
-                    Refund percentage:{" "}
-                    {moneyRefundPercentage.toLocaleString("de-DE", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    %
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <Label className="mb-1 block text-xs text-muted-foreground">
-                    Reason for refund
-                  </Label>
-                  <Select
-                    key="money-reason"
-                    value={moneyRefundReason || undefined}
-                    onValueChange={setMoneyRefundReason}
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger className="w-full border border-input">
-                      <SelectValue placeholder="Select a reason" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {REFUND_REASON_GROUPS.map((group, groupIndex) => (
-                        <React.Fragment key={group.label}>
-                          <SelectGroup>
-                            <SelectLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wide text-foreground">
-                              {group.label}
-                            </SelectLabel>
-                            {group.options.map((reason) => (
-                              <SelectItem key={reason} value={reason}>
-                                {reason}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                          {groupIndex < REFUND_REASON_GROUPS.length - 1 ? (
-                            <SelectSeparator />
-                          ) : null}
-                        </React.Fragment>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          <div
+            className={cn(
+              "space-y-4",
+              itemSectionDisabled &&
+                "rounded-xl border border-muted-foreground/20 bg-muted/20 p-4",
+            )}
+          >
+            <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h3 className="font-semibold">Item refund</h3>
+                <p className="text-sm text-muted-foreground">
+                  Each ordered quantity is split into its own row. Select 0 or 1
+                  unit per row.
+                </p>
               </div>
+              {itemSectionDisabled ? (
+                <p className="max-w-xs text-sm text-muted-foreground md:text-right">
+                  Clear the fixed amount below to enable item and shipping refund.
+                </p>
+              ) : null}
             </div>
-          ) : null}
 
-          {refundMode !== "money" ? (
             <div className="space-y-4">
               {lineRefunds.map((line) => (
-                <div key={line.key} className="rounded-lg border p-4">
+                <div
+                  key={line.key}
+                  className={cn(
+                    "rounded-lg border p-4 transition-colors",
+                    line.units > 0 && !itemSectionDisabled
+                      ? "border-secondary/30 bg-secondary/5"
+                      : "bg-background",
+                  )}
+                >
                   <div className="grid grid-cols-12 gap-4">
-                    <div className="col-span-12 flex items-start gap-3 md:col-span-4">
+                    <div className="col-span-12 flex items-start gap-3 md:col-span-5">
                       {line.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -863,14 +691,12 @@ const IssueRefundDialog = ({
                         <div className="h-16 w-16 rounded-md border bg-muted" />
                       )}
                       <div className="min-w-0">
-                        <div className="line-clamp-2 font-medium">
-                          {line.name}
-                        </div>
+                        <div className="line-clamp-2 font-medium">{line.name}</div>
                         <div className="text-sm text-muted-foreground">
                           SKU: {line.sku}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          Quantity: {line.quantity}
+                          Unit {line.unitIndex} of {line.originalQuantity}
                         </div>
                       </div>
                     </div>
@@ -886,99 +712,43 @@ const IssueRefundDialog = ({
 
                     <div className="col-span-6 md:col-span-2">
                       <Label className="mb-1 block text-xs text-muted-foreground">
-                        Units (0-{line.quantity})
+                        Units (0-1)
                       </Label>
                       <Select
-                        key={`${refundMode}-${line.key}-units`}
                         value={String(line.units)}
                         onValueChange={(value) =>
-                          updateActiveLineForm(line.key, (prev) => ({
-                            ...prev,
-                            units: Number(value),
-                            amountInput:
-                              refundMode === "partial"
-                                ? formatAmountInput(
-                                    clamp(
-                                      parseAmountInput(prev.amountInput),
-                                      0,
-                                      Number(value) * line.unitPrice,
-                                    ),
-                                  )
-                                : prev.amountInput,
-                          }))
+                          updateLineForm(line.key, (prev) => {
+                            const nextUnits = clamp(Number(value), 0, 1);
+
+                            if (nextUnits === 0) {
+                              prev.images.forEach((image) => {
+                                if (image.previewUrl) {
+                                  URL.revokeObjectURL(image.previewUrl);
+                                }
+                              });
+
+                              return createInitialLineFormState();
+                            }
+
+                            return {
+                              ...prev,
+                              units: nextUnits,
+                            };
+                          })
                         }
-                            disabled={isSubmitting}
+                        disabled={isSubmitting || itemSectionDisabled}
                       >
                         <SelectTrigger className="w-full border border-input">
                           <SelectValue placeholder="Select units" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(
-                            refundMode === "full"
-                              ? [0, line.quantity]
-                              : Array.from(
-                                  { length: line.quantity + 1 },
-                                  (_, index) => index,
-                                )
-                          ).map((option) => (
-                            <SelectItem key={option} value={String(option)}>
-                              {option}
-                            </SelectItem>
-                          ))}
+                          <SelectItem value="0">0</SelectItem>
+                          <SelectItem value="1">1</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div className="col-span-6 md:col-span-2">
-                      {refundMode === "partial" ? (
-                        <>
-                          <Label className="mb-1 block text-xs text-muted-foreground">
-                            Amount (0-{normalizeCurrency(line.partialMaxAmount)})
-                          </Label>
-                          <Input
-                            type="number"
-                            min={0}
-                            max={line.partialMaxAmount}
-                            step="0.01"
-                            value={
-                              activeLineFormByKey[line.key]?.amountInput ?? ""
-                            }
-                            onChange={(event) => {
-                              const rawValue = event.target.value;
-
-                              if (!rawValue.trim()) {
-                                updateActiveLineForm(line.key, (prev) => ({
-                                  ...prev,
-                                  amountInput: "",
-                                }));
-                                return;
-                              }
-
-                              const parsedValue = Number(
-                                rawValue.replace(",", "."),
-                              );
-                              if (Number.isNaN(parsedValue)) return;
-
-                              const clampedValue = clamp(
-                                parsedValue,
-                                0,
-                                line.partialMaxAmount,
-                              );
-                              updateActiveLineForm(line.key, (prev) => ({
-                                ...prev,
-                                amountInput:
-                                  parsedValue === clampedValue
-                                    ? rawValue
-                                    : formatAmountInput(clampedValue),
-                              }));
-                            }}
-                            disabled={isSubmitting || line.units <= 0}
-                          />
-                        </>
-                      ) : null}
-                    </div>
-
-                    <div className="col-span-12 md:col-span-2">
+                    <div className="col-span-12 md:col-span-3">
                       <div className="text-xs text-muted-foreground">
                         Refund amount
                       </div>
@@ -993,38 +763,21 @@ const IssueRefundDialog = ({
                       Reason for refund
                     </Label>
                     <Select
-                      key={`${refundMode}-${line.key}-reason`}
                       value={line.reason || undefined}
                       onValueChange={(value) =>
-                        updateActiveLineForm(line.key, (prev) => ({
+                        updateLineForm(line.key, (prev) => ({
                           ...prev,
                           reason: value,
                         }))
                       }
-                      disabled={isSubmitting}
+                      disabled={
+                        isSubmitting || itemSectionDisabled || line.units <= 0
+                      }
                     >
                       <SelectTrigger className="w-full border border-input">
                         <SelectValue placeholder="Select a reason" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {REFUND_REASON_GROUPS.map((group, groupIndex) => (
-                          <React.Fragment key={group.label}>
-                            <SelectGroup>
-                              <SelectLabel className="px-2 py-2 text-xs font-bold uppercase tracking-wide text-foreground">
-                                {group.label}
-                              </SelectLabel>
-                              {group.options.map((reason) => (
-                                <SelectItem key={reason} value={reason}>
-                                  {reason}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                            {groupIndex < REFUND_REASON_GROUPS.length - 1 ? (
-                              <SelectSeparator />
-                            ) : null}
-                          </React.Fragment>
-                        ))}
-                      </SelectContent>
+                      <SelectContent>{renderRefundReasonOptions()}</SelectContent>
                     </Select>
                   </div>
 
@@ -1033,21 +786,26 @@ const IssueRefundDialog = ({
                       Upload files
                     </Label>
                     <div
-                      onDragOver={(event) =>
-                        handleLineDragOver(line.key, event)
-                      }
-                      onDragEnter={(event) =>
-                        handleLineDragOver(line.key, event)
-                      }
+                      onDragOver={(event) => handleLineDragOver(line.key, event)}
+                      onDragEnter={(event) => handleLineDragOver(line.key, event)}
                       onDragLeave={handleLineDragLeave}
                       onDrop={(event) => handleLineDrop(line.key, event)}
-                      className={`rounded-md border border-dashed p-4 transition-colors ${
+                      className={cn(
+                        "rounded-md border border-dashed p-4 transition-colors",
                         draggingLineKey === line.key
                           ? "border-primary bg-primary/5"
-                          : "border-input"
-                      }`}
+                          : "border-input",
+                        (itemSectionDisabled || line.units <= 0) && "bg-muted/10",
+                      )}
                     >
-                      <label className="flex cursor-pointer flex-col items-center gap-2 text-sm text-muted-foreground">
+                      <label
+                        className={cn(
+                          "flex flex-col items-center gap-2 text-sm text-muted-foreground",
+                          isSubmitting || itemSectionDisabled || line.units <= 0
+                            ? "cursor-not-allowed"
+                            : "cursor-pointer",
+                        )}
+                      >
                         <Upload className="size-4" />
                         <span>Drag and drop files here</span>
                         <span>or click to browse</span>
@@ -1059,7 +817,9 @@ const IssueRefundDialog = ({
                             handleLineImageUpload(line.key, event.target.files);
                             event.currentTarget.value = "";
                           }}
-                          disabled={isSubmitting}
+                          disabled={
+                            isSubmitting || itemSectionDisabled || line.units <= 0
+                          }
                         />
                       </label>
                     </div>
@@ -1092,7 +852,7 @@ const IssueRefundDialog = ({
                               onClick={() =>
                                 handleRemoveLineImage(line.key, image.id)
                               }
-                              disabled={isSubmitting}
+                              disabled={isSubmitting || itemSectionDisabled}
                               aria-label="Remove image"
                             >
                               <X className="size-3" />
@@ -1105,17 +865,20 @@ const IssueRefundDialog = ({
                 </div>
               ))}
             </div>
-          ) : null}
 
-          {refundMode !== "money" ? (
             <div className="rounded-lg border p-4">
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 md:col-span-6">
                   <div className="font-medium">Shipping fee</div>
                   <div className="text-sm text-muted-foreground">
-                    Max refundable shipping: €
-                    {normalizeCurrency(shippingMaxAmount)}
+                    Max refundable shipping: €{normalizeCurrency(shippingMaxAmount)}
                   </div>
+                  {!isShippingRefundAllowed ? (
+                    <div className="mt-2 text-xs text-muted-foreground">
+                      Select at least one refunded item with a shipping-eligible
+                      refund reason to enable shipping refund.
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="col-span-6 md:col-span-2">
@@ -1128,79 +891,28 @@ const IssueRefundDialog = ({
                 </div>
 
                 <div className="col-span-6 md:col-span-2">
-                  {refundMode === "full" ? (
-                    <>
-                      <Label className="mb-1 block text-xs text-muted-foreground">
-                        Units (0-1)
-                      </Label>
-                      <Select
-                        key={`${refundMode}-shipping-units`}
-                        value={String(activeShippingForm.units > 0 ? 1 : 0)}
-                        onValueChange={(value) =>
-                          updateActiveShippingForm((prev) => ({
-                            ...prev,
-                            units: Number(value),
-                          }))
-                        }
-                        disabled={isSubmitting || !isShippingRefundAllowed}
-                      >
-                        <SelectTrigger className="w-full border border-input">
-                          <SelectValue placeholder="Select units" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="0">0</SelectItem>
-                          <SelectItem value="1">1</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </>
-                  ) : (
-                    <>
-                      <Label className="mb-1 block text-xs text-muted-foreground">
-                        Amount (0-{normalizeCurrency(shippingMaxAmount)})
-                      </Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        max={shippingMaxAmount}
-                        step="0.01"
-                        value={
-                          isShippingRefundAllowed
-                            ? activeShippingForm.amountInput
-                            : "0"
-                        }
-                        onChange={(event) => {
-                          const rawValue = event.target.value;
-
-                          if (!rawValue.trim()) {
-                            updateActiveShippingForm((prev) => ({
-                              ...prev,
-                              amountInput: "0",
-                            }));
-                            return;
-                          }
-
-                          const parsedValue = Number(
-                            rawValue.replace(",", "."),
-                          );
-                          if (Number.isNaN(parsedValue)) return;
-
-                          const clampedValue = clamp(
-                            parsedValue,
-                            0,
-                            shippingMaxAmount,
-                          );
-                          updateActiveShippingForm((prev) => ({
-                            ...prev,
-                            amountInput:
-                              parsedValue === clampedValue
-                                ? rawValue
-                                : formatAmountInput(clampedValue),
-                          }));
-                        }}
-                        disabled={isSubmitting || !isShippingRefundAllowed}
-                      />
-                    </>
-                  )}
+                  <Label className="mb-1 block text-xs text-muted-foreground">
+                    Units (0-1)
+                  </Label>
+                  <Select
+                    value={String(shippingForm.units > 0 ? 1 : 0)}
+                    onValueChange={(value) =>
+                      setShippingForm({
+                        units: clamp(Number(value), 0, 1),
+                      })
+                    }
+                    disabled={
+                      isSubmitting || itemSectionDisabled || !isShippingRefundAllowed
+                    }
+                  >
+                    <SelectTrigger className="w-full border border-input">
+                      <SelectValue placeholder="Select units" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">0</SelectItem>
+                      <SelectItem value="1">1</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="col-span-12 md:col-span-2">
@@ -1213,7 +925,92 @@ const IssueRefundDialog = ({
                 </div>
               </div>
             </div>
-          ) : null}
+          </div>
+
+          <div
+            className={cn(
+              "rounded-lg border p-4",
+              fixedAmountSectionDisabled &&
+                "border-muted-foreground/20 bg-muted/20 opacity-60",
+            )}
+          >
+            <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h3 className="font-semibold">Fixed amount</h3>
+                <p className="text-sm text-muted-foreground">
+                  Use a single refund amount for the order. This follows the same
+                  logic as the previous fixed amount refund.
+                </p>
+              </div>
+              {fixedAmountSectionDisabled ? (
+                <p className="max-w-xs text-sm text-muted-foreground md:text-right">
+                  Clear selected item units and shipping to enable fixed amount.
+                </p>
+              ) : null}
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <Label className="mb-1 block text-xs text-muted-foreground">
+                  Refund amount
+                </Label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={orderTotal}
+                  step="0.01"
+                  value={moneyRefundInput}
+                  onChange={(event) => {
+                    const rawValue = event.target.value;
+
+                    if (!rawValue.trim()) {
+                      setMoneyRefundInput("0");
+                      return;
+                    }
+
+                    const parsedValue = Number(rawValue.replace(",", "."));
+                    if (Number.isNaN(parsedValue)) return;
+
+                    const clampedValue = clamp(parsedValue, 0, orderTotal);
+                    setMoneyRefundInput(
+                      parsedValue === clampedValue
+                        ? rawValue
+                        : formatAmountInput(clampedValue),
+                    );
+                  }}
+                  disabled={isSubmitting || fixedAmountSectionDisabled}
+                />
+              </div>
+
+              <div className="self-end space-y-1 text-sm text-muted-foreground">
+                <div>Max refundable amount: €{normalizeCurrency(orderTotal)}</div>
+                <div>
+                  Refund percentage: {" "}
+                  {moneyRefundPercentage.toLocaleString("de-DE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  %
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <Label className="mb-1 block text-xs text-muted-foreground">
+                  Reason for refund
+                </Label>
+                <Select
+                  value={moneyRefundReason || undefined}
+                  onValueChange={setMoneyRefundReason}
+                  disabled={isSubmitting || fixedAmountSectionDisabled}
+                >
+                  <SelectTrigger className="w-full border border-input">
+                    <SelectValue placeholder="Select a reason" />
+                  </SelectTrigger>
+                  <SelectContent>{renderRefundReasonOptions()}</SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
 
           <div className="ml-auto w-full max-w-md rounded-lg border bg-muted/20 p-4">
             <div className="space-y-2 text-sm">
