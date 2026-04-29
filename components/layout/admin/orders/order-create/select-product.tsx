@@ -50,6 +50,11 @@ const SelectOrderItems = ({
   const [queryParams, setQueryParams] = useState("");
   const [open, setOpen] = useState(false);
 
+  const roundPrice = (value: number) => {
+    const normalized = Number(value) || 0;
+    return Number(normalized.toFixed(2));
+  };
+
   const {
     data: products,
     isLoading,
@@ -75,7 +80,7 @@ const SelectOrderItems = ({
         {
           product,
           quantity: 1,
-          final_price: product.final_price ?? 0,
+          final_price: roundPrice(Number(product.final_price) || 0),
           carrier: product.carrier,
         },
       ];
@@ -93,7 +98,9 @@ const SelectOrderItems = ({
   const handlePriceChange = (id: string, value: number) => {
     setListProducts((prev) =>
       prev.map((item) =>
-        item.product.id === id ? { ...item, final_price: value } : item,
+        item.product.id === id
+          ? { ...item, final_price: roundPrice(value) }
+          : item,
       ),
     );
   };
@@ -122,7 +129,7 @@ const SelectOrderItems = ({
       quantity: item.quantity,
       title: item.product.name,
       sku: item.product.sku ?? "",
-      final_price: item.final_price,
+      final_price: roundPrice(item.final_price),
       carrier: item.carrier,
     }));
     setValue("items", items);
@@ -260,9 +267,9 @@ const SelectOrderItems = ({
                 <div>
                   <Input
                     type="number"
-                    step="0.001"
+                    step="0.01"
                     min={0}
-                    value={final_price}
+                    value={roundPrice(final_price)}
                     onChange={(e) =>
                       handlePriceChange(product.id, Number(e.target.value))
                     }

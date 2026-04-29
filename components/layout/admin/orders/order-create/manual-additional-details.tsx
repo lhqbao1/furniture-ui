@@ -111,6 +111,7 @@ export default function ManualAdditionalInformation({
         { value: "amazon", label: "Amazon" },
         { value: "inprodius", label: "Inprodius" },
         { value: "netto", label: "Netto" },
+        { value: "econelo", label: "Econelo" },
         { value: "freakout", label: "FreakOut" },
         { value: "praktiker", label: "Praktiker" },
         { value: "norma", label: "Norma24" },
