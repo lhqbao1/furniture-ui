@@ -1,16 +1,62 @@
-export function getCountryName(code: string): string {
-  const normalized = code?.toUpperCase();
+const COUNTRY_NAME_MAP: Record<string, string> = {
+  AL: "Albanien",
+  AD: "Andorra",
+  AM: "Armenien",
+  AT: "Österreich",
+  AZ: "Aserbaidschan",
+  BA: "Bosnien und Herzegowina",
+  BE: "Belgien",
+  BG: "Bulgarien",
+  BY: "Belarus",
+  CH: "Schweiz",
+  CY: "Zypern",
+  CZ: "Tschechien",
+  DE: "Deutschland",
+  DK: "Dänemark",
+  EE: "Estland",
+  ES: "Spanien",
+  FI: "Finnland",
+  FR: "Frankreich",
+  GB: "Vereinigtes Königreich",
+  GE: "Georgien",
+  GR: "Griechenland",
+  HR: "Kroatien",
+  HU: "Ungarn",
+  IE: "Irland",
+  IS: "Island",
+  IT: "Italien",
+  LI: "Liechtenstein",
+  LT: "Litauen",
+  LU: "Luxemburg",
+  LV: "Lettland",
+  MC: "Monaco",
+  MD: "Moldau",
+  ME: "Montenegro",
+  MK: "Nordmazedonien",
+  MT: "Malta",
+  NL: "Niederlande",
+  NO: "Norwegen",
+  PL: "Polen",
+  PT: "Portugal",
+  RO: "Rumänien",
+  RS: "Serbien",
+  RU: "Russland",
+  SE: "Schweden",
+  SI: "Slowenien",
+  SK: "Slowakei",
+  SM: "San Marino",
+  TR: "Türkei",
+  UA: "Ukraine",
+  UK: "Vereinigtes Königreich",
+  VA: "Vatikanstadt",
+  XK: "Kosovo",
+  SCHWEIZ: "Schweiz",
+};
 
-  switch (normalized) {
-    case "DE":
-      return "Deutschland"; // Nước Đức
-    case "FR":
-      return "Frankreich"; // Nước Đức
-    case "AT":
-      return "Österreich"; // Nước Áo
-    case "SCHWEIZ":
-      return "Schweiz";
-    default:
-      return ""; // hoặc return code nếu muốn
-  }
+export function getCountryName(code: string): string {
+  const normalized = code?.trim().toUpperCase();
+
+  if (!normalized) return "";
+
+  return COUNTRY_NAME_MAP[normalized] ?? normalized;
 }

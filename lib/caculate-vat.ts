@@ -82,6 +82,28 @@ function parseTaxRate(
     return value / 100;
   }
 
+  // 🇫🇷 France
+  if (country_code === "FR") {
+    // Có VAT ID → reverse charge → 0%
+    if (tax_id) return 0;
+
+    // Không VAT ID → standard VAT
+    if (value === 19) return 20 / 100;
+
+    return value / 100;
+  }
+
+  // 🇧🇪 Belgium
+  if (country_code === "BE") {
+    // Có VAT ID → reverse charge → 0%
+    if (tax_id) return 0;
+
+    // Không VAT ID → standard VAT
+    if (value === 19) return 21 / 100;
+
+    return value / 100;
+  }
+
   // 🇩🇪 Germany
   if (country_code === "DE") {
     // DE giữ nguyên dù có tax_id hay không

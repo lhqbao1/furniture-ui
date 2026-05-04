@@ -23,7 +23,7 @@ export const ORDER_LIST_STATUS_FILTER_OPTIONS: OrderListStatusFilterOption[] = [
   {
     key: "stock_reserved",
     label: "Stock reserved",
-    statuses: ["tock_reserved", "reserved", "stock_reserved"],
+    statuses: ["tock_reserved"],
   },
   {
     key: "dispatched",
@@ -53,4 +53,3 @@ export const ORDER_LIST_STATUS_FILTER_OPTIONS: OrderListStatusFilterOption[] = [
     statuses: ["return_issue"],
   },
 ];
-
