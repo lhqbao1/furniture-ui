@@ -22,6 +22,7 @@ export interface GetAllCheckoutParams {
   from_date?: string;
   to_date?: string;
   search?: string;
+  country?: string;
   is_b2b?: boolean;
 }
 
@@ -170,6 +171,7 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
       ...(params?.search !== undefined && { search: params.search }),
+      ...(params?.country !== undefined && { country: params.country }),
       ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
     },
 

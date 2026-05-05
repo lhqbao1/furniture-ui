@@ -1,9 +1,14 @@
+import qs from "qs";
 import { apiAdmin } from "@/lib/axios";
 import { IncomingInventoryValues } from "@/lib/schema/incoming-inventory";
 import { PurchaseOrderDetail } from "@/types/po";
 
 export interface UpdatePONumberOfContainerInput {
   number_of_containers: number;
+}
+
+export interface GetAllPurchaseOrdersParams {
+  search?: string | string[];
 }
 
 export async function updateProductStockFromInventoryPo(
@@ -92,7 +97,9 @@ export async function deletePurchaseOrder(purchaseOrderId: string) {
   return data;
 }
 
-export async function getAllPurchaseOrders() {
+export async function getAllPurchaseOrders(
+  params?: GetAllPurchaseOrdersParams,
+) {
   const { data } = await apiAdmin.get<PurchaseOrderDetail[]>(
     "/po/purchase-order/all",
     {
@@ -101,6 +108,11 @@ export async function getAllPurchaseOrders() {
         Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
       },
       withCredentials: true,
+      params: {
+        ...(params?.search !== undefined && { search: params.search }),
+      },
+      paramsSerializer: (queryParams) =>
+        qs.stringify(queryParams, { arrayFormat: "repeat" }),
     },
   );
 

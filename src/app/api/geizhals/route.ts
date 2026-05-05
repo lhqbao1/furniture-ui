@@ -66,14 +66,15 @@ export async function GET() {
             p.categories?.map((c) => c.name).join(" > ") || "General";
           const largeImage =
             Array.isArray(p.static_files) && p.static_files.length > 0
-              ? p.static_files[0]?.url ?? ""
+              ? (p.static_files[0]?.url ?? "")
               : "";
           const url =
             p.brand.name.toLowerCase() === "econelo"
               ? `https://econelo.de/produkt/${p.url_key}`
               : `https://prestige-home.de/de/product/${p.url_key}`;
 
-          return [`
+          return [
+            `
  <product>
   <Artikelnummer>${escapeXml(p.id_provider)}</Artikelnummer>
 
@@ -107,7 +108,8 @@ export async function GET() {
     cleanDescription(p.description),
   )}]]></Beschreibung>
 </product>
-`];
+`,
+          ];
         } catch (error) {
           skippedProducts += 1;
           console.warn("Skip invalid Geizhals product row:", {
@@ -120,7 +122,9 @@ export async function GET() {
       .join("\n");
 
     if (skippedProducts > 0) {
-      console.warn(`Geizhals feed skipped ${skippedProducts} invalid products.`);
+      console.warn(
+        `Geizhals feed skipped ${skippedProducts} invalid products.`,
+      );
     }
 
     const xml = `<?xml version="1.0" encoding="utf-8"?>
@@ -136,7 +140,7 @@ ${itemsXml}
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { success: false, error: "Failed to generate AWIN XML feed" },
+      { success: false, error: "Failed to generate geizhals XML feed" },
       { status: 500 },
     );
   }

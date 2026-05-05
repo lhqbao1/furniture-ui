@@ -2,6 +2,7 @@
 
 import { POColumns } from "@/components/layout/admin/incoming-inventory/po-columns";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
+import PurchaseOrderSearch from "@/components/layout/admin/inventory/purchase-order-search";
 import { ProductTable } from "@/components/layout/admin/products/products-list/product-table";
 import ProductTableSkeleton from "@/components/shared/skeleton/table-skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,6 +34,7 @@ const IncomingInventoryList = () => {
   const [pageSize, setPageSize] = useState(50);
   const [inventoryPoPage, setInventoryPoPage] = useState(1);
   const [inventoryPoPageSize, setInventoryPoPageSize] = useState(50);
+  const [activeTab, setActiveTab] = useState("purchase-orders");
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -52,7 +54,24 @@ const IncomingInventoryList = () => {
   }, [searchParams]);
 
   const search = searchParams.get("search") ?? undefined;
-  const { data, isLoading, isError } = useGetAllPurchaseOrders();
+  const multiSearchRaw = searchParams.get("multi_search") ?? "";
+  const multiSearchValues = React.useMemo(
+    () =>
+      multiSearchRaw
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+    [multiSearchRaw],
+  );
+
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+  } = useGetAllPurchaseOrders({
+    search: multiSearchValues.length > 0 ? multiSearchValues : undefined,
+  });
   const {
     data: inventoryPoData,
     isLoading: isInventoryPoLoading,
@@ -175,6 +194,12 @@ const IncomingInventoryList = () => {
   ];
 
   const inventoryPoItems = inventoryPoData ?? [];
+  const purchaseOrderItems = data ?? [];
+  const purchaseOrderPageStart = (page - 1) * pageSize;
+  const purchaseOrderPageItems = purchaseOrderItems.slice(
+    purchaseOrderPageStart,
+    purchaseOrderPageStart + pageSize,
+  );
   const inventoryPoTotal = inventoryPoItems.length;
   const inventoryPoTotalPages = Math.max(
     1,
@@ -192,6 +217,12 @@ const IncomingInventoryList = () => {
       behavior: "smooth",
     });
   }, [page]);
+
+  const isPurchaseOrdersPending = isLoading || isFetching;
+  const purchaseOrderTotalPages = Math.max(
+    1,
+    Math.ceil(purchaseOrderItems.length / pageSize),
+  );
 
   const tableWrapRef = useRef<HTMLDivElement | null>(null);
   const [tableHeight, setTableHeight] = useState<number | null>(null);
@@ -220,21 +251,28 @@ const IncomingInventoryList = () => {
       </div>
 
       <InventoryTableToolbar
-        pageSize={pageSize}
-        setPageSize={setPageSize}
+        pageSize={activeTab === "purchase-orders" ? pageSize : inventoryPoPageSize}
+        setPageSize={
+          activeTab === "purchase-orders"
+            ? setPageSize
+            : setInventoryPoPageSize
+        }
         addButtonText="Add Product"
         addButtonUrl="/admin/products/add"
-        setPage={setPage}
+        setPage={activeTab === "purchase-orders" ? setPage : setInventoryPoPage}
+        searchContent={
+          activeTab === "purchase-orders" ? <PurchaseOrderSearch /> : undefined
+        }
       />
 
-      <Tabs defaultValue="purchase-orders">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="purchase-orders">Purchase Orders</TabsTrigger>
           <TabsTrigger value="inventory-po">Incoming Items</TabsTrigger>
         </TabsList>
 
         <TabsContent value="purchase-orders">
-          {isLoading ? (
+          {isPurchaseOrdersPending ? (
             <ProductTableSkeleton />
           ) : (
             <div
@@ -243,19 +281,14 @@ const IncomingInventoryList = () => {
               style={tableHeight ? { height: `${tableHeight}px` } : undefined}
             >
               <ProductTable
-                data={data ?? []}
-                // columns={getIncomingInventoryColumns(setSortByStock)}
+                data={purchaseOrderPageItems}
                 columns={POColumns}
                 page={page}
                 pageSize={pageSize}
                 setPage={handlePageChange}
                 setPageSize={setPageSize}
-                totalItems={data?.length ?? 0}
-                totalPages={
-                  data && data.length > 0 && data.length > pageSize
-                    ? data.length / pageSize
-                    : 1
-                }
+                totalItems={purchaseOrderItems.length}
+                totalPages={purchaseOrderTotalPages}
                 hasHeaderBackGround
                 isSticky
                 stickyContainerClassName="h-full"

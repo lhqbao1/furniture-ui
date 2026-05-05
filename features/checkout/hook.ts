@@ -197,6 +197,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
     from_date,
     to_date,
     search,
+    country,
     is_b2b,
   } = params;
 
@@ -210,6 +211,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       from_date ?? null,
       to_date ?? null,
       search ?? null,
+      country ?? null,
       is_b2b,
     ],
     queryFn: () => getCheckOutMain(params),

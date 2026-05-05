@@ -63,7 +63,8 @@ export async function GET() {
               .join(", ") || "";
           const stock = calculateAvailableStock(p);
 
-          return [`
+          return [
+            `
   <product weboffer="no" preorder="no" instock="${
     stock > 0 ? "yes" : "no"
   }" forsale="${p.is_active ? "yes" : "no"}">
@@ -110,7 +111,8 @@ export async function GET() {
       .toISOString()
       .replace("T", " ")
       .slice(0, 19)}</lastupdated>
-  </product>`];
+  </product>`,
+          ];
         } catch (error) {
           skippedProducts += 1;
           console.warn("Skip invalid AWIN product row:", {
@@ -139,7 +141,7 @@ ${itemsXml}
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { success: false, error: "Failed to generate AWIN XML feed" },
+      { success: false, error: "Failed to generate geizhals XML feed" },
       { status: 500 },
     );
   }
