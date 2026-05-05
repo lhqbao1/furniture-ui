@@ -38,6 +38,10 @@ import B2BInvoiceDrawer from "./b2b-invoice-drawer";
 import OrderB2BFilter from "./filter/filter-order-b2b";
 import { exportOrderListTemplateToExcel } from "./export-order-template";
 import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
+import {
+  normalizeOrderCountryCode,
+  ORDER_EUROPEAN_COUNTRY_OPTIONS,
+} from "./filter/order-country-filter-options";
 import { STATUS_OPTIONS } from "@/data/data";
 import { ORDER_LIST_STATUS_FILTER_OPTIONS } from "./filter/order-status-filter-options";
 
@@ -59,6 +63,7 @@ interface OrderToolbarProps {
   selectedOrders?: CheckOutMain[];
   showB2BRevenue?: boolean;
   showClaimedFilters?: boolean;
+  showCountryFilter?: boolean;
   exportPresetStatuses?: string[];
   lockExportStatuses?: boolean;
   expandExportByRefundItems?: boolean;
@@ -70,6 +75,7 @@ const FILTER_KEYS = [
   "channel",
   "from_date",
   "to_date",
+  "country",
   "is_b2b",
   "is_claimed_factory",
   "is_claimed_marketplace",
@@ -87,6 +93,7 @@ export default function OrderToolbar({
   selectedOrders = [],
   showB2BRevenue = true,
   showClaimedFilters = false,
+  showCountryFilter = false,
   exportPresetStatuses,
   lockExportStatuses = false,
   expandExportByRefundItems = false,
@@ -131,6 +138,18 @@ export default function OrderToolbar({
     CHANEL_OPTIONS.forEach((item) => {
       map.set(item.key.toLowerCase(), item.label);
     });
+
+    return map;
+  }, []);
+
+  const countryLabelMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+
+    ORDER_EUROPEAN_COUNTRY_OPTIONS.forEach((item) => {
+      map.set(item.key, `${item.flag} ${item.label}`);
+    });
+
+    map.set("UK", map.get("GB") ?? "🇬🇧 United Kingdom");
 
     return map;
   }, []);
@@ -252,6 +271,15 @@ export default function OrderToolbar({
       });
     }
 
+    const country = normalizeOrderCountryCode(searchParams.get("country"));
+    if (country) {
+      chips.push({
+        id: "country",
+        label: `Country: ${countryLabelMap.get(country) ?? country}`,
+        onRemove: () => removeFilterParam("country"),
+      });
+    }
+
     const isB2B = searchParams.get("is_b2b");
     if (isB2B === "true" || isB2B === "false") {
       chips.push({
@@ -284,6 +312,7 @@ export default function OrderToolbar({
     searchParams,
     statusLabelMap,
     channelLabelMap,
+    countryLabelMap,
     parseCsvParam,
     removeFilterParam,
     removeFilterValue,
@@ -371,7 +400,10 @@ export default function OrderToolbar({
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[95vw] max-w-[920px] p-4 md:p-6">
                 {type === ToolbarType.order && (
-                  <OrderFilterForm showClaimedFilters={showClaimedFilters} />
+                  <OrderFilterForm
+                    showClaimedFilters={showClaimedFilters}
+                    showCountryFilter={showCountryFilter}
+                  />
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

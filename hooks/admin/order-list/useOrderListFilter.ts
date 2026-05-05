@@ -15,6 +15,17 @@ function parseChannelParam(param: string | null) {
   return arr;
 }
 
+function parseCountryParam(param: string | null): string | undefined {
+  if (!param) return undefined;
+
+  const normalized = param.trim().toUpperCase();
+
+  if (!normalized) return undefined;
+  if (normalized === "UK") return "GB";
+
+  return normalized;
+}
+
 function parseIsB2BParam(param: string | null): boolean | undefined {
   if (!param) return undefined;
   const normalized = param.trim().toLowerCase();
@@ -44,6 +55,7 @@ export function useOrderListFilters() {
     fromDate: searchParams.get("from_date") || undefined,
     toDate: searchParams.get("to_date") || undefined,
     search: searchParams.get("search") || "",
+    country: parseCountryParam(searchParams.get("country")),
     isB2B: parseIsB2BParam(searchParams.get("is_b2b")),
     isClaimedFactory: parseBooleanParam(searchParams.get("is_claimed_factory")),
     isClaimedMarketplace: parseBooleanParam(

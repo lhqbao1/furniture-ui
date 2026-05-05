@@ -44,6 +44,7 @@ const OrderList = () => {
     from_date: filters.fromDate,
     to_date: filters.toDate,
     search: filters.search,
+    country: filters.country,
     is_b2b: filters.isB2B,
   });
 
@@ -89,6 +90,7 @@ const OrderList = () => {
           setPageSize={setPageSize}
           type={ToolbarType.order}
           selectedOrders={selectedOrders}
+          showCountryFilter
         />
         {isError ? (
           <div className="flex h-[60vh] items-center justify-center rounded-2xl border border-destructive/30 bg-destructive/5 p-6">

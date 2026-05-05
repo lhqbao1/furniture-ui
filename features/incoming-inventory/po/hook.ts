@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createPurchaseOrder,
   deletePurchaseOrder,
+  GetAllPurchaseOrdersParams,
   getAllPurchaseOrders,
   getPurchaseOrderDetail,
   UpdatePONumberOfContainerInput,
@@ -124,12 +125,15 @@ export function useDeletePurchaseOrder() {
   });
 }
 
-export function useGetAllPurchaseOrders() {
-  return useQuery<PurchaseOrderDetail[]>({
-    queryKey: PURCHASE_ORDER_QUERY_KEY,
-    queryFn: getAllPurchaseOrders,
+export function useGetAllPurchaseOrders(params: GetAllPurchaseOrdersParams = {}) {
+  const searchKey = Array.isArray(params.search)
+    ? params.search.join(",")
+    : (params.search ?? "");
 
-    // optional nhưng nên có
+  return useQuery<PurchaseOrderDetail[]>({
+    queryKey: [...PURCHASE_ORDER_QUERY_KEY, searchKey],
+    queryFn: () => getAllPurchaseOrders(params),
+
     staleTime: 60 * 1000, // 1 phút
     refetchOnWindowFocus: true,
   });

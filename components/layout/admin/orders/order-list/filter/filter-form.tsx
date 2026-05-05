@@ -5,13 +5,18 @@ import OrderStatusFilter from "./filter-order-status";
 import OrderChanelFilter from "./filter-order-chanel";
 import OrderDateFilter from "./filter-order-date";
 import OrderClaimedFilter from "./filter-order-claimed";
+import OrderCountryFilter from "./filter-order-country";
 import { useSearchParams } from "next/navigation";
 
 interface OrderFilterFormProps {
   showClaimedFilters?: boolean;
+  showCountryFilter?: boolean;
 }
 
-const OrderFilterForm = ({ showClaimedFilters = false }: OrderFilterFormProps) => {
+const OrderFilterForm = ({
+  showClaimedFilters = false,
+  showCountryFilter = false,
+}: OrderFilterFormProps) => {
   const router = useRouter();
   const pathname = usePathname(); // ví dụ "/admin/products"
   const searchParams = useSearchParams();
@@ -25,6 +30,7 @@ const OrderFilterForm = ({ showClaimedFilters = false }: OrderFilterFormProps) =
     searchParams.get("channel") ||
     searchParams.get("from_date") ||
     searchParams.get("to_date") ||
+    searchParams.get("country") ||
     searchParams.get("is_b2b") ||
     searchParams.get("is_claimed_factory") ||
     searchParams.get("is_claimed_marketplace");
@@ -34,6 +40,7 @@ const OrderFilterForm = ({ showClaimedFilters = false }: OrderFilterFormProps) =
       <div className="space-y-4">
         <OrderStatusFilter />
         <OrderChanelFilter />
+        {showCountryFilter ? <OrderCountryFilter /> : null}
         {showClaimedFilters ? <OrderClaimedFilter /> : null}
       </div>
       <div className="space-y-4">
