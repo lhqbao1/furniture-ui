@@ -175,7 +175,7 @@ const formatEur = (value: number) =>
   `${value.toLocaleString("de-DE", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })} EUR`;
+  })} €`;
 
 export const B2BInvoicePDFFile = ({
   invoiceId,
@@ -574,28 +574,16 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                   {truncateText(String(row.productName), 70)}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
-                  €
-                  {row.shippingNet.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {formatEur(row.shippingNet)}
                 </Text>
                 <Text style={{ width: "8%", textAlign: "center", fontSize: 8 }}>
                   {row.quantity}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
-                  €
-                  {row.unitNet.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {formatEur(row.unitNet)}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
-                  €
-                  {row.rowNet.toLocaleString("de-DE", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {formatEur(row.rowNet)}
                 </Text>
               </View>
             );

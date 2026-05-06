@@ -5,20 +5,24 @@ export const refundProductFileSchema = z.object({
 });
 
 export const refundProductSchema = z.object({
-  name: z.string().min(1, "Product name is required"),
-  sku: z.string().min(1, "Product SKU is required"),
+  name: z.string().min(1, "Product name is required").nullable(),
+  sku: z.string().min(1, "Product SKU is required").nullable(),
   quantity: z
     .number()
     .int("Quantity must be an integer")
-    .nonnegative("Quantity must be greater than or equal to 0"),
-  id_provider: z.string().min(1, "Product id_provider is required"),
-  unit_price: z.number().nonnegative("Unit price must be greater than or equal to 0"),
+    .nonnegative("Quantity must be greater than or equal to 0")
+    .nullable(),
+  id_provider: z.string().min(1, "Product id_provider is required").nullable(),
+  unit_price: z
+    .number()
+    .nonnegative("Unit price must be greater than or equal to 0")
+    .nullable(),
   refund_amount: z
     .number()
     .nonnegative("Refund amount must be greater than or equal to 0"),
   reason: z.string().min(1, "Reason is required"),
-  type: z.string().min(1, "Type is required"),
-  file: z.array(refundProductFileSchema),
+  type: z.string().min(1, "Type is required").nullable(),
+  file: z.array(refundProductFileSchema).nullable(),
 });
 
 export const createRefundMainCheckoutSchema = z.object({

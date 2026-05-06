@@ -45,6 +45,7 @@ import {
   updateIsClaimedFactoryMainCheckout,
   updateIsClaimedMarketplaceMainCheckout,
   updateReasonForMainCheckout,
+  updateTagForMainCheckout,
   updateNoteForMainCheckout,
 } from "./api";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
@@ -437,6 +438,26 @@ export function useUpdateReasonForMainCheckout() {
         queryKey: ["checkout-main-id", variables.main_checkout_id],
       });
       qc.refetchQueries({ queryKey: ["checkout-main"] });
+    },
+  });
+}
+
+export function useUpdateTagForMainCheckout() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      main_checkout_id,
+      tag,
+    }: {
+      main_checkout_id: string;
+      tag?: string;
+    }) => updateTagForMainCheckout(main_checkout_id, tag),
+    onSuccess: (_data, variables) => {
+      qc.refetchQueries({
+        queryKey: ["checkout-main-id", variables.main_checkout_id],
+      });
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
     },
   });
 }

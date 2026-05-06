@@ -64,6 +64,7 @@ interface CheckOut {
   marketplace_order_id: string;
   delivery_from?: string | null;
   delivery_to?: string | null;
+  ware_house?: string | null;
   total_amount: number;
   supplier: SupplierResponse;
   carrier: string;
@@ -101,6 +102,7 @@ export interface CheckOutMain {
   invoice_pdf_file?: string | null;
   invoice_pdf_file_2?: string | null;
   status: string;
+  tag?: string | null;
   note: string;
   total_amount_item: number;
   total_shipping: number;

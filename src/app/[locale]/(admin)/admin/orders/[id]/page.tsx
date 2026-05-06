@@ -117,7 +117,8 @@ const OrderDetails = () => {
   const updateNoteMutation = useUpdateNoteForMainCheckout();
   const uploadStaticFileMutation = useUploadStaticFile();
   const uploadCheckoutFilesMutation = useUploadCheckoutFiles();
-  const updateIsClaimedFactoryMutation = useUpdateIsClaimedFactoryMainCheckout();
+  const updateIsClaimedFactoryMutation =
+    useUpdateIsClaimedFactoryMainCheckout();
   const updateIsClaimedMarketplaceMutation =
     useUpdateIsClaimedMarketplaceMainCheckout();
 
@@ -663,10 +664,6 @@ const OrderDetails = () => {
                             <span className="font-medium">Reason:</span>{" "}
                             {item?.reason ?? "-"}
                           </div>
-                          <div>
-                            <span className="font-medium">Type:</span>{" "}
-                            {item?.type ?? "-"}
-                          </div>
                         </div>
                       </div>
                     ))}
@@ -729,7 +726,10 @@ const OrderDetails = () => {
                     Documents
                   </h3>
                 </div>
-                <DocumentTable order={order} invoiceCode={invoice?.invoice_code} />
+                <DocumentTable
+                  order={order}
+                  invoiceCode={invoice?.invoice_code}
+                />
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

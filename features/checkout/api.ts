@@ -58,6 +58,7 @@ export interface DeliveryOrderItem {
 export interface DeliveryOrderPayload {
   items: DeliveryOrderItem[];
   carrier: string;
+  ware_house: string;
 }
 
 export interface CreateRefundMainCheckoutResponse {
@@ -341,6 +342,21 @@ export async function updateReasonForMainCheckout(
     null,
     {
       params: { reason },
+    },
+  );
+
+  return data;
+}
+
+export async function updateTagForMainCheckout(
+  main_checkout_id: string,
+  tag?: string,
+) {
+  const { data } = await apiAdmin.put(
+    `/checkout/tag-main-checkout/${main_checkout_id}`,
+    null,
+    {
+      params: tag === undefined ? {} : { tag },
     },
   );
 
