@@ -237,7 +237,10 @@ export default function TableToolbar({
                           checked={checked}
                           disabled={column.alwaysVisible}
                           onCheckedChange={(value) => {
-                            onColumnVisibilityChange?.(column.id, Boolean(value));
+                            onColumnVisibilityChange?.(
+                              column.id,
+                              Boolean(value),
+                            );
                           }}
                         >
                           {column.label}
@@ -272,7 +275,7 @@ export default function TableToolbar({
               </DropdownMenu>
             )}
 
-            {addButtonText && (
+            {/* {addButtonText && (
               <Button
                 className="h-10 bg-primary hover:bg-primary font-semibold px-4 shadow-sm"
                 onClick={() => {
@@ -285,7 +288,7 @@ export default function TableToolbar({
               >
                 {addButtonText}
               </Button>
-            )}
+            )} */}
           </div>
         </div>
 

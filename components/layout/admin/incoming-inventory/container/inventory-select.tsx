@@ -126,7 +126,8 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
   const filteredProductOptions = React.useMemo(
     () =>
       productOptions.filter(
-        (product) => !items.some((selected) => selected.product_id === product.id),
+        (product) =>
+          !items.some((selected) => selected.product_id === product.id),
       ),
     [productOptions, items],
   );
@@ -397,8 +398,6 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
     fetchInventory();
   }, [containerId, fetchInventory]);
-
-  console.log(isLoading);
 
   return (
     <div className="w-full">
