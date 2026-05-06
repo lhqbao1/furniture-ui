@@ -1887,6 +1887,7 @@ export const getProductColumns = (
       );
     },
   },
+
   {
     accessorKey: "id_provider",
     header: ({}) => <div className="text-center">ID</div>,

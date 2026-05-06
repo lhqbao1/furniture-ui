@@ -35,11 +35,6 @@ export function AdminSideBar() {
       icon: ChevronRight,
       children: [
         {
-          title: "Add Product",
-          url: "/admin/products/add",
-          icon: CornerDownRight,
-        },
-        {
           title: "Products",
           url: "/admin/products/list",
           icon: CornerDownRight,
