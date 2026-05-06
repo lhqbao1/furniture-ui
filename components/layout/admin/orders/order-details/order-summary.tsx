@@ -55,6 +55,11 @@ const OrderSummary = ({
       maximumFractionDigits: 2,
     })}`;
 
+  const totalAfterRefund = Math.max(
+    (total_amount ?? 0) - (refund_amount ?? 0),
+    0,
+  );
+
   const formatVatLabel = (percent: number) => {
     const safePercent = Number(percent) || 0;
     const isInteger = Number.isInteger(safePercent);
@@ -128,7 +133,7 @@ const OrderSummary = ({
         <div className="grid grid-cols-2 gap-3 text-base">
           <div className="font-semibold text-slate-900">Total</div>
           <div className="text-right text-xl font-bold text-primary">
-            {formatEuro(total_amount)}
+            {formatEuro(totalAfterRefund)}
           </div>
         </div>
       </div>
