@@ -37,7 +37,7 @@ const OrderDetailUser = ({
     .join(" ");
   const shippingEmail =
     shippingAddress?.email ||
-    ((user?.email ?? "").toLowerCase() !== "guest" ? user?.email ?? "" : "");
+    ((user?.email ?? "").toLowerCase() !== "guest" ? (user?.email ?? "") : "");
 
   return (
     <>
@@ -81,6 +81,10 @@ const OrderDetailUser = ({
             ) : null}
             {invoiceCityLine ? <div>{invoiceCityLine}</div> : null}
             {invoiceCountry ? <div>{invoiceCountry}</div> : null}
+            {invoiceAddress?.email ? <div>{invoiceAddress.email}</div> : null}
+            {invoiceAddress?.phone_number ? (
+              <div>{invoiceAddress.phone_number}</div>
+            ) : null}
           </div>
         </div>
       ) : null}
