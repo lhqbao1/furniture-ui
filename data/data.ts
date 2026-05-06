@@ -1117,6 +1117,26 @@ export const STATUS_OPTIONS = [
   },
 ];
 
+export const ORDER_TAG_OPTIONS = [
+  {
+    value: "Exchange in Progress",
+    label: "Exchange in Progress",
+    shortLabel: "EP",
+    bg: "bg-[#1E3A8A]",
+    color: "text-[#DBEAFE]",
+  },
+  {
+    value: "Exchange Completed",
+    label: "Exchange Completed",
+    shortLabel: "EC",
+    bg: "bg-[#14532D]",
+    color: "text-[#DCFCE7]",
+  },
+] as const;
+
+export const getOrderTagOption = (tag?: string | null) =>
+  ORDER_TAG_OPTIONS.find((option) => option.value === tag);
+
 export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   completed: ["return", "exchange", "return_issue"],
   preparation_shipping: [
@@ -1170,6 +1190,11 @@ export const CARRIERS = [
   { id: "ups", logo: "/ups.png" },
   { id: "hermes", logo: "/hermes.png" },
   { id: "fedex", logo: "/fedex.png" },
+] as const;
+
+export const EXCHANGE_WAREHOUSE_OPTIONS = [
+  { value: "9_1 Amm GmbH", label: "9_1 Amm GmbH" },
+  { value: "9_3 Amm GmbH", label: "9_3 Amm GmbH" },
 ] as const;
 
 export const SHIPMENT_CARRIERS = [

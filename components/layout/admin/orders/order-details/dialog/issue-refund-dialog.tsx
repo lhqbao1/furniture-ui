@@ -600,6 +600,19 @@ const IssueRefundDialog = ({
           main_checkout_id: id,
           payload: {
             amount,
+            products: [
+              {
+                name: null,
+                sku: null,
+                quantity: null,
+                id_provider: null,
+                unit_price: null,
+                refund_amount: amount,
+                reason: moneyRefundReason.trim(),
+                type: null,
+                file: null,
+              },
+            ],
           },
         });
 

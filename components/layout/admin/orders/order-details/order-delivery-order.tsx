@@ -8,12 +8,20 @@ import { CartItem } from "@/types/cart";
 
 const DEFAULT_WAREHOUSE_NAME = "9_1 Amm GmbH";
 
-const shipmentProductColumns: ColumnDef<CartItem>[] = [
+type ShipmentProductRow = CartItem & {
+  ware_house?: string | null;
+};
+
+const shipmentProductColumns: ColumnDef<ShipmentProductRow>[] = [
   {
     accessorKey: "sku",
     header: () => <div className="text-left uppercase">SKU</div>,
     cell: ({ row }) => (
-      <div>{row.original.purchased_products?.sku ?? row.original.products?.sku ?? "-"}</div>
+      <div>
+        {row.original.purchased_products?.sku ??
+          row.original.products?.sku ??
+          "-"}
+      </div>
     ),
   },
   {
@@ -21,7 +29,9 @@ const shipmentProductColumns: ColumnDef<CartItem>[] = [
     header: () => <div className="text-left uppercase">Name</div>,
     cell: ({ row }) => (
       <div>
-        {row.original.purchased_products?.name ?? row.original.products?.name ?? "-"}
+        {row.original.purchased_products?.name ??
+          row.original.products?.name ??
+          "-"}
       </div>
     ),
   },
@@ -33,7 +43,9 @@ const shipmentProductColumns: ColumnDef<CartItem>[] = [
   {
     accessorKey: "warehouse",
     header: () => <div className="text-left uppercase">Warehouse</div>,
-    cell: () => <div>{DEFAULT_WAREHOUSE_NAME}</div>,
+    cell: ({ row }) => (
+      <div>{row.original.ware_house?.trim() || DEFAULT_WAREHOUSE_NAME}</div>
+    ),
   },
   {
     accessorKey: "created_at",
@@ -94,21 +106,30 @@ const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(100);
 
-  const transformCartItems = useCallback((cartItems: CartItem[]): CartItem[] => {
-    return cartItems.flatMap((item) => {
-      const product = item.products;
+  const transformCartItems = useCallback(
+    (checkout: CheckOut): ShipmentProductRow[] => {
+      const cartItems = checkout?.cart?.items ?? [];
 
-      if (product?.bundles && product.bundles.length > 0) {
-        return product.bundles.map((bundle) => ({
+      return cartItems.flatMap((item) => {
+        const product = item.products;
+
+        if (product?.bundles && product.bundles.length > 0) {
+          return product.bundles.map((bundle) => ({
+            ...item,
+            products: bundle.bundle_item,
+            quantity: bundle.quantity * item.quantity,
+            ware_house: checkout.ware_house,
+          }));
+        }
+
+        return {
           ...item,
-          products: bundle.bundle_item,
-          quantity: bundle.quantity * item.quantity,
-        }));
-      }
-
-      return item;
-    });
-  }, []);
+          ware_house: checkout.ware_house,
+        };
+      });
+    },
+    [],
+  );
 
   const normalizeShipmentReturns = useCallback(
     (checkout: CheckOut): CheckOutShipmentProductReturn[] => {
@@ -130,12 +151,12 @@ const OrderDeliveryOrder = ({ data }: OrderDeliveryOrderProps) => {
   const renderRowSubComponent = useCallback(
     (row: { original: CheckOut }) => {
       const checkout = row.original;
-      const cartItems = transformCartItems(checkout?.cart?.items ?? []);
+      const cartItems = transformCartItems(checkout);
       const productReturns = normalizeShipmentReturns(checkout);
 
       return (
         <div className="space-y-4">
-          <ProductTable<CartItem, unknown>
+          <ProductTable<ShipmentProductRow, unknown>
             data={cartItems}
             columns={shipmentProductColumns}
             page={1}

@@ -1,6 +1,7 @@
 import { CheckOutMain } from "@/types/checkout";
 import React from "react";
 import OrderStatusSelector from "./order-status-selector";
+import OrderTagSelector from "./order-tag-selector";
 import { Hash, ReceiptText, Store, WalletCards } from "lucide-react";
 interface OrderDetailOverViewProps {
   created_at: string;
@@ -72,8 +73,9 @@ const OrderDetailOverView = ({
         </div>
       </div>
 
-      <div className="pt-1">
+      <div className="space-y-2 pt-1">
         <OrderStatusSelector order={order} status={status} />
+        <OrderTagSelector order={order} />
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ import {
 
 import { useCreateDeliveryOrder } from "@/features/checkout/hook";
 import { useGetAllProducts } from "@/features/products/hook";
-import { CARRIERS } from "@/data/data";
+import { CARRIERS, EXCHANGE_WAREHOUSE_OPTIONS } from "@/data/data";
 import { ProductItem } from "@/types/products";
 
 interface ExchangeConfirmDialogProps {
@@ -74,6 +74,9 @@ const resolveCarrierLabel = (carrierId: string) => {
   return carrierId.toUpperCase();
 };
 
+const normalizeExchangeCarrierValue = (carrierId: string) =>
+  normalizeCarrierValue(carrierId) === "amm" ? "spedition" : carrierId;
+
 const ExchangeConfirmDialog = ({
   id,
   open,
@@ -85,6 +88,7 @@ const ExchangeConfirmDialog = ({
   const [queryParams, setQueryParams] = useState("");
   const [listProducts, setListProducts] = useState<SelectedProduct[]>([]);
   const [carrier, setCarrier] = useState("");
+  const [warehouse, setWarehouse] = useState("");
 
   const {
     data: products,
@@ -97,19 +101,24 @@ const ExchangeConfirmDialog = ({
 
   const carrierOptions = useMemo(
     () =>
-      CARRIERS.map((carrierItem) => ({
-        id: carrierItem.id,
-        label: resolveCarrierLabel(carrierItem.id),
-        logo: carrierItem.logo,
-      })),
+      CARRIERS.filter((carrierItem) => carrierItem.id !== "amm").map(
+        (carrierItem) => ({
+          id: carrierItem.id,
+          label: resolveCarrierLabel(carrierItem.id),
+          logo: carrierItem.logo,
+        }),
+      ),
     [],
   );
+
+  const warehouseOptions = useMemo(() => EXCHANGE_WAREHOUSE_OPTIONS, []);
 
   const resetFormState = useCallback(() => {
     setOpenProductPopover(false);
     setQueryParams("");
     setListProducts([]);
     setCarrier("");
+    setWarehouse("");
   }, []);
 
   const handleCloseDrawer = useCallback(() => {
@@ -129,7 +138,12 @@ const ExchangeConfirmDialog = ({
       );
 
       if (matchedCarrier) {
-        setCarrier(matchedCarrier.id);
+        setCarrier(normalizeExchangeCarrierValue(matchedCarrier.id));
+        return;
+      }
+
+      if (carrierFromProduct === "amm") {
+        setCarrier("spedition");
       }
     },
     [carrierOptions],
@@ -185,11 +199,17 @@ const ExchangeConfirmDialog = ({
       return;
     }
 
+    if (!warehouse) {
+      toast.error("Warehouse is required");
+      return;
+    }
+
     exchangeOrderMutation.mutate(
       {
         main_checkout_id: id,
         payload: {
           carrier,
+          ware_house: warehouse,
           items: listProducts.map((item) => ({
             product_id: item.product.id,
             quantity: item.quantity,
@@ -223,7 +243,7 @@ const ExchangeConfirmDialog = ({
         <DrawerHeader className="relative px-0 pb-4 pr-12">
           <DrawerTitle>Exchange</DrawerTitle>
           <DrawerDescription>
-            Select products and carrier for exchange order
+            Select products, carrier and warehouse for exchange order
           </DrawerDescription>
           <Button
             type="button"
@@ -237,7 +257,10 @@ const ExchangeConfirmDialog = ({
         </DrawerHeader>
 
         <div className="space-y-4">
-          <Popover open={openProductPopover} onOpenChange={setOpenProductPopover}>
+          <Popover
+            open={openProductPopover}
+            onOpenChange={setOpenProductPopover}
+          >
             <PopoverTrigger asChild>
               <Button
                 type="button"
@@ -264,7 +287,9 @@ const ExchangeConfirmDialog = ({
                 >
                   <CommandEmpty>No product found.</CommandEmpty>
                   <CommandGroup>
-                    {isLoading && <CommandItem disabled>Loading...</CommandItem>}
+                    {isLoading && (
+                      <CommandItem disabled>Loading...</CommandItem>
+                    )}
                     {isError && (
                       <CommandItem disabled>Error loading products</CommandItem>
                     )}
@@ -295,7 +320,7 @@ const ExchangeConfirmDialog = ({
                             <div className="min-w-0">
                               <p className="truncate">{product.name}</p>
                               <p className="text-xs text-muted-foreground">
-                                ID: {product.id_provider ?? "-"} | SKU: {" "}
+                                ID: {product.id_provider ?? "-"} | SKU:{" "}
                                 {product.sku?.trim() ? product.sku : "-"} |{" "}
                                 {priceLabel}
                               </p>
@@ -310,29 +335,48 @@ const ExchangeConfirmDialog = ({
             </PopoverContent>
           </Popover>
 
-          <Select onValueChange={setCarrier} value={carrier}>
-            <SelectTrigger className="border">
-              <SelectValue placeholder="Select carrier" />
-            </SelectTrigger>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Select onValueChange={setCarrier} value={carrier}>
+              <SelectTrigger className="border" placeholderColor>
+                <SelectValue placeholder="Select carrier" />
+              </SelectTrigger>
 
-            <SelectContent className="z-[210] max-h-72">
-              {carrierOptions.map((carrierItem) => (
-                <SelectItem key={carrierItem.id} value={carrierItem.id}>
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={carrierItem.logo}
-                      alt={carrierItem.label}
-                      width={18}
-                      height={18}
-                      className="rounded-sm object-contain"
-                      unoptimized
-                    />
-                    <span>{carrierItem.label}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <SelectContent className="z-[210] max-h-72">
+                {carrierOptions.map((carrierItem) => (
+                  <SelectItem key={carrierItem.id} value={carrierItem.id}>
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={carrierItem.logo}
+                        alt={carrierItem.label}
+                        width={18}
+                        height={18}
+                        className="rounded-sm object-contain"
+                        unoptimized
+                      />
+                      <span>{carrierItem.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select onValueChange={setWarehouse} value={warehouse}>
+              <SelectTrigger className="border" placeholderColor>
+                <SelectValue placeholder="Select product type" />
+              </SelectTrigger>
+
+              <SelectContent className="z-[210] max-h-72">
+                {warehouseOptions.map((warehouseItem) => (
+                  <SelectItem
+                    key={warehouseItem.value}
+                    value={warehouseItem.value}
+                  >
+                    {warehouseItem.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {listProducts.length > 0 && (
             <div className="space-y-3">
@@ -367,7 +411,7 @@ const ExchangeConfirmDialog = ({
                       <div className="min-w-0">
                         <div className="font-medium">{product.name}</div>
                         <div className="text-xs text-muted-foreground">
-                          ID: {product.id_provider ?? "-"} | SKU: {" "}
+                          ID: {product.id_provider ?? "-"} | SKU:{" "}
                           {product.sku?.trim() ? product.sku : "-"} |{" "}
                           {selectedPriceLabel}
                         </div>
@@ -380,7 +424,10 @@ const ExchangeConfirmDialog = ({
                       step="1"
                       value={quantity}
                       onChange={(event) =>
-                        handleQuantityChange(product.id, Number(event.target.value))
+                        handleQuantityChange(
+                          product.id,
+                          Number(event.target.value),
+                        )
                       }
                     />
 
