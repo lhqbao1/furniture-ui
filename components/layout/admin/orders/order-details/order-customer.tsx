@@ -99,9 +99,6 @@ const OrderDetailUser = ({
         </div>
         <div className="text-sm leading-6 text-slate-700">
           <div className="font-medium text-slate-900">{shippingName}</div>
-          {shippingAddress?.phone_number ? (
-            <div>{shippingAddress.phone_number}</div>
-          ) : null}
           {shippingAddress?.address_line ? (
             <div>{shippingAddress.address_line}</div>
           ) : null}
@@ -111,6 +108,9 @@ const OrderDetailUser = ({
           {shippingCityLine ? <div>{shippingCityLine}</div> : null}
           {shippingCountry ? <div>{shippingCountry}</div> : null}
           {shippingEmail ? <div>{shippingEmail}</div> : null}
+          {shippingAddress?.phone_number ? (
+            <div>{shippingAddress.phone_number}</div>
+          ) : null}
         </div>
       </div>
     </>
