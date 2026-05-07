@@ -91,6 +91,14 @@ const PRESET_BY_MARKETPLACE: Record<
     invoice_postal_code: "4600",
     invoice_country: "AT",
   },
+  mobelix: {
+    company_name: "Möbelix GmbH",
+    tax_id: "ATU63842248",
+    invoice_address: "Römerstraße 39",
+    invoice_city: "Wels",
+    invoice_postal_code: "4600",
+    invoice_country: "AT",
+  },
 };
 
 export function useManualCheckoutLogic(

@@ -98,6 +98,7 @@ const CHANNEL_OPTIONS = [
   { value: "euro-tops", label: "Euro Tops" },
   { value: "XXXLUTZ", label: "XXXLUTZ" },
   { value: "prestige", label: "Prestige Home" },
+  { value: "mobelix", label: "Mobelix" },
 ] as const;
 
 const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
@@ -169,6 +170,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     company_name: "XXXLutz KG",
     tax_id: "ATU65296645",
     invoice_address: "Römerstrasse 39",
+    invoice_city: "Wels",
+    invoice_postal_code: "4600",
+    invoice_country: "AT",
+  },
+  mobelix: {
+    company_name: "Möbelix GmbH",
+    tax_id: "ATU63842248",
+    invoice_address: "Römerstraße 39",
     invoice_city: "Wels",
     invoice_postal_code: "4600",
     invoice_country: "AT",
