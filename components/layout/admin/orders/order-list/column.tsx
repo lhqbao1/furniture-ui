@@ -476,6 +476,7 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       return <div>{row.original.marketplace_order_id}</div>;
     },
   },
+
   {
     accessorKey: "customer",
     header: "CUSTOMER",
@@ -518,6 +519,42 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
             className="object-contain p-2"
             unoptimized
           />
+        </div>
+      );
+    },
+  },
+
+  {
+    accessorKey: "created_at",
+    header: () => <div className="text-center w-full">DATE CREATED</div>,
+    cell: ({ row }) => {
+      let iso = row.original.created_at.toString();
+
+      // 👉 Nếu backend không gửi Z, mình thêm vào để JS parse đúng UTC
+      if (!iso.endsWith("Z")) {
+        iso += "Z";
+      }
+
+      const date = new Date(iso);
+
+      const time = date.toLocaleString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Europe/Berlin", // giờ Berlin
+      });
+
+      const day = date.toLocaleString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        timeZone: "Europe/Berlin",
+      });
+
+      return (
+        <div className="flex flex-col items-center text-xs text-[#4D4D4D]">
+          <span>{day}</span>
+          <span>{time}</span>
         </div>
       );
     },
