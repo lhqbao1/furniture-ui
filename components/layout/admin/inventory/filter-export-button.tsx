@@ -109,13 +109,19 @@ const normalizeProductsResponse = (payload: unknown): ProductItem[] => {
   return [];
 };
 
-export default function InventoryFilterExportButton() {
+interface InventoryFilterExportButtonProps {
+  forcedSupplierId?: string;
+}
+
+export default function InventoryFilterExportButton({
+  forcedSupplierId,
+}: InventoryFilterExportButtonProps) {
   const searchParams = useSearchParams();
 
   const paramsForExport = useMemo(() => {
     const statusParam = searchParams.get("all_products");
     const search = searchParams.get("search")?.trim() ?? "";
-    const supplierId = searchParams.get("supplier_id") ?? "";
+    const supplierId = forcedSupplierId ?? searchParams.get("supplier_id") ?? "";
     const brandId = searchParams.get("brand_id") ?? "";
     const sortByStock = searchParams.get("sort_by_stock") ?? "";
     const sortByIncomingStock = searchParams.get("sort_by_incoming_stock") ?? "";
@@ -149,7 +155,7 @@ export default function InventoryFilterExportButton() {
     if (sortByMarketplace) params.sort_by_marketplace = sortByMarketplace;
 
     return params;
-  }, [searchParams]);
+  }, [forcedSupplierId, searchParams]);
 
   const { refetch, isFetching } = useQuery({
     queryKey: [
