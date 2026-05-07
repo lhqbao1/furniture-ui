@@ -125,6 +125,7 @@ export default function ManualAdditionalInformation({
         { value: "euro-tops", label: "Euro Tops" },
         { value: "XXXLUTZ", label: "XXXLUTZ" },
         { value: "prestige", label: "Prestige Home" },
+        { value: "mobelix", label: "Mobelix" },
       ].sort((a, b) =>
         a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
       ),

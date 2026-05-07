@@ -33,6 +33,7 @@ export const CHANEL_OPTIONS = [
   { key: "norma", label: "Norma24", icon: "norma.png" },
   { key: "praktiker", label: "Praktiker", icon: "praktiker.jpg" },
   { key: "XXXLUTZ", label: "XXXLUTZ", icon: "xxxlutz.png" },
+  { key: "mobelix", label: "Mobelix", icon: "mobelix.jpg" },
 ];
 
 export default function OrderChanelFilter() {
