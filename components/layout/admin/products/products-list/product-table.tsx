@@ -57,6 +57,13 @@ interface DataTableProps<TData, TValue> {
   defaultExpandedRowPredicate?: (row: TData) => boolean;
 }
 
+type TableColumnMeta = {
+  width?: number;
+  headerClassName?: string;
+  stickyLeft?: number;
+  stickyClassName?: string;
+};
+
 export function ProductTable<TData, TValue>({
   columns,
   data,
@@ -88,6 +95,10 @@ export function ProductTable<TData, TValue>({
   renderRowSubComponent,
   defaultExpandedRowPredicate,
 }: DataTableProps<TData, TValue>) {
+  const defaultHeaderBackgroundClass = hasHeaderBackGround
+    ? "bg-[#EEF8F0]"
+    : "bg-white";
+  const stripedRowBackgroundClass = "bg-[#F7FBF8]";
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "id_provider", desc: false }, // default sort by id_provider asc
   ]);
@@ -224,30 +235,49 @@ export function ProductTable<TData, TValue>({
               : stickyContainerClassName
           }
         >
-          <TableHeader className={isSticky ? "sticky top-0 z-20" : ""}>
-            {table.getHeaderGroups().map((headerGroup) => (
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    style={{
-                      width: (header.column.columnDef.meta as any)?.width,
-                      minWidth: (header.column.columnDef.meta as any)?.width,
-                      maxWidth: (header.column.columnDef.meta as any)?.width,
-                    }}
-                    className={`${
-                      hasHeaderBackGround ? "bg-secondary/10" : "bg-background"
-                    } ${headerClassName ?? ""} ${
-                      isSticky ? "sticky top-0 z-30 shadow-sm bg-green-100" : ""
-                    }`}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
+                  (() => {
+                    const meta =
+                      (header.column.columnDef.meta as TableColumnMeta | undefined) ??
+                      {};
+                    const stickyLeft = meta?.stickyLeft;
+
+                    return (
+                      <TableHead
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        style={{
+                          width: meta?.width,
+                          minWidth: meta?.width,
+                          maxWidth: meta?.width,
+                          ...(isSticky
+                            ? { top: `${headerGroupIndex * 40}px` }
+                            : {}),
+                          ...(stickyLeft !== undefined
+                            ? { left: `${stickyLeft}px` }
+                            : {}),
+                        }}
+                        className={cn(
+                          defaultHeaderBackgroundClass,
+                          meta?.headerClassName ?? "",
+                          headerClassName ?? "",
+                          isSticky && "sticky z-30 shadow-sm",
+                          stickyLeft !== undefined && "sticky z-40",
+                          meta?.stickyClassName ?? "",
                         )}
-                  </TableHead>
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    );
+                  })()
                 ))}
               </TableRow>
             ))}
@@ -258,29 +288,54 @@ export function ProductTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     className={
-                      hasBackground && index % 2 === 1 ? "bg-secondary/5" : ""
+                      hasBackground && index % 2 === 1
+                        ? stripedRowBackgroundClass
+                        : ""
                     }
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        style={{
-                          width: (cell.column.columnDef.meta as any)?.width,
-                          minWidth: (cell.column.columnDef.meta as any)?.width,
-                          maxWidth: (cell.column.columnDef.meta as any)?.width,
-                        }}
-                      >
-                        {flexRender(cell.column.columnDef.cell, {
-                          ...cell.getContext(),
-                          expandedRowId,
-                          setExpandedRowId,
-                          expandedRowIds,
-                          setExpandedRowIds,
-                          toggleExpandedRow,
-                          isRowExpanded,
-                          currentRowId: row.id,
-                        })}
-                      </TableCell>
+                      (() => {
+                        const meta =
+                          (cell.column.columnDef.meta as TableColumnMeta | undefined) ??
+                          {};
+                        const stickyLeft = meta?.stickyLeft;
+
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            style={{
+                              width: meta?.width,
+                              minWidth: meta?.width,
+                              maxWidth: meta?.width,
+                              ...(stickyLeft !== undefined
+                                ? { left: `${stickyLeft}px` }
+                                : {}),
+                            }}
+                            className={cn(
+                              stickyLeft !== undefined && "sticky z-20",
+                              stickyLeft !== undefined &&
+                                hasBackground &&
+                                index % 2 === 1 &&
+                                stripedRowBackgroundClass,
+                              stickyLeft !== undefined &&
+                                (!hasBackground || index % 2 !== 1) &&
+                                "bg-white",
+                              meta?.stickyClassName ?? "",
+                            )}
+                          >
+                            {flexRender(cell.column.columnDef.cell, {
+                              ...cell.getContext(),
+                              expandedRowId,
+                              setExpandedRowId,
+                              expandedRowIds,
+                              setExpandedRowIds,
+                              toggleExpandedRow,
+                              isRowExpanded,
+                              currentRowId: row.id,
+                            })}
+                          </TableCell>
+                        );
+                      })()
                     ))}
                   </TableRow>
                 ))

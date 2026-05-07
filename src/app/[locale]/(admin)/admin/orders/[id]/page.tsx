@@ -64,7 +64,14 @@ function extractCartItemsFromMain(checkOutMain: CheckOutMain): CartItem[] {
       // lọc bỏ exchange + cancel_exchange
       .filter((checkout) => {
         const status = checkout.status?.toLowerCase();
-        return status !== "exchange" && status !== "cancel_exchange";
+        return (
+          status !== "exchange" &&
+          status !== "cancel_exchange" &&
+          status !== "exchange_stock_reserved" &&
+          status !== "exchange_shipped" &&
+          status !== "exchange_preparation_shipping" &&
+          status !== "exchange_cancel_no_stock"
+        );
       })
       // sau đó mới lấy cart items
       .flatMap((checkout) =>
@@ -143,6 +150,7 @@ const OrderDetails = () => {
     if (!order) return [];
     return extractCartItemsFromMain(order);
   }, [order]);
+
   const checkoutCountryCode = useMemo(
     () =>
       order?.checkouts?.[0]?.shipping_address?.country ??
@@ -526,6 +534,8 @@ const OrderDetails = () => {
 
   const createdAt = formatDate(order.created_at);
   const updatedAt = formatDateTimeString(order.updated_at);
+
+  console.log(cartItems);
 
   return (
     <div className="space-y-8 pb-20 mt-6">

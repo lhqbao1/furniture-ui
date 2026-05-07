@@ -1,6 +1,7 @@
 "use client";
 
 import { getInventoryColumns } from "@/components/layout/admin/inventory/columns";
+import PHInventoryFilterForm from "@/components/layout/admin/inventory/ph-filter-form";
 import PhysicalInventoryFilterForm from "@/components/layout/admin/inventory/physical-filter-form";
 import PhysicalInventorySearch from "@/components/layout/admin/inventory/physical-inventory-search";
 import InventoryTableToolbar from "@/components/layout/admin/inventory/inventory-table-toolbar";
@@ -28,6 +29,8 @@ const formatCurrency = (value?: number) =>
 
 const renderCurrencyValue = (value?: number) =>
   value === undefined ? "—" : `€${formatCurrency(value)}`;
+
+const PH_INVENTORY_SUPPLIER_ID = "prestige_home";
 
 const AdminInventoryList = () => {
   const [page, setPage] = useState(1);
@@ -89,6 +92,20 @@ const AdminInventoryList = () => {
       multiSearchValues.length > 0 ? multiSearchValues : filters.search || undefined,
     is_econelo: filters.is_econelo,
   });
+  const {
+    data: phInventoryData,
+    isLoading: isPhInventoryLoading,
+    isFetching: isPhInventoryFetching,
+    isError: isPhInventoryError,
+  } = useGetAllProducts({
+    page,
+    page_size: pageSize,
+    all_products: filters.all_products,
+    search: filters.search,
+    is_inventory: "false",
+    supplier_id: PH_INVENTORY_SUPPLIER_ID,
+    brand_id: filters.brand,
+  });
 
   useEffect(() => {
     window.scrollTo({
@@ -98,7 +115,9 @@ const AdminInventoryList = () => {
   }, [page]);
   const physicalInventoryItems = (physicalInventoryData?.items ??
     []) as ProductItem[];
+  const phInventoryItems = (phInventoryData?.items ?? []) as ProductItem[];
   const isInventoryPending = isInventoryLoading || isInventoryFetching;
+  const isPhInventoryPending = isPhInventoryLoading || isPhInventoryFetching;
   const isPhysicalInventoryPending =
     isPhysicalInventoryLoading || isPhysicalInventoryFetching;
 
@@ -111,6 +130,7 @@ const AdminInventoryList = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="ph-inventory">PH inventory</TabsTrigger>
           <TabsTrigger value="physical-inventory">
             Physical Inventory
           </TabsTrigger>
@@ -126,6 +146,8 @@ const AdminInventoryList = () => {
           filterContent={
             activeTab === "physical-inventory" ? (
               <PhysicalInventoryFilterForm />
+            ) : activeTab === "ph-inventory" ? (
+              <PHInventoryFilterForm />
             ) : undefined
           }
           searchContent={
@@ -150,6 +172,29 @@ const AdminInventoryList = () => {
               setPageSize={setPageSize}
               totalItems={inventoryData?.pagination.total_items ?? 0}
               totalPages={inventoryData?.pagination.total_pages ?? 0}
+              hasHeaderBackGround
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value="ph-inventory">
+          {isPhInventoryError ? (
+            <div>No data</div>
+          ) : isPhInventoryPending ? (
+            <ProductTableSkeleton />
+          ) : (
+            <ProductTable
+              data={phInventoryItems}
+              columns={getInventoryColumns(setSortByStock, {
+                variant: "ph",
+              })}
+              isSticky
+              page={page}
+              pageSize={pageSize}
+              setPage={handlePageChange}
+              setPageSize={setPageSize}
+              totalItems={phInventoryData?.pagination.total_items ?? 0}
+              totalPages={phInventoryData?.pagination.total_pages ?? 0}
               hasHeaderBackGround
             />
           )}
