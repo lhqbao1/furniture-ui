@@ -27,7 +27,15 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { createManualCheckOut } from "@/features/checkout/api";
+import { getProductByIdProvider } from "@/features/products/api";
+import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
+import {
+  addBusinessDays,
+  getDeliveryDayRange,
+} from "@/hooks/get-estimated-shipping";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
+import { ProductItem } from "@/types/products";
 import ExportExampleOrderExcelButton from "./export-example-button";
 import { cn } from "@/lib/utils";
 
@@ -80,6 +88,7 @@ type NormalizedOrder = {
 };
 
 type GroupedOrder = ManualCreateOrderFormValues;
+type DeliveryRange = { from: Date; to: Date };
 
 const CHANNEL_OPTIONS = [
   { value: "amazon", label: "Amazon" },
@@ -235,6 +244,129 @@ const toRequiredString = (value: unknown, fallback = ""): string =>
   toTrimmedStringOrNull(value) ?? fallback;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const addCalendarDays = (startDate: Date, days: number) => {
+  const result = new Date(startDate);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+
+const formatCheckoutDateTime = (date: Date): string =>
+  date.toISOString().replace(/Z$/, "");
+
+const calculateProductDeliveryRange = (
+  product?: Partial<ProductItem> | null,
+): DeliveryRange | null => {
+  if (!product) return null;
+
+  const deliveryRange = getDeliveryDayRange(product.delivery_time);
+  if (!deliveryRange) return null;
+
+  const currentStock = calculateAvailableStock(product);
+  const incomingSummary = calculateIncomingStockSummary(product);
+  const isBundleProduct = (product.bundles?.length ?? 0) > 0;
+  const nextIncomingDate = isBundleProduct
+    ? incomingSummary.latestIncomingDate
+    : incomingSummary.nearestIncomingDate;
+
+  if (currentStock > 0 || !nextIncomingDate) {
+    const today = new Date();
+    return {
+      from: addCalendarDays(today, deliveryRange.min),
+      to: addCalendarDays(today, deliveryRange.max),
+    };
+  }
+
+  return {
+    from: addBusinessDays(nextIncomingDate, deliveryRange.min),
+    to: addBusinessDays(nextIncomingDate, deliveryRange.max),
+  };
+};
+
+const calculateManualCheckoutDeliveryRange = (
+  products: Array<Partial<ProductItem> | null | undefined>,
+): DeliveryRange | null => {
+  const itemRanges = products
+    .map((product) => calculateProductDeliveryRange(product))
+    .filter(
+      (range): range is DeliveryRange =>
+        !!range &&
+        !Number.isNaN(range.from.getTime()) &&
+        !Number.isNaN(range.to.getTime()),
+    );
+
+  if (itemRanges.length === 0) return null;
+
+  const from = new Date(
+    Math.min(...itemRanges.map((range) => range.from.getTime())),
+  );
+  const to = new Date(Math.max(...itemRanges.map((range) => range.to.getTime())));
+
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return null;
+  return { from, to };
+};
+
+const collectUniqueOrderItemIdProviders = (orders: GroupedOrder[]): string[] => {
+  const uniqueIdProviders = new Set<string>();
+
+  orders.forEach((order) => {
+    order.items.forEach((item) => {
+      const idProvider = item.id_provider?.trim();
+      if (idProvider) uniqueIdProviders.add(idProvider);
+    });
+  });
+
+  return Array.from(uniqueIdProviders);
+};
+
+const fetchProductByIdProviderMap = async (
+  orders: GroupedOrder[],
+): Promise<Map<string, ProductItem>> => {
+  const uniqueIdProviders = collectUniqueOrderItemIdProviders(orders);
+  if (uniqueIdProviders.length === 0) return new Map();
+
+  const productEntries = await Promise.all(
+    uniqueIdProviders.map(async (idProvider) => {
+      try {
+        const product = await getProductByIdProvider(idProvider);
+        return [idProvider, product] as const;
+      } catch (error) {
+        console.error("Failed to fetch product by id_provider", {
+          idProvider,
+          error,
+        });
+        return [idProvider, null] as const;
+      }
+    }),
+  );
+
+  return new Map(
+    productEntries.filter(
+      (entry): entry is readonly [string, ProductItem] => entry[1] !== null,
+    ),
+  );
+};
+
+const attachOrderDeliveryRange = (
+  order: GroupedOrder,
+  productByIdProvider: Map<string, ProductItem>,
+): GroupedOrder => {
+  const deliveryRange = calculateManualCheckoutDeliveryRange(
+    order.items.map((item) => {
+      const idProvider = item.id_provider?.trim();
+      if (!idProvider) return null;
+      return productByIdProvider.get(idProvider) ?? null;
+    }),
+  );
+
+  if (!deliveryRange) return order;
+
+  return {
+    ...order,
+    delivery_from: formatCheckoutDateTime(deliveryRange.from),
+    delivery_to: formatCheckoutDateTime(deliveryRange.to),
+  };
+};
 
 const getOrderGroupKey = (row: NormalizedOrder, rowIndex: number): string => {
   const marketplaceOrderId = row.marketplace_order_id?.trim();
@@ -427,6 +559,7 @@ const OrderImport = () => {
 
     // đóng dialog ngay khi submit
     setOpen(false);
+    const productByIdProvider = await fetchProductByIdProviderMap(orders);
 
     const failures: {
       index: number;
@@ -438,7 +571,11 @@ const OrderImport = () => {
 
     for (let index = 0; index < orders.length; index += 1) {
       try {
-        await createManualCheckOut(orders[index]);
+        const orderPayload = attachOrderDeliveryRange(
+          orders[index],
+          productByIdProvider,
+        );
+        await createManualCheckOut(orderPayload);
         successCount += 1;
       } catch (error: unknown) {
         console.error("Failed to create order", { index, error });
