@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -41,6 +41,8 @@ import UpdateStatusDialog from "./toolbar/bulk-update/status-dialog";
 import ExportSelectedProducts from "./toolbar/bulk-update/export-selected";
 import EANDrawer from "./toolbar/bulk-update/ean-drawer";
 import MultiSearch from "./toolbar/multi-search";
+import { useGetSuppliers } from "@/features/supplier/hook";
+import { useGetBrands } from "@/features/brand/hook";
 
 export enum ToolbarType {
   product = "product",
@@ -71,7 +73,17 @@ type ImageFile = {
   url: string;
 };
 
-const FILTER_KEYS = ["search", "status", "channel", "from_date", "to_date"];
+const FILTER_KEYS = [
+  "search",
+  "multi_search",
+  "all_products",
+  "supplier_id",
+  "brand_id",
+  "sort_by_stock",
+  "sort_by_incoming_stock",
+  "sort_by_marketplace",
+  "is_inventory",
+];
 
 export default function TableToolbar({
   searchQuery,
@@ -100,10 +112,12 @@ export default function TableToolbar({
   const [isImporting, setIsImporting] = useState(false);
   const [hasShownSpaceToast, setHasShownSpaceToast] = useState(false);
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
-  const [openEanDrawer, setOpenEanDrawer] = useState(false);
+  // const [openEanDrawer, setOpenEanDrawer] = useState(false);
 
   const pathname = usePathname();
   const defaultSearch = searchParams.get("search") ?? "";
+  const { data: suppliers } = useGetSuppliers(type === ToolbarType.product);
+  const { data: brands } = useGetBrands();
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
   const [prevParams, setPrevParams] = useState(
@@ -111,6 +125,185 @@ export default function TableToolbar({
   );
   // debounce inputValue
   const [debouncedSearch] = useDebounce(searchValue, 600);
+
+  const parseCsvParam = React.useCallback(
+    (value: string | null) =>
+      (value ?? "")
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    [],
+  );
+
+  const pushWithParams = React.useCallback(
+    (params: URLSearchParams) => {
+      router.push(
+        {
+          pathname,
+          query: {
+            ...Object.fromEntries(params.entries()),
+            page: 1,
+          },
+        },
+        { scroll: false },
+      );
+      setPage(1);
+    },
+    [pathname, router, setPage],
+  );
+
+  const removeFilterParam = React.useCallback(
+    (paramKey: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete(paramKey);
+      pushWithParams(params);
+    },
+    [pushWithParams, searchParams],
+  );
+
+  const removeFilterValue = React.useCallback(
+    (paramKey: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      const currentValues = parseCsvParam(params.get(paramKey));
+      const nextValues = currentValues.filter((item) => item !== value);
+
+      if (nextValues.length === 0) {
+        params.delete(paramKey);
+      } else {
+        params.set(paramKey, nextValues.join(","));
+      }
+
+      pushWithParams(params);
+    },
+    [parseCsvParam, pushWithParams, searchParams],
+  );
+
+  const resetAllFilters = React.useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    FILTER_KEYS.forEach((key) => params.delete(key));
+    pushWithParams(params);
+    setSearchValue("");
+  }, [pushWithParams, searchParams]);
+
+  const supplierLabelMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    map.set("prestige_home", "Prestige Home");
+    (suppliers ?? []).forEach((supplier) => {
+      map.set(supplier.id, supplier.business_name);
+    });
+    return map;
+  }, [suppliers]);
+
+  const brandLabelMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    (brands ?? []).forEach((brand) => {
+      map.set(brand.id, brand.name);
+    });
+    return map;
+  }, [brands]);
+
+  const activeFilterChips = React.useMemo(() => {
+    type FilterChip = {
+      id: string;
+      label: string;
+      onRemove: () => void;
+    };
+
+    const chips: FilterChip[] = [];
+
+    const search = (searchParams.get("search") ?? "").trim();
+    if (search) {
+      chips.push({
+        id: "search",
+        label: `Search: ${search}`,
+        onRemove: () => {
+          setSearchValue("");
+          removeFilterParam("search");
+        },
+      });
+    }
+
+    const multiSearchValues = parseCsvParam(searchParams.get("multi_search"));
+    multiSearchValues.forEach((value) => {
+      chips.push({
+        id: `multi-search-${value}`,
+        label: `Multiple: ${value}`,
+        onRemove: () => removeFilterValue("multi_search", value),
+      });
+    });
+
+    const allProducts = searchParams.get("all_products");
+    if (allProducts === "true" || allProducts === "false") {
+      chips.push({
+        id: "all-products",
+        label: `Status: ${allProducts === "true" ? "Active only" : "Inactive"}`,
+        onRemove: () => removeFilterParam("all_products"),
+      });
+    }
+
+    const supplierId = searchParams.get("supplier_id");
+    if (supplierId) {
+      chips.push({
+        id: "supplier",
+        label: `Supplier: ${supplierLabelMap.get(supplierId) ?? supplierId}`,
+        onRemove: () => removeFilterParam("supplier_id"),
+      });
+    }
+
+    const brandId = searchParams.get("brand_id");
+    if (brandId) {
+      chips.push({
+        id: "brand",
+        label: `Brand: ${brandLabelMap.get(brandId) ?? brandId}`,
+        onRemove: () => removeFilterParam("brand_id"),
+      });
+    }
+
+    const stockSort = searchParams.get("sort_by_stock");
+    if (stockSort === "asc" || stockSort === "desc") {
+      chips.push({
+        id: "sort-by-stock",
+        label: `Stock sort: ${stockSort === "asc" ? "Ascending" : "Descending"}`,
+        onRemove: () => removeFilterParam("sort_by_stock"),
+      });
+    }
+
+    const incomingStockSort = searchParams.get("sort_by_incoming_stock");
+    if (incomingStockSort === "asc" || incomingStockSort === "desc") {
+      chips.push({
+        id: "sort-by-incoming-stock",
+        label: `Incoming stock sort: ${incomingStockSort === "asc" ? "Ascending" : "Descending"}`,
+        onRemove: () => removeFilterParam("sort_by_incoming_stock"),
+      });
+    }
+
+    const marketplaceSort = searchParams.get("sort_by_marketplace");
+    if (marketplaceSort === "asc" || marketplaceSort === "desc") {
+      chips.push({
+        id: "sort-by-marketplace",
+        label: `Marketplace sort: ${marketplaceSort === "asc" ? "Ascending" : "Descending"}`,
+        onRemove: () => removeFilterParam("sort_by_marketplace"),
+      });
+    }
+
+    const isInventory = searchParams.get("is_inventory");
+    if (isInventory === "true" || isInventory === "false") {
+      chips.push({
+        id: "inventory",
+        label: `Inventory: ${isInventory === "true" ? "In stock only" : "Out of stock only"}`,
+        onRemove: () => removeFilterParam("is_inventory"),
+      });
+    }
+
+    return chips;
+  }, [
+    brandLabelMap,
+    parseCsvParam,
+    removeFilterParam,
+    removeFilterValue,
+    searchParams,
+    supplierLabelMap,
+  ]);
 
   // push URL khi debounce hoàn thành
   useEffect(() => {
@@ -292,6 +485,44 @@ export default function TableToolbar({
           </div>
         </div>
 
+        {type === ToolbarType.product && activeFilterChips.length > 0 ? (
+          <div className="rounded-xl border border-secondary/15 bg-secondary/5 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="mr-1 inline-flex items-center gap-1.5 rounded-md bg-secondary/10 px-2 py-1 text-xs font-semibold text-secondary">
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                Active filters
+              </div>
+
+              {activeFilterChips.map((chip) => (
+                <div
+                  key={chip.id}
+                  className="inline-flex items-center gap-1 rounded-full border border-secondary/20 bg-white px-2.5 py-1 text-xs text-slate-700"
+                >
+                  <span>{chip.label}</span>
+                  <button
+                    type="button"
+                    onClick={chip.onRemove}
+                    className="rounded-full p-0.5 text-slate-500 transition-colors hover:bg-secondary/10 hover:text-secondary"
+                    aria-label={`Remove ${chip.label}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="ml-auto text-xs font-medium text-muted-foreground hover:text-foreground"
+                onClick={resetAllFilters}
+              >
+                Clear all
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
         {!isDSP && (
           <div className="flex flex-col gap-2 rounded-xl border border-secondary/10 bg-muted/20 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -323,12 +554,12 @@ export default function TableToolbar({
                     />
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem
+                  {/* <DropdownMenuItem
                     className="cursor-pointer"
                     onSelect={() => setOpenEanDrawer(true)}
                   >
                     EAN
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -349,11 +580,6 @@ export default function TableToolbar({
           open={openUpdateStatus}
           onOpenChange={setOpenUpdateStatus}
           productIds={product_ids ?? []}
-        />
-        <EANDrawer
-          product_ids={product_ids ?? []}
-          open={openEanDrawer}
-          onOpenChange={setOpenEanDrawer}
         />
 
         {isAddButtonModal && (

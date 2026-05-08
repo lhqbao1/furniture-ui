@@ -941,16 +941,27 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
     accessorKey: "status",
     header: () => <div className="text-center w-full">STATUS</div>,
     cell: ({ row }) => {
-      const status = row.original.status?.toLowerCase();
-      const shipmentStatus = row.original.shipment?.status;
+      const checkoutStatus = row.original.status?.toLowerCase().trim() ?? "";
+      const shipmentStatus =
+        row.original.shipment?.status?.toLowerCase().trim() ?? "";
 
-      let displayStatus = "pending";
+      const exchangeCheckoutStatuses = new Set([
+        "cancel_exchange",
+        "exchange_stock_reserved",
+        "exchange_shipped",
+        "exchange_preparation_shipping",
+        "exchange_cancel_no_stock",
+      ]);
 
-      if (status === "cancel_exchange") {
-        displayStatus = "cancel exchange";
-      } else if (row.original.shipment) {
-        displayStatus = shipmentStatus;
-      }
+      const shouldUseCheckoutStatus =
+        checkoutStatus !== "exchange" &&
+        exchangeCheckoutStatuses.has(checkoutStatus);
+
+      const normalizedStatus = shouldUseCheckoutStatus
+        ? checkoutStatus
+        : shipmentStatus || "pending";
+
+      const displayStatus = normalizedStatus.replaceAll("_", " ");
 
       return <div className="text-center lowercase">{displayStatus}</div>;
     },

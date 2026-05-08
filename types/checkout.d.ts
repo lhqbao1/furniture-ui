@@ -201,6 +201,21 @@ export interface CheckoutDashboardResponse {
   data: MarketplaceOverviewItem[];
 }
 
+export interface CheckoutBrandTypeOverviewItem {
+  brand_type: string;
+  total_orders: number;
+  total_amount: number;
+  percentage: number;
+}
+
+export interface CheckoutBrandTypeOverviewResponse {
+  from_date: string | null;
+  to_date: string | null;
+  grand_total_amount: number;
+  grand_total_orders: number;
+  data: CheckoutBrandTypeOverviewItem[];
+}
+
 export interface QuantityAmount {
   total_quantity: number;
   total_amount: number;

@@ -4,6 +4,7 @@ import { CreateOrderFormValues } from "@/lib/schema/checkout";
 import { ManualCreateOrderFormValues } from "@/lib/schema/manual-checkout";
 import { CreateRefundMainCheckoutPayload } from "@/lib/schema/refund";
 import {
+  CheckoutBrandTypeOverviewResponse,
   CheckOut,
   CheckoutDashboardResponse,
   CheckOutMain,
@@ -513,6 +514,23 @@ export const getCheckOutDashboard = async (params: OrderStatisticsParams) => {
     },
   });
   return res.data as CheckoutDashboardResponse;
+};
+
+export const getCheckOutDashboardEconeloAndRest = async (
+  params: OrderStatisticsParams,
+) => {
+  const fromDate = sanitizeDateTimeParam(params?.from_date);
+  const toDate = sanitizeDateTimeParam(params?.to_date);
+
+  const res = await api.get(`/checkout/dash-board/econelo-and-rest`, {
+    params: {
+      ...(fromDate !== undefined && { from_date: fromDate }),
+      ...(toDate !== undefined && { to_date: toDate }),
+      ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
+    },
+  });
+
+  return res.data as CheckoutBrandTypeOverviewResponse;
 };
 
 export const getProductsCheckOutDashboard = async (
