@@ -63,34 +63,6 @@ import { format, getISOWeek } from "date-fns";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
 
-type FlattenCategory = CategoryResponse & {
-  isParent: boolean;
-  depth: number;
-};
-
-const flattenCategories = (
-  categories: CategoryResponse[],
-  depth = 0,
-): FlattenCategory[] => {
-  let result: FlattenCategory[] = [];
-
-  for (const category of categories) {
-    const hasChildren = !!(category.children && category.children.length > 0);
-
-    result.push({
-      ...category,
-      isParent: hasChildren,
-      depth,
-    });
-
-    if (hasChildren) {
-      result = [...result, ...flattenCategories(category.children!, depth + 1)];
-    }
-  }
-
-  return result;
-};
-
 const sortByHasValue = (
   rowA: Row<ProductItem>,
   rowB: Row<ProductItem>,
@@ -1267,16 +1239,36 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
     setSelectedIds(product.categories?.map((category) => category.id) ?? []);
   }, [product.categories]);
 
-  const flatOptions = useMemo(() => {
-    if (!categories) return [];
-    return flattenCategories(categories);
-  }, [categories]);
+  const collectLeaves = (
+    categoryTree: CategoryResponse[],
+    leaves: Record<string, CategoryResponse> = {},
+  ) => {
+    for (const category of categoryTree) {
+      if (category.children && category.children.length > 0) {
+        collectLeaves(category.children, leaves);
+      } else {
+        leaves[category.id] = category;
+      }
+    }
+
+    return leaves;
+  };
+
+  const selectedLeaves = useMemo(() => {
+    if (!categories || selectedIds.length === 0) return [];
+
+    const leaves = collectLeaves(categories);
+    return selectedIds
+      .map((id) => leaves[id])
+      .filter(Boolean) as CategoryResponse[];
+  }, [categories, selectedIds]);
 
   const selectedNames = useMemo(() => {
     if (selectedIds.length === 0) return [];
-    const optionMap = new Map(
-      flatOptions.map((option) => [option.id, option.name]),
-    );
+
+    const names = selectedLeaves.map((category) => category.name);
+    if (names.length > 0) return names;
+
     const fallbackMap = new Map(
       (product.categories ?? []).map((category) => [
         category.id,
@@ -1285,9 +1277,9 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
     );
 
     return selectedIds
-      .map((id) => optionMap.get(id) ?? fallbackMap.get(id))
+      .map((id) => fallbackMap.get(id))
       .filter(Boolean) as string[];
-  }, [flatOptions, product.categories, selectedIds]);
+  }, [product.categories, selectedIds, selectedLeaves]);
 
   const handleUpdateCategories = (nextSelected: string[]) => {
     const previous = selectedIds;
@@ -1327,6 +1319,51 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
     );
   };
 
+  const toggleSelect = (categoryId: string) => {
+    const nextSelected = selectedIds.includes(categoryId)
+      ? selectedIds.filter((id) => id !== categoryId)
+      : [...selectedIds, categoryId];
+    handleUpdateCategories(nextSelected);
+  };
+
+  const renderUnselected = (categoryTree: CategoryResponse[]): JSX.Element[] => {
+    return categoryTree.flatMap((category) => {
+      const hasChildren = !!(category.children && category.children.length > 0);
+
+      if (hasChildren) {
+        const childNodes = renderUnselected(category.children);
+        if (childNodes.length === 0) return [];
+
+        return [
+          <div
+            key={category.id}
+            className="px-3 py-2 text-sm font-semibold text-muted-foreground cursor-default"
+          >
+            {category.name}
+          </div>,
+          ...childNodes,
+        ];
+      }
+
+      if (selectedIds.includes(category.id)) return [];
+
+      return [
+        <CommandItem
+          key={category.id}
+          onSelect={() => toggleSelect(category.id)}
+          className="flex items-center gap-2 cursor-pointer pl-6"
+        >
+          <Checkbox
+            checked={selectedIds.includes(category.id)}
+            onCheckedChange={() => toggleSelect(category.id)}
+            className="pointer-events-none"
+          />
+          <span>{category.name}</span>
+        </CommandItem>,
+      ];
+    });
+  };
+
   return (
     <div className="flex justify-center text-center w-full">
       <Popover open={open} onOpenChange={setOpen}>
@@ -1353,62 +1390,37 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
             <div className="flex items-center justify-center p-4">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : isError ? (
+          ) : isError || !categories || categories.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              Error loading categories
+              No categories available
             </div>
           ) : (
-            <Command>
+            <Command className="w-full">
               <CommandInput
                 placeholder="Search categories..."
                 className="h-10"
               />
-              <CommandList className="max-h-[320px]">
+              <CommandList
+                className="max-h-[320px] overflow-y-auto overscroll-contain"
+                onWheelCapture={(event) => event.stopPropagation()}
+              >
                 <CommandEmpty>No categories available</CommandEmpty>
                 <CommandGroup>
-                  {flatOptions.map((option) => {
-                    const isSelected = selectedIds.includes(option.id);
-                    const isTopLevelCategory = option.depth === 0;
-
-                    if (isTopLevelCategory) {
-                      return (
-                        <div
-                          key={option.id}
-                          className="px-3 py-2 text-sm font-semibold text-muted-foreground cursor-default"
-                          style={{
-                            paddingLeft: `${option.depth * 12 + 12}px`,
-                          }}
-                        >
-                          {option.name}
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <CommandItem
-                        key={option.id}
-                        onSelect={() => {
-                          const nextSelected = isSelected
-                            ? selectedIds.filter((id) => id !== option.id)
-                            : [...selectedIds, option.id];
-                          handleUpdateCategories(nextSelected);
-                        }}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => {}}
-                          className="pointer-events-none"
-                        />
-                        <span
-                          className="truncate"
-                          style={{ paddingLeft: `${option.depth * 12}px` }}
-                        >
-                          {option.name}
-                        </span>
-                      </CommandItem>
-                    );
-                  })}
+                  {selectedLeaves.map((category) => (
+                    <CommandItem
+                      key={category.id}
+                      onSelect={() => toggleSelect(category.id)}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Checkbox
+                        checked
+                        onCheckedChange={() => toggleSelect(category.id)}
+                        className="pointer-events-none"
+                      />
+                      <span>{category.name}</span>
+                    </CommandItem>
+                  ))}
+                  {renderUnselected(categories)}
                 </CommandGroup>
               </CommandList>
             </Command>

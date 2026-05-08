@@ -1,40 +1,83 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { getAllProductsSelect } from "@/features/product-group/api";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-import React, { useState } from "react";
+
+import React, { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
-import { ProductItem } from "@/types/products";
-import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { useQuery } from "@tanstack/react-query";
+import { CheckCheck, Loader2, RotateCcw, Search } from "lucide-react";
 import { toast } from "sonner";
-import {
-  buildProductExportData,
-  getIncomingStockExportLabel,
-} from "./export-utils";
 
-type ExportAction =
-  | "excel"
-  | "excel_basic"
-  | "csv"
-  | "praktiker"
-  | "search"
-  | null;
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { getAllProductsSelect } from "@/features/product-group/api";
+import { ProductItem } from "@/types/products";
+import { buildProductExportData } from "./export-utils";
+
+type ColumnOption = {
+  key: string;
+  label: string;
+};
+
+const formatColumnLabel = (key: string) => {
+  const customLabels: Record<string, string> = {
+    id: "ID Provider",
+    ean: "EAN",
+    img_url: "Image URLs",
+    weee_nr: "WEEE Number",
+    SEO_keywords: "SEO Keywords",
+    log_length: "Package Length",
+    log_width: "Package Width",
+    log_height: "Package Height",
+    log_weight: "Package Weight",
+  };
+
+  if (customLabels[key]) return customLabels[key];
+
+  return key
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const pickColumnsFromRows = (
+  rows: Record<string, unknown>[],
+  selectedColumns: string[],
+) => {
+  return rows.map((row) => {
+    const pickedRow: Record<string, unknown> = {};
+
+    selectedColumns.forEach((column) => {
+      pickedRow[column] = row[column] ?? "";
+    });
+
+    return pickedRow;
+  });
+};
 
 const FilterExportForm = () => {
-  const [exportingAction, setExportingAction] = useState<ExportAction>(null);
+  const [exporting, setExporting] = useState(false);
+  const [columnPickerOpen, setColumnPickerOpen] = useState(false);
+  const [columnSearch, setColumnSearch] = useState("");
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+
   const searchParams = useSearchParams();
   const supplierId = searchParams.get("supplier_id") ?? "";
   const statusParam = searchParams.get("all_products");
-  const brandId = searchParams.get("brand_id") ?? "";
   const search = searchParams.get("search")?.trim() ?? "";
   const sortByStock = searchParams.get("sort_by_stock") ?? "";
   const sortByIncomingStock = searchParams.get("sort_by_incoming_stock") ?? "";
   const sortByMarketplace = searchParams.get("sort_by_marketplace") ?? "";
   const isInventory = searchParams.get("is_inventory") ?? "";
-  const isEconeloParam = "true";
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
 
   const buildParams = () => {
@@ -49,10 +92,6 @@ const FilterExportForm = () => {
     if (supplierId) {
       params.supplier_id = supplierId;
     }
-
-    // if (brandId) {
-    //   params.brand_id = brandId;
-    // }
 
     if (search) {
       params.search = search;
@@ -74,12 +113,6 @@ const FilterExportForm = () => {
       params.is_inventory = isInventory;
     }
 
-    // if (isEconeloParam === "true") {
-    //   params.is_econelo = true;
-    // } else if (isEconeloParam === "false") {
-    //   params.is_econelo = false;
-    // }
-
     return params;
   };
 
@@ -88,18 +121,15 @@ const FilterExportForm = () => {
       "all-products",
       supplierId,
       statusParam ?? "all",
-      // brandId,
       search,
       sortByStock,
       sortByIncomingStock,
       sortByMarketplace,
       isInventory,
-      // isEconeloParam ?? "all",
     ],
     queryFn: () => getAllProductsSelect(buildParams()),
     enabled: false,
   });
-  const isAnyExporting = exportingAction !== null;
 
   const normalizeProductsResponse = (payload: unknown): ProductItem[] => {
     if (Array.isArray(payload)) return payload as ProductItem[];
@@ -136,8 +166,99 @@ const FilterExportForm = () => {
     });
   };
 
-  const handleExportExcel = async () => {
-    setExportingAction("excel");
+  const availableColumns = useMemo<ColumnOption[]>(() => {
+    const templateRows = buildProductExportData([{} as ProductItem]);
+    const templateRow = (templateRows[0] ?? {}) as Record<string, unknown>;
+
+    return Object.keys(templateRow).map((key) => ({
+      key,
+      label: formatColumnLabel(key),
+    }));
+  }, []);
+
+  const filteredColumns = useMemo(() => {
+    const query = columnSearch.trim().toLowerCase();
+    if (!query) return availableColumns;
+
+    return availableColumns.filter((column) => {
+      const keyMatch = column.key.toLowerCase().includes(query);
+      const labelMatch = column.label.toLowerCase().includes(query);
+      return keyMatch || labelMatch;
+    });
+  }, [availableColumns, columnSearch]);
+
+  const selectedSet = useMemo(
+    () => new Set(selectedColumns),
+    [selectedColumns],
+  );
+  const hasExportFilters = useMemo(
+    () =>
+      statusParam !== null ||
+      Boolean(supplierId) ||
+      Boolean(search) ||
+      Boolean(sortByStock) ||
+      Boolean(sortByIncomingStock) ||
+      Boolean(sortByMarketplace) ||
+      Boolean(isInventory),
+    [
+      isInventory,
+      search,
+      sortByIncomingStock,
+      sortByMarketplace,
+      sortByStock,
+      statusParam,
+      supplierId,
+    ],
+  );
+
+  const openColumnPicker = () => {
+    if (!hasExportFilters) {
+      toast.warning("Bạn nên chọn ít nhất 1 filter trước khi export");
+      return;
+    }
+
+    setSelectedColumns(availableColumns.map((column) => column.key));
+    setColumnSearch("");
+    setColumnPickerOpen(true);
+  };
+
+  const toggleColumn = (columnKey: string) => {
+    setSelectedColumns((current) => {
+      if (current.includes(columnKey)) {
+        return current.filter((key) => key !== columnKey);
+      }
+
+      return [...current, columnKey];
+    });
+  };
+
+  const setColumnChecked = (columnKey: string, checked: boolean) => {
+    setSelectedColumns((current) => {
+      if (checked) {
+        if (current.includes(columnKey)) return current;
+        return [...current, columnKey];
+      }
+
+      return current.filter((key) => key !== columnKey);
+    });
+  };
+
+  const selectAllColumns = () => {
+    setSelectedColumns(availableColumns.map((column) => column.key));
+  };
+
+  const clearAllColumns = () => {
+    setSelectedColumns([]);
+  };
+
+  const getOrderedSelectedColumns = () => {
+    return availableColumns
+      .map((column) => column.key)
+      .filter((key) => selectedSet.has(key));
+  };
+
+  const handleExportExcel = async (columns: string[]) => {
+    setExporting(true);
     try {
       const res = await refetch();
       const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
@@ -146,7 +267,10 @@ const FilterExportForm = () => {
         return;
       }
 
-      const exportData = buildProductExportData(data);
+      const exportData = pickColumnsFromRows(
+        buildProductExportData(data) as Record<string, unknown>[],
+        columns,
+      );
 
       const worksheet = XLSX.utils.json_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
@@ -162,248 +286,178 @@ const FilterExportForm = () => {
         `export-${Date.now()}.xlsx`,
       );
     } finally {
-      setExportingAction(null);
+      setExporting(false);
     }
   };
 
-  const handleExportExcelBasic = async () => {
-    setExportingAction("excel_basic");
-    try {
-      const res = await refetch();
-      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
-      if (!data.length) {
-        toast.info("No products to export");
-        return;
-      }
+  const handleConfirmExport = async () => {
+    const columns = getOrderedSelectedColumns();
 
-      const basicData = data
-        // .filter((product) =>
-        //   (product.sku ?? "").trim().toLowerCase().startsWith("CL"),
-        // )
-        .map((product) => ({
-          // id_provider: product.id_provider ?? "",
-          name: product.name ?? "",
-          sku: product.sku ?? "",
-          ean: product.ean ?? "",
-          incoming_stock: getIncomingStockExportLabel(product),
-        }));
-
-      if (!basicData.length) {
-        toast.info("No matching products for Prestige Home Living Indoor");
-        return;
-      }
-
-      const worksheet = XLSX.utils.json_to_sheet(basicData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      saveAs(
-        new Blob([excelBuffer], { type: "application/octet-stream" }),
-        `export-basic-${Date.now()}.xlsx`,
-      );
-    } finally {
-      setExportingAction(null);
+    if (columns.length === 0) {
+      toast.info("Please select at least one column");
+      return;
     }
-  };
 
-  const handleExportExcelWithSearch = async () => {
-    const searchValue = search || undefined;
-    setExportingAction("search");
-    try {
-      const payload = await getAllProductsSelect({
-        ...buildParams(),
-        search: searchValue,
-      });
-      const data = applyMultiSearchFilter(normalizeProductsResponse(payload));
-
-      if (!data.length) {
-        toast.info(
-          searchValue
-            ? "No products matched your search"
-            : "No products to export with current filters",
-        );
-        return;
-      }
-
-      const exportData = buildProductExportData(data);
-      const worksheet = XLSX.utils.json_to_sheet(exportData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      saveAs(
-        new Blob([excelBuffer], { type: "application/octet-stream" }),
-        `export-search-${Date.now()}.xlsx`,
-      );
-      toast.success("Export with search completed");
-    } catch (error: unknown) {
-      const err = error as {
-        response?: { data?: { detail?: unknown; message?: unknown } };
-        message?: unknown;
-      };
-      const message =
-        err.response?.data?.detail ??
-        err.response?.data?.message ??
-        err.message ??
-        "Failed to export with search";
-      toast.error("Export with search failed", {
-        description: String(message),
-      });
-    } finally {
-      setExportingAction(null);
-    }
-  };
-
-  const handleExportCSV = async () => {
-    setExportingAction("csv");
-    try {
-      const res = await refetch();
-      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
-      if (!data.length) {
-        toast.info("No products to export");
-        return;
-      }
-
-      const exportData = buildProductExportData(data);
-
-      const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-      const csv = XLSX.utils.sheet_to_csv(worksheet, {
-        FS: ",", // ✅ COMMA
-        RS: "\n",
-        forceQuotes: true, // ✅ vì description có dấu phẩy
-        blankrows: false,
-      });
-
-      const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8;",
-      });
-
-      saveAs(blob, `export-${Date.now()}.csv`);
-    } finally {
-      setExportingAction(null);
-    }
-  };
-
-  const handleExportCSVForPraktiker = async () => {
-    setExportingAction("praktiker");
-    try {
-      const res = await refetch();
-      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
-      if (!data.length) {
-        toast.info("No products to export");
-        return;
-      }
-
-      const inStockProducts = data.filter(
-        (product) =>
-          calculateAvailableStock(product) > 0 &&
-          Array.isArray(product.static_files) &&
-          product.static_files.length > 0 &&
-          product.final_price,
-      );
-
-      if (!inStockProducts.length) {
-        toast.info("No products with stock > 0 and images to export");
-        return;
-      }
-
-      const exportData = buildProductExportData(inStockProducts, "///");
-
-      const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-      const csv = XLSX.utils.sheet_to_csv(worksheet, {
-        FS: ",",
-        RS: "\n",
-        forceQuotes: true,
-        blankrows: false,
-      });
-
-      const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8;",
-      });
-
-      saveAs(blob, `export-praktiker-${Date.now()}.csv`);
-    } finally {
-      setExportingAction(null);
-    }
+    setColumnPickerOpen(false);
+    await handleExportExcel(columns);
   };
 
   return (
     <div>
-      {/* Export Button */}
-      <div className="flex justify-start gap-2">
+      <div className="flex flex-wrap justify-start gap-2">
         <Button
-          onClick={handleExportExcel}
-          disabled={isAnyExporting}
+          onClick={openColumnPicker}
+          disabled={exporting}
           type="button"
+          className="h-11"
         >
-          {exportingAction === "excel" ? (
-            <Loader2 className="animate-spin" />
+          {exporting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             "Export Excel"
           )}
         </Button>
-        <Button
-          onClick={handleExportExcelBasic}
-          disabled={isAnyExporting}
-          type="button"
-        >
-          {exportingAction === "excel_basic" ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            "Export Excel Basic"
-          )}
-        </Button>
-
-        <Button
-          variant="secondary"
-          onClick={handleExportCSV}
-          disabled={isAnyExporting}
-          type="button"
-        >
-          {exportingAction === "csv" ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            "Export CSV"
-          )}
-        </Button>
-
-        <Button
-          variant="secondary"
-          onClick={handleExportCSVForPraktiker}
-          disabled={isAnyExporting}
-          type="button"
-        >
-          {exportingAction === "praktiker" ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            "Export for Praktiker"
-          )}
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleExportExcelWithSearch}
-          disabled={isAnyExporting}
-          type="button"
-        >
-          {exportingAction === "search" ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            "Export with search"
-          )}
-        </Button>
       </div>
+
+      <Dialog open={columnPickerOpen} onOpenChange={setColumnPickerOpen}>
+        <DialogContent className="max-w-4xl overflow-hidden border-secondary/15 p-0">
+          <DialogHeader className="border-b border-secondary/10 bg-gradient-to-r from-secondary/5 via-white to-secondary/5 p-6">
+            <DialogTitle className="text-xl font-semibold text-foreground">
+              Choose Columns
+            </DialogTitle>
+            <DialogDescription className="mt-1 text-sm text-muted-foreground">
+              Export Excel will include only selected columns.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 p-6">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="relative w-full md:max-w-sm">
+                <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={columnSearch}
+                  onChange={(event) => setColumnSearch(event.target.value)}
+                  placeholder="Search column by key or label"
+                  className="h-10 pl-9"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>
+                  {selectedColumns.length}/{availableColumns.length} selected
+                </span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8"
+                  onClick={selectAllColumns}
+                >
+                  <CheckCheck className="h-3.5 w-3.5" />
+                  Select all
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-8"
+                  onClick={clearAllColumns}
+                >
+                  Clear
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-8"
+                  onClick={selectAllColumns}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Default
+                </Button>
+              </div>
+            </div>
+
+            <div className="max-h-[360px] overflow-y-auto rounded-xl border border-secondary/15 bg-muted/20 p-3">
+              {filteredColumns.length > 0 ? (
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+                  {filteredColumns.map((column) => {
+                    const checked = selectedSet.has(column.key);
+
+                    return (
+                      <div
+                        key={column.key}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => toggleColumn(column.key)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            toggleColumn(column.key);
+                          }
+                        }}
+                        className={cn(
+                          "flex items-start gap-3 rounded-lg border p-3 text-left transition-colors cursor-pointer",
+                          checked
+                            ? "border-secondary/40 bg-secondary/10"
+                            : "border-secondary/15 bg-white hover:bg-secondary/5",
+                        )}
+                      >
+                        <Checkbox
+                          checked={checked}
+                          onClick={(event) => event.stopPropagation()}
+                          onCheckedChange={(value) =>
+                            setColumnChecked(column.key, value === true)
+                          }
+                          className="mt-0.5"
+                        />
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-foreground">
+                            {column.label}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {column.key}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-10 text-center text-sm text-muted-foreground">
+                  No columns match your search.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className="border-t border-secondary/10 bg-white px-6 py-4 sm:justify-between">
+            <p className="text-sm text-muted-foreground">
+              Tip: default is all columns selected.
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setColumnPickerOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmExport}
+                disabled={exporting || selectedColumns.length === 0}
+              >
+                {exporting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Export now"
+                )}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

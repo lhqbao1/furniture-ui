@@ -244,16 +244,26 @@ export function useGetCheckOutRefundOrders(params: GetRefundOrdersParams = {}) {
 }
 
 export function useGetAllCheckOutMain(params?: {
-  channel?: string;
+  channel?: string[];
   status?: string[];
+  from_date?: string;
+  to_date?: string;
+  search?: string;
+  country?: string;
+  is_b2b?: boolean;
 }) {
   return useQuery({
     queryKey: [
       "checkout-main-all",
-      params?.channel ?? null,
+      (params?.channel ?? []).join(","),
       (params?.status ?? []).join(","),
+      params?.from_date ?? null,
+      params?.to_date ?? null,
+      params?.search ?? null,
+      params?.country ?? null,
+      params?.is_b2b ?? null,
     ],
-    queryFn: () => getAllCheckOutMain(params?.channel, params?.status),
+    queryFn: () => getAllCheckOutMain(params),
     retry: false,
   });
 }

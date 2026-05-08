@@ -205,11 +205,18 @@ export async function getCheckOutRefundOrders(params?: GetRefundOrdersParams) {
   return data as RefundOrdersResponse;
 }
 
-export async function getAllCheckOutMain(channel?: string, status?: string[]) {
+export async function getAllCheckOutMain(params?: GetAllCheckoutParams) {
   const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all", {
     params: {
-      ...(channel ? { channel } : {}),
-      ...(status && status.length > 0 ? { status } : {}),
+      ...(params?.channel !== undefined && { channel: params.channel }),
+      ...(params?.status && params.status.length > 0
+        ? { status: params.status }
+        : {}),
+      ...(params?.from_date !== undefined && { from_date: params.from_date }),
+      ...(params?.to_date !== undefined && { to_date: params.to_date }),
+      ...(params?.search !== undefined && { search: params.search }),
+      ...(params?.country !== undefined && { country: params.country }),
+      ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
     },
     paramsSerializer: (params) =>
       qs.stringify(params, { arrayFormat: "repeat" }),

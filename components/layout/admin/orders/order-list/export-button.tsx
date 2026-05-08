@@ -1,40 +1,22 @@
 "use client";
 
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getAllCheckOutMain, getCheckOutRefundOrders } from "@/features/checkout/api";
-import { getStatusStyle } from "./status-styles";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import {
+  getAllCheckOutMain,
+  getCheckOutRefundOrders,
+} from "@/features/checkout/api";
 import { formatDateDDMMYYYY } from "@/lib/date-formated";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
-import { useEffect, useMemo, useState } from "react";
-import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
-import { STATUS_OPTIONS } from "@/data/data";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { cn } from "@/lib/utils";
+
 import { exportOrderListTemplateToExcel } from "./export-order-template";
+import { getStatusStyle } from "./status-styles";
 
 interface ExportOrderExcelButtonProps {
   presetStatuses?: string[];
@@ -42,107 +24,162 @@ interface ExportOrderExcelButtonProps {
   expandByProductRefund?: boolean;
 }
 
+const parseCsvParam = (value: string | null) =>
+  (value ?? "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const parseBooleanParam = (value: string | null): boolean | undefined => {
+  if (!value) return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+  return undefined;
+};
+
 export default function ExportOrderExcelButton({
   presetStatuses,
   lockStatusSelection = false,
   expandByProductRefund = false,
 }: ExportOrderExcelButtonProps) {
-  const sortedChannelOptions = useMemo(
-    () =>
-      [...CHANEL_OPTIONS].sort((a, b) =>
-        a.label.localeCompare(b.label, "de", { sensitivity: "base" }),
-      ),
-    [],
-  );
-  const channelOptions = useMemo(
-    () => [{ key: "", label: "All" }, ...sortedChannelOptions],
-    [sortedChannelOptions],
-  );
-  const [openChannel, setOpenChannel] = useState(false);
+  const searchParams = useSearchParams();
+
   const normalizedPresetStatuses = useMemo(
-    () => Array.from(new Set((presetStatuses ?? []).map((status) => status.trim()))),
+    () =>
+      Array.from(
+        new Set((presetStatuses ?? []).map((status) => status.trim()).filter(Boolean)),
+      ),
     [presetStatuses],
   );
-  const baseStatuses = useMemo(
-    () => (lockStatusSelection ? normalizedPresetStatuses : []),
-    [lockStatusSelection, normalizedPresetStatuses],
+
+  const channelValues = useMemo(
+    () => parseCsvParam(searchParams.get("channel")),
+    [searchParams],
   );
-  const [marketplace, setMarketplace] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<string[]>(baseStatuses);
 
-  useEffect(() => {
-    setSelectedStatus(baseStatuses);
-  }, [baseStatuses]);
+  const statusValuesFromFilter = useMemo(
+    () => parseCsvParam(searchParams.get("status")),
+    [searchParams],
+  );
 
-  const hasFilters = useMemo(() => {
-    if (marketplace !== "") return true;
+  const statusValues = useMemo(() => {
+    if (lockStatusSelection && normalizedPresetStatuses.length > 0) {
+      return normalizedPresetStatuses;
+    }
 
-    const current = [...selectedStatus].sort().join(",");
-    const initial = [...baseStatuses].sort().join(",");
-    return current !== initial;
-  }, [baseStatuses, marketplace, selectedStatus]);
-  const selectedChannelLabel = useMemo(
-    () => channelOptions.find((item) => item.key === marketplace)?.label ?? "All",
-    [channelOptions, marketplace],
+    if (statusValuesFromFilter.length > 0) {
+      return statusValuesFromFilter;
+    }
+
+    return normalizedPresetStatuses;
+  }, [
+    lockStatusSelection,
+    normalizedPresetStatuses,
+    statusValuesFromFilter,
+  ]);
+
+  const search = (searchParams.get("search") ?? "").trim();
+  const multiSearchRaw = searchParams.get("multi_search") ?? "";
+  const multiSearchValues = useMemo(
+    () =>
+      multiSearchRaw
+        .split(",")
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean),
+    [multiSearchRaw],
+  );
+  const fromDate = searchParams.get("from_date") || undefined;
+  const toDate = searchParams.get("to_date") || undefined;
+  const country = searchParams.get("country") || undefined;
+  const isB2B = parseBooleanParam(searchParams.get("is_b2b"));
+  const isClaimedFactory = parseBooleanParam(
+    searchParams.get("is_claimed_factory"),
+  );
+  const isClaimedMarketplace = parseBooleanParam(
+    searchParams.get("is_claimed_marketplace"),
   );
 
   const { isFetching, refetch } = useQuery({
     queryKey: [
-      "checkout-main-all",
-      marketplace,
-      selectedStatus.join(","),
+      "checkout-main-all-export",
       expandByProductRefund,
+      channelValues.join(","),
+      statusValues.join(","),
+      search,
+      multiSearchRaw,
+      fromDate ?? null,
+      toDate ?? null,
+      country ?? null,
+      isB2B ?? null,
+      isClaimedFactory ?? null,
+      isClaimedMarketplace ?? null,
     ],
     queryFn: async () => {
       if (expandByProductRefund) {
         const response = await getCheckOutRefundOrders({
           page: 1,
           page_size: 5000,
-          ...(marketplace ? { channel: [marketplace] } : {}),
+          ...(channelValues.length > 0 ? { channel: channelValues } : {}),
+          ...(search ? { search } : {}),
+          ...(isClaimedFactory !== undefined
+            ? { is_claimed_factory: isClaimedFactory }
+            : {}),
+          ...(isClaimedMarketplace !== undefined
+            ? { is_claimed_marketplace: isClaimedMarketplace }
+            : {}),
         });
+
         return response.items;
       }
 
-      return getAllCheckOutMain(marketplace, selectedStatus);
+      return getAllCheckOutMain({
+        ...(channelValues.length > 0 ? { channel: channelValues } : {}),
+        ...(statusValues.length > 0 ? { status: statusValues } : {}),
+        ...(fromDate ? { from_date: fromDate } : {}),
+        ...(toDate ? { to_date: toDate } : {}),
+        ...(search ? { search } : {}),
+        ...(country ? { country } : {}),
+        ...(isB2B !== undefined ? { is_b2b: isB2B } : {}),
+      });
     },
-    enabled: false, // ❌ không auto call
+    enabled: false,
   });
 
-  const toggleStatus = (item: (typeof STATUS_OPTIONS)[number]) => {
-    if (lockStatusSelection) return;
-
-    const backendStatuses = item.statuses ?? [item.key];
-    const isSelected = backendStatuses.every((status) =>
-      selectedStatus.includes(status),
-    );
-
-    if (isSelected) {
-      setSelectedStatus((prev) =>
-        prev.filter((status) => !backendStatuses.includes(status)),
-      );
-      return;
-    }
-
-    setSelectedStatus((prev) =>
-      Array.from(new Set([...prev, ...backendStatuses])),
-    );
-  };
-
-  const getExportFileName = (marketplace: string) => {
-    if (!marketplace) return "order_export.xlsx";
-
-    return `order_export_${marketplace}.xlsx`;
+  const getExportFileName = () => {
+    if (channelValues.length !== 1) return "order_export.xlsx";
+    return `order_export_${channelValues[0]}.xlsx`;
   };
 
   const handleExport = async () => {
-    const res = await refetch(); // 🔥 gọi API tại đây
-    const data = res.data;
+    const result = await refetch();
+    const data = result.data;
 
-    if (!data || data.length === 0) return;
+    if (!data || data.length === 0) {
+      toast.info("No orders to export");
+      return;
+    }
 
-    // Hàm xử lý giá trị null / undefined / "None"
+    const target = new Set(multiSearchValues);
+    const filteredData =
+      target.size === 0
+        ? data
+        : data.filter((item) =>
+            target.has(
+              String(item.marketplace_order_id ?? "")
+                .trim()
+                .toLowerCase(),
+            ),
+          );
+
+    if (filteredData.length === 0) {
+      toast.info("No orders matched the current multi-search filter");
+      return;
+    }
+
     const clean = (val: unknown) =>
       val === null || val === undefined || val === "None" ? "" : val;
+
     const mapRefundType = (value: unknown) => {
       const normalized = String(value ?? "")
         .trim()
@@ -181,8 +218,9 @@ export default function ExportOrderExcelButton({
         "Reason",
         "Refund type",
       ] as const;
+
       const maxImageCount = Math.max(
-        data.reduce((max, order) => {
+        filteredData.reduce((max, order) => {
           const imageCount = (order.files ?? [])
             .map((file) => String(file?.url ?? "").trim())
             .filter(Boolean).length;
@@ -190,20 +228,28 @@ export default function ExportOrderExcelButton({
         }, 0),
         1,
       );
+
       const imageHeaders = Array.from(
         { length: maxImageCount },
         (_, index) => `Image items refund ${index + 1}`,
       );
+
       const refundHeaders = [...baseRefundHeaders, ...imageHeaders] as string[];
 
-      const refundRows = data.flatMap((p) => {
+      const refundRows = filteredData.flatMap((p) => {
         const allItems = p.checkouts?.flatMap((c) => c.cart?.items ?? []) ?? [];
-        const refundItems = Array.isArray(p.product_refund) ? p.product_refund : [];
+        const refundItems = Array.isArray(p.product_refund)
+          ? p.product_refund
+          : [];
         const checkoutImageUrls = (p.files ?? [])
           .map((file) => String(file?.url ?? "").trim())
           .filter(Boolean);
+
         const imageColumns = Object.fromEntries(
-          imageHeaders.map((header, index) => [header, clean(checkoutImageUrls[index] ?? "")]),
+          imageHeaders.map((header, index) => [
+            header,
+            clean(checkoutImageUrls[index] ?? ""),
+          ]),
         );
 
         const baseRow = {
@@ -218,19 +264,18 @@ export default function ExportOrderExcelButton({
 
         return Array.from({ length: rowCount }).map((_, index) => {
           const refundItem = refundItems[index];
-          const matchedCartItem =
-            refundItem
-              ? allItems.find(
-                  (item) =>
-                    (item?.purchased_products?.sku ?? "") ===
-                    (refundItem.sku ?? ""),
-                ) ??
-                allItems.find(
-                  (item) =>
-                    (item?.purchased_products?.id_provider ?? "") ===
-                    (refundItem.id_provider ?? ""),
-                )
-              : undefined;
+          const matchedCartItem = refundItem
+            ? allItems.find(
+                (item) =>
+                  (item?.purchased_products?.sku ?? "") ===
+                  (refundItem.sku ?? ""),
+              ) ??
+              allItems.find(
+                (item) =>
+                  (item?.purchased_products?.id_provider ?? "") ===
+                  (refundItem.id_provider ?? ""),
+              )
+            : undefined;
 
           return {
             ...baseRow,
@@ -303,174 +348,23 @@ export default function ExportOrderExcelButton({
         type: "array",
       });
 
-      const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-      saveAs(blob, getExportFileName(marketplace));
+      const blob = new Blob([excelBuffer], {
+        type: "application/octet-stream",
+      });
+      saveAs(blob, getExportFileName());
       return;
     }
 
-    exportOrderListTemplateToExcel(data, getExportFileName(marketplace));
+    exportOrderListTemplateToExcel(filteredData, getExportFileName());
   };
-
-  const handleResetFilters = () => {
-    setMarketplace("");
-    setSelectedStatus(baseStatuses);
-  };
-
-  const lockedStatusLabel = useMemo(() => {
-    if (!lockStatusSelection || normalizedPresetStatuses.length === 0) return "";
-
-    const labels = normalizedPresetStatuses.map((status) => {
-      const matched = STATUS_OPTIONS.find(
-        (option) =>
-          option.key === status || option.statuses?.some((item) => item === status),
-      );
-      return matched?.label ?? status;
-    });
-
-    return labels.join(", ");
-  }, [lockStatusSelection, normalizedPresetStatuses]);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          className="h-10 rounded-lg border-secondary/20 bg-white px-4 font-medium shadow-sm hover:bg-muted/30"
-        >
-          Export Orders
-        </Button>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        align="start"
-        sideOffset={8}
-        className="w-[350px] rounded-xl border border-secondary/15 p-0 shadow-xl"
-      >
-        <div className="space-y-4 p-4">
-          <div className="border-b border-secondary/10 pb-3">
-            <h3 className="text-base font-semibold leading-none text-foreground">
-              Export Orders
-            </h3>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Filter your data before exporting.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Channel
-            </Label>
-
-            <Popover open={openChannel} onOpenChange={setOpenChannel}>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  role="combobox"
-                  className="h-11 w-full justify-between border bg-white font-normal"
-                >
-                  {selectedChannelLabel}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                usePortal={false}
-                className="z-[120] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto"
-              >
-                <Command>
-                  <CommandInput placeholder="Search channel..." />
-                  <CommandList>
-                    <CommandEmpty>No channel found.</CommandEmpty>
-                    <CommandGroup className="max-h-64 overflow-y-auto">
-                      {channelOptions.map((item) => (
-                        <CommandItem
-                          key={item.key || "all"}
-                          value={`${item.label} ${item.key}`}
-                          onSelect={() => {
-                            setMarketplace(item.key);
-                            setOpenChannel(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              marketplace === item.key ? "opacity-100" : "opacity-0",
-                            )}
-                          />
-                          {item.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Status
-            </Label>
-            <Select>
-              <SelectTrigger
-                className="h-11 border bg-white"
-                disabled={lockStatusSelection}
-              >
-                <SelectValue
-                  placeholder={
-                    lockStatusSelection && lockedStatusLabel
-                      ? lockedStatusLabel
-                      : "Choose status"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent className="max-h-96">
-                {STATUS_OPTIONS.map((item) => (
-                  <div
-                    key={item.key}
-                    className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 hover:bg-accent"
-                    onClick={() => toggleStatus(item)}
-                  >
-                    <Checkbox
-                      checked={
-                        item.statuses
-                          ? item.statuses.every((status) =>
-                              selectedStatus.includes(status),
-                            )
-                          : selectedStatus.includes(item.key)
-                      }
-                    />
-                    <span>{item.label}</span>
-                  </div>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-2 pt-1">
-            <Button
-              variant="outline"
-              onClick={handleResetFilters}
-              disabled={!hasFilters || isFetching}
-              className="h-11 flex-1"
-            >
-              Reset Filters
-            </Button>
-
-            <Button
-              onClick={handleExport}
-              disabled={isFetching}
-              className="h-11 flex-1"
-            >
-              {isFetching ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Export Excel"
-              )}
-            </Button>
-          </div>
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      onClick={handleExport}
+      disabled={isFetching}
+      className="h-10 min-w-[118px] px-4"
+    >
+      {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : "Export Excel"}
+    </Button>
   );
 }

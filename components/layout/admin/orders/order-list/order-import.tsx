@@ -107,7 +107,7 @@ const CHANNEL_OPTIONS = [
   { value: "euro-tops", label: "Euro Tops" },
   { value: "XXXLUTZ", label: "XXXLUTZ" },
   { value: "prestige", label: "Prestige Home" },
-  { value: "mobelix", label: "Mobelix" },
+  { value: "moebelix", label: "Moebelix" },
 ] as const;
 
 const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
@@ -183,7 +183,7 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_postal_code: "4600",
     invoice_country: "AT",
   },
-  mobelix: {
+  moebelix: {
     company_name: "Möbelix GmbH",
     tax_id: "ATU63842248",
     invoice_address: "Römerstraße 39",
@@ -300,13 +300,17 @@ const calculateManualCheckoutDeliveryRange = (
   const from = new Date(
     Math.min(...itemRanges.map((range) => range.from.getTime())),
   );
-  const to = new Date(Math.max(...itemRanges.map((range) => range.to.getTime())));
+  const to = new Date(
+    Math.max(...itemRanges.map((range) => range.to.getTime())),
+  );
 
   if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return null;
   return { from, to };
 };
 
-const collectUniqueOrderItemIdProviders = (orders: GroupedOrder[]): string[] => {
+const collectUniqueOrderItemIdProviders = (
+  orders: GroupedOrder[],
+): string[] => {
   const uniqueIdProviders = new Set<string>();
 
   orders.forEach((order) => {
