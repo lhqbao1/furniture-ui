@@ -27,6 +27,7 @@ import {
   getCheckOutByCheckOutId,
   getCheckOutByUserId,
   getCheckOutDashboard,
+  getCheckOutDashboardEconeloAndRest,
   getCheckOutMain,
   getCheckOutMainByUserIdAdmin,
   getProductRefundByMainCheckoutId,
@@ -643,6 +644,21 @@ export const useGetCheckOutDashboard = (params: OrderStatisticsParams) => {
       params.is_b2b ?? null,
     ],
     queryFn: () => getCheckOutDashboard(params),
+    retry: false,
+  });
+};
+
+export const useGetCheckOutDashboardEconeloAndRest = (
+  params: OrderStatisticsParams,
+) => {
+  return useQuery({
+    queryKey: [
+      "checkout-dashboard-econelo-and-rest",
+      params.from_date,
+      params.to_date,
+      params.is_b2b ?? null,
+    ],
+    queryFn: () => getCheckOutDashboardEconeloAndRest(params),
     retry: false,
   });
 };

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useGetCheckOutDashboard,
+  useGetCheckOutDashboardEconeloAndRest,
   useGetCheckOutStatistic,
   useGetProductsCheckOutDashboard,
 } from "@/features/checkout/hook";
@@ -44,6 +45,7 @@ interface DashboardMetric {
   label: string;
   value: string;
   hint: string;
+  detailLines?: string[];
   icon: React.ComponentType<{ className?: string }>;
   tone: CardTone;
 }
@@ -567,6 +569,16 @@ export default function EcommerceDashboard({
   });
 
   const {
+    data: dashboardEconeloAndRest,
+    isLoading: isDashboardEconeloAndRestLoading,
+    isError: isDashboardEconeloAndRestError,
+  } = useGetCheckOutDashboardEconeloAndRest({
+    from_date: fromDate,
+    to_date: toDate,
+    is_b2b: isB2B,
+  });
+
+  const {
     data: productOverview,
     isLoading: isProductOverviewLoading,
     isError: isProductOverviewError,
@@ -576,9 +588,14 @@ export default function EcommerceDashboard({
     is_b2b: isB2B,
   });
 
-  const hasAnyData = Boolean(statistic || dashboard || productOverview);
+  const hasAnyData = Boolean(
+    statistic || dashboard || productOverview || dashboardEconeloAndRest,
+  );
   const isLoading =
-    (isStatisticLoading || isDashboardLoading || isProductOverviewLoading) &&
+    (isStatisticLoading ||
+      isDashboardLoading ||
+      isProductOverviewLoading ||
+      isDashboardEconeloAndRestLoading) &&
     !hasAnyData;
 
   if (isLoading) {
@@ -587,7 +604,10 @@ export default function EcommerceDashboard({
 
   if (
     !hasAnyData &&
-    (isStatisticError || isDashboardError || isProductOverviewError)
+    (isStatisticError ||
+      isDashboardError ||
+      isProductOverviewError ||
+      isDashboardEconeloAndRestError)
   ) {
     return (
       <Card className="rounded-2xl border-destructive/25">
@@ -634,6 +654,21 @@ export default function EcommerceDashboard({
   const netFromGrossByFormula = (gross: number) =>
     Math.max(0, gross - revenueDeductions);
 
+  const econeloBreakdownByType = dashboardEconeloAndRest?.data ?? [];
+  const econeloBreakdown = econeloBreakdownByType.find(
+    (item) => item.brand_type?.toLowerCase() === "econelo",
+  );
+  const restBreakdown = econeloBreakdownByType.find((item) =>
+    ["non_econelo", "rest"].includes(item.brand_type?.toLowerCase()),
+  );
+  const hasEconeloBreakdown = Boolean(econeloBreakdown || restBreakdown);
+  const apiBreakdownDetailLines = hasEconeloBreakdown
+    ? [
+        `Econelo: ${formatCurrency(toNumber(econeloBreakdown?.total_amount))}`,
+        `Rest: ${formatCurrency(toNumber(restBreakdown?.total_amount))}`,
+      ]
+    : [];
+
   const operationalBacklog =
     waitingPaymentOrders + stockReservedOrders + preparingOrders;
 
@@ -642,6 +677,7 @@ export default function EcommerceDashboard({
       label: "Gross Revenue",
       value: formatCurrency(grossRevenue),
       hint: `${totalOrders.toLocaleString("de-DE")} orders`,
+      detailLines: [],
       icon: Euro,
       tone: "emerald",
     },
@@ -649,6 +685,7 @@ export default function EcommerceDashboard({
       label: "Net Revenue",
       value: formatCurrency(netRevenue),
       hint: "gross - returns - cancellations",
+      detailLines: apiBreakdownDetailLines,
       icon: Wallet,
       tone: "blue",
     },
@@ -852,6 +889,18 @@ export default function EcommerceDashboard({
                 <p className="mt-3 text-xs text-muted-foreground">
                   {metric.hint}
                 </p>
+                {metric.detailLines?.length ? (
+                  <div className="mt-1 space-y-1">
+                    {metric.detailLines.map((line, index) => (
+                      <p
+                        key={`${metric.label}-${index}`}
+                        className="text-xs text-muted-foreground"
+                      >
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           );
