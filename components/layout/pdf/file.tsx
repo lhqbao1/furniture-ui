@@ -892,7 +892,9 @@ export const InvoicePDF = ({
                   Warenwert (netto)
                 </Text>
                 <Text style={{ width: "20%", textAlign: "right" }}>
-                  {(Number(orderTaxSummary?.totalNetWithoutShipping) || 0).toLocaleString("de-DE", {
+                  {(
+                    Number(orderTaxSummary?.totalNetWithoutShipping) || 0
+                  ).toLocaleString("de-DE", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -1027,12 +1029,13 @@ export const InvoicePDF = ({
                       fontWeight: "bold",
                     }}
                   >
-                    {(
-                      Number(orderTaxSummary?.totalGross) || 0
-                    ).toLocaleString("de-DE", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                    {(Number(orderTaxSummary?.totalGross) || 0).toLocaleString(
+                      "de-DE",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      },
+                    )}
                     {" €"}
                   </Text>
                 </View>
