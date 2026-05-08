@@ -29,7 +29,6 @@ import { useLocale } from "next-intl";
 import { ProductItem } from "@/types/products";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
-import ExportOrderExcelButton from "./export-button";
 import OrderImport from "./order-import";
 import { CheckOutMain } from "@/types/checkout";
 import { toast } from "sonner";
@@ -71,6 +70,7 @@ interface OrderToolbarProps {
 
 const FILTER_KEYS = [
   "search",
+  "multi_search",
   "status",
   "channel",
   "from_date",
@@ -403,6 +403,11 @@ export default function OrderToolbar({
                   <OrderFilterForm
                     showClaimedFilters={showClaimedFilters}
                     showCountryFilter={showCountryFilter}
+                    showExportButton
+                    exportPresetStatuses={exportPresetStatuses}
+                    lockExportStatuses={lockExportStatuses}
+                    expandExportByRefundItems={expandExportByRefundItems}
+                    onResetFilters={resetAllFilters}
                   />
                 )}
               </DropdownMenuContent>
@@ -575,11 +580,6 @@ export default function OrderToolbar({
           </DropdownMenu>
 
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium">
-            <ExportOrderExcelButton
-              presetStatuses={exportPresetStatuses}
-              lockStatusSelection={lockExportStatuses}
-              expandByProductRefund={expandExportByRefundItems}
-            />
             <OrderImport />
           </div>
         </div>

@@ -946,6 +946,7 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
         row.original.shipment?.status?.toLowerCase().trim() ?? "";
 
       const exchangeStatusToBaseStatus: Record<string, string> = {
+        exchange: "payment recieved",
         cancel_exchange: "canceled",
         exchange_stock_reserved: "tock_reserved",
         exchange_shipped: "shipped",
@@ -953,18 +954,18 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
         exchange_cancel_no_stock: "canceled_no_stock",
       };
 
-      const shouldUseCheckoutStatus =
-        checkoutStatus !== "exchange" &&
-        Object.prototype.hasOwnProperty.call(
-          exchangeStatusToBaseStatus,
-          checkoutStatus,
-        );
+      const shouldUseCheckoutStatus = Object.prototype.hasOwnProperty.call(
+        exchangeStatusToBaseStatus,
+        checkoutStatus,
+      );
 
       const displayStatus = shouldUseCheckoutStatus
         ? getStatusStyle(exchangeStatusToBaseStatus[checkoutStatus]).text
         : (shipmentStatus || "pending").replaceAll("_", " ");
 
-      return <div className="text-center lowercase">{displayStatus}</div>;
+      console.log(displayStatus);
+
+      return <div className="text-center capitalize">{displayStatus}</div>;
     },
   },
   {

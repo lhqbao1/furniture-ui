@@ -768,7 +768,7 @@ export const listChanel = [
   },
   {
     id: 21,
-    name: "mobelix",
+    name: "moebelix",
     icon: "mobelix.png",
   },
 ];
