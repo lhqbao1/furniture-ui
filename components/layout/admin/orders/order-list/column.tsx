@@ -946,7 +946,7 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
         row.original.shipment?.status?.toLowerCase().trim() ?? "";
 
       const exchangeStatusToBaseStatus: Record<string, string> = {
-        exchange: "payment recieved",
+        exchange: "payment received",
         cancel_exchange: "canceled",
         exchange_stock_reserved: "tock_reserved",
         exchange_shipped: "shipped",

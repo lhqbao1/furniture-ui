@@ -50,7 +50,7 @@ const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
     );
   };
   return (
-    <Drawer direction="right" open={open} onOpenChange={setOpen}>
+    <Drawer direction="right" open={open} onOpenChange={setOpen} handleOnly>
       <DrawerTrigger asChild>
         <button
           type="button"
@@ -59,7 +59,7 @@ const EditProductDrawer = ({ product }: EditProductDrawerProps) => {
           {product.id_provider}
         </button>
       </DrawerTrigger>
-      <DrawerContent className="p-6 w-[95vw] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[1600px] overflow-y-auto">
+      <DrawerContent className="w-[1600px] max-w-[95vw] overflow-y-auto overflow-x-hidden p-6 data-[vaul-drawer-direction=right]:sm:max-w-[1600px]">
         <DrawerHeader>
           <DrawerTitle>Edit Product</DrawerTitle>
         </DrawerHeader>

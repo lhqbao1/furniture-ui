@@ -8,7 +8,7 @@ interface LogStockTabProps {
 
 const LogStockTab = ({ productDetail }: LogStockTabProps) => {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto select-text">
       <div className="w-max min-w-full">
         <div className="text-lg font-semibold mb-4">
           Total: {productDetail.log_stocks?.length}
@@ -25,24 +25,28 @@ const LogStockTab = ({ productDetail }: LogStockTabProps) => {
 
           {productDetail.log_stocks?.map((item) => (
             <React.Fragment key={item.id}>
-              <div className="text-sm">
+              <div className="text-sm select-text">
                 {formatDateTimeString(item.created_at)}
               </div>
-              <div className="text-sm">
+              <div className="text-sm select-text">
                 {item.main_checkout?.from_marketplace
                   ? item.main_checkout.from_marketplace.toUpperCase()
                   : "Prestige Home"}
               </div>
-              <div className="text-sm"></div>
-              <div className="text-sm">
+              <div className="text-sm select-text"></div>
+              <div className="text-sm select-text">
                 {item.main_checkout ? item.main_checkout.checkout_code : ""}
               </div>
-              <div className="text-sm">
+              <div className="text-sm select-text">
                 {item.quantity ? item.quantity : ""} (
                 {item.current_stock ? item.current_stock : "-"})
               </div>
-              <div className="text-sm">{item.user ? item.user.email : ""}</div>
-              <div className="text-sm">{item.note ? item.note : ""}</div>
+              <div className="text-sm break-words whitespace-normal select-text">
+                {item.user ? item.user.email : ""}
+              </div>
+              <div className="text-sm break-words whitespace-normal select-text">
+                {item.note ? item.note : ""}
+              </div>
             </React.Fragment>
           ))}
         </div>
