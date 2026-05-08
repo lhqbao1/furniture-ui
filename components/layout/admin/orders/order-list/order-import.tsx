@@ -603,7 +603,7 @@ const OrderImport = () => {
       }
 
       if (index < orders.length - 1) {
-        await sleep(2000);
+        await sleep(300);
       }
     }
 

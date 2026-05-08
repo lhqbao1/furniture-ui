@@ -213,7 +213,7 @@ const FilterExportForm = () => {
 
   const openColumnPicker = () => {
     if (!hasExportFilters) {
-      toast.warning("Bạn nên chọn ít nhất 1 filter trước khi export");
+      toast.warning("Please apply at least one filter before exporting.");
       return;
     }
 

@@ -1,17 +1,22 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ChevronsUpDown } from "lucide-react";
 
 export const CHANEL_OPTIONS = [
   { key: "prestige_home", label: "Prestige Home", icon: "new-logo.svg" },
@@ -39,6 +44,7 @@ export const CHANEL_OPTIONS = [
 export default function OrderChanelFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [open, setOpen] = useState(false);
 
   // Lấy giá trị hiện tại từ URL
   const param = searchParams.get("channel") || "";
@@ -51,6 +57,17 @@ export default function OrderChanelFilter() {
     const current = searchParams.get("channel") || "";
     setSelected(current ? current.split(",") : []);
   }, [searchParams]);
+
+  const selectedLabel = useMemo(() => {
+    if (selected.length === 0) return "Choose channel";
+
+    if (selected.length === 1) {
+      const channel = CHANEL_OPTIONS.find((item) => item.key === selected[0]);
+      return channel?.label ?? "1 selected";
+    }
+
+    return `${selected.length} selected`;
+  }, [selected]);
 
   const toggleStatus = (key: string) => {
     let updated: string[];
@@ -77,37 +94,60 @@ export default function OrderChanelFilter() {
   return (
     <div className="flex flex-col gap-2">
       <Label>Channel</Label>
-      <Select>
-        <SelectTrigger
-          className="w-full cursor-pointer border text-black justify-between"
-          placeholderColor
-          iconColor="black"
-        >
-          <SelectValue placeholder="Choose channel" />
-        </SelectTrigger>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            className="w-full justify-between border bg-white font-normal text-black"
+          >
+            <span className="truncate">{selectedLabel}</span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
 
-        <SelectContent className="max-h-96">
-          {CHANEL_OPTIONS.map((item) => (
-            <div
-              key={item.key}
-              className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-accent rounded-md"
-              onClick={() => toggleStatus(item.key)}
-            >
-              <Checkbox checked={selected.includes(item.key)} />
-              {item.icon && (
-                <Image
-                  src={`/${item.icon}`}
-                  alt={item.label}
-                  width={18}
-                  height={18}
-                  className="shrink-0"
-                />
-              )}
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </SelectContent>
-      </Select>
+        <PopoverContent
+          usePortal={false}
+          className="z-[120] w-[var(--radix-popover-trigger-width)] p-0 pointer-events-auto"
+        >
+          <Command>
+            <CommandInput placeholder="Search channel..." />
+            <CommandList className="max-h-80">
+              <CommandEmpty>No channel found.</CommandEmpty>
+              <CommandGroup>
+                {CHANEL_OPTIONS.map((item) => {
+                  const isSelected = selected.includes(item.key);
+
+                  return (
+                    <CommandItem
+                      key={item.key}
+                      value={`${item.label} ${item.key}`}
+                      onSelect={() => toggleStatus(item.key)}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        className="pointer-events-none"
+                      />
+                      {item.icon ? (
+                        <Image
+                          src={`/${item.icon}`}
+                          alt={item.label}
+                          width={18}
+                          height={18}
+                          className="shrink-0"
+                        />
+                      ) : null}
+                      <span className="truncate">{item.label}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
