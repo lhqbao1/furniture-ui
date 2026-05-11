@@ -139,6 +139,10 @@ export type ProductPdfFiles = {
   url: string;
 };
 
+export type ProductVideoUrl = {
+  url: string | string[];
+};
+
 export interface InventoryItem {
   product_id: string;
   incoming_stock: number;
@@ -265,6 +269,7 @@ export type ProductItem = {
   is_econelo: boolean;
 
   pdf_files: ProductPdfFiles[];
+  video_urls?: ProductVideoUrl[];
   is_fsc: boolean | null;
   note: string | null;
 

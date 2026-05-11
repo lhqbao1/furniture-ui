@@ -97,6 +97,9 @@ const ProductFormDSP = ({
                           productId={
                             productValues ? productValues.id_provider : null
                           }
+                          productUuid={productValues ? productValues.id : null}
+                          videoUrls={productValues?.video_urls}
+                          productDetails={productValues}
                           isDSP
                         />
                       </CardContent>

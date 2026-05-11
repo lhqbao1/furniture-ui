@@ -191,6 +191,9 @@ const ProductBundleForm = ({
                           productId={
                             productValues ? productValues.id_provider : null
                           }
+                          productUuid={productValues ? productValues.id : null}
+                          videoUrls={productValues?.video_urls}
+                          productDetails={productValues}
                         />
                       </CardContent>
                     </Card>

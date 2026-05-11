@@ -5,6 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
+  addProductVideoUrls,
   CreateProduct,
   deleteProduct,
   editProduct,
@@ -299,6 +300,25 @@ export function useGenerateSEO() {
     // onSuccess: (res) => {
     //   qc.invalidateQueries({ queryKey: ["products"] })
     // },
+  });
+}
+
+export function useAddProductVideoUrls() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      productId,
+      input,
+    }: {
+      productId: string;
+      input: { url: string[] };
+    }) => addProductVideoUrls(productId, input),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ["all-products"] });
+      qc.invalidateQueries({ queryKey: ["products"] });
+      qc.invalidateQueries({ queryKey: ["product", variables.productId] });
+    },
   });
 }
 

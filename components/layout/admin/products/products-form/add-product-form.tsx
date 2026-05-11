@@ -275,6 +275,9 @@ const ProductForm = ({
                         <ProductDetailInputs
                           isEdit={!!productValues}
                           productId={productValues?.id_provider ?? null}
+                          productUuid={productValues?.id ?? null}
+                          videoUrls={productValues?.video_urls}
+                          productDetails={productValues}
                         />
                       </CardContent>
                     </Card>
