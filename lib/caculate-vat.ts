@@ -267,6 +267,8 @@ export function calculateOrderTaxWithDiscount(
     bucket.gross = +(bucket.gross + grossRounded).toFixed(2);
 
     const split = splitGross(grossRounded, vatRate);
+    bucket.net = +(bucket.net + split.net).toFixed(2);
+    bucket.vat = +(bucket.vat + split.vat).toFixed(2);
     shippingNet = +(shippingNet + split.net).toFixed(2);
     shippingVat = +(shippingVat + split.vat).toFixed(2);
     shippingRates.add(vatRate);
@@ -403,25 +405,76 @@ export function calculateDisplayOrderTaxSummary(
     tax_id,
     total_shipping,
   );
-  const shippingRate = normalizeVatRate(Number(shippingBase.vatRate) || 0);
-  const shippingNet = +(Number(shippingBase.net) || 0).toFixed(2);
-  const shippingVat = +(shippingNet * shippingRate).toFixed(2);
-  const shippingGross = +(shippingNet + shippingVat).toFixed(2);
+  const shippingGross = Math.max(0, Number(shippingBase.gross ?? 0));
 
-  if (shippingGross > 0) {
-    if (!buckets.has(shippingRate)) {
-      buckets.set(shippingRate, {
-        vatRate: shippingRate,
+  // Shipping VAT follows product VAT composition.
+  // For single-VAT orders, all shipping goes to that same VAT bucket.
+  const productBuckets = Array.from(buckets.entries())
+    .map(([vatRate, bucket]) => ({
+      vatRate,
+      gross: +(Number(bucket.gross) || 0).toFixed(2),
+    }))
+    .filter((bucket) => bucket.gross > 0);
+
+  let shippingNet = 0;
+  let shippingVat = 0;
+  const shippingRates = new Set<number>();
+
+  const applyShippingToBucket = (vatRate: number, gross: number) => {
+    const grossRounded = +gross.toFixed(2);
+    if (grossRounded <= 0) return;
+
+    if (!buckets.has(vatRate)) {
+      buckets.set(vatRate, {
+        vatRate,
         gross: 0,
         net: 0,
         vat: 0,
       });
     }
 
-    const shippingBucket = buckets.get(shippingRate)!;
-    shippingBucket.net = +(shippingBucket.net + shippingNet).toFixed(2);
-    shippingBucket.vat = +(shippingBucket.vat + shippingVat).toFixed(2);
-    shippingBucket.gross = +(shippingBucket.gross + shippingGross).toFixed(2);
+    const bucket = buckets.get(vatRate)!;
+    bucket.gross = +(bucket.gross + grossRounded).toFixed(2);
+
+    const split = splitGross(grossRounded, vatRate);
+    bucket.net = +(bucket.net + split.net).toFixed(2);
+    bucket.vat = +(bucket.vat + split.vat).toFixed(2);
+    shippingNet = +(shippingNet + split.net).toFixed(2);
+    shippingVat = +(shippingVat + split.vat).toFixed(2);
+    shippingRates.add(vatRate);
+  };
+
+  if (shippingGross > 0) {
+    const totalProductGross = +productBuckets
+      .reduce((sum, bucket) => sum + bucket.gross, 0)
+      .toFixed(2);
+
+    if (productBuckets.length === 0 || totalProductGross <= 0) {
+      const fallbackRate = normalizeVatRate(Number(shippingBase.vatRate) || 0);
+      applyShippingToBucket(fallbackRate, shippingGross);
+    } else {
+      let remainingGross = +shippingGross.toFixed(2);
+
+      productBuckets.forEach((bucket, index) => {
+        const isLast = index === productBuckets.length - 1;
+        let allocatedGross = isLast
+          ? remainingGross
+          : +((shippingGross * bucket.gross) / totalProductGross).toFixed(2);
+
+        allocatedGross = Math.max(
+          0,
+          Math.min(+remainingGross.toFixed(2), allocatedGross),
+        );
+        remainingGross = +(remainingGross - allocatedGross).toFixed(2);
+
+        applyShippingToBucket(bucket.vatRate, allocatedGross);
+      });
+
+      if (remainingGross > 0) {
+        const fallbackRate = productBuckets[productBuckets.length - 1].vatRate;
+        applyShippingToBucket(fallbackRate, remainingGross);
+      }
+    }
   }
 
   const totalNet = +Array.from(buckets.values())
@@ -443,10 +496,13 @@ export function calculateDisplayOrderTaxSummary(
   return {
     buckets: Array.from(buckets.values()),
     shipping: {
-      gross: shippingGross,
-      net: shippingNet,
-      vat: shippingVat,
-      vatRate: shippingRate,
+      gross: +shippingGross.toFixed(2),
+      net: +shippingNet.toFixed(2),
+      vat: +shippingVat.toFixed(2),
+      vatRate:
+        shippingRates.size === 1
+          ? Number(Array.from(shippingRates)[0]) || 0
+          : 0,
     },
     discountGross: appliedDiscountGross,
     totalNet,

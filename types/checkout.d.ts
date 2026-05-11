@@ -216,6 +216,14 @@ export interface CheckoutBrandTypeOverviewResponse {
   data: CheckoutBrandTypeOverviewItem[];
 }
 
+export interface CheckoutMainTag {
+  id: string;
+  tag: string;
+  code: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface QuantityAmount {
   total_quantity: number;
   total_amount: number;
