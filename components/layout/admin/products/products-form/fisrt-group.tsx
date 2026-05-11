@@ -24,6 +24,7 @@ import { saveAs } from "file-saver";
 import { ProductItem } from "@/types/products";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { getProductActivationMissingFields } from "@/lib/product-activation";
+import ProductVideoUrls from "./product-video-urls";
 import {
   Dialog,
   DialogContent,
@@ -46,16 +47,21 @@ const RichEditor = dynamic(
 interface ProductDetailInputsProps {
   isEdit?: boolean;
   productId?: string | null;
+  productUuid?: string | null;
   isDSP?: boolean;
   productDetails?: Partial<ProductItem>;
+  videoUrls?: ProductItem["video_urls"];
 }
 
 const ProductDetailInputs = ({
   isEdit,
   productId,
+  productUuid,
   isDSP = false,
   productDetails,
+  videoUrls,
 }: ProductDetailInputsProps) => {
+  console.log("hceckec", videoUrls);
   const form = useFormContext();
   const listImages = form.watch("static_files") ?? [];
   const supplierName =
@@ -410,6 +416,8 @@ const ProductDetailInputs = ({
           isAddProduct
         />
       </div>
+
+      <ProductVideoUrls productId={productUuid} videoUrls={videoUrls} />
 
       {/*Tag choose */}
       <div className="w-full">

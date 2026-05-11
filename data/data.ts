@@ -1203,7 +1203,9 @@ export const EXCHANGE_WAREHOUSE_OPTIONS = [
 ] as const;
 
 export const SHIPMENT_CARRIERS = [
-  { id: "spedition", logo: "/amm.jpeg", label: "Spedition" },
+  { id: "spedition", logo: "/cargoline.webp", label: "Cargoline" },
+  { id: "cargoline", logo: "/amm.jpeg", label: "Cargoline" },
+
   { id: "dpd", logo: "/dpd.jpeg", label: "DPD" },
   { id: "dhl", logo: "/dhl.png", label: "DHL" },
   { id: "gls", logo: "/gls-new.png", label: "GLS" },

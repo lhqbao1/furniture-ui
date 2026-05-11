@@ -333,6 +333,10 @@ export type EditProductInput = Partial<ProductInput> & {
   static_files?: ProductInput["static_files"];
 };
 
+export interface AddProductVideoUrlsInput {
+  url: string[];
+}
+
 export async function editProduct(input: EditProductInput, id: string) {
   const { data } = await apiAdmin.put(`/products/${id}`, input, {
     headers: {
@@ -341,6 +345,25 @@ export async function editProduct(input: EditProductInput, id: string) {
     },
     withCredentials: true, // nếu backend cần cookie/session
   });
+  return data as ProductItem;
+}
+
+export async function addProductVideoUrls(
+  productId: string,
+  input: AddProductVideoUrlsInput,
+) {
+  const { data } = await apiAdmin.put(
+    `/products/add-url-video/${productId}`,
+    input,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    },
+  );
+
   return data as ProductItem;
 }
 
