@@ -62,11 +62,11 @@ const OrderSummary = ({
 
   const formatVatLabel = (percent: number) => {
     const safePercent = Number(percent) || 0;
-    const isInteger = Number.isInteger(safePercent);
+    const roundedPercent = Math.round(safePercent * 100) / 100;
 
-    return `VAT (${safePercent.toLocaleString("de-DE", {
-      minimumFractionDigits: isInteger ? 0 : 2,
-      maximumFractionDigits: isInteger ? 0 : 2,
+    return `VAT (${roundedPercent.toLocaleString("de-DE", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
     })}%)`;
   };
 
