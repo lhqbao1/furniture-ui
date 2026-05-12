@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormField, FormMessage } from "@/components/ui/form";
 import { useUploadStaticFile } from "@/features/file/hook";
 import { cn } from "@/lib/utils";
@@ -53,15 +54,24 @@ interface ImagePickerInputProps<T extends FieldValues> {
   isSimple?: boolean;
   isFile?: boolean;
   isAddProduct?: boolean;
+  isSelectionMode?: boolean;
+  selectedUrls?: string[];
+  onToggleSelect?: (url: string) => void;
 }
 
 // ================== SORTABLE ITEM ==================
 function SortableImage({
   item,
   onRemove,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect,
 }: {
   item: ImageItem;
   onRemove: () => void;
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (url: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: item.id });
@@ -75,27 +85,64 @@ function SortableImage({
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      className="relative h-full aspect-square rounded-lg overflow-hidden group cursor-move z-0"
+      {...(!isSelectionMode ? attributes : {})}
+      className={cn(
+        "relative h-full aspect-square rounded-lg overflow-hidden group z-0",
+        isSelectionMode ? "cursor-pointer" : "cursor-move",
+      )}
+      onClick={(event) => {
+        if (!isSelectionMode) return;
+
+        const target = event.target as HTMLElement | null;
+        if (target?.closest("[data-image-select-checkbox='true']")) return;
+
+        onToggleSelect?.(item.url);
+      }}
     >
       <Image
-        {...listeners}
+        {...(!isSelectionMode ? listeners : {})}
         src={item.url}
         alt={`Uploaded-${item.id}`}
         fill
-        className="object-contain z-0"
+        className={cn(
+          "object-contain z-0 transition",
+          isSelectionMode && "cursor-pointer",
+          isSelected && "opacity-80",
+        )}
         unoptimized
       />
+      {isSelectionMode ? (
+        <div
+          className="absolute left-2 top-2 z-10"
+          data-image-select-checkbox="true"
+        >
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onToggleSelect?.(item.url)}
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Select image"
+            className="size-6 rounded-md border-2 border-primary bg-white shadow-[0_8px_20px_-14px_rgba(15,23,42,0.55)] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+          />
+        </div>
+      ) : null}
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+        className={cn(
+          "absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center transition",
+          isSelectionMode
+            ? "opacity-0 pointer-events-none"
+            : "opacity-0 group-hover:opacity-100",
+        )}
       >
         ✕
       </button>
+      {isSelected ? (
+        <div className="pointer-events-none absolute inset-0 rounded-lg ring-2 ring-primary ring-offset-2" />
+      ) : null}
     </div>
   );
 }
@@ -108,6 +155,9 @@ function ImagePickerInput<T extends FieldValues>({
   isSingle = false,
   isFile = false,
   isAddProduct = false,
+  isSelectionMode = false,
+  selectedUrls = [],
+  onToggleSelect,
   className,
   isSimple,
 }: ImagePickerInputProps<T>) {
@@ -331,6 +381,9 @@ function ImagePickerInput<T extends FieldValues>({
                     key={it.id}
                     item={it}
                     onRemove={() => removeImage(idx)}
+                    isSelectionMode={isSelectionMode}
+                    isSelected={selectedUrls.includes(it.url)}
+                    onToggleSelect={onToggleSelect}
                   />
                 ))}
               </div>
