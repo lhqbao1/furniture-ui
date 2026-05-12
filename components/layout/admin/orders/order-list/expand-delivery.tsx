@@ -7,8 +7,8 @@ import { CartItem } from "@/types/cart";
 import { orderChildColumns } from "./column";
 import { orderListExpandColumns } from "./product-columns";
 import { ProductItem } from "@/types/products";
-import { format, getISOWeek } from "date-fns";
 import { cn } from "@/lib/utils";
+import { formatIncomingStockDate } from "@/lib/format-incoming-stock";
 
 function transformCartItems(items: CartItem[]): CartItem[] {
   return items.flatMap((item) => {
@@ -218,9 +218,7 @@ const OrderExpandTable = ({ row }: { row: { original: CheckOutMain } }) => {
                 <div className="font-medium line-clamp-1">{entry.name}</div>
                 <div className="mt-1 flex flex-wrap gap-2">
                   {entry.incomingItems.map((incoming) => {
-                    const formattedDate = `CW ${String(
-                      getISOWeek(incoming.date),
-                    ).padStart(2, "0")} - ${format(incoming.date, "MMMM d")}`;
+                    const formattedDate = formatIncomingStockDate(incoming.date);
                     const isSoon =
                       incoming.date > today && incoming.date <= sixWeeksFromNow;
 

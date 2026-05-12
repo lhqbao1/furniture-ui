@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { getAllProductsSelect } from "@/features/product-group/api";
 import { useQuery } from "@tanstack/react-query";
-import { format, getISOWeek } from "date-fns";
 import { saveAs } from "file-saver";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +10,7 @@ import { useMemo } from "react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { ProductItem } from "@/types/products";
+import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 
 type ExportCellValue = string | number;
 
@@ -34,16 +34,7 @@ const getIncomingLabel = (product: ProductItem): string => {
 
   return upcoming
     .map((item) => {
-      const date = item.list_delivery_date ? new Date(item.list_delivery_date) : null;
-      const formattedDate =
-        date && !Number.isNaN(date.getTime())
-          ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(
-              date,
-              "MMMM d",
-            )}`
-          : "—";
-
-      return `${item.quantity ?? 0} | ${formattedDate}`;
+      return formatIncomingStockEntry(item.quantity, item.list_delivery_date);
     })
     .join(" ; ");
 };

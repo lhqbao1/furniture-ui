@@ -7,7 +7,7 @@ import { useGetAllProductAndSold } from "@/features/products/hook";
 import { getAllProductAndSold } from "@/features/products/api";
 import { ProductAndSoldItem } from "@/types/products";
 import { ProviderItem } from "@/types/checkout";
-import { format, getISOWeek } from "date-fns";
+import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { CustomPagination } from "@/components/shared/custom-pagination";
 import { useDebounce } from "use-debounce";
 import { Badge } from "@/components/ui/badge";
+import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 import {
   Select,
   SelectContent,
@@ -80,13 +81,7 @@ const getIncomingStockExportValue = (product: ProductAndSoldItem): string => {
 
   return incomingItems
     .map((item) => {
-      const date = item.date;
-      const formattedDate =
-        date && !Number.isNaN(date.getTime())
-          ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(date, "MMMM d")}`
-          : "—";
-
-      return `${item.quantity ?? 0} | ${formattedDate}`;
+      return formatIncomingStockEntry(item.quantity, item.date);
     })
     .join(" ; ");
 };
@@ -251,10 +246,6 @@ function IncomingStockDisplay({ product }: { product: ProductAndSoldItem }) {
     <div className="space-y-1.5 text-sm text-center">
       {incomingItems.map((item) => {
         const date = item.date;
-        const formattedDate =
-          date && !Number.isNaN(date.getTime())
-            ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(date, "MMMM d")}`
-            : "—";
 
         const sixWeeksFromNow = new Date(today);
         sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
@@ -266,7 +257,7 @@ function IncomingStockDisplay({ product }: { product: ProductAndSoldItem }) {
 
         return (
           <div key={item.id} className={isSoon ? "text-secondary" : undefined}>
-            {item.quantity ?? 0} | {formattedDate ?? "—"}
+            {formatIncomingStockEntry(item.quantity, date)}
           </div>
         );
       })}
