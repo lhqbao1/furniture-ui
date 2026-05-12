@@ -19,14 +19,10 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
-import { format, getISOWeek } from "date-fns";
+import { formatIncomingStockDate } from "@/lib/format-incoming-stock";
 
 const formatISOWeek = (value?: string | null) => {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  const week = getISOWeek(date);
-  return `CW ${String(week).padStart(2, "0")} - ${format(date, "MMMM d")}`;
+  return formatIncomingStockDate(value);
 };
 
 const IncomingInventoryList = () => {

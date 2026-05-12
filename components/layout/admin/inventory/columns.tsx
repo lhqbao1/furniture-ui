@@ -19,9 +19,9 @@ import { useEditProduct } from "@/features/products/hook";
 import { useUpdateStockProduct } from "@/features/products/inventory/hook";
 import { useAtom } from "jotai";
 import { adminIdAtom } from "@/store/auth";
-import { format, getISOWeek } from "date-fns";
 import { Check, X } from "lucide-react";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
+import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 
 // function ActionsCell({ product }: { product: ProductItem }) {
 //   const locale = useLocale();
@@ -847,13 +847,6 @@ export const getInventoryColumns = (
             const date = item.list_delivery_date
               ? new Date(item.list_delivery_date)
               : null;
-            const formattedDate =
-              date && !Number.isNaN(date.getTime())
-                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(
-                    date,
-                    "MMMM d",
-                  )}`
-                : "—";
 
             const sixWeeksFromNow = new Date(today);
             sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
@@ -868,7 +861,7 @@ export const getInventoryColumns = (
                 key={item.id}
                 className={isSoon ? "text-secondary" : undefined}
               >
-                {item.quantity ?? 0} | {formattedDate ?? "—"}
+                {formatIncomingStockEntry(item.quantity, date)}
               </div>
             );
           })}

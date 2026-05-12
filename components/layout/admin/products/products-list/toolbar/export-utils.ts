@@ -1,8 +1,8 @@
 "use client";
 
-import { format, getISOWeek } from "date-fns";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { ProductItem } from "@/types/products";
+import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 
 const clean = (val: unknown) =>
   val === null || val === undefined ? "" : val;
@@ -24,18 +24,7 @@ export const getIncomingStockExportLabel = (product: ProductItem): string => {
 
   return upcoming
     .map((item) => {
-      const date = item.list_delivery_date
-        ? new Date(item.list_delivery_date)
-        : null;
-      const formattedDate =
-        date && !Number.isNaN(date.getTime())
-          ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(
-              date,
-              "MMMM d",
-            )}`
-          : "—";
-
-      return `${item.quantity ?? 0} | ${formattedDate}`;
+      return formatIncomingStockEntry(item.quantity, item.list_delivery_date);
     })
     .join(" ; ");
 };

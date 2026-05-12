@@ -59,7 +59,7 @@ import { CategoryResponse } from "@/types/categories";
 import { CARRIERS } from "@/data/data";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
-import { format, getISOWeek } from "date-fns";
+import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
 
 const PRESTIGE_OWNER_VALUE = "__PRESTIGE__";
 
@@ -2238,10 +2238,6 @@ export const getProductColumns = (
         <div className="space-y-1.5 text-sm text-center">
           {incomingItems.map((item) => {
             const date = item.date;
-            const formattedDate =
-              date && !Number.isNaN(date.getTime())
-                ? `CW ${String(getISOWeek(date)).padStart(2, "0")} - ${format(date, "MMMM d")}`
-                : "—";
 
             const sixWeeksFromNow = new Date(today);
             sixWeeksFromNow.setDate(sixWeeksFromNow.getDate() + 42);
@@ -2256,7 +2252,7 @@ export const getProductColumns = (
                 key={item.id}
                 className={isSoon ? "text-secondary" : undefined}
               >
-                {item.quantity ?? 0} | {formattedDate ?? "—"}
+                {formatIncomingStockEntry(item.quantity, date)}
               </div>
             );
           })}
