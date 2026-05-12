@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   FormControl,
@@ -33,6 +33,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Copy, Images } from "lucide-react";
 
 // import RichEditor dynamically to avoid SSR issues
 const RichEditor = dynamic(
@@ -63,11 +64,20 @@ const ProductDetailInputs = ({
 }: ProductDetailInputsProps) => {
   console.log("hceckec", videoUrls);
   const form = useFormContext();
-  const listImages = form.watch("static_files") ?? [];
+  const watchedStaticFiles = form.watch("static_files");
+  const listImages = useMemo(
+    () =>
+      Array.isArray(watchedStaticFiles)
+        ? (watchedStaticFiles as Array<{ url?: string }>)
+        : [],
+    [watchedStaticFiles],
+  );
   const supplierName =
     productDetails?.owner?.business_name?.trim() || "Prestige Home";
 
   const [isRemoveImagesOpen, setIsRemoveImagesOpen] = useState(false);
+  const [isImageSelectionMode, setIsImageSelectionMode] = useState(false);
+  const [selectedImageUrls, setSelectedImageUrls] = useState<string[]>([]);
 
   function sanitizeFolderName(name: string) {
     return name
@@ -127,7 +137,58 @@ const ProductDetailInputs = ({
   const handleRemoveAllImages = () => {
     if (!listImages.length) return;
     form.setValue("static_files", [], { shouldDirty: true });
+    setSelectedImageUrls([]);
+    setIsImageSelectionMode(false);
   };
+
+  const handleToggleImageSelection = (url: string) => {
+    setSelectedImageUrls((current) =>
+      current.includes(url)
+        ? current.filter((item) => item !== url)
+        : [...current, url],
+    );
+  };
+
+  const handleToggleSelectionMode = () => {
+    setIsImageSelectionMode((current) => {
+      if (current) {
+        setSelectedImageUrls([]);
+      }
+      return !current;
+    });
+  };
+
+  const handleCopyImageLinks = async () => {
+    if (!selectedImageUrls.length) return;
+
+    try {
+      await navigator.clipboard.writeText(selectedImageUrls.join(", "));
+      toast.success(
+        `Copied ${selectedImageUrls.length} image link${
+          selectedImageUrls.length > 1 ? "s" : ""
+        }`,
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to copy image links");
+    }
+  };
+
+  useEffect(() => {
+    const availableUrls = new Set(
+      listImages
+        .map((item) => item?.url)
+        .filter((url): url is string => Boolean(url)),
+    );
+
+    setSelectedImageUrls((current) =>
+      current.filter((url) => availableUrls.has(url)),
+    );
+
+    if (!availableUrls.size) {
+      setIsImageSelectionMode(false);
+    }
+  }, [listImages]);
 
   return (
     <div className="space-y-6">
@@ -361,7 +422,7 @@ const ProductDetailInputs = ({
       <div className="flex flex-col gap-4">
         <div className="flex gap-3 items-center justify-between">
           <p className="text-black font-semibold text-sm">Image</p>
-          <div className="space-x-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <Button
               type="button"
               variant={"secondary"}
@@ -369,6 +430,25 @@ const ProductDetailInputs = ({
             >
               Download images ({listImages.length})
             </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleToggleSelectionMode}
+              disabled={!listImages.length}
+            >
+              <Images className="h-4 w-4" />
+              {isImageSelectionMode ? "Cancel choosing" : "Choose images"}
+            </Button>
+            {selectedImageUrls.length > 0 ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCopyImageLinks}
+              >
+                <Copy className="h-4 w-4" />
+                Copy link{selectedImageUrls.length > 1 ? "s" : ""}
+              </Button>
+            ) : null}
             <Button
               type="button"
               className="bg-red-500 hover:bg-red-600"
@@ -414,6 +494,9 @@ const ProductDetailInputs = ({
           fieldName="static_files"
           description="prefer 2k - 2500 x 1875px - Ratio 4:3"
           isAddProduct
+          isSelectionMode={isImageSelectionMode}
+          selectedUrls={selectedImageUrls}
+          onToggleSelect={handleToggleImageSelection}
         />
       </div>
 
