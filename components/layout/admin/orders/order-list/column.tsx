@@ -76,6 +76,73 @@ const formatDeliveryRangeLabel = (
   return formatDate(fromDate ?? toDate!);
 };
 
+const TAG_COLOR_BY_LABEL: Record<string, string> = {
+  "exchange in progress": "bg-[#1E3A8A]",
+  "exchange completed": "bg-[#14532D]",
+  "no refund needed": "bg-[#B45309]",
+  "different carrier": "bg-[#0F766E]",
+};
+
+const normalizeTagValue = (value?: string | null) =>
+  typeof value === "string" ? value.trim() : "";
+
+const getFallbackTagCode = (tag: string) => {
+  const words = tag
+    .split(/\s+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (words.length === 0) {
+    return "TAG";
+  }
+
+  if (words.length === 1) {
+    return words[0].slice(0, 3).toUpperCase();
+  }
+
+  return words
+    .slice(0, 3)
+    .map((item) => item[0]?.toUpperCase() ?? "")
+    .join("");
+};
+
+const buildOrderTagBadges = (order: CheckOutMain) => {
+  const tagsFromArray = Array.isArray(order.tags)
+    ? order.tags
+        .map((item) => ({
+          tag: normalizeTagValue(item?.tag),
+          code: normalizeTagValue(item?.code),
+        }))
+        .filter((item) => item.tag)
+    : [];
+
+  const fallbackTag = normalizeTagValue(order.tag);
+  const baseTags =
+    tagsFromArray.length > 0
+      ? tagsFromArray
+      : fallbackTag
+        ? [{ tag: fallbackTag, code: "" }]
+        : [];
+
+  const uniqueTags = Array.from(
+    new Map(baseTags.map((item) => [item.tag.toLowerCase(), item])).values(),
+  );
+
+  return uniqueTags.map((item) => {
+    const option = getOrderTagOption(item.tag);
+    const bgClass = TAG_COLOR_BY_LABEL[item.tag.toLowerCase()] ?? option?.bg ?? "bg-[#334155]";
+    const shortCode = item.code
+      ? item.code.toUpperCase()
+      : option?.shortLabel ?? getFallbackTagCode(item.tag);
+
+    return {
+      label: item.tag,
+      code: shortCode,
+      bgClass,
+    };
+  });
+};
+
 const deliveryPreviewColumns: ColumnDef<CartItem>[] = [
   {
     accessorKey: "id_provider",
@@ -593,18 +660,23 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     accessorKey: "tag",
     header: () => <div className="text-center w-full">TAG</div>,
     cell: ({ row }) => {
-      const tagOption = getOrderTagOption(row.original.tag);
+      const tagBadges = buildOrderTagBadges(row.original);
 
-      if (!tagOption) {
+      if (tagBadges.length === 0) {
         return <div />;
       }
 
       return (
-        <div
-          title={tagOption.label}
-          className={`mx-auto w-fit rounded-[4px] px-2 py-1 text-xs font-semibold leading-none ${tagOption.bg} ${tagOption.color}`}
-        >
-          {tagOption.shortLabel}
+        <div className="mx-auto flex w-fit flex-wrap items-center justify-center gap-1">
+          {tagBadges.map((tagBadge) => (
+            <div
+              key={tagBadge.label}
+              title={tagBadge.label}
+              className={`rounded-[4px] px-2 py-1 text-xs font-semibold leading-none text-white ${tagBadge.bgClass}`}
+            >
+              {tagBadge.code}
+            </div>
+          ))}
         </div>
       );
     },
