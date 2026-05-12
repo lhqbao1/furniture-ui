@@ -448,7 +448,7 @@ export const BauhausReturnSlipPdf = ({
                   </View>
                   <View style={[styles.cell, styles.colNumber]}>
                     <Text style={styles.cellContent}>
-                      {idx === 0 ? "33754376" : ""}
+                      {idx === 0 ? "32879443" : ""}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.colName]}>

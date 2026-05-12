@@ -38,6 +38,9 @@ export function useDeleteCheckoutMainTag() {
     mutationFn: (tagId: string) => deleteCheckoutMainTag(tagId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["checkout-main-tags"] });
+      qc.invalidateQueries({ queryKey: ["checkout-main-id"] });
+      qc.invalidateQueries({ queryKey: ["checkout-main"] });
+      qc.invalidateQueries({ queryKey: ["checkout"] });
     },
   });
 }

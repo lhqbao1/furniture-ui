@@ -1,13 +1,28 @@
 "use client";
 
 import * as React from "react";
-import { Loader2 } from "lucide-react";
+import { ChevronDown, Loader2, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { getOrderTagOption, ORDER_TAG_OPTIONS } from "@/data/data";
-import { useUpdateTagForMainCheckout } from "@/features/checkout/hook";
+import {
+  useCreateCheckoutMainTag,
+  useGetCheckoutMainTags,
+  useUpdateCheckoutMainTag,
+} from "@/features/checkout-tag/hook";
 import { CheckOutMain } from "@/types/checkout";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogClose,
@@ -18,18 +33,44 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-const EMPTY_SELECT_VALUE = "__tag_select_empty__";
-const NONE_TAG_VALUE = "__tag_none__";
+const normalizeTagValue = (value?: string | null) =>
+  typeof value === "string" ? value.trim() : "";
 
-const getTagLabel = (tag?: string | null) => {
-  if (!tag) return "None";
-  return getOrderTagOption(tag)?.label ?? tag;
+const getUniqueTags = (tags: string[]) => Array.from(new Set(tags));
+
+const TAG_COLOR_BY_LABEL: Record<string, string> = {
+  "exchange in progress": "bg-[#1E3A8A]",
+  "exchange completed": "bg-[#14532D]",
+  "no refund needed": "bg-[#B45309]",
+  "different carrier": "bg-[#0F766E]",
+};
+
+const getTagColorClass = (tag: string) =>
+  TAG_COLOR_BY_LABEL[tag.toLowerCase()] ?? "bg-[#334155]";
+
+const getFallbackTagCode = (tag: string) => {
+  const words = tag
+    .split(/\s+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (words.length === 0) {
+    return "TAG";
+  }
+
+  if (words.length === 1) {
+    return words[0].slice(0, 3).toUpperCase();
+  }
+
+  return words
+    .slice(0, 3)
+    .map((item) => item[0]?.toUpperCase() ?? "")
+    .join("");
 };
 
 export default function OrderTagSelector({
@@ -37,126 +78,370 @@ export default function OrderTagSelector({
 }: {
   order: CheckOutMain;
 }) {
-  const updateTagMutation = useUpdateTagForMainCheckout();
-  const [value, setValue] = React.useState(EMPTY_SELECT_VALUE);
-  const [pendingTag, setPendingTag] = React.useState<string | undefined>();
-  const [openConfirm, setOpenConfirm] = React.useState(false);
+  const updateTagMutation = useUpdateCheckoutMainTag();
+  const createTagMutation = useCreateCheckoutMainTag();
+  const { data: tagOptionsRaw = [], isLoading: isLoadingTags } =
+    useGetCheckoutMainTags();
 
-  const currentTag = order.tag ?? undefined;
-  const currentLabel = getTagLabel(currentTag);
-  const pendingLabel = getTagLabel(pendingTag);
+  const tagOptions = React.useMemo(
+    () =>
+      (Array.isArray(tagOptionsRaw) ? tagOptionsRaw : [])
+        .filter((item) => typeof item?.tag === "string" && item.tag.trim())
+        .map((item) => ({
+          id: item.id,
+          tag: item.tag.trim(),
+          code: item.code,
+        })),
+    [tagOptionsRaw],
+  );
 
-  const resetSelectionState = React.useCallback(() => {
-    setValue(EMPTY_SELECT_VALUE);
-    setPendingTag(undefined);
-  }, []);
+  const tagMetaMap = React.useMemo(() => {
+    const map = new Map<string, { tag: string; code?: string | null }>();
 
-  const handleClose = React.useCallback(() => {
-    setOpenConfirm(false);
-    resetSelectionState();
-  }, [resetSelectionState]);
+    for (const option of tagOptions) {
+      map.set(option.tag.toLowerCase(), {
+        tag: option.tag,
+        code: option.code,
+      });
+    }
 
-  const handleChange = React.useCallback(
-    (nextValue: string) => {
-      const nextTag = nextValue === NONE_TAG_VALUE ? undefined : nextValue;
+    if (Array.isArray(order.tags)) {
+      for (const item of order.tags) {
+        const normalizedTag = normalizeTagValue(item?.tag);
+        if (!normalizedTag) continue;
 
-      if (nextTag === currentTag) {
-        resetSelectionState();
+        map.set(normalizedTag.toLowerCase(), {
+          tag: normalizedTag,
+          code: item?.code,
+        });
+      }
+    }
+
+    return map;
+  }, [order.tags, tagOptions]);
+
+  const selectedTags = React.useMemo(() => {
+    const tagsFromArray = Array.isArray(order.tags)
+      ? order.tags
+          .map((item) => normalizeTagValue(item?.tag))
+          .filter(Boolean)
+      : [];
+
+    if (tagsFromArray.length > 0) {
+      return getUniqueTags(tagsFromArray);
+    }
+
+    const legacyTag = normalizeTagValue(order.tag);
+    return legacyTag ? [legacyTag] : [];
+  }, [order.tag, order.tags]);
+
+  const [openSelect, setOpenSelect] = React.useState(false);
+  const [openCreateDialog, setOpenCreateDialog] = React.useState(false);
+  const [newTag, setNewTag] = React.useState("");
+  const [newCode, setNewCode] = React.useState("");
+
+  const selectedTagKeys = React.useMemo(
+    () => new Set(selectedTags.map((item) => item.toLowerCase())),
+    [selectedTags],
+  );
+
+  const isSubmitting =
+    updateTagMutation.isPending ||
+    createTagMutation.isPending;
+
+  const updateOrderTags = React.useCallback(
+    (tags: string[]) => {
+      const normalizedTags = getUniqueTags(
+        tags.map((item) => normalizeTagValue(item)).filter(Boolean),
+      );
+      const currentTagKeys = new Set(selectedTags.map((item) => item.toLowerCase()));
+      const nextTagKeys = new Set(normalizedTags.map((item) => item.toLowerCase()));
+
+      if (
+        nextTagKeys.size === currentTagKeys.size &&
+        Array.from(nextTagKeys).every((item) => currentTagKeys.has(item))
+      ) {
         return;
       }
 
-      setValue(nextValue);
-      setPendingTag(nextTag);
-      setOpenConfirm(true);
+      const actionLabel =
+        normalizedTags.length === 0
+          ? "Order tags cleared successfully"
+          : normalizedTags.length > selectedTags.length
+            ? "Order tag updated successfully"
+            : "Order tag removed successfully";
+
+      setOpenSelect(false);
+      updateTagMutation.mutate(
+        {
+          mainCheckoutId: order.id,
+          tags: normalizedTags,
+        },
+        {
+          onSuccess: () => {
+            toast.success(actionLabel);
+          },
+          onError: () => {
+            toast.error("Failed to update order tag");
+          },
+        },
+      );
     },
-    [currentTag, resetSelectionState],
+    [order.id, selectedTags, updateTagMutation],
   );
 
-  const handleConfirm = React.useCallback(() => {
-    updateTagMutation.mutate(
+  const toggleTag = React.useCallback(
+    (tag: string) => {
+      const normalizedTag = normalizeTagValue(tag);
+      if (!normalizedTag || isSubmitting) {
+        return;
+      }
+
+      const normalizedKey = normalizedTag.toLowerCase();
+      const hasTag = selectedTagKeys.has(normalizedKey);
+      const nextTags = hasTag
+        ? selectedTags.filter((item) => item.toLowerCase() !== normalizedKey)
+        : [...selectedTags, normalizedTag];
+
+      updateOrderTags(nextTags);
+    },
+    [isSubmitting, selectedTagKeys, selectedTags, updateOrderTags],
+  );
+
+  const clearTags = React.useCallback(() => {
+    if (selectedTags.length === 0 || isSubmitting) {
+      return;
+    }
+
+    updateOrderTags([]);
+  }, [isSubmitting, selectedTags.length, updateOrderTags]);
+
+  const selectedLabel = React.useMemo(() => {
+    if (selectedTags.length === 0) {
+      return "None";
+    }
+
+    if (selectedTags.length === 1) {
+      return selectedTags[0];
+    }
+
+    return `${selectedTags.length} selected`;
+  }, [selectedTags]);
+
+  const selectedTagBadges = React.useMemo(
+    () =>
+      selectedTags.map((tag) => {
+        const normalizedKey = tag.toLowerCase();
+        const meta = tagMetaMap.get(normalizedKey);
+        const codeRaw = normalizeTagValue(meta?.code);
+
+        return {
+          tag,
+          code: codeRaw ? codeRaw.toUpperCase() : getFallbackTagCode(tag),
+          bgClass: getTagColorClass(tag),
+        };
+      }),
+    [selectedTags, tagMetaMap],
+  );
+
+  const handleCreateTag = React.useCallback(() => {
+    const normalizedTag = newTag.trim();
+    const normalizedCode = newCode.trim();
+
+    if (!normalizedTag || !normalizedCode) {
+      toast.error("Tag and code are required");
+      return;
+    }
+
+    createTagMutation.mutate(
       {
-        main_checkout_id: order.id,
-        tag: pendingTag,
+        tag: normalizedTag,
+        code: normalizedCode,
       },
       {
         onSuccess: () => {
-          toast.success("Order tag updated successfully");
-          handleClose();
+          toast.success("Tag created successfully");
+          setOpenCreateDialog(false);
+          setOpenSelect(true);
+          setNewTag("");
+          setNewCode("");
         },
         onError: () => {
-          toast.error("Failed to update order tag");
-          handleClose();
+          toast.error("Failed to create tag");
         },
       },
     );
-  }, [handleClose, order.id, pendingTag, updateTagMutation]);
+  }, [createTagMutation, newCode, newTag]);
 
   return (
     <>
-      <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
-        <div className="flex flex-1 items-center gap-2">
-          <div className="font-medium text-slate-500">Tag:</div>
-          <span className="font-semibold text-slate-900">{currentLabel}</span>
-        </div>
+      <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="font-medium text-slate-500">Tag:</div>
+            {selectedTags.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {selectedTagBadges.map((item) => (
+                  <div
+                    key={item.tag}
+                    title={item.tag}
+                    className={`inline-flex items-center gap-1 rounded-[4px] px-2 py-1 text-xs font-semibold text-white ${item.bgClass}`}
+                  >
+                    <span>{item.code}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleTag(item.tag)}
+                      disabled={isSubmitting}
+                      className="rounded p-0.5 text-white/90 transition hover:bg-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label={`Remove tag ${item.tag}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
-        <div className="flex items-center gap-2">
-          <Select value={value} onValueChange={handleChange}>
-            <SelectTrigger
-              className="h-7 min-h-7 w-fit rounded-md border border-slate-200 bg-white px-2"
-              iconColor="#334155"
-            />
-            <SelectContent>
-              <SelectItem value={EMPTY_SELECT_VALUE} className="hidden" disabled>
-                Select
-              </SelectItem>
-              <SelectItem value={NONE_TAG_VALUE} className="cursor-pointer">
-                None
-              </SelectItem>
-              {ORDER_TAG_OPTIONS.map((option) => (
-                <SelectItem
-                  key={option.value}
-                  value={option.value}
-                  className="cursor-pointer"
-                >
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={openSelect} onOpenChange={setOpenSelect}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                disabled={isLoadingTags || isSubmitting}
+                className="h-8 min-h-8 min-w-[132px] justify-between rounded-md border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700"
+              >
+                <span className="truncate">{selectedLabel}</span>
+                {isSubmitting ? (
+                  <Loader2 className="ml-2 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ChevronDown className="ml-2 h-3.5 w-3.5 opacity-70" />
+                )}
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent
+              align="end"
+              className="w-[300px] p-0"
+              usePortal={false}
+            >
+              <Command>
+                <CommandInput placeholder="Search tags..." />
+                <CommandList className="max-h-72">
+                  <CommandEmpty>No tags found.</CommandEmpty>
+                  <CommandGroup>
+                    <CommandItem
+                      value="none"
+                      onSelect={clearTags}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={selectedTags.length === 0}
+                        className="pointer-events-none"
+                      />
+                      <span>None</span>
+                    </CommandItem>
+                    {tagOptions.map((option) => {
+                      const checked = selectedTagKeys.has(option.tag.toLowerCase());
+
+                      return (
+                        <CommandItem
+                          key={option.id}
+                          value={`${option.tag} ${option.code ?? ""}`}
+                          onSelect={() => toggleTag(option.tag)}
+                          className="cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            className="pointer-events-none"
+                          />
+                          <span className="truncate">{option.tag}</span>
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                  <CommandSeparator />
+                  <CommandGroup>
+                    <CommandItem
+                      value="add-new-tag"
+                      onSelect={() => {
+                        setOpenSelect(false);
+                        setOpenCreateDialog(true);
+                      }}
+                      className="cursor-pointer text-emerald-600"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Add new tag</span>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
-      <Dialog open={openConfirm} onOpenChange={handleClose}>
+      <Dialog
+        open={openCreateDialog}
+        onOpenChange={(nextOpen) => {
+          setOpenCreateDialog(nextOpen);
+          if (!nextOpen) {
+            setNewTag("");
+            setNewCode("");
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Update order tag</DialogTitle>
+            <DialogTitle>Create new tag</DialogTitle>
             <DialogDescription>
-              {pendingTag === undefined
-                ? "Are you sure you want to remove the tag from this order?"
-                : `Are you sure you want to update this order tag to "${pendingLabel}"?`}
+              Add a new tag option for main checkout.
             </DialogDescription>
           </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-600">Tag</Label>
+              <Input
+                value={newTag}
+                onChange={(event) => setNewTag(event.target.value)}
+                placeholder="e.g. High Priority"
+                disabled={createTagMutation.isPending}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-600">Code</Label>
+              <Input
+                value={newCode}
+                onChange={(event) => setNewCode(event.target.value)}
+                placeholder="e.g. high-priority"
+                disabled={createTagMutation.isPending}
+              />
+            </div>
+          </div>
+
           <DialogFooter className="sm:justify-start">
             <DialogClose asChild>
               <Button
                 type="button"
                 className="bg-gray-400 text-white hover:bg-gray-500"
-                disabled={updateTagMutation.isPending}
+                disabled={createTagMutation.isPending}
               >
                 Cancel
               </Button>
             </DialogClose>
             <Button
               type="button"
-              onClick={handleConfirm}
-              hasEffect
               variant="secondary"
-              disabled={updateTagMutation.isPending}
+              hasEffect
+              onClick={handleCreateTag}
+              disabled={createTagMutation.isPending}
             >
-              {updateTagMutation.isPending ? (
+              {createTagMutation.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                "Confirm"
+                "Create"
               )}
             </Button>
           </DialogFooter>

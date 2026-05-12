@@ -103,6 +103,7 @@ export interface CheckOutMain {
   invoice_pdf_file_2?: string | null;
   status: string;
   tag?: string | null;
+  tags?: CheckoutMainTag[] | null;
   note: string;
   total_amount_item: number;
   total_shipping: number;

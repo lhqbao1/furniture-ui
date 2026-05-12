@@ -1137,6 +1137,20 @@ export const ORDER_TAG_OPTIONS = [
     bg: "bg-[#14532D]",
     color: "text-[#DCFCE7]",
   },
+  {
+    value: "No Refund Needed",
+    label: "No Refund Needed",
+    shortLabel: "NRN",
+    bg: "bg-[#B45309]",
+    color: "text-white",
+  },
+  {
+    value: "Different Carrier",
+    label: "Different Carrier",
+    shortLabel: "DC",
+    bg: "bg-[#0F766E]",
+    color: "text-white",
+  },
 ] as const;
 
 export const getOrderTagOption = (tag?: string | null) =>

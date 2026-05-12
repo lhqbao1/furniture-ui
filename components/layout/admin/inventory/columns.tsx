@@ -274,6 +274,7 @@ const PH_MARKETPLACE_GROUPS = [
     aliases: ["ebay"],
     groupHeaderClassName: "bg-[#E7F0FF] text-[#0B57D0]",
     childHeaderClassName: "bg-[#F4F8FF] text-[#0B57D0]",
+    indicatorClassName: "text-[#0B57D0]",
   },
   {
     id: "amazon",
@@ -282,6 +283,7 @@ const PH_MARKETPLACE_GROUPS = [
     aliases: ["amazon", "amz"],
     groupHeaderClassName: "bg-[#FFF1D6] text-[#B45309]",
     childHeaderClassName: "bg-[#FFF8EB] text-[#B45309]",
+    indicatorClassName: "text-[#B45309]",
   },
   {
     id: "kaufland",
@@ -290,6 +292,7 @@ const PH_MARKETPLACE_GROUPS = [
     aliases: ["kaufland", "kaufaldn"],
     groupHeaderClassName: "bg-[#FDE5E7] text-[#B42318]",
     childHeaderClassName: "bg-[#FFF1F3] text-[#B42318]",
+    indicatorClassName: "text-[#B42318]",
   },
 ] as const;
 
@@ -401,9 +404,14 @@ const parseBooleanLike = (value: unknown): boolean | undefined => {
   return undefined;
 };
 
-const renderBooleanIndicator = (value: boolean | undefined) => {
+const renderBooleanIndicator = (
+  value: boolean | undefined,
+  trueClassName = "text-primary",
+) => {
   return value ? (
-    <Check className="mx-auto h-6 w-6 text-primary stroke-[3]" />
+    <Check
+      className={cn("mx-auto h-6 w-6 stroke-[3]", trueClassName)}
+    />
   ) : (
     <X className="mx-auto h-6 w-6 text-red-600 stroke-[3]" />
   );
@@ -416,6 +424,22 @@ const getMarketplaceProductRecord = (
   product.marketplace_products?.find((item) =>
     aliases.includes(String(item.marketplace ?? "").toLowerCase()),
   );
+
+const hasProductStaticFiles = (product: ProductItem, minimumCount = 1) =>
+  (product.static_files?.length ?? 0) >= minimumCount;
+
+const hasProductVideos = (product: ProductItem) =>
+  (product.video_urls ?? []).some((item) => {
+    if (typeof item?.url === "string") {
+      return item.url.trim().length > 0;
+    }
+
+    if (Array.isArray(item?.url)) {
+      return item.url.some((url) => String(url ?? "").trim().length > 0);
+    }
+
+    return false;
+  });
 
 const hasSeoHtmlStructure = (html: string) => {
   const normalized = html.toLowerCase();
@@ -494,12 +518,8 @@ const getMarketplaceTextInformationStatus = (
   aliases: readonly string[],
 ): MarketplaceTextInformationStatus => {
   const marketplaceRecord = getMarketplaceProductRecord(product, aliases);
-
-  if (!marketplaceRecord) {
-    return { status: "no-description" };
-  }
-
-  const description = marketplaceRecord.description?.trim() ?? "";
+  const description =
+    marketplaceRecord?.description?.trim() ?? product.description?.trim() ?? "";
   if (!description) {
     return { status: "no-description" };
   }
@@ -563,12 +583,6 @@ const getMarketplaceBooleanFieldValue = (
 
   return undefined;
 };
-
-const hasMarketplaceProduct = (
-  product: ProductItem,
-  aliases: readonly string[],
-) =>
-  Boolean(getMarketplaceProductRecord(product, aliases));
 
 const calculateBundlePhysicalStock = (product: ProductItem): number => {
   // const bundles = product.bundles ?? [];
@@ -1101,17 +1115,36 @@ export const getInventoryColumns = (
               ),
               cell: ({ row }) => {
                 if (field.id === "sup_photos_ready") {
-                  const hasMarketplace = hasMarketplaceProduct(
+                  const hasEnoughPhotos = hasProductStaticFiles(
                     row.original,
-                    marketplaceGroup.aliases,
+                    3,
                   );
-                  const hasEnoughPhotos =
-                    (row.original.static_files?.length ?? 0) > 2;
 
                   return (
                     <div className="text-center text-sm">
                       {renderBooleanIndicator(
-                        hasMarketplace ? hasEnoughPhotos : false,
+                        hasEnoughPhotos,
+                        marketplaceGroup.indicatorClassName,
+                      )}
+                    </div>
+                  );
+                }
+
+                if (field.id === "size_photo_ready") {
+                  const hasMarketplaceSizePhotoFlag =
+                    getMarketplaceBooleanFieldValue(
+                      row.original,
+                      marketplaceGroup.aliases,
+                      field.keys,
+                    ) ?? false;
+                  const hasSizePhotoData =
+                    hasMarketplaceSizePhotoFlag || hasProductStaticFiles(row.original);
+
+                  return (
+                    <div className="text-center text-sm">
+                      {renderBooleanIndicator(
+                        hasSizePhotoData,
+                        marketplaceGroup.indicatorClassName,
                       )}
                     </div>
                   );
@@ -1127,7 +1160,10 @@ export const getInventoryColumns = (
                   if (textInformationStatus.status === "ok") {
                     return (
                       <div className="text-center text-sm">
-                        {renderBooleanIndicator(true)}
+                        {renderBooleanIndicator(
+                          true,
+                          marketplaceGroup.indicatorClassName,
+                        )}
                       </div>
                     );
                   }
@@ -1155,6 +1191,25 @@ export const getInventoryColumns = (
                   );
                 }
 
+                if (field.id === "video_available") {
+                  const hasMarketplaceVideoFlag = getMarketplaceBooleanFieldValue(
+                    row.original,
+                    marketplaceGroup.aliases,
+                    field.keys,
+                  );
+                  const hasVideoData =
+                    hasMarketplaceVideoFlag === true || hasProductVideos(row.original);
+
+                  return (
+                    <div className="text-center text-sm">
+                      {renderBooleanIndicator(
+                        hasVideoData,
+                        marketplaceGroup.indicatorClassName,
+                      )}
+                    </div>
+                  );
+                }
+
                 if (field.id === "synchrone") {
                   const synchroneValue = getMarketplaceBooleanFieldValue(
                     row.original,
@@ -1164,7 +1219,10 @@ export const getInventoryColumns = (
 
                   return (
                     <div className="text-center text-sm">
-                      {renderBooleanIndicator(synchroneValue ?? false)}
+                      {renderBooleanIndicator(
+                        synchroneValue ?? false,
+                        marketplaceGroup.indicatorClassName,
+                      )}
                     </div>
                   );
                 }
@@ -1178,6 +1236,7 @@ export const getInventoryColumns = (
                           marketplaceGroup.aliases,
                           field.keys,
                         ),
+                        marketplaceGroup.indicatorClassName,
                       )}
                     </div>
                   );
