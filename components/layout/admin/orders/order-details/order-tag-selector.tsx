@@ -53,26 +53,6 @@ const TAG_COLOR_BY_LABEL: Record<string, string> = {
 const getTagColorClass = (tag: string) =>
   TAG_COLOR_BY_LABEL[tag.toLowerCase()] ?? "bg-[#334155]";
 
-const getFallbackTagCode = (tag: string) => {
-  const words = tag
-    .split(/\s+/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-
-  if (words.length === 0) {
-    return "TAG";
-  }
-
-  if (words.length === 1) {
-    return words[0].slice(0, 3).toUpperCase();
-  }
-
-  return words
-    .slice(0, 3)
-    .map((item) => item[0]?.toUpperCase() ?? "")
-    .join("");
-};
-
 export default function OrderTagSelector({
   order,
 }: {
@@ -94,31 +74,6 @@ export default function OrderTagSelector({
         })),
     [tagOptionsRaw],
   );
-
-  const tagMetaMap = React.useMemo(() => {
-    const map = new Map<string, { tag: string; code?: string | null }>();
-
-    for (const option of tagOptions) {
-      map.set(option.tag.toLowerCase(), {
-        tag: option.tag,
-        code: option.code,
-      });
-    }
-
-    if (Array.isArray(order.tags)) {
-      for (const item of order.tags) {
-        const normalizedTag = normalizeTagValue(item?.tag);
-        if (!normalizedTag) continue;
-
-        map.set(normalizedTag.toLowerCase(), {
-          tag: normalizedTag,
-          code: item?.code,
-        });
-      }
-    }
-
-    return map;
-  }, [order.tags, tagOptions]);
 
   const selectedTags = React.useMemo(() => {
     const tagsFromArray = Array.isArray(order.tags)
@@ -231,17 +186,12 @@ export default function OrderTagSelector({
   const selectedTagBadges = React.useMemo(
     () =>
       selectedTags.map((tag) => {
-        const normalizedKey = tag.toLowerCase();
-        const meta = tagMetaMap.get(normalizedKey);
-        const codeRaw = normalizeTagValue(meta?.code);
-
         return {
           tag,
-          code: codeRaw ? codeRaw.toUpperCase() : getFallbackTagCode(tag),
           bgClass: getTagColorClass(tag),
         };
       }),
-    [selectedTags, tagMetaMap],
+    [selectedTags],
   );
 
   const handleCreateTag = React.useCallback(() => {
@@ -287,7 +237,7 @@ export default function OrderTagSelector({
                     title={item.tag}
                     className={`inline-flex items-center gap-1 rounded-[4px] px-2 py-1 text-xs font-semibold text-white ${item.bgClass}`}
                   >
-                    <span>{item.code}</span>
+                    <span>{item.tag}</span>
                     <button
                       type="button"
                       onClick={() => toggleTag(item.tag)}

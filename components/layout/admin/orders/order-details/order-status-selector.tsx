@@ -14,6 +14,7 @@ import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
 import CancelWrongPriceDialog from "./dialog/canceled-wrong-price-dialog";
 import CancelNoStockConfirmDialog from "./dialog/canceled-no-stock-confirm-dialog";
 import IssueRefundDialog from "./dialog/issue-refund-dialog";
+import { toast } from "sonner";
 
 const EMPTY_STATUS_VALUE = "__status_empty__";
 const NO_REFUND_NEEDED_TAG = "no refund needed";
@@ -91,12 +92,8 @@ export default function OrderStatusSelector({
     const current = String(status).toLowerCase();
     const allowedKeys = new Set(STATUS_ACTIVE_RULES[current] ?? []);
 
-    return STATUS_OPTIONS.filter((item) => {
-      if (!allowedKeys.has(item.key)) return false;
-      if (hasNoRefundNeededTag && item.key === "return_issue") return false;
-      return true;
-    });
-  }, [hasNoRefundNeededTag, status]);
+    return STATUS_OPTIONS.filter((item) => allowedKeys.has(item.key));
+  }, [status]);
 
   const selectValue = React.useMemo(
     () => (options.some((opt) => opt.key === value) ? value : EMPTY_STATUS_VALUE),
@@ -104,6 +101,14 @@ export default function OrderStatusSelector({
   );
 
   const handleChange = (val: string) => {
+    if (val === "return_issue" && hasNoRefundNeededTag) {
+      setValue(EMPTY_STATUS_VALUE);
+      toast.error(
+        "Cannot issue refund because this order is tagged as No Refund Needed.",
+      );
+      return;
+    }
+
     setValue(val);
 
     // open dialogs for specific choices
