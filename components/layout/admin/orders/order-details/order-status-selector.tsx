@@ -16,6 +16,7 @@ import CancelNoStockConfirmDialog from "./dialog/canceled-no-stock-confirm-dialo
 import IssueRefundDialog from "./dialog/issue-refund-dialog";
 
 const EMPTY_STATUS_VALUE = "__status_empty__";
+const NO_REFUND_NEEDED_TAG = "no refund needed";
 
 const ORDER_STATUS_ACTION_LABELS: Record<string, string> = {
   paid: "Mark payment as received",
@@ -73,12 +74,29 @@ export default function OrderStatusSelector({
   const [openCancelNoStock, setOpenCancelNoStock] = React.useState(false);
   const [openCancelWrongPrice, setOpenCancelWrongPrice] = React.useState(false);
 
+  const hasNoRefundNeededTag = React.useMemo(() => {
+    const normalize = (value?: string | null) => value?.trim().toLowerCase() ?? "";
+
+    const fromLegacyTag = normalize(order.tag) === NO_REFUND_NEEDED_TAG;
+    const fromTags = Array.isArray(order.tags)
+      ? order.tags.some(
+          (item) => normalize(item?.tag) === NO_REFUND_NEEDED_TAG,
+        )
+      : false;
+
+    return fromLegacyTag || fromTags;
+  }, [order.tag, order.tags]);
+
   const options = React.useMemo(() => {
     const current = String(status).toLowerCase();
     const allowedKeys = new Set(STATUS_ACTIVE_RULES[current] ?? []);
 
-    return STATUS_OPTIONS.filter((item) => allowedKeys.has(item.key));
-  }, [status]);
+    return STATUS_OPTIONS.filter((item) => {
+      if (!allowedKeys.has(item.key)) return false;
+      if (hasNoRefundNeededTag && item.key === "return_issue") return false;
+      return true;
+    });
+  }, [hasNoRefundNeededTag, status]);
 
   const selectValue = React.useMemo(
     () => (options.some((opt) => opt.key === value) ? value : EMPTY_STATUS_VALUE),
