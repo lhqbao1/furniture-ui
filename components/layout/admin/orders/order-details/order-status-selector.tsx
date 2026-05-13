@@ -14,8 +14,10 @@ import ExchangeConfirmDialog from "./dialog/exchange-confirm-dialog";
 import CancelWrongPriceDialog from "./dialog/canceled-wrong-price-dialog";
 import CancelNoStockConfirmDialog from "./dialog/canceled-no-stock-confirm-dialog";
 import IssueRefundDialog from "./dialog/issue-refund-dialog";
+import { toast } from "sonner";
 
 const EMPTY_STATUS_VALUE = "__status_empty__";
+const NO_REFUND_NEEDED_TAG = "no refund needed";
 
 const ORDER_STATUS_ACTION_LABELS: Record<string, string> = {
   paid: "Mark payment as received",
@@ -73,6 +75,19 @@ export default function OrderStatusSelector({
   const [openCancelNoStock, setOpenCancelNoStock] = React.useState(false);
   const [openCancelWrongPrice, setOpenCancelWrongPrice] = React.useState(false);
 
+  const hasNoRefundNeededTag = React.useMemo(() => {
+    const normalize = (value?: string | null) => value?.trim().toLowerCase() ?? "";
+
+    const fromLegacyTag = normalize(order.tag) === NO_REFUND_NEEDED_TAG;
+    const fromTags = Array.isArray(order.tags)
+      ? order.tags.some(
+          (item) => normalize(item?.tag) === NO_REFUND_NEEDED_TAG,
+        )
+      : false;
+
+    return fromLegacyTag || fromTags;
+  }, [order.tag, order.tags]);
+
   const options = React.useMemo(() => {
     const current = String(status).toLowerCase();
     const allowedKeys = new Set(STATUS_ACTIVE_RULES[current] ?? []);
@@ -86,6 +101,14 @@ export default function OrderStatusSelector({
   );
 
   const handleChange = (val: string) => {
+    if (val === "return_issue" && hasNoRefundNeededTag) {
+      setValue(EMPTY_STATUS_VALUE);
+      toast.error(
+        "Cannot issue refund because this order is tagged as No Refund Needed.",
+      );
+      return;
+    }
+
     setValue(val);
 
     // open dialogs for specific choices
