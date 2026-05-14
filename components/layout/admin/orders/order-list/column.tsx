@@ -130,10 +130,13 @@ const buildOrderTagBadges = (order: CheckOutMain) => {
 
   return uniqueTags.map((item) => {
     const option = getOrderTagOption(item.tag);
-    const bgClass = TAG_COLOR_BY_LABEL[item.tag.toLowerCase()] ?? option?.bg ?? "bg-[#334155]";
+    const bgClass =
+      TAG_COLOR_BY_LABEL[item.tag.toLowerCase()] ??
+      option?.bg ??
+      "bg-[#334155]";
     const shortCode = item.code
       ? item.code.toUpperCase()
-      : option?.shortLabel ?? getFallbackTagCode(item.tag);
+      : (option?.shortLabel ?? getFallbackTagCode(item.tag));
 
     return {
       label: item.tag,
@@ -1034,8 +1037,6 @@ export const orderChildColumns: ColumnDef<CheckOut>[] = [
       const displayStatus = shouldUseCheckoutStatus
         ? getStatusStyle(exchangeStatusToBaseStatus[checkoutStatus]).text
         : (shipmentStatus || "pending").replaceAll("_", " ");
-
-      console.log(displayStatus);
 
       return <div className="text-center capitalize">{displayStatus}</div>;
     },
