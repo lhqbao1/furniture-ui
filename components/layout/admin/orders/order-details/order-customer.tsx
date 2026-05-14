@@ -35,9 +35,7 @@ const OrderDetailUser = ({
   const shippingCityLine = [shippingAddress?.postal_code, shippingAddress?.city]
     .filter(Boolean)
     .join(" ");
-  const shippingEmail =
-    shippingAddress?.email ||
-    ((user?.email ?? "").toLowerCase() !== "guest" ? (user?.email ?? "") : "");
+  const shippingEmail = shippingAddress?.email ?? null;
 
   return (
     <>
