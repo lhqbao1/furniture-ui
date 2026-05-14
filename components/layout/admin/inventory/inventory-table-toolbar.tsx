@@ -39,6 +39,7 @@ interface InventoryTableToolbarProps {
   isInventory?: boolean;
   filterContent?: React.ReactNode;
   searchContent?: React.ReactNode;
+  searchByEnter?: boolean;
 }
 
 export default function InventoryTableToolbar({
@@ -48,6 +49,7 @@ export default function InventoryTableToolbar({
   isInventory,
   filterContent,
   searchContent,
+  searchByEnter = false,
 }: InventoryTableToolbarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,9 +65,33 @@ export default function InventoryTableToolbar({
   // debounce inputValue
   const [debouncedSearch] = useDebounce(searchValue, 600);
 
+  const applySearch = React.useCallback(() => {
+    if (usesCustomSearch) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", "1");
+
+    const normalizedSearch = searchValue.trim();
+    if (normalizedSearch) {
+      params.set("search", normalizedSearch);
+    } else {
+      params.delete("search");
+    }
+
+    router.push(
+      {
+        pathname,
+        query: Object.fromEntries(params.entries()),
+      },
+      { scroll: false },
+    );
+
+    setPage(1);
+  }, [pathname, router, searchParams, searchValue, setPage, usesCustomSearch]);
+
   // push URL khi debounce hoàn thành
   useEffect(() => {
-    if (usesCustomSearch) return;
+    if (usesCustomSearch || searchByEnter) return;
 
     const currentSearch = searchParams.get("search") ?? "";
     if (debouncedSearch === currentSearch) return;
@@ -92,6 +118,7 @@ export default function InventoryTableToolbar({
     debouncedSearch,
     pathname,
     router,
+    searchByEnter,
     searchParams,
     setPage,
     usesCustomSearch,
@@ -118,9 +145,16 @@ export default function InventoryTableToolbar({
         <div className="w-full min-w-0 max-w-2xl">
           {searchContent ?? (
             <Input
-              placeholder="Search"
+              placeholder={searchByEnter ? "Search (press Enter)" : "Search"}
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(event) => {
+                if (!searchByEnter) return;
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  applySearch();
+                }
+              }}
             />
           )}
         </div>
