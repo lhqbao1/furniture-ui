@@ -146,6 +146,33 @@ const buildOrderTagBadges = (order: CheckOutMain) => {
   });
 };
 
+const formatPostalCity = (postalCode?: string | null, city?: string | null) => {
+  const postal = String(postalCode ?? "").trim();
+  const cityName = String(city ?? "").trim();
+  return [postal, cityName].filter(Boolean).join(" ");
+};
+
+const getOrderCustomerEmail = (
+  order: CheckOutMain,
+  checkout?: CheckOut,
+): string => {
+  const mainCheckoutUserEmail = String(
+    (
+      order as CheckOutMain & {
+        user?: { email?: string | null } | null;
+      }
+    )?.user?.email ?? "",
+  ).trim();
+
+  if (mainCheckoutUserEmail) return mainCheckoutUserEmail;
+
+  const checkoutUserEmail = String(checkout?.user?.email ?? "").trim();
+  if (checkoutUserEmail) return checkoutUserEmail;
+
+  const invoiceEmail = String(checkout?.invoice_address?.email ?? "").trim();
+  return invoiceEmail;
+};
+
 const deliveryPreviewColumns: ColumnDef<CartItem>[] = [
   {
     accessorKey: "id_provider",
@@ -555,19 +582,26 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
       const user = primaryCheckout?.user;
       const shippingAddress = primaryCheckout?.shipping_address;
       const invoiceAddress = primaryCheckout?.invoice_address;
+      const postalCity = formatPostalCity(
+        shippingAddress?.postal_code,
+        shippingAddress?.city,
+      );
       const displayName =
         shippingAddress?.recipient_name?.trim() ||
         user?.company_name?.trim() ||
         invoiceAddress?.recipient_name?.trim() ||
         "";
-      const displayEmail = user?.is_real
-        ? (user?.email ?? "")
-        : (invoiceAddress?.email ?? "");
+      const displayEmail = getOrderCustomerEmail(row.original, primaryCheckout);
 
       return (
         <div>
           <div>{displayName}</div>
-          <div>{displayEmail}</div>
+          {postalCity ? (
+            <div className="text-xs text-slate-500">{postalCity}</div>
+          ) : null}
+          {displayEmail ? (
+            <div className="text-xs text-slate-500">{displayEmail}</div>
+          ) : null}
         </div>
       );
     },
@@ -747,14 +781,22 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
     header: "CUSTOMER",
     cell: ({ row }) => {
       const primaryCheckout = row.original.checkouts?.[0];
+      const shippingAddress = primaryCheckout?.shipping_address;
+      const postalCity = formatPostalCity(
+        shippingAddress?.postal_code,
+        shippingAddress?.city,
+      );
       const firstName = primaryCheckout?.user?.first_name ?? "";
       const lastName = primaryCheckout?.user?.last_name ?? "";
-      const email = primaryCheckout?.user?.email ?? "";
+      const email = getOrderCustomerEmail(row.original, primaryCheckout);
 
       return (
         <div>
           <div className="capitalize">{`${firstName} ${lastName}`.trim()}</div>
-          <div>{email}</div>
+          {postalCity ? (
+            <div className="text-xs text-slate-500">{postalCity}</div>
+          ) : null}
+          {email ? <div className="text-xs text-slate-500">{email}</div> : null}
         </div>
       );
     },
