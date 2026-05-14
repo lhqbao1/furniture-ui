@@ -143,6 +143,7 @@ const AdminInventoryList = () => {
           addButtonUrl="/admin/products/add"
           setPage={setPage}
           isInventory
+          searchByEnter
           filterContent={
             activeTab === "physical-inventory" ? (
               <PhysicalInventoryFilterForm />

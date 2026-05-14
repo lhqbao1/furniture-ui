@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "use-debounce";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -123,8 +122,6 @@ export default function TableToolbar({
   const [prevParams, setPrevParams] = useState(
     Object.fromEntries(searchParams.entries()),
   );
-  // debounce inputValue
-  const [debouncedSearch] = useDebounce(searchValue, 600);
 
   const parseCsvParam = React.useCallback(
     (value: string | null) =>
@@ -184,6 +181,20 @@ export default function TableToolbar({
     pushWithParams(params);
     setSearchValue("");
   }, [pushWithParams, searchParams]);
+
+  const applySearch = React.useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const normalizedSearch = searchValue.trim();
+
+    if (normalizedSearch) {
+      params.set("search", normalizedSearch);
+    } else {
+      params.delete("search");
+    }
+
+    pushWithParams(params);
+    setSearchQuery?.(normalizedSearch);
+  }, [pushWithParams, searchParams, searchValue, setSearchQuery]);
 
   const supplierLabelMap = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -325,22 +336,6 @@ export default function TableToolbar({
     setPrevParams(current);
   }, [searchParams]);
 
-  useEffect(() => {
-    const currentSearch = searchParams.get("search") ?? "";
-    if (debouncedSearch !== currentSearch) {
-      router.push(
-        {
-          pathname,
-          query: {
-            ...Object.fromEntries(searchParams.entries()),
-            search: debouncedSearch || "",
-          },
-        },
-        { scroll: false },
-      );
-    }
-  }, [debouncedSearch]);
-
   return (
     <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">
       <div className="flex flex-col gap-3">
@@ -348,7 +343,7 @@ export default function TableToolbar({
           <div className="flex w-full flex-1 items-center gap-2 rounded-xl border border-secondary/10 bg-muted/20 p-1.5">
             <MultiSearch />
             <Input
-              placeholder="Search"
+              placeholder="Search (press Enter)"
               className={cn(
                 "h-10 border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0",
                 searchValue.includes(" ") &&
@@ -370,6 +365,12 @@ export default function TableToolbar({
                 }
 
                 setSearchValue(value);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void applySearch();
+                }
               }}
             />
           </div>

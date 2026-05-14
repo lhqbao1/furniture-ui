@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "use-debounce";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -110,7 +109,6 @@ export default function OrderToolbar({
 
   const [searchValue, setSearchValue] = useState(defaultSearch);
   const prevParamsRef = useRef(Object.fromEntries(searchParams.entries()));
-  const [debouncedSearch] = useDebounce(searchValue, 600);
 
   const statusLabelMap = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -212,6 +210,19 @@ export default function OrderToolbar({
     pushWithParams(params);
     setSearchValue("");
   }, [pushWithParams, searchParams]);
+
+  const applySearch = React.useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const normalizedSearch = searchValue.trim();
+
+    if (normalizedSearch) {
+      params.set("search", normalizedSearch);
+    } else {
+      params.delete("search");
+    }
+
+    pushWithParams(params);
+  }, [pushWithParams, searchParams, searchValue]);
 
   const activeFilterChips = React.useMemo(() => {
     type FilterChip = {
@@ -340,24 +351,6 @@ export default function OrderToolbar({
     prevParamsRef.current = current;
   }, [pathname, router, searchParams, setPage]);
 
-  useEffect(() => {
-    const currentSearch = searchParams.get("search") ?? "";
-    if (debouncedSearch !== searchValue) return;
-
-    if (debouncedSearch !== currentSearch) {
-      router.push(
-        {
-          pathname,
-          query: {
-            ...Object.fromEntries(searchParams.entries()),
-            search: debouncedSearch,
-          },
-        },
-        { scroll: false },
-      );
-    }
-  }, [debouncedSearch, pathname, router, searchParams, searchValue]);
-
   return (
     <div className="w-full rounded-2xl border border-secondary/15 bg-white p-3 shadow-sm md:p-4">
       <div className="flex flex-col gap-3">
@@ -365,9 +358,15 @@ export default function OrderToolbar({
           <div className="flex w-full flex-1 items-center gap-2">
             <MultiSearch />
             <Input
-              placeholder="Search"
+              placeholder="Search (press Enter)"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  applySearch();
+                }
+              }}
             />
           </div>
 
