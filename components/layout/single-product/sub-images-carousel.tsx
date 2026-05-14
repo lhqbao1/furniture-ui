@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
+import { PlayCircle } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -7,14 +8,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import {
-  Product,
-  ProductItem,
-  StaticFile,
-  StaticFileItem,
-} from "@/types/products";
-import type { EmblaCarouselType } from "embla-carousel";
+import { ProductItem } from "@/types/products";
 import type { CarouselApi } from "@/components/ui/carousel";
+import { buildProductMediaItems } from "./image/product-media-utils";
 
 interface ProductImageCarouselProps {
   productDetails: ProductItem;
@@ -28,6 +24,7 @@ export function ProductImageCarousel({
   setMainImageIndex,
 }: ProductImageCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
+  const mediaItems = buildProductMediaItems(productDetails);
 
   const handleSelectImage = (index: number) => {
     setMainImageIndex(index);
@@ -41,33 +38,40 @@ export function ProductImageCarousel({
         setApi={setApi} // 👈 lấy api khi mount
       >
         <CarouselContent className="w-full flex">
-          {productDetails.static_files.map(
-            (item: StaticFile, index: number) => (
-              <CarouselItem
-                key={index}
-                className="lg:basis-1/4 basis-1/3 3xl:basis-1/5"
+          {mediaItems.map((item, index) => (
+            <CarouselItem
+              key={item.key}
+              className="lg:basis-1/4 basis-1/3 3xl:basis-1/5"
+            >
+              <div
+                className={`cursor-pointer overflow-hidden rounded-md ${
+                  mainImageIndex === index
+                    ? "border-2 border-primary lg:p-2 p-0.5"
+                    : ""
+                }`}
+                onClick={() => handleSelectImage(index)}
               >
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleSelectImage(index)}
-                >
+                {item.type === "image" ? (
                   <Image
-                    src={item.url}
+                    src={item.sourceUrl}
                     width={100}
                     height={100}
                     alt=""
-                    className={`${
-                      mainImageIndex === index
-                        ? "border-2 border-primary lg:p-2 p-0.5 rounded-md object-cover"
-                        : "rounded-md"
-                    } lg:h-[100px] h-[80px] object-cover rounded-md`}
+                    className="lg:h-[100px] h-[80px] object-cover rounded-md"
                     priority={index < 2}
                     loading={index < 2 ? "eager" : "lazy"}
                   />
-                </div>
-              </CarouselItem>
-            ),
-          )}
+                ) : (
+                  <div className="lg:h-[100px] h-[80px] rounded-md bg-black text-white flex items-center justify-center gap-2">
+                    <PlayCircle className="h-5 w-5 text-white" />
+                    <span className="text-xs font-semibold uppercase tracking-wide">
+                      Video
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CarouselItem>
+          ))}
         </CarouselContent>
 
         <CarouselPrevious className="text-primary border-primary" />

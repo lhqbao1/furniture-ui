@@ -1,4 +1,3 @@
-// sections/MainImage.tsx
 "use client";
 
 import React from "react";
@@ -6,6 +5,10 @@ import Image from "next/image";
 import ProductImageDialog from "../main-image-dialog";
 import { ProductItem } from "@/types/products";
 import { useSwipeable } from "react-swipeable";
+import {
+  buildProductMediaItems,
+  ProductMediaItem,
+} from "./product-media-utils";
 
 interface MainImageProps {
   productDetails: ProductItem;
@@ -16,6 +19,28 @@ interface MainImageProps {
   setIsHover: (v: boolean) => void;
   handleZoomImage: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
+
+const VIDEO_QUERY = "autoplay=1&mute=1&playsinline=1&rel=0";
+
+const renderMediaPreview = (media: ProductMediaItem, alt: string) => {
+  if (media.type === "image") {
+    return (
+      <Image
+        src={media.sourceUrl}
+        fill
+        alt={alt}
+        className="object-contain cursor-pointer rounded-xs"
+        sizes="100vw"
+      />
+    );
+  }
+
+  return (
+    <div className="h-full w-full bg-black/90 flex items-center justify-center text-white text-sm font-semibold tracking-wide">
+      VIDEO
+    </div>
+  );
+};
 
 export default function MainImage({
   productDetails,
@@ -34,8 +59,13 @@ export default function MainImage({
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [isMobileViewport, setIsMobileViewport] = React.useState(false);
 
-  const imageCount = productDetails.static_files?.length ?? 0;
-  const canSwipe = imageCount > 1;
+  const mediaItems = React.useMemo(
+    () => buildProductMediaItems(productDetails),
+    [productDetails],
+  );
+
+  const mediaCount = mediaItems.length;
+  const canSwipe = mediaCount > 1;
   const SLIDE_DURATION = 210;
   const REBOUND_DURATION = 180;
   const SNAP_RATIO = 0.3;
@@ -43,27 +73,44 @@ export default function MainImage({
   const SLIDE_EASING = "cubic-bezier(0.22, 0.88, 0.26, 1)";
 
   const nextIndex = React.useCallback(
-    (index: number) => (index + 1) % imageCount,
-    [imageCount],
+    (index: number) => (index + 1) % Math.max(mediaCount, 1),
+    [mediaCount],
   );
 
   const prevIndex = React.useCallback(
-    (index: number) => (index - 1 + imageCount) % imageCount,
-    [imageCount],
+    (index: number) => (index - 1 + Math.max(mediaCount, 1)) % Math.max(mediaCount, 1),
+    [mediaCount],
   );
 
-  const getImageUrl = React.useCallback(
-    (index: number) => {
-      if (imageCount <= 0) return "/placeholder-product.webp";
-      return (
-        productDetails.static_files[index]?.url ?? "/placeholder-product.webp"
-      );
+  const getMediaItem = React.useCallback(
+    (index: number): ProductMediaItem => {
+      const fallback: ProductMediaItem = {
+        type: "image",
+        key: "fallback-image",
+        sourceUrl: "/placeholder-product.webp",
+      };
+
+      if (mediaCount <= 0) return fallback;
+      return mediaItems[index] ?? fallback;
     },
-    [imageCount, productDetails.static_files],
+    [mediaCount, mediaItems],
   );
 
-  const preloadImageUrl = React.useCallback((url: string | null | undefined) => {
+  React.useEffect(() => {
+    if (mediaCount <= 0) {
+      if (mainImageIndex !== 0) setMainImageIndex(0);
+      return;
+    }
+
+    if (mainImageIndex > mediaCount - 1) {
+      setMainImageIndex(mediaCount - 1);
+    }
+  }, [mainImageIndex, mediaCount, setMainImageIndex]);
+
+  const preloadMediaItem = React.useCallback((media: ProductMediaItem) => {
     if (typeof window === "undefined") return;
+    if (media.type !== "image") return;
+    const url = media.sourceUrl;
     if (!url || url === "/placeholder-product.webp") return;
     if (preloadedUrlsRef.current.has(url)) return;
 
@@ -186,112 +233,149 @@ export default function MainImage({
     },
   });
 
-  const prevImage = getImageUrl(prevIndex(mainImageIndex));
-  const currentImage = getImageUrl(mainImageIndex);
-  const nextImage = getImageUrl(nextIndex(mainImageIndex));
+  const prevMedia = getMediaItem(prevIndex(mainImageIndex));
+  const currentMedia = getMediaItem(mainImageIndex);
+  const nextMedia = getMediaItem(nextIndex(mainImageIndex));
 
   const slideTransition = isAnimating
     ? `transform ${SLIDE_DURATION}ms ${SLIDE_EASING}`
     : "none";
 
   React.useEffect(() => {
-    if (!isMobileViewport || imageCount <= 0) return;
+    if (!isMobileViewport || mediaCount <= 0) return;
 
     const next = nextIndex(mainImageIndex);
     const prev = prevIndex(mainImageIndex);
-    preloadImageUrl(getImageUrl(mainImageIndex));
-    preloadImageUrl(getImageUrl(next));
-    preloadImageUrl(getImageUrl(prev));
+    preloadMediaItem(getMediaItem(mainImageIndex));
+    preloadMediaItem(getMediaItem(next));
+    preloadMediaItem(getMediaItem(prev));
   }, [
     isMobileViewport,
-    imageCount,
+    mediaCount,
     mainImageIndex,
     nextIndex,
     prevIndex,
-    getImageUrl,
-    preloadImageUrl,
+    getMediaItem,
+    preloadMediaItem,
   ]);
 
-  return (
-    <ProductImageDialog
-      productDetails={productDetails}
-      mainImageIndex={mainImageIndex}
-      setMainImageIndex={setMainImageIndex}
+  const hasLeadingVideo = mediaItems[0]?.type === "video";
+  const dialogIndexOffset = hasLeadingVideo ? 1 : 0;
+  const currentMediaIsImage = currentMedia.type === "image";
+
+  const setDialogImageIndex: React.Dispatch<React.SetStateAction<number>> =
+    React.useCallback(
+      (nextValue) => {
+        setMainImageIndex((prevMediaIndex) => {
+          const prevImageIndex = Math.max(0, prevMediaIndex - dialogIndexOffset);
+          const resolvedNextImageIndex =
+            typeof nextValue === "function"
+              ? (nextValue as (prevState: number) => number)(prevImageIndex)
+              : nextValue;
+          return Math.max(0, resolvedNextImageIndex + dialogIndexOffset);
+        });
+      },
+      [dialogIndexOffset, setMainImageIndex],
+    );
+
+  const viewer = (
+    <div
+      ref={containerRef}
+      className="flex w-full justify-center overflow-hidden main-image relative lg:h-[430px] h-[340px] bg-white"
+      onMouseMove={currentMediaIsImage ? handleZoomImage : undefined}
+      onMouseEnter={currentMediaIsImage ? () => setIsHover(true) : undefined}
+      onMouseLeave={currentMediaIsImage ? () => setIsHover(false) : undefined}
+      style={isMobileViewport ? { touchAction: "pan-y" } : undefined}
+      {...(isMobileViewport ? swipeHandlers : {})}
     >
-      <div
-        ref={containerRef}
-        className="flex w-full justify-center overflow-hidden main-image relative lg:h-[430px] h-[340px] bg-white"
-        onMouseMove={handleZoomImage}
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
-        style={isMobileViewport ? { touchAction: "pan-y" } : undefined}
-        {...(isMobileViewport ? swipeHandlers : {})}
-      >
-        {isMobileViewport ? (
-          <div
-            className="absolute inset-0 flex"
-            style={{
-              width: "300%",
-              transform: `translate3d(calc(-33.3333% + ${dragOffset}px), 0, 0)`,
-              transition: slideTransition,
-            }}
-          >
-            <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
-              <Image
-                src={prevImage}
-                fill
-                alt={productDetails.name}
-                className="object-contain cursor-pointer rounded-xs"
-                sizes="100vw"
+      {isMobileViewport ? (
+        <div
+          className="absolute inset-0 flex"
+          style={{
+            width: "300%",
+            transform: `translate3d(calc(-33.3333% + ${dragOffset}px), 0, 0)`,
+            transition: slideTransition,
+          }}
+        >
+          <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
+            {renderMediaPreview(prevMedia, productDetails.name)}
+          </div>
+
+          <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
+            {currentMedia.type === "video" ? (
+              <iframe
+                className="h-full w-full"
+                src={`${currentMedia.embedUrl}?${VIDEO_QUERY}`}
+                title={productDetails.name}
+                loading="eager"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
               />
-            </div>
-            <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
+            ) : (
               <Image
-                src={currentImage}
+                src={currentMedia.sourceUrl}
                 fill
                 alt={productDetails.name}
                 priority
                 className="object-contain cursor-pointer rounded-xs"
                 sizes="100vw"
               />
-            </div>
-            <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
-              <Image
-                src={nextImage}
-                fill
-                alt={productDetails.name}
-                className="object-contain cursor-pointer rounded-xs"
-                sizes="100vw"
-              />
-            </div>
+            )}
           </div>
-        ) : (
-          <Image
-            src={currentImage}
-            width={500}
-            height={300}
-            alt={productDetails.name}
-            priority
-            className="transition-transform duration-300 lg:h-[430px] h-[340px] w-auto object-contain cursor-pointer rounded-xs"
-            style={{
-              transformOrigin: `${position.x}% ${position.y}%`,
-              transform: isHover ? "scale(1.55)" : "scale(1)",
-            }}
-          />
-        )}
 
-        {productDetails.is_fsc && (
-          <div className="absolute top-4 right-4 cursor-pointer">
-            <Image
-              src={"/fcs1.webp"}
-              width={50}
-              height={50}
-              alt=""
-              className="object-cover hover:scale-110 transition-all duration-300"
-            />
+          <div className="relative h-full w-1/3 flex-shrink-0 bg-white">
+            {renderMediaPreview(nextMedia, productDetails.name)}
           </div>
-        )}
-      </div>
+        </div>
+      ) : currentMedia.type === "video" ? (
+        <iframe
+          className="h-full w-full"
+          src={`${currentMedia.embedUrl}?${VIDEO_QUERY}`}
+          title={productDetails.name}
+          loading="eager"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+      ) : (
+        <Image
+          src={currentMedia.sourceUrl}
+          width={500}
+          height={300}
+          alt={productDetails.name}
+          priority
+          className="transition-transform duration-300 lg:h-[430px] h-[340px] w-auto object-contain cursor-pointer rounded-xs"
+          style={{
+            transformOrigin: `${position.x}% ${position.y}%`,
+            transform: isHover ? "scale(1.55)" : "scale(1)",
+          }}
+        />
+      )}
+
+      {productDetails.is_fsc && (
+        <div className="absolute top-4 right-4 cursor-pointer">
+          <Image
+            src={"/fcs1.webp"}
+            width={50}
+            height={50}
+            alt=""
+            className="object-cover hover:scale-110 transition-all duration-300"
+          />
+        </div>
+      )}
+    </div>
+  );
+
+  if (!currentMediaIsImage) {
+    return viewer;
+  }
+
+  return (
+    <ProductImageDialog
+      productDetails={productDetails}
+      mainImageIndex={Math.max(0, mainImageIndex - dialogIndexOffset)}
+      setMainImageIndex={setDialogImageIndex}
+    >
+      {viewer}
     </ProductImageDialog>
   );
 }

@@ -100,11 +100,36 @@ export default function OrderStatusSelector({
     [options, value],
   );
 
+  const shouldRequirePaymentForRefund = React.useMemo(() => {
+    const normalizedMarketplace = String(order.from_marketplace ?? "")
+      .trim()
+      .toLowerCase();
+
+    return !normalizedMarketplace || normalizedMarketplace === "econelo";
+  }, [order.from_marketplace]);
+
+  const hasPaymentMethod = React.useMemo(() => {
+    const paymentMethod = String(order.payment_method ?? "").trim();
+    return paymentMethod.length > 0 && paymentMethod.toLowerCase() !== "null";
+  }, [order.payment_method]);
+
   const handleChange = (val: string) => {
     if (val === "return_issue" && hasNoRefundNeededTag) {
       setValue(EMPTY_STATUS_VALUE);
       toast.error(
         "Cannot issue refund because this order is tagged as No Refund Needed.",
+      );
+      return;
+    }
+
+    if (
+      val === "return_issue" &&
+      shouldRequirePaymentForRefund &&
+      !hasPaymentMethod
+    ) {
+      setValue(EMPTY_STATUS_VALUE);
+      toast.error(
+        "This order does not have payment information yet. Refund cannot be issued.",
       );
       return;
     }
