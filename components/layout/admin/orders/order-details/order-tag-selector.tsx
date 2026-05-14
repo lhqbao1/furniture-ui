@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDown, Loader2, Plus, X } from "lucide-react";
+import { Check, Loader2, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -11,7 +11,6 @@ import {
 } from "@/features/checkout-tag/hook";
 import { CheckOutMain } from "@/types/checkout";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
   CommandEmpty,
@@ -126,7 +125,6 @@ export default function OrderTagSelector({
             ? "Order tag updated successfully"
             : "Order tag removed successfully";
 
-      setOpenSelect(false);
       updateTagMutation.mutate(
         {
           mainCheckoutId: order.id,
@@ -162,26 +160,6 @@ export default function OrderTagSelector({
     },
     [isSubmitting, selectedTagKeys, selectedTags, updateOrderTags],
   );
-
-  const clearTags = React.useCallback(() => {
-    if (selectedTags.length === 0 || isSubmitting) {
-      return;
-    }
-
-    updateOrderTags([]);
-  }, [isSubmitting, selectedTags.length, updateOrderTags]);
-
-  const selectedLabel = React.useMemo(() => {
-    if (selectedTags.length === 0) {
-      return "None";
-    }
-
-    if (selectedTags.length === 1) {
-      return selectedTags[0];
-    }
-
-    return `${selectedTags.length} selected`;
-  }, [selectedTags]);
 
   const selectedTagBadges = React.useMemo(
     () =>
@@ -260,13 +238,12 @@ export default function OrderTagSelector({
                 variant="outline"
                 role="combobox"
                 disabled={isLoadingTags || isSubmitting}
-                className="h-8 min-h-8 min-w-[132px] justify-between rounded-md border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700"
+                className="size-8 min-h-8 min-w-8 justify-center rounded-md border border-slate-200 bg-white p-0 text-slate-700"
               >
-                <span className="truncate">{selectedLabel}</span>
                 {isSubmitting ? (
-                  <Loader2 className="ml-2 h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <ChevronDown className="ml-2 h-3.5 w-3.5 opacity-70" />
+                  <Plus className="h-4 w-4" />
                 )}
               </Button>
             </PopoverTrigger>
@@ -281,17 +258,6 @@ export default function OrderTagSelector({
                 <CommandList className="max-h-72">
                   <CommandEmpty>No tags found.</CommandEmpty>
                   <CommandGroup>
-                    <CommandItem
-                      value="none"
-                      onSelect={clearTags}
-                      className="cursor-pointer"
-                    >
-                      <Checkbox
-                        checked={selectedTags.length === 0}
-                        className="pointer-events-none"
-                      />
-                      <span>None</span>
-                    </CommandItem>
                     {tagOptions.map((option) => {
                       const checked = selectedTagKeys.has(option.tag.toLowerCase());
 
@@ -302,10 +268,11 @@ export default function OrderTagSelector({
                           onSelect={() => toggleTag(option.tag)}
                           className="cursor-pointer"
                         >
-                          <Checkbox
-                            checked={checked}
-                            className="pointer-events-none"
-                          />
+                          <span className="flex h-4 w-4 items-center justify-center">
+                            {checked ? (
+                              <Check className="h-4 w-4 text-primary" />
+                            ) : null}
+                          </span>
                           <span className="truncate">{option.tag}</span>
                         </CommandItem>
                       );
