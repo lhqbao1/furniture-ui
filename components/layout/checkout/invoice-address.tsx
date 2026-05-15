@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import {
   FormField,
@@ -13,6 +13,8 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { usePostalCitySuggestions } from "@/hooks/checkout/usePostalCitySuggestions";
+import { Loader2 } from "lucide-react";
 
 interface InvoiceAddressValues {
   invoice_address_line: string;
@@ -32,6 +34,25 @@ const CheckOutInvoiceAddress = ({
   const t = useTranslations();
 
   const [isSameShipping, setIsSameShipping] = useState(true);
+  const invoicePostalCode = useWatch({
+    control: form.control,
+    name: "invoice_postal_code",
+  });
+  const { cities: invoiceCitySuggestions, isLoading: isLoadingInvoiceCity } =
+    usePostalCitySuggestions(invoicePostalCode);
+
+  useEffect(() => {
+    const sanitizedPostalCode = String(invoicePostalCode ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 5);
+
+    if (sanitizedPostalCode.length !== 5) {
+      form.setValue("invoice_city", "");
+      return;
+    }
+
+    form.setValue("invoice_city", invoiceCitySuggestions[0] ?? "");
+  }, [invoicePostalCode, invoiceCitySuggestions, form]);
 
   // Lưu invoice gốc để restore khi user tắt switch
   const invoiceSnapshot = useRef<InvoiceAddressValues | null>(null);
@@ -197,8 +218,25 @@ const CheckOutInvoiceAddress = ({
               <FormItem>
                 <FormLabel>{t("city")}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    list="invoice-city-suggestion-list-secondary"
+                  />
                 </FormControl>
+                <datalist id="invoice-city-suggestion-list-secondary">
+                  {invoiceCitySuggestions.map((city) => (
+                    <option
+                      key={city}
+                      value={city}
+                    />
+                  ))}
+                </datalist>
+                {isLoadingInvoiceCity && (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Stadt wird gesucht...</span>
+                  </div>
+                )}
                 <FormMessage />
               </FormItem>
             )}

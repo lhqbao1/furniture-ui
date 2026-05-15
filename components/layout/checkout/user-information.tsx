@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -32,6 +32,8 @@ import { userIdAtom } from "@/store/auth";
 import { getUserById } from "@/features/users/api";
 import { useQuery } from "@tanstack/react-query";
 import { getInvoiceAddressByUserId } from "@/features/address/api";
+import { usePostalCitySuggestions } from "@/hooks/checkout/usePostalCitySuggestions";
+import { Loader2 } from "lucide-react";
 
 interface CheckOutUserInformationProps {
   userId?: string;
@@ -43,6 +45,25 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
   const isLogin = !!userIdLogin;
+  const invoicePostalCode = useWatch({
+    control: form.control,
+    name: "invoice_postal_code",
+  });
+  const { cities: invoiceCitySuggestions, isLoading: isLoadingInvoiceCity } =
+    usePostalCitySuggestions(invoicePostalCode);
+
+  useEffect(() => {
+    const sanitizedPostalCode = String(invoicePostalCode ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 5);
+
+    if (sanitizedPostalCode.length !== 5) {
+      form.setValue("invoice_city", "");
+      return;
+    }
+
+    form.setValue("invoice_city", invoiceCitySuggestions[0] ?? "");
+  }, [invoicePostalCode, invoiceCitySuggestions, form]);
 
   const { data: userData } = useQuery({
     queryKey: ["user", userIdLogin],
@@ -304,8 +325,25 @@ function CheckOutUserInformation({ userId }: CheckOutUserInformationProps) {
             <FormItem>
               <FormLabel>{t("city")}</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  list="invoice-city-suggestion-list"
+                />
               </FormControl>
+              <datalist id="invoice-city-suggestion-list">
+                {invoiceCitySuggestions.map((city) => (
+                  <option
+                    key={city}
+                    value={city}
+                  />
+                ))}
+              </datalist>
+              {isLoadingInvoiceCity && (
+                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Stadt wird gesucht...</span>
+                </div>
+              )}
               <FormMessage />
             </FormItem>
           )}
