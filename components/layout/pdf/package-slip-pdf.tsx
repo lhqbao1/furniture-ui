@@ -159,10 +159,7 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
 
   return (
     <Document>
-      <Page
-        size="A4"
-        style={styles.page}
-      >
+      <Page size="A4" style={styles.page}>
         {/* Header Logo */}
         <View
           style={{
@@ -190,10 +187,10 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
               {checkout?.checkouts?.[0]?.user.company_name
                 ? checkout?.checkouts?.[0]?.user.company_name
                 : checkout?.checkouts?.[0]?.shipping_address?.recipient_name
-                ? checkout?.checkouts?.[0]?.shipping_address?.recipient_name
-                : `${checkout?.checkouts?.[0]?.user?.first_name ?? ""} ${
-                    checkout?.checkouts?.[0]?.user?.last_name ?? ""
-                  }`}
+                  ? checkout?.checkouts?.[0]?.shipping_address?.recipient_name
+                  : `${checkout?.checkouts?.[0]?.user?.first_name ?? ""} ${
+                      checkout?.checkouts?.[0]?.user?.last_name ?? ""
+                    }`}
             </Text>
 
             <Text>
@@ -220,7 +217,7 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
               {getCountryName(
                 checkout?.checkouts?.[0]?.shipping_address?.country?.trim()
                   ? checkout?.checkouts?.[0]?.shipping_address?.country
-                  : checkout?.checkouts?.[0]?.invoice_address?.country ?? "",
+                  : (checkout?.checkouts?.[0]?.invoice_address?.country ?? ""),
               )}
             </Text>
 
@@ -267,12 +264,7 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
               <Text style={{ width: 80, fontWeight: "bold" }}>
                 Belegnummer:
               </Text>
-              <Text>
-                {checkout.checkouts[0].shipment &&
-                checkout.checkouts[0].shipment.tracking_number
-                  ? checkout.checkouts[0].shipment.tracking_number
-                  : ""}
-              </Text>
+              <Text>{checkout.checkouts[0].checkout_code ?? ""}</Text>
             </View>
 
             <View

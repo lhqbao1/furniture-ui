@@ -92,7 +92,21 @@ export default function OrderStatusSelector({
     const current = String(status).toLowerCase();
     const allowedKeys = new Set(STATUS_ACTIVE_RULES[current] ?? []);
 
-    return STATUS_OPTIONS.filter((item) => allowedKeys.has(item.key));
+    const filtered = STATUS_OPTIONS.filter((item) => allowedKeys.has(item.key));
+
+    if (
+      current === "preparing" ||
+      current === "prepare" ||
+      current === "preparation_shipping"
+    ) {
+      return filtered.filter(
+        (item) =>
+          item.key !== "canceled_no_stock" &&
+          item.key !== "canceled_wrong_price",
+      );
+    }
+
+    return filtered;
   }, [status]);
 
   const selectValue = React.useMemo(
