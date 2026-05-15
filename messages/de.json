@@ -301,6 +301,8 @@
   "signUpFail": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "city_required": "Stadt ist ein Pflichtfeld",
   "postal_required": "Postleitzahl ist ein Pflichtfeld",
+  "postal_digits_only": "Postleitzahl darf nur Ziffern enthalten",
+  "postal_max_length_5": "Postleitzahl darf maximal 5 Stellen haben",
   "address_required": "Adresszeile ist ein Pflichtfeld",
   "choose_payment_method": "Sie müssen mindestens eine Zahlungsmethode auswählen",
   "must_accept_terms": "Sie müssen die Allgemeinen Geschäftsbedingungen akzeptieren",
