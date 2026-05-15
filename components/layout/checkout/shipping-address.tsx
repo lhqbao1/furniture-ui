@@ -28,6 +28,8 @@ import { Button } from "@/components/ui/button";
 import { COUNTRY_OPTIONS } from "@/data/data";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { usePostalCitySuggestions } from "@/hooks/checkout/usePostalCitySuggestions";
+import { Loader2 } from "lucide-react";
 interface CheckOutShippingAddressProps {
   isAdmin?: boolean;
 }
@@ -65,6 +67,25 @@ function CheckOutShippingAddress({
       "phone_number",
     ],
   });
+  const shippingPostalCode = useWatch({
+    control: form.control,
+    name: "shipping_postal_code",
+  });
+  const { cities: shippingCitySuggestions, isLoading: isLoadingShippingCity } =
+    usePostalCitySuggestions(shippingPostalCode);
+
+  useEffect(() => {
+    const sanitizedPostalCode = String(shippingPostalCode ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 5);
+
+    if (sanitizedPostalCode.length !== 5) {
+      form.setValue("shipping_city", "");
+      return;
+    }
+
+    form.setValue("shipping_city", shippingCitySuggestions[0] ?? "");
+  }, [shippingPostalCode, shippingCitySuggestions, form]);
 
   const invoiceSnapshot = JSON.stringify(invoiceValues);
 
@@ -289,8 +310,27 @@ function CheckOutShippingAddress({
                   {isAdmin ? "City" : t("city")}
                 </FormLabel>
                 <FormControl>
-                  <Input type="text" autoComplete="address-level2" {...field} />
+                  <Input
+                    type="text"
+                    autoComplete="address-level2"
+                    list="shipping-city-suggestion-list"
+                    {...field}
+                  />
                 </FormControl>
+                <datalist id="shipping-city-suggestion-list">
+                  {shippingCitySuggestions.map((city) => (
+                    <option
+                      key={city}
+                      value={city}
+                    />
+                  ))}
+                </datalist>
+                {isLoadingShippingCity && (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Stadt wird gesucht...</span>
+                  </div>
+                )}
                 <FormMessage />
               </FormItem>
             )}
