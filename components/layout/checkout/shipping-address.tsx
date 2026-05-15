@@ -261,7 +261,17 @@ function CheckOutShippingAddress({
                     type="text"
                     inputMode="numeric"
                     autoComplete="postal-code"
-                    {...field}
+                    maxLength={5}
+                    value={field.value ?? ""}
+                    onChange={(event) => {
+                      const sanitized = event.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 5);
+                      field.onChange(sanitized);
+                    }}
+                    onBlur={field.onBlur}
+                    name={field.name}
+                    ref={field.ref}
                   />
                 </FormControl>
                 <FormMessage />

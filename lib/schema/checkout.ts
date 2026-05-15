@@ -22,7 +22,16 @@ export const CreateOrderSchema = (t: (key: string) => string) =>
       invoice_address_line: z
         .string()
         .min(1, { message: t("address_required") }),
-      invoice_postal_code: z.string().min(1, { message: t("postal_required") }),
+      invoice_postal_code: z
+        .string()
+        .trim()
+        .min(1, { message: t("postal_required") })
+        .refine((value) => value === "" || /^\d+$/.test(value), {
+          message: t("postal_digits_only"),
+        })
+        .refine((value) => value.length <= 5, {
+          message: t("postal_max_length_5"),
+        }),
       invoice_city: z.string().min(1, { message: t("city_required") }),
       invoice_country: z.string().min(1, { message: t("country_required") }),
       invoice_address_additional: z.string().optional(),
@@ -42,7 +51,14 @@ export const CreateOrderSchema = (t: (key: string) => string) =>
         .min(1, { message: t("address_required") }),
       shipping_postal_code: z
         .string()
-        .min(1, { message: t("postal_required") }),
+        .trim()
+        .min(1, { message: t("postal_required") })
+        .refine((value) => value === "" || /^\d+$/.test(value), {
+          message: t("postal_digits_only"),
+        })
+        .refine((value) => value.length <= 5, {
+          message: t("postal_max_length_5"),
+        }),
       shipping_city: z.string().min(1, { message: t("city_required") }),
       shipping_country: z.string().min(1, { message: t("country_required") }),
       supplier_carts: z

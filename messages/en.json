@@ -303,6 +303,8 @@
   "country_required": "Country is required",
   "noCountry": "No country found.",
   "postal_required": "Postal code is required",
+  "postal_digits_only": "Postal code must contain only digits",
+  "postal_max_length_5": "Postal code must be at most 5 digits",
   "address_required": "Address line is required",
   "choose_payment_method": "You need to choose at least one payment method",
   "must_accept_terms": "You must accept the terms and conditions",
