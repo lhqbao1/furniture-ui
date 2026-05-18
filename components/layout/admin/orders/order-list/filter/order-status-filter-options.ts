@@ -28,7 +28,7 @@ export const ORDER_LIST_STATUS_FILTER_OPTIONS: OrderListStatusFilterOption[] = [
   {
     key: "dispatched",
     label: "Dispatched",
-    statuses: ["shipped", "completed", "dispatched"],
+    statuses: ["shipped", "completed"],
   },
   {
     key: "canceled",
