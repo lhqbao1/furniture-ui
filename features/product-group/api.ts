@@ -74,7 +74,32 @@ export async function getAllProductsSelect({
     },
   });
 
-  return data as ProductItem[];
+  const normalizeProduct = (
+    item: ProductItem & {
+      inventory_po?: ProductItem["inventory_pos"] | null;
+      inventories_po?: ProductItem["inventory_pos"] | null;
+    },
+  ): ProductItem => ({
+    ...item,
+    inventory_pos:
+      item.inventory_pos ?? item.inventories_po ?? item.inventory_po ?? [],
+  });
+
+  if (Array.isArray(data)) {
+    return data.map((item) => normalizeProduct(item as ProductItem));
+  }
+
+  if (
+    data &&
+    typeof data === "object" &&
+    Array.isArray((data as { items?: ProductItem[] }).items)
+  ) {
+    return ((data as { items: ProductItem[] }).items ?? []).map((item) =>
+      normalizeProduct(item),
+    );
+  }
+
+  return [] as ProductItem[];
 }
 
 export async function getProductGroupDetail(parent_id: string) {

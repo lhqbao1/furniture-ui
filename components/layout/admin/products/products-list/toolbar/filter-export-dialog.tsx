@@ -4,7 +4,6 @@ import React, { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import { CheckCheck, Loader2, RotateCcw, Search } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { getAllProductsSelect } from "@/features/product-group/api";
+import { getAllProducts } from "@/features/products/api";
 import { ProductItem } from "@/types/products";
 import { buildProductExportData } from "./export-utils";
 
@@ -81,12 +80,12 @@ const FilterExportForm = () => {
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
 
   const buildParams = () => {
-    const params: Record<string, string | boolean> = {};
+    const params: Record<string, string> = {};
 
     if (statusParam === "true") {
-      params.all_products = true;
+      params.all_products = "true";
     } else if (statusParam === "false") {
-      params.all_products = false;
+      params.all_products = "false";
     }
 
     if (supplierId) {
@@ -116,33 +115,27 @@ const FilterExportForm = () => {
     return params;
   };
 
-  const { refetch } = useQuery({
-    queryKey: [
-      "all-products",
-      supplierId,
-      statusParam ?? "all",
-      search,
-      sortByStock,
-      sortByIncomingStock,
-      sortByMarketplace,
-      isInventory,
-    ],
-    queryFn: () => getAllProductsSelect(buildParams()),
-    enabled: false,
-  });
+  const fetchAllFilteredProducts = async (): Promise<ProductItem[]> => {
+    const params = buildParams();
+    const pageSize = 500;
+    let page = 1;
+    let totalPages = 1;
+    const collected: ProductItem[] = [];
 
-  const normalizeProductsResponse = (payload: unknown): ProductItem[] => {
-    if (Array.isArray(payload)) return payload as ProductItem[];
+    do {
+      const response = await getAllProducts({
+        ...params,
+        page,
+        page_size: pageSize,
+      });
 
-    if (
-      payload &&
-      typeof payload === "object" &&
-      Array.isArray((payload as { items?: unknown[] }).items)
-    ) {
-      return (payload as { items: ProductItem[] }).items;
-    }
+      const items = response?.items ?? [];
+      collected.push(...items);
+      totalPages = response?.pagination?.total_pages ?? 1;
+      page += 1;
+    } while (page <= totalPages);
 
-    return [];
+    return collected;
   };
 
   const applyMultiSearchFilter = (products: ProductItem[]): ProductItem[] => {
@@ -260,8 +253,8 @@ const FilterExportForm = () => {
   const handleExportExcel = async (columns: string[]) => {
     setExporting(true);
     try {
-      const res = await refetch();
-      const data = applyMultiSearchFilter(normalizeProductsResponse(res.data));
+      const products = await fetchAllFilteredProducts();
+      const data = applyMultiSearchFilter(products);
       if (!data.length) {
         toast.info("No products to export");
         return;
