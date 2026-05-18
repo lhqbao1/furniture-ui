@@ -1164,8 +1164,8 @@ export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
     "canceled_wrong_price",
   ],
   shipped: ["exchange", "return_issue"],
-  pending: ["paid", "canceled", "canceled_no_stock", "canceled_wrong_price"],
-  paid: ["canceled", "canceled_no_stock", "canceled_wrong_price"],
+  pending: ["paid", "canceled"],
+  paid: ["canceled"],
   return: ["return_issue", "exchange"],
   exchange: ["return_issue", "exchange"],
   canceled: ["return_issue"],
@@ -1176,7 +1176,7 @@ export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   waiting_for_return: ["warranty_initiated", "exchange_initiated"],
   exchange_initiated: ["credit_note_created"],
   warranty_initiated: ["credit_note_created"],
-  tock_reserved: ["canceled", "canceled_no_stock", "canceled_wrong_price"],
+  tock_reserved: ["canceled"],
 };
 
 export const VOUCHER_TYPE = [

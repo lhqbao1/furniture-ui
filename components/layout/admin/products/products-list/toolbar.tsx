@@ -37,7 +37,7 @@ import { useSearchParams } from "next/navigation";
 import FilterExportForm from "./toolbar/filter-export-dialog";
 import { cn } from "@/lib/utils";
 import UpdateStatusDialog from "./toolbar/bulk-update/status-dialog";
-import ExportSelectedProducts from "./toolbar/bulk-update/export-selected";
+import ExportSelectedProductsDialog from "./toolbar/bulk-update/export-selected";
 import EANDrawer from "./toolbar/bulk-update/ean-drawer";
 import MultiSearch from "./toolbar/multi-search";
 import { useGetSuppliers } from "@/features/supplier/hook";
@@ -111,6 +111,7 @@ export default function TableToolbar({
   const [isImporting, setIsImporting] = useState(false);
   const [hasShownSpaceToast, setHasShownSpaceToast] = useState(false);
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
+  const [openExportSelected, setOpenExportSelected] = useState(false);
   // const [openEanDrawer, setOpenEanDrawer] = useState(false);
 
   const pathname = usePathname();
@@ -550,11 +551,13 @@ export default function TableToolbar({
                     Update Status
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem>
-                    <ExportSelectedProducts
-                      product_ids={product_ids ?? []}
-                      products={selectedProducts ?? []}
-                    />
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      setOpenExportSelected(true);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    Export Selected
                   </DropdownMenuItem>
 
                   {/* <DropdownMenuItem
@@ -583,6 +586,13 @@ export default function TableToolbar({
           open={openUpdateStatus}
           onOpenChange={setOpenUpdateStatus}
           productIds={product_ids ?? []}
+        />
+
+        <ExportSelectedProductsDialog
+          open={openExportSelected}
+          onOpenChange={setOpenExportSelected}
+          productIds={product_ids ?? []}
+          products={selectedProducts ?? []}
         />
 
         {isAddButtonModal && (

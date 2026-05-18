@@ -8,7 +8,24 @@ const clean = (val: unknown) =>
   val === null || val === undefined ? "" : val;
 
 export const getIncomingStockExportLabel = (product: ProductItem): string => {
-  const inventoryPos = product.inventory_pos ?? [];
+  const fallbackInventoriesPo = (product as ProductItem & {
+    inventories_po?: ProductItem["inventory_pos"] | null;
+  }).inventories_po;
+  const fallbackInventoryPo = (product as ProductItem & {
+    inventory_po?: ProductItem["inventory_pos"] | null;
+  }).inventory_po;
+
+  const inventoryPos =
+    (Array.isArray(product.inventory_pos) && product.inventory_pos.length > 0
+      ? product.inventory_pos
+      : null) ??
+    (Array.isArray(fallbackInventoriesPo) && fallbackInventoriesPo.length > 0
+      ? fallbackInventoriesPo
+      : null) ??
+    (Array.isArray(fallbackInventoryPo) && fallbackInventoryPo.length > 0
+      ? fallbackInventoryPo
+      : []);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
