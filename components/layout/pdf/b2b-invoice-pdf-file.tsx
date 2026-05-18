@@ -10,10 +10,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { B2BInvoiceFooter } from "./b2b-invoice-footer";
-import {
-  calculateOrderTaxWithDiscount,
-  calculateProductVAT,
-} from "@/lib/caculate-vat";
+import { calculateProductVAT } from "@/lib/caculate-vat";
 
 Font.register({
   family: "Figtree",
@@ -177,6 +174,39 @@ const formatEur = (value: number) =>
     maximumFractionDigits: 2,
   })} €`;
 
+const formatTaxPercent = (tax: unknown) => {
+  if (tax === null || tax === undefined) return "-";
+
+  const formatValue = (value: number) =>
+    `${value.toLocaleString("de-DE", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })}%`;
+
+  if (typeof tax === "number") {
+    if (!Number.isFinite(tax)) return "-";
+    const percentageValue = tax > 1 ? tax : tax * 100;
+    return formatValue(percentageValue);
+  }
+
+  if (typeof tax === "string") {
+    const normalized = tax.trim();
+    if (!normalized) return "-";
+
+    const cleaned = normalized
+      .replace("%", "")
+      .replace(",", ".")
+      .trim();
+    const parsed = Number(cleaned);
+    if (!Number.isFinite(parsed)) return "-";
+
+    const percentageValue = parsed > 1 ? parsed : parsed * 100;
+    return formatValue(percentageValue);
+  }
+
+  return "-";
+};
+
 export const B2BInvoicePDFFile = ({
   invoiceId,
   servicePeriod,
@@ -220,30 +250,6 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     ? paymentNote
     : defaultPaymentText;
   const paymentLines = resolvedPaymentNote.replace(/\r\n/g, "\n").split("\n");
-  const flattenedCartItems = orders.flatMap((order) =>
-    (order.checkouts ?? [])
-      .filter((checkout) => {
-        const status = checkout.status?.toLowerCase();
-        return status !== "exchange" && status !== "cancel_exchange";
-      })
-      .flatMap((checkout) => {
-        if (Array.isArray(checkout.cart)) {
-          return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
-        }
-        return checkout.cart?.items ?? [];
-      }),
-  );
-  const totalShippingGross = orders.reduce(
-    (sum, order) => sum + (Number(order.total_shipping) || 0),
-    0,
-  );
-  const orderTaxSummary = calculateOrderTaxWithDiscount(
-    flattenedCartItems,
-    0,
-    invoiceCountry,
-    invoiceTaxId,
-    totalShippingGross,
-  );
   const displayRows = orders.map((order, index) => {
     const orderItems = (order.checkouts ?? []).flatMap((checkout) => {
       if (Array.isArray(checkout.cart)) {
@@ -265,21 +271,27 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
       ) || 0;
     const rowGross = unitGross * quantity;
     const shippingGross = Number(order.total_shipping) || 0;
-    const orderTaxSummary = calculateOrderTaxWithDiscount(
-      orderItems,
-      0,
-      invoiceCountry,
-      invoiceTaxId,
-      shippingGross,
-    );
-    const vatCalculation = calculateProductVAT(
+    const taxValue =
+      firstItem?.purchased_products?.tax ?? firstItem?.products?.tax ?? null;
+    const unitVatCalculation = calculateProductVAT(
       unitGross,
-      firstItem?.purchased_products?.tax ?? firstItem?.products?.tax ?? null,
+      taxValue,
       invoiceCountry,
       invoiceTaxId,
     );
-    const unitNet = Number(vatCalculation.net) || 0;
+    const shippingVatCalculation = calculateProductVAT(
+      shippingGross,
+      taxValue,
+      invoiceCountry,
+      invoiceTaxId,
+    );
+    const unitNet = Number(unitVatCalculation.net) || 0;
     const rowNet = unitNet * quantity;
+    const shippingNet = Number(shippingVatCalculation.net) || 0;
+    const vatRate = Number(unitVatCalculation.vatRate) || 0;
+    const rowVat = +(rowGross + shippingGross - (rowNet + shippingNet)).toFixed(
+      2,
+    );
 
     return {
       order,
@@ -287,9 +299,12 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
       quantity,
       unitNet,
       rowNet,
-      shippingNet: Number(orderTaxSummary?.shipping?.net) || 0,
+      shippingNet,
       shippingGross,
       rowTotalGross: rowGross + shippingGross,
+      vatRate,
+      rowVat,
+      tax: formatTaxPercent(taxValue),
       idProvider:
         firstItem?.purchased_products?.id_provider ??
         firstItem?.products?.id_provider ??
@@ -303,39 +318,40 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     (sum, row) => sum + row.rowTotalGross,
     0,
   );
+  const displayNetTotal = displayRows.reduce(
+    (sum, row) => sum + row.rowNet + row.shippingNet,
+    0,
+  );
 
-  const taxBuckets = (orderTaxSummary?.buckets ?? []).reduce(
-    (acc, bucket) => {
-      const rawRate = Number(bucket?.vatRate) || 0;
-      const normalizedRate = rawRate > 1 ? rawRate / 100 : rawRate;
-      const vatValue = Number(bucket?.vat) || 0;
-
-      if (Math.abs(normalizedRate - 0.19) < 0.0001) {
-        acc.vat19 += vatValue;
-      } else if (Math.abs(normalizedRate - 0.07) < 0.0001) {
-        acc.vat7 += vatValue;
+  const taxBuckets = displayRows.reduce(
+    (acc, row) => {
+      if (Math.abs(row.vatRate - 0.19) < 0.0001) {
+        acc.vat19 += row.rowVat;
+      } else if (Math.abs(row.vatRate - 0.07) < 0.0001) {
+        acc.vat7 += row.rowVat;
       } else {
-        acc.otherVat += vatValue;
+        acc.otherVat += row.rowVat;
       }
 
       return acc;
     },
     { vat19: 0, vat7: 0, otherVat: 0 },
   );
+  const roundedTaxBuckets = {
+    vat19: +taxBuckets.vat19.toFixed(2),
+    vat7: +taxBuckets.vat7.toFixed(2),
+    otherVat: +taxBuckets.otherVat.toFixed(2),
+  };
 
-  const totalVat19 = isGermanyInvoice ? taxBuckets.vat19 : 0;
-  const totalVat7 = isGermanyInvoice ? taxBuckets.vat7 : 0;
-  const totalVatOther = isGermanyInvoice ? taxBuckets.otherVat : 0;
+  const totalVat19 = isGermanyInvoice ? roundedTaxBuckets.vat19 : 0;
+  const totalVat7 = isGermanyInvoice ? roundedTaxBuckets.vat7 : 0;
+  const totalVatOther = isGermanyInvoice ? roundedTaxBuckets.otherVat : 0;
   // Keep summary fully aligned with table rows:
   // each row contributes G.-Preis + Versand.
-  const totalGross =
-    Number.isFinite(orderTaxSummary?.totalGross) &&
-    orderTaxSummary.totalGross > 0
-      ? orderTaxSummary.totalGross
-      : displayGrossTotal;
+  const totalGross = +displayGrossTotal.toFixed(2);
   const totalNet =
-    Number.isFinite(orderTaxSummary?.totalNet) && orderTaxSummary.totalNet >= 0
-      ? orderTaxSummary.totalNet
+    Number.isFinite(displayNetTotal) && displayNetTotal >= 0
+      ? +displayNetTotal.toFixed(2)
       : isGermanyInvoice
         ? totalGross - totalVat19 - totalVat7 - totalVatOther
         : totalGross;
@@ -531,7 +547,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
             </Text>
             <Text style={{ width: "12%", fontSize: 8 }}>Ref.-Nr .</Text>
             <Text style={{ width: "12%", fontSize: 8 }}>Artikelnummer</Text>
-            <Text style={{ width: "33%", fontSize: 8 }}>Produktname</Text>
+            <Text style={{ width: "25%", fontSize: 8 }}>Produktname</Text>
             <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
               Versand
             </Text>
@@ -540,6 +556,9 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
             </Text>
             <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
               E.-Preis
+            </Text>
+            <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
+              USt.
             </Text>
             <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
               G.-Preis
@@ -570,7 +589,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 <Text style={{ width: "12%", fontSize: 8 }}>
                   {truncateText(row.idProvider)}
                 </Text>
-                <Text style={{ width: "33%", fontSize: 8 }}>
+                <Text style={{ width: "25%", fontSize: 8 }}>
                   {truncateText(String(row.productName), 70)}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
@@ -581,6 +600,9 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
                   {formatEur(row.unitNet)}
+                </Text>
+                <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
+                  {row.tax}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
                   {formatEur(row.rowNet)}
