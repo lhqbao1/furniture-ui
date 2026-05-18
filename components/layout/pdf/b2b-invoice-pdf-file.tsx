@@ -305,10 +305,6 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
       vatRate,
       rowVat,
       tax: formatTaxPercent(taxValue),
-      idProvider:
-        firstItem?.purchased_products?.id_provider ??
-        firstItem?.products?.id_provider ??
-        "-",
       productName:
         firstItem?.purchased_products?.name ?? firstItem?.products?.name ?? "-",
     };
@@ -546,13 +542,12 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
               Pos.
             </Text>
             <Text style={{ width: "12%", fontSize: 8 }}>Ref.-Nr .</Text>
-            <Text style={{ width: "12%", fontSize: 8 }}>Artikelnummer</Text>
-            <Text style={{ width: "25%", fontSize: 8 }}>Produktname</Text>
-            <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
-              Versand
-            </Text>
+            <Text style={{ width: "37%", fontSize: 8 }}>Produktname</Text>
             <Text style={{ width: "8%", textAlign: "center", fontSize: 8 }}>
               Menge
+            </Text>
+            <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
+              Versand
             </Text>
             <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
               E.-Preis
@@ -586,17 +581,14 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                     row.order.checkout_code ||
                     row.order.id}
                 </Text>
-                <Text style={{ width: "12%", fontSize: 8 }}>
-                  {truncateText(row.idProvider)}
-                </Text>
-                <Text style={{ width: "25%", fontSize: 8 }}>
+                <Text style={{ width: "37%", fontSize: 8 }}>
                   {truncateText(String(row.productName), 70)}
-                </Text>
-                <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
-                  {formatEur(row.shippingNet)}
                 </Text>
                 <Text style={{ width: "8%", textAlign: "center", fontSize: 8 }}>
                   {row.quantity}
+                </Text>
+                <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
+                  {formatEur(row.shippingNet)}
                 </Text>
                 <Text style={{ width: "10%", textAlign: "right", fontSize: 8 }}>
                   {formatEur(row.unitNet)}
