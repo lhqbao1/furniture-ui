@@ -22,6 +22,8 @@ import { adminIdAtom } from "@/store/auth";
 import { Check, X } from "lucide-react";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
+import { getMarketplaceSyncGuardErrors } from "@/lib/marketplace-sync-guards";
+import type { SupportedMarketplace } from "@/lib/marketplace-sync-guards";
 
 // function ActionsCell({ product }: { product: ProductItem }) {
 //   const locale = useLocale();
@@ -424,6 +426,15 @@ const getMarketplaceProductRecord = (
   product.marketplace_products?.find((item) =>
     aliases.includes(String(item.marketplace ?? "").toLowerCase()),
   );
+
+const resolveSupportedMarketplace = (
+  aliases: readonly string[],
+): SupportedMarketplace | null => {
+  if (aliases.includes("ebay")) return "ebay";
+  if (aliases.includes("amazon") || aliases.includes("amz")) return "amazon";
+  if (aliases.includes("kaufland") || aliases.includes("kaufaldn")) return "kaufland";
+  return null;
+};
 
 const hasProductStaticFiles = (product: ProductItem, minimumCount = 1) =>
   (product.static_files?.length ?? 0) >= minimumCount;
@@ -1204,6 +1215,27 @@ export const getInventoryColumns = (
                 }
 
                 if (field.id === "synchrone") {
+                  const resolvedMarketplace = resolveSupportedMarketplace(
+                    marketplaceGroup.aliases,
+                  );
+
+                  if (resolvedMarketplace) {
+                    const syncGuardErrors = getMarketplaceSyncGuardErrors(
+                      row.original,
+                      resolvedMarketplace,
+                    );
+
+                    if (syncGuardErrors.length > 0) {
+                      return (
+                        <div className="space-y-1 text-left text-xs font-medium leading-tight text-red-600">
+                          {syncGuardErrors.map((errorMessage) => (
+                            <div key={errorMessage}>{errorMessage}</div>
+                          ))}
+                        </div>
+                      );
+                    }
+                  }
+
                   const synchroneValue = getMarketplaceBooleanFieldValue(
                     row.original,
                     marketplaceGroup.aliases,
