@@ -15,7 +15,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { ChevronsUpDown } from "lucide-react";
 
 export const CHANEL_OPTIONS = [
@@ -39,6 +43,7 @@ export const CHANEL_OPTIONS = [
   { key: "praktiker", label: "Praktiker", icon: "praktiker.jpg" },
   { key: "XXXLUTZ", label: "XXXLUTZ", icon: "xxxlutz.png" },
   { key: "moebelix", label: "Moebelix", icon: "mobelix.png" },
+  { key: "otto", label: "Otto", icon: "otto.png" },
 ];
 
 export default function OrderChanelFilter() {

@@ -99,6 +99,14 @@ const PRESET_BY_MARKETPLACE: Record<
     invoice_postal_code: "4600",
     invoice_country: "AT",
   },
+  otto: {
+    company_name: "Otto GmbH & Co. KGaA",
+    tax_id: "DE340596305",
+    invoice_address: "Werner-Otto-Straße 1-7",
+    invoice_city: "Hamburg",
+    invoice_postal_code: "22179",
+    invoice_country: "DE",
+  },
 };
 
 export function useManualCheckoutLogic(

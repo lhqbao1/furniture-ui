@@ -126,6 +126,7 @@ export default function ManualAdditionalInformation({
         { value: "XXXLUTZ", label: "XXXLUTZ" },
         { value: "prestige", label: "Prestige Home" },
         { value: "moebelix", label: "Moebelix" },
+        { value: "otto", label: "Otto" },
       ].sort((a, b) =>
         a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
       ),

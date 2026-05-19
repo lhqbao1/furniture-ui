@@ -108,6 +108,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_postal_code: "4600",
     invoice_country: "AT",
   },
+  otto: {
+    company_name: "Otto GmbH & Co. KGaA",
+    tax_id: "DE340596305",
+    invoice_address: "Werner-Otto-Straße 1-7",
+    invoice_city: "Hamburg",
+    invoice_postal_code: "22179",
+    invoice_country: "DE",
+  },
   praktiker: null,
   check24: null,
   amazon: null,
@@ -193,10 +201,7 @@ const formatTaxPercent = (tax: unknown) => {
     const normalized = tax.trim();
     if (!normalized) return "-";
 
-    const cleaned = normalized
-      .replace("%", "")
-      .replace(",", ".")
-      .trim();
+    const cleaned = normalized.replace("%", "").replace(",", ".").trim();
     const parsed = Number(cleaned);
     if (!Number.isFinite(parsed)) return "-";
 
