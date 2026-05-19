@@ -1,4 +1,5 @@
-import { useGetAllProducts } from "@/features/products/hook";
+import { getProductById } from "@/features/products/api";
+import { useEditProduct, useGetAllProducts } from "@/features/products/hook";
 import React, { useEffect, useState } from "react";
 import {
   Popover,
@@ -56,6 +57,7 @@ interface SelectedInventoryItem {
   total_cost: number;
   stock_from_amm?: number | null;
   updated_stock?: boolean | null;
+  costSyncPending?: boolean;
 
   isNew?: boolean;
   isEditing?: boolean; // 👈 thêm
@@ -97,6 +99,12 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
 
   const { mutate: deleteInventoryPoMutate } = useDeleteInventoryPo(containerId);
   const updateStockMutation = useUpdateProductStockFromInventoryPo();
+  const editProductMutation = useEditProduct();
+  const productDetailsCacheRef = React.useRef<Record<string, ProductItem>>({});
+  const skipBlurCostSyncRef = React.useRef<Record<string, boolean>>({});
+  const [syncingCostByProductId, setSyncingCostByProductId] = useState<
+    Record<string, boolean>
+  >({});
 
   const { data: products, isLoading } = useGetAllProducts({
     search: debouncedSearch,
@@ -153,6 +161,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
           total_cost: 0,
           stock_from_amm: null,
           updated_stock: null,
+          costSyncPending: false,
           isNew: true,
           isEditing: true, // 👈 NEW item edit được ngay
         },
@@ -305,6 +314,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
         description: item.description ?? "",
         stock_from_amm: item.stock_from_amm ?? null,
         updated_stock: item.updated_stock ?? null,
+        costSyncPending: false,
 
         isNew: false,
         isEditing: false, // 👈 LOCK
@@ -324,6 +334,109 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
       });
     }
   }, [containerId]);
+
+  const getProductDetailsForCostUpdate = React.useCallback(
+    async (productId: string): Promise<ProductItem | null> => {
+      const cached = productDetailsCacheRef.current[productId];
+      if (cached) return cached;
+
+      try {
+        const fetched = await getProductById(productId);
+        productDetailsCacheRef.current[productId] = fetched;
+        return fetched;
+      } catch {
+        return null;
+      }
+    },
+    [],
+  );
+
+  const handleSyncProductCost = React.useCallback(
+    async (index: number) => {
+      const item = items[index];
+      const productId = item?.product_id;
+
+      if (!item || !productId || !item.costSyncPending) return;
+
+      const nextCost = Number(item.unit_cost);
+      if (!Number.isFinite(nextCost) || nextCost < 0) return;
+
+      if (syncingCostByProductId[productId]) return;
+
+      const product = await getProductDetailsForCostUpdate(productId);
+      if (!product) {
+        toast.error("Failed to update product cost", {
+          description: "Could not load product details.",
+        });
+        return;
+      }
+
+      if (Number(product.cost ?? 0) === nextCost) {
+        setItems((prev) =>
+          prev.map((entry, itemIndex) =>
+            itemIndex === index
+              ? { ...entry, costSyncPending: false }
+              : entry,
+          ),
+        );
+        return;
+      }
+
+      setSyncingCostByProductId((prev) => ({ ...prev, [productId]: true }));
+      const toastId = toast.loading("Updating product cost...");
+
+      try {
+        await editProductMutation.mutateAsync({
+          id: product.id,
+          input: {
+            ...product,
+            cost: nextCost,
+            ...(product.categories?.length
+              ? { category_ids: product.categories.map((category) => category.id) }
+              : {}),
+            ...(product.brand?.id ? { brand_id: product.brand.id } : {}),
+            ...(product.bundles?.length
+              ? {
+                  bundles: product.bundles.map((bundleItem) => ({
+                    product_id: bundleItem.bundle_item.id,
+                    quantity: bundleItem.quantity,
+                  })),
+                }
+              : { bundles: [] }),
+            brand_id: product.brand ? product.brand.id : null,
+          },
+          skipInvalidateProducts: true,
+        });
+
+        productDetailsCacheRef.current[productId] = {
+          ...product,
+          cost: nextCost,
+        };
+
+        setItems((prev) =>
+          prev.map((entry, itemIndex) =>
+            itemIndex === index
+              ? { ...entry, costSyncPending: false }
+              : entry,
+          ),
+        );
+
+        toast.success("Product cost updated", { id: toastId });
+      } catch {
+        toast.error("Failed to update product cost", {
+          id: toastId,
+          description: "Please try again.",
+        });
+      } finally {
+        setSyncingCostByProductId((prev) => {
+          const next = { ...prev };
+          delete next[productId];
+          return next;
+        });
+      }
+    },
+    [editProductMutation, getProductDetailsForCostUpdate, items, syncingCostByProductId],
+  );
 
   const handleOpenConfirmStock = (index: number) => {
     const item = items[index];
@@ -507,7 +620,7 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                     <td className="p-2">
                       <div className="flex gap-2 items-center">
                         <Image
-                          src={item.image}
+                          src={item.image || "/1.png"}
                           alt={item.name || "product"}
                           width={32}
                           height={32}
@@ -560,7 +673,10 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                         type="number"
                         min={0}
                         value={item.unit_cost}
-                        disabled={!item.isEditing}
+                        disabled={
+                          !item.isEditing ||
+                          (!!item.product_id && syncingCostByProductId[item.product_id])
+                        }
                         onChange={(e) => {
                           const unit_cost = Number(e.target.value);
                           setItems((prev) =>
@@ -570,10 +686,25 @@ const InventorySelect = ({ containerId, po_id }: InventorySelectProps) => {
                                     ...p,
                                     unit_cost,
                                     total_cost: p.quantity * unit_cost,
+                                    costSyncPending: true,
                                   }
                                 : p,
                             ),
                           );
+                        }}
+                        onBlur={async () => {
+                          if (!item.product_id) return;
+                          if (skipBlurCostSyncRef.current[item.product_id]) {
+                            skipBlurCostSyncRef.current[item.product_id] = false;
+                            return;
+                          }
+                          await handleSyncProductCost(index);
+                        }}
+                        onKeyDown={async (e) => {
+                          if (e.key !== "Enter" || !item.product_id) return;
+                          e.preventDefault();
+                          skipBlurCostSyncRef.current[item.product_id] = true;
+                          await handleSyncProductCost(index);
                         }}
                       />
                     </td>
