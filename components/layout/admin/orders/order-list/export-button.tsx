@@ -86,6 +86,7 @@ const formatColumnLabel = (key: string) => {
     shipping_cost: "Shipping Cost",
     discount_amout: "Discount Amount",
     total_amount: "Total Amount",
+    net_amount: "Net Amount",
     shipping_date: "Shipping Date",
     tracking_number: "Tracking Number",
     shipping_code: "Shipping Code",
