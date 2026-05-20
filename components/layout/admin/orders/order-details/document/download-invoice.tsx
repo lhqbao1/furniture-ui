@@ -14,10 +14,13 @@ import { BauhausReturnSlipPdf } from "@/components/layout/pdf/bauhaus-return-sli
 import UploadInvoicePdfDialog from "./upload-invoice-pdf-dialog";
 import { toast } from "sonner";
 import { useDeleteCheckoutPdfFile } from "@/features/checkout/hook";
+import { CheckOutMain } from "@/types/checkout";
+import B2BInvoiceDrawer from "../../order-list/b2b-invoice-drawer";
 
 interface DownloadInvoiceProps {
   checkoutId: string;
   type: string;
+  order?: CheckOutMain;
   invoicePdfFile?: string | null;
   invoicePdfFile2?: string | null;
   mainCheckoutId?: string;
@@ -26,14 +29,19 @@ interface DownloadInvoiceProps {
 const DownloadInvoice = ({
   checkoutId,
   type,
+  order,
   invoicePdfFile,
   invoicePdfFile2,
   mainCheckoutId,
 }: DownloadInvoiceProps) => {
   const deleteCheckoutPdfFileMutation = useDeleteCheckoutPdfFile();
+  const [openB2BDrawer, setOpenB2BDrawer] = React.useState(false);
+  const [b2bMarketplace, setB2BMarketplace] = React.useState("");
   const normalizedType = String(type ?? "").toLowerCase();
+  const isInvoiceType = normalizedType === "invoice";
   const isPackageType = normalizedType === "package";
   const isRefundInvoiceType = normalizedType === "refund-invoice";
+  const isB2BInvoiceOrder = isInvoiceType && Boolean(order?.is_b2b);
   const uploadedPackageSlipFiles = React.useMemo(
     () =>
       [
@@ -46,9 +54,14 @@ const DownloadInvoice = ({
   );
   const hasUploadedPackageSlipFile =
     isPackageType && uploadedPackageSlipFiles.length > 0;
-  const needsGeneratedDocument = !hasUploadedPackageSlipFile;
+  const needsGeneratedDocument =
+    !hasUploadedPackageSlipFile && !isB2BInvoiceOrder;
   const effectiveMainCheckoutId = mainCheckoutId || checkoutId;
   const isDeletingPackageSlip = deleteCheckoutPdfFileMutation.isPending;
+  const selectedB2BOrders = React.useMemo(
+    () => (order ? [order] : []),
+    [order],
+  );
 
   const {
     data: checkout,
@@ -148,6 +161,41 @@ const DownloadInvoice = ({
     }
   };
 
+  const handleOpenB2BInvoiceDrawer = () => {
+    if (!order) {
+      toast.error("Cannot create B2B invoice", {
+        description: "Order data is missing.",
+      });
+      return;
+    }
+
+    const errors: string[] = [];
+
+    if (!order.marketplace_order_id?.trim()) {
+      errors.push(`Missing external ID: ${order.checkout_code || order.id}`);
+    }
+
+    if (!order.from_marketplace?.trim()) {
+      errors.push(`Missing marketplace: ${order.checkout_code || order.id}`);
+    }
+
+    if (errors.length > 0) {
+      toast.error("Cannot create B2B invoice", {
+        description: (
+          <div className="flex flex-col gap-1">
+            {errors.map((error) => (
+              <div key={error}>- {error}</div>
+            ))}
+          </div>
+        ),
+      });
+      return;
+    }
+
+    setB2BMarketplace(order.from_marketplace.trim());
+    setOpenB2BDrawer(true);
+  };
+
   return (
     <div className="flex items-center justify-center gap-2">
       {isPackageType && hasUploadedPackageSlipFile ? (
@@ -184,6 +232,10 @@ const DownloadInvoice = ({
             </div>
           ))}
         </div>
+      ) : isB2BInvoiceOrder ? (
+        <Button variant={"outline"} type="button" onClick={handleOpenB2BInvoiceDrawer}>
+          <DownloadCloud />
+        </Button>
       ) : isCheckoutLoading ||
         isInvoiceLoading ||
         (isRefundInvoiceType && isProductRefundLoading) ||
@@ -262,6 +314,13 @@ const DownloadInvoice = ({
           existingUrls={uploadedPackageSlipFiles.map((file) => file.url)}
         />
       ) : null}
+
+      <B2BInvoiceDrawer
+        open={openB2BDrawer}
+        onOpenChange={setOpenB2BDrawer}
+        marketplace={b2bMarketplace}
+        selectedOrders={selectedB2BOrders}
+      />
     </div>
   );
 };

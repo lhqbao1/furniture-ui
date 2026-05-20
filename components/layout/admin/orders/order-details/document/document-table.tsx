@@ -89,11 +89,12 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
   const columns = useMemo(
     () =>
       documentColumns({
+        order,
         invoicePdfFile: order?.invoice_pdf_file ?? null,
         invoicePdfFile2: order?.invoice_pdf_file_2 ?? null,
         mainCheckoutId: order?.id,
       }),
-    [order?.id, order?.invoice_pdf_file, order?.invoice_pdf_file_2],
+    [order, order?.id, order?.invoice_pdf_file, order?.invoice_pdf_file_2],
   );
 
   const table = useReactTable({

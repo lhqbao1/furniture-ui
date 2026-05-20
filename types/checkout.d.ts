@@ -124,6 +124,7 @@ export interface CheckOutMain {
   files: StaticFile[];
   refund_amount: number;
   product_refund?: CheckoutMainProductRefundItem[];
+  is_b2b: boolean;
   created_at: Date;
   updated_at: Date;
 }

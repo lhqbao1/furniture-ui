@@ -58,6 +58,7 @@ interface SelectedProduct {
   product: ProductItem;
   quantity: number;
   final_price: number;
+  bader_id?: string | null;
   carrier: string;
 }
 

@@ -41,30 +41,19 @@ const toFiniteNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const hasPositivePackageValue = (pkg: PackageSize) =>
-  pkg.length > 0 && pkg.width > 0 && pkg.height > 0 && pkg.weight > 0;
-
 const getPreferredPackageSize = (product: ProductItem): PackageSize => {
-  const packageCandidates = Array.isArray(product.packages)
-    ? product.packages.map((pkg) => ({
-        length: toFiniteNumber(pkg?.length),
-        width: toFiniteNumber(pkg?.width),
-        height: toFiniteNumber(pkg?.height),
-        weight: toFiniteNumber(pkg?.weight),
-      }))
-    : [];
+  const firstPackage = Array.isArray(product.packages)
+    ? product.packages[0]
+    : undefined;
 
-  const firstValidPackage = packageCandidates.find(hasPositivePackageValue);
-  if (firstValidPackage) return firstValidPackage;
-
-  const directPackage = {
-    length: toFiniteNumber(product.length),
-    width: toFiniteNumber(product.width),
-    height: toFiniteNumber(product.height),
-    weight: toFiniteNumber(product.weight),
-  };
-
-  if (hasPositivePackageValue(directPackage)) return directPackage;
+  if (firstPackage) {
+    return {
+      length: toFiniteNumber(firstPackage?.length),
+      width: toFiniteNumber(firstPackage?.width),
+      height: toFiniteNumber(firstPackage?.height),
+      weight: toFiniteNumber(firstPackage?.weight),
+    };
+  }
 
   return {
     length: 0,

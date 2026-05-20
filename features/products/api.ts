@@ -27,6 +27,45 @@ export interface GetAllProductsParams {
   sort_by_incoming_stock?: string;
 }
 
+type ProductWithInventoryAliases = ProductItem & {
+  inventory_po?: ProductItem["inventory_pos"] | null;
+  inventories_po?: ProductItem["inventory_pos"] | null;
+  bundles?: Array<{
+    bundle_item?: ProductWithInventoryAliases | null;
+    quantity: number;
+  }>;
+};
+
+const normalizeInventoryPos = (
+  item?: {
+    inventory_pos?: ProductItem["inventory_pos"] | null;
+    inventories_po?: ProductItem["inventory_pos"] | null;
+    inventory_po?: ProductItem["inventory_pos"] | null;
+  } | null,
+) => item?.inventory_pos ?? item?.inventories_po ?? item?.inventory_po ?? [];
+
+const normalizeBundleItemInventory = (
+  item: ProductWithInventoryAliases | null | undefined,
+): ProductWithInventoryAliases | null => {
+  if (!item) return null;
+
+  const normalizedBundles = (item.bundles ?? []).map((bundle) => ({
+    ...bundle,
+    bundle_item: bundle.bundle_item
+      ? {
+          ...bundle.bundle_item,
+          inventory_pos: normalizeInventoryPos(bundle.bundle_item),
+        }
+      : bundle.bundle_item,
+  }));
+
+  return {
+    ...item,
+    inventory_pos: normalizeInventoryPos(item),
+    bundles: normalizedBundles,
+  };
+};
+
 export interface GetAllProductAndSoldParams {
   search?: string | string[];
   sort_by_stock?: "asc" | "desc" | string;
@@ -144,6 +183,19 @@ export async function getAllProducts(params?: GetAllProductsParams) {
       }),
     },
   });
+
+  if (
+    data &&
+    typeof data === "object" &&
+    Array.isArray((data as ProductResponse).items)
+  ) {
+    return {
+      ...(data as ProductResponse),
+      items: (data as ProductResponse).items.map((item) =>
+        normalizeBundleItemInventory(item as ProductWithInventoryAliases),
+      ) as ProductItem[],
+    } as ProductResponse;
+  }
 
   return data as ProductResponse;
 }

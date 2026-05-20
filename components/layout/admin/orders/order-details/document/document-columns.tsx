@@ -1,5 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import DownloadInvoice from "./download-invoice";
+import { CheckOutMain } from "@/types/checkout";
 
 // Kiểu dữ liệu cho mỗi row
 export type DocumentRow = {
@@ -11,12 +12,14 @@ export type DocumentRow = {
 };
 
 interface DocumentColumnsProps {
+  order?: CheckOutMain;
   invoicePdfFile?: string | null;
   invoicePdfFile2?: string | null;
   mainCheckoutId?: string;
 }
 
 export const documentColumns = ({
+  order,
   invoicePdfFile,
   invoicePdfFile2,
   mainCheckoutId,
@@ -44,6 +47,7 @@ export const documentColumns = ({
         <DownloadInvoice
           checkoutId={row.original.checkOutId ?? ""}
           type={row.original.viewType ?? ""}
+          order={order}
           invoicePdfFile={invoicePdfFile}
           invoicePdfFile2={invoicePdfFile2}
           mainCheckoutId={mainCheckoutId ?? row.original.checkOutId}

@@ -25,6 +25,7 @@ export const ManualOrderItemSchema = z.object({
   final_price: z
     .number()
     .nonnegative({ message: "Final price must be positive" }),
+  bader_id: z.string().optional().nullable(),
   carrier: z.string(),
 });
 
