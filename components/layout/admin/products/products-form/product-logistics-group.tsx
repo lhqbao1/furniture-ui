@@ -60,40 +60,24 @@ const normalizePackage = (value: unknown): PackageValue => {
   };
 };
 
-const hasPositivePackageValue = (pkg: PackageValue) =>
-  (pkg.length ?? 0) > 0 &&
-  (pkg.width ?? 0) > 0 &&
-  (pkg.height ?? 0) > 0 &&
-  (pkg.weight ?? 0) > 0;
-
-const pickPreferredPackage = (packages: unknown): PackageValue | null => {
+const pickFirstPackageDimension = (packages: unknown): PackageValue | null => {
   if (!Array.isArray(packages) || packages.length === 0) return null;
 
-  const normalizedPackages = packages.map((item) => normalizePackage(item));
-  const firstValidWithPositiveValue = normalizedPackages.find((pkg) =>
-    isValidPackage(pkg) && hasPositivePackageValue(pkg),
-  );
-  if (firstValidWithPositiveValue) return firstValidWithPositiveValue;
-
-  return normalizedPackages.find((pkg) => isValidPackage(pkg)) ?? null;
+  return normalizePackage(packages[0]);
 };
 
 const getBundleMappedPackage = (bundle: unknown): PackageValue => {
   const bundleSource = (bundle ?? {}) as Record<string, unknown>;
   const bundleItem = (bundleSource.bundle_item ?? {}) as Record<string, unknown>;
 
-  const packageFromBundleItem = pickPreferredPackage(bundleItem.packages);
+  const packageFromBundleItem = pickFirstPackageDimension(bundleItem.packages);
   if (packageFromBundleItem) return packageFromBundleItem;
 
-  const packageFromBundle = pickPreferredPackage(bundleSource.packages);
+  const packageFromBundle = pickFirstPackageDimension(bundleSource.packages);
   if (packageFromBundle) return packageFromBundle;
 
-  return normalizePackage({
-    length: bundleSource.length ?? bundleItem.length,
-    width: bundleSource.width ?? bundleItem.width,
-    height: bundleSource.height ?? bundleItem.height,
-    weight: bundleSource.weight ?? bundleItem.weight,
-  });
+  // Fallback for bundle rows already flattened in form state.
+  return normalizePackage(bundleSource);
 };
 
 const ProductLogisticsGroup = ({

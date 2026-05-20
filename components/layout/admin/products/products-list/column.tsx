@@ -133,6 +133,20 @@ type IncomingDisplayItem = {
   date: Date;
 };
 
+const getInventoryPosFromAnyProduct = (
+  productLike:
+    | (Partial<ProductItem> & {
+        inventory_po?: ProductItem["inventory_pos"] | null;
+        inventories_po?: ProductItem["inventory_pos"] | null;
+      })
+    | null
+    | undefined,
+) =>
+  productLike?.inventory_pos ??
+  productLike?.inventories_po ??
+  productLike?.inventory_po ??
+  [];
+
 const getIncomingDisplayItems = (
   product: ProductItem,
 ): IncomingDisplayItem[] => {
@@ -167,10 +181,14 @@ const getIncomingDisplayItems = (
       .map((bundle) => {
         const quantityPerBundle = Number(bundle?.quantity ?? 0);
         if (quantityPerBundle <= 0 || !bundle?.bundle_item) return null;
+        const currentStockUnits = Math.max(
+          0,
+          calculateAvailableStock(bundle.bundle_item),
+        );
 
         const incomingByDate = new Map<number, number>();
         for (const entry of buildFutureIncomingRows(
-          bundle.bundle_item.inventory_pos,
+          getInventoryPosFromAnyProduct(bundle.bundle_item),
         )) {
           const timestamp = entry.date.getTime();
           incomingByDate.set(
@@ -179,7 +197,7 @@ const getIncomingDisplayItems = (
           );
         }
 
-        return { quantityPerBundle, incomingByDate };
+        return { quantityPerBundle, incomingByDate, currentStockUnits };
       })
       .filter(
         (
@@ -187,6 +205,7 @@ const getIncomingDisplayItems = (
         ): state is {
           quantityPerBundle: number;
           incomingByDate: Map<number, number>;
+          currentStockUnits: number;
         } => state !== null,
       );
 
@@ -202,8 +221,17 @@ const getIncomingDisplayItems = (
 
     if (allDates.length === 0) return [];
 
-    const cumulativeByBundle = bundleStates.map(() => 0);
-    let previousParentTotal = 0;
+    const cumulativeByBundle = bundleStates.map(
+      (state) => state.currentStockUnits,
+    );
+    let previousParentTotal = Math.max(
+      0,
+      Math.min(
+        ...bundleStates.map((state, index) =>
+          Math.floor(cumulativeByBundle[index] / state.quantityPerBundle),
+        ),
+      ),
+    );
     const bundleRows: IncomingDisplayItem[] = [];
     const parentKey = String(product.id ?? product.id_provider ?? "product");
 
@@ -236,7 +264,7 @@ const getIncomingDisplayItems = (
     return bundleRows;
   }
 
-  return buildFutureIncomingRows(product.inventory_pos);
+  return buildFutureIncomingRows(getInventoryPosFromAnyProduct(product));
 };
 
 function EditableNameCell({ product }: { product: ProductItem }) {

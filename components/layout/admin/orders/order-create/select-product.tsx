@@ -27,6 +27,7 @@ interface SelectedProduct {
   product: ProductItem;
   quantity: number;
   final_price: number;
+  bader_id?: string | null;
   carrier: string;
 }
 
@@ -42,10 +43,13 @@ const SelectOrderItems = ({
   const form = useFormContext();
   const { setValue } = form;
   const priceMode = form.watch("price_mode") ?? "gross";
+  const fromMarketplace = String(form.watch("from_marketplace") ?? "").toLowerCase();
   const countryCode = getCountryCode(form.watch("country"));
   const taxId = form.watch("tax_id") ?? null;
   const effectiveTaxIdForVat =
     countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;
+  const shouldShowBaderId =
+    fromMarketplace === "bader" && listProducts.length >= 2;
 
   const [queryParams, setQueryParams] = useState("");
   const [open, setOpen] = useState(false);
@@ -81,6 +85,7 @@ const SelectOrderItems = ({
           product,
           quantity: 1,
           final_price: roundPrice(Number(product.final_price) || 0),
+          bader_id: null,
           carrier: product.carrier,
         },
       ];
@@ -105,6 +110,14 @@ const SelectOrderItems = ({
     );
   };
 
+  const handleBaderIdChange = (id: string, value: string) => {
+    setListProducts((prev) =>
+      prev.map((item) =>
+        item.product.id === id ? { ...item, bader_id: value } : item,
+      ),
+    );
+  };
+
   const handleRemoveProduct = (id: string) => {
     setListProducts((prev) => prev.filter((p) => p.product.id !== id));
   };
@@ -124,16 +137,19 @@ const SelectOrderItems = ({
 
   // 🔹 Auto update form.items khi listProducts thay đổi
   useEffect(() => {
+    const shouldSendBaderId =
+      fromMarketplace === "bader" && listProducts.length >= 2;
     const items = listProducts.map((item) => ({
       id_provider: item.product.id_provider,
       quantity: item.quantity,
       title: item.product.name,
       sku: item.product.sku ?? "",
       final_price: roundPrice(item.final_price),
+      bader_id: shouldSendBaderId ? (item.bader_id?.trim() ?? null) : null,
       carrier: item.carrier,
     }));
     setValue("items", items);
-  }, [listProducts, setValue]);
+  }, [fromMarketplace, listProducts, setValue]);
 
   return (
     <div className="space-y-6">
@@ -212,14 +228,19 @@ const SelectOrderItems = ({
       {/* Danh sách sản phẩm đã chọn */}
       {listProducts.length > 0 && (
         <div className="space-y-3">
-          <div className="grid grid-cols-6 gap-3 text-sm font-medium text-muted-foreground">
-            <div className="col-span-3">Product</div>
+          <div
+            className={`grid ${shouldShowBaderId ? "grid-cols-7" : "grid-cols-6"} gap-3 text-sm font-medium text-muted-foreground`}
+          >
+            <div className={shouldShowBaderId ? "col-span-2" : "col-span-3"}>
+              Product
+            </div>
             <div>Quantity</div>
             <div>Price (€)</div>
+            {shouldShowBaderId && <div>Bader ID</div>}
             <div></div>
           </div>
 
-          {listProducts.map(({ product, quantity, final_price }) => {
+          {listProducts.map(({ product, quantity, final_price, bader_id }) => {
             const grossPreview =
               priceMode === "net"
                 ? calculateProductVATFromNet(
@@ -233,9 +254,11 @@ const SelectOrderItems = ({
             return (
               <div
                 key={product.id}
-                className="grid grid-cols-6 gap-3 items-center border rounded-md p-2"
+                className={`grid ${shouldShowBaderId ? "grid-cols-7" : "grid-cols-6"} gap-3 items-center border rounded-md p-2`}
               >
-                <div className="flex items-center gap-3 col-span-3">
+                <div
+                  className={`flex items-center gap-3 ${shouldShowBaderId ? "col-span-2" : "col-span-3"}`}
+                >
                   <Image
                     src={
                       product.static_files?.[0]?.url ?? "/product-placeholder.png"
@@ -280,6 +303,17 @@ const SelectOrderItems = ({
                     </p>
                   )}
                 </div>
+
+                {shouldShowBaderId && (
+                  <Input
+                    type="text"
+                    placeholder="Bader ID"
+                    value={bader_id ?? ""}
+                    onChange={(e) =>
+                      handleBaderIdChange(product.id, e.target.value)
+                    }
+                  />
+                )}
 
                 <Button
                   variant="ghost"
