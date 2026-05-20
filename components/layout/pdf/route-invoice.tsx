@@ -156,17 +156,32 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
       return checkoutItem.cart?.items ?? [];
     });
 
-  const primaryCheckout = checkout?.checkouts?.[0];
+  const primaryCheckout =
+    checkout?.checkouts?.[0] ?? invoice?.main_checkout?.checkouts?.[0];
   const useShippingAddressForInvoice =
-    (checkout?.from_marketplace ?? "").toLowerCase() === "ebay";
+    (checkout?.from_marketplace ?? invoice?.main_checkout?.from_marketplace ?? "")
+      .toLowerCase() === "ebay";
   const addressForInvoice = useShippingAddressForInvoice
     ? (primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address)
     : primaryCheckout?.invoice_address;
-  const checkoutCountryCode =
-    checkout?.checkouts?.[0]?.shipping_address?.country ??
-    checkout?.checkouts?.[0]?.invoice_address?.country ??
-    "DE";
-  const checkoutTaxId = invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id;
+  const shippingCountryCode =
+    primaryCheckout?.shipping_address?.country?.trim() ?? "";
+  const invoiceCountryCode =
+    primaryCheckout?.invoice_address?.country?.trim() ?? "";
+  const companyName = primaryCheckout?.user?.company_name?.trim() ?? "";
+  const invoiceRecipientName =
+    primaryCheckout?.invoice_address?.recipient_name?.trim() ?? "";
+  const taxIdFromOrder = primaryCheckout?.user?.tax_id?.trim() ?? "";
+  const taxIdFromInvoice =
+    invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id?.trim() ?? "";
+  const checkoutTaxId = taxIdFromOrder || taxIdFromInvoice;
+  const shouldUseInvoiceAddressForVat =
+    Boolean(companyName || invoiceRecipientName) &&
+    Boolean(checkoutTaxId) &&
+    Boolean(invoiceCountryCode);
+  const checkoutCountryCode = shouldUseInvoiceAddressForVat
+    ? invoiceCountryCode
+    : shippingCountryCode || invoiceCountryCode || "DE";
   const paymentTermDays = Number(invoice?.payment_term);
   const resolvedPaymentTermDays =
     Number.isFinite(paymentTermDays) && paymentTermDays > 0

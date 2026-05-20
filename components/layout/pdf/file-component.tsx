@@ -71,6 +71,30 @@ export default function InvoiceTable({
     );
   }, [invoice]);
 
+  const primaryCheckout = checkout?.checkouts?.[0];
+  const vatCalculationContext = useMemo(() => {
+    const shippingCountryCode =
+      primaryCheckout?.shipping_address?.country?.trim() ?? "";
+    const invoiceCountryCode =
+      primaryCheckout?.invoice_address?.country?.trim() ?? "";
+    const companyName = primaryCheckout?.user?.company_name?.trim() ?? "";
+    const invoiceRecipientName =
+      primaryCheckout?.invoice_address?.recipient_name?.trim() ?? "";
+    const taxId = primaryCheckout?.user?.tax_id?.trim() ?? "";
+
+    const shouldUseInvoiceAddressForVat =
+      Boolean(companyName || invoiceRecipientName) &&
+      Boolean(taxId) &&
+      Boolean(invoiceCountryCode);
+
+    return {
+      countryCode: shouldUseInvoiceAddressForVat
+        ? invoiceCountryCode
+        : shippingCountryCode || invoiceCountryCode || "DE",
+      taxId,
+    };
+  }, [primaryCheckout]);
+
   return (
     <div
       id="invoice-table"
@@ -157,9 +181,8 @@ export default function InvoiceTable({
         <FileTable
           columns={createInvoiceColumns({
             tax: checkout?.tax ?? "",
-            country_code:
-              invoice?.main_checkout.checkouts[0].shipping_address.country,
-            tax_id: invoice?.main_checkout.checkouts[0].user.tax_id,
+            country_code: vatCalculationContext.countryCode,
+            tax_id: vatCalculationContext.taxId,
           })}
           data={flattenedCartItems}
           voucher={invoice?.voucher_amount}
@@ -210,8 +233,8 @@ export default function InvoiceTable({
                 .flatMap((c) => c.cart)
                 .flatMap((c) => c.items) ?? [],
               invoice?.voucher_amount,
-              invoice?.main_checkout.checkouts[0].shipping_address.country,
-              invoice?.main_checkout.checkouts[0].user.tax_id,
+              vatCalculationContext.countryCode,
+              vatCalculationContext.taxId,
               checkout?.total_shipping,
             ).totalVat.toLocaleString("de-DE", {
               minimumFractionDigits: 2,
