@@ -194,17 +194,39 @@ export const InvoicePDF = ({
     [refundProducts],
   );
 
-  const primaryCheckout = checkout?.checkouts?.[0];
+  const primaryCheckout =
+    checkout?.checkouts?.[0] ?? invoice?.main_checkout?.checkouts?.[0];
   const useShippingAddressForInvoice =
-    (checkout?.from_marketplace ?? "").toLowerCase() === "ebay";
+    (checkout?.from_marketplace ?? invoice?.main_checkout?.from_marketplace ?? "")
+      .toLowerCase() === "ebay";
   const addressForInvoice = useShippingAddressForInvoice
     ? (primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address)
     : primaryCheckout?.invoice_address;
-  const checkoutCountryCode =
-    checkout?.checkouts?.[0]?.shipping_address?.country ??
-    checkout?.checkouts?.[0]?.invoice_address?.country ??
-    "DE";
-  const checkoutTaxId = invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id;
+  const vatCalculationContext = useMemo(() => {
+    const shippingCountryCode =
+      primaryCheckout?.shipping_address?.country?.trim() ?? "";
+    const invoiceCountryCode =
+      primaryCheckout?.invoice_address?.country?.trim() ?? "";
+    const companyName = primaryCheckout?.user?.company_name?.trim() ?? "";
+    const invoiceRecipientName =
+      primaryCheckout?.invoice_address?.recipient_name?.trim() ?? "";
+    const taxIdFromOrder = primaryCheckout?.user?.tax_id?.trim() ?? "";
+    const taxIdFromInvoice =
+      invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id?.trim() ?? "";
+    const taxId = taxIdFromOrder || taxIdFromInvoice;
+
+    const shouldUseInvoiceAddressForVat =
+      Boolean(companyName || invoiceRecipientName) &&
+      Boolean(taxId) &&
+      Boolean(invoiceCountryCode);
+
+    return {
+      countryCode: shouldUseInvoiceAddressForVat
+        ? invoiceCountryCode
+        : shippingCountryCode || invoiceCountryCode || "DE",
+      taxId,
+    };
+  }, [invoice?.main_checkout?.checkouts, primaryCheckout]);
   const paymentTermDays = Number(invoice?.payment_term);
   const resolvedPaymentTermDays =
     Number.isFinite(paymentTermDays) && paymentTermDays > 0
@@ -298,8 +320,8 @@ export const InvoicePDF = ({
         calculateProductVAT(
           matchedOrderItem?.final_price ?? matchedOrderItem?.item_price ?? 0,
           orderItemTax,
-          checkoutCountryCode,
-          checkoutTaxId,
+          vatCalculationContext.countryCode,
+          vatCalculationContext.taxId,
         )?.vatRate,
       );
 
@@ -352,11 +374,11 @@ export const InvoicePDF = ({
     };
   }, [
     checkout?.refund_amount,
-    checkoutCountryCode,
-    checkoutTaxId,
     flattenedCartItems,
     invoice?.main_checkout?.refund_amount,
     normalizedRefundProducts,
+    vatCalculationContext.countryCode,
+    vatCalculationContext.taxId,
   ]);
 
   const orderTaxSummary = useMemo(
@@ -364,16 +386,16 @@ export const InvoicePDF = ({
       calculateDisplayOrderTaxSummary(
         flattenedCartItems,
         invoice?.voucher_amount,
-        checkoutCountryCode,
-        checkoutTaxId,
+        vatCalculationContext.countryCode,
+        vatCalculationContext.taxId,
         checkout?.total_shipping,
       ),
     [
       checkout?.total_shipping,
-      checkoutCountryCode,
-      checkoutTaxId,
       flattenedCartItems,
       invoice?.voucher_amount,
+      vatCalculationContext.countryCode,
+      vatCalculationContext.taxId,
     ],
   );
 
@@ -708,10 +730,10 @@ export const InvoicePDF = ({
             flattenedCartItems.map((item, index) => {
               const { quantity, unitNet, vatRate, lineNet } =
                 calculateCartItemDisplayPricing(
-                  item,
-                  checkoutCountryCode,
-                  checkoutTaxId,
-                );
+                item,
+                vatCalculationContext.countryCode,
+                vatCalculationContext.taxId,
+              );
               const vatPercent = vatRate * 100;
 
               return (

@@ -151,36 +151,49 @@ const OrderDetails = () => {
     return extractCartItemsFromMain(order);
   }, [order]);
 
-  const checkoutCountryCode = useMemo(
-    () =>
-      order?.checkouts?.[0]?.shipping_address?.country ??
-      order?.checkouts?.[0]?.invoice_address?.country ??
-      "DE",
-    [order],
-  );
-  const checkoutTaxId = useMemo(
-    () =>
-      order?.checkouts?.[0]?.user?.tax_id ??
-      invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id ??
-      "",
-    [invoice?.main_checkout?.checkouts, order],
-  );
+  const primaryCheckout = useMemo(() => order?.checkouts?.[0], [order]);
+  const vatCalculationContext = useMemo(() => {
+    const shippingCountryCode =
+      primaryCheckout?.shipping_address?.country?.trim() ?? "";
+    const invoiceCountryCode =
+      primaryCheckout?.invoice_address?.country?.trim() ?? "";
+    const companyName = primaryCheckout?.user?.company_name?.trim() ?? "";
+    const invoiceRecipientName =
+      primaryCheckout?.invoice_address?.recipient_name?.trim() ?? "";
+    const taxIdFromOrder = primaryCheckout?.user?.tax_id?.trim() ?? "";
+    const taxIdFromInvoice =
+      invoice?.main_checkout?.checkouts?.[0]?.user?.tax_id?.trim() ?? "";
+    const taxId = taxIdFromOrder || taxIdFromInvoice;
+
+    // For company orders with VAT ID, tax must follow invoice address.
+    const shouldUseInvoiceAddressForVat =
+      Boolean(companyName || invoiceRecipientName) &&
+      Boolean(taxId) &&
+      Boolean(invoiceCountryCode);
+
+    return {
+      countryCode: shouldUseInvoiceAddressForVat
+        ? invoiceCountryCode
+        : shippingCountryCode || invoiceCountryCode || "DE",
+      taxId,
+    };
+  }, [invoice?.main_checkout?.checkouts, primaryCheckout]);
   const orderTaxSummary = useMemo(
     () =>
       calculateDisplayOrderTaxSummary(
         cartItems,
         Number(invoice?.voucher_amount ?? order?.voucher_amount ?? 0),
-        checkoutCountryCode,
-        checkoutTaxId,
+        vatCalculationContext.countryCode,
+        vatCalculationContext.taxId,
         Number(order?.total_shipping ?? 0),
       ),
     [
       cartItems,
-      checkoutCountryCode,
-      checkoutTaxId,
       invoice?.voucher_amount,
       order?.total_shipping,
       order?.voucher_amount,
+      vatCalculationContext.countryCode,
+      vatCalculationContext.taxId,
     ],
   );
   const orderVatRows = useMemo(() => {
@@ -551,9 +564,9 @@ const OrderDetails = () => {
           />
           <div className="lg:col-span-2 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <OrderDetailUser
-              user={order.checkouts[0].user}
-              shippingAddress={order.checkouts[0].shipping_address}
-              invoiceAddress={order.checkouts[0].invoice_address}
+              user={primaryCheckout?.user}
+              shippingAddress={primaryCheckout?.shipping_address}
+              invoiceAddress={primaryCheckout?.invoice_address}
             />
           </div>
         </div>
@@ -568,8 +581,8 @@ const OrderDetails = () => {
         <ProductTable
           data={cartItems}
           columns={getOrderDetailColumns({
-            country_code: checkoutCountryCode,
-            tax_id: checkoutTaxId,
+            country_code: vatCalculationContext.countryCode,
+            tax_id: vatCalculationContext.taxId,
           })}
           page={page}
           setPage={setPage}

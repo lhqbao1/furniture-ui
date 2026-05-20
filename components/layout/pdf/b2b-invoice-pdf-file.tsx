@@ -222,6 +222,9 @@ export const B2BInvoicePDFFile = ({
 }: B2BInvoicePDFFileProps) => {
   const selectedMarketplace =
     orders?.[0]?.from_marketplace?.toLowerCase() ?? "";
+  const isBaderChannel = selectedMarketplace === "bader";
+  const refColumnWidth = isBaderChannel ? "15%" : "12%";
+  const productNameColumnWidth = isBaderChannel ? "34%" : "37%";
   const marketplacePreset = PRESET_BY_MARKETPLACE[selectedMarketplace] ?? null;
   const invoiceCountry =
     (
@@ -255,65 +258,93 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     ? paymentNote
     : defaultPaymentText;
   const paymentLines = resolvedPaymentNote.replace(/\r\n/g, "\n").split("\n");
-  const displayRows = orders.map((order, index) => {
-    const orderItems = (order.checkouts ?? []).flatMap((checkout) => {
-      if (Array.isArray(checkout.cart)) {
-        return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
-      }
-      return checkout.cart?.items ?? [];
-    });
-    const firstItem = orderItems[0];
-    const quantity =
-      orderItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) ||
-      1;
-    const unitGross =
-      Number(
-        firstItem?.item_price ??
-          firstItem?.purchased_products?.final_price ??
-          firstItem?.products?.final_price ??
-          firstItem?.final_price ??
-          0,
-      ) || 0;
-    const rowGross = unitGross * quantity;
-    const shippingGross = Number(order.total_shipping) || 0;
-    const taxValue =
-      firstItem?.purchased_products?.tax ?? firstItem?.products?.tax ?? null;
-    const unitVatCalculation = calculateProductVAT(
-      unitGross,
-      taxValue,
-      invoiceCountry,
-      invoiceTaxId,
-    );
-    const shippingVatCalculation = calculateProductVAT(
-      shippingGross,
-      taxValue,
-      invoiceCountry,
-      invoiceTaxId,
-    );
-    const unitNet = Number(unitVatCalculation.net) || 0;
-    const rowNet = unitNet * quantity;
-    const shippingNet = Number(shippingVatCalculation.net) || 0;
-    const vatRate = Number(unitVatCalculation.vatRate) || 0;
-    const rowVat = +(rowGross + shippingGross - (rowNet + shippingNet)).toFixed(
-      2,
-    );
+  const displayRows = orders
+    .flatMap((order) => {
+      const firstCheckout = order.checkouts?.[0];
+      const firstCheckoutItems = Array.isArray(firstCheckout?.cart)
+        ? firstCheckout.cart.flatMap((cartItem) => cartItem.items ?? [])
+        : (firstCheckout?.cart?.items ?? []);
 
-    return {
-      order,
+      if (firstCheckoutItems.length === 0) {
+        return [
+          {
+            rowKey: `${order.id}-empty`,
+            order,
+            quantity: 1,
+            unitNet: 0,
+            rowNet: 0,
+            shippingNet: Number(order.total_shipping) || 0,
+            shippingGross: Number(order.total_shipping) || 0,
+            rowTotalGross: Number(order.total_shipping) || 0,
+            vatRate: 0,
+            rowVat: 0,
+            tax: "-",
+            productName: "-",
+          },
+        ];
+      }
+
+      const orderShippingGross = Number(order.total_shipping) || 0;
+
+      return firstCheckoutItems.map((item, itemIndex) => {
+        const quantity = Number(item?.quantity) || 1;
+        const unitGross =
+          Number(
+            item?.item_price ??
+              item?.purchased_products?.final_price ??
+              item?.products?.final_price ??
+              item?.final_price ??
+              0,
+          ) || 0;
+        const rowGross = unitGross * quantity;
+        const shippingGross = itemIndex === 0 ? orderShippingGross : 0;
+        const taxValue =
+          item?.purchased_products?.tax ?? item?.products?.tax ?? null;
+
+        const unitVatCalculation = calculateProductVAT(
+          unitGross,
+          taxValue,
+          invoiceCountry,
+          invoiceTaxId,
+        );
+        const shippingVatCalculation = calculateProductVAT(
+          shippingGross,
+          taxValue,
+          invoiceCountry,
+          invoiceTaxId,
+        );
+
+        const unitNet = Number(unitVatCalculation.net) || 0;
+        const rowNet = unitNet * quantity;
+        const shippingNet = Number(shippingVatCalculation.net) || 0;
+        const vatRate = Number(unitVatCalculation.vatRate) || 0;
+        const rowVat = +(
+          rowGross +
+          shippingGross -
+          (rowNet + shippingNet)
+        ).toFixed(2);
+
+        return {
+          rowKey: `${order.id}-${item?.id ?? itemIndex}`,
+          order,
+          quantity,
+          unitNet,
+          rowNet,
+          shippingNet,
+          shippingGross,
+          rowTotalGross: rowGross + shippingGross,
+          vatRate,
+          rowVat,
+          tax: formatTaxPercent(taxValue),
+          productName:
+            item?.purchased_products?.name ?? item?.products?.name ?? "-",
+        };
+      });
+    })
+    .map((row, index) => ({
+      ...row,
       index,
-      quantity,
-      unitNet,
-      rowNet,
-      shippingNet,
-      shippingGross,
-      rowTotalGross: rowGross + shippingGross,
-      vatRate,
-      rowVat,
-      tax: formatTaxPercent(taxValue),
-      productName:
-        firstItem?.purchased_products?.name ?? firstItem?.products?.name ?? "-",
-    };
-  });
+    }));
 
   const displayGrossTotal = displayRows.reduce(
     (sum, row) => sum + row.rowTotalGross,
@@ -546,8 +577,12 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
             <Text style={{ width: "7%", textAlign: "center", fontSize: 8 }}>
               Pos.
             </Text>
-            <Text style={{ width: "12%", fontSize: 8 }}>Ref.-Nr .</Text>
-            <Text style={{ width: "37%", fontSize: 8 }}>Produktname</Text>
+            <Text style={{ width: refColumnWidth, fontSize: 8 }}>
+              Ref.-Nr .
+            </Text>
+            <Text style={{ width: productNameColumnWidth, fontSize: 8 }}>
+              Produktname
+            </Text>
             <Text style={{ width: "8%", textAlign: "center", fontSize: 8 }}>
               Menge
             </Text>
@@ -568,7 +603,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
           {displayRows.map((row) => {
             return (
               <View
-                key={row.order.id}
+                key={row.rowKey}
                 wrap={false}
                 style={{
                   display: "flex",
@@ -581,12 +616,12 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 <Text style={{ width: "7%", textAlign: "center", fontSize: 8 }}>
                   {row.index + 1}
                 </Text>
-                <Text style={{ width: "12%", fontSize: 8 }}>
+                <Text style={{ width: refColumnWidth, fontSize: 8 }}>
                   {row.order.marketplace_order_id ||
                     row.order.checkout_code ||
                     row.order.id}
                 </Text>
-                <Text style={{ width: "37%", fontSize: 8 }}>
+                <Text style={{ width: productNameColumnWidth, fontSize: 8 }}>
                   {truncateText(String(row.productName), 70)}
                 </Text>
                 <Text style={{ width: "8%", textAlign: "center", fontSize: 8 }}>

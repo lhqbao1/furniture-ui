@@ -1,4 +1,8 @@
-import { getProductBySlug, getProductsFeed } from "@/features/products/api";
+import {
+  getProductByIdProvider,
+  getProductBySlug,
+  getProductsFeed,
+} from "@/features/products/api";
 import {
   getAllProductsSelect,
   getProductGroupDetail,
@@ -14,7 +18,7 @@ import { ProductDetailsTab } from "@/components/layout/single-product/product-ta
 import RelatedCategoryProducts from "@/components/layout/single-product/related-category";
 
 import { getReviewByProduct } from "@/features/review/api";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { ProductGridSkeleton } from "@/components/shared/product-grid-skeleton";
 import { getBlogsByProductSlug } from "@/features/blog/api";
@@ -42,6 +46,83 @@ export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string[]; locale: string }>;
+}
+
+function extractLegacyIdProviderFromSlug(slug: string): string | null {
+  const normalizedSlug = slug.trim().toLowerCase();
+  const match = normalizedSlug.match(/-(\d+)$/);
+  return match?.[1] ?? null;
+}
+
+function resolveProductUrlKey(product: ProductItem): string {
+  const urlKey = product.url_key?.trim();
+  if (urlKey) return urlKey;
+
+  const rawUrl = (
+    product as ProductItem & {
+      url?: string | null;
+    }
+  ).url;
+
+  if (!rawUrl) return "";
+
+  const withoutQuery = rawUrl.split("?")[0]?.trim() ?? "";
+  if (!withoutQuery) return "";
+
+  const segments = withoutQuery.split("/").filter(Boolean);
+  return segments.at(-1)?.trim() ?? "";
+}
+
+async function resolveProductBySlugWithLegacyFallback(slug: string): Promise<{
+  product: ProductItem | null;
+  redirectUrlKey: string | null;
+}> {
+  const productBySlug = await getProductBySlug(slug);
+  if (productBySlug) {
+    return {
+      product: productBySlug,
+      redirectUrlKey: null,
+    };
+  }
+
+  const legacyIdProvider = extractLegacyIdProviderFromSlug(slug);
+  if (!legacyIdProvider) {
+    return {
+      product: null,
+      redirectUrlKey: null,
+    };
+  }
+
+  let productByIdProvider: ProductItem | null = null;
+  try {
+    productByIdProvider = await getProductByIdProvider(legacyIdProvider);
+  } catch (error: unknown) {
+    const status = (error as { response?: { status?: number } })?.response
+      ?.status;
+
+    if (status === 404) {
+      return {
+        product: null,
+        redirectUrlKey: null,
+      };
+    }
+
+    throw error;
+  }
+
+  if (!productByIdProvider || productByIdProvider.is_active !== true) {
+    return {
+      product: null,
+      redirectUrlKey: null,
+    };
+  }
+
+  const redirectUrlKey = resolveProductUrlKey(productByIdProvider);
+
+  return {
+    product: productByIdProvider,
+    redirectUrlKey: redirectUrlKey && redirectUrlKey !== slug ? redirectUrlKey : null,
+  };
 }
 
 function isPublishableProduct(product?: Partial<ProductItem> | null) {
@@ -124,16 +205,17 @@ export async function generateMetadata({
 
   if (!lastSlug) return {};
 
-  let product = null;
+  let product: ProductItem | null = null;
 
   try {
-    product = await getProductBySlug(lastSlug);
+    const resolved = await resolveProductBySlugWithLegacyFallback(lastSlug);
+    product = resolved.product;
   } catch (err) {
     console.error("❌ getProductBySlug failed in metadata:", err);
     return {};
   }
 
-  if (!product) return notFound();
+  if (!product) return {};
 
   // SAFE JSON
   product = JSON.parse(JSON.stringify(product));
@@ -210,9 +292,9 @@ function getGtinField(ean?: string | null): Record<string, string> | null {
 export default async function Page({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<{ slug: string[]; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const lastSlug = Array.isArray(slug) ? slug.at(-1) : slug;
 
   if (!lastSlug) return notFound();
@@ -221,12 +303,19 @@ export default async function Page({
    * 1) GET PRODUCT (wrapped in try/catch to prevent 502 crash)
    * --------------------------------------------------*/
   let product: ProductItem | null = null;
+  let redirectUrlKey: string | null = null;
 
   try {
-    product = await getProductBySlug(lastSlug);
+    const resolved = await resolveProductBySlugWithLegacyFallback(lastSlug);
+    product = resolved.product;
+    redirectUrlKey = resolved.redirectUrlKey;
   } catch (err) {
     console.error("❌ getProductBySlug failed:", err);
     return notFound();
+  }
+
+  if (redirectUrlKey) {
+    permanentRedirect(`/${locale}/product/${redirectUrlKey}`);
   }
 
   if (!product) return notFound();
