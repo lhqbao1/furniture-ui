@@ -776,6 +776,11 @@ export const listChanel = [
     name: "otto",
     icon: "otto.png",
   },
+  {
+    id: 23,
+    name: "docmorris",
+    icon: "docmorris.png",
+  },
 ];
 
 export const listDE = [

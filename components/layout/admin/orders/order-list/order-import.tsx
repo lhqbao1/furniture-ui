@@ -109,6 +109,7 @@ const CHANNEL_OPTIONS = [
   { value: "prestige", label: "Prestige Home" },
   { value: "moebelix", label: "Moebelix" },
   { value: "otto", label: "Otto" },
+  { value: "docmorris", label: "Docmorris" },
 ] as const;
 
 const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
@@ -199,6 +200,14 @@ const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
     invoice_city: "Hamburg",
     invoice_postal_code: "22179",
     invoice_country: "DE",
+  },
+  docmorris: {
+    company_name: "DocMorris N.V.",
+    tax_id: "NL819861303B01",
+    invoice_address: "Avantisallee 152",
+    invoice_city: "Heerlen",
+    invoice_postal_code: "6422 RA",
+    invoice_country: "NL",
   },
   // thêm sau nếu cần:
   praktiker: null,

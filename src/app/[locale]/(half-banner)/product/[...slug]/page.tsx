@@ -405,6 +405,10 @@ export default async function Page({
       .replace(/\s+/g, " ")
       .trim() || plainProduct.name;
 
+  const schemaPrice = Number(plainProduct.final_price);
+  const hasValidSchemaPrice =
+    Number.isFinite(schemaPrice) && schemaPrice > 0;
+
   const productSchema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -416,18 +420,21 @@ export default async function Page({
       "@type": "Brand",
       name: plainProduct.brand?.name ?? "Prestige Home",
     },
-    offers: {
+  };
+
+  if (hasValidSchemaPrice) {
+    productSchema.offers = {
       "@type": "Offer",
       url: `https://www.prestige-home.de/de/product/${plainProduct.url_key}`,
       priceCurrency: "EUR",
-      price: String(plainProduct.final_price),
+      price: Number(schemaPrice.toFixed(2)),
       availability:
         availableStock > 0
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
       priceValidUntil: "2026-12-31",
-    },
-  };
+    };
+  }
 
   const gtinField = getGtinField(plainProduct.ean);
   if (gtinField) {
