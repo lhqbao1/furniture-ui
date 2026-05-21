@@ -52,7 +52,8 @@ const UploadInvoicePdfDialog = ({
   const [file, setFile] = React.useState<File | null>(null);
 
   const isUploading =
-    uploadStaticFileMutation.isPending || uploadCheckoutPdfFileMutation.isPending;
+    uploadStaticFileMutation.isPending ||
+    uploadCheckoutPdfFileMutation.isPending;
   const currentFileCount = existingUrls.filter((url) => url?.trim()).length;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -120,7 +121,7 @@ const UploadInvoicePdfDialog = ({
         });
       }
 
-      toast.success("Package slip PDF uploaded", { id: toastId });
+      toast.success("Pack slip PDF uploaded", { id: toastId });
       setOpen(false);
       resetState();
     } catch (error) {
@@ -152,13 +153,15 @@ const UploadInvoicePdfDialog = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[560px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Upload Package Slip PDF</DialogTitle>
+          <DialogTitle>Upload Pack Slip PDF</DialogTitle>
         </DialogHeader>
 
         <div
           {...getRootProps()}
           className={`mt-2 flex h-44 cursor-pointer items-center justify-center rounded-md border-2 border-dashed px-4 text-center transition ${
-            isDragActive ? "border-primary bg-primary/10" : "border-muted-foreground/30"
+            isDragActive
+              ? "border-primary bg-primary/10"
+              : "border-muted-foreground/30"
           }`}
         >
           <input {...getInputProps()} />
@@ -176,7 +179,11 @@ const UploadInvoicePdfDialog = ({
 
         <div className="mt-2 flex justify-end">
           <Button type="button" onClick={handleUpload} disabled={isUploading}>
-            {isUploading ? <Loader2 className="size-4 animate-spin" /> : "Upload"}
+            {isUploading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              "Upload"
+            )}
           </Button>
         </div>
       </DialogContent>

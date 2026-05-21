@@ -278,7 +278,7 @@
   "bankInfor": "Bank transfer details",
   "noPolicy": "No policy found",
   "packaging": {
-    "title": "Package Slip",
+    "title": "Pack Slip",
     "subtitle": "Package",
     "packageNumber": "Package #",
     "orderDate": "Order Date #",
