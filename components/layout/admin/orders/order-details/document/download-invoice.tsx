@@ -54,8 +54,7 @@ const DownloadInvoice = ({
   );
   const hasUploadedPackageSlipFile =
     isPackageType && uploadedPackageSlipFiles.length > 0;
-  const needsGeneratedDocument =
-    !hasUploadedPackageSlipFile && !isB2BInvoiceOrder;
+  const needsGeneratedDocument = !isB2BInvoiceOrder;
   const effectiveMainCheckoutId = mainCheckoutId || checkoutId;
   const isDeletingPackageSlip = deleteCheckoutPdfFileMutation.isPending;
   const selectedB2BOrders = React.useMemo(
@@ -196,6 +195,48 @@ const DownloadInvoice = ({
     setOpenB2BDrawer(true);
   };
 
+  const renderPackageSampleDownloadButton = () => {
+    if (!isPackageType) return null;
+
+    if (isCheckoutLoading || isInvoiceLoading || !checkout || !invoice) {
+      return (
+        <Button variant="outline" size="sm" type="button" disabled className="gap-1.5">
+          <Loader2 className="size-4 animate-spin" />
+          Sample package slip
+        </Button>
+      );
+    }
+
+    return (
+      <Button variant="outline" size="sm" type="button" className="gap-1.5">
+        <PDFDownloadLink
+          document={
+            checkout.from_marketplace?.toLowerCase() === "bauhaus" ? (
+              <BauhausReturnSlipPdf checkout={checkout} invoice={invoice} />
+            ) : (
+              <PackageSlipPdf checkout={checkout} invoice={invoice} />
+            )
+          }
+          fileName={defaultGeneratedFileName}
+        >
+          {({ loading }) =>
+            loading ? (
+              <span className="inline-flex items-center gap-1.5">
+                <Loader2 className="size-4 animate-spin" />
+                Generating...
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 cursor-pointer">
+                <DownloadCloud className="size-4" />
+                Sample package slip
+              </span>
+            )
+          }
+        </PDFDownloadLink>
+      </Button>
+    );
+  };
+
   return (
     <div className="flex items-center justify-center gap-2">
       {isPackageType && hasUploadedPackageSlipFile ? (
@@ -231,11 +272,14 @@ const DownloadInvoice = ({
               </Button>
             </div>
           ))}
+          {renderPackageSampleDownloadButton()}
         </div>
       ) : isB2BInvoiceOrder ? (
         <Button variant={"outline"} type="button" onClick={handleOpenB2BInvoiceDrawer}>
           <DownloadCloud />
         </Button>
+      ) : isPackageType ? (
+        renderPackageSampleDownloadButton()
       ) : isCheckoutLoading ||
         isInvoiceLoading ||
         (isRefundInvoiceType && isProductRefundLoading) ||
@@ -246,28 +290,7 @@ const DownloadInvoice = ({
         </Button>
       ) : (
         <Button variant={"outline"} type="button">
-          {type === "package" ? (
-            <PDFDownloadLink
-              document={
-                checkout.from_marketplace?.toLowerCase() === "bauhaus" ? (
-                  <BauhausReturnSlipPdf checkout={checkout} invoice={invoice} />
-                ) : (
-                  <PackageSlipPdf checkout={checkout} invoice={invoice} />
-                )
-              }
-              fileName={defaultGeneratedFileName}
-            >
-              {({ loading }) =>
-                loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <div className="cursor-pointer">
-                    <DownloadCloud />
-                  </div>
-                )
-              }
-            </PDFDownloadLink>
-          ) : isRefundInvoiceType ? (
+          {isRefundInvoiceType ? (
             <PDFDownloadLink
               document={
                 <InvoicePDF
