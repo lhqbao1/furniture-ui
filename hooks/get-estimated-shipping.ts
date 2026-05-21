@@ -2,29 +2,69 @@ import { useMemo } from "react";
 
 /* ---------- helpers ---------- */
 
-export function getLatestInventory(inventory: any[]) {
-  if (!inventory || inventory.length === 0) return null;
+type IncomingInventoryItem = {
+  quantity?: unknown;
+  list_delivery_date?: unknown;
+};
 
+type NormalizedIncomingInventoryItem = {
+  quantity: number;
+  date: Date;
+};
+
+const normalizeFutureIncomingInventory = (
+  inventory: IncomingInventoryItem[],
+): NormalizedIncomingInventoryItem[] => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const futureItems = inventory.filter((item) => {
-    if ((item?.quantity ?? 0) <= 0) return false;
-    if (!item?.list_delivery_date) return false;
-    const date = new Date(item.list_delivery_date);
-    if (Number.isNaN(date.getTime())) return false;
-    date.setHours(0, 0, 0, 0);
-    return date >= today;
+  const normalized = (inventory ?? []).flatMap((item) => {
+    const quantity = Number(item?.quantity ?? 0);
+    if (!Number.isFinite(quantity) || quantity <= 0) return [];
+    if (!item?.list_delivery_date) return [];
+
+    const date = new Date(String(item.list_delivery_date));
+    if (Number.isNaN(date.getTime())) return [];
+
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    if (compareDate < today) return [];
+
+    return [{ quantity, date }];
   });
 
+  return normalized.sort((a, b) => a.date.getTime() - b.date.getTime());
+};
+
+export function getLatestInventory(inventory: IncomingInventoryItem[]) {
+  const futureItems = normalizeFutureIncomingInventory(inventory);
   if (futureItems.length === 0) return null;
 
-  return futureItems.reduce((nearest, item) => {
-    if (!nearest) return item;
-    return new Date(item.list_delivery_date) < new Date(nearest.list_delivery_date)
-      ? item
-      : nearest;
-  }, null);
+  return futureItems[0];
+}
+
+export function getIncomingDateForRequiredQuantity(
+  inventory: IncomingInventoryItem[],
+  requiredQuantity: number,
+): Date | null {
+  const futureItems = normalizeFutureIncomingInventory(inventory);
+  if (futureItems.length === 0) return null;
+
+  if (!Number.isFinite(requiredQuantity) || requiredQuantity <= 0) {
+    return futureItems[0]?.date ?? null;
+  }
+
+  let cumulativeQuantity = 0;
+
+  for (const item of futureItems) {
+    cumulativeQuantity += item.quantity;
+    if (cumulativeQuantity >= requiredQuantity) {
+      return item.date;
+    }
+  }
+
+  // If future incoming is not enough yet, use the latest known incoming date.
+  return futureItems[futureItems.length - 1]?.date ?? null;
 }
 
 export function getDeliveryDayRange(
@@ -84,22 +124,22 @@ export const useDeliveryEstimate = ({
     const deliveryRange = getDeliveryDayRange(deliveryTime);
     if (!deliveryRange) return null;
 
-    const latestInventory = getLatestInventory(inventory ?? []);
+    let startDate: Date | null = null;
 
-    let startDate: Date;
+    if (stock > 0) {
+      startDate = new Date();
+    } else {
+      const requiredIncomingQuantity = Math.abs(stock) + 1;
+      const incomingDate = getIncomingDateForRequiredQuantity(
+        inventory ?? [],
+        requiredIncomingQuantity,
+      );
+      if (incomingDate) {
+        startDate = new Date(incomingDate);
+      }
+    }
 
-    // CASE 1: còn hàng → hôm nay
-    if (stock !== 0) {
-      startDate = new Date();
-    }
-    // CASE 2: hết hàng nhưng có inventory sắp về
-    else if (latestInventory) {
-      startDate = new Date(latestInventory.list_delivery_date);
-    }
-    // CASE 3: hết hàng & không có inventory → vẫn tính (fallback)
-    else {
-      startDate = new Date();
-    }
+    if (!startDate) return null;
 
     return {
       from: addBusinessDays(startDate, deliveryRange.min),
@@ -116,8 +156,6 @@ export function calculateDeliveryEstimate({
   const deliveryRange = getDeliveryDayRange(deliveryTime);
   if (!deliveryRange) return null;
 
-  const latestInventory = getLatestInventory(inventory ?? []);
-
   let startDate: Date | null = null;
 
   // CASE 1: còn hàng
@@ -125,9 +163,17 @@ export function calculateDeliveryEstimate({
     startDate = new Date();
   }
 
-  // CASE 2: hết hàng nhưng có inventory sắp về
-  if (stock === 0 && latestInventory) {
-    startDate = new Date(latestInventory.list_delivery_date);
+  // CASE 2: hết hàng hoặc thiếu stock do result_stock > stock
+  if (stock <= 0) {
+    const requiredIncomingQuantity = Math.abs(stock) + 1;
+    const incomingDate = getIncomingDateForRequiredQuantity(
+      inventory ?? [],
+      requiredIncomingQuantity,
+    );
+
+    if (incomingDate) {
+      startDate = new Date(incomingDate);
+    }
   }
 
   if (!startDate) return null;

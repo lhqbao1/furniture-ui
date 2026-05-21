@@ -2,6 +2,7 @@
 import {
   addBusinessDays,
   getDeliveryDayRange,
+  getIncomingDateForRequiredQuantity,
 } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
 import { ProductItem } from "@/types/products";
@@ -52,6 +53,11 @@ const DeliveryRange = ({
     [productDetails, data],
   );
 
+  const incomingInventorySource = React.useMemo(() => {
+    if (Array.isArray(data) && data.length > 0) return data;
+    return productDetails.inventory_pos ?? [];
+  }, [data, productDetails.inventory_pos]);
+
   const nextIncomingDate = React.useMemo(() => {
     const isBundleProduct = (productDetails.bundles?.length ?? 0) > 0;
 
@@ -59,8 +65,19 @@ const DeliveryRange = ({
       return incomingSummary.latestIncomingDate;
     }
 
-    return incomingSummary.nearestIncomingDate;
-  }, [productDetails.bundles, incomingSummary]);
+    const requiredIncomingQuantity = Math.abs(currentStock) + 1;
+    const incomingDate = getIncomingDateForRequiredQuantity(
+      incomingInventorySource,
+      requiredIncomingQuantity,
+    );
+
+    return incomingDate ?? incomingSummary.nearestIncomingDate;
+  }, [
+    productDetails.bundles,
+    incomingSummary,
+    currentStock,
+    incomingInventorySource,
+  ]);
 
   const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
     const result = new Date(startDate);
