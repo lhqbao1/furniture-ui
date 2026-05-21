@@ -11,6 +11,11 @@ import {
 } from "@react-pdf/renderer";
 import { B2BInvoiceFooter } from "./b2b-invoice-footer";
 import { calculateProductVAT } from "@/lib/caculate-vat";
+import {
+  B2BInvoicePartyInfo,
+  normalizeB2BInvoicePartyInfo,
+  resolveB2BInvoicePartyInfo,
+} from "@/lib/b2b-invoice";
 
 Font.register({
   family: "Figtree",
@@ -24,103 +29,8 @@ interface B2BInvoicePDFFileProps {
   introText: string;
   paymentNote: string;
   orders: CheckOutMain[];
+  invoicePartyInfo?: B2BInvoicePartyInfo;
 }
-
-type MarketplacePreset = {
-  company_name: string;
-  tax_id: string;
-  invoice_address: string;
-  invoice_city: string;
-  invoice_postal_code: string;
-  invoice_country: string;
-};
-
-const PRESET_BY_MARKETPLACE: Record<string, MarketplacePreset | null> = {
-  netto: {
-    company_name: "NeS GmbH",
-    tax_id: "DE811205180",
-    invoice_address: "Industriepark Ponholz 1",
-    invoice_city: "Maxhütte-Haidhof",
-    invoice_postal_code: "93142",
-    invoice_country: "DE",
-  },
-  freakout: {
-    company_name: "FREAK-OUT GmbH",
-    tax_id: "ATU80855139",
-    invoice_address: "Steingasse 6a",
-    invoice_city: "Linz",
-    invoice_postal_code: "4020",
-    invoice_country: "AT",
-  },
-  inprodius: {
-    company_name: "Inprodius Solutions GmbH",
-    tax_id: "DE815533652",
-    invoice_address: "Lange Wende 41-43",
-    invoice_city: "Soest",
-    invoice_postal_code: "59494",
-    invoice_country: "DE",
-  },
-  norma: {
-    company_name: "NORMA24 Online-Shop GmbH & Co.KG",
-    tax_id: "DE281146018",
-    invoice_address: "Manfred-Roth-Straße 7",
-    invoice_city: "Fürth",
-    invoice_postal_code: "90766",
-    invoice_country: "DE",
-  },
-  forstinger: {
-    company_name: "Forstinger eCom GmbH",
-    tax_id: "ATU81672717",
-    invoice_address: "Königstetter Straße 128-134",
-    invoice_city: "Tulln",
-    invoice_postal_code: "3430",
-    invoice_country: "AT",
-  },
-  "euro-tops": {
-    company_name: "Eurotops Versand GmbH",
-    tax_id: "DE121393328",
-    invoice_address: "Elisabeth-Selbert-Str. 3",
-    invoice_city: "Langenfeld",
-    invoice_postal_code: "40764",
-    invoice_country: "DE",
-  },
-  bauhaus: {
-    company_name: "BAHAG Baus Handelsgesellschaft AG",
-    tax_id: "DE143872368",
-    invoice_address: "Gutenbergstr. 21",
-    invoice_city: "Mannheim",
-    invoice_postal_code: "68167",
-    invoice_country: "DE",
-  },
-  bader: {
-    company_name: "BRUNO BADER GmbH + Co. KG",
-    tax_id: "DE 144173081",
-    invoice_address: "Maximilianstr. 48",
-    invoice_city: "Pforzheim",
-    invoice_postal_code: "75172",
-    invoice_country: "DE",
-  },
-  XXXLUTZ: {
-    company_name: "XXXLutz KG",
-    tax_id: "ATU65296645",
-    invoice_address: "Römerstrasse 39",
-    invoice_city: "Wels",
-    invoice_postal_code: "4600",
-    invoice_country: "AT",
-  },
-  otto: {
-    company_name: "Otto GmbH & Co. KGaA",
-    tax_id: "DE340596305",
-    invoice_address: "Werner-Otto-Straße 1-7",
-    invoice_city: "Hamburg",
-    invoice_postal_code: "22179",
-    invoice_country: "DE",
-  },
-  praktiker: null,
-  check24: null,
-  amazon: null,
-  prestige: null,
-};
 const PDF_GRAY_BG = "#D2D2D2";
 const EU_COUNTRIES = new Set([
   "AT",
@@ -212,6 +122,38 @@ const formatTaxPercent = (tax: unknown) => {
   return "-";
 };
 
+const getCheckoutCartItems = (checkout: CheckOutMain["checkouts"][number] | undefined) => {
+  if (!checkout) return [];
+
+  if (Array.isArray(checkout.cart)) {
+    return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
+  }
+
+  return checkout.cart?.items ?? [];
+};
+
+const resolveRefNumber = ({
+  order,
+  item,
+  itemCount,
+}: {
+  order: CheckOutMain;
+  item?: { bader_id?: string | null } | null;
+  itemCount: number;
+}) => {
+  const normalizedChannel = String(order.from_marketplace ?? "")
+    .trim()
+    .toLowerCase();
+  const isBaderWithMultiItems = normalizedChannel === "bader" && itemCount >= 2;
+  const normalizedBaderId = String(item?.bader_id ?? "").trim();
+
+  if (isBaderWithMultiItems && normalizedBaderId) {
+    return normalizedBaderId;
+  }
+
+  return order.marketplace_order_id || order.checkout_code || order.id || "-";
+};
+
 export const B2BInvoicePDFFile = ({
   invoiceId,
   servicePeriod,
@@ -219,18 +161,25 @@ export const B2BInvoicePDFFile = ({
   introText,
   paymentNote,
   orders,
+  invoicePartyInfo,
 }: B2BInvoicePDFFileProps) => {
   const selectedMarketplace =
     orders?.[0]?.from_marketplace?.toLowerCase() ?? "";
   const isBaderChannel = selectedMarketplace === "bader";
   const refColumnWidth = isBaderChannel ? "15%" : "12%";
   const productNameColumnWidth = isBaderChannel ? "34%" : "37%";
-  const marketplacePreset = PRESET_BY_MARKETPLACE[selectedMarketplace] ?? null;
+  const fallbackInvoicePartyInfo = resolveB2BInvoicePartyInfo({
+    marketplace: selectedMarketplace,
+    order: orders?.[0],
+  });
+  const resolvedInvoicePartyInfo = invoicePartyInfo
+    ? normalizeB2BInvoicePartyInfo(invoicePartyInfo)
+    : fallbackInvoicePartyInfo;
   const invoiceCountry =
     (
-      marketplacePreset?.invoice_country ??
-      orders?.[0]?.checkouts?.[0]?.invoice_address?.country ??
-      ""
+      resolvedInvoicePartyInfo.invoice_country ||
+      fallbackInvoicePartyInfo.invoice_country ||
+      "DE"
     )
       .toString()
       .toUpperCase()
@@ -239,7 +188,7 @@ export const B2BInvoicePDFFile = ({
   const isEuInvoice = EU_COUNTRIES.has(invoiceCountry);
   const cleanedOrderNumber = orderNumber?.trim() ?? "";
   const invoiceTaxId =
-    marketplacePreset?.tax_id ?? orders?.[0]?.checkouts?.[0]?.user?.tax_id;
+    resolvedInvoicePartyInfo.tax_id || fallbackInvoicePartyInfo.tax_id || "";
   const titleLine = cleanedOrderNumber
     ? `Rechnung Nr. ${invoiceId} - Ihre Bestellung ${cleanedOrderNumber}`
     : `Rechnung Nr. ${invoiceId}`;
@@ -261,15 +210,18 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
   const displayRows = orders
     .flatMap((order) => {
       const firstCheckout = order.checkouts?.[0];
-      const firstCheckoutItems = Array.isArray(firstCheckout?.cart)
-        ? firstCheckout.cart.flatMap((cartItem) => cartItem.items ?? [])
-        : (firstCheckout?.cart?.items ?? []);
+      const firstCheckoutItems = getCheckoutCartItems(firstCheckout);
 
       if (firstCheckoutItems.length === 0) {
         return [
           {
             rowKey: `${order.id}-empty`,
             order,
+            refNumber: resolveRefNumber({
+              order,
+              item: null,
+              itemCount: 0,
+            }),
             quantity: 1,
             unitNet: 0,
             rowNet: 0,
@@ -318,15 +270,18 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
         const rowNet = unitNet * quantity;
         const shippingNet = Number(shippingVatCalculation.net) || 0;
         const vatRate = Number(unitVatCalculation.vatRate) || 0;
-        const rowVat = +(
-          rowGross +
-          shippingGross -
-          (rowNet + shippingNet)
-        ).toFixed(2);
+        const rowVat = +(rowGross + shippingGross - (rowNet + shippingNet)).toFixed(
+          2,
+        );
 
         return {
           rowKey: `${order.id}-${item?.id ?? itemIndex}`,
           order,
+          refNumber: resolveRefNumber({
+            order,
+            item,
+            itemCount: firstCheckoutItems.length,
+          }),
           quantity,
           unitNet,
           rowNet,
@@ -415,28 +370,16 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
             <Text>
-              {marketplacePreset?.company_name ??
-                orders?.[0]?.checkouts?.[0]?.invoice_address?.recipient_name ??
-                ""}
+              {resolvedInvoicePartyInfo.company_name}
             </Text>
             <Text>
-              {marketplacePreset?.invoice_address ??
-                orders?.[0]?.checkouts?.[0]?.invoice_address?.address_line ??
-                ""}
+              {resolvedInvoicePartyInfo.invoice_address}
             </Text>
             <Text>
-              {marketplacePreset?.invoice_postal_code ??
-                orders?.[0]?.checkouts?.[0]?.invoice_address?.postal_code ??
-                ""}{" "}
-              {marketplacePreset?.invoice_city ??
-                orders?.[0]?.checkouts?.[0]?.invoice_address?.city ??
-                ""}
+              {resolvedInvoicePartyInfo.invoice_postal_code}{" "}
+              {resolvedInvoicePartyInfo.invoice_city}
             </Text>
-            <Text>
-              {marketplacePreset?.tax_id ??
-                orders?.[0]?.checkouts?.[0]?.user?.tax_id ??
-                ""}
-            </Text>
+            <Text>{resolvedInvoicePartyInfo.tax_id}</Text>
           </View>
 
           <View
@@ -617,9 +560,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                   {row.index + 1}
                 </Text>
                 <Text style={{ width: refColumnWidth, fontSize: 8 }}>
-                  {row.order.marketplace_order_id ||
-                    row.order.checkout_code ||
-                    row.order.id}
+                  {row.refNumber}
                 </Text>
                 <Text style={{ width: productNameColumnWidth, fontSize: 8 }}>
                   {truncateText(String(row.productName), 70)}

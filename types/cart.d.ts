@@ -11,6 +11,7 @@ export type CartItem = {
   final_price: number;
   price_whithout_tax: number;
   quantity: number;
+  bader_id: string | null;
   created_at: string;
   updated_at: string;
 };

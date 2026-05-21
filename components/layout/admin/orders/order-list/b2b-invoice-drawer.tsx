@@ -28,6 +28,19 @@ import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { calculateProductVAT } from "@/lib/caculate-vat";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  B2BInvoicePartyInfo,
+  normalizeB2BInvoicePartyInfo,
+  resolveB2BInvoicePartyInfo,
+} from "@/lib/b2b-invoice";
 
 interface B2BInvoiceDrawerProps {
   open: boolean;
@@ -35,6 +48,14 @@ interface B2BInvoiceDrawerProps {
   marketplace: string;
   selectedOrders: CheckOutMain[];
 }
+
+type InvoiceExportFormat = "csv" | "xlsx" | "pdf";
+
+const EXPORT_LABEL_BY_FORMAT: Record<InvoiceExportFormat, string> = {
+  csv: "CSV",
+  xlsx: "XLSX",
+  pdf: "PDF",
+};
 
 const DEFAULT_INVOICE_INTRO = `Sehr geehrte Damen und Herren,
 
@@ -90,6 +111,38 @@ const formatTaxPercent = (tax: unknown) => {
   return "-";
 };
 
+const getCheckoutCartItems = (checkout: CheckOutMain["checkouts"][number] | undefined) => {
+  if (!checkout) return [];
+
+  if (Array.isArray(checkout.cart)) {
+    return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
+  }
+
+  return checkout.cart?.items ?? [];
+};
+
+const resolveRefNumber = ({
+  order,
+  item,
+  itemCount,
+}: {
+  order: CheckOutMain;
+  item?: { bader_id?: string | null } | null;
+  itemCount: number;
+}) => {
+  const normalizedChannel = String(order.from_marketplace ?? "")
+    .trim()
+    .toLowerCase();
+  const isBaderWithMultiItems = normalizedChannel === "bader" && itemCount >= 2;
+  const normalizedBaderId = String(item?.bader_id ?? "").trim();
+
+  if (isBaderWithMultiItems && normalizedBaderId) {
+    return normalizedBaderId;
+  }
+
+  return order.marketplace_order_id || order.checkout_code || order.id || "-";
+};
+
 export default function B2BInvoiceDrawer({
   open,
   onOpenChange,
@@ -113,13 +166,37 @@ export default function B2BInvoiceDrawer({
   const [skontoError, setSkontoError] = useState<string | null>(null);
   const [invoiceIntro, setInvoiceIntro] = useState("");
   const [paymentNote, setPaymentNote] = useState("");
+  const [invoicePartyInfo, setInvoicePartyInfo] = useState<B2BInvoicePartyInfo>(
+    () =>
+      resolveB2BInvoicePartyInfo({
+        marketplace,
+        order: selectedOrders[0],
+      }),
+  );
+  const [isInvoicePartyEdited, setIsInvoicePartyEdited] = useState(false);
+  const [confirmExportFormat, setConfirmExportFormat] =
+    useState<InvoiceExportFormat | null>(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isCreatingInvoice, setIsCreatingInvoice] = useState(false);
   const [isInvoiceIntroEdited, setIsInvoiceIntroEdited] = useState(false);
   const [isPaymentNoteEdited, setIsPaymentNoteEdited] = useState(false);
   const wasOpenRef = useRef(false);
 
+  const defaultInvoicePartyInfo = useMemo(
+    () =>
+      resolveB2BInvoicePartyInfo({
+        marketplace,
+        order: invoiceOrders[0],
+      }),
+    [invoiceOrders, marketplace],
+  );
+
   useEffect(() => {
     if (!open) {
       setInvoiceOrders(selectedOrders);
+      setIsConfirmDialogOpen(false);
+      setConfirmExportFormat(null);
+      setIsCreatingInvoice(false);
     }
   }, [selectedOrders, open]);
 
@@ -175,25 +252,77 @@ export default function B2BInvoiceDrawer({
     ? `Zahlungsbedingungen: Zahlung innerhalb von ${Math.floor(parsedSkontoDays)} Tagen - ${formattedSkontoPercent}% Skonto, innerhalb von 30 Tagen ab Rechnungseingang ohne Abzüge.`
     : "Zahlungsbedingungen:";
   const defaultPaymentNote = `${paymentTermLine}\n\n${paymentDueDateLine}\n${DEFAULT_PAYMENT_NOTE}`;
+  const normalizedInvoicePartyInfo = useMemo(
+    () => normalizeB2BInvoicePartyInfo(invoicePartyInfo),
+    [invoicePartyInfo],
+  );
 
   const invoiceExportRows = useMemo(() => {
     const invoiceCountry =
-      (
-        invoiceOrders?.[0]?.checkouts?.[0]?.invoice_address?.country ??
-        "DE"
-      )
-        .toString()
-        .toUpperCase()
-        .trim() || "DE";
-    const invoiceTaxId = invoiceOrders?.[0]?.checkouts?.[0]?.user?.tax_id;
+      normalizedInvoicePartyInfo.invoice_country.toString().toUpperCase().trim() ||
+      "DE";
+    const invoiceTaxId = normalizedInvoicePartyInfo.tax_id;
 
-    return invoiceOrders.map((order, index) => {
-      const orderItems = (order.checkouts ?? []).flatMap((checkout) => {
-        if (Array.isArray(checkout.cart)) {
-          return checkout.cart.flatMap((cartItem) => cartItem.items ?? []);
-        }
-        return checkout.cart?.items ?? [];
-      });
+    const rawRows = invoiceOrders.flatMap((order) => {
+      const primaryCheckoutItems = getCheckoutCartItems(order.checkouts?.[0]);
+      const orderItems = (order.checkouts ?? []).flatMap((checkout) =>
+        getCheckoutCartItems(checkout),
+      );
+      const normalizedChannel = String(order.from_marketplace ?? "")
+        .trim()
+        .toLowerCase();
+      const isBaderWithMultiItems =
+        normalizedChannel === "bader" && primaryCheckoutItems.length >= 2;
+      const orderShippingGross = Number(order.total_shipping) || 0;
+
+      if (isBaderWithMultiItems) {
+        return primaryCheckoutItems.map((item, itemIndex) => {
+          const quantity = Number(item?.quantity) || 1;
+          const unitGross =
+            Number(
+              item?.item_price ??
+                item?.purchased_products?.final_price ??
+                item?.products?.final_price ??
+                item?.final_price ??
+                0,
+            ) || 0;
+          const shippingGross = itemIndex === 0 ? orderShippingGross : 0;
+          const taxValue =
+            item?.purchased_products?.tax ?? item?.products?.tax ?? null;
+
+          const unitVatCalculation = calculateProductVAT(
+            unitGross,
+            taxValue,
+            invoiceCountry,
+            invoiceTaxId,
+          );
+          const shippingVatCalculation = calculateProductVAT(
+            shippingGross,
+            taxValue,
+            invoiceCountry,
+            invoiceTaxId,
+          );
+
+          const unitNet = Number(unitVatCalculation.net) || 0;
+          const rowNet = unitNet * quantity;
+          const shippingNet = Number(shippingVatCalculation.net) || 0;
+
+          return {
+            "Ref.-Nr .": resolveRefNumber({
+              order,
+              item,
+              itemCount: primaryCheckoutItems.length,
+            }),
+            Produktname:
+              item?.purchased_products?.name ?? item?.products?.name ?? "-",
+            Menge: quantity,
+            Versand: formatEur(shippingNet),
+            "E.-Preis": formatEur(unitNet),
+            "USt.": formatTaxPercent(taxValue),
+            "G.-Preis": formatEur(rowNet),
+          };
+        });
+      }
 
       const firstItem = orderItems[0];
       const quantity =
@@ -201,7 +330,6 @@ export default function B2BInvoiceDrawer({
           (sum, item) => sum + (Number(item.quantity) || 0),
           0,
         ) || 1;
-
       const unitGross =
         Number(
           firstItem?.item_price ??
@@ -210,8 +338,6 @@ export default function B2BInvoiceDrawer({
             firstItem?.final_price ??
             0,
         ) || 0;
-
-      const shippingGross = Number(order.total_shipping) || 0;
       const taxValue =
         firstItem?.purchased_products?.tax ?? firstItem?.products?.tax ?? null;
 
@@ -222,7 +348,7 @@ export default function B2BInvoiceDrawer({
         invoiceTaxId,
       );
       const shippingVatCalculation = calculateProductVAT(
-        shippingGross,
+        orderShippingGross,
         taxValue,
         invoiceCountry,
         invoiceTaxId,
@@ -232,22 +358,31 @@ export default function B2BInvoiceDrawer({
       const rowNet = unitNet * quantity;
       const shippingNet = Number(shippingVatCalculation.net) || 0;
 
-      return {
-        "Pos.": index + 1,
-        "Ref.-Nr .":
-          order.marketplace_order_id || order.checkout_code || order.id || "-",
-        Produktname:
-          firstItem?.purchased_products?.name ??
-          firstItem?.products?.name ??
-          "-",
-        Menge: quantity,
-        Versand: formatEur(shippingNet),
-        "E.-Preis": formatEur(unitNet),
-        "USt.": formatTaxPercent(taxValue),
-        "G.-Preis": formatEur(rowNet),
-      };
+      return [
+        {
+          "Ref.-Nr .": resolveRefNumber({
+            order,
+            item: firstItem,
+            itemCount: primaryCheckoutItems.length || orderItems.length,
+          }),
+          Produktname:
+            firstItem?.purchased_products?.name ??
+            firstItem?.products?.name ??
+            "-",
+          Menge: quantity,
+          Versand: formatEur(shippingNet),
+          "E.-Preis": formatEur(unitNet),
+          "USt.": formatTaxPercent(taxValue),
+          "G.-Preis": formatEur(rowNet),
+        },
+      ];
     });
-  }, [invoiceOrders]);
+
+    return rawRows.map((row, index) => ({
+      "Pos.": index + 1,
+      ...row,
+    }));
+  }, [invoiceOrders, normalizedInvoicePartyInfo]);
 
   const validateBeforeCreate = () => {
     if (!invoiceId.trim()) {
@@ -285,9 +420,18 @@ export default function B2BInvoiceDrawer({
     return true;
   };
 
-  const handleCreatePdf = async () => {
-    if (!validateBeforeCreate()) return;
+  const updateInvoicePartyInfo = (
+    field: keyof B2BInvoicePartyInfo,
+    value: string,
+  ) => {
+    setIsInvoicePartyEdited(true);
+    setInvoicePartyInfo((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
+  const createPdfInvoice = async () => {
     const marketplaceOrderIds = invoiceOrders
       .map((order) => order.marketplace_order_id)
       .filter((id): id is string => Boolean(id?.trim()));
@@ -313,21 +457,23 @@ export default function B2BInvoiceDrawer({
           introText={invoiceIntro}
           paymentNote={paymentNote}
           orders={invoiceOrders}
+          invoicePartyInfo={normalizedInvoicePartyInfo}
         />,
       ).toBlob();
 
       saveAs(blob, `b2b-invoice-${invoiceId.trim()}.pdf`);
+      return true;
     } catch (error) {
       toast.error("Failed to create B2B invoice PDF");
       console.error(error);
+      return false;
     }
   };
 
-  const handleCreateCsv = () => {
-    if (!validateBeforeCreate()) return;
+  const createCsvInvoice = () => {
     if (!invoiceExportRows.length) {
       toast.error("No invoice rows to export");
-      return;
+      return false;
     }
 
     const headers = Object.keys(invoiceExportRows[0]);
@@ -350,13 +496,13 @@ export default function B2BInvoiceDrawer({
       type: "text/csv;charset=utf-8;",
     });
     saveAs(blob, `b2b-invoice-${invoiceId.trim()}.csv`);
+    return true;
   };
 
-  const handleCreateXlsx = async () => {
-    if (!validateBeforeCreate()) return;
+  const createXlsxInvoice = async () => {
     if (!invoiceExportRows.length) {
       toast.error("No invoice rows to export");
-      return;
+      return false;
     }
 
     try {
@@ -374,9 +520,39 @@ export default function B2BInvoiceDrawer({
       });
 
       saveAs(blob, `b2b-invoice-${invoiceId.trim()}.xlsx`);
+      return true;
     } catch (error) {
       toast.error("Failed to create XLSX invoice");
       console.error(error);
+      return false;
+    }
+  };
+
+  const openConfirmDialog = (format: InvoiceExportFormat) => {
+    if (!validateBeforeCreate()) return;
+    setConfirmExportFormat(format);
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmCreateInvoice = async () => {
+    if (!confirmExportFormat || isCreatingInvoice) return;
+
+    setIsCreatingInvoice(true);
+    let isSuccess = false;
+
+    if (confirmExportFormat === "csv") {
+      isSuccess = createCsvInvoice();
+    } else if (confirmExportFormat === "xlsx") {
+      isSuccess = await createXlsxInvoice();
+    } else {
+      isSuccess = await createPdfInvoice();
+    }
+
+    setIsCreatingInvoice(false);
+
+    if (isSuccess) {
+      setIsConfirmDialogOpen(false);
+      setConfirmExportFormat(null);
     }
   };
 
@@ -388,11 +564,16 @@ export default function B2BInvoiceDrawer({
       setSkontoError(null);
       setInvoiceIntro(defaultIntroText);
       setPaymentNote(defaultPaymentNote);
+      setInvoicePartyInfo(defaultInvoicePartyInfo);
+      setIsInvoicePartyEdited(false);
       setIsInvoiceIntroEdited(false);
       setIsPaymentNoteEdited(false);
+      setIsConfirmDialogOpen(false);
+      setConfirmExportFormat(null);
+      setIsCreatingInvoice(false);
     }
     wasOpenRef.current = open;
-  }, [open, defaultIntroText, defaultPaymentNote]);
+  }, [open, defaultIntroText, defaultPaymentNote, defaultInvoicePartyInfo]);
 
   useEffect(() => {
     if (!open || isInvoiceIntroEdited) return;
@@ -404,9 +585,19 @@ export default function B2BInvoiceDrawer({
     setPaymentNote(defaultPaymentNote);
   }, [defaultPaymentNote, isPaymentNoteEdited, open]);
 
+  useEffect(() => {
+    if (!open || isInvoicePartyEdited) return;
+    setInvoicePartyInfo(defaultInvoicePartyInfo);
+  }, [defaultInvoicePartyInfo, isInvoicePartyEdited, open]);
+
+  const confirmExportLabel = confirmExportFormat
+    ? EXPORT_LABEL_BY_FORMAT[confirmExportFormat]
+    : "Invoice";
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="p-6 w-[620px] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[620px] mx-auto overflow-y-auto">
+    <>
+      <Drawer open={open} onOpenChange={onOpenChange} direction="right">
+        <DrawerContent className="p-6 w-[620px] max-w-none data-[vaul-drawer-direction=right]:sm:max-w-[620px] mx-auto overflow-y-auto">
         <DrawerHeader className="px-0 pb-4">
           <DrawerTitle>
             Create{" "}
@@ -651,6 +842,91 @@ export default function B2BInvoiceDrawer({
             </CardContent>
           </Card>
 
+          <Card className="border border-sky-100 bg-sky-50/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">
+                Invoice Receiver Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-muted-foreground">
+                This block controls recipient information shown in the invoice
+                header.
+              </p>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <p className="text-sm font-semibold">Company name</p>
+                  <Input
+                    value={invoicePartyInfo.company_name}
+                    onChange={(e) =>
+                      updateInvoicePartyInfo("company_name", e.target.value)
+                    }
+                    placeholder="e.g. BRUNO BADER GmbH + Co. KG"
+                  />
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <p className="text-sm font-semibold">Street address</p>
+                  <Input
+                    value={invoicePartyInfo.invoice_address}
+                    onChange={(e) =>
+                      updateInvoicePartyInfo("invoice_address", e.target.value)
+                    }
+                    placeholder="e.g. Maximilianstr. 48"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">Postal code</p>
+                  <Input
+                    value={invoicePartyInfo.invoice_postal_code}
+                    onChange={(e) =>
+                      updateInvoicePartyInfo(
+                        "invoice_postal_code",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="e.g. 75172"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">City</p>
+                  <Input
+                    value={invoicePartyInfo.invoice_city}
+                    onChange={(e) =>
+                      updateInvoicePartyInfo("invoice_city", e.target.value)
+                    }
+                    placeholder="e.g. Pforzheim"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">Country</p>
+                  <Input
+                    value={invoicePartyInfo.invoice_country}
+                    onChange={(e) =>
+                      updateInvoicePartyInfo("invoice_country", e.target.value)
+                    }
+                    placeholder="e.g. DE"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">Tax ID</p>
+                  <Input
+                    value={invoicePartyInfo.tax_id}
+                    onChange={(e) =>
+                      updateInvoicePartyInfo("tax_id", e.target.value)
+                    }
+                    placeholder="e.g. DE 144173081"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="space-y-2">
             <p className="text-sm font-semibold">Invoice Intro Text</p>
             <Textarea
@@ -679,26 +955,108 @@ export default function B2BInvoiceDrawer({
             <Button
               variant="outline"
               disabled={invoiceOrders.length === 0}
-              onClick={handleCreateCsv}
+              onClick={() => openConfirmDialog("csv")}
             >
               Create CSV Invoice
             </Button>
             <Button
               variant="outline"
               disabled={invoiceOrders.length === 0}
-              onClick={handleCreateXlsx}
+              onClick={() => openConfirmDialog("xlsx")}
             >
               Create XLSX Invoice
             </Button>
             <Button
               disabled={invoiceOrders.length === 0}
-              onClick={handleCreatePdf}
+              onClick={() => openConfirmDialog("pdf")}
             >
               Create PDF Invoice
             </Button>
           </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+        </DrawerContent>
+      </Drawer>
+
+      <Dialog
+        open={isConfirmDialogOpen}
+        onOpenChange={(nextOpen) => {
+          if (isCreatingInvoice) return;
+          setIsConfirmDialogOpen(nextOpen);
+          if (!nextOpen) {
+            setConfirmExportFormat(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Invoice Information</DialogTitle>
+            <DialogDescription>
+              Please review the invoice receiver details before creating the{" "}
+              {confirmExportLabel} invoice.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Card className="border border-sky-100 bg-sky-50/40">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold">
+                  Invoice Receiver Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-1 text-sm leading-6">
+                <p>{normalizedInvoicePartyInfo.company_name || "-"}</p>
+                <p>{normalizedInvoicePartyInfo.invoice_address || "-"}</p>
+                <p>
+                  {normalizedInvoicePartyInfo.invoice_postal_code || "-"}{" "}
+                  {normalizedInvoicePartyInfo.invoice_city || ""}
+                </p>
+                <p>{normalizedInvoicePartyInfo.tax_id || "-"}</p>
+                <p className="text-xs text-muted-foreground">
+                  Country: {normalizedInvoicePartyInfo.invoice_country || "-"}
+                </p>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 gap-2 rounded-md border bg-muted/20 p-3 text-sm sm:grid-cols-2">
+              <div>
+                <span className="text-muted-foreground">Invoice ID: </span>
+                <span className="font-medium">{invoiceId.trim()}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Orders: </span>
+                <span className="font-medium">{invoiceOrders.length}</span>
+              </div>
+              <div className="sm:col-span-2">
+                <span className="text-muted-foreground">Service period: </span>
+                <span className="font-medium">{servicePeriod || "-"}</span>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isCreatingInvoice}
+              onClick={() => {
+                setIsConfirmDialogOpen(false);
+                setConfirmExportFormat(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={isCreatingInvoice}
+              onClick={handleConfirmCreateInvoice}
+            >
+              {isCreatingInvoice
+                ? "Creating..."
+                : `Confirm & Create ${confirmExportLabel} Invoice`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
