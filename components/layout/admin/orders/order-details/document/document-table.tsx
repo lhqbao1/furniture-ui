@@ -43,7 +43,7 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
     // ✅ Chỉ thêm Package Slip khi có <= 1 checkout
     if (order.checkouts?.length ?? 0) {
       baseData.push({
-        document: "Package Slip",
+        document: "Pack Slip",
         code: order.checkout_code ?? "",
         dateSent: formatDateTimeString(
           order.created_at
@@ -111,7 +111,10 @@ const DocumentTable = ({ order, invoiceCode }: DocumentTableProps) => {
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="text-[13px] font-semibold text-slate-700">
+                  <TableHead
+                    key={header.id}
+                    className="text-[13px] font-semibold text-slate-700"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(

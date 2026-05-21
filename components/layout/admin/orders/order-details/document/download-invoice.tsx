@@ -62,19 +62,13 @@ const DownloadInvoice = ({
     [order],
   );
 
-  const {
-    data: checkout,
-    isLoading: isCheckoutLoading,
-  } = useQuery({
+  const { data: checkout, isLoading: isCheckoutLoading } = useQuery({
     queryKey: ["checkout-id", checkoutId],
     queryFn: () => getMainCheckOutByMainCheckOutId(checkoutId as string),
     enabled: !!checkoutId && needsGeneratedDocument,
   });
 
-  const {
-    data: invoice,
-    isLoading: isInvoiceLoading,
-  } = useQuery({
+  const { data: invoice, isLoading: isInvoiceLoading } = useQuery({
     queryKey: ["invoice-checkout", checkoutId],
     queryFn: () => getInvoiceByCheckOut(checkoutId as string),
     enabled: !!checkoutId && needsGeneratedDocument,
@@ -86,7 +80,9 @@ const DownloadInvoice = ({
       queryKey: ["product-refund", effectiveMainCheckoutId],
       queryFn: () => getProductRefundByMainCheckoutId(effectiveMainCheckoutId),
       enabled: Boolean(
-        effectiveMainCheckoutId && isRefundInvoiceType && needsGeneratedDocument,
+        effectiveMainCheckoutId &&
+        isRefundInvoiceType &&
+        needsGeneratedDocument,
       ),
       retry: false,
     });
@@ -109,7 +105,10 @@ const DownloadInvoice = ({
         ? `package-slip-${effectiveMainCheckoutId}.pdf`
         : `invoice-${effectiveMainCheckoutId}.pdf`;
 
-  const downloadUploadedInvoiceFile = async (url: string, fileIndex?: number) => {
+  const downloadUploadedInvoiceFile = async (
+    url: string,
+    fileIndex?: number,
+  ) => {
     try {
       const response = await fetch(url, { mode: "cors" });
       const blob = await response.blob();
@@ -141,19 +140,19 @@ const DownloadInvoice = ({
       return;
     }
 
-    if (!window.confirm("Delete this package slip PDF?")) return;
+    if (!window.confirm("Delete this pack slip PDF?")) return;
 
-    const toastId = toast.loading("Deleting package slip PDF...");
+    const toastId = toast.loading("Deleting pack slip PDF...");
     try {
       await deleteCheckoutPdfFileMutation.mutateAsync({
         main_checkout_id: effectiveMainCheckoutId,
         urls: [targetKey],
       });
-      toast.success("Package slip PDF deleted", { id: toastId });
+      toast.success("Pack slip PDF deleted", { id: toastId });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to delete file";
-      toast.error("Failed to delete package slip PDF", {
+      toast.error("Failed to delete pack slip PDF", {
         id: toastId,
         description: message,
       });
@@ -200,9 +199,15 @@ const DownloadInvoice = ({
 
     if (isCheckoutLoading || isInvoiceLoading || !checkout || !invoice) {
       return (
-        <Button variant="outline" size="sm" type="button" disabled className="gap-1.5">
+        <Button
+          variant="outline"
+          size="sm"
+          type="button"
+          disabled
+          className="gap-1.5"
+        >
           <Loader2 className="size-4 animate-spin" />
-          Sample package slip
+          Sample
         </Button>
       );
     }
@@ -228,7 +233,7 @@ const DownloadInvoice = ({
             ) : (
               <span className="inline-flex items-center gap-1.5 cursor-pointer">
                 <DownloadCloud className="size-4" />
-                Sample package slip
+                Sample
               </span>
             )
           }
@@ -250,7 +255,9 @@ const DownloadInvoice = ({
                 variant={"outline"}
                 size="sm"
                 type="button"
-                onClick={() => void downloadUploadedInvoiceFile(file.url, index)}
+                onClick={() =>
+                  void downloadUploadedInvoiceFile(file.url, index)
+                }
                 disabled={isDeletingPackageSlip}
                 className="gap-1.5"
               >
@@ -275,7 +282,11 @@ const DownloadInvoice = ({
           {renderPackageSampleDownloadButton()}
         </div>
       ) : isB2BInvoiceOrder ? (
-        <Button variant={"outline"} type="button" onClick={handleOpenB2BInvoiceDrawer}>
+        <Button
+          variant={"outline"}
+          type="button"
+          onClick={handleOpenB2BInvoiceDrawer}
+        >
           <DownloadCloud />
         </Button>
       ) : isPackageType ? (
