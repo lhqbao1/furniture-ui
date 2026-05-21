@@ -299,8 +299,8 @@ export const PackageSlipPdf = ({ checkout, invoice }: InvoicePDFProps) => {
                 paddingVertical: 2,
               }}
             >
-              <Text style={{ width: 80, fontWeight: "bold" }}>Bearbeiter:</Text>
-              <Text>–</Text>
+              <Text style={{ width: 80, fontWeight: "bold" }}>Referenz:</Text>
+              <Text>{checkout.marketplace_order_id}</Text>
             </View>
 
             {/* Footer note */}
