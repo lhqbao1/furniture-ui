@@ -44,6 +44,9 @@ const formatColumnLabel = (key: string) => {
     log_width: "Package Width",
     log_height: "Package Height",
     log_weight: "Package Weight",
+    amazon_price: "Amazon Price",
+    ebay_price: "Ebay Price",
+    kaufland_price: "Kaufland Price",
   };
 
   if (customLabels[key]) return customLabels[key];

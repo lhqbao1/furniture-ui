@@ -92,9 +92,9 @@ const PRESET_BY_MARKETPLACE: Record<
     invoice_country: "AT",
   },
   moebelix: {
-    company_name: "Möbelix GmbH",
-    tax_id: "ATU63842248",
-    invoice_address: "Römerstraße 39",
+    company_name: "XXXLutz KG",
+    tax_id: "ATU65296645",
+    invoice_address: "Römerstrasse 39",
     invoice_city: "Wels",
     invoice_postal_code: "4600",
     invoice_country: "AT",
@@ -117,7 +117,7 @@ export function useManualCheckoutLogic(
   const { skipMarketplacePreset = false } = options;
   const marketplace = form.watch("from_marketplace");
   const status = form.watch("status");
-  const country = form.watch("country");
+  const invoiceCountry = form.watch("invoice_country");
 
   // -------------------------------------------------------------
   // 1️⃣ Apply marketplace preset + disable fields
@@ -165,14 +165,14 @@ export function useManualCheckoutLogic(
   // 3️⃣ Auto calculate tax
   // -------------------------------------------------------------
   useEffect(() => {
-    if (!country) return;
+    if (!invoiceCountry) return;
 
-    if (country === "DE") {
+    if (invoiceCountry === "DE") {
       form.setValue("tax", 19);
     }
 
-    if (country === "AT") {
+    if (invoiceCountry === "AT") {
       form.setValue("tax", 0);
     }
-  }, [country]);
+  }, [invoiceCountry]);
 }

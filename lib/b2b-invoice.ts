@@ -95,14 +95,14 @@ export const B2B_INVOICE_PRESET_BY_MARKETPLACE: Record<
     invoice_country: "AT",
   },
   moebelix: {
-    company_name: "Möbelix GmbH",
-    tax_id: "ATU63842248",
-    invoice_address: "Römerstraße 39",
+    company_name: "XXXLutz KG",
+    tax_id: "ATU65296645",
+    invoice_address: "Römerstrasse 39",
     invoice_city: "Wels",
     invoice_postal_code: "4600",
     invoice_country: "AT",
   },
-  "möbelix": {
+  möbelix: {
     company_name: "Möbelix GmbH",
     tax_id: "ATU63842248",
     invoice_address: "Römerstraße 39",

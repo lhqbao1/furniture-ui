@@ -40,6 +40,7 @@ import { useSyncToAmazon } from "@/features/amazon/hook";
 import { SyncToAmazonInput } from "@/features/amazon/api";
 import { COUNTRY_ORIGIN_OPTIONS } from "@/data/data";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { getCountryOriginCode } from "@/components/shared/getCountryNameDe";
 
 interface SyncToAmazonFormProps {
   product: ProductItem;
@@ -69,6 +70,8 @@ const NORMA_PACKAGE_FALLBACK = {
   height: 60,
   weight: 8,
 };
+const AMAZON_COUNTRY_ERROR_MESSAGE =
+  "Manufacturer country is not in the supported Amazon country list (AT, DE, CN, VN).";
 
 const SyncToAmazonForm = ({
   product,
@@ -105,9 +108,11 @@ const SyncToAmazonForm = ({
       is_active: product.marketplace_products.find(
         (i) => i.marketplace === currentMarketplace,
       )?.is_active,
-      country_of_origin: product.marketplace_products.find(
-        (i) => i.marketplace === currentMarketplace,
-      )?.country_of_origin,
+      country_of_origin:
+        product.marketplace_products.find(
+          (i) => i.marketplace === currentMarketplace,
+        )?.country_of_origin ??
+        getCountryOriginCode(product.manufacture_country),
       handling_time:
         product.marketplace_products.find(
           (i) => i.marketplace === currentMarketplace,
@@ -135,6 +140,15 @@ const SyncToAmazonForm = ({
   }, [form, defaultValues]);
 
   const handleSubmit = (values: MarketPlaceFormValues) => {
+    const resolvedCountryOfOrigin = getCountryOriginCode(
+      values.country_of_origin ?? product.manufacture_country,
+    );
+
+    if (!resolvedCountryOfOrigin) {
+      toast.error(AMAZON_COUNTRY_ERROR_MESSAGE);
+      return;
+    }
+
     const loadingToastId: string | number = toast.loading(
       "Syncing marketplace data...",
       {
@@ -205,6 +219,7 @@ const SyncToAmazonForm = ({
       sku: product.id_provider ?? "",
       brand: product.brand ? product.brand.name : "",
       handling_time: values.handling_time ?? 0,
+      country_of_origin: resolvedCountryOfOrigin,
     };
 
     const updatedMarketplaceProducts = [
@@ -358,7 +373,7 @@ const SyncToAmazonForm = ({
               images: product.static_files?.map((f) => f.url) ?? [],
               model_number: product.sku,
               size: `${resolvedLength}x${resolvedWidth}x${resolvedHeight}`,
-              country_of_origin: values.country_of_origin,
+              country_of_origin: resolvedCountryOfOrigin,
               min_stock: values.min_stock ?? 0,
               max_stock: values.max_stock ?? 10,
               handling_time: values.handling_time ?? 0,

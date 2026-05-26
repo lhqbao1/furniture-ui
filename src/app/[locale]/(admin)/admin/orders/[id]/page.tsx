@@ -548,8 +548,6 @@ const OrderDetails = () => {
   const createdAt = formatDate(order.created_at);
   const updatedAt = formatDateTimeString(order.updated_at);
 
-  console.log(cartItems);
-
   return (
     <div className="space-y-8 pb-20 mt-6">
       <AdminBackButton />

@@ -60,6 +60,27 @@ const getMarketplaceStatus = (
   return found.is_active ? "synced" : "not synced";
 };
 
+const getMarketplacePrice = (
+  marketplaces: ProductItem["marketplace_products"] | undefined,
+  name: string,
+) => {
+  if (!Array.isArray(marketplaces)) return "";
+
+  const found = marketplaces.find(
+    (marketplace) => marketplace.marketplace?.toLowerCase() === name,
+  );
+
+  if (!found) return "";
+
+  const fallbackPrice = (
+    found as ProductItem["marketplace_products"][number] & {
+      price?: number | null;
+    }
+  ).price;
+
+  return clean(found.final_price ?? fallbackPrice);
+};
+
 export const buildProductExportData = (
   data: ProductItem[],
   imageDelimiter = "|",
@@ -166,6 +187,12 @@ export const buildProductExportData = (
       amazon: getMarketplaceStatus(product.marketplace_products, "amazon"),
       kaufland: getMarketplaceStatus(product.marketplace_products, "kaufland"),
       ebay: getMarketplaceStatus(product.marketplace_products, "ebay"),
+      amazon_price: getMarketplacePrice(product.marketplace_products, "amazon"),
+      kaufland_price: getMarketplacePrice(
+        product.marketplace_products,
+        "kaufland",
+      ),
+      ebay_price: getMarketplacePrice(product.marketplace_products, "ebay"),
     };
   });
 };

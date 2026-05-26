@@ -59,7 +59,7 @@ export default function ManualAdditionalInformation({
   const marketplace = form.watch("from_marketplace");
   const priceMode = form.watch("price_mode") ?? "gross";
   const totalShippingInput = Number(form.watch("total_shipping") ?? 0) || 0;
-  const countryCode = getCountryCode(form.watch("country"));
+  const countryCode = getCountryCode(form.watch("invoice_country"));
   const taxId = form.watch("tax_id") ?? null;
   const effectiveTaxIdForVat = countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;
   const isDirty = form.formState.isDirty;

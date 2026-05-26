@@ -15,6 +15,7 @@ function normalize(str: string) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "")
     .replace(/\s+/g, "");
 }
 
@@ -43,4 +44,42 @@ export function getCountryCode(input?: string | null) {
   if (normalized === "germany" || normalized === "deutschland") return "DE";
 
   return null;
+}
+
+const COUNTRY_ORIGIN_ALIASES: Record<string, string> = {
+  at: "AT",
+  austria: "AT",
+  osterreich: "AT",
+  oesterreich: "AT",
+  de: "DE",
+  germany: "DE",
+  deutschland: "DE",
+  cn: "CN",
+  china: "CN",
+  vn: "VN",
+  vietnam: "VN",
+  vietnamese: "VN",
+};
+
+export function getCountryOriginCode(
+  input?: string | null,
+): string | undefined {
+  if (!input) return undefined;
+
+  const raw = String(input).trim();
+  if (!raw) return undefined;
+
+  const byValue = COUNTRY_ORIGIN_OPTIONS.find(
+    (item) => item.value.toUpperCase() === raw.toUpperCase(),
+  );
+  if (byValue) return byValue.value;
+
+  const normalized = normalize(raw);
+
+  const byLabel = COUNTRY_ORIGIN_OPTIONS.find(
+    (item) => normalize(item.label) === normalized,
+  );
+  if (byLabel?.value) return byLabel.value;
+
+  return COUNTRY_ORIGIN_ALIASES[normalized];
 }
