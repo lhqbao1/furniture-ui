@@ -1864,6 +1864,10 @@ export const getProductColumns = (
   setSortByIncomingStock: (val: "asc" | "desc" | "") => void,
   sortByIncomingStock: "asc" | "desc" | "",
 ): ColumnDef<ProductItem>[] => [
+  // Freeze columns on horizontal scroll (image, id, name, sku)
+  // Keep offsets explicit to match fixed column widths below.
+  // Select column is intentionally not frozen.
+  // left: image(88) -> id(110) -> name(300) -> sku(260)
   {
     id: "select",
     header: ({ table }) => (
@@ -1888,6 +1892,11 @@ export const getProductColumns = (
   },
   {
     accessorKey: "static_files",
+    meta: {
+      width: 88,
+      stickyLeft: 0,
+      stickyClassName: "shadow-[2px_0_6px_-3px_rgba(15,23,42,0.18)]",
+    },
     header: "IMAGE",
     cell: ({ row }) => {
       const image = row.original.static_files?.[0]?.url;
@@ -1930,6 +1939,11 @@ export const getProductColumns = (
 
   {
     accessorKey: "id_provider",
+    meta: {
+      width: 110,
+      stickyLeft: 88,
+      stickyClassName: "shadow-[2px_0_6px_-3px_rgba(15,23,42,0.18)]",
+    },
     header: ({}) => <div className="text-center">ID</div>,
     cell: ({ row }) => {
       return <EditProductDrawer product={row.original} />;
@@ -1937,7 +1951,11 @@ export const getProductColumns = (
   },
   {
     accessorKey: "name",
-    meta: { width: "200px" },
+    meta: {
+      width: 300,
+      stickyLeft: 198,
+      stickyClassName: "shadow-[2px_0_6px_-3px_rgba(15,23,42,0.18)]",
+    },
     header: ({ column }) => (
       <>NAME</>
       // <Button
@@ -1960,6 +1978,11 @@ export const getProductColumns = (
   },
   {
     accessorKey: "sku",
+    meta: {
+      width: 260,
+      stickyLeft: 498,
+      stickyClassName: "shadow-[6px_0_8px_-6px_rgba(15,23,42,0.22)]",
+    },
     header: ({ column }) => {
       const direction = column.getIsSorted() as "asc" | "desc" | undefined;
       return (
