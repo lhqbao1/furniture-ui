@@ -117,7 +117,7 @@ export function useManualCheckoutLogic(
   const { skipMarketplacePreset = false } = options;
   const marketplace = form.watch("from_marketplace");
   const status = form.watch("status");
-  const country = form.watch("country");
+  const invoiceCountry = form.watch("invoice_country");
 
   // -------------------------------------------------------------
   // 1️⃣ Apply marketplace preset + disable fields
@@ -165,14 +165,14 @@ export function useManualCheckoutLogic(
   // 3️⃣ Auto calculate tax
   // -------------------------------------------------------------
   useEffect(() => {
-    if (!country) return;
+    if (!invoiceCountry) return;
 
-    if (country === "DE") {
+    if (invoiceCountry === "DE") {
       form.setValue("tax", 19);
     }
 
-    if (country === "AT") {
+    if (invoiceCountry === "AT") {
       form.setValue("tax", 0);
     }
-  }, [country]);
+  }, [invoiceCountry]);
 }

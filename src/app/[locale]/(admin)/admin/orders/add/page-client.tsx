@@ -140,7 +140,7 @@ export default function CreateOrderPageClient() {
 
   const listItems = form.watch("items");
   const priceMode = form.watch("price_mode") ?? "gross";
-  const countryCode = getCountryCode(form.watch("country"));
+  const countryCode = getCountryCode(form.watch("invoice_country"));
   const taxId = form.watch("tax_id") || null;
   const effectiveTaxIdForVat =
     countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;

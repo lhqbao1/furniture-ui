@@ -44,7 +44,7 @@ const SelectOrderItems = ({
   const { setValue } = form;
   const priceMode = form.watch("price_mode") ?? "gross";
   const fromMarketplace = String(form.watch("from_marketplace") ?? "").toLowerCase();
-  const countryCode = getCountryCode(form.watch("country"));
+  const countryCode = getCountryCode(form.watch("invoice_country"));
   const taxId = form.watch("tax_id") ?? null;
   const effectiveTaxIdForVat =
     countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;
