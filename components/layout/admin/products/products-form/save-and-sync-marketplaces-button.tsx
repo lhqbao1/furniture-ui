@@ -14,6 +14,7 @@ import { syncToKaufland, syncToKauflandInput } from "@/features/kaufland/api";
 import { SyncToAmazonInput, syncToAmazon } from "@/features/amazon/api";
 import { stripHtmlRegex } from "@/hooks/simplifyHtml";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
+import { getCountryOriginCode } from "@/components/shared/getCountryNameDe";
 
 const NORMA_OWNER_BUSINESS_NAME = "NORMA24 Online-Shop GmbH & Co. KG";
 const NORMA_PACKAGE_FALLBACK = {
@@ -22,6 +23,8 @@ const NORMA_PACKAGE_FALLBACK = {
   height: 60,
   weight: 8,
 };
+const AMAZON_COUNTRY_ERROR_MESSAGE =
+  "Manufacturer country is not in the supported Amazon country list (AT, DE, CN, VN).";
 
 type SaveAndSyncMarketplacesButtonProps = {
   form: UseFormReturn<ProductInput>;
@@ -233,6 +236,9 @@ const SaveAndSyncMarketplacesButton = ({
 
     const syncAmazonDefault = async () => {
       const amazonData = getMarketplaceData(product, "amazon");
+      const resolvedCountryOfOrigin = getCountryOriginCode(
+        product.manufacture_country,
+      );
       const hasPackageInformation =
         !!product.packages && product.packages.length > 0;
       const isNormaOwner =
@@ -272,10 +278,7 @@ const SaveAndSyncMarketplacesButton = ({
         { value: resolvedWidth, label: "Width" },
         { value: resolvedHeight, label: "Height" },
         { value: resolvedWeight, label: "Net Weight" },
-        {
-          value: amazonData?.country_of_origin,
-          label: "Country of origin (Amazon)",
-        },
+        { value: product.manufacture_country, label: "Manufacture country" },
         { value: amazonData?.handling_time, label: "Handling time (Amazon)" },
       ].find((field) => !field.value);
 
@@ -284,6 +287,14 @@ const SaveAndSyncMarketplacesButton = ({
           marketplace: "amazon" as const,
           success: false,
           message: `Missing ${missingField.label}`,
+        };
+      }
+
+      if (!resolvedCountryOfOrigin) {
+        return {
+          marketplace: "amazon" as const,
+          success: false,
+          message: AMAZON_COUNTRY_ERROR_MESSAGE,
         };
       }
 
@@ -322,7 +333,7 @@ const SaveAndSyncMarketplacesButton = ({
         brand: product.brand ? product.brand.name : "",
         model_number: product.sku,
         size: `${resolvedLength}x${resolvedWidth}x${resolvedHeight}`,
-        country_of_origin: amazonData?.country_of_origin ?? "",
+        country_of_origin: resolvedCountryOfOrigin,
         min_stock: amazonData?.min_stock ?? 0,
         max_stock: amazonData?.max_stock ?? 10,
         handling_time: amazonData?.handling_time ?? 0,

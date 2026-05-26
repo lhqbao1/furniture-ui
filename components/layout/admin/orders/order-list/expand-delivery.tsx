@@ -10,6 +10,15 @@ import { ProductItem } from "@/types/products";
 import { cn } from "@/lib/utils";
 import { formatIncomingStockDate } from "@/lib/format-incoming-stock";
 
+const EXCLUDED_EXCHANGE_CHECKOUT_STATUSES = new Set([
+  "exchange",
+  "cancel_exchange",
+  "exchange_stock_reserved",
+  "exchange_shipped",
+  "exchange_preparation_shipping",
+  "exchange_cancel_no_stock",
+]);
+
 function transformCartItems(items: CartItem[]): CartItem[] {
   return items.flatMap((item) => {
     // // Nếu là bundle → tách thành nhiều dòng con
@@ -146,12 +155,10 @@ export function flattenCheckOutCart(checkoutMain: CheckOutMain): CartItem[] {
 
   return (
     checkoutMain.checkouts
-      // ❌ lọc bỏ exchange và cancel_exchange
       .filter((checkout) => {
-        const status = checkout.status?.toLowerCase();
-        return status !== "exchange" && status !== "cancel_exchange";
+        const status = checkout.status?.toLowerCase().trim() ?? "";
+        return !EXCLUDED_EXCHANGE_CHECKOUT_STATUSES.has(status);
       })
-      // ✔ flatten items
       .flatMap((checkout) => transformCartItems(checkout.cart.items))
   );
 }
