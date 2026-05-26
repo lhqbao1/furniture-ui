@@ -398,7 +398,7 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               }}
             >
               <Text style={{ width: 115, fontWeight: "bold" }}>
-                Ihre Kundennummer:
+                Kundennummer:
               </Text>
               {/* <Text>1011</Text> */}
             </View>
