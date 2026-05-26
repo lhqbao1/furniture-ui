@@ -197,8 +197,11 @@ export const InvoicePDF = ({
   const primaryCheckout =
     checkout?.checkouts?.[0] ?? invoice?.main_checkout?.checkouts?.[0];
   const useShippingAddressForInvoice =
-    (checkout?.from_marketplace ?? invoice?.main_checkout?.from_marketplace ?? "")
-      .toLowerCase() === "ebay";
+    (
+      checkout?.from_marketplace ??
+      invoice?.main_checkout?.from_marketplace ??
+      ""
+    ).toLowerCase() === "ebay";
   const addressForInvoice = useShippingAddressForInvoice
     ? (primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address)
     : primaryCheckout?.invoice_address;
@@ -594,7 +597,7 @@ export const InvoicePDF = ({
               }}
             >
               <Text style={{ width: 115, fontWeight: "bold" }}>
-                Ihre Kundennummer:
+                Kundennummer:
               </Text>
               {/* <Text>1011</Text> */}
             </View>
@@ -609,25 +612,11 @@ export const InvoicePDF = ({
                 }}
               >
                 <Text style={{ width: 115, fontWeight: "bold" }}>
-                  Referenz:
+                  Referenz-Nr.:
                 </Text>
                 <Text>{marketplaceReference}</Text>
               </View>
             )}
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 8,
-                paddingVertical: 2,
-              }}
-            >
-              <Text style={{ width: 115, fontWeight: "bold" }}>
-                Ihr Ansprechpartner:
-              </Text>
-              <Text>Duong Thuy Nguyen</Text>
-            </View>
           </View>
         </View>
 
@@ -730,10 +719,10 @@ export const InvoicePDF = ({
             flattenedCartItems.map((item, index) => {
               const { quantity, unitNet, vatRate, lineNet } =
                 calculateCartItemDisplayPricing(
-                item,
-                vatCalculationContext.countryCode,
-                vatCalculationContext.taxId,
-              );
+                  item,
+                  vatCalculationContext.countryCode,
+                  vatCalculationContext.taxId,
+                );
               const vatPercent = vatRate * 100;
 
               return (

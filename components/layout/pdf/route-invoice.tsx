@@ -159,8 +159,11 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
   const primaryCheckout =
     checkout?.checkouts?.[0] ?? invoice?.main_checkout?.checkouts?.[0];
   const useShippingAddressForInvoice =
-    (checkout?.from_marketplace ?? invoice?.main_checkout?.from_marketplace ?? "")
-      .toLowerCase() === "ebay";
+    (
+      checkout?.from_marketplace ??
+      invoice?.main_checkout?.from_marketplace ??
+      ""
+    ).toLowerCase() === "ebay";
   const addressForInvoice = useShippingAddressForInvoice
     ? (primaryCheckout?.shipping_address ?? primaryCheckout?.invoice_address)
     : primaryCheckout?.invoice_address;
@@ -246,7 +249,9 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
     (invoice?.coupon_amount ?? 0) + Math.abs(invoice?.voucher_amount ?? 0);
   const showGiftCouponRow = giftCouponGross > 0;
   const refundDiscountGross = Math.abs(
-    Number(invoice?.main_checkout?.refund_amount ?? checkout?.refund_amount ?? 0),
+    Number(
+      invoice?.main_checkout?.refund_amount ?? checkout?.refund_amount ?? 0,
+    ),
   );
   const showRefundDiscountRow = refundDiscountGross > 0;
 
@@ -393,7 +398,7 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               }}
             >
               <Text style={{ width: 115, fontWeight: "bold" }}>
-                Ihre Kundennummer:
+                Kundennummer:
               </Text>
               {/* <Text>1011</Text> */}
             </View>
@@ -408,25 +413,11 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                 }}
               >
                 <Text style={{ width: 115, fontWeight: "bold" }}>
-                  Referenz:
+                  Referenz-Nr.:
                 </Text>
                 <Text>{marketplaceReference}</Text>
               </View>
             )}
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 8,
-                paddingVertical: 2,
-              }}
-            >
-              <Text style={{ width: 115, fontWeight: "bold" }}>
-                Ihr Ansprechpartner:
-              </Text>
-              <Text>Duong Thuy Nguyen</Text>
-            </View>
           </View>
         </View>
 
@@ -563,7 +554,9 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
               Warenwert (netto)
             </Text>
             <Text style={{ width: "20%", textAlign: "right" }}>
-              {(Number(orderTaxSummary?.totalNetWithoutShipping) || 0).toLocaleString("de-DE", {
+              {(
+                Number(orderTaxSummary?.totalNetWithoutShipping) || 0
+              ).toLocaleString("de-DE", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
@@ -751,10 +744,13 @@ export const RouteInvoicePDF = ({ checkout, invoice }: InvoicePDFProps) => {
                   fontWeight: "bold",
                 }}
               >
-                {(Number(orderTaxSummary?.totalGross) || 0).toLocaleString("de-DE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+                {(Number(orderTaxSummary?.totalGross) || 0).toLocaleString(
+                  "de-DE",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  },
+                )}
                 {" €"}
               </Text>
             </View>

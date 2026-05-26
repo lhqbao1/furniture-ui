@@ -122,7 +122,9 @@ const formatTaxPercent = (tax: unknown) => {
   return "-";
 };
 
-const getCheckoutCartItems = (checkout: CheckOutMain["checkouts"][number] | undefined) => {
+const getCheckoutCartItems = (
+  checkout: CheckOutMain["checkouts"][number] | undefined,
+) => {
   if (!checkout) return [];
 
   if (Array.isArray(checkout.cart)) {
@@ -270,9 +272,11 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
         const rowNet = unitNet * quantity;
         const shippingNet = Number(shippingVatCalculation.net) || 0;
         const vatRate = Number(unitVatCalculation.vatRate) || 0;
-        const rowVat = +(rowGross + shippingGross - (rowNet + shippingNet)).toFixed(
-          2,
-        );
+        const rowVat = +(
+          rowGross +
+          shippingGross -
+          (rowNet + shippingNet)
+        ).toFixed(2);
 
         return {
           rowKey: `${order.id}-${item?.id ?? itemIndex}`,
@@ -369,12 +373,8 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
             <Text style={{ fontSize: 8, paddingBottom: 20 }}>
               Prestige Home GmbH · Greifswalder Straße 226, 10405 Berlin
             </Text>
-            <Text>
-              {resolvedInvoicePartyInfo.company_name}
-            </Text>
-            <Text>
-              {resolvedInvoicePartyInfo.invoice_address}
-            </Text>
+            <Text>{resolvedInvoicePartyInfo.company_name}</Text>
+            <Text>{resolvedInvoicePartyInfo.invoice_address}</Text>
             <Text>
               {resolvedInvoicePartyInfo.invoice_postal_code}{" "}
               {resolvedInvoicePartyInfo.invoice_city}
@@ -455,11 +455,11 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
               }}
             >
               <Text style={{ width: 115, fontWeight: "bold" }}>
-                Ihre Kundennummer
+                Kundennummer
               </Text>
               <Text></Text>
             </View>
-            <View
+            {/* <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -471,7 +471,7 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
                 Ihr Ansprechpartner
               </Text>
               <Text>Duong Thuy Nguyen</Text>
-            </View>
+            </View> */}
           </View>
         </View>
 
