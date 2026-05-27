@@ -234,7 +234,9 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
 
   const incomingSummary = React.useMemo(() => {
     if (cartServer?.products) {
-      return calculateIncomingStockSummary(cartServer.products, { inventoryPo });
+      return calculateIncomingStockSummary(cartServer.products, {
+        inventoryPo,
+      });
     }
 
     if (localProducts) {
@@ -336,15 +338,15 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
             </div>
 
             {item.deliveryText && (
-              <p className="text-secondary mt-6">
+              <p className="text-black mt-6">
                 {estimatedDeliveryRange ? (
-                  <>
+                  <span className="text-primary">
                     {t.rich("deliveryDateRange", {
                       from: formatDateDE(estimatedDeliveryRange.from),
                       to: formatDateDE(estimatedDeliveryRange.to),
                       b: (chunks) => <strong>{chunks}</strong>,
                     })}
-                  </>
+                  </span>
                 ) : item.deliveryText ? (
                   t("deliveryTime", {
                     days: item.deliveryText,

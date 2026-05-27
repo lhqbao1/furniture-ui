@@ -25,15 +25,17 @@ export function useMyOrderTableColumns(): ColumnDef<CartItem>[] {
     },
     {
       accessorKey: "quantity",
-      header: () => <span>{t("quantity")}</span>,
+      header: () => <span className="block text-center">{t("quantity")}</span>,
       meta: { width: "100px" },
       cell: ({ row }) => (
-        <div className="text-center font-medium text-foreground">x{row.original.quantity}</div>
+        <div className="text-center font-medium text-foreground">
+          x{row.original.quantity}
+        </div>
       ),
     },
     {
       accessorKey: "product_price",
-      header: () => <span>{t("total")}</span>,
+      header: () => <span className="block text-right">{t("total")}</span>,
       meta: { width: "150px" },
       cell: ({ row }) => (
         <div className="text-right font-semibold text-foreground">

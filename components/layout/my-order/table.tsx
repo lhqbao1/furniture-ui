@@ -16,7 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CheckOut } from "@/types/checkout";
-import { getStatusStyleDe } from "../admin/orders/order-list/status-styles";
 
 interface MyOrderDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,7 +27,7 @@ interface MyOrderDataTableProps<TData, TValue> {
 export function MyOrderDataTable<TData, TValue>({
   columns,
   data,
-  orderData,
+  orderData: _orderData,
   pos,
 }: MyOrderDataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -46,13 +45,10 @@ export function MyOrderDataTable<TData, TValue>({
               colSpan={columns.length}
               className="bg-secondary/10 px-3 py-3"
             >
-              <div className="flex justify-between w-full">
+              <div className="w-full">
                 <div className="text-sm font-semibold uppercase tracking-wide text-foreground">
                   Lieferung {pos}
                 </div>
-                <p className="text-xs font-semibold text-secondary">
-                  {getStatusStyleDe(orderData.status).text ?? ""}
-                </p>
               </div>
             </TableHead>
           </TableRow>
