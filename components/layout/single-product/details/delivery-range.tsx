@@ -124,7 +124,7 @@ const DeliveryRange = ({
   }, [parsedServerRange, isLoading, isError, data, estimatedDeliveryRange]);
 
   return (
-    <div className="flex flex-row gap-4 items-start">
+    <div className="flex flex-row gap-4 items-center">
       <Clock size={25} className="mt-1.5" />
       <div>
         <span className="text-gray-800 font-medium text-sm">
@@ -133,7 +133,9 @@ const DeliveryRange = ({
               {t.rich("deliveryDateRange", {
                 from: formatDateDE(displayRange.from),
                 to: formatDateDE(displayRange.to),
-                b: (chunks) => <strong>{chunks}</strong>,
+                b: (chunks) => (
+                  <strong className="text-primary font-bold">{chunks}</strong>
+                ),
               })}
             </>
           ) : productDetails.delivery_time ? (

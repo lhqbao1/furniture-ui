@@ -12,7 +12,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLocale, useTranslations } from "next-intl";
-import { formatDate } from "@/lib/date-formated";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,6 +59,17 @@ const formatDeliveryRangeLabel = (
   }
 
   return formatDateLabel(fromDate ?? toDate!);
+};
+
+const formatGermanOrderDate = (value?: string | Date | null): string => {
+  const parsedDate = parseDateValue(value);
+  if (!parsedDate) return "-";
+
+  return parsedDate.toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 };
 
 const OrderList = () => {
@@ -162,7 +172,7 @@ const OrderList = () => {
                           <span className="font-medium text-foreground">
                             Bestelldatum:
                           </span>
-                          <span>{formatDate(item.created_at)}</span>
+                          <span>{formatGermanOrderDate(item.created_at)}</span>
                         </div>
                         <div className="inline-flex items-center gap-2 text-muted-foreground sm:justify-end">
                           <Truck className="h-4 w-4 text-secondary" />
