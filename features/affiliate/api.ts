@@ -1,0 +1,88 @@
+import { apiAdmin, apiPublic } from "@/lib/axios";
+import {
+  AffiliateCreateInput,
+  AffiliateResponse,
+  AffiliateUpdateInput,
+} from "@/types/affiliate";
+
+export interface GenerateAffiliateLinkInput {
+  affiliate_id: string;
+  expire_in?: number;
+}
+
+export async function getAffiliates() {
+  const { data } = await apiPublic.get("/affiliate/all", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data as AffiliateResponse[];
+}
+
+export async function getAffiliateById(id: string) {
+  const { data } = await apiPublic.get(`/affiliate/get/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data as AffiliateResponse;
+}
+
+export async function createAffiliate(input: AffiliateCreateInput) {
+  const { data } = await apiAdmin.post("/affiliate/create", input, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data as AffiliateResponse;
+}
+
+export async function updateAffiliate(id: string, input: AffiliateUpdateInput) {
+  const { data } = await apiAdmin.put(`/affiliate/put/${id}`, input, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data as AffiliateResponse;
+}
+
+export async function deleteAffiliate(id: string) {
+  const { data } = await apiAdmin.delete(`/affiliate/delete/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+    },
+    withCredentials: true,
+  });
+
+  return data;
+}
+
+export async function generateAffiliateLink(input: GenerateAffiliateLinkInput) {
+  const { affiliate_id, expire_in } = input;
+
+  const { data } = await apiAdmin.post(
+    `/affiliate/generate-link/${affiliate_id}`,
+    null,
+    {
+      params: {
+        ...(expire_in !== undefined && { expire_in }),
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_access_token")}`,
+      },
+      withCredentials: true,
+    },
+  );
+
+  return data as string;
+}

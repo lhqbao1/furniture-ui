@@ -28,58 +28,11 @@ import { sendOtp } from "@/features/auth/api";
 import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 import { currentVoucherAtom } from "@/store/voucher";
 import {
-  addBusinessDays,
-  getDeliveryDayRange,
+  calculateProductDeliveryRange,
 } from "@/hooks/get-estimated-shipping";
-import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
-import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
-import { ProductItem } from "@/types/products";
-
-const addCalendarDays = (startDate: Date, days: number) => {
-  const result = new Date(startDate);
-  result.setDate(result.getDate() + days);
-  return result;
-};
 
 const formatCheckoutDateTime = (date: Date): string =>
   date.toISOString().replace(/Z$/, "");
-
-const calculateProductDeliveryRange = (
-  product?: Partial<ProductItem> | null,
-) => {
-  if (!product) return null;
-
-  const deliveryRange = getDeliveryDayRange(product.delivery_time);
-  if (!deliveryRange) return null;
-
-  const currentStock = calculateAvailableStock(product);
-  const incomingSummary = calculateIncomingStockSummary(product);
-  const isBundleProduct = (product.bundles?.length ?? 0) > 0;
-  const nextIncomingDate = isBundleProduct
-    ? incomingSummary.latestIncomingDate
-    : incomingSummary.nearestIncomingDate;
-
-  if (currentStock > 0) {
-    const today = new Date();
-    return {
-      from: addCalendarDays(today, deliveryRange.min),
-      to: addCalendarDays(today, deliveryRange.max),
-    };
-  }
-
-  if (!nextIncomingDate) {
-    const today = new Date();
-    return {
-      from: addCalendarDays(today, deliveryRange.min),
-      to: addCalendarDays(today, deliveryRange.max),
-    };
-  }
-
-  return {
-    from: addBusinessDays(nextIncomingDate, deliveryRange.min),
-    to: addBusinessDays(nextIncomingDate, deliveryRange.max),
-  };
-};
 
 const calculateCheckoutDeliveryRange = (cartData: CartResponse) => {
   const itemRanges = cartData

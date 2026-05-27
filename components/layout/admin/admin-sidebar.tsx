@@ -177,6 +177,23 @@ export function AdminSideBar() {
       ],
     },
     {
+      title: "Affiliate",
+      url: "/admin/affiliate",
+      icon: ChevronRight,
+      children: [
+        {
+          title: "Affiliate List",
+          url: "/admin/affiliate/list",
+          icon: CornerDownRight,
+        },
+        {
+          title: "Generate Link",
+          url: "/admin/affiliate/generate-link",
+          icon: CornerDownRight,
+        },
+      ],
+    },
+    {
       title: "Settings",
       url: "/admin/settings",
       icon: ChevronRight,

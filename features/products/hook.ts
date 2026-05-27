@@ -282,8 +282,7 @@ export function useEditProduct() {
       id: string;
       input: EditProductInput;
       skipInvalidateProducts?: boolean;
-    }) =>
-      editProduct(input, id),
+    }) => editProduct(input, id),
     onSuccess: (_, variables) => {
       if (!variables.skipInvalidateProducts) {
         qc.invalidateQueries({ queryKey: ["all-products"] });
