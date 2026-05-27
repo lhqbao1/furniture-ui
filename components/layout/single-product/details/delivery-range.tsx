@@ -1,8 +1,6 @@
 "use client";
 import {
-  addBusinessDays,
-  getDeliveryDayRange,
-  getIncomingDateForRequiredQuantity,
+  calculateProductDeliveryRange,
 } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
 import { ProductItem } from "@/types/products";
@@ -15,8 +13,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
-import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
-import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 
 interface DeliveryRangeProps {
   productDetails: ProductItem;
@@ -35,11 +31,6 @@ const DeliveryRange = ({
     productDetails.id,
   );
 
-  const currentStock = React.useMemo(
-    () => calculateAvailableStock(productDetails),
-    [productDetails],
-  );
-
   const parsedServerRange = React.useMemo(() => {
     if (!serverDeliveryRange?.from || !serverDeliveryRange?.to) return null;
     const from = new Date(serverDeliveryRange.from);
@@ -48,73 +39,16 @@ const DeliveryRange = ({
     return { from, to };
   }, [serverDeliveryRange]);
 
-  const incomingSummary = React.useMemo(
-    () => calculateIncomingStockSummary(productDetails, { inventoryPo: data }),
-    [productDetails, data],
-  );
-
   const incomingInventorySource = React.useMemo(() => {
     if (Array.isArray(data) && data.length > 0) return data;
     return productDetails.inventory_pos ?? [];
   }, [data, productDetails.inventory_pos]);
 
-  const nextIncomingDate = React.useMemo(() => {
-    const isBundleProduct = (productDetails.bundles?.length ?? 0) > 0;
-
-    if (isBundleProduct) {
-      return incomingSummary.latestIncomingDate;
-    }
-
-    const requiredIncomingQuantity = Math.abs(currentStock) + 1;
-    const incomingDate = getIncomingDateForRequiredQuantity(
-      incomingInventorySource,
-      requiredIncomingQuantity,
-    );
-
-    return incomingDate ?? incomingSummary.nearestIncomingDate;
-  }, [
-    productDetails.bundles,
-    incomingSummary,
-    currentStock,
-    incomingInventorySource,
-  ]);
-
-  const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
-    const result = new Date(startDate);
-    result.setDate(result.getDate() + days);
-    return result;
-  }, []);
-
   const estimatedDeliveryRange = React.useMemo(() => {
-    const deliveryRange = getDeliveryDayRange(productDetails.delivery_time);
-    if (!deliveryRange) return null;
-
-    if (currentStock > 0) {
-      const today = new Date();
-      return {
-        from: addCalendarDays(today, deliveryRange.min),
-        to: addCalendarDays(today, deliveryRange.max),
-      };
-    }
-
-    if (!nextIncomingDate) {
-      const today = new Date();
-      return {
-        from: addCalendarDays(today, deliveryRange.min),
-        to: addCalendarDays(today, deliveryRange.max),
-      };
-    }
-
-    return {
-      from: addBusinessDays(nextIncomingDate, deliveryRange.min),
-      to: addBusinessDays(nextIncomingDate, deliveryRange.max),
-    };
-  }, [
-    addCalendarDays,
-    currentStock,
-    nextIncomingDate,
-    productDetails.delivery_time,
-  ]);
+    return calculateProductDeliveryRange(productDetails, {
+      inventoryPo: incomingInventorySource,
+    });
+  }, [productDetails, incomingInventorySource]);
 
   const displayRange = React.useMemo(() => {
     if (parsedServerRange && (isLoading || isError || !data)) {

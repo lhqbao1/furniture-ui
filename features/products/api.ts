@@ -219,9 +219,10 @@ export async function getAllProductAndSold(
         sort_by_stock: params.sort_by_stock,
       }),
       ...(params?.page !== undefined && { page: params.page }),
-      ...(params?.is_econelo !== undefined && params?.is_econelo !== null && {
-        is_econelo: params.is_econelo,
-      }),
+      ...(params?.is_econelo !== undefined &&
+        params?.is_econelo !== null && {
+          is_econelo: params.is_econelo,
+        }),
       ...(params?.page_size !== undefined && { page_size: params.page_size }),
     },
     paramsSerializer: (nextParams) =>
@@ -273,7 +274,9 @@ export async function getAllRevenueInventory(
       }),
   });
 
-  const normalizedItems = ((data?.items ?? []) as ProductRevenueInventoryItem[]).map((item) => ({
+  const normalizedItems = (
+    (data?.items ?? []) as ProductRevenueInventoryItem[]
+  ).map((item) => ({
     ...item,
     inventory_pos:
       item.inventory_pos ??

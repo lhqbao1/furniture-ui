@@ -1,4 +1,7 @@
 import { useMemo } from "react";
+import { calculateAvailableStock } from "./calculate_available_stock";
+import { calculateIncomingStockSummary } from "./calculate_incoming_stock";
+import { ProductItem } from "@/types/products";
 
 /* ---------- helpers ---------- */
 
@@ -107,11 +110,72 @@ export function addBusinessDays(startDate: Date, businessDays: number) {
   return result;
 }
 
+export function addCalendarDays(startDate: Date, days: number) {
+  const result = new Date(startDate);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+interface CalculateProductDeliveryRangeOptions {
+  inventoryPo?: IncomingInventoryItem[] | null;
+  referenceDate?: Date;
+}
+
+export function calculateProductDeliveryRange(
+  product?: Partial<ProductItem> | null,
+  options: CalculateProductDeliveryRangeOptions = {},
+): { from: Date; to: Date } | null {
+  if (!product) return null;
+
+  const deliveryRange = getDeliveryDayRange(product.delivery_time);
+  if (!deliveryRange) return null;
+
+  const currentStock = calculateAvailableStock(product);
+  const incomingSummary = calculateIncomingStockSummary(product, {
+    inventoryPo: options.inventoryPo,
+    referenceDate: options.referenceDate,
+  });
+  const isBundleProduct = (product.bundles?.length ?? 0) > 0;
+
+  const incomingInventorySource =
+    Array.isArray(options.inventoryPo) && options.inventoryPo.length > 0
+      ? options.inventoryPo
+      : product.inventory_pos ?? [];
+
+  const nextIncomingDate = isBundleProduct
+    ? incomingSummary.latestIncomingDate
+    : (getIncomingDateForRequiredQuantity(
+        incomingInventorySource,
+        Math.abs(currentStock) + 1,
+      ) ?? incomingSummary.nearestIncomingDate);
+
+  if (currentStock > 0) {
+    const today = options.referenceDate ?? new Date();
+    return {
+      from: addCalendarDays(today, deliveryRange.min),
+      to: addCalendarDays(today, deliveryRange.max),
+    };
+  }
+
+  if (!nextIncomingDate) {
+    const today = options.referenceDate ?? new Date();
+    return {
+      from: addCalendarDays(today, deliveryRange.min),
+      to: addCalendarDays(today, deliveryRange.max),
+    };
+  }
+
+  return {
+    from: addBusinessDays(nextIncomingDate, deliveryRange.min),
+    to: addBusinessDays(nextIncomingDate, deliveryRange.max),
+  };
+}
+
 /* ---------- hook ---------- */
 
 interface UseDeliveryEstimateParams {
   stock: number;
-  inventory?: any[];
+  inventory?: IncomingInventoryItem[];
   deliveryTime?: string;
 }
 

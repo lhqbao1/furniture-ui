@@ -1363,7 +1363,9 @@ function EditableCategoryCell({ product }: { product: ProductItem }) {
     handleUpdateCategories(nextSelected);
   };
 
-  const renderUnselected = (categoryTree: CategoryResponse[]): JSX.Element[] => {
+  const renderUnselected = (
+    categoryTree: CategoryResponse[],
+  ): JSX.Element[] => {
     return categoryTree.flatMap((category) => {
       const hasChildren = !!(category.children && category.children.length > 0);
 
@@ -2012,6 +2014,27 @@ export const getProductColumns = (
     sortingFn: sortByHasValue,
   },
   {
+    accessorKey: "tag",
+    header: () => <div className="text-center">TAG</div>,
+    cell: ({ row }) => {
+      const tagName = row.original.tag?.trim();
+      if (!tagName) {
+        return <div className="text-center text-gray-400">-</div>;
+      }
+
+      return (
+        <div className="flex justify-center">
+          <span
+            className="rounded-xl text-xs py-1 px-2 text-white uppercase"
+            style={{ background: getProductTagColor(tagName) }}
+          >
+            {tagName}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "brand",
     header: ({ column }) => {
       const direction = column.getIsSorted() as "asc" | "desc" | undefined;
@@ -2124,27 +2147,7 @@ export const getProductColumns = (
     header: "STATUS",
     cell: ({ row }) => <ToggleProductStatus product={row.original} />,
   },
-  {
-    accessorKey: "tag",
-    header: "TAG",
-    cell: ({ row }) => {
-      const tagName = row.original.tag?.trim();
-      if (!tagName) {
-        return <div className="text-center text-gray-400">-</div>;
-      }
 
-      return (
-        <div className="flex justify-center">
-          <span
-            className="rounded-xl text-xs py-1 px-2 text-white uppercase"
-            style={{ background: getProductTagColor(tagName) }}
-          >
-            {tagName}
-          </span>
-        </div>
-      );
-    },
-  },
   {
     accessorKey: "color",
     header: ({ column }) => {

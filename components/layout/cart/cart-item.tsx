@@ -3,7 +3,6 @@ import { Heart, Trash } from "lucide-react";
 import { CartItemLocal } from "@/lib/utils/cart";
 import { CartItem } from "@/types/cart";
 import { useCartLocal } from "@/hooks/cart";
-import { CartTableItem } from "./cart-local-table";
 import {
   useDeleteCartItem,
   useUpdateCartItemQuantity,
@@ -22,13 +21,10 @@ import { useAddToWishList } from "@/features/wishlist/hook";
 import { HandleApiError } from "@/lib/api-helper";
 import ProductBrand from "../single-product/product-brand";
 import {
-  addBusinessDays,
-  getDeliveryDayRange,
+  calculateProductDeliveryRange,
 } from "@/hooks/get-estimated-shipping";
 import { formatDateDE } from "@/lib/format-date-DE";
-import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import { useInventoryPoByProductId } from "@/features/incoming-inventory/inventory/hook";
-import { calculateIncomingStockSummary } from "@/hooks/calculate_incoming_stock";
 
 interface CartItemProps {
   cartServer?: CartItem;
@@ -119,7 +115,10 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
   const deleteCartItemMutation = useDeleteCartItem();
   const addToWishlistMutation = useAddToWishList();
 
-  const onUpdateQuantity = (item: CartTableItem, newQuantity: number) => {
+  const onUpdateQuantity = (
+    item: { product_id: string; stock: number },
+    newQuantity: number,
+  ) => {
     if (newQuantity < 1) return;
     if (item.stock && newQuantity > item.stock) return;
     updateQuantity({ product_id: item.product_id, quantity: newQuantity });
@@ -176,7 +175,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     if (userId && cartServer) {
       debouncedUpdate(cartServer.id, newQty);
     } else if (localProducts) {
-      onUpdateQuantity(localProducts as any, newQty);
+      onUpdateQuantity(localProducts, newQty);
     }
   };
 
@@ -204,7 +203,7 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
         return;
       }
 
-      onUpdateQuantity(localProducts as any, newQty);
+      onUpdateQuantity(localProducts, newQty);
     }
   };
 
@@ -214,77 +213,29 @@ const CartItemCard = ({ cartServer, localProducts }: CartItemProps) => {
     productIdForInventoryPo,
   );
 
-  const deliveryDayRange = React.useMemo(
-    () => getDeliveryDayRange(item?.deliveryText),
-    [item?.deliveryText],
-  );
-
-  const availableStock = React.useMemo(
-    () =>
-      calculateAvailableStock(
-        item
-          ? {
-              stock: item.stock,
-              result_stock: item.result_stock,
-            }
-          : null,
-      ),
-    [item?.stock, item?.result_stock],
-  );
-
-  const incomingSummary = React.useMemo(() => {
+  const estimatedDeliveryRange = React.useMemo(() => {
     if (cartServer?.products) {
-      return calculateIncomingStockSummary(cartServer.products, {
-        inventoryPo,
+      return calculateProductDeliveryRange(cartServer.products, {
+        inventoryPo: inventoryPo,
       });
     }
 
     if (localProducts) {
-      return calculateIncomingStockSummary(
+      return calculateProductDeliveryRange(
         {
           stock: localProducts.stock,
           result_stock: localProducts.result_stock,
+          delivery_time: localProducts.delivery_time,
           inventory_pos: localProducts.inventory,
         },
-        { inventoryPo },
+        {
+          inventoryPo: inventoryPo,
+        },
       );
     }
 
-    return calculateIncomingStockSummary(null);
+    return null;
   }, [cartServer?.products, localProducts, inventoryPo]);
-
-  const nextIncomingDate = incomingSummary.nearestIncomingDate;
-
-  const addCalendarDays = React.useCallback((startDate: Date, days: number) => {
-    const result = new Date(startDate);
-    result.setDate(result.getDate() + days);
-    return result;
-  }, []);
-
-  const estimatedDeliveryRange = React.useMemo(() => {
-    if (!deliveryDayRange) return null;
-
-    if (availableStock > 0) {
-      const today = new Date();
-      return {
-        from: addCalendarDays(today, deliveryDayRange.min),
-        to: addCalendarDays(today, deliveryDayRange.max),
-      };
-    }
-
-    if (!nextIncomingDate) {
-      const today = new Date();
-      return {
-        from: addCalendarDays(today, deliveryDayRange.min),
-        to: addCalendarDays(today, deliveryDayRange.max),
-      };
-    }
-
-    return {
-      from: addBusinessDays(nextIncomingDate, deliveryDayRange.min),
-      to: addBusinessDays(nextIncomingDate, deliveryDayRange.max),
-    };
-  }, [deliveryDayRange, availableStock, nextIncomingDate, addCalendarDays]);
 
   const handleAddToWishlist = (id: string) => {
     if (!id) return;
