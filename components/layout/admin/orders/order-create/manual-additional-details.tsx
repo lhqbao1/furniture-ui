@@ -63,8 +63,6 @@ export default function ManualAdditionalInformation({
   const taxId = form.watch("tax_id") ?? null;
   const effectiveTaxIdForVat = countryCode === "AT" ? "__AT_ZERO_VAT__" : taxId;
   const isDirty = form.formState.isDirty;
-  const isNettoMarketplace =
-    String(marketplace ?? marketplaceDisplay ?? "").toLowerCase() === "netto";
 
   const shippingGrossPreview = useMemo(() => {
     if (priceMode !== "net") return 0;
@@ -154,12 +152,6 @@ export default function ManualAdditionalInformation({
       setMarketplaceDisplay(marketplace);
     }
   }, [marketplace, isDirty]);
-
-  useEffect(() => {
-    if (!isNettoMarketplace) {
-      form.setValue("netto_buyer_id", null);
-    }
-  }, [isNettoMarketplace, form]);
 
   return (
     <div className="space-y-4">
@@ -304,6 +296,33 @@ export default function ManualAdditionalInformation({
 
         <FormField
           control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem className="col-span-1">
+              <FormLabel className="text-black font-semibold text-sm">
+                Status
+              </FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="border">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PAID">Payment received</SelectItem>
+                    <SelectItem value="PENDING">Waiting for payment</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="marketplace_order_id"
           render={({ field }) => (
             <FormItem className="col-span-1">
@@ -326,53 +345,24 @@ export default function ManualAdditionalInformation({
           )}
         />
 
-        {isNettoMarketplace && (
-          <FormField
-            control={form.control}
-            name="netto_buyer_id"
-            render={({ field }) => (
-              <FormItem className="col-span-1">
-                <FormLabel className="text-black font-semibold text-sm">
-                  Netto Customer ID
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder=""
-                    onChange={(e) => {
-                      const value = e.target.value.trim();
-                      field.onChange(value === "" ? null : value);
-                    }}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-
         <FormField
           control={form.control}
-          name="status"
+          name="netto_buyer_id"
           render={({ field }) => (
             <FormItem className="col-span-1">
               <FormLabel className="text-black font-semibold text-sm">
-                Status
+                External Reference
               </FormLabel>
               <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="border">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PAID">Payment received</SelectItem>
-                    <SelectItem value="PENDING">Waiting for payment</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  {...field}
+                  placeholder=""
+                  onChange={(e) => {
+                    const value = e.target.value.trim();
+                    field.onChange(value === "" ? null : value);
+                  }}
+                  value={field.value ?? ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

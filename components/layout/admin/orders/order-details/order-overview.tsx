@@ -31,16 +31,16 @@ const OrderDetailOverView = ({
       <div className="space-y-2.5 text-sm">
         <div className="flex items-center justify-between gap-3">
           <div className="text-slate-500">Channel</div>
-          <div className="font-semibold text-slate-900">
-            {channelLabel}
-          </div>
+          <div className="font-semibold text-slate-900">{channelLabel}</div>
         </div>
         <div className="flex items-center justify-between gap-3">
           <div className="inline-flex items-center gap-1 text-slate-500">
             <Hash className="size-3.5" />
             <span>Order ID</span>
           </div>
-          <div className="font-semibold text-slate-900">{order.checkout_code}</div>
+          <div className="font-semibold text-slate-900">
+            {order.checkout_code}
+          </div>
         </div>
         <div className="flex items-center justify-between gap-3">
           <div className="inline-flex items-center gap-1 text-slate-500">
@@ -49,6 +49,15 @@ const OrderDetailOverView = ({
           </div>
           <div className="font-medium text-slate-700">
             {order.marketplace_order_id ? order.marketplace_order_id : "-"}
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-1 text-slate-500">
+            <ReceiptText className="size-3.5" />
+            <span>External Reference</span>
+          </div>
+          <div className="font-medium text-slate-700">
+            {order.netto_buyer_id ? order.netto_buyer_id : "-"}
           </div>
         </div>
         <div className="flex items-center justify-between gap-3">
@@ -65,10 +74,10 @@ const OrderDetailOverView = ({
             <span>Payment Method</span>
           </div>
           <div translate="no" className="text-right capitalize text-slate-700">
-          {order.from_marketplace &&
-          order.from_marketplace.toLowerCase() !== "econelo"
-            ? `${order.from_marketplace} Managed Payments`
-            : order.payment_method}
+            {order.from_marketplace &&
+            order.from_marketplace.toLowerCase() !== "econelo"
+              ? `${order.from_marketplace} Managed Payments`
+              : order.payment_method}
           </div>
         </div>
       </div>
