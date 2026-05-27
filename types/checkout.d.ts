@@ -115,6 +115,7 @@ export interface CheckOutMain {
   marketplace_order_id: string;
   delivery_from?: string | null;
   delivery_to?: string | null;
+  netto_buyer_id?: string | null;
   payment_method: string;
   checkouts: CheckOut[];
   tax: number;
