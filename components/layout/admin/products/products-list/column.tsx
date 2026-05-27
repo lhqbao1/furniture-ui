@@ -56,7 +56,7 @@ import {
 import { getCarrierLogo } from "@/lib/getCarrierImage";
 import { getProductActivationMissingFields } from "@/lib/product-activation";
 import { CategoryResponse } from "@/types/categories";
-import { CARRIERS } from "@/data/data";
+import { CARRIERS, tags as PRODUCT_TAGS } from "@/data/data";
 import { calculateAvailableStock } from "@/hooks/calculate_available_stock";
 import EditProductDrawer from "../marketplace/edit-product-drawer";
 import { formatIncomingStockEntry } from "@/lib/format-incoming-stock";
@@ -75,6 +75,15 @@ const sortByHasValue = (
 
   if (aHasValue === bHasValue) return 0;
   return aHasValue ? 1 : -1;
+};
+
+const PRODUCT_TAG_COLOR_LOOKUP = new Map(
+  PRODUCT_TAGS.map((item) => [item.name.toLowerCase(), item.color]),
+);
+
+const getProductTagColor = (tagName?: string | null) => {
+  if (!tagName) return "#6b7280";
+  return PRODUCT_TAG_COLOR_LOOKUP.get(tagName.toLowerCase()) ?? "#6b7280";
 };
 
 const getErrorDescription = (error: unknown) => {
@@ -2114,6 +2123,27 @@ export const getProductColumns = (
     accessorKey: "is_active",
     header: "STATUS",
     cell: ({ row }) => <ToggleProductStatus product={row.original} />,
+  },
+  {
+    accessorKey: "tag",
+    header: "TAG",
+    cell: ({ row }) => {
+      const tagName = row.original.tag?.trim();
+      if (!tagName) {
+        return <div className="text-center text-gray-400">-</div>;
+      }
+
+      return (
+        <div className="flex justify-center">
+          <span
+            className="rounded-xl text-xs py-1 px-2 text-white uppercase"
+            style={{ background: getProductTagColor(tagName) }}
+          >
+            {tagName}
+          </span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "color",

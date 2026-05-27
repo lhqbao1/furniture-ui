@@ -512,6 +512,10 @@ export const tags = [
     name: "Best Seller",
     color: "#01bfff",
   },
+  {
+    name: "EOL",
+    color: "#ff1f1f",
+  },
 ];
 
 export const materials = [
