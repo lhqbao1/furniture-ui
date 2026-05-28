@@ -46,6 +46,7 @@ const OrderList = () => {
     search: filters.search,
     country: filters.country,
     is_b2b: filters.isB2B,
+    filter_by_shipment: filters.filterByShipment,
   });
 
   const multiSearchRaw = searchParams.get("multi_search") ?? "";
@@ -91,6 +92,7 @@ const OrderList = () => {
           type={ToolbarType.order}
           selectedOrders={selectedOrders}
           showCountryFilter
+          showShipmentFilter
         />
         {isError ? (
           <div className="flex h-[60vh] items-center justify-center rounded-2xl border border-destructive/30 bg-destructive/5 p-6">

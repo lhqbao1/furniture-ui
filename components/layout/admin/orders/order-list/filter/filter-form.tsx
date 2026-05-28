@@ -10,10 +10,12 @@ import OrderChanelFilter from "./filter-order-chanel";
 import OrderDateFilter from "./filter-order-date";
 import OrderClaimedFilter from "./filter-order-claimed";
 import OrderCountryFilter from "./filter-order-country";
+import OrderShipmentFilter from "./filter-order-shipment";
 
 interface OrderFilterFormProps {
   showClaimedFilters?: boolean;
   showCountryFilter?: boolean;
+  showShipmentFilter?: boolean;
   showExportButton?: boolean;
   exportPresetStatuses?: string[];
   lockExportStatuses?: boolean;
@@ -24,6 +26,7 @@ interface OrderFilterFormProps {
 const OrderFilterForm = ({
   showClaimedFilters = false,
   showCountryFilter = false,
+  showShipmentFilter = false,
   showExportButton = false,
   exportPresetStatuses,
   lockExportStatuses = false,
@@ -54,6 +57,7 @@ const OrderFilterForm = ({
     searchParams.get("is_b2b") ||
     searchParams.get("is_claimed_factory") ||
     searchParams.get("is_claimed_marketplace") ||
+    searchParams.get("filter_by_shipment") ||
     searchParams.get("search") ||
     searchParams.get("multi_search");
 
@@ -67,6 +71,7 @@ const OrderFilterForm = ({
       </div>
 
       <div className="space-y-4">
+        {showShipmentFilter ? <OrderShipmentFilter /> : null}
         <OrderDateFilter />
       </div>
 

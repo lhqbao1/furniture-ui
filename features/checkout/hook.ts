@@ -201,6 +201,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
     search,
     country,
     is_b2b,
+    filter_by_shipment,
   } = params;
 
   return useQuery({
@@ -215,6 +216,7 @@ export function useGetCheckOutMain(params: GetAllCheckoutParams = {}) {
       search ?? null,
       country ?? null,
       is_b2b,
+      filter_by_shipment ?? null,
     ],
     queryFn: () => getCheckOutMain(params),
     placeholderData: (previousData) => previousData,
@@ -251,6 +253,7 @@ export function useGetAllCheckOutMain(params?: {
   search?: string;
   country?: string;
   is_b2b?: boolean;
+  filter_by_shipment?: boolean;
 }) {
   return useQuery({
     queryKey: [
@@ -262,6 +265,7 @@ export function useGetAllCheckOutMain(params?: {
       params?.search ?? null,
       params?.country ?? null,
       params?.is_b2b ?? null,
+      params?.filter_by_shipment ?? null,
     ],
     queryFn: () => getAllCheckOutMain(params),
     retry: false,

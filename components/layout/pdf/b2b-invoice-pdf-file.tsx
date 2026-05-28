@@ -314,14 +314,16 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     0,
   );
 
-  const taxBuckets = displayRows.reduce(
+  const netBuckets = displayRows.reduce(
     (acc, row) => {
+      const rowNetWithShipping = row.rowNet + row.shippingNet;
+
       if (Math.abs(row.vatRate - 0.19) < 0.0001) {
-        acc.vat19 += row.rowVat;
+        acc.vat19 += rowNetWithShipping;
       } else if (Math.abs(row.vatRate - 0.07) < 0.0001) {
-        acc.vat7 += row.rowVat;
+        acc.vat7 += rowNetWithShipping;
       } else {
-        acc.otherVat += row.rowVat;
+        acc.otherVat += rowNetWithShipping * row.vatRate;
       }
 
       return acc;
@@ -329,23 +331,24 @@ Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf d
     { vat19: 0, vat7: 0, otherVat: 0 },
   );
   const roundedTaxBuckets = {
-    vat19: +taxBuckets.vat19.toFixed(2),
-    vat7: +taxBuckets.vat7.toFixed(2),
-    otherVat: +taxBuckets.otherVat.toFixed(2),
+    vat19: +(netBuckets.vat19 * 0.19).toFixed(3),
+    vat7: +(netBuckets.vat7 * 0.07).toFixed(3),
+    otherVat: +netBuckets.otherVat.toFixed(3),
   };
 
   const totalVat19 = isGermanyInvoice ? roundedTaxBuckets.vat19 : 0;
   const totalVat7 = isGermanyInvoice ? roundedTaxBuckets.vat7 : 0;
   const totalVatOther = isGermanyInvoice ? roundedTaxBuckets.otherVat : 0;
-  // Keep summary fully aligned with table rows:
-  // each row contributes G.-Preis + Versand.
-  const totalGross = +displayGrossTotal.toFixed(2);
+  const grossFromRows = +displayGrossTotal.toFixed(2);
   const totalNet =
     Number.isFinite(displayNetTotal) && displayNetTotal >= 0
       ? +displayNetTotal.toFixed(2)
       : isGermanyInvoice
-        ? totalGross - totalVat19 - totalVat7 - totalVatOther
-        : totalGross;
+        ? +(grossFromRows - totalVat19 - totalVat7 - totalVatOther).toFixed(2)
+        : grossFromRows;
+  const totalGross = isGermanyInvoice
+    ? +(totalNet + totalVat19 + totalVat7 + totalVatOther).toFixed(2)
+    : grossFromRows;
   const intraCommunityVat = !isGermanyInvoice && isEuInvoice ? 0 : null;
 
   return (

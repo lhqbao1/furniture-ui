@@ -42,6 +42,11 @@ function parseBooleanParam(param: string | null): boolean | undefined {
   return undefined;
 }
 
+function parseShipmentFilterParam(param: string | null): boolean | undefined {
+  if (!param) return undefined;
+  return param.trim().toLowerCase() === "true" ? true : undefined;
+}
+
 export function useOrderListFilters() {
   const searchParams = useSearchParams();
 
@@ -57,6 +62,9 @@ export function useOrderListFilters() {
     search: searchParams.get("search") || "",
     country: parseCountryParam(searchParams.get("country")),
     isB2B: parseIsB2BParam(searchParams.get("is_b2b")),
+    filterByShipment: parseShipmentFilterParam(
+      searchParams.get("filter_by_shipment"),
+    ),
     isClaimedFactory: parseBooleanParam(searchParams.get("is_claimed_factory")),
     isClaimedMarketplace: parseBooleanParam(
       searchParams.get("is_claimed_marketplace"),
