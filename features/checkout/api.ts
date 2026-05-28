@@ -28,6 +28,11 @@ export interface GetAllCheckoutParams {
   filter_by_shipment?: boolean;
 }
 
+export type GetAllMainCheckOutsAllParams = Pick<
+  GetAllCheckoutParams,
+  "channel" | "status" | "from_date" | "to_date" | "filter_by_shipment"
+>;
+
 export interface OrderStatisticsParams {
   from_date?: string;
   to_date?: string;
@@ -76,6 +81,18 @@ export interface UploadCheckoutFilesResponse {
 }
 
 export interface CheckoutPdfFileResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
+export interface UpdateBulkExtInvoiceIdPayloadItem {
+  ext_invoice_id: string;
+  main_checkout_id: string;
+}
+
+export type UpdateBulkExtInvoiceIdPayload = UpdateBulkExtInvoiceIdPayloadItem[];
+
+export interface UpdateBulkExtInvoiceIdResponse {
   message?: string;
   [key: string]: unknown;
 }
@@ -209,7 +226,7 @@ export async function getCheckOutRefundOrders(params?: GetRefundOrdersParams) {
   return data as RefundOrdersResponse;
 }
 
-export async function getAllCheckOutMain(params?: GetAllCheckoutParams) {
+export async function getAllCheckOutMain(params?: GetAllMainCheckOutsAllParams) {
   const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all", {
     params: {
       ...(params?.channel !== undefined && { channel: params.channel }),
@@ -218,9 +235,6 @@ export async function getAllCheckOutMain(params?: GetAllCheckoutParams) {
         : {}),
       ...(params?.from_date !== undefined && { from_date: params.from_date }),
       ...(params?.to_date !== undefined && { to_date: params.to_date }),
-      ...(params?.search !== undefined && { search: params.search }),
-      ...(params?.country !== undefined && { country: params.country }),
-      ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
       ...(params?.filter_by_shipment !== undefined && {
         filter_by_shipment: params.filter_by_shipment,
       }),
@@ -406,6 +420,22 @@ export async function updateIsClaimedFactoryMainCheckout(
   );
 
   return data;
+}
+
+export async function updateBulkExtInvoiceId(
+  payload: UpdateBulkExtInvoiceIdPayload,
+) {
+  const { data } = await apiAdmin.put(
+    "/checkout/update-bulk-ext-invoice-id",
+    payload,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return data as UpdateBulkExtInvoiceIdResponse;
 }
 
 export async function uploadCheckoutFiles(

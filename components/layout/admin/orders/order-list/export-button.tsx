@@ -283,8 +283,6 @@ export default function ExportOrderExcelButton({
   );
   const fromDate = searchParams.get("from_date") || undefined;
   const toDate = searchParams.get("to_date") || undefined;
-  const country = searchParams.get("country") || undefined;
-  const isB2B = parseBooleanParam(searchParams.get("is_b2b"));
   const filterByShipment = parseShipmentFilterParam(
     searchParams.get("filter_by_shipment"),
   );
@@ -296,24 +294,31 @@ export default function ExportOrderExcelButton({
   );
 
   const hasExportFilters = useMemo(
-    () =>
-      statusValues.length > 0 ||
-      channelValues.length > 0 ||
-      Boolean(fromDate) ||
-      Boolean(toDate) ||
-      Boolean(search) ||
-      Boolean(multiSearchValues.length) ||
-      Boolean(country) ||
-      isB2B !== undefined ||
-      filterByShipment !== undefined ||
-      isClaimedFactory !== undefined ||
-      isClaimedMarketplace !== undefined,
+    () => {
+      if (expandByProductRefund) {
+        return (
+          channelValues.length > 0 ||
+          Boolean(search) ||
+          isClaimedFactory !== undefined ||
+          isClaimedMarketplace !== undefined ||
+          Boolean(multiSearchValues.length)
+        );
+      }
+
+      return (
+        statusValues.length > 0 ||
+        channelValues.length > 0 ||
+        Boolean(fromDate) ||
+        Boolean(toDate) ||
+        filterByShipment !== undefined ||
+        Boolean(multiSearchValues.length)
+      );
+    },
     [
+      expandByProductRefund,
       channelValues.length,
-      country,
       filterByShipment,
       fromDate,
-      isB2B,
       isClaimedFactory,
       isClaimedMarketplace,
       multiSearchValues.length,
@@ -333,8 +338,6 @@ export default function ExportOrderExcelButton({
       multiSearchRaw,
       fromDate ?? null,
       toDate ?? null,
-      country ?? null,
-      isB2B ?? null,
       filterByShipment ?? null,
       isClaimedFactory ?? null,
       isClaimedMarketplace ?? null,
@@ -362,9 +365,6 @@ export default function ExportOrderExcelButton({
         ...(statusValues.length > 0 ? { status: statusValues } : {}),
         ...(fromDate ? { from_date: fromDate } : {}),
         ...(toDate ? { to_date: toDate } : {}),
-        ...(search ? { search } : {}),
-        ...(country ? { country } : {}),
-        ...(isB2B !== undefined ? { is_b2b: isB2B } : {}),
         ...(filterByShipment !== undefined
           ? { filter_by_shipment: filterByShipment }
           : {}),

@@ -6,6 +6,8 @@ import {
   GenerateAffiliateLinkInput,
   getAffiliateById,
   getAffiliates,
+  trackAffiliateClick,
+  TrackAffiliateClickInput,
   updateAffiliate,
 } from "./api";
 import { AffiliateCreateInput, AffiliateUpdateInput } from "@/types/affiliate";
@@ -68,5 +70,11 @@ export function useGenerateAffiliateLink() {
   return useMutation({
     mutationFn: (input: GenerateAffiliateLinkInput) =>
       generateAffiliateLink(input),
+  });
+}
+
+export function useTrackAffiliateClick() {
+  return useMutation({
+    mutationFn: (input: TrackAffiliateClickInput) => trackAffiliateClick(input),
   });
 }

@@ -21,6 +21,7 @@ import {
   DeliveryOrderPayload,
   getAllCheckOutMain,
   getCheckOutRefundOrders,
+  GetAllMainCheckOutsAllParams,
   GetAllCheckoutParams,
   GetRefundOrdersParams,
   getCheckOut,
@@ -43,7 +44,9 @@ import {
   uploadCheckoutPdfFile,
   uploadCheckoutFiles,
   UploadCheckoutFilesPayload,
+  UpdateBulkExtInvoiceIdPayload,
   updateIsClaimedFactoryMainCheckout,
+  updateBulkExtInvoiceId,
   updateIsClaimedMarketplaceMainCheckout,
   updateReasonForMainCheckout,
   updateTagForMainCheckout,
@@ -245,16 +248,7 @@ export function useGetCheckOutRefundOrders(params: GetRefundOrdersParams = {}) {
   });
 }
 
-export function useGetAllCheckOutMain(params?: {
-  channel?: string[];
-  status?: string[];
-  from_date?: string;
-  to_date?: string;
-  search?: string;
-  country?: string;
-  is_b2b?: boolean;
-  filter_by_shipment?: boolean;
-}) {
+export function useGetAllCheckOutMain(params?: GetAllMainCheckOutsAllParams) {
   return useQuery({
     queryKey: [
       "checkout-main-all",
@@ -262,9 +256,6 @@ export function useGetAllCheckOutMain(params?: {
       (params?.status ?? []).join(","),
       params?.from_date ?? null,
       params?.to_date ?? null,
-      params?.search ?? null,
-      params?.country ?? null,
-      params?.is_b2b ?? null,
       params?.filter_by_shipment ?? null,
     ],
     queryFn: () => getAllCheckOutMain(params),
@@ -515,6 +506,32 @@ export function useUpdateIsClaimedFactoryMainCheckout() {
       });
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
+    },
+  });
+}
+
+export function useUpdateBulkExtInvoiceId() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: UpdateBulkExtInvoiceIdPayload) =>
+      updateBulkExtInvoiceId(payload),
+    onSuccess: (_data, payload) => {
+      qc.refetchQueries({ queryKey: ["checkout-main"] });
+      qc.refetchQueries({ queryKey: ["checkout"] });
+
+      const mainCheckoutIds = Array.from(
+        new Set(
+          payload
+            .map((item) => item.main_checkout_id?.trim())
+            .filter((id): id is string => Boolean(id)),
+        ),
+      );
+
+      mainCheckoutIds.forEach((mainCheckoutId) => {
+        qc.refetchQueries({
+          queryKey: ["checkout-main-id", mainCheckoutId],
+        });
+      });
     },
   });
 }
