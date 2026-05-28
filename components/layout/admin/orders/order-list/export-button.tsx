@@ -57,6 +57,11 @@ const parseBooleanParam = (value: string | null): boolean | undefined => {
   return undefined;
 };
 
+const parseShipmentFilterParam = (value: string | null): boolean | undefined => {
+  if (!value) return undefined;
+  return value.trim().toLowerCase() === "true" ? true : undefined;
+};
+
 const clean = (val: unknown) =>
   val === null || val === undefined || val === "None" ? "" : val;
 
@@ -280,6 +285,9 @@ export default function ExportOrderExcelButton({
   const toDate = searchParams.get("to_date") || undefined;
   const country = searchParams.get("country") || undefined;
   const isB2B = parseBooleanParam(searchParams.get("is_b2b"));
+  const filterByShipment = parseShipmentFilterParam(
+    searchParams.get("filter_by_shipment"),
+  );
   const isClaimedFactory = parseBooleanParam(
     searchParams.get("is_claimed_factory"),
   );
@@ -297,11 +305,13 @@ export default function ExportOrderExcelButton({
       Boolean(multiSearchValues.length) ||
       Boolean(country) ||
       isB2B !== undefined ||
+      filterByShipment !== undefined ||
       isClaimedFactory !== undefined ||
       isClaimedMarketplace !== undefined,
     [
       channelValues.length,
       country,
+      filterByShipment,
       fromDate,
       isB2B,
       isClaimedFactory,
@@ -325,6 +335,7 @@ export default function ExportOrderExcelButton({
       toDate ?? null,
       country ?? null,
       isB2B ?? null,
+      filterByShipment ?? null,
       isClaimedFactory ?? null,
       isClaimedMarketplace ?? null,
     ],
@@ -354,6 +365,9 @@ export default function ExportOrderExcelButton({
         ...(search ? { search } : {}),
         ...(country ? { country } : {}),
         ...(isB2B !== undefined ? { is_b2b: isB2B } : {}),
+        ...(filterByShipment !== undefined
+          ? { filter_by_shipment: filterByShipment }
+          : {}),
       });
     },
     enabled: false,

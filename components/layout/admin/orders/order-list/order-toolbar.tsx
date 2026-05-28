@@ -62,6 +62,7 @@ interface OrderToolbarProps {
   showB2BRevenue?: boolean;
   showClaimedFilters?: boolean;
   showCountryFilter?: boolean;
+  showShipmentFilter?: boolean;
   exportPresetStatuses?: string[];
   lockExportStatuses?: boolean;
   expandExportByRefundItems?: boolean;
@@ -78,6 +79,7 @@ const FILTER_KEYS = [
   "is_b2b",
   "is_claimed_factory",
   "is_claimed_marketplace",
+  "filter_by_shipment",
 ];
 
 export default function OrderToolbar({
@@ -93,6 +95,7 @@ export default function OrderToolbar({
   showB2BRevenue = true,
   showClaimedFilters = false,
   showCountryFilter = false,
+  showShipmentFilter = false,
   exportPresetStatuses,
   lockExportStatuses = false,
   expandExportByRefundItems = false,
@@ -318,6 +321,15 @@ export default function OrderToolbar({
       });
     }
 
+    const filterByShipment = searchParams.get("filter_by_shipment");
+    if (filterByShipment === "true") {
+      chips.push({
+        id: "filter-by-shipment",
+        label: "Shipment: Only with shipment",
+        onRemove: () => removeFilterParam("filter_by_shipment"),
+      });
+    }
+
     return chips;
   }, [
     searchParams,
@@ -402,6 +414,7 @@ export default function OrderToolbar({
                   <OrderFilterForm
                     showClaimedFilters={showClaimedFilters}
                     showCountryFilter={showCountryFilter}
+                    showShipmentFilter={showShipmentFilter}
                     showExportButton
                     exportPresetStatuses={exportPresetStatuses}
                     lockExportStatuses={lockExportStatuses}

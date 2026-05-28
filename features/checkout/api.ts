@@ -25,6 +25,7 @@ export interface GetAllCheckoutParams {
   search?: string;
   country?: string;
   is_b2b?: boolean;
+  filter_by_shipment?: boolean;
 }
 
 export interface OrderStatisticsParams {
@@ -175,6 +176,9 @@ export async function getCheckOutMain(params?: GetAllCheckoutParams) {
       ...(params?.search !== undefined && { search: params.search }),
       ...(params?.country !== undefined && { country: params.country }),
       ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
+      ...(params?.filter_by_shipment !== undefined && {
+        filter_by_shipment: params.filter_by_shipment,
+      }),
     },
 
     paramsSerializer: (params) =>
@@ -217,6 +221,9 @@ export async function getAllCheckOutMain(params?: GetAllCheckoutParams) {
       ...(params?.search !== undefined && { search: params.search }),
       ...(params?.country !== undefined && { country: params.country }),
       ...(params?.is_b2b !== undefined && { is_b2b: params.is_b2b }),
+      ...(params?.filter_by_shipment !== undefined && {
+        filter_by_shipment: params.filter_by_shipment,
+      }),
     },
     paramsSerializer: (params) =>
       qs.stringify(params, { arrayFormat: "repeat" }),
