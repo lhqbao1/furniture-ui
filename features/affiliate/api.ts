@@ -10,6 +10,17 @@ export interface GenerateAffiliateLinkInput {
   expire_in?: number;
 }
 
+export interface TrackAffiliateClickInput {
+  aff?: string | null;
+  utm_source?: string | null;
+  landing_page?: string | null;
+}
+
+export interface TrackAffiliateClickResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
 export async function getAffiliates() {
   const { data } = await apiPublic.get("/affiliate/all", {
     headers: {
@@ -85,4 +96,15 @@ export async function generateAffiliateLink(input: GenerateAffiliateLinkInput) {
   );
 
   return data as string;
+}
+
+export async function trackAffiliateClick(input: TrackAffiliateClickInput) {
+  const { data } = await apiPublic.post("/affiliate/track-click", input, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+
+  return data as TrackAffiliateClickResponse;
 }
