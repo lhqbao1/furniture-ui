@@ -29,6 +29,7 @@ import { ProductItem } from "@/types/products";
 import OrderFilterForm from "../../orders/order-list/filter/filter-form";
 import { useSearchParams } from "next/navigation";
 import OrderImport from "./order-import";
+import ConfirmInvoicedImport from "./confirm-invoiced-import";
 import { CheckOutMain } from "@/types/checkout";
 import { toast } from "sonner";
 import MultiSearch from "../../products/products-list/toolbar/multi-search";
@@ -593,6 +594,7 @@ export default function OrderToolbar({
 
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium">
             <OrderImport />
+            <ConfirmInvoicedImport />
           </div>
         </div>
       </div>
