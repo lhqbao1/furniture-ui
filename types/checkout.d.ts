@@ -126,6 +126,7 @@ export interface CheckOutMain {
   refund_amount: number;
   product_refund?: CheckoutMainProductRefundItem[];
   is_b2b: boolean;
+  ext_invoice_id?: string | null;
   created_at: Date;
   updated_at: Date;
 }

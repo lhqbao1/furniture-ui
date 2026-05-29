@@ -87,15 +87,19 @@ export interface CheckoutPdfFileResponse {
 
 export interface UpdateBulkExtInvoiceIdPayloadItem {
   ext_invoice_id: string;
-  main_checkout_id: string;
+  ext_id: string;
 }
 
 export type UpdateBulkExtInvoiceIdPayload = UpdateBulkExtInvoiceIdPayloadItem[];
 
-export interface UpdateBulkExtInvoiceIdResponse {
-  message?: string;
+export interface UpdateBulkExtInvoiceIdErrorItem {
+  ext_id?: string;
   [key: string]: unknown;
 }
+
+export type UpdateBulkExtInvoiceIdResponse =
+  | null
+  | UpdateBulkExtInvoiceIdErrorItem[];
 
 export interface ProductRefundFile {
   url: string;

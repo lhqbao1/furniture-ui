@@ -515,23 +515,9 @@ export function useUpdateBulkExtInvoiceId() {
   return useMutation({
     mutationFn: (payload: UpdateBulkExtInvoiceIdPayload) =>
       updateBulkExtInvoiceId(payload),
-    onSuccess: (_data, payload) => {
+    onSuccess: () => {
       qc.refetchQueries({ queryKey: ["checkout-main"] });
       qc.refetchQueries({ queryKey: ["checkout"] });
-
-      const mainCheckoutIds = Array.from(
-        new Set(
-          payload
-            .map((item) => item.main_checkout_id?.trim())
-            .filter((id): id is string => Boolean(id)),
-        ),
-      );
-
-      mainCheckoutIds.forEach((mainCheckoutId) => {
-        qc.refetchQueries({
-          queryKey: ["checkout-main-id", mainCheckoutId],
-        });
-      });
     },
   });
 }

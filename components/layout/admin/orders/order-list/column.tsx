@@ -744,6 +744,14 @@ export const orderColumns: ColumnDef<CheckOutMain>[] = [
     },
   },
   {
+    accessorKey: "ext_invoice_id",
+    header: () => <div className="text-center w-full">INVOICE NUMBER</div>,
+    cell: ({ row }) => {
+      const extInvoiceId = String(row.original.ext_invoice_id ?? "").trim();
+      return <div className="text-center">{extInvoiceId || "-"}</div>;
+    },
+  },
+  {
     id: "actions",
     header: () => <div className="text-center w-full">ACTIONS</div>,
     cell: ({ row, table }) => (
@@ -901,6 +909,14 @@ export const customerOrderColumns: ColumnDef<CheckOutMain>[] = [
           )} */}
         </div>
       );
+    },
+  },
+  {
+    accessorKey: "ext_invoice_id",
+    header: () => <div className="text-center w-full">INVOICE NUMBER</div>,
+    cell: ({ row }) => {
+      const extInvoiceId = String(row.original.ext_invoice_id ?? "").trim();
+      return <div className="text-center">{extInvoiceId || "-"}</div>;
     },
   },
   {
