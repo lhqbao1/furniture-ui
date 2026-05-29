@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  checkoutCompleted,
   createAffiliate,
   deleteAffiliate,
   generateAffiliateLink,
@@ -93,5 +94,11 @@ export function useTrackAffiliatePageView() {
 export function useTrackAffiliateOrder() {
   return useMutation({
     mutationFn: (input: TrackAffiliateOrderInput) => trackAffiliateOrder(input),
+  });
+}
+
+export function useCheckoutCompleted() {
+  return useMutation({
+    mutationFn: (main_checkout_id: string) => checkoutCompleted(main_checkout_id),
   });
 }

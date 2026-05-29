@@ -44,6 +44,11 @@ export interface TrackAffiliateOrderResponse {
   [key: string]: unknown;
 }
 
+export interface CheckoutCompletedResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
 export async function getAffiliates() {
   const { data } = await apiPublic.get("/affiliate/all", {
     headers: {
@@ -154,4 +159,19 @@ export async function trackAffiliateOrder(input: TrackAffiliateOrderInput) {
   });
 
   return data as TrackAffiliateOrderResponse;
+}
+
+export async function checkoutCompleted(main_checkout_id: string) {
+  const { data } = await apiPublic.post(
+    `/affiliate/checkout-completed/${main_checkout_id}`,
+    null,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    },
+  );
+
+  return data as CheckoutCompletedResponse;
 }

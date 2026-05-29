@@ -17,7 +17,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { userIdAtom } from "@/store/auth";
-import { Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2, RefreshCcw } from "lucide-react";
 import {
   TrustedShopsCheckout,
   TrustedShopsCheckoutProps,
@@ -37,6 +37,7 @@ import {
   toTrackingCsv,
   toTrackingString,
 } from "@/components/shared/tracking/tracking-utils";
+import { useCheckoutCompleted } from "@/features/affiliate/hook";
 
 function waitForAwinReady(timeout = 3000): Promise<boolean> {
   return new Promise((resolve) => {
@@ -81,6 +82,7 @@ const OrderPlaced = () => {
   const params = useSearchParams();
   const paymentIntentId = params?.get("payment_intent"); // Lấy param paymentIntent.id nếu có
   const paypalToken = params?.get("token");
+  const hasPaymentContext = Boolean(paymentIntentId || paypalToken);
 
   const hasFetchedRef = React.useRef(false);
   const hasProcessedRef = React.useRef(false);
@@ -93,11 +95,13 @@ const OrderPlaced = () => {
   const [paymentId, setPaymentId] = useAtom(paymentIdAtom);
   const [paramsChecked, setParamsChecked] = useState(false);
   const [captureFailed, setCaptureFailed] = useState(false);
+  const [homeRedirectCounter, setHomeRedirectCounter] = useState(4);
 
   const [trustedShopData, setTrustedShopData] =
     useState<TrustedShopsCheckoutProps | null>(null);
 
   const capturePaymentMutation = useCapturePayment();
+  const checkoutCompletedMutation = useCheckoutCompleted();
   const uploadStaticFileMutation = useUploadStaticFile();
   const sendMailMutation = useSendMail();
 
@@ -114,11 +118,20 @@ const OrderPlaced = () => {
   useEffect(() => {
     if (!paramsChecked) return;
 
-    // ❌ Không có Stripe & không có PayPal
-    if (!paymentIntentId && !paypalToken) {
+    // ❌ Không có context thanh toán: hiển thị trạng thái + redirect tự động
+    if (hasPaymentContext) return;
+
+    if (homeRedirectCounter <= 0) {
       router.replace("/", { locale });
+      return;
     }
-  }, [paramsChecked, paymentIntentId, paypalToken, router, locale]);
+
+    const timer = setTimeout(() => {
+      setHomeRedirectCounter((prev) => Math.max(0, prev - 1));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [paramsChecked, hasPaymentContext, homeRedirectCounter, router, locale]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -127,6 +140,12 @@ const OrderPlaced = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (paramsChecked && !hasPaymentContext) {
+      setIsProcessingPayment(false);
+    }
+  }, [paramsChecked, hasPaymentContext]);
 
   useEffect(() => {
     if (!isProcessingPayment) return;
@@ -169,7 +188,11 @@ const OrderPlaced = () => {
 
   const { data: checkout, error } = useQuery({
     queryKey: ["checkout-id", checkoutId],
-    enabled: delayed && Boolean(checkoutId) && !hasFetchedRef.current,
+    enabled:
+      hasPaymentContext &&
+      delayed &&
+      Boolean(checkoutId) &&
+      !hasFetchedRef.current,
     retry: false, // Ta tự retry rồi nên không cần retry của React Query
     queryFn: async () => {
       hasFetchedRef.current = true;
@@ -179,7 +202,17 @@ const OrderPlaced = () => {
           await retryCaptureUntilSuccess(paymentId);
         }
 
-        return await getMainCheckOutByMainCheckOutId(checkoutId!);
+        const checkoutData = await getMainCheckOutByMainCheckOutId(checkoutId!);
+
+        if (checkoutData?.id) {
+          try {
+            await checkoutCompletedMutation.mutateAsync(checkoutData.id);
+          } catch (checkoutCompletedError) {
+            console.error("checkoutCompleted failed:", checkoutCompletedError);
+          }
+        }
+
+        return checkoutData;
       } catch (err) {
         console.error(err);
         // 🔥 PAYPAL CAPTURE FAIL
@@ -680,69 +713,148 @@ const OrderPlaced = () => {
     return () => clearTimeout(timer);
   }, [trustedShopData]);
 
+  const showMissingContextState = paramsChecked && !hasPaymentContext;
+  const showMissingCheckoutState =
+    hasPaymentContext &&
+    !isProcessingPayment &&
+    !captureFailed &&
+    (!checkout || Boolean(error));
+  const showSuccessState =
+    hasPaymentContext && !isProcessingPayment && !captureFailed && Boolean(checkout);
+
   return (
-    <div className="w-full min-h-screen flex flex-col justify-center items-center gap-12 -translate-y-10">
-      <div className="px-5 py-6 flex flex-col items-center gap-3">
-        <Image
-          src="/new-logo.svg"
-          alt="Prestige Home logo"
-          width={100}
-          height={100}
-          priority
-          className="w-auto h-[80px]"
-        />
-        <div className="text-2xl flex gap-1">
-          <span className="text-secondary text-[40px] font-semibold">
-            Prestige
-          </span>
-          <span className="text-primary text-[40px] font-semibold">Home</span>
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,#f8faf7_0%,#f2f5ef_42%,#edf2ea_100%)]">
+      <div className="pointer-events-none absolute -left-20 top-12 h-56 w-56 rounded-full bg-secondary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+
+      <div className="mx-auto flex min-h-screen w-full items-center justify-center px-4 py-6 md:px-8">
+        <div className="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-[#DCE7D5] bg-white/90 shadow-[0_24px_60px_-20px_rgba(46,92,57,0.25)] backdrop-blur">
+          <div className="absolute -left-16 -top-16 h-44 w-44 rounded-full border-8 border-secondary/10" />
+          <div className="absolute -bottom-24 -right-10 h-56 w-56 rounded-full border-8 border-primary/10" />
+
+          <div className="relative z-10 flex min-h-[70vh] flex-col items-center justify-center gap-5 px-6 py-10 md:px-10">
+            <Image
+              src="/new-logo.svg"
+              alt="Prestige Home logo"
+              width={88}
+              height={88}
+              priority
+              className="h-[72px] w-auto"
+            />
+
+            <div className="text-xl font-semibold md:text-2xl">
+              <span className="text-secondary">Prestige</span>
+              <span className="text-primary">Home</span>
+            </div>
+
+            {showMissingContextState && (
+              <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-amber-50/90 px-6 py-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                  <AlertTriangle className="h-6 w-6" />
+                </div>
+                <h2 className="text-2xl font-semibold text-[#2B2B2B]">
+                  {t("thankYouNoDataTitle")}
+                </h2>
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#555] md:text-base">
+                  {t("thankYouNoDataDescription")}
+                </p>
+                <p className="mt-3 text-sm font-medium text-[#6E7F63]">
+                  {t("thankYouNoDataRedirectCountdown", {
+                    seconds: homeRedirectCounter,
+                  })}
+                </p>
+                <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  <Button
+                    variant="secondary"
+                    onClick={() => router.push("/", { locale })}
+                    className="min-w-[180px]"
+                  >
+                    {t("continueShopping")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push("/check-out", { locale })}
+                    className="min-w-[180px]"
+                  >
+                    {t("checkout")}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {showMissingCheckoutState && (
+              <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-slate-50/90 px-6 py-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-700">
+                  <RefreshCcw className="h-5 w-5" />
+                </div>
+                <h2 className="text-2xl font-semibold text-[#2B2B2B]">
+                  {t("thankYouNoOrderTitle")}
+                </h2>
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#555] md:text-base">
+                  {t("thankYouNoOrderDescription")}
+                </p>
+                <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.reload()}
+                    className="min-w-[180px]"
+                  >
+                    {t("retryNow")}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => router.push("/", { locale })}
+                    className="min-w-[180px]"
+                  >
+                    {t("continueShopping")}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {captureFailed && (
+              <div className="w-full max-w-2xl rounded-2xl border border-red-200 bg-red-50/90 px-6 py-6 text-center">
+                <h2 className="mb-2 text-2xl font-semibold text-red-700">
+                  {t("paymentFailedTitle")}
+                </h2>
+                <p className="text-sm text-red-700/90 md:text-base">
+                  {t("paymentFailedMessage")}
+                </p>
+              </div>
+            )}
+
+            {isProcessingPayment && hasPaymentContext && (
+              <div className="mt-2 flex flex-col items-center gap-3 text-gray-600">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm italic">{t("orderProcessingMessage")}</p>
+              </div>
+            )}
+
+            {showSuccessState && (
+              <>
+                <h1 className="text-center text-4xl font-semibold italic text-gray-700 md:text-6xl">
+                  {t("thankYou")}
+                </h1>
+                <div className="space-y-2 text-center text-base text-gray-600 md:text-lg">
+                  <p>{t("orderPlacedMessage")}</p>
+                  <p>{t("trackingInfoMessage")}</p>
+                  <p>{t("thankYouShopping")}</p>
+                </div>
+              </>
+            )}
+
+            {!showMissingContextState && !showMissingCheckoutState && (
+              <Button
+                variant="secondary"
+                disabled={isProcessingPayment}
+                onClick={() => router.push("/", { locale })}
+                className="mt-2 min-w-[200px]"
+              >
+                {t("continueShopping")}
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="relative flex flex-col items-center justify-center bg-white text-center w-fit h-fit md:px-40 px-20 py-8">
-        <div className="absolute top-0 left-0 w-40 h-32 bg-secondary clip-triangle-top-left" />
-        <div className="absolute bottom-0 right-0 w-40 h-32 bg-primary clip-triangle-bottom-right" />
-
-        {captureFailed && (
-          <div className="mt-6 text-center text-red-600 max-w-md">
-            <h2 className="text-2xl font-semibold mb-2">
-              {t("paymentFailedTitle")}
-            </h2>
-            <p className="text-sm">{t("paymentFailedMessage")}</p>
-          </div>
-        )}
-
-        {!isProcessingPayment &&
-          !captureFailed &&
-          (paymentIntentId || paypalToken) && (
-            <>
-              <h1 className="text-6xl text-gray-700 mb-6 italic">
-                {t("thankYou")}
-              </h1>
-
-              <p className="text-gray-600 text-lg">{t("orderPlacedMessage")}</p>
-              <p className="text-gray-600 text-lg mt-2">
-                {t("trackingInfoMessage")}
-              </p>
-              <p className="text-gray-600 text-lg mt-2">
-                {t("thankYouShopping")}
-              </p>
-            </>
-          )}
-        {isProcessingPayment && (paypalToken || paymentIntentId) && (
-          <div className="mt-6 flex flex-col items-center gap-3 text-gray-600">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm italic">{t("orderProcessingMessage")}</p>
-          </div>
-        )}
-
-        <Button
-          variant="secondary"
-          disabled={isProcessingPayment}
-          onClick={() => router.push("/", { locale })}
-          className="mt-6"
-        >
-          {t("continueShopping")}
-        </Button>
       </div>
 
       {trustedShopData && <TrustedShopsCheckout {...trustedShopData} />}
