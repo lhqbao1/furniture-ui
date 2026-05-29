@@ -21,6 +21,29 @@ export interface TrackAffiliateClickResponse {
   [key: string]: unknown;
 }
 
+export interface TrackAffiliatePageViewInput {
+  url: string;
+  time_spent: number;
+}
+
+export interface TrackAffiliatePageViewResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
+export interface TrackAffiliateOrderInput {
+  checkout_id: string;
+  status: string;
+  user_id: string;
+  total_discount: number;
+  total_amount: number;
+}
+
+export interface TrackAffiliateOrderResponse {
+  message?: string;
+  [key: string]: unknown;
+}
+
 export async function getAffiliates() {
   const { data } = await apiPublic.get("/affiliate/all", {
     headers: {
@@ -107,4 +130,28 @@ export async function trackAffiliateClick(input: TrackAffiliateClickInput) {
   });
 
   return data as TrackAffiliateClickResponse;
+}
+
+export async function trackAffiliatePageView(
+  input: TrackAffiliatePageViewInput,
+) {
+  const { data } = await apiPublic.post("/affiliate/track-page-view", input, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+
+  return data as TrackAffiliatePageViewResponse;
+}
+
+export async function trackAffiliateOrder(input: TrackAffiliateOrderInput) {
+  const { data } = await apiPublic.post("/affiliate/track-order", input, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+
+  return data as TrackAffiliateOrderResponse;
 }

@@ -20,6 +20,13 @@ const AffiliateClickTracker = dynamic(
     ),
   { ssr: false },
 );
+const AffiliatePageViewTracker = dynamic(
+  () =>
+    import("@/components/shared/affiliate-page-view-tracker").then(
+      (mod) => mod.AffiliatePageViewTracker,
+    ),
+  { ssr: false },
+);
 const AuthSanity = dynamic(
   () => import("@/hooks/auth/auth-sanity").then((mod) => mod.AuthSanity),
   { ssr: false },
@@ -35,6 +42,7 @@ export default function LocaleClientBoot() {
       <AwinTracker />
       <AwinAttribution />
       <AffiliateClickTracker />
+      <AffiliatePageViewTracker />
       <AuthSanity />
       <WhatsAppChatBox />
     </>

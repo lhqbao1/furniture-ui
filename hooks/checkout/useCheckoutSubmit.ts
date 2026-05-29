@@ -27,9 +27,8 @@ import { CartItemLocal } from "@/lib/utils/cart";
 import { sendOtp } from "@/features/auth/api";
 import { userIdAtom, userIdGuestAtom } from "@/store/auth";
 import { currentVoucherAtom } from "@/store/voucher";
-import {
-  calculateProductDeliveryRange,
-} from "@/hooks/get-estimated-shipping";
+import { calculateProductDeliveryRange } from "@/hooks/get-estimated-shipping";
+import { useTrackAffiliateOrder } from "@/features/affiliate/hook";
 
 const formatCheckoutDateTime = (date: Date): string =>
   date.toISOString().replace(/Z$/, "");
@@ -50,7 +49,9 @@ const calculateCheckoutDeliveryRange = (cartData: CartResponse) => {
   const from = new Date(
     Math.min(...itemRanges.map((range) => range.from.getTime())),
   );
-  const to = new Date(Math.max(...itemRanges.map((range) => range.to.getTime())));
+  const to = new Date(
+    Math.max(...itemRanges.map((range) => range.to.getTime())),
+  );
 
   if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return null;
   return { from, to };
@@ -102,13 +103,15 @@ export function useCheckoutSubmit({
   const updateInvoice = useUpdateInvoiceAddress();
   const createShipping = useCreateAddress();
   const syncLocalCart = useSyncLocalCartCheckOut();
+  const trackAffiliateOrder = useTrackAffiliateOrder();
 
   const submitting =
     createCheckOut.isPending ||
     createInvoice.isPending ||
     createPayment.isPending ||
     createShipping.isPending ||
-    createUser.isPending;
+    createUser.isPending ||
+    trackAffiliateOrder.isPending;
 
   const handleSubmit = useCallback(
     async (data: CreateOrderFormValues) => {
@@ -247,6 +250,18 @@ export function useCheckoutSubmit({
         // toast.success(t("orderSuccess"));
         setCheckoutId(checkout.id);
         setVoucherId(null);
+
+        try {
+          await trackAffiliateOrder.mutateAsync({
+            checkout_id: checkout.id,
+            status: "PENDING",
+            user_id: userLoginId ?? currentGuestId ?? finalUserId ?? "",
+            total_discount: Number(checkout.voucher_amount ?? 0),
+            total_amount: Number(checkout.total_amount ?? 0),
+          });
+        } catch (trackOrderError) {
+          console.error("trackAffiliateOrder failed:", trackOrderError);
+        }
         // Payment flow
 
         // ===========================
@@ -316,6 +331,7 @@ export function useCheckoutSubmit({
       shippingCost,
       locale,
       userLoginId,
+      trackAffiliateOrder,
     ],
   );
 

@@ -2,10 +2,10 @@
 
 import { useTrackAffiliateClick } from "@/features/affiliate/hook";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
-const TRACKED_AFFILIATE_CLICK_KEY = "tracked_affiliate_click_keys";
 const PRODUCT_DETAIL_PATH_REGEX = /^\/(?:[a-z]{2}\/)?product\/.+/i;
+const WINDOW_TRACKED_KEYS = "__ph_affiliate_click_tracked_keys__";
 
 function resolveLandingPage(pathname: string | null): string | null {
   if (!pathname) return null;
@@ -21,55 +21,24 @@ function resolveLandingPage(pathname: string | null): string | null {
   return withoutLocale.startsWith("/product/") ? withoutLocale : null;
 }
 
-function readTrackedKeys() {
-  if (typeof window === "undefined") return new Set<string>();
-
-  const raw = window.sessionStorage.getItem(TRACKED_AFFILIATE_CLICK_KEY);
-  if (!raw) return new Set<string>();
-
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return new Set<string>();
-
-    return new Set(
-      parsed.filter((value): value is string => typeof value === "string"),
-    );
-  } catch {
-    return new Set<string>();
+declare global {
+  interface Window {
+    [WINDOW_TRACKED_KEYS]?: Set<string>;
   }
 }
 
-function hasTrackedKey(key: string) {
-  return readTrackedKeys().has(key);
-}
-
-function addTrackedKey(key: string) {
-  if (typeof window === "undefined") return;
-
-  const keys = readTrackedKeys();
-  keys.add(key);
-  window.sessionStorage.setItem(
-    TRACKED_AFFILIATE_CLICK_KEY,
-    JSON.stringify(Array.from(keys)),
-  );
-}
-
-function removeTrackedKey(key: string) {
-  if (typeof window === "undefined") return;
-
-  const keys = readTrackedKeys();
-  keys.delete(key);
-  window.sessionStorage.setItem(
-    TRACKED_AFFILIATE_CLICK_KEY,
-    JSON.stringify(Array.from(keys)),
-  );
+function getRuntimeTrackedKeys() {
+  if (typeof window === "undefined") return new Set<string>();
+  if (!window[WINDOW_TRACKED_KEYS]) {
+    window[WINDOW_TRACKED_KEYS] = new Set<string>();
+  }
+  return window[WINDOW_TRACKED_KEYS]!;
 }
 
 export function AffiliateClickTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { mutate } = useTrackAffiliateClick();
-  const trackedInMemoryRef = useRef<Set<string>>(new Set());
   const landingPage = useMemo(() => resolveLandingPage(pathname), [pathname]);
   const search = searchParams.toString();
 
@@ -83,11 +52,10 @@ export function AffiliateClickTracker() {
     if (!utmSource || !aff) return;
 
     const trackedKey = `${landingPage}|${utmSource}|${aff}`;
-    if (trackedInMemoryRef.current.has(trackedKey) || hasTrackedKey(trackedKey))
-      return;
+    const trackedKeys = getRuntimeTrackedKeys();
+    if (trackedKeys.has(trackedKey)) return;
 
-    trackedInMemoryRef.current.add(trackedKey);
-    addTrackedKey(trackedKey);
+    trackedKeys.add(trackedKey);
 
     mutate(
       {
@@ -97,8 +65,7 @@ export function AffiliateClickTracker() {
       },
       {
         onError: () => {
-          trackedInMemoryRef.current.delete(trackedKey);
-          removeTrackedKey(trackedKey);
+          trackedKeys.delete(trackedKey);
         },
       },
     );

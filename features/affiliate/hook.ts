@@ -7,7 +7,11 @@ import {
   getAffiliateById,
   getAffiliates,
   trackAffiliateClick,
+  trackAffiliateOrder,
+  trackAffiliatePageView,
   TrackAffiliateClickInput,
+  TrackAffiliateOrderInput,
+  TrackAffiliatePageViewInput,
   updateAffiliate,
 } from "./api";
 import { AffiliateCreateInput, AffiliateUpdateInput } from "@/types/affiliate";
@@ -76,5 +80,18 @@ export function useGenerateAffiliateLink() {
 export function useTrackAffiliateClick() {
   return useMutation({
     mutationFn: (input: TrackAffiliateClickInput) => trackAffiliateClick(input),
+  });
+}
+
+export function useTrackAffiliatePageView() {
+  return useMutation({
+    mutationFn: (input: TrackAffiliatePageViewInput) =>
+      trackAffiliatePageView(input),
+  });
+}
+
+export function useTrackAffiliateOrder() {
+  return useMutation({
+    mutationFn: (input: TrackAffiliateOrderInput) => trackAffiliateOrder(input),
   });
 }
