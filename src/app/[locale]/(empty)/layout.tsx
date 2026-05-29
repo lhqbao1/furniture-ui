@@ -4,8 +4,8 @@ export default function EmptyLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="relative flex flex-col items-center justify-center">
-      <section className="lg:max-w-7/12 max-w-12/12">{children}</section>
+    <main className="relative min-h-screen w-full">
+      <section className="w-full">{children}</section>
     </main>
   );
 }
