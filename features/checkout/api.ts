@@ -127,7 +127,7 @@ export async function createCheckOut(item: CreateOrderFormValues) {
     },
     withCredentials: true,
   });
-  return data as CheckOut;
+  return data as CheckOutMain;
 }
 
 export async function trackAwin(awc: string) {
@@ -226,7 +226,9 @@ export async function getCheckOutRefundOrders(params?: GetRefundOrdersParams) {
   return data as RefundOrdersResponse;
 }
 
-export async function getAllCheckOutMain(params?: GetAllMainCheckOutsAllParams) {
+export async function getAllCheckOutMain(
+  params?: GetAllMainCheckOutsAllParams,
+) {
   const { data } = await apiAdmin.get("/checkout/checkout/main-checkouts/all", {
     params: {
       ...(params?.channel !== undefined && { channel: params.channel }),

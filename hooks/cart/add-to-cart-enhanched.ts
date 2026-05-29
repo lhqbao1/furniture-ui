@@ -16,7 +16,11 @@ export function useAddToCartLocalEnhanced() {
   const addToCartLocalOnly = (
     product: ProductItem,
     quantity: number = 1,
-    options?: { onSuccess?: () => void; onError?: () => void },
+    options?: {
+      onSuccess?: () => void;
+      onError?: () => void;
+      disableToast?: boolean;
+    },
   ) => {
     if (!product) return;
 
@@ -61,7 +65,9 @@ export function useAddToCartLocalEnhanced() {
       },
       {
         onSuccess: () => {
-          toast.success(t("addToCartSuccess"), { duration: TOAST_DURATION });
+          if (!options?.disableToast) {
+            toast.success(t("addToCartSuccess"), { duration: TOAST_DURATION });
+          }
           options?.onSuccess?.();
         },
         onError: () => {

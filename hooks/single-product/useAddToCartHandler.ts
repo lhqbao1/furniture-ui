@@ -47,6 +47,7 @@ export function useAddToCartHandler(productDetails: ProductItem) {
     if (!userId) {
       addToCartLocalOnly(productDetails, values.quantity, {
         onSuccess: options?.onSuccess,
+        disableToast: true,
       });
       return;
     }
@@ -56,7 +57,7 @@ export function useAddToCartHandler(productDetails: ProductItem) {
       { productId: productDetails.id, quantity: values.quantity },
       {
         onSuccess: () => {
-          toast.success(t("addToCartSuccess"));
+          // toast.success(t("addToCartSuccess"));
           options?.onSuccess?.();
         },
         onError: (error) => {
