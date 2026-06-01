@@ -143,6 +143,7 @@ export function mapOrderListTemplateRows(data: CheckOutMain[]) {
         code: clean(order.checkout_code),
         marketplace: clean(order.from_marketplace ?? "Prestige Home"),
         marketplace_order_id: clean(order.marketplace_order_id),
+        ext_invoice_id: clean(order.ext_invoice_id ?? ""),
         date: clean(formatDateDDMMYYYY(order.created_at)),
         status: clean(getStatusStyle(order.status).text),
         payment_method: clean(order.payment_method),
