@@ -30,6 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CHANEL_OPTIONS } from "./filter/filter-order-chanel";
 import {
+  getAllCheckOutMain,
   UpdateBulkExtInvoiceIdPayload,
   UpdateBulkExtInvoiceIdResponse,
   UpdateBulkExtInvoiceIdPayloadItem,
@@ -48,6 +49,17 @@ const normalizeHeader = (value: string): string =>
     .trim()
     .toLowerCase()
     .replace(/[\s.-]+/g, "_");
+
+const normalizeOrderId = (value: unknown): string =>
+  String(value ?? "").trim();
+
+const toCanonicalOrderId = (value: unknown): string => {
+  const normalized = normalizeOrderId(value);
+  if (!normalized) return "";
+
+  const withoutLeadingZeros = normalized.replace(/^0+/, "");
+  return withoutLeadingZeros || "0";
+};
 
 const hasExpectedHeaders = (firstCell: string, secondCell: string): boolean => {
   const first = normalizeHeader(firstCell);
@@ -171,6 +183,7 @@ const ConfirmInvoicedImport = () => {
   const [channel, setChannel] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [payload, setPayload] = useState<UpdateBulkExtInvoiceIdPayload>([]);
+  const [isPreparingSubmit, setIsPreparingSubmit] = useState(false);
 
   const extractInvalidExtIds = (
     response: UpdateBulkExtInvoiceIdResponse,
@@ -265,7 +278,8 @@ const ConfirmInvoicedImport = () => {
     onDrop,
     accept: EXCEL_ACCEPT,
     multiple: false,
-    disabled: !channel || updateBulkExtInvoiceIdMutation.isPending,
+    disabled:
+      !channel || updateBulkExtInvoiceIdMutation.isPending || isPreparingSubmit,
     onDropRejected: () => {
       toast.error("Only .xls or .xlsx files are allowed");
     },
@@ -285,7 +299,68 @@ const ConfirmInvoicedImport = () => {
     const toastId = toast.loading(`Confirming ${payload.length} invoices...`);
 
     try {
-      const response = await updateBulkExtInvoiceIdMutation.mutateAsync(payload);
+      setIsPreparingSubmit(true);
+
+      const checkouts = await getAllCheckOutMain({
+        channel: [channel],
+      });
+
+      const checkoutByOrderId = new Map<string, string>();
+      const checkoutByCanonicalOrderId = new Map<string, string>();
+
+      checkouts.forEach((checkout) => {
+        const rawOrderId = normalizeOrderId(checkout.marketplace_order_id);
+        const canonicalOrderId = toCanonicalOrderId(rawOrderId);
+        const existingExtInvoiceId = normalizeOrderId(checkout.ext_invoice_id);
+
+        if (rawOrderId && !checkoutByOrderId.has(rawOrderId)) {
+          checkoutByOrderId.set(rawOrderId, existingExtInvoiceId);
+        }
+
+        if (
+          canonicalOrderId &&
+          !checkoutByCanonicalOrderId.has(canonicalOrderId)
+        ) {
+          checkoutByCanonicalOrderId.set(canonicalOrderId, existingExtInvoiceId);
+        }
+      });
+
+      const alreadyInvoicedExtIdsSet = new Set<string>();
+
+      const filteredPayload = payload.filter((item) => {
+        const rawExtId = normalizeOrderId(item.ext_id);
+        const canonicalExtId = toCanonicalOrderId(rawExtId);
+
+        const existingExtInvoiceId =
+          checkoutByOrderId.get(rawExtId) ??
+          checkoutByCanonicalOrderId.get(canonicalExtId) ??
+          "";
+
+        if (existingExtInvoiceId) {
+          alreadyInvoicedExtIdsSet.add(rawExtId);
+          return false;
+        }
+
+        return true;
+      });
+
+      const alreadyInvoicedExtIds = Array.from(alreadyInvoicedExtIdsSet);
+
+      if (alreadyInvoicedExtIds.length > 0) {
+        toast.error("These marketplace order IDs are already invoiced.", {
+          description: alreadyInvoicedExtIds.join(", "),
+        });
+      }
+
+      if (filteredPayload.length === 0) {
+        toast.error("No rows to submit after filtering invoiced orders.", {
+          id: toastId,
+        });
+        return;
+      }
+
+      const response =
+        await updateBulkExtInvoiceIdMutation.mutateAsync(filteredPayload);
       const invalidExtIds = extractInvalidExtIds(response);
 
       if (invalidExtIds.length > 0) {
@@ -304,6 +379,8 @@ const ConfirmInvoicedImport = () => {
         id: toastId,
         description: getErrorMessage(error),
       });
+    } finally {
+      setIsPreparingSubmit(false);
     }
   };
 
@@ -422,17 +499,19 @@ const ConfirmInvoicedImport = () => {
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
-            disabled={updateBulkExtInvoiceIdMutation.isPending}
+            disabled={updateBulkExtInvoiceIdMutation.isPending || isPreparingSubmit}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={
-              payload.length === 0 || updateBulkExtInvoiceIdMutation.isPending
+              payload.length === 0 ||
+              updateBulkExtInvoiceIdMutation.isPending ||
+              isPreparingSubmit
             }
           >
-            {updateBulkExtInvoiceIdMutation.isPending ? (
+            {updateBulkExtInvoiceIdMutation.isPending || isPreparingSubmit ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               "Submit"
