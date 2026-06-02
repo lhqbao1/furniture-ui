@@ -1183,7 +1183,7 @@ export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   return: ["return_issue", "exchange"],
   exchange: ["return_issue", "exchange"],
   canceled: ["return_issue"],
-  canceled_no_stock: ["return_issue"],
+  canceled_no_stock: ["return_issue", "canceled"],
   canceled_wrong_price: ["return_issue"],
 
   items_are_checked: ["waiting_for_return"],
@@ -1191,6 +1191,7 @@ export const STATUS_ACTIVE_RULES: Record<string, string[]> = {
   exchange_initiated: ["credit_note_created"],
   warranty_initiated: ["credit_note_created"],
   tock_reserved: ["canceled"],
+  return_issue: ["return_issue"],
 };
 
 export const VOUCHER_TYPE = [
